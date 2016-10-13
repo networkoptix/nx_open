@@ -1297,18 +1297,24 @@ nx::db::DBResult SystemManager::inviteNewUserToSystem(
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
-    data::AccountConfirmationCode accountConfirmationCode;
-    dbResult = m_accountManager->createPasswordResetCode(
+    return scheduleInvintationNotificationDelivery(
         queryContext,
-        inviteeAccount.email,
-        &accountConfirmationCode);
-    if (dbResult != db::DBResult::ok)
-        return dbResult;
+        inviterEmail,
+        inviteeAccount,
+        systemId);
+}
 
+nx::db::DBResult SystemManager::scheduleInvintationNotificationDelivery(
+    nx::db::QueryContext* const queryContext,
+    const std::string& inviterEmail,
+    const data::AccountData& inviteeAccount,
+    const std::string& systemId)
+{
     auto notification = std::make_unique<InviteUserNotification>();
-    fillSystemSharedNotification(
-        queryContext, inviterEmail, systemId, inviteeAccount.email, notification.get());
-    notification->setActivationCode(std::move(accountConfirmationCode.code));
+    auto dbResult = prepareInviteNotification(
+        queryContext, inviterEmail, inviteeAccount, systemId, notification.get());
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, 
@@ -1319,6 +1325,28 @@ nx::db::DBResult SystemManager::inviteNewUserToSystem(
                 *notification,
                 std::function<void(bool)>());
         });
+
+    return db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::prepareInviteNotification(
+    nx::db::QueryContext* const queryContext,
+    const std::string& inviterEmail,
+    const data::AccountData& inviteeAccount,
+    const std::string& systemId,
+    InviteUserNotification* const notification)
+{
+    data::AccountConfirmationCode accountConfirmationCode;
+    db::DBResult dbResult = m_accountManager->createPasswordResetCode(
+        queryContext,
+        inviteeAccount.email,
+        &accountConfirmationCode);
+    if (dbResult != db::DBResult::ok)
+        return dbResult;
+
+    fillSystemSharedNotification(
+        queryContext, inviterEmail, systemId, inviteeAccount.email, notification);
+    notification->setActivationCode(std::move(accountConfirmationCode.code));
 
     return db::DBResult::ok;
 }

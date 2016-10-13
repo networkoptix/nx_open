@@ -38,7 +38,9 @@ namespace nx {
 namespace cdb {
 
 namespace conf {
+
 class Settings;
+
 }   // namespace conf
 
 class AbstractEmailManager;
@@ -46,9 +48,13 @@ class AccountManager;
 class SystemHealthInfoProvider;
 
 namespace ec2 {
+
 class IncomingTransactionDispatcher;
 class TransactionLog;
+
 }   // namespace ec2 
+
+class InviteUserNotification;
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -339,6 +345,17 @@ private:
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
         const std::string& systemId);
+    nx::db::DBResult scheduleInvintationNotificationDelivery(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId);
+    nx::db::DBResult prepareInviteNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId,
+        InviteUserNotification* const notification);
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */
