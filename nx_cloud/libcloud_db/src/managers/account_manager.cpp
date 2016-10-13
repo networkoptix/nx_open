@@ -391,8 +391,8 @@ db::DBResult AccountManager::insertAccount(
     QSqlQuery insertAccountQuery(*queryContext->connection());
     insertAccountQuery.prepare(
         R"sql(
-        INSERT INTO account (id, email, password_ha1, full_name, customization, status_code)
-        VALUES  (:id, :email, :passwordHa1, :fullName, :customization, :statusCode)
+        INSERT INTO account (id, email, password_ha1, password_ha1_sha256, full_name, customization, status_code)
+        VALUES  (:id, :email, :passwordHa1, :passwordHa1Sha256, :fullName, :customization, :statusCode)
         )sql");
     QnSql::bind(account, &insertAccountQuery);
     if (!insertAccountQuery.exec())
@@ -426,7 +426,8 @@ nx::db::DBResult AccountManager::updateAccount(
     updateAccountQuery.prepare(
         R"sql(
         UPDATE account 
-        SET password_ha1=:passwordHa1, full_name=:fullName, customization=:customization, status_code=:statusCode
+        SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256, 
+            full_name=:fullName, customization=:customization, status_code=:statusCode
         WHERE id=:id AND email=:email
         )sql");
     QnSql::bind(account, &updateAccountQuery);
@@ -463,8 +464,8 @@ nx::db::DBResult AccountManager::fetchAccountByEmail(
     fetchAccountQuery.setForwardOnly(true);
     fetchAccountQuery.prepare(
         R"sql(
-        SELECT id, email, password_ha1 as passwordHa1, full_name as fullName,
-               customization, status_code as statusCode
+        SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256,
+               full_name as fullName, customization, status_code as statusCode
         FROM account
         WHERE email=:email
         )sql");
@@ -545,7 +546,7 @@ db::DBResult AccountManager::fetchAccounts(
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(
-        "SELECT id, email, password_ha1 as passwordHa1, "
+        "SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256, "
                "full_name as fullName, customization, status_code as statusCode "
         "FROM account" );
     if (!readAccountsQuery.exec())
@@ -813,6 +814,8 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     QStringList accountUpdateFieldsSql;
     if (accountData.passwordHa1)
         accountUpdateFieldsSql << lit("password_ha1=:passwordHa1");
+    if (accountData.passwordHa1Sha256)
+        accountUpdateFieldsSql << lit("password_ha1_sha256=:passwordHa1Sha256");
     if (accountData.fullName)
         accountUpdateFieldsSql << lit("full_name=:fullName");
     if (accountData.customization)
@@ -827,6 +830,10 @@ nx::db::DBResult AccountManager::updateAccountInDB(
         updateAccountQuery.bindValue(
             ":passwordHa1",
             QnSql::serialized_field(accountData.passwordHa1.get()));
+    if (accountData.passwordHa1Sha256)
+        updateAccountQuery.bindValue(
+            ":passwordHa1Sha256",
+            QnSql::serialized_field(accountData.passwordHa1Sha256.get()));
     if (accountData.fullName)
         updateAccountQuery.bindValue(
             ":fullName",

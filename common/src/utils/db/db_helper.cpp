@@ -115,7 +115,8 @@ bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details)
     if (!query->exec())
     {
         auto error = query->lastError();
-        NX_ASSERT(error.type() != QSqlError::StatementError, error.text());
+        NX_ASSERT(error.type() != QSqlError::StatementError,
+            error.text() + lit(":\n") + query->lastQuery());
         qWarning() << details << error.text();
         return false;
     }

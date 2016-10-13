@@ -151,6 +151,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
 (nx::cdb::api::ResultCode::serviceUnavailable, "serviceUnavailable")
 (nx::cdb::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
 (nx::cdb::api::ResultCode::invalidFormat, "invalidFormat")
+(nx::cdb::api::ResultCode::retryLater, "retryLater")
 (nx::cdb::api::ResultCode::unknownError, "unknownError")
 )
 

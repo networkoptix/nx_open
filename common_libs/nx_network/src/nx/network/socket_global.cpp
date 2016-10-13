@@ -99,7 +99,7 @@ void SocketGlobals::setDebugConfigurationTimer()
         kReloadDebugConfigurationInterval,
         [this]()
         {
-            m_debugConfiguration.reload(utils::FlagConfig::Output::silent);
+            m_debugConfiguration.reload(utils::FlagConfig::OutputType::silent);
             setDebugConfigurationTimer();
         });
 }

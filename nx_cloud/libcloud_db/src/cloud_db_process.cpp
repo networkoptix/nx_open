@@ -141,7 +141,7 @@ int CloudDBProcess::exec()
         settings.load( m_argc, m_argv );
         if( settings.showHelp() )
         {
-            settings.printCmdLineArgsHelp();
+            settings.printCmdLineArgsHelpToCout();
             return 0;
         }
 
@@ -256,7 +256,8 @@ int CloudDBProcess::exec()
         AuthenticationProvider authProvider(
             settings,
             accountManager,
-            systemManager);
+            systemManager,
+            tempPasswordManager);
         m_authProvider = &authProvider;
 
         MaintenanceManager maintenanceManager(
@@ -617,6 +618,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
     dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
+    dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     return dbStructureUpdater.updateStructSync();
 }
 

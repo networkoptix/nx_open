@@ -22,11 +22,12 @@ public:
 
     void push(Result result);
     bool isEmpty();
+    std::size_t size() const;
 
     std::function<void(Result)> pusher();
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
     std::queue<Result> m_queue;
 };
@@ -51,6 +52,9 @@ Result SyncQueue<Result>::pop()
     return std::move(*value);
 }
 
+/**
+ * @param timeout std::chrono::milliseconds::zero() means "no timeout"
+ */
 template< typename Result>
 boost::optional<Result> SyncQueue<Result>::pop(std::chrono::milliseconds timeout)
 {
@@ -89,6 +93,13 @@ bool SyncQueue<Result>::isEmpty()
 {
     QnMutexLocker lock( &m_mutex );
     return m_queue.empty();
+}
+
+template< typename Result>
+std::size_t SyncQueue<Result>::size() const
+{
+    QnMutexLocker lock( &m_mutex );
+    return m_queue.size();
 }
 
 template<typename Result>
