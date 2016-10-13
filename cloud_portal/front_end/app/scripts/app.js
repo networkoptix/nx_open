@@ -32,6 +32,17 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
             }
         })
+        .when('/register/successActivated', {
+            title: L.pageTitles.registerSuccess,
+            templateUrl: 'static/views/register.html',
+            controller: 'RegisterCtrl',
+            resolve: {
+                test: ['$route',function ($route) {
+                    $route.current.params.registerSuccess = true;
+                    $route.current.params.activated = true;
+                }]
+            }
+        })
         .when('/register/:code', {
             title: L.pageTitles.register,
             templateUrl: 'static/views/register.html',

@@ -6,12 +6,20 @@ angular.module('cloudApp')
         $http.get('static/views/static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
-        '$scope', 'cloudApi', 'process', '$location', '$localStorage',
+        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout',
         '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64',
-        function ($scope, cloudApi, process, $location, $localStorage,
+        function ($scope, cloudApi, process, $location, $localStorage, $timeout,
                   $sessionStorage, $routeParams, account, urlProtocol, $base64) {
 
-        account.logoutAuthorised();
+        $scope.registerSuccess = $routeParams.registerSuccess;
+        $scope.activated = $routeParams.activated;
+
+        if(!$scope.registerSuccess){
+            account.logoutAuthorised();
+        }
+        if($scope.activated){
+            account.redirectAuthorised();
+        }
         $scope.Config = Config;
         $scope.session = $localStorage;
         $scope.context = $sessionStorage;
@@ -25,7 +33,7 @@ angular.module('cloudApp')
             $scope.lockEmail = true;
         }
 
-        $scope.registerSuccess = $routeParams.registerSuccess;
+
 
         if($scope.registerSuccess &&  $scope.context.process !== 'registerSuccess'){
             account.redirectToHome();
@@ -66,6 +74,12 @@ angular.module('cloudApp')
             errorPrefix:'Some error has happened:'
         }).then(function(){
             $scope.context.process = 'registerSuccess';
-            $location.path('/register/success',false);
+            if($scope.account.code){
+                $scope.activated = true;
+                $location.path('/register/successActivated',false);
+                account.login($scope.account.email, $scope.account.password);
+            }else{
+                $location.path('/register/success',false);
+            }
         });
     }]);
