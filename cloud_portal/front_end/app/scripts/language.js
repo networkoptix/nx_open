@@ -32,7 +32,7 @@ var L = {
         download: 'Download VMS_NAME',
         downloadPlatform: 'Download VMS_NAME for ',
         startPage: '',
-        pageNotFount: 'Page not found'
+        pageNotFound: 'Page not found'
     },
     systemStatuses:{
         notActivated: 'not activated',
