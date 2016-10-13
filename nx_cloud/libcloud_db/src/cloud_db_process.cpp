@@ -64,11 +64,7 @@ namespace cdb {
 
 static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
 
-CloudDBProcess::CloudDBProcess(int argc, char **argv)
-    :
-#ifdef USE_QAPPLICATION
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
-#endif
+CloudDBProcess::CloudDBProcess(int argc, char **argv):
     m_argc(argc),
     m_argv(argv),
     m_terminated(false),
@@ -87,23 +83,13 @@ CloudDBProcess::CloudDBProcess(int argc, char **argv)
     m_authorizationManager(nullptr),
     m_authProvider(nullptr)
 {
-#ifdef USE_QAPPLICATION
-    setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
-#endif
-
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
 }
 
 void CloudDBProcess::pleaseStop()
 {
-#ifdef USE_QAPPLICATION
-    m_terminated = true;
-    if (application())
-        application()->quit();
-#else
     m_processTerminationEvent.set_value();
-#endif
 }
 
 void CloudDBProcess::setOnStartedEventHandler(
@@ -119,11 +105,7 @@ const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-#ifdef USE_QAPPLICATION
-int CloudDBProcess::executeApplication()
-#else
 int CloudDBProcess::exec()
-#endif
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -306,9 +288,6 @@ int CloudDBProcess::exec()
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-#ifdef USE_QAPPLICATION
-        application()->installEventFilter(this);
-#endif
         if (m_terminated)
             return 0;
 
@@ -319,18 +298,8 @@ int CloudDBProcess::exec()
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
-#ifdef USE_QAPPLICATION
-        //starting timer to check for m_terminated again after event loop start
-        m_timerID = application()->startTimer(0);
-
-        //TODO #ak remove qt event loop
-        //application's main loop
-        const int result = application()->exec();
-        return result;
-#else
         m_processTerminationEvent.get_future().wait();
         return 0;
-#endif
     }
     catch (const std::exception& e)
     {
@@ -338,39 +307,6 @@ int CloudDBProcess::exec()
         return 3;
     }
 }
-
-#ifdef USE_QAPPLICATION
-void CloudDBProcess::start()
-{
-    QtSingleCoreApplication* application = this->application();
-
-    if (application->isRunning())
-    {
-        NX_LOG("Server already started", cl_logERROR);
-        application->quit();
-        return;
-    }
-}
-
-void CloudDBProcess::stop()
-{
-    pleaseStop();
-    //TODO #ak wait for executeApplication to return?
-}
-
-bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
-{
-    if (m_timerID != -1)
-    {
-        application()->killTimer(m_timerID);
-        m_timerID = -1;
-    }
-
-    if (m_terminated)
-        application()->quit();
-    return false;
-}
-#endif
 
 void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
@@ -460,7 +396,12 @@ void CloudDBProcess::registerApiHandlers(
 
     registerHttpHandler(
         kSystemRenamePath,
-        &SystemManager::renameSystem, systemManager,
+        &SystemManager::updateSystem, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemUpdatePath,
+        &SystemManager::updateSystem, systemManager,
         EntityType::system, DataActionType::update);
 
     registerHttpHandler(
@@ -619,6 +560,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
     dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
     dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
+    dbStructureUpdater.addUpdateScript(db::kAddVmsOpaqueData);
     return dbStructureUpdater.updateStructSync();
 }
 

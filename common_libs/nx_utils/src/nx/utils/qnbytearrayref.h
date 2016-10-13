@@ -15,7 +15,7 @@
     Provides a few methods of \a QByteArray to use it instead.
     \note This class methods do not contain array boundary validation!
 */
-class NX_NETWORK_API QnByteArrayConstRef
+class NX_UTILS_API QnByteArrayConstRef
 {
 public:
     typedef size_t size_type;
@@ -64,24 +64,24 @@ private:
     size_type m_count;
 };
 
-bool NX_NETWORK_API operator==( const QnByteArrayConstRef& left, const QByteArray& right );
-bool NX_NETWORK_API operator!=( const QnByteArrayConstRef& left, const QByteArray& right );
-bool NX_NETWORK_API operator==( const QByteArray& left, const QnByteArrayConstRef& right );
-bool NX_NETWORK_API operator!=( const QByteArray& left, const QnByteArrayConstRef& right );
+bool NX_UTILS_API operator==( const QnByteArrayConstRef& left, const QByteArray& right );
+bool NX_UTILS_API operator!=( const QnByteArrayConstRef& left, const QByteArray& right );
+bool NX_UTILS_API operator==( const QByteArray& left, const QnByteArrayConstRef& right );
+bool NX_UTILS_API operator!=( const QByteArray& left, const QnByteArrayConstRef& right );
 
 /*!
     \param left 0-terminated string
 */
-bool NX_NETWORK_API operator==( const QnByteArrayConstRef::const_pointer& left, 
+bool NX_UTILS_API operator==( const QnByteArrayConstRef::const_pointer& left, 
 							    const QnByteArrayConstRef& right );
 
-bool NX_NETWORK_API operator!=( const QnByteArrayConstRef::const_pointer& left, 
+bool NX_UTILS_API operator!=( const QnByteArrayConstRef::const_pointer& left, 
 							    const QnByteArrayConstRef& right );
 
-bool NX_NETWORK_API operator==( const QnByteArrayConstRef& left, 
+bool NX_UTILS_API operator==( const QnByteArrayConstRef& left, 
 							    const QnByteArrayConstRef::const_pointer& right );
 
-bool NX_NETWORK_API operator!=( const QnByteArrayConstRef& left, 
+bool NX_UTILS_API operator!=( const QnByteArrayConstRef& left, 
 							    const QnByteArrayConstRef::const_pointer& right );
 
 #endif  //QNBYTEARRAYREF_H

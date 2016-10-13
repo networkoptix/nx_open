@@ -25,6 +25,10 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
         if (!certPath.isEmpty())
             addArg("-http/sslCertPath", certPath.toUtf8());
     }
+    else
+    {
+        addArg("-http/sslSupport", "false");
+    }
 
     // do not allow VmsGateway reinit the log
     addArg("-log/logLevel", "none");

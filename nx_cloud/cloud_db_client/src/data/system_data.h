@@ -22,7 +22,7 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-#define SystemRegistrationData_Fields (name)(customization)
+#define SystemRegistrationData_Fields (name)(customization)(opaque)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
@@ -33,7 +33,8 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
-                          (status)(cloudConnectionSubscriptionStatus)(systemSequence)
+                          (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
+                          (opaque)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
@@ -52,20 +53,15 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 #define SystemID_Fields (systemID)
 
 
-/**
- * Input arguments for "rename system" request
- */
-class SystemNameUpdate
-{
-public:
-    std::string systemID;
-    std::string name;
-};
+//-------------------------------------------------------------------------------------------------
+// SystemAttributesUpdate
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data);
-void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery);
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemAttributesUpdate* const data);
+void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const urlQuery);
 
-#define SystemNameUpdate_Fields (systemID)(name)
+void serialize(QnJsonContext*, const SystemAttributesUpdate&, QJsonValue*);
+bool deserialize(QnJsonContext*, const QJsonValue&, SystemAttributesUpdate*);
+
 
 
 ////////////////////////////////////////////////////////////
@@ -103,7 +99,7 @@ bool deserialize(QnJsonContext*, const QJsonValue&, UserSessionDescriptor*);
 // common functions
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemAttributesUpdate),
     (json));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

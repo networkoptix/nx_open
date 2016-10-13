@@ -505,6 +505,87 @@ uint64_t stringToBytesConst(const char* str)
     return value;
 }
 
+
+std::vector<QnByteArrayConstRef> splitQuotedString(const QnByteArrayConstRef& src, char sep)
+{
+    std::vector<QnByteArrayConstRef> result;
+    QnByteArrayConstRef::size_type curTokenStart = 0;
+    bool quoted = false;
+    for (QnByteArrayConstRef::size_type
+        pos = 0;
+        pos < src.size();
+        ++pos)
+    {
+        const char ch = src[pos];
+        if (!quoted && (ch == sep))
+        {
+            result.push_back(src.mid(curTokenStart, pos - curTokenStart));
+            curTokenStart = pos + 1;
+        }
+        else if (ch == '"')
+        {
+            quoted = !quoted;
+        }
+    }
+    result.push_back(src.mid(curTokenStart));
+
+    return result;
+}
+
+NX_UTILS_API QMap<QByteArray, QByteArray> parseNameValuePairs(
+    const QnByteArrayConstRef& authenticateParamsStr,
+    char separator)
+{
+    QMap<QByteArray, QByteArray> nameValueContainer;
+    parseNameValuePairs(
+        authenticateParamsStr,
+        separator,
+        &nameValueContainer);
+    return nameValueContainer;
+}
+
+void parseNameValuePairs(
+    const QnByteArrayConstRef& authenticateParamsStr,
+    char separator,
+    QMap<QByteArray, QByteArray>* const params)
+{
+    const std::vector<QnByteArrayConstRef>& paramsList = 
+        splitQuotedString(authenticateParamsStr, separator);
+    for (const QnByteArrayConstRef& token : paramsList)
+    {
+        const auto& nameAndValue = splitQuotedString(token.trimmed(), '=');
+        if (nameAndValue.empty())
+            continue;
+        QnByteArrayConstRef value = nameAndValue.size() > 1 ? nameAndValue[1] : QnByteArrayConstRef();
+        params->insert(nameAndValue[0].trimmed(), value.trimmed("\""));
+    }
+}
+
+QByteArray serializeNameValuePairs(
+    const QMap<QByteArray, QByteArray>& params)
+{
+    QByteArray serializedData;
+    serializeNameValuePairs(params, &serializedData);
+    return serializedData;
+}
+
+void serializeNameValuePairs(
+    const QMap<QByteArray, QByteArray>& params,
+    QByteArray* const dstBuffer)
+{
+    for (QMap<QByteArray, QByteArray>::const_iterator
+        it = params.begin();
+        it != params.end();
+        ++it)
+    {
+        if (it != params.begin())
+            dstBuffer->append(", ");
+        dstBuffer->append(it.key());
+        dstBuffer->append("=\"");
+        dstBuffer->append(it.value());
+        dstBuffer->append("\"");
+    }
+}
+
 } // namespace utils
 } // namespace nx
-

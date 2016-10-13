@@ -75,7 +75,7 @@ void DbRequestExecutionThread::run()
             if (std::chrono::steady_clock::now() - previousActivityTime >= 
                 m_connectionOptions.inactivityTimeout)
             {
-                //dropping connection by timeout
+                // Dropping connection by timeout.
                 NX_LOGX(lm("Closing DB connection by timeout (%1)")
                     .arg(m_connectionOptions.inactivityTimeout), cl_logDEBUG2);
                 m_dbConnection.close();
@@ -88,8 +88,9 @@ void DbRequestExecutionThread::run()
         const auto result = (*task)->execute(&m_dbConnection);
         if (result != DBResult::ok)
         {
-            NX_LOGX(lit("DB request failed with error %1")
-                .arg(m_dbConnection.lastError().text()), cl_logWARNING);
+            NX_LOGX(lit("DB request failed with error %1. Db text %2")
+                .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                cl_logWARNING);
             //TODO #ak reopen connection?
         }
 

@@ -38,7 +38,9 @@ namespace nx {
 namespace cdb {
 
 namespace conf {
+
 class Settings;
+
 }   // namespace conf
 
 class AbstractEmailManager;
@@ -46,9 +48,13 @@ class AccountManager;
 class SystemHealthInfoProvider;
 
 namespace ec2 {
+
 class IncomingTransactionDispatcher;
 class TransactionLog;
+
 }   // namespace ec2 
+
+class InviteUserNotification;
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -123,9 +129,9 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
-    void renameSystem(
+    void updateSystem(
         const AuthorizationInfo& authzInfo,
-        data::SystemNameUpdate data,
+        data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
     
     void recordUserSessionStart(
@@ -283,7 +289,7 @@ private:
     // system sharing methods. TODO: #ak: move to a separate class
 
     /**
-     * @param inviteeAccount Filled with attributes of account \a sharing.accountEmail
+     * @param inviteeAccount Filled with attributes of account sharing.accountEmail
      */
     nx::db::DBResult shareSystem(
         nx::db::QueryContext* const queryContext,
@@ -326,7 +332,7 @@ private:
         api::SystemSharingEx* const sharing);
 
     /**
-     * Fetches existing account or creates new one sending corresponding notification.
+     * Fetch existing account or create a new one sending corresponding notification.
      */
     nx::db::DBResult fetchAccountToShareWith(
         nx::db::QueryContext* const queryContext,
@@ -339,6 +345,17 @@ private:
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
         const std::string& systemId);
+    nx::db::DBResult scheduleInvintationNotificationDelivery(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId);
+    nx::db::DBResult prepareInviteNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId,
+        InviteUserNotification* const notification);
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */
@@ -357,19 +374,25 @@ private:
         api::SystemSharingEx sharing,
         bool updateExFields = true);
 
-    nx::db::DBResult updateSystemNameInDB(
+    nx::db::DBResult updateSystem(
         nx::db::QueryContext* const queryContext,
-        const data::SystemNameUpdate& data);
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult renameSystem(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
     nx::db::DBResult execSystemNameUpdate(
         nx::db::QueryContext* const queryContext,
-        const data::SystemNameUpdate& data);
-    void updateSystemNameInCache(
-        data::SystemNameUpdate data);
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult execSystemOpaqueUpdate(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
+    void updateSystemAttributesInCache(
+        data::SystemAttributesUpdate data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemNameUpdate data,
+        data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult activateSystem(
@@ -403,6 +426,7 @@ private:
         api::SystemAccessRole accessRole) const;
 
     nx::db::DBResult fillCache();
+    template<typename Func> nx::db::DBResult doBlockingDbQuery(Func func);
     nx::db::DBResult fetchSystems(nx::db::QueryContext* queryContext, int* const /*dummy*/);
     nx::db::DBResult fetchSystemToAccountBinder(
         nx::db::QueryContext* queryContext,
@@ -440,11 +464,11 @@ private:
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
-        data::SystemNameUpdate* const systemNameUpdate);
+        data::SystemAttributesUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemNameUpdate systemNameUpdate);
+        data::SystemAttributesUpdate systemNameUpdate);
 
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* const queryContext,

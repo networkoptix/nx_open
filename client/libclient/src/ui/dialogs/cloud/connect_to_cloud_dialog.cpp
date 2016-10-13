@@ -243,6 +243,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
+    sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
     cloudConnection->systemManager()->bindSystem(
                 sysRegistrationData,

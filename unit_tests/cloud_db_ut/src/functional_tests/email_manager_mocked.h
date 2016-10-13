@@ -4,8 +4,7 @@
 
 #include <libcloud_db/src/managers/email_manager.h>
 
-class EmailManagerMocked
-:
+class EmailManagerMocked:
     public nx::cdb::AbstractEmailManager
 {
 public:

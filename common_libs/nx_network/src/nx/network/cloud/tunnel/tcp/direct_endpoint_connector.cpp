@@ -52,10 +52,20 @@ void DirectEndpointConnector::connect(
 
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
 
-    // Performing /api/moduleInformation HTTP requests since 
-    //  currently only mediaserver can be on remote side
-
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
+    if (!s_needVerification)
+    {
+        auto endpoint = std::move(response.forwardedTcpEndpointList.front());
+        return post(
+            [this, endpoint = std::move(endpoint), handler = std::move(handler)]() mutable
+            {
+                m_completionHandler = std::move(handler);
+                reportSuccessfulVerificationResult(std::move(endpoint), nullptr);
+            });
+    }
+
+    // Performing /api/moduleInformation HTTP requests since
+    //  currently only mediaserver can be on remote side
     for (const SocketAddress& endpoint: response.forwardedTcpEndpointList)
     {
         auto httpClient = nx_http::AsyncHttpClient::create();
@@ -93,6 +103,13 @@ const AddressEntry& DirectEndpointConnector::targetPeerAddress() const
 {
     return m_targetHostAddress;
 }
+
+void DirectEndpointConnector::setVerificationRequirement(bool value)
+{
+    s_needVerification = value;
+}
+
+bool DirectEndpointConnector::s_needVerification(true);
 
 void DirectEndpointConnector::onHttpRequestDone(
     nx_http::AsyncHttpClientPtr httpClient,

@@ -282,8 +282,8 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
-    static detail::TransactionDescriptor<Param>* holder = nullptr;
-    if (!holder)
+    static std::atomic<detail::TransactionDescriptor<Param>*> holder(nullptr);
+    if (!holder.load())
     {
         for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
         {
@@ -293,7 +293,7 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
                 holder = td;
         }
     }
-    NX_ASSERT(holder, "Transaciton descriptor for the given param not found");
+    NX_ASSERT(holder.load(), "Transaciton descriptor for the given param not found");
     return holder;
 }
 

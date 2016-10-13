@@ -434,13 +434,12 @@ bool CloudStreamSocket::startAsyncConnect(
                         return; //operation has been cancelled
 
                     if (errorCode == SystemError::noError)
-                    {
                         NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
-                    }
+                    else
+                        NX_ASSERT(!cloudConnection);
 
                     dispatch(
-                        [this, errorCode, 
-                            cloudConnection = std::move(cloudConnection)]() mutable
+                        [this, errorCode, cloudConnection = std::move(cloudConnection)]() mutable
                         {
                             onCloudConnectDone(
                                 errorCode,

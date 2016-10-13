@@ -423,7 +423,7 @@ public:
             QnAbstractStorageResource::cap::ListFile;
     }
 
-    virtual Qn::StorageInitResult initOrUpdate() const override {
+    virtual Qn::StorageInitResult initOrUpdate() override {
         NX_ASSERT(0);
         return Qn::StorageInit_Ok;
     }
