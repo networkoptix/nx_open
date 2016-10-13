@@ -26,21 +26,21 @@ MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, opaque)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
-    return 
-        url::deserializeField(
-            urlQuery,
-            SystemRegistrationData_name_field,
-            &data->name)
-        &&
-        url::deserializeField(
+    if (!url::deserializeField(urlQuery, SystemRegistrationData_name_field, &data->name))
+        return false;
+
+    if (!url::deserializeField(
             urlQuery,
             SystemRegistrationData_customization_field,
-            &data->customization)
-        &&
-        url::deserializeField(
-            urlQuery,
-            SystemRegistrationData_opaque_field,
-            &data->opaque);
+            &data->customization))
+    {
+        return false;
+    }
+
+    // Optional field.
+    url::deserializeField(urlQuery, SystemRegistrationData_opaque_field, &data->opaque);
+
+    return true;
 }
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
