@@ -126,7 +126,7 @@ angular.module('webadminApp')
                 $log.log("failed to get systemCloudInfo");
                 return mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
-                    $scope.settings.systemName = $scope.serverInfo.name;
+                    $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
                     checkInternet(false);
                     if($scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
                         $log.log("System is new - go to master");
