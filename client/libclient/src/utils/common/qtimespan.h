@@ -42,6 +42,9 @@
 #ifndef QTIMESPAN_H
 #define QTIMESPAN_H
 
+#include <functional>
+#include <chrono>
+
 #include <QtCore/qdatetime.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qnamespace.h>
@@ -84,6 +87,7 @@ class QTimeSpan
 public:
     QTimeSpan();
     explicit QTimeSpan(qint64 msecs);
+    explicit QTimeSpan(std::chrono::milliseconds msecs);
     explicit QTimeSpan(const QDateTime& reference, qint64 msecs = 0);
     explicit QTimeSpan(const QDate& reference, quint64 msecs = 0);
     explicit QTimeSpan(const QTime& reference, quint64 msecs = 0);

@@ -21,6 +21,10 @@ Button
 
     height: 28;
 
+    Keys.enabled: true;
+    Keys.onEnterPressed: { control.clicked(); }
+    Keys.onReturnPressed: { control.clicked(); }
+
     Binding
     {
         target: control;

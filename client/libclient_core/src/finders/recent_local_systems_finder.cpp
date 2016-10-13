@@ -1,78 +1,31 @@
-
 #include "recent_local_systems_finder.h"
 
 #include <client_core/client_core_settings.h>
 #include <client_core/local_connection_data.h>
 #include <nx/network/http/asynchttpclient.h>
 
-QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
+QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent) :
     base_type(parent),
-    m_systems(),
-    m_reservedSystems(),
-    m_onlineSystems()
+    m_recentSystems()
 {
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
         [this](int valueId)
-        {
-            if (valueId == QnClientCoreSettings::RecentLocalConnections)
-                updateSystems();
-        });
+    {
+        if (valueId == QnClientCoreSettings::RecentLocalConnections)
+            updateSystems();
+    });
 
     updateSystems();
 }
 
-
-void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
-{
-    auto it = m_onlineSystems.find(system->id());
-    if (it == m_onlineSystems.end())
-        it = m_onlineSystems.insert(system->id(), SystemNameCountPair(system->name(), 1));
-    else
-        ++it->second;
-
-    if (it->second > 1)
-        return;
-
-    checkAllSystems();
-}
-
-void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
-{
-    const auto it = m_onlineSystems.find(systemId);
-    if (it == m_onlineSystems.end())
-        return;
-
-    if (it->second > 1)
-    {
-        --it->second;
-        return;
-    }
-
-    m_onlineSystems.erase(it);
-    checkAllSystems();
-}
-
-void QnRecentLocalSystemsFinder::checkAllSystems()
-{
-    const auto processSystems =
-        [this](const SystemsHash& systems)
-        {
-            for (const auto id : systems.keys())
-                checkSystem(systems.value(id));
-        };
-
-    processSystems(m_systems);
-    processSystems(m_reservedSystems);
-}
-
 QnAbstractSystemsFinder::SystemDescriptionList QnRecentLocalSystemsFinder::systems() const
 {
-    return m_systems.values();
+    return m_recentSystems.values();
 }
 
 QnSystemDescriptionPtr QnRecentLocalSystemsFinder::getSystem(const QString &id) const
 {
-    return m_systems.value(id, QnSystemDescriptionPtr());
+    return m_recentSystems.value(id, QnSystemDescriptionPtr());
 }
 
 void QnRecentLocalSystemsFinder::updateSystems()
@@ -82,70 +35,31 @@ void QnRecentLocalSystemsFinder::updateSystems()
     {
         if (connection.systemId.isEmpty())
             continue;
+
         const auto system = QnSystemDescription::createLocalSystem(
             connection.systemId, connection.systemName);
+
         newSystems.insert(connection.systemId, system);
     }
 
     const auto newSystemsKeys = newSystems.keys().toSet();
-    const auto currentKeys = m_systems.keys().toSet();
+    const auto currentKeys = m_recentSystems.keys().toSet();
     const auto added = newSystemsKeys - currentKeys;
     const auto removed = currentKeys - newSystemsKeys;
 
+    QList<QString> IdsList;
+
     for (const auto systemId : removed)
-    {
-        m_reservedSystems.remove(systemId);
-        removeVisibleSystem(systemId);
-    }
+        m_recentSystems.remove(systemId);
 
     for (const auto systemId : added)
     {
         const auto system = newSystems.value(systemId);
-        checkSystem(system);
-    }
-}
-
-void QnRecentLocalSystemsFinder::removeVisibleSystem(const QString& systemId)
-{
-    if (m_systems.remove(systemId))
-        emit systemLost(systemId);
-}
-
-void QnRecentLocalSystemsFinder::checkSystem(const QnSystemDescriptionPtr& system)
-{
-    if (!system)
-        return;
-
-    const auto systemId = system->id();
-    if (shouldRemoveSystem(system))
-    {
-        // adds to online list
-        if (!m_reservedSystems.contains(systemId))
-            m_reservedSystems.insert(systemId, system);
-
-        removeVisibleSystem(systemId);
-    }
-    else
-    {
-        m_reservedSystems.remove(systemId);
-        if (m_systems.contains(systemId))
-            return;
-
-        m_systems.insert(systemId, system);
+        m_recentSystems.insert(systemId, system);
         emit systemDiscovered(system);
     }
+
+    for (const auto id : removed)
+        emit systemLost(id);
 }
 
-bool QnRecentLocalSystemsFinder::shouldRemoveSystem(const QnSystemDescriptionPtr& system)
-{
-    if (!system)
-        return true;
-
-    for (const auto data: m_onlineSystems)
-    {
-        const auto systemName = data.first;
-        if (system->name() == systemName)
-            return true;
-    }
-    return false;
-}

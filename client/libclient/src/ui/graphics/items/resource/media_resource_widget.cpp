@@ -1961,6 +1961,10 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
     const auto statusOverlay = statusOverlayController();
     if (m_camera)
     {
+        static const auto kPermissions = (Qn::SavePermission | Qn::WritePermission);
+        const bool canChangeSettings = context()->accessController()->hasPermissions(
+            base_type::resource(), kPermissions);
+
         if (overlay == Qn::IoModuleDisabledOverlay)
         {
             NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO,
@@ -1969,8 +1973,10 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
             if (!m_ioLicenceStatusHelper)
                 return;
 
-            switch (m_ioLicenceStatusHelper->status())
+            if (canChangeSettings)
             {
+                switch (m_ioLicenceStatusHelper->status())
+                {
                 case QnSingleCamLicenceStatusHelper::LicenseNotUsed:
                     statusOverlay->setCurrentButton(QnStatusOverlayController::Button::kIoEnable);
                     return;
@@ -1979,6 +1985,7 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
                     return;
                 default:
                     break;
+                }
             }
         }
         else if (overlay == Qn::OfflineOverlay)
@@ -1989,7 +1996,7 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
                 return;
             }
         }
-        else if (overlay == Qn::UnauthorizedOverlay)
+        else if ((overlay == Qn::UnauthorizedOverlay) && canChangeSettings)
         {
             statusOverlay->setCurrentButton(QnStatusOverlayController::Button::kSettings);
             return;

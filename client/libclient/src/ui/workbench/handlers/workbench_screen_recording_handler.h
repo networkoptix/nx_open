@@ -4,16 +4,17 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QElapsedTimer>
 
-#include <recording/stream_recorder.h>
+#include <recording/stream_recorder_data.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
 class QGLWidget;
+class QnStreamRecorder;
 class QnCountdownTimer;
 class QnGraphicsMessageBox;
 class QnDesktopDataProviderWrapper;
 
-class QnScreenRecorder: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchScreenRecordingHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -23,12 +24,12 @@ public:
      * Constructor.
      * \param parent Parent object.
      */
-    QnScreenRecorder(QObject *parent = nullptr);
+    QnWorkbenchScreenRecordingHandler(QObject *parent = nullptr);
 
     /*
      * Virtual destructor.
      */
-    virtual ~QnScreenRecorder();
+    virtual ~QnWorkbenchScreenRecordingHandler();
 
 protected:
     virtual void timerEvent(QTimerEvent* event) override;
@@ -61,7 +62,7 @@ private:
     void onRecordingFinished(const QString& fileName);
 
     void onStreamRecordingFinished(
-        const QnStreamRecorder::ErrorStruct& status,
+        const StreamRecorderErrorStruct& status,
         const QString& filename);
 
     void onError(const QString& reason);

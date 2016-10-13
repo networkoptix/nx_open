@@ -1,5 +1,4 @@
-#ifndef CAMERA_OUTPUT_BUSINESS_ACTION_WIDGET_H
-#define CAMERA_OUTPUT_BUSINESS_ACTION_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include <ui/widgets/business/abstract_business_params_widget.h>
@@ -27,5 +26,3 @@ private slots:
 private:
     QScopedPointer<Ui::CameraOutputBusinessActionWidget> ui;
 };
-
-#endif // CAMERA_OUTPUT_BUSINESS_ACTION_WIDGET_H

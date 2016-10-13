@@ -20,6 +20,7 @@ MaskedComboBox
 
     isEditableComboBox: true;
 
+    activeFocusOnTab: true;
     onActiveFocusChanged:
     {
         if (!activeFocus || !isAvailable)
