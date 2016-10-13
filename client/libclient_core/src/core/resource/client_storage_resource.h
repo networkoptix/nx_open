@@ -28,7 +28,7 @@ public:
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
-    virtual Qn::StorageInitResult initOrUpdate() const override;
+    virtual Qn::StorageInitResult initOrUpdate() override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
