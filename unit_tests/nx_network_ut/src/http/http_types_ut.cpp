@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/httptypes.h>
+#include <nx/utils/string.h>
 
 
 namespace nx_http
@@ -572,10 +573,10 @@ TEST( HttpHeaderTest, parseDigestAuthParams )
             "auth_rtsp=YWRtaW46NTFkMWMzZTUxZDc1MDo3M2I1MDVhYTMzNjcyNDZmNDEzYWQ2ZThkZjg1MDRkZQ%3D%3D; "
             "response=6b09bbab1f0f8417fb5ff0772da42bc4; username=admin";
         QMap<nx_http::BufferType, nx_http::BufferType> params;
-        nx_http::header::parseDigestAuthParams(
+        nx::utils::parseNameValuePairs(
             QByteArray::fromRawData( testData, sizeof( testData ) - 1 ),
-            &params,
-            ';' );
+            ';',
+            &params);
         ASSERT_EQ( params["auth"], "YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D" );
     }
 }
