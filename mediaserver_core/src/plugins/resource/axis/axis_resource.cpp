@@ -16,12 +16,15 @@
 
 #include "axis_stream_reader.h"
 #include "axis_ptz_controller.h"
-#include "api/model/api_ioport_data.h"
-#include "nx/fusion/serialization/json.h"
-#include <nx/fusion/model_functions.h>
-#include "utils/common/concurrent.h"
-#include "common/common_module.h"
 #include "axis_audio_transmitter.h"
+
+#include <api/model/api_ioport_data.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
+#include <utils/common/concurrent.h>
+#include <utils/xml/camera_advanced_param_reader.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_data_pool.h>
 
 #include <motion/motion_detection.h>
 
@@ -560,7 +563,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
-    // determin camera max resolution
+    fetchAndSetAdvancedParameters();
 
     saveParams();
 
@@ -815,6 +818,32 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
             const auto& paramItems = line.split('=');
             if( paramItems.size() == 2)
                 params << QPair<QByteArray, QByteArray>(paramItems[0], paramItems[1]);
+        }
+    }
+    else
+    {
+        NX_LOG( lit("Failed to read params from path %1 of camera %2. Result: %3").
+            arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+    }
+    return status;
+}
+
+CLHttpStatus QnPlAxisResource::readAxisParameters(
+    const QString& rootPath,
+    CLSimpleHTTPClient* const httpClient,
+    QMap<QString, QString>& params)
+{
+    params.clear();
+    CLHttpStatus status = httpClient->doGET( lit("axis-cgi/param.cgi?action=list&group=%1").arg(rootPath).toLatin1() );
+    if( status == CL_HTTP_SUCCESS )
+    {
+        QByteArray body;
+        httpClient->readAll( body );
+        for (const QByteArray& line: body.split('\n'))
+        {
+            const auto& paramItems = line.split('=');
+            if( paramItems.size() == 2)
+                params[paramItems[0]] = paramItems[1];
         }
     }
     else
@@ -1399,6 +1428,271 @@ QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
         return nullptr;
 
     return m_audioTransmitter;
+}
+
+QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& idList) const
+{
+    QList<QnCameraAdvancedParameter> params;
+    for(const auto& id: idList)
+    {
+        auto param = m_advancedParameters.getParameterById(id);
+        params.append(param);
+    }
+    return params;
+}
+
+QString QnPlAxisResource::getAdvancedParametersTemplate() const
+{
+    return lit("axis.xml");
+}
+
+bool QnPlAxisResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& templateFilename)
+{
+    QFile paramsTemplateFile(templateFilename);
+
+#ifdef _DEBUG
+    QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
+#endif
+    bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+#ifdef _DEBUG
+    if (!result)
+        qWarning() << "Error while parsing xml" << templateFilename;
+#endif
+    return result;
+}
+
+QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams)
+{
+    QSet<QString> supported;
+    QList<QnCameraAdvancedParameter> paramList;
+    auto paramIds = allParams.allParameterIds();
+    bool success = true;
+
+    for(const auto& paramId: paramIds)
+    {
+        auto param = allParams.getParameterById(paramId);
+        if(!isMaintenanceParam(param))
+            paramList.push_back(param);
+        else
+            supported.insert(paramId);
+    }
+
+    auto queries = buildGetParamsQueries(paramList);
+    auto response = executeParamsQueries(queries, success);
+
+    for(const auto& paramId: paramIds)
+        if(response.contains(paramId))
+            supported.insert(paramId);
+
+    for (const auto& s: supported)
+    {
+        qDebug() << "=====> SUPPORTED" << s;
+    }
+
+    return supported;
+}
+
+void QnPlAxisResource::fetchAndSetAdvancedParameters()
+{
+    QnMutexLocker lock( &m_physicalParamsMutex );
+    m_advancedParameters.clear();
+    auto resourceData = qnCommon->dataPool()->data(MANUFACTURE, getModel());
+
+    qDebug() << "ResourceData" << resourceData.value<QMap<QString, QString>>("advancedParametersOverload");
+
+    auto templateFile = getAdvancedParametersTemplate();
+    QnCameraAdvancedParams params;
+    if (!loadAdvancedParametersTemplateFromFile(
+            params,
+            lit("/home/fp/develop/nx_vms/common/static-resources/camera_advanced_params/") + templateFile))
+    {
+        return;
+    }
+
+    auto supportedParams = calculateSupportedAdvancedParameters(params);
+    m_advancedParameters = params.filtered(supportedParams);
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
+}
+
+bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
+{
+    return  param.dataType == QnCameraAdvancedParameter::DataType::Button;
+}
+
+QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString> &queries, bool &isSuccessful) const
+{
+    QMap<QString, QString> result;
+    CLHttpStatus status;
+    isSuccessful = true;
+
+    CLSimpleHTTPClient httpClient (
+        getHostAddress(),
+        QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
+        getNetworkTimeout(),
+        getAuth());
+
+    for(const auto& query: queries)
+    {
+        qDebug() << "QUERY" << query;
+
+        status = httpClient.doGET(query);
+        if( status == CL_HTTP_SUCCESS )
+        {
+            QByteArray body;
+            httpClient.readAll( body );
+
+            qDebug() << "BODY IS" << body;
+
+            if(body.startsWith("OK"))
+                continue;
+
+            for (const QByteArray& line: body.split('\n'))
+            {
+                const auto& paramItems = line.split('=');
+                if( paramItems.size() == 2)
+                    result[paramItems[0]] = paramItems[1];
+            }
+        }
+        else
+        {
+            isSuccessful = false;
+            qDebug() << "FAILED TO EXECUTE " << query;
+            NX_LOG( lit("Failed to execute params query from path %1 of camera %2. Result: %3")
+                .arg(query)
+                .arg(getHostAddress())
+                .arg(::toString(status)),
+                cl_logWARNING );
+        }
+    }
+    return result;
+}
+
+QMap<QString, QString>  QnPlAxisResource::executeParamsQueries(
+    const QString &query,
+    bool &isSuccessful) const
+{
+    QSet<QString> queries;
+    queries.insert(query);
+    return executeParamsQueries(queries, isSuccessful);
+}
+
+QnCameraAdvancedParamValueList QnPlAxisResource::parseParamsQueriesResult(
+    const QMap<QString, QString> &queriesResult,
+    const QList<QnCameraAdvancedParameter> &params) const
+{
+    QnCameraAdvancedParamValueList result;
+    for(const auto& param: params)
+        if(queriesResult.contains(param.id))
+        {
+            auto paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration ?
+                param.fromInternalRange(queriesResult[param.id]) : queriesResult[param.id];
+            result.append(QnCameraAdvancedParamValue(param.id, paramValue));
+        }
+
+    return result;
+}
+
+QSet<QString> QnPlAxisResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
+{
+    QSet<QString> result;
+    for(const auto& param: params)
+    {
+        if(isMaintenanceParam(param))
+            continue;
+
+        auto paramPath = param.id.left(param.id.lastIndexOf('.'));
+        result.insert(lit("axis-cgi/admin/param.cgi?action=list&group=") + paramPath);
+    }
+
+    return result;
+}
+
+QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueList &params) const
+{
+    QString query = lit("axis-cgi/admin/param.cgi?action=update&");
+    bool hasParamsToSet = false;
+    for(const auto& paramIdAndValue: params)
+    {
+        auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+        if(!isMaintenanceParam(param))
+        {
+            auto paramValue = paramIdAndValue.value;
+            hasParamsToSet = true;
+            paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration ?
+                param.toInternalRange(paramValue) : paramValue;
+            query += paramIdAndValue.id + lit("=") + paramValue + lit("&");
+        }
+    }
+
+    return hasParamsToSet ? query.left(query.size() - 1) : lit("");
+}
+
+QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValueList& params) const
+{
+    QString query = lit("axis-cgi/admin/");
+    for(const auto& paramIdAndValue: params)
+    {
+        auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+        if(isMaintenanceParam(param))
+            return query + param.readCmd;
+    }
+    return QString();
+}
+
+bool QnPlAxisResource::getParamPhysical(const QString &id, QString &value)
+{
+    QSet<QString> idList;
+    QnCameraAdvancedParamValueList paramValueList;
+    idList.insert(id);
+    auto result = getParamsPhysical(idList, paramValueList);
+    if(!paramValueList.isEmpty())
+        value = paramValueList.first().value;
+
+    return result;
+}
+
+bool QnPlAxisResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
+{
+    qDebug() << "AXIS GET PARAMS PHYSICAL";
+
+    bool success = true;
+    const auto params = getParamsByIds(idList);
+    const auto queries = buildGetParamsQueries(params);
+
+    qDebug() << queries;
+
+    const auto queriesResults = executeParamsQueries(queries, success);
+
+    qDebug() << "RESULT" << queriesResults;
+    result = parseParamsQueriesResult(queriesResults, params);
+
+    return result.size() == idList.size();
+
+}
+
+bool QnPlAxisResource::setParamPhysical(const QString &id, const QString& value)
+{
+    QnCameraAdvancedParamValueList inputParamList;
+    QnCameraAdvancedParamValueList resParamList;
+    inputParamList.append({ id, value });
+    return setParamsPhysical(inputParamList, resParamList);
+}
+
+bool QnPlAxisResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+{
+    qDebug() << "AXIS SET PARAMS PHYSICAL";
+    bool success;
+    const auto query = buildSetParamsQuery(values);
+    const auto maintenanceQuery = buildMaintenanceQuery(values);
+    qDebug() << "Executing SET Query: " << query;
+
+    if(!query.isEmpty())
+        executeParamsQueries(query, success);
+
+    if(!maintenanceQuery.isEmpty())
+        executeParamsQueries(maintenanceQuery, success);
+
+    return success;
 }
 
 #endif // #ifdef ENABLE_AXIS
