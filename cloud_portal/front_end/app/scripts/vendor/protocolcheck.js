@@ -1,4 +1,5 @@
-//https://github.com/ismailhabib/custom-protocol-detection/
+// https://github.com/ismailhabib/custom-protocol-detection/
+// There is a hack here: look for Config.openClientTimeout
 
 (function(window) {
 
@@ -58,7 +59,7 @@
         var timeout = setTimeout(function () {
             failCb();
             handler.remove();
-        }, 1000);
+        }, Config.openClientTimeout);
 
         //handle page running in an iframe (blur must be registered with top level window)
         var target = window;

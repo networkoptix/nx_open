@@ -14,7 +14,6 @@
     <div process-loading="gettingSystems" class="row">
         <div ng-if="!systems.length">
             <p>Please connect a system to your cloud account first.</p>
-            <p><button class="btn btn-default" ng-click="openClient(null)">Open VMS_NAME</button></p>
         </div>
 
         <div ng-repeat="system in systems | filter:searchSystems as filtered" class="col-sm-6 col-md-4 col-lg-3 system-button">
@@ -25,8 +24,8 @@
                     <span ng-if="system.stateOfHealth!=Config.systemStatuses.onlineStatus" class="label"
                           ng-class="Config.systemStatuses[system.stateOfHealth].style || Config.systemStatuses.default.style"
                           ng-bind-html="Config.systemStatuses[system.stateOfHealth].label||system.stateOfHealth | highlight:search"></span>
-                    <button ng-if="system.stateOfHealth==Config.systemStatuses.onlineStatus" class="btn btn-default"
-                            ng-click="openClient(system,$event);">Open in VMS_NAME</button>
+
+                    <open-client-button ng-if="system.stateOfHealth==Config.systemStatuses.onlineStatus" system="system"></open-client-button>
                 </div>
             </div>
         </div>

@@ -57,13 +57,6 @@ angular.module('cloudApp')
             $location.path('/systems/' + systemId, false);
         }
 
-        $scope.openClient = process.init(function () {
-            urlProtocol.open(systemId);
-            return $timeout(function(){
-
-            },Config.openClientTimeout);
-        });
-
         function reloadSystems(){
             cloudApi.systems('clearCache').then(function(){
                $location.path('/systems');

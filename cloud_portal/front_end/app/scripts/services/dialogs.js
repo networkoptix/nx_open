@@ -167,6 +167,9 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     }
                 }).result;
             },
+            noClientDetected:function(){
+                return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
+            },
 
 
             closeMe:function($scope, result){
