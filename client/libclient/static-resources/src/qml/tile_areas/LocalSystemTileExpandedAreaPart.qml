@@ -57,7 +57,7 @@ Column
             text: "admin";
             width: parent.width;
 
-            onAccepted: control.connectClicked();
+            onAccepted: control.connectButtonClicked();
 
             KeyNavigation.tab: passwordTextItem;
             KeyNavigation.backtab: prevTabObject;
@@ -96,6 +96,7 @@ Column
             text: qsTr("Save password");
 
             enabled: !control.isConnecting;
+            onAccepted: control.connectButtonClicked();
 
             onCheckedChanged:
             {
@@ -109,6 +110,8 @@ Column
             id: autoLoginCheckBoxItem;
             enabled: savePasswordCheckBoxControl.checked && !control.isConnecting;
             text: qsTr("Auto-login");
+
+            onAccepted: control.connectButtonClicked();
         }
     }
 

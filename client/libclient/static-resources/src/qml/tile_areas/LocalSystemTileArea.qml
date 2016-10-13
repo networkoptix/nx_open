@@ -95,6 +95,9 @@ Item
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
             visible: control.isOnline;
+
+            onAccepted: control.connectRequested();
+
         }
 
         InfoItem
@@ -126,6 +129,8 @@ Item
             {
                 expandedArea.loginTextField.text = value;
             }
+
+            onAccepted: control.connectRequested();
         }
     }
 

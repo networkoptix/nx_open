@@ -17,6 +17,8 @@ Item
     property var area: (isMasked ? maskedAreaLoader.item : areaLoader.item);
     property var maskedArea: maskedAreaLoader.item;
 
+    signal accepted();
+
     height: area.height;
 
     MouseArea

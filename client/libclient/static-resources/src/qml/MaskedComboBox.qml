@@ -10,6 +10,7 @@ MaskedItem
     property string comboBoxValueRole: comboBoxTextRole;
     property bool isEditableComboBox: false;
     property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1);
+
     maskedAreaDelegate: NxComboBox
     {
         id: comboBox;
@@ -38,5 +39,6 @@ MaskedItem
 
         KeyNavigation.tab: control.KeyNavigation.tab;
         KeyNavigation.backtab: control.KeyNavigation.backtab;
+        onAccepted: control.accepted();
     }
 }
