@@ -237,14 +237,16 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::Item, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
-    GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
+
+    m_gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
+    m_gridAdjustmentInstrument->setSpeed(0.25 / 360.0);
+    m_gridAdjustmentInstrument->setMaxSpacing(0.15);
+
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
     SignalingInstrument *sceneFocusSignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::FocusIn), this);
     PtzInstrument *ptzInstrument = new PtzInstrument(this);
     m_zoomWindowInstrument = new ZoomWindowInstrument(this);
 
-    gridAdjustmentInstrument->setSpeed(0.25 / 360.0);
-    gridAdjustmentInstrument->setMaxSpacing( 0.15);
 
     m_motionSelectionInstrument->setBrush(subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
     m_motionSelectionInstrument->setPen(subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
@@ -277,7 +279,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
-    m_manager->installInstrument(gridAdjustmentInstrument);
+    m_manager->installInstrument(m_gridAdjustmentInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
@@ -467,6 +469,51 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return workbench()->mapper();
+}
+
+Instrument* QnWorkbenchController::handScrollInstrument() const
+{
+    return m_handScrollInstrument;
+}
+
+Instrument* QnWorkbenchController::wheelZoomInstrument() const
+{
+    return m_wheelZoomInstrument;
+}
+
+Instrument* QnWorkbenchController::motionSelectionInstrument() const
+{
+    return m_motionSelectionInstrument;
+}
+
+Instrument* QnWorkbenchController::itemRightClickInstrument() const
+{
+    return m_itemRightClickInstrument;
+}
+
+Instrument* QnWorkbenchController::moveInstrument() const
+{
+    return m_moveInstrument;
+}
+
+Instrument* QnWorkbenchController::resizingInstrument() const
+{
+    return m_resizingInstrument;
+}
+
+Instrument* QnWorkbenchController::rubberBandInstrument() const
+{
+    return m_rubberBandInstrument;
+}
+
+Instrument* QnWorkbenchController::itemLeftClickInstrument() const
+{
+    return m_itemLeftClickInstrument;
+}
+
+Instrument* QnWorkbenchController::gridAdjustmentInstrument() const
+{
+    return m_gridAdjustmentInstrument;
 }
 
 bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
