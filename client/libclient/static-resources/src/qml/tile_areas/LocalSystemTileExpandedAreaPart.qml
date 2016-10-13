@@ -34,10 +34,7 @@ Column
         if (opacity < 1.0 || !visible)
             return;
 
-        if (loginTextItem.visible)
-            loginTextItem.forceActiveFocus();
-        else
-            passwordTextItem.forceActiveFocus();
+        passwordTextItem.forceActiveFocus();
     }
 
     Column
@@ -57,6 +54,7 @@ Column
             id: loginTextItem;
 
             visible: !control.hasRecentConnections;
+            text: "admin";
             width: parent.width;
 
             onAccepted: control.connectClicked();
