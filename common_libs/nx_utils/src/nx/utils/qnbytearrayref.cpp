@@ -6,6 +6,7 @@
 #include "qnbytearrayref.h"
 
 #include <cstring>
+
 #include <nx/utils/log/assert.h>
 
 
