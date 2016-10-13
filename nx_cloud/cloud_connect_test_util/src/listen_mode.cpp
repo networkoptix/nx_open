@@ -88,7 +88,7 @@ public:
             for (auto& context: socketContexts)
             {
                 context.socket->registerOnMediator(
-                    [&, handler = barrier.fork(), contextPtr = &context](hpm::api::ResultCode code)
+                    [&, handler = barrier.fork(), contextPtr = &context](hpm::api::ResultCode code) mutable
                     {
                         if (code != hpm::api::ResultCode::ok)
                         {

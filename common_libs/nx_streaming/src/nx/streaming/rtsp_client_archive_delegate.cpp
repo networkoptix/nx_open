@@ -59,7 +59,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_tcpMode(true),
     m_position(DATETIME_NOW),
     m_opened(false),
-    m_lastPacketFlags(-1),
+    m_lastMediaFlags(-1),
     m_closing(false),
     m_singleShotMode(false),
     m_sendedCSec(0),
@@ -357,7 +357,7 @@ void QnRtspClientArchiveDelegate::close()
     QnMutexLocker lock( &m_mutex );
     //m_waitBOF = false;
     m_rtspSession->stop();
-    m_lastPacketFlags = -1;
+    m_lastMediaFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
     m_frameCnt = 0;
@@ -561,8 +561,10 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     }
     if (!result && !m_closing)
         reopen();
-    if (result) {
-        m_lastPacketFlags = result->flags;
+    if (result)
+    {
+        if (result->dataType != QnAbstractMediaData::EMPTY_DATA)
+            m_lastMediaFlags = result->flags;
         m_frameCnt++;
     }
 
@@ -738,10 +740,10 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 
 bool QnRtspClientArchiveDelegate::isRealTimeSource() const
 {
-    if (m_lastPacketFlags == -1)
+    if (m_lastMediaFlags == -1)
         return m_position == DATETIME_NOW;
     else
-        return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
+        return m_lastMediaFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
 
 bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution)
