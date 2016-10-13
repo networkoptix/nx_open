@@ -193,6 +193,9 @@ void QnConnectToCloudDialogPrivate::updateUi()
     indicatorButton->setEnabled(q->ui->loginInputField->isValid()
                              && q->ui->passwordInputField->isValid());
 
+    const bool visible = (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut);
+    q->ui->stayLoggedInCheckBox->setVisible(visible);
+
     showCredentialsError(false);
 };
 
@@ -322,14 +325,27 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    auto handleReply = [this](bool success, rest::Handle handleId, const QnRestResult& reply)
+    auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
         Q_UNUSED(handleId)
 
-        if (success && reply.error == QnRestResult::NoError)
-            showSuccess();
-        else
+        if (!success || (reply.error != QnRestResult::NoError))
+        {
             showFailure(reply.errorString);
+            return;
+        }
+
+        const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
+        if (stayLoggedIn)
+        {
+            qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
+            qnClientCoreSettings->setCloudPassword(q->ui->passwordInputField->text().trimmed());
+            qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+                q->ui->loginInputField->text().trimmed(),
+                q->ui->passwordInputField->text().trimmed()));
+        }
+
+        showSuccess();
     };
 
     connection->saveCloudSystemCredentials(
