@@ -282,7 +282,7 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
-    static std::atomic<detail::TransactionDescriptor<Param>*> holder = nullptr;
+    static std::atomic<detail::TransactionDescriptor<Param>*> holder(nullptr);
     if (!holder.load())
     {
         for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
