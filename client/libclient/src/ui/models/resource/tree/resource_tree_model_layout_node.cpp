@@ -1,11 +1,17 @@
 #include "resource_tree_model_layout_node.h"
 
+#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
+#include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_context.h>
 
 QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     QnResourceTreeModel* model,
@@ -25,8 +31,8 @@ QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
         &QnResourceTreeModelLayoutNode::at_snapshotManager_flagsChanged);
 
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        &QnResourceTreeModelLayoutNode::handlePermissionsChanged);
+    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+        &QnResourceTreeModelLayoutNode::handleAccessChanged);
 
     connect(layout, &QnResource::parentIdChanged, this,
         &QnResourceTreeModelLayoutNode::update);
@@ -70,6 +76,48 @@ void QnResourceTreeModelLayoutNode::updateRecursive()
         item->update();
 }
 
+QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
+{
+    if (type() == Qn::ResourceNode)
+        return context()->user();
+
+    auto owner = parent();
+    if (owner && owner->type() == Qn::SharedLayoutsNode)
+        owner = owner->parent();
+
+    NX_ASSERT(owner);
+    if (owner)
+    {
+        switch (owner->type())
+        {
+            /* Layout under user. */
+            case Qn::ResourceNode:
+                return owner->resource().dynamicCast<QnUserResource>();
+
+            case Qn::RoleNode:
+                return qnUserRolesManager->userRole(owner->uuid());
+
+            default:
+                NX_ASSERT(false);
+                break;
+        }
+    }
+
+    return QnResourceAccessSubject();
+}
+
+QIcon QnResourceTreeModelLayoutNode::iconBySubject(const QnResourceAccessSubject& subject) const
+{
+    switch (qnResourceAccessProvider->accessibleVia(subject, resource()))
+    {
+        case QnAbstractResourceAccessProvider::Source::videowall:
+            return qnResIconCache->icon(QnResourceIconCache::VideoWallLayout);
+        default:
+            break;
+    }
+    return base_type::calculateIcon();
+}
+
 void QnResourceTreeModelLayoutNode::removeNode(const QnResourceTreeModelNodePtr& node)
 {
     node->setResource(QnResourcePtr());
@@ -100,6 +148,18 @@ void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& res
     }
 }
 
+void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource)
+{
+    if (resource != this->resource())
+        return;
+
+    if (subject != getOwner())
+        return;
+
+    update();
+}
+
 void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
 {
     base_type::handlePermissionsChanged(resource);
@@ -108,6 +168,27 @@ void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr
         if (item->resource() == resource)
             item->update();
     }
+}
+
+QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
+{
+    /* Check if node is in process of removing. */
+    if (!resource())
+        return QIcon();
+
+    if (resource()->hasFlags(Qn::exported_layout))
+        return base_type::calculateIcon();
+
+    switch (type())
+    {
+        case Qn::ResourceNode:
+        case Qn::SharedLayoutNode:
+            return iconBySubject(getOwner());
+        default:
+            NX_ASSERT(false);
+            break;
+    }
+    return base_type::calculateIcon();
 }
 
 void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePtr& /*layout*/,
