@@ -246,7 +246,26 @@
                         dataType="Number"
                         range="1,255"/>
                 </group>
-
+                <group name="UPnP">
+                    <param id="root.Network.UPnP.Enabled"
+                        name="UPnP Enabled"
+                        dataType="Enumeration"
+                        range="Yes,No"
+                        internalRange="yes,no"/>
+                    <param id="root.Network.UPnP.FriendlyName"
+                        name="Friendly Name"
+                        dataType="String"/>
+                </group>
+                <group name="Bonjour">
+                    <param id="root.Network.Bonjour.Enabled"
+                        name="Bonjour Enabled"
+                        dataType="Enumeration"
+                        range="Yes,No"
+                        internalRange="yes,no"/>
+                    <param id="root.Network.Bonjour.FriendlyName"
+                        name="Friendly Name"
+                        dataType="String"/>
+                </group>
             </group>
             <group name="LED">
                 <param id="root.StatusLED.Usage"
