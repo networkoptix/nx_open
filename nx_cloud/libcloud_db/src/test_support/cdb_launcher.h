@@ -132,6 +132,11 @@ public:
         const std::string& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole newAccessRole);
+    api::ResultCode removeSystemSharing(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemID,
+        const std::string& accountEmail);
     api::ResultCode getSystemSharings(
         const std::string& email,
         const std::string& password,

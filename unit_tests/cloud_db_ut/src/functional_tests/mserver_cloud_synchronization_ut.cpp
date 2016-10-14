@@ -109,14 +109,13 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserLocallyWhileOffline)
 
         if (i == 0)
         {
-            // Removing user in cloud.
-            api::SystemSharing sharingData;
-            sharingData.accountEmail = account2VmsData.email.toStdString();
-            sharingData.accessRole = api::SystemAccessRole::none;   //< Removing user.
-            sharingData.systemID = registeredSystemData().id;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharingData));
+                cdb()->removeSystemSharing(
+                    ownerAccount().email,
+                    ownerAccountPassword(),
+                    registeredSystemData().id,
+                    account2VmsData.email.toStdString()));
 
             // Waiting for user to disappear from vms.
             waitForUserToDisappearLocally(account2VmsData.id);
@@ -521,15 +520,13 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
 
         waitForCloudAndVmsToSyncUsers();
 
-        // Removing user in cloud.
         ASSERT_EQ(
             api::ResultCode::ok,
-            cdb()->updateSystemSharing(
+            cdb()->removeSystemSharing(
                 ownerAccount().email,
                 ownerAccountPassword(),
                 registeredSystemData().id,
-                newAccountEmail,
-                api::SystemAccessRole::none));
+                newAccountEmail));
         waitForCloudAndVmsToSyncUsers();
 
         // Checking that user has been removed.
