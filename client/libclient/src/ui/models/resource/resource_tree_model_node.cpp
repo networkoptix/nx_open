@@ -69,6 +69,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 {
     NX_ASSERT(model != NULL);
     m_editable.checked = false;
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnResourceTreeModelNode::handlePermissionsChanged);
 }
 
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType):
@@ -907,6 +910,15 @@ void QnResourceTreeModelNode::setModified(bool modified)
 QnResourceTreeModel* QnResourceTreeModelNode::model() const
 {
     return m_model;
+}
+
+void QnResourceTreeModelNode::handlePermissionsChanged(const QnResourcePtr& resource)
+{
+    if (resource == m_resource)
+    {
+        m_editable.checked = false;
+        update();
+    }
 }
 
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)

@@ -14,11 +14,13 @@ public:
     virtual void setParent(const QnResourceTreeModelNodePtr& parent) override;
     virtual void updateRecursive() override;
 
+protected:
+    virtual void handlePermissionsChanged(const QnResourcePtr& resource) override;
+
 private:
     void removeNode(const QnResourceTreeModelNodePtr& node);
 
     void handleResourceAdded(const QnResourcePtr& resource);
-    void handlePermissionsChanged(const QnResourcePtr& resource);
 
     void at_layout_itemAdded(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
     void at_layout_itemRemoved(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);

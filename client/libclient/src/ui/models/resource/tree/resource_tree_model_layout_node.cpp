@@ -102,19 +102,12 @@ void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& res
 
 void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
 {
-    if (resource == this->resource())
+    base_type::handlePermissionsChanged(resource);
+    for (auto item : m_items)
     {
-        update();
+        if (item->resource() == resource)
+            item->update();
     }
-    else
-    {
-        for (auto item : m_items)
-        {
-            if (item->resource() == resource)
-                item->update();
-        }
-    }
-
 }
 
 void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePtr& /*layout*/,
