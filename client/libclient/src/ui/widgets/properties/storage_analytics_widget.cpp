@@ -46,6 +46,7 @@ namespace {
     const qint64 kFinalStepSeconds = 1000000000ll * 10;
 
     const int kTableRowHeight = 24;
+    const int kMinimumColumnWidth = 110;
 
     //TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
     const std::array<qint64, 5> kExtraDataBase =
@@ -200,13 +201,14 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
 
     table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
 
-    CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
-    table->setHorizontalHeader(headers);
+    CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
+    table->setHorizontalHeader(header);
 
-    headers->setSectionsClickable(true);
-    headers->setSectionResizeMode(QHeaderView::ResizeToContents);
-    headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
-    headers->setSortIndicatorShown(true);
+    header->setSectionsClickable(true);
+    header->setMinimumSectionSize(kMinimumColumnWidth);
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
+    header->setSortIndicatorShown(true);
 
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
@@ -228,12 +230,13 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
         ? ui->forecastTable
         : ui->statsTable;
 
-    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, [this, otherTable](int index)
-    {
-        static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->comboBox()->setCurrentIndex(index);
-        if (otherTable == ui->forecastTable)
-            updateData();
-    });
+    connect(header->comboBox(), QnComboboxCurrentIndexChanged, this,
+        [this, otherTable](int index)
+        {
+            static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->comboBox()->setCurrentIndex(index);
+            if (otherTable == ui->forecastTable)
+                updateData();
+        });
 }
 
 QnMediaServerResourcePtr QnStorageAnalyticsWidget::server() const

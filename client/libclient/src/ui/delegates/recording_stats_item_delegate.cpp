@@ -72,7 +72,12 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &opt, opt.widget);
     QnScopedPainterPenRollback penRollback(painter, opt.palette.color(QPalette::Text));
     QnScopedPainterFontRollback fontRollback(painter, opt.font);
+
     int textFlags = opt.displayAlignment | Qt::TextHideMnemonic | Qt::TextSingleLine;
+
+    if (index.column() == QnRecordingStatsModel::CameraNameColumn)
+        label = opt.fontMetrics.elidedText(label, Qt::ElideRight, textRect.width(), textFlags);
+
     painter->drawText(textRect, textFlags, label);
 }
 
@@ -116,6 +121,8 @@ void QnRecordingStatsItemDelegate::initStyleOption(QStyleOptionViewItem* option,
         option->displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
     else
         option->displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+
+    option->fontMetrics = QFontMetrics(option->font);
 }
 
 QnRecordingStatsItemDelegate::RowType QnRecordingStatsItemDelegate::rowType(const QModelIndex& index) const
