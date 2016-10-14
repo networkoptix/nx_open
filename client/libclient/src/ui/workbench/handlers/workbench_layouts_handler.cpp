@@ -108,6 +108,26 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
         &QnWorkbenchLayoutsHandler::at_removeLayoutItemAction_triggered);
     connect(action(QnActions::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
         &QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (!resource->hasFlags(Qn::layout))
+                return;
+
+            auto layoutResource = resource.dynamicCast<QnLayoutResource>();
+            if (!layoutResource)
+                return;
+
+            if (auto layout = QnWorkbenchLayout::instance(layoutResource))
+            {
+                workbench()->removeLayout(layout);
+                delete layout;
+            }
+
+            if (workbench()->layouts().empty())
+                action(QnActions::OpenNewTabAction)->trigger();
+        });
 }
 
 QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler()
