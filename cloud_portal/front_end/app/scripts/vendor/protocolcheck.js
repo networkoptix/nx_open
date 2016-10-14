@@ -153,7 +153,7 @@
         return {
             isOpera   : isOpera,
             isFirefox : typeof InstallTrigger !== 'undefined',
-            isSafari  : Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0,
+            isSafari  : navigator.userAgent.indexOf("Safari") > 0,
             isChrome  : !!window.chrome && !isOpera,
             isIE      : /*@cc_on!@*/false || !!document.documentMode // At least IE6
         }
@@ -183,8 +183,6 @@
                 || navigator.userAgent.match(/iPhone/i)
                 || navigator.userAgent.match(/iPad/i)
                 || navigator.userAgent.match(/iPod/i)
-                || navigator.userAgent.match(/BlackBerry/i)
-                || navigator.userAgent.match(/Windows Phone/i)
                 ){
             return true;
         }
@@ -203,23 +201,35 @@
         }
 
         if (navigator.msLaunchUri) { //for IE and Edge in Win 8 and Win 10
-            openUriWithMsLaunchUri(uri, failCb, successCb);
-        } else {
-            var browser = checkBrowser();
-
-            if (browser.isFirefox) {
-                openUriUsingFirefox(uri, failCallback, successCallback);
-            } else if (browser.isChrome) {
-                openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
-            } else if (browser.isIE) {
-                openUriUsingIEInOlderWindows(uri, failCallback, successCallback);
-            } else if (detectmob()){
-                //not supported, implement please
-                openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openMobileClientTimeout);
-            } else {
-                // default - unknown browser, try chrome's solution
-                openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
+            try{
+                openUriWithMsLaunchUri(uri, failCb, successCb);
+                return;
+            }catch(a){
+                if(console){
+                    console.log("Edge issue with calling msLaunchUri - try other methods");
+                }
+                openUriUsingIE10InWindows7(uri, failCallback, successCallback);
+                return;
             }
+        }
+
+        var browser = checkBrowser();
+
+        if (browser.isFirefox) {
+            openUriUsingFirefox(uri, failCallback, successCallback);
+        } else if (browser.isChrome) {
+            openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
+        } else if (browser.isIE) {
+            openUriUsingIEInOlderWindows(uri, failCallback, successCallback);
+        } else if (browser.isSafari) {
+             // Here we need some special workaround
+             openUriWithHiddenFrame(uri, failCallback, successCallback);
+        } else if (detectmob()){
+            //not supported, implement please
+            openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openMobileClientTimeout);
+        } else {
+            // default - unknown browser, try chrome's solution
+            openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
         }
     }
 } (window));
