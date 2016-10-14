@@ -1,5 +1,5 @@
 
-#include "filtered_systems_model.h"
+#include "filtering_systems_model.h"
 
 #include <ui/models/ordered_systems_model.h>
 
