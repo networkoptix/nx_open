@@ -33,6 +33,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -3366,6 +3367,13 @@ void QnNxStyle::polish(QWidget *widget)
             widget->setFont(font);
         }
         widget->setAttribute(Qt::WA_Hover);
+
+#if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
+#error Check if this workaround is required in current Qt version
+#endif
+        /* Fix for Qt 5.6 bug: QHeaderView doesn't resize stretch sections to minimum
+         *  if quickly resized down. To overcome this problem we do it ourselves: */
+        widget->installEventFilter(this);
     }
 
     if (qobject_cast<QLineEdit*>(widget))
@@ -3765,6 +3773,37 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
         {
             event->ignore();
             return true;
+        }
+    }
+    /* Fix for Qt 5.6 bug: QHeaderView doesn't resize stretch sections to minimum
+     *  if quickly resized down.To overcome this problem we do it manually here: */
+    if (auto header = qobject_cast<QHeaderView*>(object))
+    {
+        if (event->type() == QEvent::Resize)
+        {
+            auto updateSectionSizes =
+                [header]()
+                {
+                    if (header->stretchSectionCount() > 0 && header->length() > header->width())
+                    {
+                        bool last = header->stretchLastSection();
+                        int minumumSize = header->minimumSectionSize();
+
+                        for (int i = header->count() - 1; i >= 0; --i)
+                        {
+                            if (header->isSectionHidden(i))
+                                continue;
+
+                            if (last || header->sectionResizeMode(i) == QHeaderView::Stretch)
+                            {
+                                header->resizeSection(i, minumumSize);
+                                last = false;
+                            }
+                        }
+                    }
+                };
+
+            executeDelayedParented(updateSectionSizes, 0, header);
         }
     }
 
