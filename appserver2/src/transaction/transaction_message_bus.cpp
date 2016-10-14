@@ -1387,6 +1387,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             QnTransactionTransport* transport = itr.value();
 
             if (transport->getState() >= QnTransactionTransport::Connected &&
+                transport->getState() <= QnTransactionTransport::Closed &&
                 transport->isHttpKeepAliveTimeout())
             {
                 NX_LOGX(
@@ -1398,7 +1399,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 continue;
             }
 
-            if (transport->getState() >= QnTransactionTransport::ReadyForStreaming &&
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming &&
                 !transport->remotePeer().isClient() &&
                 transport->isNeedResync())
             {
