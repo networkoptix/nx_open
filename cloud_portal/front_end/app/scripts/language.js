@@ -2,8 +2,8 @@
 
 var L = {
     productName: 'PRODUCT_NAME',
-    clientProtocol: 'CLIENT_PROTOCOL:',
-    clientDomain: '{{portalDomain}}',
+    clientProtocol: 'nx-vms:',
+    clientDomain: 'cloud-test.hdw.mx',
 
     dialogs:{
         okButton: 'Ok',
@@ -32,7 +32,7 @@ var L = {
         download: 'Download VMS_NAME',
         downloadPlatform: 'Download VMS_NAME for ',
         startPage: '',
-        pageNotFount: 'Page not found'
+        pageNotFound: 'Page not found'
     },
     systemStatuses:{
         notActivated: 'not activated',
@@ -107,8 +107,9 @@ var L = {
         systemNotFound: 'System not found.',
 
         cantEditYourself: 'Changing own permissions is not allowed.',
-        cantEditAdmin: 'This user already has administrator permissions.'
+        cantEditAdmin: 'This user already has administrator permissions.',
 
+        cantOpenClient: 'VMS_NAME application was not detected. <a href="/download">Download</a>'
     },
     passwordRequirements:{
         minLengthMessage:'Password must contain at least 8 characters',

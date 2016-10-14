@@ -32,6 +32,17 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
             }
         })
+        .when('/register/successActivated', {
+            title: L.pageTitles.registerSuccess,
+            templateUrl: 'static/views/register.html',
+            controller: 'RegisterCtrl',
+            resolve: {
+                test: ['$route',function ($route) {
+                    $route.current.params.registerSuccess = true;
+                    $route.current.params.activated = true;
+                }]
+            }
+        })
         .when('/register/:code', {
             title: L.pageTitles.register,
             templateUrl: 'static/views/register.html',
@@ -182,7 +193,7 @@ angular.module('cloudApp', [
             controller: 'StartPageCtrl'
         })
         .otherwise({
-            title: L.pageTitles.pageNotFount,
+            title: L.pageTitles.pageNotFound,
             templateUrl: 'static/views/404.html'
         });
 }]).run(['$route', '$rootScope', '$location', 'page', function ($route, $rootScope, $location, page) {
@@ -199,6 +210,10 @@ angular.module('cloudApp', [
     };
 
     $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
-        page.title(current.$$route.title);
+        if(current.$$route){
+            page.title(current.$$route.title);
+        }else{
+            page.title(L.pageTitles.pageNotFound);
+        }
     });
 }]);

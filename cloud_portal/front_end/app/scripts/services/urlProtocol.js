@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('urlProtocol', ['$base64', '$location', 'account', '$q',  function ($base64, $location, account, $q) {
+    .factory('urlProtocol', ['$base64', '$location', 'account', '$q',
+    function ($base64, $location, account, $q) {
 
         function parseSource() {
             var search = $location.search();
@@ -80,11 +81,17 @@ angular.module('cloudApp')
                 return defer.promise;
             },
             open:function(systemId){
+                var result = $q.defer();
                 this.getLink({
                     systemId: systemId
                 }).then(function(link){
-                    window.location.href = link;
-                })
+                    window.protocolCheck(link, function () {
+                        result.reject(L.errorCodes.noClientDetected);
+                    },function(){
+                        result.resolve();
+                    });
+                });
+                return result.promise;
             },
             getSource: parseSource,
             source: parseSource()

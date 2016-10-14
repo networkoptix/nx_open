@@ -13,7 +13,7 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
-    var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
+    var cloudHost = 'cloud-dev.hdw.mx';  // 'cloud-local' // For local vagrant
 
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);

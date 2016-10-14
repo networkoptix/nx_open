@@ -169,7 +169,7 @@ h1>.label{
 }
 
 @media (min-width: $screen-sm-min) {
-  // Automatically set modal's width for larger viewports
+  /* Automatically set modal's width for larger viewports */
   .modal-dialog {
     margin: 108px auto;
   }
@@ -348,24 +348,24 @@ label {
 
 @mixin kill-glyphicon{
   background-size: 112px 32px;
-  background-image: url('../images/portal_icons.png') !important;
+  background-image: url('/static/images/portal_icons.png') !important;
   &:before{
     content:none;
   }
 
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('../images/portal_icons@2x.png');
+    background-image: url('/static/images/portal_icons@2x.png');
   }
 }
 
 select {
   position: relative;
-  background-image: url('../images/arrow_down.png') !important;
+  background-image: url('/static/images/arrow_down.png') !important;
   background-repeat: no-repeat;
   background-size: 16px 16px;
   background-position: right 8px center;
 
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('../images/arrow_down@2x.png') !important;
+    background-image: url('/static/images/arrow_down@2x.png') !important;
   }
 }

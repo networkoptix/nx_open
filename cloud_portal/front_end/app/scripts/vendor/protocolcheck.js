@@ -1,4 +1,5 @@
-//https://github.com/ismailhabib/custom-protocol-detection/
+// https://github.com/ismailhabib/custom-protocol-detection/
+// There is a hack here: look for Config.openClientTimeout
 
 (function(window) {
 
@@ -53,12 +54,12 @@
         iframe.contentWindow.location.href = uri;
     }
 
-    function openUriWithTimeoutHack(uri, failCb, successCb) {
+    function openUriWithTimeoutHack(uri, failCb, successCb, timeout) {
 
         var timeout = setTimeout(function () {
             failCb();
             handler.remove();
-        }, 1000);
+        }, timeout);
 
         //handle page running in an iframe (blur must be registered with top level window)
         var target = window;
@@ -176,6 +177,22 @@
         return rv;
     }
 
+    function detectmob() {
+        if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     window.protocolCheck = function(uri, failCb, successCb) {
         function failCallback() {
             failCb && failCb();
@@ -193,11 +210,15 @@
             if (browser.isFirefox) {
                 openUriUsingFirefox(uri, failCallback, successCallback);
             } else if (browser.isChrome) {
-                openUriWithTimeoutHack(uri, failCallback, successCallback);
+                openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
             } else if (browser.isIE) {
                 openUriUsingIEInOlderWindows(uri, failCallback, successCallback);
-            } else {
+            } else if (detectmob()){
                 //not supported, implement please
+                openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openMobileClientTimeout);
+            } else {
+                // default - unknown browser, try chrome's solution
+                openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
             }
         }
     }

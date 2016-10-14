@@ -18,11 +18,7 @@
                     ng-click="share()" ng-if="system.permissions.editUsers">
                 <span class="glyphicon glyphicon-share"></span> Share</button>
             &nbsp;
-            <process-button process="openClient"
-                            action-type="'default'"
-                            title="{{system.stateMessage}}"
-                            button-disabled="!system.isOnline"
-                            button-text="L.system.openClient"></process-button>
+            <open-client-button system="system"></open-client-button>
         </div>
     </div>
 </div>

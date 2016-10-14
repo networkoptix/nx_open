@@ -49,12 +49,6 @@ angular.module('cloudApp')
         });
         $scope.gettingSystems.run();
 
-
-        $scope.openClient = function(system,$event){
-            urlProtocol.open(system?system.id:null);
-            $event.stopPropagation();
-        };
-
         $scope.openSystem = function(system){
             $location.path('/systems/' + system.id);
         };

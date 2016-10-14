@@ -69,13 +69,11 @@ angular.module('cloudApp')
             login:function (email, password, remember){
                 this.setEmail(email);
                 this.setPassword(password);
-                var promise = cloudApi.login(email, password, remember);
-                promise.then(function(result){
+                return cloudApi.login(email, password, remember).then(function(result){
                     if(result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                         $rootScope.session.loginState = result.data.email;
                     }
                 });
-                return promise;
             },
             logout:function(doNotRedirect){
                 cloudApi.logout().then(function(){
