@@ -178,16 +178,18 @@ TEST_F(Account, reactivation_activated_account)
 TEST_F(Account, general)
 {
     EmailManagerMocked mockedEmailManager;
+
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(
-            GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&)))
-            .Times(3);
+            GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(3);
+
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(
-            GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&)))
-            .Times(2);
+            GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&))
+    ).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
