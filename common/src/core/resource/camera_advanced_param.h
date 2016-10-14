@@ -35,6 +35,49 @@ struct QnCameraAdvancedParamQueryInfo
     QString cmd;
 };
 
+struct QnCameraAdvancedParameterCondition
+{
+    enum class ConditionType
+    {
+        Equal,
+        InRange,
+        NotInRange,
+        Unknown
+    };
+
+    QnCameraAdvancedParameterCondition();
+
+    ConditionType type;
+    QString paramId;
+    QString value;
+    QString range;
+
+    static ConditionType fromStringToConditionType(const QString& conditionType);
+    static QString fromConditionTypeToString(const ConditionType& conditionType);
+};
+
+#define QnCameraAdvancedParameterCondition_Fields (type)(paramId)(value)(range)
+
+struct QnCameraAdvancedParameterDependency
+{
+    enum class DependencyType
+    {
+        Show,
+        Range,
+        Unknown
+    };
+
+    QnCameraAdvancedParameterDependency();
+
+    DependencyType type;
+    std::vector<QnCameraAdvancedParameterCondition> conditions;
+
+    static DependencyType fromStringToDependencyType(const QString& dependencyType);
+    static QString fromDependencyTypeToString(const DependencyType& dependencyType);
+};
+
+#define QnCameraAdvancedParameterDependency_Fields (type)(conditions)
+
 struct QnCameraAdvancedParameter {
     enum class DataType {
         None,
@@ -58,6 +101,7 @@ struct QnCameraAdvancedParameter {
     QString readCmd; // read parameter command line. Isn't used in UI
     QString writeCmd; // write parameter command line. Isn't used in UI
     QString internalRange; // internal device values for range parameters
+    std::vector<QnCameraAdvancedParameterDependency> dependencies;
 
     QnCameraAdvancedParameter();
 
@@ -75,7 +119,7 @@ struct QnCameraAdvancedParameter {
 
 	static bool dataTypeHasValue(DataType value);
 };
-#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)(readCmd)(writeCmd)(internalRange)
+#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)(readCmd)(writeCmd)(internalRange)(dependencies)
 
 struct QnCameraAdvancedParamGroup {
     QString name;
@@ -109,7 +153,7 @@ struct QnCameraAdvancedParams {
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 
-#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)
+#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)(QnCameraAdvancedParameterDependency)(QnCameraAdvancedParameterCondition)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 	QnCameraAdvancedParameterTypes,

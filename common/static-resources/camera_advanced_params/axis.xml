@@ -120,13 +120,62 @@
                     dataType="Enumeration"
                     range="8,16"
                     internalRange="8000,16000"
-                    readCmd="param.cgi"/>
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <!--<conditional-show>
+                            <condition id="root.Network.SomeParam"
+                                condition="value=somevalue"/>
+                            <condition id="root.Network.SomeParam2"
+                                condition="valueIn=somevalue1,someValue2,someValue3"/>
+                            <condition id="root.Network.SomeParam3"
+                                condition="valueNotIn=somevalue1,someValue2,someValue3"/>
+                        </conditional-show>-->
+                        
+                        <conditional-ranges>
+                            <conditional-range range="8" internalRange="8000">
+                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                    condition="valueIn=G711 ulaw,G726"/>    
+                            </conditional-range>
+                            <conditional-range range="8,16" internalRange="8000,16000">
+                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                        condition="value=AAC"/>
+                            </conditional-range>
+                        </conditional-ranges>
+                    </dependencies>
+                </param>
                 <param id="root.AudioSource.A0.BitRate"
                     name="Bit Rate"
                     dataType="Enumeration"
                     range="12,16,24,32,48,64"
                     internalRange="12000,16000,24000,32000,48000,64000"
-                    readCmd="param.cgi"/>
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <!--<conditional-show>
+                            <condition id="root.Network.SomeParam"
+                                condition="value=somevalue"/>
+                            <condition id="root.Network.SomeParam2"
+                                condition="valueIn=somevalue1,someValue2,someValue3"/>
+                            <condition id="root.Network.SomeParam3"
+                                condition="valueNotIn=somevalue1,someValue2,someValue3"/>
+                        </conditional-show>-->
+                        
+                        <conditional-ranges>
+                            <conditional-range range="64" internalRange="64000">
+                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                    condition="value=G711 ulaw"/>    
+                            </conditional-range>
+                            <conditional-range range="24,32" internalRange="24000,32000">
+                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                        condition="value=G726"/>
+                            </conditional-range>
+                            <conditional-range range="12,16,24,32,48,64" 
+                                internalRange="12000,16000,24000,32000,48000,64000">
+                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                        condition="value=AAC"/>
+                            </conditional-range>
+                        </conditional-ranges>
+                    </dependencies>
+                </param>
                 <param id="root.Audio.A0.AlarmLevel"
                     name="Alarm Level"
                     dataType="Number"
@@ -244,7 +293,8 @@
                     <param id="root.Network.RTP.R0.TTL"
                         name="Time To Live"
                         dataType="Number"
-                        range="1,255"/>
+                        range="1,255">
+                    </param>
                 </group>
                 <group name="UPnP">
                     <param id="root.Network.UPnP.Enabled"

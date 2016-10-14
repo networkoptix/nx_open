@@ -6,6 +6,11 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/properties/camera_advanced_param_widget_factory.h>
 
+#include <nx/utils/log/assert.h>
+
+using ConditionType = QnCameraAdvancedParameterCondition::ConditionType;
+using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
+
 QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
 	QObject(parent),
 	m_groupWidget(groupWidget),
@@ -142,6 +147,29 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                 &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
         }
 	}
+
+    for (const auto& param: params)
+    {
+        if (param.dependencies.empty())
+            continue;
+
+        qDebug() << "====================> GOT DEPENDENCIES ON CLIENT SIDE" << param.name;
+        for (const auto& dependency: param.dependencies)
+        {
+            if (dependency.type == DependencyType::Show)
+            {
+                qDebug() << "=====================> HAS SHOW DEPENDENCY!";
+            }
+            else if (dependency.type == DependencyType::Range)
+            {
+                qDebug() << "=====================> HAS RANGE DEPENDENCY!";
+            }
+            else
+            {
+                NX_ASSERT(false, "Should never get here.");
+            }
+        }
+    }
 
 	return page;
 }

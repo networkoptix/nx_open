@@ -10,6 +10,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
 
+using ConditionType = QnCameraAdvancedParameterCondition::ConditionType;
+using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
+
 QnCameraAdvancedParamValue::QnCameraAdvancedParamValue() {}
 
 QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const QString &value):
@@ -300,6 +303,100 @@ bool deserialize(QnJsonContext *, const QJsonValue &value, QnCameraAdvancedParam
 void serialize(QnJsonContext *ctx, const QnCameraAdvancedParameter::DataType &value, QJsonValue *target) 
 {
 	QJson::serialize(ctx, QnCameraAdvancedParameter::dataTypeToString(value), target);
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& value, ConditionType* target)
+{
+    *target = QnCameraAdvancedParameterCondition::fromStringToConditionType(value.toString());
+    return true;
+}
+
+void serialize(QnJsonContext* ctx, const ConditionType& value, QJsonValue* target)
+{
+    QJson::serialize(ctx, QnCameraAdvancedParameterCondition::fromConditionTypeToString(value), target);
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& value, DependencyType* target)
+{
+    *target = QnCameraAdvancedParameterDependency::fromStringToDependencyType(value.toString());
+    return true;
+}
+
+void serialize(QnJsonContext* ctx, const DependencyType& value, QJsonValue* target)
+{
+    QJson::serialize(ctx, QnCameraAdvancedParameterDependency::fromDependencyTypeToString(value), target);
+}
+
+QnCameraAdvancedParameterCondition::QnCameraAdvancedParameterCondition():
+    type(ConditionType::Unknown)
+{
+}
+
+QnCameraAdvancedParameterDependency::QnCameraAdvancedParameterDependency():
+    type(DependencyType::Unknown)
+{
+}
+
+ConditionType QnCameraAdvancedParameterCondition::fromStringToConditionType(
+    const QString& conditionType)
+{
+    //TODO: #dmishin to move these constants to static members.
+    const auto kEqual = lit("value");
+    const auto kInRange = lit("valueIn");
+    const auto kNotInRange = lit("valueNotIn");
+
+    if (conditionType == kEqual)
+        return ConditionType::Equal;
+    else if (conditionType == kInRange)
+        return ConditionType::InRange;
+    else if (conditionType == kNotInRange)
+        return ConditionType::NotInRange;
+
+    return ConditionType::Unknown;
+}
+
+QString QnCameraAdvancedParameterCondition::fromConditionTypeToString(const ConditionType& conditionType)
+{
+    //TODO: #dmishin maybe to move these constants to static members.
+    const auto kEqual = lit("value");
+    const auto kInRange = lit("valueIn");
+    const auto kNotInRange = lit("valueNotIn");
+
+    if (conditionType == ConditionType::Equal)
+        return kEqual;
+    else if (conditionType == ConditionType::InRange)
+        return kInRange;
+    else if (conditionType == ConditionType::NotInRange)
+        return kNotInRange;
+
+    return QString();
+
+}
+
+DependencyType QnCameraAdvancedParameterDependency::fromStringToDependencyType(const QString& dependencyType)
+{
+    const auto kShow = lit("Show");
+    const auto kRange = lit("Range");
+
+    if (dependencyType == kShow)
+        return DependencyType::Show;
+    else if(dependencyType == kRange)
+        return DependencyType::Range;
+
+    return DependencyType::Unknown;
+}
+
+QString QnCameraAdvancedParameterDependency::fromDependencyTypeToString(const DependencyType& dependencyType)
+{
+    const auto kShow = lit("Show");
+    const auto kRange = lit("Range");
+
+    if (dependencyType == DependencyType::Show)
+        return kShow;
+    else if (dependencyType == DependencyType::Range)
+        return kRange;
+
+    return QString();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)
