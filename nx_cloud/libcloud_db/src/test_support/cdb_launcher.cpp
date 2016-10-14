@@ -571,7 +571,7 @@ api::ResultCode CdbLauncher::updateSystemSharing(
     return resCode;
 }
 
-api::ResultCode removeSystemSharing(
+api::ResultCode CdbLauncher::removeSystemSharing(
     const std::string& email,
     const std::string& password,
     const std::string& systemID,
