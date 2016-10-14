@@ -13,7 +13,8 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_cloudWeights(),
     m_localWeights(),
     m_newSystemWeights(),
-    m_updatingWeights(false)
+    m_updatingWeights(false),
+    m_sourceRowsCount(0)
 {
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged,
         this, &QnOrderedSystemsModel::handleCloudSystemsChanged);
@@ -26,6 +27,12 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
         });
 
     setSourceModel(new QnSystemsModel(this));
+    connect(sourceModel(), &QAbstractItemModel::modelReset,
+        this, &QnOrderedSystemsModel::updateSourceRowsCount);
+    connect(sourceModel(), &QAbstractItemModel::rowsRemoved,
+        this, &QnOrderedSystemsModel::updateSourceRowsCount);
+    connect(sourceModel(), &QAbstractItemModel::rowsInserted,
+        this, &QnOrderedSystemsModel::updateSourceRowsCount);
 
     handleCloudSystemsChanged();
     handleLocalWeightsChanged();
@@ -38,7 +45,31 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     connect(m_updateTimer, &QTimer::timeout,
         this, &QnOrderedSystemsModel::updateFinalWeights);
     m_updateTimer->start();
+
+
+    updateSourceRowsCount();
 }
+
+void QnOrderedSystemsModel::updateSourceRowsCount()
+{
+    const auto source = sourceModel();
+    setSourceRowsCount(source->rowCount());
+}
+
+int QnOrderedSystemsModel::sourceRowsCount() const
+{
+    return m_sourceRowsCount;
+}
+
+void QnOrderedSystemsModel::setSourceRowsCount(int value)
+{
+    if (m_sourceRowsCount == value)
+        return;
+
+    m_sourceRowsCount = value;
+    emit sourceRowsCountChanged();
+}
+
 
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
