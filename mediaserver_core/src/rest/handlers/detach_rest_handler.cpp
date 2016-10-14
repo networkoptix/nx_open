@@ -19,12 +19,6 @@
 #include <utils/common/app_info.h>
 #include <api/model/detach_from_cloud_reply.h>
 
-namespace {
-
-static const QString kDefaultAdminPassword = "admin";
-
-} // namespace
-
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     CloudConnectionManager* const cloudConnectionManager)
     :

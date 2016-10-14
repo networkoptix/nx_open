@@ -915,7 +915,7 @@ void initAppServerConnection(QSettings &settings)
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
-    QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
+    QString userName = settings.value("appserverLogin", QnServer::kDefaultAdminPassword).toString();
     QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
     QByteArray authKey = nx::ServerSetting::getAuthKey();
     QString appserverHostString = settings.value("appserverHost").toString();
