@@ -113,6 +113,8 @@ angular.module('cloudApp')
             urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(link){
                 window.protocolCheck(link, function () {
                     alert("protocol not recognized");
+                },function () {
+                    alert("ok - procotol is working");
                 });
             });
         }

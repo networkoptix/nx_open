@@ -2,8 +2,8 @@
 
 var L = {
     productName: 'PRODUCT_NAME',
-    clientProtocol: 'nx-vms:',
-    clientDomain: 'cloud-test.hdw.mx',
+    clientProtocol: 'CLIENT_PROTOCOL:',
+    clientDomain: '{{portalDomain}}',
 
     dialogs:{
         okButton: 'Ok',
