@@ -1387,7 +1387,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             QnTransactionTransport* transport = itr.value();
 
             if (transport->getState() >= QnTransactionTransport::Connected &&
-                transport->getState() <= QnTransactionTransport::Closed &&
+                transport->getState() < QnTransactionTransport::Closed &&
                 transport->isHttpKeepAliveTimeout())
             {
                 NX_LOGX(
