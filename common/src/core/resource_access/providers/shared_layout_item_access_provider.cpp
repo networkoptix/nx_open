@@ -68,6 +68,37 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
     return false;
 }
 
+void QnSharedLayoutItemAccessProvider::fillProviders(
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource,
+    QnResourceList* providers) const
+{
+    if (!providers)
+        return;
+
+    if (!isMediaResource(resource))
+        return;
+
+    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
+        qnSharedResourcesManager->sharedResources(subject));
+
+    auto resourceId = resource->getId();
+    for (const auto& layout : sharedLayouts)
+    {
+        NX_ASSERT(layout->isShared());
+        if (!layout->isShared())
+            continue;
+
+        for (const auto& item : layout->getItems())
+        {
+            if (item.resource.id != resourceId)
+                continue;
+            *providers << layout;
+            break;
+        }
+    }
+}
+
 void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
     base_type::handleResourceAdded(resource);

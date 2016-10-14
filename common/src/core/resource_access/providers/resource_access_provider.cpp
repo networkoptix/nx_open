@@ -22,11 +22,15 @@ bool QnResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
 }
 
 QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia(
-    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource,
+    QnResourceList* providers) const
 {
     for (auto provider : m_providers)
     {
-        auto result = provider->accessibleVia(subject, resource);
+        if (providers)
+            providers->clear();
+        auto result = provider->accessibleVia(subject, resource, providers);
         if (result != Source::none)
             return result;
     }

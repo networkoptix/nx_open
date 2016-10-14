@@ -16,9 +16,14 @@ protected:
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
+    virtual void fillProviders(
+        const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource,
+        QnResourceList* providers = nullptr
+    ) const override;
+
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;
     virtual void handleResourceRemoved(const QnResourcePtr& resource) override;
-
 private:
     void handleVideoWallItemAdded(const QnVideoWallResourcePtr& resource,
         const QnVideoWallItem &item);
