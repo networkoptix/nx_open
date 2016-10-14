@@ -327,6 +327,7 @@ public:
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
+    QString ifListFilter;
     bool cleanupDb;
 
     CmdLineArguments()
@@ -2906,6 +2907,23 @@ void SIGUSR1_handler(int)
 }
 #endif
 
+void updateAllowedInterfaces(const CmdLineArguments& cmdLineArguments)
+{
+    // check registry
+    QString ifList = MSSettings::roSettings()->value(lit("if")).toString();
+    // check startup parameter
+    if (ifList.isEmpty())
+        ifList = cmdLineArguments.ifListFilter;
+
+    QList<QHostAddress> allowedInterfaces;
+    for (const QString& s: ifList.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        allowedInterfaces << QHostAddress(s);
+
+    if (!allowedInterfaces.isEmpty())
+        qWarning() << "Using net IF filter:" << allowedInterfaces;
+    setInterfaceListFilter(allowedInterfaces);
+}
+
 int MediaServerProcess::main(int argc, char* argv[])
 {
 #if 0
@@ -2959,6 +2977,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.ifListFilter, "--if", NULL,
+        "Strict media server network interface list (comma delimited list)");
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL,
         "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL,
@@ -2986,6 +3006,8 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+
+    updateAllowedInterfaces(cmdLineArguments);
 
     #ifdef __linux__
         if( !disableCrashHandler )
