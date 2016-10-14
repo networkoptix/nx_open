@@ -35,11 +35,8 @@
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
-#include "ec2/connection_manager.h"
 #include "ec2/db/migration/add_history_to_transaction.h"
-#include "ec2/incoming_transaction_dispatcher.h"
-#include "ec2/outgoing_transaction_dispatcher.h"
-#include "ec2/transaction_log.h"
+#include "ec2/synchronization_engine.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
@@ -185,22 +182,13 @@ int CloudDBProcess::exec()
         EventManager eventManager(settings);
         m_eventManager = &eventManager;
 
-        ec2::OutgoingTransactionDispatcher ec2OutgoingTransactionDispatcher;
-        ec2::TransactionLog transactionLog(
-            kCdbGuid,
-            &dbManager,
-            &ec2OutgoingTransactionDispatcher);
-        ec2::IncomingTransactionDispatcher incomingTransactionDispatcher(
-            kCdbGuid,
-            &transactionLog);
-        ec2::ConnectionManager ec2ConnectionManager(
+        ec2::SyncronizationEngine ec2SyncronizationEngine(
             kCdbGuid,
             settings,
-            &transactionLog,
-            &incomingTransactionDispatcher,
-            &ec2OutgoingTransactionDispatcher);
+            &dbManager);
 
-        SystemHealthInfoProvider systemHealthInfoProvider(ec2ConnectionManager);
+        SystemHealthInfoProvider systemHealthInfoProvider(
+            ec2SyncronizationEngine.connectionManager());
 
         SystemManager systemManager(
             settings,
@@ -209,9 +197,11 @@ int CloudDBProcess::exec()
             systemHealthInfoProvider,
             &dbManager,
             emailManager.get(),
-            &transactionLog,
-            &incomingTransactionDispatcher);
+            &ec2SyncronizationEngine);
         m_systemManager = &systemManager;
+
+        ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
+            systemManager.systemMarkedAsDeletedSubscription());
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
@@ -244,8 +234,7 @@ int CloudDBProcess::exec()
 
         MaintenanceManager maintenanceManager(
             kCdbGuid,
-            ec2ConnectionManager,
-            &transactionLog);
+            &ec2SyncronizationEngine);
 
         //registering HTTP handlers
         registerApiHandlers(
@@ -255,7 +244,7 @@ int CloudDBProcess::exec()
             &systemManager,
             &authProvider,
             &eventManager,
-            &ec2ConnectionManager,
+            &ec2SyncronizationEngine.connectionManager(),
             &maintenanceManager);
         //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
         eventManager.registerHttpHandlers(
@@ -298,7 +287,16 @@ int CloudDBProcess::exec()
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
+        // This is actually a main loop.
         m_processTerminationEvent.get_future().wait();
+
+        // First of all, cancelling accepting new requests.
+        multiAddressHttpServer.forEachListener(
+            [](nx_http::HttpStreamSocketServer* listener){ listener->pleaseStop(); });
+
+        ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
+            systemManager.systemMarkedAsDeletedSubscription());
+
         return 0;
     }
     catch (const std::exception& e)

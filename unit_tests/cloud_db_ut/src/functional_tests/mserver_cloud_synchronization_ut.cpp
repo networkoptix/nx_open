@@ -542,5 +542,149 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
     }
 }
 
+class Ec2MserverCloudSynchronizationConnection
+:
+    public CdbFunctionalTest
+{
+public:
+    Ec2MserverCloudSynchronizationConnection()
+    :
+        m_moduleGuid(QnUuid::createUuid()),
+        m_runningInstanceGuid(QnUuid::createUuid()),
+        m_transactionConnectionIdSequence(0)
+    {
+    }
+
+    /**
+     * @return new connection id
+     */
+    int openTransactionConnection(
+        const std::string& systemId,
+        const std::string& systemAuthKey)
+    {
+        auto localPeerInfo = localPeer();
+        localPeerInfo.id = QnUuid::createUuid();
+
+        auto transactionConnection =
+            std::make_unique<test::TransactionTransport>(
+                localPeerInfo,
+                systemId,
+                systemAuthKey);
+        QObject::connect(
+            transactionConnection.get(), &test::TransactionTransport::stateChanged,
+            transactionConnection.get(),
+            [transactionConnection = transactionConnection.get(), this](
+                test::TransactionTransport::State state)
+            {
+                onTransactionConnectionStateChanged(transactionConnection, state);
+            },
+            Qt::DirectConnection);
+
+        std::lock_guard<std::mutex> lk(m_mutex);
+        auto transactionConnectionPtr = transactionConnection.get();
+        const int connectionId = ++m_transactionConnectionIdSequence;
+        m_connections.emplace(
+            connectionId,
+            std::move(transactionConnection));
+        const QUrl url(lit("http://%1/ec2/events").arg(endpoint().toString()));
+        transactionConnectionPtr->doOutgoingConnect(url);
+
+        return connectionId;
+    }
+    
+    bool waitForState(
+        const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
+        int connectionId,
+        std::chrono::milliseconds durationToWait)
+    {
+        std::unique_lock<std::mutex> lk(m_mutex);
+
+        const auto waitUntil = std::chrono::steady_clock::now() + durationToWait;
+        boost::optional<::ec2::QnTransactionTransportBase::State> prevState;
+        for (;;)
+        {
+            auto connectionIter = m_connections.find(connectionId);
+            if (connectionIter == m_connections.end())
+            {
+                // Connection has been removed.
+                for (const auto& desiredState: desiredStates)
+                    if (desiredState == test::TransactionTransport::Closed)
+                        return true;
+                return false;
+            }
+
+            const auto currentState = connectionIter->second->getState();
+
+            for (const auto& desiredState : desiredStates)
+                if (currentState == desiredState)
+                    return true;
+
+            if (m_condition.wait_until(lk, waitUntil) == std::cv_status::timeout)
+                return false;
+        }
+    }
+
+private:
+    QnUuid m_moduleGuid;
+    QnUuid m_runningInstanceGuid;
+    std::map<int, std::unique_ptr<test::TransactionTransport>> m_connections;
+    mutable std::mutex m_mutex;
+    std::condition_variable m_condition;
+    std::atomic<int> m_transactionConnectionIdSequence;
+
+    ec2::ApiPeerData localPeer() const
+    {
+        return ec2::ApiPeerData(
+            m_moduleGuid,
+            m_runningInstanceGuid,
+            Qn::PT_Server);
+    }
+
+    void onTransactionConnectionStateChanged(
+        ec2::QnTransactionTransportBase* connection,
+        ec2::QnTransactionTransportBase::State newState)
+    {
+        m_condition.notify_all();
+    }
+};
+
+TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_removal)
+{
+    constexpr static const auto kWaitTimeout = std::chrono::seconds(10);
+    // TODO: #ak static data of ConnectionLockGuard prohibits from testing with more than one connection
+    constexpr static const auto kConnectionsToCreateCount = 1;
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system = addRandomSystemToAccount(account);
+
+    std::vector<int> connectionIds;
+    for (int i = 0; i < kConnectionsToCreateCount; ++i)
+        connectionIds.push_back(openTransactionConnection(system.id, system.authKey));
+
+    for (const auto& connectionId: connectionIds)
+    {
+        ASSERT_TRUE(
+            waitForState(
+                {::ec2::QnTransactionTransportBase::Connected},
+                connectionId,
+                kWaitTimeout));
+    }
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        unbindSystem(account.data.email, account.password, system.id));
+
+    for (const auto& connectionId: connectionIds)
+    {
+        ASSERT_TRUE(
+            waitForState(
+                {::ec2::QnTransactionTransportBase::Closed, ::ec2::QnTransactionTransportBase::Error},
+                connectionId,
+                kWaitTimeout));
+    }
+}
+
 } // namespace cdb
 } // namespace nx

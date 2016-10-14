@@ -8,6 +8,7 @@
 
 #include <cloud_db_client/src/cdb_request_path.h>
 #include <http/custom_headers.h>
+#include <utils/common/guard.h>
 
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
@@ -356,6 +357,29 @@ bool ConnectionManager::isSystemConnected(const std::string& systemId) const
         systemIter->systemIdAndPeerId.first == systemId;
 }
 
+void ConnectionManager::closeConnectionsToSystem(
+    const nx::String& systemId,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    auto allConnectionsRemovedGuard = makeSharedGuard(std::move(completionHandler));
+
+    QnMutexLocker lk(&m_mutex);
+
+    auto& connectionBySystemIdAndPeerIdIndex =
+        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+    auto it = connectionBySystemIdAndPeerIdIndex.lower_bound(
+        std::make_pair(systemId, nx::String()));
+    while (it != connectionBySystemIdAndPeerIdIndex.end() &&
+           it->systemIdAndPeerId.first == systemId)
+    {
+        removeConnectionByIter(
+            &lk,
+            connectionBySystemIdAndPeerIdIndex,
+            it++,
+            [allConnectionsRemovedGuard](){});
+    }
+}
+
 bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
     QnMutexLocker lk(&m_mutex);
@@ -391,7 +415,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
 
 template<int connectionIndexNumber, typename ConnectionKeyType>
 void ConnectionManager::removeExistingConnection(
-    QnMutexLockerBase* const /*lock*/,
+    QnMutexLockerBase* const lock,
     ConnectionKeyType connectionKey)
 {
     auto& connectionIndex = m_connections.get<connectionIndexNumber>();
@@ -399,15 +423,28 @@ void ConnectionManager::removeExistingConnection(
     if (existingConnectionIter == connectionIndex.end())
         return;
 
-    // Removing existing connection.
+    removeConnectionByIter(
+        lock,
+        connectionIndex,
+        existingConnectionIter,
+        [](){});
+}
+
+template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
+void ConnectionManager::removeConnectionByIter(
+    QnMutexLockerBase* const /*lock*/,
+    ConnectionIndex& connectionIndex,
+    Iterator connectionIterator,
+    CompletionHandler completionHandler)
+{
     std::unique_ptr<TransactionTransport> existingConnection;
     connectionIndex.modify(
-        existingConnectionIter,
+        connectionIterator,
         [&existingConnection](ConnectionContext& data)
         {
             existingConnection = std::move(data.connection);
         });
-    connectionIndex.erase(existingConnectionIter);
+    connectionIndex.erase(connectionIterator);
 
     TransactionTransport* existingConnectionPtr = existingConnection.get();
     
@@ -424,9 +461,11 @@ void ConnectionManager::removeExistingConnection(
 
     existingConnectionPtr->post(
         [existingConnection = std::move(existingConnection),
-            locker = m_startedAsyncCallsCounter.getScopedIncrement()]() mutable
+            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            completionHandler = std::move(completionHandler)]() mutable
         {
             existingConnection.reset();
+            completionHandler();
         });
 }
 

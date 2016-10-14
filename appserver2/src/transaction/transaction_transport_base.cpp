@@ -853,7 +853,7 @@ void QnTransactionTransportBase::sendHttpKeepAlive( quint64 taskID )
 
 void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
 {
-    if( !m_remotePeer.isServer() )
+    if( m_remotePeer.isClient() )
         return; //not sending keep-alive to a client
 
     if( m_peerRole == prAccepting )
@@ -1317,12 +1317,8 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
 
         m_incomingDataSocket = QSharedPointer<AbstractCommunicatingSocket>(m_httpClient->takeSocket().release());
         if( m_connectionType == ConnectionType::bidirectional )
-        {
             m_outgoingDataSocket = m_incomingDataSocket;
-            QnMutexLocker lk( &m_mutex );
-            startSendKeepAliveTimerNonSafe();
-        }
-        else
+
         {
             QnMutexLocker lk( &m_mutex );
             startSendKeepAliveTimerNonSafe();
