@@ -2,6 +2,7 @@
 #define GUARD_H
 
 #include <functional>
+#include <memory>
 
 
 /** RAII wrapper for @class std::function<void()> */
