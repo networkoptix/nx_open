@@ -1385,19 +1385,24 @@ void QnTransactionMessageBus::doPeriodicTasks()
             ++itr)
         {
             QnTransactionTransport* transport = itr.value();
-            if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient())
+
+            if (transport->getState() >= QnTransactionTransport::Connected &&
+                transport->isHttpKeepAliveTimeout())
             {
-                if (transport->isHttpKeepAliveTimeout())
-                {
-                    NX_LOGX(
-                        QnLog::EC2_TRAN_LOG,
-                        lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
-                            .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()),
-                        cl_logWARNING);
-                    transport->setState(QnTransactionTransport::Error);
-                }
-                else if (transport->isNeedResync())
-                    queueSyncRequest(transport);
+                NX_LOGX(
+                    QnLog::EC2_TRAN_LOG,
+                    lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
+                    .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()),
+                    cl_logWARNING);
+                transport->setState(QnTransactionTransport::Error);
+                continue;
+            }
+
+            if (transport->getState() >= QnTransactionTransport::ReadyForStreaming &&
+                !transport->remotePeer().isClient() &&
+                transport->isNeedResync())
+            {
+                queueSyncRequest(transport);
             }
         }
     }
