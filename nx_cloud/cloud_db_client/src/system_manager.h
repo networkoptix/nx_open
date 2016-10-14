@@ -46,6 +46,9 @@ public:
     virtual void getAccessRoleList(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler) override;
+    virtual void update(
+        const api::SystemAttributesUpdate& updatedData,
+        std::function<void(api::ResultCode)> completionHandler) override;
     virtual void rename(
         const std::string& systemId,
         const std::string& systemName,

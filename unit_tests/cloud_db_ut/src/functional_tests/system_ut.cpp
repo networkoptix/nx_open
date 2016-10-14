@@ -19,11 +19,13 @@ namespace nx {
 namespace cdb {
 
 namespace {
+
 class System
 :
     public CdbFunctionalTest
 {
 };
+
 }
 
 TEST_F(System, unbind)
@@ -46,7 +48,7 @@ TEST_F(System, unbind)
     api::SystemData system0;
     ASSERT_EQ(
         api::ResultCode::ok,
-        bindRandomSystem(account1.email, account1Password, &system0));
+        bindRandomSystem(account1.email, account1Password, "vms opaque data", &system0));
 
     for (int i = 0; i < 4; ++i)
     {
@@ -800,6 +802,37 @@ TEST_F(System, sorting_order_unknown_system)
     ASSERT_EQ(
         api::ResultCode::notFound,
         recordUserSessionStart(account1, "{"+system1.id+"}"));
+}
+
+TEST_F(System, update)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    auto system1 = addRandomSystemToAccount(account1);
+
+    api::SystemAttributesUpdate updatedData;
+    updatedData.systemID = system1.id;
+    updatedData.opaque = "qweasdasdqwewqeqw";
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateSystem(system1, updatedData));
+
+    system1.opaque = updatedData.opaque.get();
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(account1.data.email, account1.password, &systems));
+        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(system1, systems[0]);
+        ASSERT_EQ(system1.opaque, systems[0].opaque);
+    }
 }
 
 } // namespace cdb

@@ -6,16 +6,9 @@
 #ifndef CLOUD_DB_PROCESS_H
 #define CLOUD_DB_PROCESS_H
 
-//#define USE_QAPPLICATION
-
 #include <atomic>
 #include <functional>
 #include <memory>
-
-#ifdef USE_QAPPLICATION
-#include <qtsinglecoreapplication.h>
-#include <qtservice.h>
-#endif
 
 #include <utils/common/stoppable.h>
 #include <utils/db/async_sql_query_executor.h>
@@ -71,10 +64,6 @@ class MaintenanceManager;
 
 class CloudDBProcess
 :
-#ifdef USE_QAPPLICATION
-    public QObject,
-    public QtService<QtSingleCoreApplication>,
-#endif
     public QnStoppable
 {
 public:
@@ -88,18 +77,7 @@ public:
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
-#ifndef USE_QAPPLICATION
     int exec();
-#endif
-
-protected:
-#ifdef USE_QAPPLICATION
-    virtual int executeApplication() override;
-    virtual void start() override;
-    virtual void stop() override;
-
-    virtual bool eventFilter(QObject* watched, QEvent* event) override;
-#endif
 
 private:
     template<typename ManagerType>
@@ -151,9 +129,7 @@ private:
     int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
-#ifndef USE_QAPPLICATION
     nx::utils::promise<void> m_processTerminationEvent;
-#endif
 
     //following pointers are here for debugging convenience
     conf::Settings* m_settings;

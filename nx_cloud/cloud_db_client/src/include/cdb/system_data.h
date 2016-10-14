@@ -11,14 +11,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-/** Unused currently. */
-class SubscriptionData
-{
-public:
-    std::string productID;
-    std::string systemID;
-};
-
 /**
  * Information required to register system in cloud.
  */
@@ -28,6 +20,16 @@ public:
     /** Not unique system name. */
     std::string name;
     std::string customization;
+    /** Vms-specific data. Transparently stored and returned. */
+    std::string opaque;
+};
+
+class SystemAttributesUpdate
+{
+public:
+    std::string systemID;
+    boost::optional<std::string> name;
+    boost::optional<std::string> opaque;
 };
 
 enum class SystemStatus
@@ -59,6 +61,8 @@ public:
     bool cloudConnectionSubscriptionStatus;
     /** MUST be used as upper 64 bits of 128-bit transaction timestamp. */
     std::uint64_t systemSequence;
+    /** Vms-specific data. Same as SystemRegistrationData::opaque. */
+    std::string opaque;
 
     SystemData()
     :
@@ -78,7 +82,8 @@ public:
             ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
             cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus &&
-            systemSequence == right.systemSequence;
+            systemSequence == right.systemSequence &&
+            opaque == right.opaque;
     }
 };
 

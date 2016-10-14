@@ -88,7 +88,7 @@ SystemManager::SystemManager(
     m_transactionDispatcher->registerTransactionHandler
         <::ec2::ApiCommand::setResourceParam,
          ::ec2::ApiResourceParamWithRefData,
-         data::SystemNameUpdate>(
+         data::SystemAttributesUpdate>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2SetResourceParamDone, this, _1, _2, _3));
 }
@@ -510,66 +510,44 @@ void SystemManager::getAccessRoleList(
 }
 
 constexpr const std::size_t kMaxSystemNameLength = 1024;
+constexpr const std::size_t kMaxOpaqueDataSize = 1024;
 
-void SystemManager::renameSystem(
+void SystemManager::updateSystem(
     const AuthorizationInfo& /*authzInfo*/,
-    data::SystemNameUpdate data,
+    data::SystemAttributesUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_LOGX(lm("Rename system %1 to %2").arg(data.systemID).arg(data.name), cl_logDEBUG2);
+    NX_LOGX(lm("Updating system %1 sttributes").arg(data.systemID), cl_logDEBUG2);
 
-    if (data.name.empty() || data.name.size() > kMaxSystemNameLength)
+    // Validating data received.
+    if (data.name && (data.name->empty() || data.name->size() > kMaxSystemNameLength))
+        return completionHandler(api::ResultCode::badRequest);
+    if (data.opaque && (data.opaque->size() > kMaxOpaqueDataSize))
         return completionHandler(api::ResultCode::badRequest);
 
-    //if system name matches current, no update is needed
-    {
-        QnMutexLocker lk(&m_mutex);
-
-        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-        auto systemIter = systemByIdIndex.find(data.systemID);
-        if (systemIter == systemByIdIndex.end())
-        {
-            NX_ASSERT(false);
-            return completionHandler(api::ResultCode::notFound);
-        }
-
-        if (systemIter->name == data.name)
-        {
-            //system name match existing
-            return completionHandler(api::ResultCode::ok);
-        }
-    }
-
-    auto systemNameDataOnHeap = std::make_unique<data::SystemNameUpdate>(std::move(data));
-    auto systemNameDataOnHeapPtr = systemNameDataOnHeap.get();
+    const auto systemId = data.systemID;
 
     auto dbUpdateFunc =
-        [this, systemNameDataOnHeapPtr](
-            nx::db::QueryContext* const queryContext) -> nx::db::DBResult
+        [this, data = std::move(data)](
+            nx::db::QueryContext* const queryContext) mutable
     {
-        return updateSystemNameInDB(
+        return updateSystem(
             queryContext,
-            *systemNameDataOnHeapPtr);
+            std::move(data));
     };
 
     auto onDbUpdateCompletedFunc =
         [this,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
-            systemNameData = std::move(systemNameDataOnHeap),
             completionHandler = std::move(completionHandler)](
-                nx::db::QueryContext* queryContext,
-                nx::db::DBResult dbResult) mutable
+                nx::db::QueryContext* /*queryContext*/,
+                nx::db::DBResult dbResult)
         {
-            systemNameUpdated(
-                std::move(locker),
-                queryContext,
-                dbResult,
-                std::move(*systemNameData),
-                std::move(completionHandler));
+            completionHandler(dbResultToApiResult(dbResult));
         };
 
     m_transactionLog->startDbTransaction(
-        systemNameDataOnHeapPtr->systemID.c_str(),
+        systemId.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
 }
@@ -728,13 +706,17 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
 
     QSqlQuery insertSystemQuery(*queryContext->connection());
     insertSystemQuery.prepare(
-        "INSERT INTO system(id, name, customization, auth_key, owner_account_id, "
-                           "status_code, expiration_utc_timestamp) "
-        " VALUES(:id, :name, :customization, :authKey, :ownerAccountID, "
-                ":status, :expiration_utc_timestamp)");
+        R"sql(
+        INSERT INTO system(
+                id, name, customization, auth_key, owner_account_id,
+                status_code, expiration_utc_timestamp, opaque)
+        VALUES(:id, :name, :customization, :authKey, :ownerAccountID,
+               :status, :expirationTimeUtc, :opaque)
+        )sql");
     NX_ASSERT(!result->systemData.id.empty());
     result->systemData.name = newSystem.name;
     result->systemData.customization = newSystem.customization;
+    result->systemData.opaque = newSystem.opaque;
     result->systemData.authKey = QnUuid::createUuid().toSimpleString().toStdString();
     result->systemData.ownerAccountEmail = account->email;
     result->systemData.status = api::SystemStatus::ssNotActivated;
@@ -747,7 +729,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         ":ownerAccountID",
         QnSql::serialized_field(account->id));
     insertSystemQuery.bindValue(
-        ":expiration_utc_timestamp",
+        ":expirationTimeUtc",
         result->systemData.expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
@@ -1252,7 +1234,7 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
         case nx::db::DBResult::notFound:
             if (sharing.accessRole == api::SystemAccessRole::none)
             {
-                //< Removing sharing, no sense to create account.
+                // Removing sharing, no sense to create account.
                 return nx::db::DBResult::notFound;
             }
             break;
@@ -1297,18 +1279,24 @@ nx::db::DBResult SystemManager::inviteNewUserToSystem(
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
-    data::AccountConfirmationCode accountConfirmationCode;
-    dbResult = m_accountManager->createPasswordResetCode(
+    return scheduleInvintationNotificationDelivery(
         queryContext,
-        inviteeAccount.email,
-        &accountConfirmationCode);
-    if (dbResult != db::DBResult::ok)
-        return dbResult;
+        inviterEmail,
+        inviteeAccount,
+        systemId);
+}
 
+nx::db::DBResult SystemManager::scheduleInvintationNotificationDelivery(
+    nx::db::QueryContext* const queryContext,
+    const std::string& inviterEmail,
+    const data::AccountData& inviteeAccount,
+    const std::string& systemId)
+{
     auto notification = std::make_unique<InviteUserNotification>();
-    fillSystemSharedNotification(
-        queryContext, inviterEmail, systemId, inviteeAccount.email, notification.get());
-    notification->setActivationCode(std::move(accountConfirmationCode.code));
+    auto dbResult = prepareInviteNotification(
+        queryContext, inviterEmail, inviteeAccount, systemId, notification.get());
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, 
@@ -1319,6 +1307,28 @@ nx::db::DBResult SystemManager::inviteNewUserToSystem(
                 *notification,
                 std::function<void(bool)>());
         });
+
+    return db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::prepareInviteNotification(
+    nx::db::QueryContext* const queryContext,
+    const std::string& inviterEmail,
+    const data::AccountData& inviteeAccount,
+    const std::string& systemId,
+    InviteUserNotification* const notification)
+{
+    data::AccountConfirmationCode accountConfirmationCode;
+    db::DBResult dbResult = m_accountManager->createPasswordResetCode(
+        queryContext,
+        inviteeAccount.email,
+        &accountConfirmationCode);
+    if (dbResult != db::DBResult::ok)
+        return dbResult;
+
+    fillSystemSharedNotification(
+        queryContext, inviterEmail, systemId, inviteeAccount.email, notification);
+    notification->setActivationCode(std::move(accountConfirmationCode.code));
 
     return db::DBResult::ok;
 }
@@ -1464,10 +1474,41 @@ void SystemManager::updateSharingInCache(
         });
 }
 
-nx::db::DBResult SystemManager::updateSystemNameInDB(
+nx::db::DBResult SystemManager::updateSystem(
     nx::db::QueryContext* const queryContext,
-    const data::SystemNameUpdate& data)
+    const data::SystemAttributesUpdate& data)
 {
+    nx::db::DBResult dbResult = nx::db::DBResult::ok;
+    if (data.name)
+    {
+        dbResult = renameSystem(queryContext, data);
+        if (dbResult != nx::db::DBResult::ok)
+            return dbResult;
+    }
+
+    if (data.opaque)
+    {
+        dbResult = execSystemOpaqueUpdate(queryContext, data);
+        if (dbResult != nx::db::DBResult::ok)
+            return dbResult;
+    }
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, data]() mutable
+        {
+            updateSystemAttributesInCache(std::move(data));
+        });
+
+    return dbResult;
+}
+
+nx::db::DBResult SystemManager::renameSystem(
+    nx::db::QueryContext* const queryContext,
+    const data::SystemAttributesUpdate& data)
+{
+    NX_LOGX(lm("Renaming system %1 to %2")
+        .arg(data.systemID).arg(data.name.get()), cl_logDEBUG2);
+
     const auto result = execSystemNameUpdate(queryContext, data);
     if (result != db::DBResult::ok)
         return result;
@@ -1476,7 +1517,7 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
     ::ec2::ApiResourceParamWithRefData systemNameData;
     systemNameData.resourceId = QnUserResource::kAdminGuid;
     systemNameData.name = nx::settings_names::kNameSystemName;
-    systemNameData.value = QString::fromStdString(data.name);
+    systemNameData.value = QString::fromStdString(data.name.get());
 
     return m_transactionLog->generateTransactionAndSaveToLog<
         ::ec2::ApiCommand::setResourceParam>(
@@ -1487,26 +1528,50 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
 
 nx::db::DBResult SystemManager::execSystemNameUpdate(
     nx::db::QueryContext* const queryContext,
-    const data::SystemNameUpdate& data)
+    const data::SystemAttributesUpdate& data)
 {
     QSqlQuery updateSystemNameQuery(*queryContext->connection());
     updateSystemNameQuery.prepare(
         "UPDATE system "
         "SET name=:name "
         "WHERE id=:systemID");
-    QnSql::bind(data, &updateSystemNameQuery);
+    updateSystemNameQuery.bindValue(":name", QnSql::serialized_field(data.name.get()));
+    updateSystemNameQuery.bindValue(":systemID", QnSql::serialized_field(data.systemID));
     if (!updateSystemNameQuery.exec())
     {
         NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
-            .arg(data.systemID).arg(data.name)
+            .arg(data.systemID).arg(data.name.get())
             .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
     return db::DBResult::ok;
 }
 
-void SystemManager::updateSystemNameInCache(
-    data::SystemNameUpdate data)
+nx::db::DBResult SystemManager::execSystemOpaqueUpdate(
+    nx::db::QueryContext* const queryContext,
+    const data::SystemAttributesUpdate& data)
+{
+    // TODO: #ak: this is a copy-paste of a previous method. Refactor!
+
+    QSqlQuery updateSystemOpaqueQuery(*queryContext->connection());
+    updateSystemOpaqueQuery.prepare(
+        "UPDATE system "
+        "SET opaque=:opaque "
+        "WHERE id=:systemID");
+    updateSystemOpaqueQuery.bindValue(":opaque", QnSql::serialized_field(data.opaque.get()));
+    updateSystemOpaqueQuery.bindValue(":systemID", QnSql::serialized_field(data.systemID));
+    if (!updateSystemOpaqueQuery.exec())
+    {
+        NX_LOGX(lm("Error updating system %1. %2")
+            .arg(data.systemID).arg(updateSystemOpaqueQuery.lastError().text()),
+            cl_logWARNING);
+        return db::DBResult::ioError;
+    }
+    return db::DBResult::ok;
+}
+
+void SystemManager::updateSystemAttributesInCache(
+    data::SystemAttributesUpdate data)
 {
     //updating system name in cache
     QnMutexLocker lk(&m_mutex);
@@ -1517,7 +1582,13 @@ void SystemManager::updateSystemNameInCache(
     {
         systemByIdIndex.modify(
             systemIter,
-            [&data](data::SystemData& system) { system.name = std::move(data.name); });
+            [&data](data::SystemData& system)
+            {
+                if (data.name)
+                    system.name = std::move(data.name.get());
+                if (data.opaque)
+                    system.opaque = std::move(data.opaque.get());
+            });
     }
 }
 
@@ -1525,12 +1596,12 @@ void SystemManager::systemNameUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
-    data::SystemNameUpdate data,
+    data::SystemAttributesUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        updateSystemNameInCache(std::move(data));
+        updateSystemAttributesInCache(std::move(data));
     }
 
     completionHandler(
@@ -1753,63 +1824,57 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
 
 nx::db::DBResult SystemManager::fillCache()
 {
-    {
-        std::promise<db::DBResult> cacheFilledPromise;
-        auto future = cacheFilledPromise.get_future();
+    using namespace std::placeholders;
 
-        //starting async operation
-        using namespace std::placeholders;
-        m_dbManager->executeSelect<int>(
-            std::bind(&SystemManager::fetchSystems, this, _1, _2),
-            [&cacheFilledPromise](
-                nx::db::QueryContext* /*queryContext*/,
-                db::DBResult dbResult,
-                int /*dummy*/)
-            {
-                cacheFilledPromise.set_value(dbResult);
-            });
-        //waiting for completion
-        future.wait();
-        if (future.get() != db::DBResult::ok)
-            return future.get();
-    }
+    auto result = doBlockingDbQuery(
+        std::bind(&SystemManager::fetchSystems, this, _1, _2));
+    if (result != db::DBResult::ok)
+        return result;
 
-    //fetching system_to_account binding
-    {
-        std::promise<db::DBResult> cacheFilledPromise;
-        auto future = cacheFilledPromise.get_future();
-
-        //starting async operation
-        using namespace std::placeholders;
-        m_dbManager->executeSelect<int>(
-            std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2),
-            [&cacheFilledPromise](
-                nx::db::QueryContext* /*queryContext*/,
-                db::DBResult dbResult,
-                int /*dummy*/)
-            {
-                cacheFilledPromise.set_value(dbResult);
-            });
-        //waiting for completion
-        const auto result = future.get();
-        if (result != db::DBResult::ok)
-            return result;
-    }
+    result = doBlockingDbQuery(
+        std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2));
+    if (result != db::DBResult::ok)
+        return result;
 
     return db::DBResult::ok;
 }
 
+template<typename Func> 
+nx::db::DBResult SystemManager::doBlockingDbQuery(Func func)
+{
+    std::promise<db::DBResult> cacheFilledPromise;
+    auto future = cacheFilledPromise.get_future();
+
+    //starting async operation
+    m_dbManager->executeSelect<int>(
+        std::move(func),
+        [&cacheFilledPromise](
+            nx::db::QueryContext* /*queryContext*/,
+            db::DBResult dbResult,
+            int /*dummy*/)
+        {
+            cacheFilledPromise.set_value(dbResult);
+        });
+    //waiting for completion
+    return future.get();
+}
+
 nx::db::DBResult SystemManager::fetchSystems(nx::db::QueryContext* queryContext, int* const /*dummy*/)
 {
+    constexpr const char kSelectAllSystemsQuery[] = 
+        R"sql(
+        SELECT s.id, s.name, s.customization, s.auth_key as authKey,
+               a.email as ownerAccountEmail, s.status_code as status,
+               s.expiration_utc_timestamp as expirationTimeUtc,
+               s.seq as systemSequence, s.opaque as opaque
+        FROM system s, account a
+        WHERE s.owner_account_id = a.id
+        )sql";
+
     QSqlQuery readSystemsQuery(*queryContext->connection());
     readSystemsQuery.setForwardOnly(true);
-    readSystemsQuery.prepare(
-        "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
-        "       a.email as ownerAccountEmail, s.status_code as status, "
-        "       s.expiration_utc_timestamp as expirationTimeUtc, s.seq as systemSequence "
-        "FROM system s, account a "
-        "WHERE s.owner_account_id = a.id");
-    if (!readSystemsQuery.exec())
+    if (!readSystemsQuery.prepare(kSelectAllSystemsQuery) ||
+        !readSystemsQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
             arg(readSystemsQuery.lastError().text()), cl_logWARNING);
@@ -2119,7 +2184,7 @@ nx::db::DBResult SystemManager::processSetResourceParam(
     nx::db::QueryContext* queryContext,
     const nx::String& systemId,
     ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> transaction,
-    data::SystemNameUpdate* const systemNameUpdate)
+    data::SystemAttributesUpdate* const systemNameUpdate)
 {
     const auto& data = transaction.params;
 
@@ -2143,11 +2208,11 @@ nx::db::DBResult SystemManager::processSetResourceParam(
 void SystemManager::onEc2SetResourceParamDone(
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
-    data::SystemNameUpdate systemNameUpdate)
+    data::SystemAttributesUpdate systemNameUpdate)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        updateSystemNameInCache(std::move(systemNameUpdate));
+        updateSystemAttributesInCache(std::move(systemNameUpdate));
     }
 }
 

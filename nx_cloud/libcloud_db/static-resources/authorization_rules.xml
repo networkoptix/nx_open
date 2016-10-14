@@ -177,7 +177,7 @@
                             <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                         <condition resName="auth.selfSystemAccessRequested">
-                            <set value="owner" resName="authorized" resValue="true"/>
+                            <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <sequence value="/cdb/auth/get_authentication">
@@ -206,6 +206,15 @@
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/system/update">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                        <condition resName="auth.selfSystemAccessRequested">
+                            <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">

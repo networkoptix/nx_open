@@ -84,9 +84,19 @@ public:
         const std::string& email,
         const std::string& password,
         api::SystemData* const systemData);
+    api::ResultCode bindRandomNotActivatedSystem(
+        const std::string& email,
+        const std::string& password,
+        const std::string& opaque,
+        api::SystemData* const systemData);
     api::ResultCode bindRandomSystem(
         const std::string& email,
         const std::string& password,
+        api::SystemData* const systemData);
+    api::ResultCode bindRandomSystem(
+        const std::string& email,
+        const std::string& password,
+        const std::string& opaque,
         api::SystemData* const systemData);
     api::ResultCode unbindSystem(
         const std::string& login,
@@ -141,6 +151,9 @@ public:
         const std::string& password,
         const std::string& systemID,
         const std::string& newSystemName);
+    api::ResultCode updateSystem(
+        const api::SystemData& system,
+        const api::SystemAttributesUpdate& updatedData);
 
     //calls on system's regard
     api::ResultCode getCdbNonce(

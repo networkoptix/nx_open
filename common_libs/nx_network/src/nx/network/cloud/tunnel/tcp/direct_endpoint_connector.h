@@ -39,6 +39,9 @@ public:
         ConnectCompletionHandler handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
+    /** Disables verification for test purposes */
+    static void setVerificationRequirement(bool value);
+
 private:
     struct ConnectionContext
     {
@@ -50,6 +53,7 @@ private:
     const nx::String m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
     std::list<ConnectionContext> m_connections;
+    static bool s_needVerification;
 
     void onHttpRequestDone(
         nx_http::AsyncHttpClientPtr httpClient,

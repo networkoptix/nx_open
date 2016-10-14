@@ -112,10 +112,10 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
 
 
 ////////////////////////////////////////////////////////////
-//// class SystemNameUpdate
+//// class SystemAttributesUpdate
 ////////////////////////////////////////////////////////////
 
-bool SystemNameUpdate::getAsVariant(int resID, QVariant* const value) const
+bool SystemAttributesUpdate::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
@@ -153,7 +153,7 @@ bool UserSessionDescriptor::getAsVariant(int resID, QVariant* const value) const
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemID)(SystemNameUpdate),
+    (SystemRegistrationData)(SystemID),
     (sql_record),
     _Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

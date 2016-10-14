@@ -16,7 +16,7 @@ QIODevice* QnStorageResourceStub::open(const QString&, QIODevice::OpenMode)
     return NULL;
 }
 
-Qn::StorageInitResult QnStorageResourceStub::initOrUpdate() const
+Qn::StorageInitResult QnStorageResourceStub::initOrUpdate()
 {
     NX_ASSERT(false);
     return Qn::StorageInit_CreateFailed;

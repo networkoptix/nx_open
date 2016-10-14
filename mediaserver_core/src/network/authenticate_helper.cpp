@@ -31,6 +31,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/string.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -630,7 +631,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     nx_http::Response tmpHeaders;
 
     QMap<nx_http::BufferType, nx_http::BufferType> params;
-    nx_http::header::parseDigestAuthParams(authData, &params, ';');
+    nx::utils::parseNameValuePairs(authData, ';', &params);
 
     Qn::AuthResult authResult = Qn::Auth_Forbidden;
     if (params.contains(Qn::URL_QUERY_AUTH_KEY_NAME))
