@@ -48,10 +48,8 @@ QString getLocalSystemId(const std::string& opaque)
 
     static const auto kOpaqueLocalSystemIdTag = QByteArray("localSystemId");
     if (!params.contains(kOpaqueLocalSystemIdTag))
-    {
-        NX_ASSERT(false, "localSystemId is empty!");
         return QString();
-    }
+
     return QString::fromUtf8(params.value(kOpaqueLocalSystemIdTag));
 }
 
@@ -67,6 +65,9 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         QnCloudSystem system;
         system.cloudId = QString::fromStdString(systemData.id);
         system.localId = getLocalSystemId(systemData.opaque);
+        if (system.localId.isEmpty())
+            system.localId = system.cloudId;
+
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
