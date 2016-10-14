@@ -8,7 +8,7 @@ var SystemPage = function () {
 
     this.url = '/systems';
     this.systemLink = '/77663937-eae2-4875-921b-5af0330514eb';
-    this.systemName = 'newsys';
+    this.systemName = 'korneeva-ubuntu';
 
     this.deleteConfirmations = {
         self: 'You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?',
@@ -23,6 +23,7 @@ var SystemPage = function () {
     };
 
     this.systemsList = element.all(by.repeater('system in systems'));
+    this.secondSystem = element.all(by.repeater('system in systems')).get(1);
     this.ownedSystem = element.all(by.cssContainingText('h2', this.systemName)).first();
 
     this.systemNameElem = element(by.css('h1'));
@@ -38,6 +39,10 @@ var SystemPage = function () {
     this.userDeleteButton = element(by.cssContainingText('button','Remove from my Account'));
     this.disconnectDialog = element(by.css('.modal-dialog'));
     this.cancelDisconnectButton = this.disconnectDialog.element(by.buttonText('Cancel'));
+    this.confirmDeleteButton = this.disconnectDialog.element(by.buttonText('Delete'));
+    this.disconnectPasswordField = this.disconnectDialog.element(by.css('#password'));
+    this.confirmDisconnectButton = this.disconnectDialog.element(by.buttonText('Disconnect'));
+
 
     this.selectRoleOption = function(role) {
         return this.helper.forms.share.roleField.element(by.cssContainingText('option', role));
