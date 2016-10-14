@@ -13,26 +13,19 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_cloudWeights(),
     m_localWeights(),
     m_newSystemWeights(),
-    m_updatingWeights(false),
-    m_sourceRowsCount(0)
+    m_updatingWeights(false)
 {
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged,
         this, &QnOrderedSystemsModel::handleCloudSystemsChanged);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
         [this](int valueId)
-        {
-            if (valueId == QnClientCoreSettings::LocalSystemWeightsData)
-                handleLocalWeightsChanged();
-        });
+    {
+        if (valueId == QnClientCoreSettings::LocalSystemWeightsData)
+            handleLocalWeightsChanged();
+    });
 
     setSourceModel(new QnSystemsModel(this));
-    connect(sourceModel(), &QAbstractItemModel::modelReset,
-        this, &QnOrderedSystemsModel::updateSourceRowsCount);
-    connect(sourceModel(), &QAbstractItemModel::rowsRemoved,
-        this, &QnOrderedSystemsModel::updateSourceRowsCount);
-    connect(sourceModel(), &QAbstractItemModel::rowsInserted,
-        this, &QnOrderedSystemsModel::updateSourceRowsCount);
 
     handleCloudSystemsChanged();
     handleLocalWeightsChanged();
@@ -45,31 +38,7 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     connect(m_updateTimer, &QTimer::timeout,
         this, &QnOrderedSystemsModel::updateFinalWeights);
     m_updateTimer->start();
-
-
-    updateSourceRowsCount();
 }
-
-void QnOrderedSystemsModel::updateSourceRowsCount()
-{
-    const auto source = sourceModel();
-    setSourceRowsCount(source->rowCount());
-}
-
-int QnOrderedSystemsModel::sourceRowsCount() const
-{
-    return m_sourceRowsCount;
-}
-
-void QnOrderedSystemsModel::setSourceRowsCount(int value)
-{
-    if (m_sourceRowsCount == value)
-        return;
-
-    m_sourceRowsCount = value;
-    emit sourceRowsCountChanged();
-}
-
 
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
@@ -165,9 +134,6 @@ bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
 bool QnOrderedSystemsModel::filterAcceptsRow(int row,
     const QModelIndex &parent) const
 {
-    if (!base_type::filterAcceptsRow(row, parent))
-        return false;
-
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
     const auto index = sourceModel()->index(row, 0, parent);
     if (!index.isValid())
@@ -180,12 +146,12 @@ bool QnOrderedSystemsModel::filterAcceptsRow(int row,
     }
 
     const auto systemId = index.data(QnSystemsModel::SystemIdRoleId).toString();
-    const auto itLocalSystemWeight = m_localWeights.find(systemId);
-    if (itLocalSystemWeight == m_localWeights.end())
+    const auto itFinalSystemWeight = m_finalWeights.find(systemId);
+    if (itFinalSystemWeight == m_finalWeights.end())
         return true;
 
     static const auto kMinWeight = 0.00001;
-    const auto weight = itLocalSystemWeight.value().weight;
+    const auto weight = itFinalSystemWeight.value().weight;
     return (weight > kMinWeight);
 }
 

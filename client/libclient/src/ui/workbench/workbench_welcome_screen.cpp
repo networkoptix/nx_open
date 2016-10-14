@@ -16,7 +16,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/ordered_systems_model.h>
+#include <ui/models/filtering_systems_model.h>
 #include <ui/models/recent_local_connections_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
@@ -36,7 +36,7 @@ namespace
 
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
-        qmlRegisterType<QnOrderedSystemsModel>("NetworkOptix.Qml", 1, 0, "QnOrderedSystemsModel");
+        qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
 
         auto holder = new QStackedWidget();
         holder->addWidget(new QWidget());

@@ -189,7 +189,7 @@ Rectangle
                     }
                 }
 
-                model: QnOrderedSystemsModel
+                model: QnFilteringSystemsModel
                 {
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
