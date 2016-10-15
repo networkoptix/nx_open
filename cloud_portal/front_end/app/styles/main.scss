@@ -180,6 +180,13 @@ footer {
   box-shadow:none;
 }
 
+.border-left{
+  border-left:1px solid $common-border-color;
+}
+
+.border-right{
+  border-right:1px solid $common-border-color;
+}
 .border-top{
   border-top:1px solid $common-border-color;
 }
