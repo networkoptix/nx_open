@@ -21,6 +21,7 @@
                         <a ng-href="{{platform.installers[0].src}}" class="col-md-6 col-sm-8">
                             <div class="panel panel-default hoverable">
                                 <div class="panel-body">
+                                    <span class="download-link pull-left"></span>
                                     <h2><b>Download VMS_NAME</b></h2>
                                     {{platform.installers[0].name}}
                                 </div>
@@ -52,9 +53,14 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </uib-tab>
 </uib-tabset>
+
+
+<a ng-repeat="platform in downloads.mobile"
+   class="mobile-link"
+   ng-class="platform.os"
+   ng-href="{{platform.src}}">
+</a>
