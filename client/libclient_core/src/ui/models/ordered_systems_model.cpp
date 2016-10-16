@@ -215,7 +215,14 @@ void QnOrderedSystemsModel::updateFinalWeights()
 
     auto newWeights = m_localWeights;
     for (auto it = m_cloudWeights.begin(); it != m_cloudWeights.end(); ++it)
-        newWeights[it.key()] = it.value();  // Could rewrite local weights
+    {
+        const auto nextWeightData = it.value();
+        auto& currentWeightData = newWeights[it.key()];
+
+        // Force to replace with greater weight to prevent "jumping"
+        if (currentWeightData.weight > nextWeightData.weight)
+            currentWeightData = nextWeightData;
+    }
 
     // Recalculates weights according to last connection time
     for (auto& data : newWeights)
