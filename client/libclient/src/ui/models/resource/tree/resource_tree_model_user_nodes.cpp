@@ -312,6 +312,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureResourceNode(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
 {
+    if (subject.name().contains(lit("custom")) && resource->hasFlags(Qn::server))
+    {
+        qDebug() << "checking access";
+    }
+
     if (QnResourceAccessFilter::isShareableLayout(resource))
     {
         auto layout = resource.dynamicCast<QnLayoutResource>();
