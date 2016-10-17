@@ -44,7 +44,7 @@ public:
      * @param dbUpdateFunc This function may executed SQL commands and fill output data
      * @param completionHandler DB operation result is passed here. Output data is valid only if operation succeeded
      * @note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails).
-     * @note \a dbUpdateFunc may not be called if there was no connection available for 
+     * @note \a dbUpdateFunc may not be called if there was no connection available for
      *       \a ConnectionOptions::maxPeriodQueryWaitsForAvailableConnection period.
      */
     template<typename InputData, typename OutputData>
@@ -125,7 +125,7 @@ private:
         m_requestQueue;
     std::vector<std::unique_ptr<DbRequestExecutionThread>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
-    CLThreadQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
+    QnSafeQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
 
     /**
      * @return \a true if no new connection is required or new connection has been opened.

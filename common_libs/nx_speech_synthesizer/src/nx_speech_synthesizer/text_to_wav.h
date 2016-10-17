@@ -78,7 +78,7 @@ private:
         }
     };
 
-    CLThreadQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
+    QnSafeQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;
     QnMutex m_mutex;

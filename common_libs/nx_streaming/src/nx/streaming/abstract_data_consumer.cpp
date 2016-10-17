@@ -3,6 +3,10 @@
 #include <utils/common/sleep.h>
 #include <nx/utils/log/log.h>
 
+namespace {
+    static const int kWaitTimeoutMs = 200;
+} // namespace
+
 
 QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)
     : m_dataQueue(maxQueueSize)
@@ -36,7 +40,16 @@ void QnAbstractDataConsumer::endOfRun()
 
 void QnAbstractDataConsumer::pleaseStop()
 {
+    QnMutexLocker lock(&m_pleaseStopMutex);
     QnLongRunnable::pleaseStop();
+    m_dataQueue.setTerminated(true);
+}
+
+void QnAbstractDataConsumer::resumeDataQueue()
+{
+    QnMutexLocker lock(&m_pleaseStopMutex);
+    if (!needToStop())
+        m_dataQueue.setTerminated(false);
 }
 
 void QnAbstractDataConsumer::run()
@@ -45,13 +58,14 @@ void QnAbstractDataConsumer::run()
 
     initSystemThreadId();
     beforeRun();
+    resumeDataQueue();
 
     while(!needToStop())
     {
         pauseDelay();
 
         QnAbstractDataPacketPtr data;
-        bool get = m_dataQueue.pop(data, 200);
+        bool get = m_dataQueue.pop(data, kWaitTimeoutMs);
 
         if (!get)
         {

@@ -4,7 +4,7 @@
 #include <utils/common/threadqueue.h>
 #include <nx/streaming/abstract_data_packet.h>
 
-typedef CLThreadQueue<QnAbstractDataPacketPtr> QnDataPacketQueue;
-typedef CLThreadQueue<QnConstAbstractDataPacketPtr> QnConstDataPacketQueue;
+typedef QnSafeQueue<QnAbstractDataPacketPtr> QnDataPacketQueue;
+typedef QnSafeQueue<QnConstAbstractDataPacketPtr> QnConstDataPacketQueue;
 
 #endif // DATA_PACKET_QUEUE_H
