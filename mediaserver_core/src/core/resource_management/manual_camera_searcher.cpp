@@ -53,7 +53,7 @@ namespace {
                     bool hasParent = qnResPool->getResourceById(res->getParentId());
                     return hasParent && res->getStatus() != Qn::Offline;
                 },
-                false);
+                true);
         }
         return existResource;
     }

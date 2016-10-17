@@ -150,6 +150,16 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (needToStop())
             return false;
 
+        if (QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+                *it, 
+                [](const QnNetworkResourcePtr& res) { return true; },
+                false))
+        {
+            it = resources.erase(it);
+            continue;
+        }
+
+
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes) {
             //TODO: #rvasilenko please make sure we can safely continue here
@@ -180,15 +190,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
         if (newCamRes && newCamRes->needCheckIpConflicts())
         {
-            //if (!it->dynamicCast<QnDesktopCameraResource>() &&
-            //    QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
-            //        *it, 
-            //        [](const QnNetworkResourcePtr& res) { return true; },
-            //        true))
-            //{
-            //    it = resources.erase(it);
-            //    continue;
-            //}
             // do not count 2--N channels of multichannel cameras as conflict
             quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
             if (ips)
