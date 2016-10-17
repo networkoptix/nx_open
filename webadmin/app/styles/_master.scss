@@ -213,3 +213,19 @@
   -moz-transition-duration: 0s;
   transition-duration: 0s;
 }
+
+
+
+button, select, .form-control{
+  &.disabled,
+  &[disabled],
+  &.readonly,
+  &[readonly] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border-color: $input-border;
+    box-shadow: none;
+  }
+}

@@ -543,21 +543,6 @@ span.danger{
   margin: 0;
 }
 
-
-button, select, .form-control{
-  &.disabled,
-  &[disabled],
-  &.readonly,
-  &[readonly] {
-    outline: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    border-color: $input-border;
-    box-shadow: none;
-  }
-}
-
 h3 {
   margin-top: 30px;
 }
