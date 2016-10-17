@@ -33,12 +33,20 @@ public:
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
     };
 
+    struct NX_NETWORK_API Config: nx::utils::FlagConfig
+    {
+        Config(): nx::utils::FlagConfig("nx_network") { reload(); }
+
+        NX_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
+    };
+
     typedef cloud::MediatorAddressPublisher AddressPublisher;
     typedef hpm::api::MediatorConnector MediatorConnector;
     typedef cloud::OutgoingTunnelPool OutgoingTunnelPool;
     typedef cloud::CloudConnectSettings CloudSettings;
     typedef cloud::tcp::ReverseConnectionPool TcpReversePool;
 
+    static Config& config() { return s_instance->m_config; }
     static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
     static aio::AIOService& aioService() { return s_instance->m_aioService; }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
@@ -88,6 +96,7 @@ private:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
 
+    Config m_config;
     DebugConfiguration m_debugConfiguration;
     std::shared_ptr<QnLog::Logs> m_log;
 
