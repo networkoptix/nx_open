@@ -164,6 +164,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         [this]()
         {
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
+            qnClientCoreSettings->save();
         });
 
     setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
