@@ -3572,6 +3572,8 @@ void QnNxStyle::polish(QWidget *widget)
 
 void QnNxStyle::unpolish(QWidget* widget)
 {
+    widget->removeEventFilter(this);
+
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QHeaderView*>(widget) ||
         qobject_cast<QLineEdit*>(widget) ||
@@ -3618,11 +3620,7 @@ void QnNxStyle::unpolish(QWidget* widget)
     {
         /* Remove hover events tracking: */
         tabBar->setProperty(kHoveredWidgetProperty, QVariant());
-        tabBar->removeEventFilter(this);
     }
-
-    if (qobject_cast<QAbstractButton*>(widget))
-        widget->removeEventFilter(this);
 
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
