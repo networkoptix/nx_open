@@ -94,6 +94,11 @@ public:
         clear();
     }
 
+    const RandomAccess lock() const
+    {
+        return RandomAccess(*const_cast<QnSafeQueue*>(this));
+    }
+
     RandomAccess lock()
     {
         return RandomAccess(*this);

@@ -84,7 +84,7 @@ qint64 PlayerDataConsumer::queueVideoDurationUsec() const
 {
     qint64 minTime = std::numeric_limits<qint64>::max();
     qint64 maxTime = 0;
-    const auto unsafeQueue = const_cast<PlayerDataConsumer*>(this)->m_dataQueue.lock();
+    auto unsafeQueue = m_dataQueue.lock();
     for (int i = 0; i < unsafeQueue.size(); ++i)
     {
         auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(
