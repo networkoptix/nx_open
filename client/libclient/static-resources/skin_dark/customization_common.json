@@ -251,6 +251,14 @@
         }
     },
 
+    "QnAlertBar": {
+        "palette": { 
+            "default": {
+                "window": "#61282b"
+            }
+        }
+    },
+
     "QHeaderView": {
         "palette": {
             "default": {
