@@ -11,18 +11,10 @@ class QnOrderedSystemsModel : public QSortFilterProxyModel
     Q_OBJECT
     typedef QSortFilterProxyModel base_type;
 
-    Q_PROPERTY(int sourceRowsCount READ sourceRowsCount NOTIFY sourceRowsCountChanged)
-
 public:
     QnOrderedSystemsModel(QObject* parent = nullptr);
 
     virtual ~QnOrderedSystemsModel() = default;
-
-public: // properties
-    int sourceRowsCount() const;
-
-signals:
-    void sourceRowsCountChanged();
 
 protected: // overrides
     virtual bool lessThan(const QModelIndex& left,
@@ -40,10 +32,6 @@ private:
 
     qreal getWeight(const QModelIndex& modelIndex) const;
 
-    void setSourceRowsCount(int value);
-
-    void updateSourceRowsCount();
-
 private:
     typedef QHash<QString, QnWeightData> IdWeightDataHash;
 
@@ -54,6 +42,4 @@ private:
 
     mutable IdWeightDataHash m_newSystemWeights;
     mutable bool m_updatingWeights;
-
-    int m_sourceRowsCount;
 };

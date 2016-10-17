@@ -12,20 +12,27 @@
 #include <nx/utils/string.h>
 
 namespace {
-    const qreal BYTES_IN_GB = 1000000000.0;
-    const qreal BYTES_IN_TB = 1000.0 * BYTES_IN_GB;
-    const qreal SECS_PER_HOUR = 3600.0;
-    const qreal SECS_PER_DAY = SECS_PER_HOUR * 24;
-    const qreal SECS_PER_YEAR = SECS_PER_DAY * 365.0;
-    const qreal SECS_PER_MONTH = SECS_PER_YEAR / 12.0;
-    const qreal BYTES_IN_MB = 1000000.0;
-    const int PREC = 2;
 
-    /* One additional row for footer. */
-    const int footerRowsCount = 1;
+//TODO: #vkutin #common Refactor all this to use some common formatting
+const qreal kBytesInKB = 1024.0;
 
-    const int kMaxNameLength = 30;
-}
+const qreal kBytesInMB = kBytesInKB * kBytesInKB;
+const qreal kBytesInGB = kBytesInMB * kBytesInKB;
+const qreal kBytesInTB = kBytesInGB * kBytesInKB;
+
+const qreal kSecondsPerHour = 3600.0;
+const qreal kSecondsPerDay = kSecondsPerHour * 24;
+const qreal kSecondsPerYear = kSecondsPerDay * 365.25;
+const qreal kSecondsPerMonth = kSecondsPerYear / 12.0;
+
+const int kPrecision = 2;
+
+/* One additional row for footer. */
+const int footerRowsCount = 1;
+
+const int kMaxNameLength = 30;
+
+} // namespace
 
 const QString QnSortedRecordingStatsModel::kForeignCameras(lit("C7139D2D-0CB2-424D-9C73-704C417B32F2"));
 
@@ -98,7 +105,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
     {
     case CameraNameColumn:
         {
-            QString foreignText = tr("<Cameras from other servers and removed cameras>");
+            QString foreignText = tr("Cameras from other servers and removed cameras");
             int maxLength = qMax(foreignText.length(), kMaxNameLength); /* There is no need to limit name to be shorter than predefined string. */
             return isForeign
                 ? foreignText
@@ -159,32 +166,33 @@ QnResourcePtr QnRecordingStatsModel::getResource(const QModelIndex &index) const
     }
 }
 
-qreal QnRecordingStatsModel::chartData(const QModelIndex &index) const
+qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
 {
     const QnCamRecordingStatsData& value = m_data.at(index.row());
     qreal result = 0.0;
+
     const auto& footer = m_footer;
-    switch(index.column())
+    switch (index.column())
     {
-    case BytesColumn:
-        if (footer.recordedBytes > 0)
-            result = value.recordedBytes / (qreal) footer.recordedBytes;
-        else
-            return 0.0;
-        break;
-    case DurationColumn:
-        if (footer.archiveDurationSecs > 0)
-            result = value.archiveDurationSecs / (qreal) footer.archiveDurationSecs;
-        else
-            result = 0.0;
-        break;
-    case BitrateColumn:
-        if (footer.averageBitrate > 0)
-            result =  value.averageBitrate / (qreal) footer.averageBitrate;
-        else
-            result =  0.0;
-        break;
+        case BytesColumn:
+            if (footer.recordedBytes <= 0)
+                return 0.0;
+            result = value.recordedBytes / (qreal) footer.maxValues.recordedBytes;
+            break;
+
+        case DurationColumn:
+            if (footer.archiveDurationSecs <= 0)
+                return 0.0;
+            result = value.archiveDurationSecs / (qreal) footer.maxValues.archiveDurationSecs;
+            break;
+
+        case BitrateColumn:
+            if (footer.averageBitrate > 0)
+                return 0.0;
+            result = value.averageBitrate / (qreal) footer.maxValues.averageBitrate;
+            break;
     }
+
     NX_ASSERT(qBetween(0.0, result, 1.00001));
     return qBound(0.0, result, 1.0);
 }
@@ -196,13 +204,6 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
         return footerDisplayData(index);
     case Qt::ToolTipRole:
         return tooltipText(static_cast<Columns>(index.column()));
-    case Qt::FontRole: {
-        QFont font;
-        font.setBold(true);
-        return font;
-    }
-    case Qt::BackgroundRole:
-        return qApp->palette().color(QPalette::Normal, QPalette::Background);
 
     case Qn::RecordingStatsDataRole:
         return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
@@ -240,35 +241,31 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
 QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 {
     /* Check invalid indices. */
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this
+        || !hasIndex(index.row(), index.column(), index.parent()))
+    {
         return QVariant();
+    }
 
     if (index.row() >= m_data.size())
         return footerData(index, role);
 
-    switch(role) {
-    case Qt::DisplayRole:
-        return displayData(index);
-    case Qt::DecorationRole:
-        return qnResIconCache->icon(getResource(index));
-    case Qn::ResourceRole:
-        return QVariant::fromValue<QnResourcePtr>(getResource(index));
-    case Qt::BackgroundRole:
-        return qApp->palette().color(QPalette::Normal, QPalette::Base);
-    case Qn::RecordingStatsDataRole:
-        return QVariant::fromValue<QnCamRecordingStatsData>(m_data.at(index.row()));
-    case Qn::RecordingStatChartDataRole:
-        return chartData(index);
-    //case Qn::RecordingStatForecastDataRole:
-    //    return chartData(index, true);
-    //case Qn::RecordingStatColorsDataRole:
-    //    return QVariant::fromValue<QnRecordingStatsColors>(m_colors);
-    case Qn::RecordingStatChartColorDataRole:
-        return m_isForecastRole ? m_colors.chartForecastColor : m_colors.chartMainColor;
-    case Qt::ToolTipRole:
-        return tooltipText(static_cast<Columns>(index.column()));
-    default:
-        break;
+    switch(role)
+    {
+        case Qt::DisplayRole:
+            return displayData(index);
+        case Qt::DecorationRole:
+            return qnResIconCache->icon(getResource(index));
+        case Qn::ResourceRole:
+            return QVariant::fromValue<QnResourcePtr>(getResource(index));
+        case Qn::RecordingStatsDataRole:
+            return QVariant::fromValue<QnCamRecordingStatsData>(m_data.at(index.row()));
+        case Qn::RecordingStatChartDataRole:
+            return chartData(index);
+        case Qt::ToolTipRole:
+            return tooltipText(static_cast<Columns>(index.column()));
+        default:
+            break;
     }
     return QVariant();
 }
@@ -283,7 +280,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
 
     if (role == Qt::DisplayRole)
     {
-        switch(section)
+        switch (section)
         {
             case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
             case BytesColumn:      return tr("Space");
@@ -292,8 +289,6 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
             default:               break;
         }
     }
-    //else if (role == Qt::TextAlignmentRole)
-    //    return Qt::AlignLeft; // it's broken at our style and value is ignored
 
     return base_type::headerData(section, orientation, role);
 }
@@ -315,15 +310,6 @@ QnRecordingStatsReply QnRecordingStatsModel::modelData() const {
     return m_data;
 }
 
-QnRecordingStatsColors QnRecordingStatsModel::colors() const {
-    return m_colors;
-}
-
-void QnRecordingStatsModel::setColors(const QnRecordingStatsColors &colors) {
-    m_colors = colors;
-    emit colorsChanged();
-}
-
 void QnRecordingStatsModel::setHeaderTextBlocked(bool value)
 {
     m_isHeaderTextBlocked = value;
@@ -331,71 +317,71 @@ void QnRecordingStatsModel::setHeaderTextBlocked(bool value)
 
 QnFooterData QnRecordingStatsModel::calculateFooter(const QnRecordingStatsReply& data) const {
     QnRecordingStatsData summ;
-    QnRecordingStatsData maxValue;
     QnFooterData footer;
 
     for(const QnCamRecordingStatsData& value: data) {
         summ += value;
-        maxValue.recordedBytes = qMax(maxValue.recordedBytes, value.recordedBytes);
-        maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
-        maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
-        maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
+        footer.maxValues.recordedBytes = qMax(footer.maxValues.recordedBytes, value.recordedBytes);
+        footer.maxValues.recordedSecs = qMax(footer.maxValues.recordedSecs, value.recordedSecs);
+        footer.maxValues.archiveDurationSecs = qMax(footer.maxValues.archiveDurationSecs, value.archiveDurationSecs);
+        footer.maxValues.averageBitrate = qMax(footer.maxValues.averageBitrate, value.averageBitrate);
         footer.bitrateSum += value.averageBitrate;
     }
 
     footer.recordedBytes = summ.recordedBytes;
     footer.recordedSecs = summ.recordedSecs;
     footer.archiveDurationSecs = summ.archiveDurationSecs;
-    footer.averageBitrate = maxValue.averageBitrate;
+    footer.averageBitrate = footer.maxValues.averageBitrate;
 
     return footer;
 }
 
-QString QnRecordingStatsModel::formatBitrateString(qint64 bitrate) const {
+QString QnRecordingStatsModel::formatBitrateString(qint64 bitrate) const
+{
     if (bitrate > 0)
-        return tr("%1 Mbps").arg(QString::number(bitrate / BYTES_IN_MB * 8, 'f', PREC));
+        return tr("%1 Mbps").arg(QString::number(bitrate / kBytesInMB * 8, 'f', kPrecision));
 
     return lit("-");
 }
 
-QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const {
-    if (bytes > BYTES_IN_TB)
-        return tr("%1 Tb").arg(QString::number(bytes / BYTES_IN_TB, 'f', PREC));
+QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const
+{
+    if (bytes > kBytesInTB)
+        return tr("%1 TB").arg(QString::number(bytes / kBytesInTB, 'f', kPrecision));
     else
-        return tr("%1 Gb").arg(QString::number(bytes / BYTES_IN_GB, 'f', PREC));
+        return tr("%1 GB").arg(QString::number(bytes / kBytesInGB, 'f', kPrecision));
 }
 
-
-QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData &data) const
+QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData& data) const
 {
     if (data.archiveDurationSecs == 0)
         return tr("empty");
 
     qint64 tmpVal = data.archiveDurationSecs;
-    int years = tmpVal / SECS_PER_YEAR;
-    tmpVal -= years * SECS_PER_YEAR;
-    int months = tmpVal / SECS_PER_MONTH;
-    tmpVal -= months * SECS_PER_MONTH;
-    int days = tmpVal / SECS_PER_DAY;
-    tmpVal -= days * SECS_PER_DAY;
-    int hours = tmpVal / SECS_PER_HOUR;
+    int years = tmpVal / kSecondsPerYear;
+    tmpVal -= years * kSecondsPerYear;
+    int months = tmpVal / kSecondsPerMonth;
+    tmpVal -= months * kSecondsPerMonth;
+    int days = tmpVal / kSecondsPerDay;
+    tmpVal -= days * kSecondsPerDay;
+    int hours = tmpVal / kSecondsPerHour;
     QString result;
-    static const QString DELIM(lit(" "));
+    static const QString kDelimiter(lit(" "));
     if (years > 0)
         result += tr("%n years", "", years);
     if (months > 0) {
         if (!result.isEmpty())
-            result += DELIM;
+            result += kDelimiter;
         result += tr("%n months", "", months);
     }
     if (days > 0) {
         if (!result.isEmpty())
-            result += DELIM;
+            result += kDelimiter;
         result += tr("%n days", "", days);
     }
     if (hours > 0 && years == 0) {
         if (!result.isEmpty())
-            result += DELIM;
+            result += kDelimiter;
         result += tr("%n hours", "", hours);
     }
     if (result.isEmpty())

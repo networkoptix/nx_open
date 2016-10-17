@@ -44,11 +44,17 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
 }
 
 QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibleVia(
-    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource,
+    QnResourceList* providers) const
 {
-    if (hasAccess(subject, resource))
-        return baseSource();
-    return Source::none;
+    if (!hasAccess(subject, resource))
+        return Source::none;
+
+    if (providers)
+        fillProviders(subject, resource, *providers);
+
+    return baseSource();
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
@@ -102,6 +108,13 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     for (const auto& dependent: dependentSubjects(subject))
         updateAccess(dependent, resource);
+}
+
+void QnBaseResourceAccessProvider::fillProviders(
+    const QnResourceAccessSubject& /*subject*/,
+    const QnResourcePtr& /*resource*/,
+    QnResourceList& /*providers*/) const
+{
 }
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)

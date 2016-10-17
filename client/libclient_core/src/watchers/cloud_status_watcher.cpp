@@ -15,6 +15,7 @@
 
 #include <utils/common/delayed.h>
 
+#include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 
@@ -40,6 +41,18 @@ const auto kLastLoginTimeUtcMs = lit("kLastLoginTimeUtcMs");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
+QString getLocalSystemId(const std::string& opaque)
+{
+    QMap<QByteArray, QByteArray> params;
+    nx::utils::parseNameValuePairs(QByteArray::fromStdString(opaque), ',', &params);
+
+    static const auto kOpaqueLocalSystemIdTag = QByteArray("localSystemId");
+    if (!params.contains(kOpaqueLocalSystemIdTag))
+        return QString();
+
+    return QString::fromUtf8(params.value(kOpaqueLocalSystemIdTag));
+}
+
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 {
     QnCloudSystemList result;
@@ -51,7 +64,10 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 
         QnCloudSystem system;
         system.cloudId = QString::fromStdString(systemData.id);
-        system.localId = system.cloudId;// TODO: !! change for local system id when available
+        system.localId = getLocalSystemId(systemData.opaque);
+        if (system.localId.isEmpty())
+            system.localId = system.cloudId;
+
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);

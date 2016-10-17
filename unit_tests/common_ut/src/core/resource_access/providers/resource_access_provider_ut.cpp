@@ -173,3 +173,34 @@ TEST_F(QnResourceAccessProviderTest, checkSequentialAccessRemoving)
     awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::none);
     videoWall->items()->removeItem(item);
 }
+
+TEST_F(QnResourceAccessProviderTest, checkAccessProviders)
+{
+    auto camera = addCamera();
+
+    auto layout = addLayout();
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    layout->addItem(layoutItem);
+
+    auto videoWall = addVideoWall();
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    QnResourceList providers;
+
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_EQ(providers, QnResourceList() << videoWall);
+
+    auto sharedIds = QSet<QnUuid>() << layout->getId();
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_EQ(providers, QnResourceList() << layout);
+
+    sharedIds << camera->getId();
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_TRUE(providers.empty());
+}

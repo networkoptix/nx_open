@@ -86,8 +86,6 @@
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -230,8 +228,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
     connect(action(QnActions::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(QnActions::CameraDiagnosticsAction), SIGNAL(triggered()), this, SLOT(at_cameraDiagnosticsAction_triggered()));
-    connect(action(QnActions::LayoutSettingsAction), SIGNAL(triggered()), this, SLOT(at_layoutSettingsAction_triggered()));
-    connect(action(QnActions::CurrentLayoutSettingsAction), SIGNAL(triggered()), this, SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(QnActions::ServerAddCameraManuallyAction), SIGNAL(triggered()), this, SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(QnActions::PingAction), SIGNAL(triggered()), this, SLOT(at_pingAction_triggered()));
     connect(action(QnActions::ServerLogsAction), SIGNAL(triggered()), this, SLOT(at_serverLogsAction_triggered()));
@@ -964,29 +960,6 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
 
     if (!dirName.isEmpty())
         menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(dirName));
-}
-
-void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
-    if (!layout)
-        return;
-
-    if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
-        return;
-
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->readFromResource(layout);
-
-    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec() || !dialog->submitToResource(layout))
-        return;
-
-    /* Move layout items to grid center to best fit the background */
-    if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty()) {
-        QnWorkbenchLayout* wlayout = QnWorkbenchLayout::instance(layout);
-        if (wlayout)
-            wlayout->centralizeItems();
-    }
 }
 
 void QnWorkbenchActionHandler::openFailoverPriorityDialog() {
@@ -1772,14 +1745,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
     adjustVideoDialog()->setWidget(widget);
 }
 
-void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
-    QnActionParameters params = menu()->currentParameters(sender());
-    openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
-}
-
-void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
-    openLayoutSettingsDialog(workbench()->currentLayout()->resource());
-}
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(0.0);

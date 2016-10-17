@@ -5,32 +5,31 @@
 
 namespace {
 
-    QnBaseSystemDescription::ServersList subtractLists(
-        const QnBaseSystemDescription::ServersList& first,
-        const QnBaseSystemDescription::ServersList& second)
-    {
-        QnBaseSystemDescription::ServersList result;
-        std::copy_if(first.begin(), first.end(), std::back_inserter(result),
-            [&second](const QnModuleInformation& first)
+QnBaseSystemDescription::ServersList subtractLists(
+    const QnBaseSystemDescription::ServersList& first,
+    const QnBaseSystemDescription::ServersList& second)
+{
+    QnBaseSystemDescription::ServersList result;
+    std::copy_if(first.begin(), first.end(), std::back_inserter(result),
+        [&second](const QnModuleInformation& first)
+        {
+            const auto secondIt = std::find_if(second.begin(), second.end(),
+                                                [first](const QnModuleInformation& second)
             {
-                const auto secondIt = std::find_if(second.begin(), second.end(),
-                                                   [first](const QnModuleInformation& second)
-                {
-                    return (first.id == second.id);
-                });
-
-                return (secondIt == second.end()); // add to result if not found in second
+                return (first.id == second.id);
             });
-        return result;
-    };
 
-}
+            return (secondIt == second.end()); // add to result if not found in second
+        });
+    return result;
+};
+
+}   // namespace
 
 QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(int priority,
     const QnSystemDescriptionPtr& systemDescription)
     :
-    m_systems(),
-    m_servers()
+    m_systems()
 {
     mergeSystem(priority, systemDescription);
 }
@@ -64,20 +63,20 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
 
     const int lastPriority = (m_systems.isEmpty() ? 0 : m_systems.firstKey());
     const bool headSystemChanged = ((priority < lastPriority) || m_systems.empty());
-    const auto oldServers = servers();
 
     m_systems.insert(priority, system);
 
     connect(system.data(), &QnBaseSystemDescription::serverAdded,
-        this, &QnSystemDescriptionAggregator::serverAdded);
+        this, &QnSystemDescriptionAggregator::updateServers);
     connect(system.data(), &QnBaseSystemDescription::serverRemoved,
-        this, &QnSystemDescriptionAggregator::serverRemoved);
+        this, &QnSystemDescriptionAggregator::updateServers);
+
     connect(system.data(), &QnBaseSystemDescription::serverChanged,
-        this, &QnSystemDescriptionAggregator::serverChanged);
+        this, &QnSystemDescriptionAggregator::handleServerChanged);
     connect(system.data(), &QnBaseSystemDescription::systemNameChanged, this,
         [this, system]() { onSystemNameChanged(system); });
 
-    updateServers(oldServers);
+    updateServers();
     if (headSystemChanged)
         emitHeadChanged();
 }
@@ -87,6 +86,16 @@ void QnSystemDescriptionAggregator::emitHeadChanged()
     emit isCloudSystemChanged();
     emit ownerChanged();
     emit systemNameChanged();
+}
+
+void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
+    QnServerFields fields)
+{
+    const auto it = std::find_if(m_servers.begin(), m_servers.end(),
+        [serverId](const QnModuleInformation& info) { return (serverId == info.id); });
+
+    if (it != m_servers.end())
+        emit serverChanged(serverId, fields);
 }
 
 void QnSystemDescriptionAggregator::onSystemNameChanged(const QnSystemDescriptionPtr& system)
@@ -111,20 +120,6 @@ void QnSystemDescriptionAggregator::onSystemNameChanged(const QnSystemDescriptio
         emit systemNameChanged();
 }
 
-
-void QnSystemDescriptionAggregator::updateServers(const ServersList& oldServers)
-{
-    const auto newServers = servers();
-
-    const auto toRemove = subtractLists(oldServers, newServers);
-    for (const auto& server : toRemove)
-        emit serverRemoved(server.id);
-
-    const auto toAdd = subtractLists(newServers, oldServers);
-    for (const auto& server : toAdd)
-        emit serverAdded(server.id);
-}
-
 void QnSystemDescriptionAggregator::removeSystem(int priority)
 {
     const bool exist = m_systems.contains(priority);
@@ -139,7 +134,7 @@ void QnSystemDescriptionAggregator::removeSystem(int priority)
     disconnect(system.data(), nullptr, this, nullptr);
     m_systems.remove(priority);
 
-    updateServers(oldServers);
+    updateServers();
     if (headSystemChanged && !m_systems.isEmpty())
         emitHeadChanged();
 }
@@ -196,13 +191,31 @@ QString QnSystemDescriptionAggregator::ownerFullName() const
 
 QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() const
 {
+    return m_servers;
+}
+
+void QnSystemDescriptionAggregator::updateServers()
+{
+    const auto newServers = gatherServers();
+    const auto toRemove = subtractLists(m_servers, newServers);
+    const auto toAdd = subtractLists(newServers, m_servers);
+
+    m_servers = newServers;
+    for (const auto& server : toRemove)
+        emit serverRemoved(server.id);
+
+    for (const auto& server : toAdd)
+        emit serverAdded(server.id);
+}
+
+QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::gatherServers() const
+{
     ServersList result;
     for (const auto systemDescription : m_systems)
     {
         const auto toAddList = subtractLists(systemDescription->servers(), result);
         std::copy(toAddList.begin(), toAddList.end(), std::back_inserter(result));
     }
-
     return result;
 }
 

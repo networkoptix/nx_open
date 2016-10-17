@@ -25,6 +25,14 @@
 #include <utils/common/app_info.h>
 #include <api/global_settings.h>
 
+#include <nx/utils/string.h>
+
+namespace {
+
+static const int kMaxSystemNameLength = 20;
+
+}
+
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -124,8 +132,15 @@ void QnMergeSystemsDialog::updateKnownSystems()
 
     ui->urlComboBox->setCurrentText(QString());
 
-    ui->currentSystemLabel->setText(tr("You are about to merge the current system %1 with the system").arg(qnGlobalSettings->systemName()));
-    ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(qnGlobalSettings->systemName()));
+    const QString displayName = nx::utils::elideString(
+        qnGlobalSettings->systemName(), kMaxSystemNameLength);
+
+    //TODO: #GDM #tr translators would go crazy
+    ui->currentSystemLabel->setText(
+        tr("You are about to merge the current system %1 with the system")
+        .arg(displayName));
+
+    ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(displayName));
 }
 
 void QnMergeSystemsDialog::updateErrorLabel(const QString &error) {

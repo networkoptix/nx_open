@@ -32,7 +32,8 @@ private:
 
     void setCloudSystems(const QnCloudSystemList &systems);
 
-    void updateSystemInternal(const QnSystemDescription::PointerType &system);
+    void updateSystemInternal(const QString& cloudId,
+        const QnSystemDescription::PointerType &system);
 
     void processFactoryServer(const QnModuleInformation& serverInfo);
 

@@ -174,3 +174,12 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnSharedResourceAccessProviderTest, accessProviders)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
+    QnResourceList providers;
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_TRUE(providers.empty());
+}
