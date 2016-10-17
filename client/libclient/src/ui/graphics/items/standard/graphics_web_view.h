@@ -10,16 +10,16 @@ enum WebViewPageStatus
     , kPageLoadFailed
 };
 
-class QnWebView : public QGraphicsWebView
+class QnGraphicsWebView : public QGraphicsWebView
 {
     Q_OBJECT
 
     Q_PROPERTY(WebViewPageStatus status READ status WRITE setStatus NOTIFY statusChanged)
     Q_PROPERTY(bool canGoBack READ canGoBack WRITE setCanGoBack NOTIFY canGoBackChanged)
 public:
-    QnWebView(const QUrl &url = QUrl(), QGraphicsItem *parent = nullptr);
+    QnGraphicsWebView(const QUrl &url = QUrl(), QGraphicsItem *parent = nullptr);
 
-    virtual ~QnWebView();
+    virtual ~QnGraphicsWebView();
 
     WebViewPageStatus status() const;
 
@@ -31,7 +31,6 @@ public:
 
     void setPageUrl(const QUrl &newUrl);
 
-    void setupStyle();
 signals:
     void statusChanged();
 
