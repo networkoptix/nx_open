@@ -1156,26 +1156,21 @@ nx::db::DBResult SystemManager::fetchUserSharings(
         FROM system_to_account sa, account a
         WHERE sa.account_id=a.id
         )sql";
+
     QString filterStr;
-    for (const auto& filterField: filterFields)
+    if (!filterFields.empty())
     {
-        filterStr += lm(" AND %1=%2")
-            .arg(filterField.fieldName).arg(filterField.placeHolderName);
+        filterStr = db::joinFields(filterFields, " AND ");
+        sqlRequestStr += " AND " + filterStr;
     }
-    sqlRequestStr += filterStr;
 
     QSqlQuery selectSharingQuery(*queryContext->connection());
     selectSharingQuery.setForwardOnly(true);
     selectSharingQuery.prepare(sqlRequestStr);
-    for (const auto& filterField : filterFields)
-    {
-        selectSharingQuery.bindValue(
-            filterField.placeHolderName,
-            filterField.fieldValue);
-    }
+    db::bindFields(&selectSharingQuery, filterFields);
     if (!selectSharingQuery.exec())
     {
-        NX_LOGX(lm("Error executing request to select sharings with filter %1. %2")
+        NX_LOGX(lm("Error executing request to select sharings with filter \"%1\". %2")
             .arg(filterStr).arg(selectSharingQuery.lastError().text()),
             cl_logWARNING);
         return nx::db::DBResult::ioError;
@@ -2128,29 +2123,24 @@ nx::db::DBResult SystemManager::deleteSharing(
         R"sql(
         DELETE FROM system_to_account WHERE system_id=:systemId
         )sql";
+
     QString filterStr;
-    for (const auto& filterField: filterFields)
+    if (!filterFields.empty())
     {
-        filterStr += lm(" AND %1=%2")
-            .arg(filterField.fieldName).arg(filterField.placeHolderName);
+        filterStr = db::joinFields(filterFields, " AND ");
+        sqlQueryStr += " AND " + filterStr;
     }
-    sqlQueryStr += filterStr;
     removeSharingQuery.prepare(sqlQueryStr);
     removeSharingQuery.bindValue(
         ":systemId",
         QnSql::serialized_field(systemId));
-    for (const auto& filterField: filterFields)
-    {
-        removeSharingQuery.bindValue(
-            filterField.placeHolderName,
-            filterField.fieldValue);
-    }
+    db::bindFields(&removeSharingQuery, filterFields);
     if (!removeSharingQuery.exec())
     {
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("Failed to remove sharing. system %1, filter \"%2\". %3")
-            .arg(systemId).str(filterStr).arg(removeSharingQuery.lastError().text()),
+                .arg(systemId).str(filterStr).arg(removeSharingQuery.lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
