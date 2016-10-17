@@ -113,7 +113,7 @@
                     name="Audio Encoding"
                     dataType="Enumeration"
                     range="G711 ulaw,G726,AAC"
-                    internalRange="g711,g276,aac"
+                    internalRange="g711,g726,aac"
                     readCmd="param.cgi"/>
                 <param id="root.AudioSource.A0.SampleRate"
                     name="Sample Rate"
@@ -122,23 +122,17 @@
                     internalRange="8000,16000"
                     readCmd="param.cgi">
                     <dependencies>
-                        <!--<conditional-show>
-                            <condition id="root.Network.SomeParam"
-                                condition="value=somevalue"/>
-                            <condition id="root.Network.SomeParam2"
-                                condition="valueIn=somevalue1,someValue2,someValue3"/>
-                            <condition id="root.Network.SomeParam3"
-                                condition="valueNotIn=somevalue1,someValue2,someValue3"/>
-                        </conditional-show>-->
                         
                         <conditional-ranges>
                             <conditional-range range="8" internalRange="8000">
-                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                <condition 
+                                    watch="root.AudioSource.A0.AudioEncoding"
                                     condition="valueIn=G711 ulaw,G726"/>    
                             </conditional-range>
                             <conditional-range range="8,16" internalRange="8000,16000">
-                                <condition id="root.AudioSource.A0.AudioEncoding"
-                                        condition="value=AAC"/>
+                                <condition 
+                                    watch="root.AudioSource.A0.AudioEncoding"
+                                    condition="value=AAC"/>
                             </conditional-range>
                         </conditional-ranges>
                     </dependencies>
@@ -150,28 +144,23 @@
                     internalRange="12000,16000,24000,32000,48000,64000"
                     readCmd="param.cgi">
                     <dependencies>
-                        <!--<conditional-show>
-                            <condition id="root.Network.SomeParam"
-                                condition="value=somevalue"/>
-                            <condition id="root.Network.SomeParam2"
-                                condition="valueIn=somevalue1,someValue2,someValue3"/>
-                            <condition id="root.Network.SomeParam3"
-                                condition="valueNotIn=somevalue1,someValue2,someValue3"/>
-                        </conditional-show>-->
                         
                         <conditional-ranges>
                             <conditional-range range="64" internalRange="64000">
-                                <condition id="root.AudioSource.A0.AudioEncoding"
+                                <condition 
+                                    watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=G711 ulaw"/>    
                             </conditional-range>
                             <conditional-range range="24,32" internalRange="24000,32000">
-                                <condition id="root.AudioSource.A0.AudioEncoding"
-                                        condition="value=G726"/>
+                                <condition 
+                                    watch="root.AudioSource.A0.AudioEncoding"
+                                    condition="value=G726"/>
                             </conditional-range>
                             <conditional-range range="12,16,24,32,48,64" 
                                 internalRange="12000,16000,24000,32000,48000,64000">
-                                <condition id="root.AudioSource.A0.AudioEncoding"
-                                        condition="value=AAC"/>
+                                <condition
+                                    watch="root.AudioSource.A0.AudioEncoding"
+                                    condition="value=AAC"/>
                             </conditional-range>
                         </conditional-ranges>
                     </dependencies>
@@ -211,20 +200,64 @@
                         dataType="Enumeration"
                         range="DHCP,Static"
                         internalRange="dhcp,none"
-                        readCmd="param.cgi"/>
+                        readCmd="param.cgi">
+
+                        <dependencies>
+                            <conditional-show>
+                                <condition 
+                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
                     <param id="root.Network.Interface.I0.Manual.IPAddress"
                         name="IP Address"
                         dataType="String"
-                        readCmd="param.cgi"/>
+                        readCmd="param.cgi">
+
+                        <dependencies>
+                            <conditional-show>
+                                <condition 
+                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                                <condition
+                                    watch="root.Network.Interface.I0.Link.BootProto"
+                                    condition="value=Static"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
                     <param id="root.Network.Interface.I0.Manual.SubnetMask"
                         name="Subnet Mask"
                         dataType="String"
-                        readCmd="param.cgi"/>                                
+                        readCmd="param.cgi">
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition 
+                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                                <condition
+                                    watch="root.Network.Interface.I0.Link.BootProto"
+                                    condition="value=Static"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>                                
                     <param id="root.Network.Interface.I0.Manual.DefaultRouter"
                         name="DefaultGateway"
                         dataType="String"
-                        readCmd="param.cgi"/>                                
-                                
+                        readCmd="param.cgi">                                
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition 
+                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                                <condition
+                                    watch="root.Network.Interface.I0.Link.BootProto"
+                                    condition="value=Static"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>    
                     <param id="root.Network.Interface.I1.Link.IPv4Enabled"
                         name="Enable IPv4 (Wireless)"
                         dataType="Enumeration"
@@ -236,19 +269,64 @@
                         dataType="Enumeration"
                         range="DHCP,Static"
                         internalRange="dhcp,none"
-                        readCmd="param.cgi"/>
+                        readCmd="param.cgi">
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
                     <param id="root.Network.Interface.I1.Manual.IPAddress"
                         name="IP Address (Wireless)"
                         dataType="String"
-                        readCmd="param.cgi"/>
+                        readCmd="param.cgi">
+
+                        <dependencies>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.BootProto"
+                                    condition="value=Static"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
                     <param id="root.Network.Interface.I1.Manual.SubnetMask"
                         name="Subnet Mask (Wireless)"
                         dataType="String"
-                        readCmd="param.cgi"/>                                
+                        readCmd="param.cgi">
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.BootProto"
+                                    condition="value=Static"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>                                
                     <param id="root.Network.Interface.I1.Manual.DefaultRouter"
                         name="DefaultGateway (Wireless)"
                         dataType="String"
-                        readCmd="param.cgi"/>
+                        readCmd="param.cgi">
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                    condition="value=Yes"/>
+                                <condition
+                                    watch="root.Network.Interface.I1.Link.BootProto"
+                                    condition="value=Static"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
 
 
                     <param id="root.Network.Interface.I0.Link.IPv6Enabled"
@@ -304,7 +382,16 @@
                         internalRange="yes,no"/>
                     <param id="root.Network.UPnP.FriendlyName"
                         name="Friendly Name"
-                        dataType="String"/>
+                        dataType="String">
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Network.UPnP.Enabled"
+                                    condition="value=Yes"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
                 </group>
                 <group name="Bonjour">
                     <param id="root.Network.Bonjour.Enabled"
@@ -314,7 +401,16 @@
                         internalRange="yes,no"/>
                     <param id="root.Network.Bonjour.FriendlyName"
                         name="Friendly Name"
-                        dataType="String"/>
+                        dataType="String">
+                        
+                        <dependencies>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Network.Bonjour.Enabled"
+                                    condition="value=Yes"/>
+                            </conditional-show>
+                        </dependencies>
+                    </param>
                 </group>
             </group>
             <group name="LED">
@@ -328,7 +424,16 @@
                     name="Flash Interval"
                     dataType="Number"
                     range="1,30"
-                    readCmd="param.cgi"/>
+                    readCmd="param.cgi">
+
+                    <dependencies>
+                        <conditional-show>
+                            <condition
+                                watch="root.StatusLED.Usage"
+                                condition="value=Flash"/>
+                        </conditional-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="PIR Sensor">
                 <param id="root.PIRSensor.Sensitivity"

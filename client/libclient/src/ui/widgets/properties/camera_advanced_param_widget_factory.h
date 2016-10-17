@@ -4,6 +4,7 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/camera_advanced_param.h>
+#include <nx/utils/log/assert.h>
 
 class QnAbstractCameraAdvancedParamWidget: public QWidget {
 	Q_OBJECT
@@ -12,6 +13,11 @@ public:
 
 	virtual QString value() const = 0;
 	virtual void setValue(const QString &newValue) = 0;
+    virtual void setRange(const QString& /*range*/)
+    {
+        NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
+    }
+
 signals:
 	void valueChanged(const QString &id, const QString &value);
 protected:

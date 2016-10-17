@@ -156,6 +156,8 @@ namespace QnXmlTag {
     const QString conditionalRanges     = lit("conditional-ranges");
     const QString conditionalRange      = lit("conditional-range");
     const QString dependencyId          = lit("id");
+    const QString conditionId           = lit("id");
+    const QString conditionWatch        = lit("watch");
     const QString condition             = lit("condition");
 }
 
@@ -276,7 +278,6 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
         {
             QnCameraAdvancedParameterDependency dependency;
 
-            qDebug() << "===============> SETTING SHOW DEPENDECY ON THE SERVER SIDE";
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Show;
             parseConditionsXml(node.toElement(), dependency.conditions);
             dependencies.push_back(dependency);
@@ -286,24 +287,22 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
             auto conditionNodes = node.childNodes();
             for (int i = 0; i < conditionNodes.size(); ++i)
             {
-                if (!node.isElement())
+                auto condRangeXmlElement = conditionNodes.at(i).toElement();
+                if (condRangeXmlElement.isNull())
                     continue;
 
-                auto condRangeXmlNode = conditionNodes.at(i);
                 QnCameraAdvancedParameterDependency dependency;
 
-                if (condRangeXmlNode.nodeName() != QnXmlTag::conditionalRange)
+                if (condRangeXmlElement.nodeName() != QnXmlTag::conditionalRange)
                     return false;
 
-                qDebug () << "==============> SETTING RANGES DEPENDENCY ON THE SERVER SIDE";
                 dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
-                parseConditionsXml(condRangeXmlNode.toElement(), dependency.conditions);
+                dependency.range = condRangeXmlElement.attribute(QnXmlTag::paramRange);
+                dependency.internalRange = condRangeXmlElement.attribute(QnXmlTag::paramInternalRange);
+
+                parseConditionsXml(condRangeXmlElement, dependency.conditions);
                 dependencies.push_back(dependency);
             }
-        }
-        else
-        {
-            qDebug() << "==================> GOT STRANGE NODE, NAME" << node.nodeName();
         }
     }
 
@@ -324,7 +323,7 @@ bool QnCameraAdvacedParamsXmlParser::parseConditionsXml(
             continue;
 
         QnCameraAdvancedParameterCondition condition;
-        condition.paramId = element.attribute(QnXmlTag::paramId);
+        condition.paramId = element.attribute(QnXmlTag::conditionWatch);
 
         auto conditionStr = element.attribute(QnXmlTag::condition);
 
@@ -350,17 +349,14 @@ bool QnCameraAdvacedParamsXmlParser::parseConditionString(
         return false;
 
     auto condTypeStr = conditionString.left(separatorPosition);
-    auto condValueStr = conditionString.mid(separatorPosition);
+    auto condValueStr = conditionString.mid(separatorPosition + 1);
 
     condition.type = QnCameraAdvancedParameterCondition::fromStringToConditionType(condTypeStr);
 
     if (condition.type == QnCameraAdvancedParameterCondition::ConditionType::Unknown)
         return false;
 
-    if (condition.type == QnCameraAdvancedParameterCondition::ConditionType::Equal)
-        condition.value = condValueStr;
-    else
-        condition.value = condValueStr;
+    condition.value = condValueStr;
 
     return true;
 }

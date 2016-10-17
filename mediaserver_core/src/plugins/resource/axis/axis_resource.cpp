@@ -1481,12 +1481,9 @@ QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(const QnCam
     auto response = executeParamsQueries(queries, success);
 
     for(const auto& paramId: paramIds)
+    {
         if(response.contains(paramId))
             supported.insert(paramId);
-
-    for (const auto& s: supported)
-    {
-        qDebug() << "=====> SUPPORTED" << s;
     }
 
     return supported;
@@ -1496,7 +1493,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
 {
     QnMutexLocker lock( &m_physicalParamsMutex );
     m_advancedParameters.clear();
-    auto resourceData = qnCommon->dataPool()->data(MANUFACTURE, getModel());
+    auto resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
 
     qDebug() << "ResourceData" << resourceData.value<QMap<QString, QString>>("advancedParametersOverload");
 
@@ -1533,15 +1530,11 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
 
     for(const auto& query: queries)
     {
-        qDebug() << "QUERY" << query;
-
         status = httpClient.doGET(query);
         if( status == CL_HTTP_SUCCESS )
         {
             QByteArray body;
             httpClient.readAll( body );
-
-            qDebug() << "BODY IS" << body;
 
             if(body.startsWith("OK"))
                 continue;
@@ -1556,12 +1549,11 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         else
         {
             isSuccessful = false;
-            qDebug() << "FAILED TO EXECUTE " << query;
-            NX_LOG( lit("Failed to execute params query from path %1 of camera %2. Result: %3")
+            NX_LOG(lit("Failed to execute params query from path %1 of camera %2. Result: %3")
                 .arg(query)
                 .arg(getHostAddress())
                 .arg(::toString(status)),
-                cl_logWARNING );
+                cl_logDEBUG2);
         }
     }
     return result;
@@ -1582,12 +1574,16 @@ QnCameraAdvancedParamValueList QnPlAxisResource::parseParamsQueriesResult(
 {
     QnCameraAdvancedParamValueList result;
     for(const auto& param: params)
+    {
         if(queriesResult.contains(param.id))
         {
             auto paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration ?
-                param.fromInternalRange(queriesResult[param.id]) : queriesResult[param.id];
+                param.fromInternalRange(queriesResult[param.id]):
+                queriesResult[param.id];
+
             result.append(QnCameraAdvancedParamValue(param.id, paramValue));
         }
+    }
 
     return result;
 }
@@ -1619,7 +1615,9 @@ QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueLi
             auto paramValue = paramIdAndValue.value;
             hasParamsToSet = true;
             paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration ?
-                param.toInternalRange(paramValue) : paramValue;
+                param.toInternalRange(paramValue):
+                paramValue;
+
             query += paramIdAndValue.id + lit("=") + paramValue + lit("&");
         }
     }
@@ -1653,17 +1651,12 @@ bool QnPlAxisResource::getParamPhysical(const QString &id, QString &value)
 
 bool QnPlAxisResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
 {
-    qDebug() << "AXIS GET PARAMS PHYSICAL";
-
     bool success = true;
     const auto params = getParamsByIds(idList);
     const auto queries = buildGetParamsQueries(params);
 
-    qDebug() << queries;
-
     const auto queriesResults = executeParamsQueries(queries, success);
 
-    qDebug() << "RESULT" << queriesResults;
     result = parseParamsQueriesResult(queriesResults, params);
 
     return result.size() == idList.size();
@@ -1680,11 +1673,9 @@ bool QnPlAxisResource::setParamPhysical(const QString &id, const QString& value)
 
 bool QnPlAxisResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
 {
-    qDebug() << "AXIS SET PARAMS PHYSICAL";
     bool success;
     const auto query = buildSetParamsQuery(values);
     const auto maintenanceQuery = buildMaintenanceQuery(values);
-    qDebug() << "Executing SET Query: " << query;
 
     if(!query.isEmpty())
         executeParamsQueries(query, success);

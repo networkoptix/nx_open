@@ -1,25 +1,27 @@
 #ifndef QN_CAMERA_ADVANCED_PARAM
 #define QN_CAMERA_ADVANCED_PARAM
 
+#include <functional>
 #include <QtCore/QHash>
 
 #include <core/resource/resource_fwd.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
-struct QnCameraAdvancedParamValue {
+struct QnCameraAdvancedParamValue
+{
 	QString id;
 	QString value;
 
-	QnCameraAdvancedParamValue();
+    QnCameraAdvancedParamValue() = default;
 	QnCameraAdvancedParamValue(const QString &id, const QString &value);
 };
 #define QnCameraAdvancedParamValue_Fields (id)(value)
 
-class QnCameraAdvancedParamValueMap: public QMap<QString, QString> {
-public:
-    QnCameraAdvancedParamValueMap();
+class QnCameraAdvancedParamValueMap: public QMap<QString, QString>
+{
 
+public:
     QnCameraAdvancedParamValueList toValueList() const;
     void appendValueList(const QnCameraAdvancedParamValueList &list);
 
@@ -42,21 +44,20 @@ struct QnCameraAdvancedParameterCondition
         Equal,
         InRange,
         NotInRange,
+        Default,
         Unknown
     };
 
-    QnCameraAdvancedParameterCondition();
-
-    ConditionType type;
+    ConditionType type = ConditionType::Unknown;
     QString paramId;
     QString value;
-    QString range;
 
+    bool checkValue(const QString& valueToCheck) const;
     static ConditionType fromStringToConditionType(const QString& conditionType);
     static QString fromConditionTypeToString(const ConditionType& conditionType);
 };
 
-#define QnCameraAdvancedParameterCondition_Fields (type)(paramId)(value)(range)
+#define QnCameraAdvancedParameterCondition_Fields (type)(paramId)(value)
 
 struct QnCameraAdvancedParameterDependency
 {
@@ -67,19 +68,21 @@ struct QnCameraAdvancedParameterDependency
         Unknown
     };
 
-    QnCameraAdvancedParameterDependency();
-
-    DependencyType type;
+    DependencyType type = DependencyType::Unknown;
+    QString range;
+    QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
 
     static DependencyType fromStringToDependencyType(const QString& dependencyType);
     static QString fromDependencyTypeToString(const DependencyType& dependencyType);
 };
 
-#define QnCameraAdvancedParameterDependency_Fields (type)(conditions)
+#define QnCameraAdvancedParameterDependency_Fields (type)(range)(internalRange)(conditions)
 
-struct QnCameraAdvancedParameter {
-    enum class DataType {
+struct QnCameraAdvancedParameter
+{
+    enum class DataType
+    {
         None,
         Bool,
         Number,
@@ -88,23 +91,19 @@ struct QnCameraAdvancedParameter {
         String
     };
 
-
-	bool isValid() const;
-
     QString id;
-    DataType dataType;
+    DataType dataType = DataType::None;
     QString range;
     QString name;
     QString description;
     QString tag;  
-    bool readOnly;
+    bool readOnly = false;
     QString readCmd; // read parameter command line. Isn't used in UI
     QString writeCmd; // write parameter command line. Isn't used in UI
     QString internalRange; // internal device values for range parameters
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
 
-    QnCameraAdvancedParameter();
-
+    bool isValid() const;
     QStringList getRange() const;
     QStringList getInternalRange() const;
     QString fromInternalRange(const QString& value) const;
@@ -121,7 +120,8 @@ struct QnCameraAdvancedParameter {
 };
 #define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)(readCmd)(writeCmd)(internalRange)(dependencies)
 
-struct QnCameraAdvancedParamGroup {
+struct QnCameraAdvancedParamGroup
+{
     QString name;
     QString description;
     std::vector<QnCameraAdvancedParamGroup> groups;
@@ -135,14 +135,13 @@ struct QnCameraAdvancedParamGroup {
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
-struct QnCameraAdvancedParams {
+struct QnCameraAdvancedParams
+{
     QString name;
     QString version;
     QString unique_id;
-    bool packet_mode;
+    bool packet_mode =false;
     std::vector<QnCameraAdvancedParamGroup> groups;
-
-    QnCameraAdvancedParams();
 
     QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
