@@ -90,12 +90,16 @@ public:
     api::VmsConnectionDataList getVmsConnections() const;
     bool isSystemConnected(const std::string& systemId) const;
 
+    void closeConnectionsToSystem(
+        const nx::String& systemId,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
 private:
     struct ConnectionContext
     {
         std::unique_ptr<TransactionTransport> connection;
         nx::String connectionId;
-        // TODO: #ak get rid of pair and find out how build multipart inde correctly.
+        // TODO: #ak get rid of pair and find out how to build multi-field index correctly.
         std::pair<nx::String, nx::String> systemIdAndPeerId;
     };
 
@@ -133,6 +137,12 @@ private:
         void removeExistingConnection(
             QnMutexLockerBase* const /*lock*/,
             ConnectionKeyType connectionKey);
+    template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
+    void removeConnectionByIter(
+        QnMutexLockerBase* const /*lock*/,
+        ConnectionIndex& connectionIndex,
+        Iterator connectionIterator,
+        CompletionHandler completionHandler);
     void removeConnection(const nx::String& connectionId);
     void onGotTransaction(
         const nx::String& connectionId,

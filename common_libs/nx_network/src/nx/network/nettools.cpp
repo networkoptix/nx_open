@@ -51,29 +51,15 @@
 #	include <iphlpapi.h>
 #endif
 
-/*
-bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
+namespace {
+    static QList<QHostAddress> allowedInterfaces;
+} // namespace
+
+
+void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
-    int res;
-
-#ifdef Q_OS_LINUX
-    Q_UNUSED(mode)
-    if( !sock.bind(port) )
-        return false;
-    res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length());
-#else
-    res = !sock.bind(iface.address, port, mode);
-#endif
-
-    if (res)
-    {
-        //NX_LOG(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toLatin1().constData(), strerror(errno));
-        return false;
-    }
-
-    return true;
+    allowedInterfaces = ifList;
 }
-*/
 
 QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 {
@@ -118,37 +104,6 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
             if (isIpV4 && !isLocalHost)
             {
-                static bool allowedInterfaceReady = false;
-                static QList<QHostAddress> allowedInterfaces;
-                if (!allowedInterfaceReady)
-                {
-                    for(QString arg: qApp->arguments()) // TODO: #Elric totally evil! This is NOT a place to access application arguments
-                    {
-                        arg = arg.toLower();
-                        while (arg.startsWith(QLatin1Char('-')))
-                            arg = arg.mid(1);
-                        if (arg.startsWith(QLatin1String("if="))) {
-                            QStringList tmp = arg.split(QLatin1Char('='))[1].split(QLatin1Char(';'));
-                            for(const QString& s: tmp)
-                                allowedInterfaces << QHostAddress(s);
-                        }
-                    }
-
-                    // check registry
-                    if (allowedInterfaces.isEmpty())
-                    {
-                        QSettings settings;
-                        QStringList tmp = settings.value(QLatin1String("if")).toString().split(QLatin1Char(';'));
-                        for(const QString& s: tmp) {
-                            if (!s.isEmpty())
-                                allowedInterfaces << QHostAddress(s);
-                        }
-                    }
-                    if (!allowedInterfaces.isEmpty())
-                        qWarning() << "Using net IF filter:" << allowedInterfaces;
-                    allowedInterfaceReady = true;
-                }
-
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));

@@ -19,12 +19,6 @@
 #include "serverutil.h"
 #include <network/authenticate_helper.h>
 
-namespace
-{
-    const QString kDefaultOwnerName(lit("admin"));
-    const QString kDefaultOwnerPassword(lit("admin"));
-}
-
 QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_server()

@@ -56,8 +56,17 @@ public:
     Qn::GlobalPermissions getRawPermissions() const;
     void setRawPermissions(Qn::GlobalPermissions permissions);
 
+    /*
+     * Owner user has maxumum permissions. Could be local or cloud user
+     */
     bool isOwner() const;
     void setOwner(bool isOwner);
+
+    /*
+     * Predefined local owner.
+     * 'isOwner=true' for 'admin' user and can't be reset. Could be disabled for login. Can't be removed.
+     */
+    bool isAdmin() const;
 
     QnUuid userGroup() const;
     void setUserGroup(const QnUuid& group);
