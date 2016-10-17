@@ -132,10 +132,6 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     auto credentials = qnCloudStatusWatcher->credentials();
     auto effectiveName = qnCloudStatusWatcher->effectiveUserName();
     ui->loginInputField->setText(effectiveName);
-    if (credentials.user == effectiveName)
-        ui->passwordInputField->setText(credentials.password);
-    else
-        ui->passwordInputField->setText(QString());
 
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
     connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
