@@ -10,6 +10,10 @@
 
 #include "log_message.h"
 
+#if defined(ANDROID) || defined(__ANDROID__)
+    #include "backtrace_android.h"
+#endif // defined(ANDROID) || defined(__ANDROID__)
+
 // Uncomment to enable NX_CHECK condition time measurements:
 //#define NX_CHECK_MEASURE_TIME
 
@@ -21,8 +25,13 @@ NX_UTILS_API void logError(const lm& message);
 template<typename Reason>
 lm assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
-    const auto out = lm("FAILURE %1:%2 NX_CHECK(%3) %4")
-        .arg(file).arg(line).arg(condition).arg(message);
+   #if defined(ANDROID) || defined(__ANDROID__)
+       const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
+           .arg(file).arg(line).arg(condition).arg(message).arg(buildBacktrace());
+   #else
+        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
+            .arg(file).arg(line).arg(condition).arg(message);
+   #endif
 
     logError(out);
     return out;
@@ -33,6 +42,7 @@ void assertCrash(Arguments&& ... args)
 {
     const auto out  = assertLog(std::forward<Arguments>(args)...);
     std::cerr << std::endl << ">>>" << out.toStdString() << std::endl;
+
     *reinterpret_cast<volatile int*>(0) = 7;
 }
 
