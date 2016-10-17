@@ -35,8 +35,6 @@ private:
     void updateSystemInternal(const QString& cloudId,
         const QnSystemDescription::PointerType& system);
 
-    void processFactoryServer(const QnModuleInformation& serverInfo);
-
     void pingServerInternal(const QString &host
         , int serverPriority
         , const QString &systemId);

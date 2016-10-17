@@ -169,6 +169,22 @@ bool QnSystemDescriptionAggregator::isCloudSystem() const
     return m_systems.first()->isCloudSystem();
 }
 
+bool QnSystemDescriptionAggregator::isNewSystem() const
+{
+    const bool emptySystems = m_systems.empty();
+    NX_ASSERT(!emptySystems, "Invalid aggregator");
+    if (emptySystems)
+        return false;
+
+    for (const auto system : m_systems)
+    {
+        if (system->isNewSystem())
+            return true;
+    }
+    return false;
+}
+
+
 QString QnSystemDescriptionAggregator::ownerAccountEmail() const
 {
     const bool emptySystems = m_systems.empty();

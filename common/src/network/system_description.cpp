@@ -19,18 +19,14 @@ namespace
             | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField)
             | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudIdField));
 
-        if (result.testFlag(QnServerField::FlagsField))
-        {
-            const auto isNewSystem = [](const QnModuleInformation& info)
-                { return info.serverFlags.testFlag(Qn::SF_NewSystem); };
-
-            if (isNewSystem(before) != isNewSystem(after))
-                result |= QnServerField::IsFactoryFlag;
-        }
-
         return result;
     }
 #undef EXTRACT_CHANGE_FLAG
+}
+
+QnSystemDescription::PointerType QnSystemDescription::createFactorySystem(const QString& systemId)
+{
+    return PointerType(new QnSystemDescription(systemId));
 }
 
 QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
@@ -51,12 +47,26 @@ QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
             , ownerAccountEmail, ownerFullName));
 }
 
-QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName)
-    :
+QnSystemDescription::QnSystemDescription(const QString& systemId) :
     m_id(systemId),
     m_ownerAccountEmail(),
     m_ownerFullName(),
     m_isCloudSystem(false),
+    m_isNewSystem(true),
+    m_systemName(tr("New system")),
+    m_serverTimestamps(),
+    m_servers(),
+    m_prioritized(),
+    m_hosts()
+{}
+
+
+QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName) :
+    m_id(systemId),
+    m_ownerAccountEmail(),
+    m_ownerFullName(),
+    m_isCloudSystem(false),
+    m_isNewSystem(false),
     m_systemName(systemName),
     m_serverTimestamps(),
     m_servers(),
@@ -74,6 +84,7 @@ QnSystemDescription::QnSystemDescription(
     m_ownerAccountEmail(cloudOwnerAccountEmail),
     m_ownerFullName(ownerFullName),
     m_isCloudSystem(true),
+    m_isNewSystem(false),
     m_systemName(systemName),
     m_serverTimestamps(),
     m_servers(),
@@ -107,6 +118,11 @@ QString QnSystemDescription::ownerFullName() const
 bool QnSystemDescription::isCloudSystem() const
 {
     return m_isCloudSystem;
+}
+
+bool QnSystemDescription::isNewSystem() const
+{
+    return m_isNewSystem;
 }
 
 QnSystemDescription::ServersList QnSystemDescription::servers() const
