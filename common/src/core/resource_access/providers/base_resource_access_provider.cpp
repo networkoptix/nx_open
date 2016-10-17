@@ -51,7 +51,8 @@ QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibl
     if (!hasAccess(subject, resource))
         return Source::none;
 
-    fillProviders(subject, resource, providers);
+    if (providers)
+        fillProviders(subject, resource, *providers);
 
     return baseSource();
 }
@@ -112,7 +113,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 void QnBaseResourceAccessProvider::fillProviders(
     const QnResourceAccessSubject& /*subject*/,
     const QnResourcePtr& /*resource*/,
-    QnResourceList* /*providers*/) const
+    QnResourceList& /*providers*/) const
 {
 }
 

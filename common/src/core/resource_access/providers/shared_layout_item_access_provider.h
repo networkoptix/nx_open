@@ -19,7 +19,7 @@ protected:
     virtual void fillProviders(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList* providers = nullptr
+        QnResourceList& providers
     ) const override;
 
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;

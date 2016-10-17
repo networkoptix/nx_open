@@ -71,11 +71,8 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
 void QnSharedLayoutItemAccessProvider::fillProviders(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
-    QnResourceList* providers) const
+    QnResourceList& providers) const
 {
-    if (!providers)
-        return;
-
     if (!isMediaResource(resource))
         return;
 
@@ -93,7 +90,7 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
         {
             if (item.resource.id != resourceId)
                 continue;
-            *providers << layout;
+            providers << layout;
             break;
         }
     }

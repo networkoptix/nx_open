@@ -39,7 +39,7 @@ protected:
     virtual void fillProviders(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList* providers
+        QnResourceList& providers
     ) const;
     virtual void handleResourceAdded(const QnResourcePtr& resource);
     virtual void handleResourceRemoved(const QnResourcePtr& resource);
