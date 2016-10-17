@@ -51,6 +51,7 @@
 #include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
 #include <ui/workbench/handlers/workbench_cloud_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
+#include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -81,7 +82,6 @@
 #include <ui/style/globals.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -244,6 +244,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
+    context->instance<QnWorkbenchScreenRecordingHandler>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -327,9 +328,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #else
     setOptions(TitleBarDraggable);
 #endif
-
-    /* Open single tab. */
-    action(QnActions::OpenNewTabAction)->trigger();
 
 #ifdef Q_OS_MACX
     //initialize system-wide menu

@@ -118,8 +118,6 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        return false;
 
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
         return true;
@@ -156,11 +154,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //    int n = 0;
 
 
-    QString shortModel = info.name;
-    if (info.name.startsWith(info.manufacturer))
-        shortModel = info.name.mid(info.manufacturer.length()).trimmed();
-    QnResourceData resourceData = qnCommon->dataPool()->data(info.manufacturer, shortModel);
-    const bool forceOnvif = resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME);
+    const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(info.manufacturer, info.name);
     if (!forceOnvif)
     {
         if (ignoreCamera(info.manufacturer, info.name))
@@ -239,11 +233,14 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (!extInfo.mac.isEmpty())
             mac = extInfo.mac;
 
-        if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
-            ignoreCamera(manufacturer, model) )
+        if (!forceOnvif)
         {
-            qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
-            return;
+            if ((camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
+                ignoreCamera(manufacturer, model))
+            {
+                qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
+                return;
+            }
         }
     }
 
@@ -261,7 +258,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
 
 
-    resourceData = qnCommon->dataPool()->data(res->getVendor(), res->getModel());
+    QnResourceData resourceData = qnCommon->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
         resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 

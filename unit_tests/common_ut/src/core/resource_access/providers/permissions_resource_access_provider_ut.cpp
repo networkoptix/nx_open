@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/access_provider_test_fixture.h>
+#include <core/resource_access/providers/base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -18,7 +18,7 @@ static const auto kSource = QnAbstractResourceAccessProvider::Source::permission
 
 }
 
-class QnPermissionsResourceAccessProviderTest: public QnAccessProviderTestFixture
+class QnPermissionsResourceAccessProviderTest: public QnBaseAccessProviderTestFixture
 {
 protected:
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -406,4 +406,13 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkParentIdChange)
     qnResPool->addResource(target);
     target->setParentId(QnUuid());
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, accessProviders)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    QnResourceList providers;
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_TRUE(providers.empty());
 }

@@ -26,7 +26,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -837,7 +836,14 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    if (QnScreenRecorder::isSupported())
+    const bool screenRecordingSupported =
+#if defined(Q_OS_WIN)
+        true;
+#else
+        false;
+#endif
+
+    if (screenRecordingSupported && qnRuntime->isDesktopMode())
     {
         factory(QnActions::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).
@@ -1065,10 +1071,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, this));
 
     /* Resource actions. */
-    factory(QnActions::OpenInLayoutAction).
-        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
-        text(tr("Open in Layout"));
+    factory(QnActions::OpenInLayoutAction)
+        .flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget)
+        .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
+        .text(tr("Open in Layout"))
+        .condition(new QnOpenInLayoutActionCondition(this));
 
     factory(QnActions::OpenInCurrentLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1082,10 +1089,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Tab")).
         conditionalText(tr("Monitor in New Tab"), hasFlags(Qn::server), Qn::All).
-        condition(new QnConjunctionActionCondition(
-            new QnOpenInNewEntityActionCondition(this),
-            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
-            this));
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(QnActions::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
@@ -1100,7 +1104,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnOpenInNewEntityActionCondition(this),
             new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
-            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
             this));
 
     factory(QnActions::OpenSingleLayoutAction).
@@ -1499,11 +1502,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
+    //TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(QnActions::DeleteFromDiskAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Delete from Disk")).
         autoRepeat(false).
-        condition(hasFlags(Qn::url | Qn::local | Qn::media));
+        condition(hasFlags(Qn::local_media));
 
     factory(QnActions::SetAsBackgroundAction).
         flags(Qn::Scene | Qn::SingleTarget).

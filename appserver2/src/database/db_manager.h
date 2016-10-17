@@ -253,7 +253,10 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
 
         // ApiFullInfo
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data);
+        ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data);
+
+        // ApiFullInfo abridged for Mobile Client
+        ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
         //getLicenses
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLicenseDataList& data);
@@ -646,34 +649,63 @@ public:
     QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    template <typename T1>
-    ErrorCode doQuery(const T1& t1, ApiFullInfoData& data)
+    ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullInfoData& data)
     {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, data);
+        return readApiFullInfoDataComplete(&data);
+    }
+
+    ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data)
+    {
+        const ErrorCode errorCode =
+            detail::QnDbManager::instance()->readApiFullInfoDataComplete(data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        readData(data.resourceTypes);
-        readData(data.servers);
-        readData(data.serversUserAttributesList);
-        readData(data.cameras);
-        readData(data.cameraUserAttributesList);
-        readData(data.users);
-        readData(data.userGroups);
-        readData(data.userGroups);
-        readData(data.accessRights);
-        readData(data.layouts);
-        readData(data.videowalls);
-        readData(data.rules);
-        readData(data.cameraHistory);
-        readData(data.licenses);
-        readData(data.discoveryData);
-        readData(data.allProperties);
-        readData(data.storages);
-        readData(data.resStatusList);
-        readData(data.webPages);
+        filterData(data->resourceTypes);
+        filterData(data->servers);
+        filterData(data->serversUserAttributesList);
+        filterData(data->cameras);
+        filterData(data->cameraUserAttributesList);
+        filterData(data->users);
+        filterData(data->userGroups);
+        filterData(data->userGroups);
+        filterData(data->accessRights);
+        filterData(data->layouts);
+        filterData(data->videowalls);
+        filterData(data->rules);
+        filterData(data->cameraHistory);
+        filterData(data->licenses);
+        filterData(data->discoveryData);
+        filterData(data->allProperties);
+        filterData(data->storages);
+        filterData(data->resStatusList);
+        filterData(data->webPages);
 
-        return errorCode;
+        return ErrorCode::ok;
+    }
+
+    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
+    {
+        const ErrorCode errorCode =
+            detail::QnDbManager::instance()->readApiFullInfoDataForMobileClient(data, userId);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        filterData(data->servers);
+        filterData(data->serversUserAttributesList);
+        filterData(data->cameras);
+        filterData(data->cameraUserAttributesList);
+        filterData(data->users);
+        filterData(data->userGroups);
+        filterData(data->userGroups);
+        filterData(data->accessRights);
+        filterData(data->layouts);
+        filterData(data->cameraHistory);
+        filterData(data->discoveryData);
+        filterData(data->allProperties);
+        filterData(data->resStatusList);
+
+        return ErrorCode::ok;
     }
 
     QnDbHelper::QnDbTransaction* getTransaction();
@@ -758,7 +790,7 @@ public:
 
 private:
     template<typename T>
-    void readData(T& target)
+    void filterData(T& target)
     {
         getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
     }

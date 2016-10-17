@@ -22,11 +22,15 @@ bool QnResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
 }
 
 QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia(
-    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource,
+    QnResourceList* providers) const
 {
     for (auto provider : m_providers)
     {
-        auto result = provider->accessibleVia(subject, resource);
+        if (providers)
+            providers->clear();
+        auto result = provider->accessibleVia(subject, resource, providers);
         if (result != Source::none)
             return result;
     }
@@ -70,33 +74,18 @@ QList<QnAbstractResourceAccessProvider*> QnResourceAccessProvider::providers() c
     return m_providers;
 }
 
-int QnResourceAccessProvider::providersCount() const
-{
-    return m_providers.size();
-}
-
 void QnResourceAccessProvider::handleBaseProviderAccessChanged(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource, Source value)
 {
     auto source = qobject_cast<QnAbstractResourceAccessProvider*>(sender());
 
-    QList<QnAbstractResourceAccessProvider*> moreImportant;
-    QList<QnAbstractResourceAccessProvider*> lessImportant;
-
-    auto current = &moreImportant;
-    for (auto provider : m_providers)
-    {
-        if (provider == source)
-        {
-            current = &lessImportant;
-            continue;
-        }
-        *current << provider;
-    }
+    auto sourceIt = std::find(m_providers.cbegin(), m_providers.cend(), source);
+    NX_ASSERT(sourceIt != m_providers.cend());
 
     /* If we already have access from more important provider just ignore signal. */
-    for (auto provider : moreImportant)
+    for (auto it = m_providers.cbegin(); it != sourceIt; ++it)
     {
+        auto provider = *it;
         if (provider->accessibleVia(subject, resource) != Source::none)
             return;
     }
@@ -108,9 +97,13 @@ void QnResourceAccessProvider::handleBaseProviderAccessChanged(
         return;
     }
 
+    if (sourceIt != m_providers.cend())
+        ++sourceIt;
+
     /* Access was removed. Check if we still have access through less important provider. */
-    for (auto provider : lessImportant)
+    for (auto it = sourceIt; it != m_providers.cend(); ++it)
     {
+        auto provider = *it;
         auto result = provider->accessibleVia(subject, resource);
         if (result != Source::none)
         {

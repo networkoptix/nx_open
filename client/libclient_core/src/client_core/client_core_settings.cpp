@@ -78,6 +78,7 @@ void QnClientCoreSettings::writeValueToSettings(
             break;
         case LocalSystemWeightsData:
             writeListData<QnWeightData>(settings, value, kLocalSystemWeights);
+            break;
         case RecentCloudSystems:
             writeListData<QnCloudSystem>(settings, value, kRecentCloudSystemsTag);
             break;

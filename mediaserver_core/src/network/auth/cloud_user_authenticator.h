@@ -87,8 +87,7 @@ private:
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
-        const nx_http::StringType& userName,
-        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
+        const nx_http::StringType& userName) const;
     void fetchAuthorizationFromCloud(
         QnMutexLockerBase* const lk,
         const nx_http::StringType& userid,

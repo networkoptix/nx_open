@@ -17,10 +17,10 @@ namespace db {
 
 DbRequestExecutionThread::DbRequestExecutionThread(
     const ConnectionOptions& connectionOptions,
-    CLThreadQueue<std::unique_ptr<AbstractExecutor>>* const requestQueue)
+    QueryExecutorQueue* const queryExecutorQueue)
 :
     m_connectionOptions(connectionOptions),
-    m_requestQueue(requestQueue),
+    m_queryExecutorQueue(queryExecutorQueue),
     m_isOpen(false)
 {
 }
@@ -62,19 +62,20 @@ bool DbRequestExecutionThread::isOpen() const
 
 void DbRequestExecutionThread::run()
 {
-    static const int TASK_WAIT_TIMEOUT_MS = 1000;
+    constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
 
     auto previousActivityTime = std::chrono::steady_clock::now();
 
     while (!needToStop())
     {
-        std::unique_ptr<AbstractExecutor> task;
-        if (!m_requestQueue->pop(task, TASK_WAIT_TIMEOUT_MS))
+        boost::optional<std::unique_ptr<AbstractExecutor>> task = 
+            m_queryExecutorQueue->pop(kTaskWaitTimeout);
+        if (!task)
         {
             if (std::chrono::steady_clock::now() - previousActivityTime >= 
                 m_connectionOptions.inactivityTimeout)
             {
-                //dropping connection by timeout
+                // Dropping connection by timeout.
                 NX_LOGX(lm("Closing DB connection by timeout (%1)")
                     .arg(m_connectionOptions.inactivityTimeout), cl_logDEBUG2);
                 m_dbConnection.close();
@@ -84,11 +85,12 @@ void DbRequestExecutionThread::run()
             continue;
         }
 
-        const auto result = task->execute(&m_dbConnection);
+        const auto result = (*task)->execute(&m_dbConnection);
         if (result != DBResult::ok)
         {
-            NX_LOGX(lit("DB request failed with error %1")
-                .arg(m_dbConnection.lastError().text()), cl_logWARNING);
+            NX_LOGX(lit("DB request failed with error %1. Db text %2")
+                .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                cl_logWARNING);
             //TODO #ak reopen connection?
         }
 

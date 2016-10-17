@@ -20,6 +20,9 @@ else
     XCRUN_PROVISION_ARGS=
 fi
 
+echo "Unlocking Keychain..."
+security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
+
 /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication \
     -v "${libdir}/bin/${build.configuration}/${project.artifactId}.app" \
     -o "${project.build.directory}/revamped-${installer.name}-${project.version.name}.${project.version.code}-$IPA_SUFFIX.ipa" \

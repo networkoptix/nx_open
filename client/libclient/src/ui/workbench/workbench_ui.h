@@ -216,22 +216,22 @@ private:
     /* Global state. */
 
     /** Instrument manager for the scene. */
-    InstrumentManager *m_instrumentManager;
+    QPointer<InstrumentManager> m_instrumentManager;
 
     /** Fps counting instrument. */
-    FpsCountingInstrument *m_fpsCountingInstrument;
+    QPointer<FpsCountingInstrument> m_fpsCountingInstrument;
 
     /** Activity listener instrument. */
-    ActivityListenerInstrument *m_controlsActivityInstrument;
+    QPointer<ActivityListenerInstrument> m_controlsActivityInstrument;
 
     /** Current flags. */
     Flags m_flags;
 
     /** Widgets by role. */
-    std::array<QnResourceWidget*, Qn::ItemRoleCount> m_widgetByRole;
+    std::array<QPointer<QnResourceWidget>, Qn::ItemRoleCount> m_widgetByRole;
 
     /** Widget that ui controls are placed on. */
-    QGraphicsWidget *m_controlsWidget;
+    QPointer<QGraphicsWidget> m_controlsWidget;
 
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
@@ -244,8 +244,8 @@ private:
 
     bool m_inactive;
 
-    QnProxyLabel *m_fpsItem;
-    QnDebugProxyLabel* m_debugOverlayLabel;
+    QPointer<QnProxyLabel> m_fpsItem;
+    QPointer<QnDebugProxyLabel> m_debugOverlayLabel;
 
     /* In freespace mode? */
     bool m_inFreespace;
@@ -255,30 +255,30 @@ private:
     /* Timeline-related state. */
 
     /** Timeline. */
-    NxUi::TimelineWorkbenchPanel* m_timeline;
+    QPointer<NxUi::TimelineWorkbenchPanel> m_timeline;
 
     /* Resources tree. */
-    NxUi::ResourceTreeWorkbenchPanel* m_tree;
+    QPointer<NxUi::ResourceTreeWorkbenchPanel> m_tree;
 
     /* Title-related state. */
 
     /** Title bar widget. */
-    QGraphicsProxyWidget *m_titleItem;
+    QPointer<QGraphicsProxyWidget> m_titleItem;
 
-    QnImageButtonWidget *m_titleShowButton;
+    QPointer<QnImageButtonWidget> m_titleShowButton;
 
-    AnimatorGroup *m_titleOpacityAnimatorGroup;
+    QPointer<AnimatorGroup> m_titleOpacityAnimatorGroup;
 
     /** Animator for title's position. */
-    VariantAnimator *m_titleYAnimator;
+    QPointer<VariantAnimator> m_titleYAnimator;
 
-    HoverFocusProcessor *m_titleOpacityProcessor;
+    QPointer<HoverFocusProcessor> m_titleOpacityProcessor;
 
     /* Notifications window-related state. */
-    NxUi::NotificationsWorkbenchPanel* m_notifications;
+    QPointer<NxUi::NotificationsWorkbenchPanel> m_notifications;
 
     /* Calendar window-related state. */
-    NxUi::CalendarWorkbenchPanel* m_calendar;
+    QPointer<NxUi::CalendarWorkbenchPanel> m_calendar;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

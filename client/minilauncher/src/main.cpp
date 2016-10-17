@@ -105,7 +105,7 @@ bool launchInDir(const std::wstring& dir, int argc, _TCHAR* argv[])
         for (int i = 1; i < argc; ++i)
         {
             std::wstring argument(utf8toUtf16(argv[i]));
-            offset = wsprintf(buffer + offset, L" %s", argument.c_str());
+            offset += wsprintf(buffer + offset, L" %s", argument.c_str());
         }
 
         wsprintf(buffer + offset, L" \"%s\"", dir.c_str());

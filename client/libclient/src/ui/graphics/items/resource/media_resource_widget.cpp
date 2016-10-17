@@ -85,7 +85,7 @@
 
 namespace {
 
-const int kMicroInMilliSeconds = 1000;
+static const int kMicroInMilliSeconds = 1000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
@@ -93,9 +93,9 @@ const int kMicroInMilliSeconds = 1000;
 // Who returns it? --gdm?
 const int kNoTimeValue = 0;
 
-const qreal kTwoWayAudioButtonSize = 44.0;
+static const qreal kTwoWayAudioButtonSize = 44.0;
 
-const qreal kMotionRegionAlpha = 0.4;
+static const qreal kMotionRegionAlpha = 0.4;
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
@@ -1961,6 +1961,10 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
     const auto statusOverlay = statusOverlayController();
     if (m_camera)
     {
+        static const auto kPermissions = (Qn::SavePermission | Qn::WritePermission);
+        const bool canChangeSettings = context()->accessController()->hasPermissions(
+            base_type::resource(), kPermissions);
+
         if (overlay == Qn::IoModuleDisabledOverlay)
         {
             NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO,
@@ -1969,8 +1973,10 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
             if (!m_ioLicenceStatusHelper)
                 return;
 
-            switch (m_ioLicenceStatusHelper->status())
+            if (canChangeSettings)
             {
+                switch (m_ioLicenceStatusHelper->status())
+                {
                 case QnSingleCamLicenceStatusHelper::LicenseNotUsed:
                     statusOverlay->setCurrentButton(QnStatusOverlayController::Button::kIoEnable);
                     return;
@@ -1979,6 +1985,7 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
                     return;
                 default:
                     break;
+                }
             }
         }
         else if (overlay == Qn::OfflineOverlay)
@@ -1989,7 +1996,7 @@ void QnMediaResourceWidget::updateOverlayButton(Qn::ResourceStatusOverlay overla
                 return;
             }
         }
-        else if (overlay == Qn::UnauthorizedOverlay)
+        else if ((overlay == Qn::UnauthorizedOverlay) && canChangeSettings)
         {
             statusOverlay->setCurrentButton(QnStatusOverlayController::Button::kSettings);
             return;

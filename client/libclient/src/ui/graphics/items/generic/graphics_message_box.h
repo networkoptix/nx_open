@@ -60,7 +60,6 @@ public:
     int timeout() const;
 
     static QnGraphicsMessageBox* information(const QString &text, int timeoutMsec = 0);
-    static QnGraphicsMessageBox* informationTicking(const QString &text, int timeoutMsec = 0);
 
 public:
     void showAnimated();

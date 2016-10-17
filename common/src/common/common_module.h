@@ -78,9 +78,6 @@ public:
     /** Server we are currently connected to. */
     QnMediaServerResourcePtr currentServer() const;
 
-    QUrl moduleUrl() const { return m_url; }
-    void setModuleUlr(const QUrl& url) { m_url = url; }
-
     void setReadOnly(bool value);
     bool isReadOnly() const;
 
@@ -136,7 +133,6 @@ private:
     QnUuid m_runUuid;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
-    QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;

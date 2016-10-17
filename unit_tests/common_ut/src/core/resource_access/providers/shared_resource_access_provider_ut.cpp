@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/access_provider_test_fixture.h>
+#include <core/resource_access/providers/base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 
 #include <core/resource_access/shared_resources_manager.h>
@@ -17,7 +17,7 @@ static const auto kSource = QnAbstractResourceAccessProvider::Source::shared;
 
 }
 
-class QnSharedResourceAccessProviderTest: public QnAccessProviderTestFixture
+class QnSharedResourceAccessProviderTest: public QnBaseAccessProviderTestFixture
 {
 protected:
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -174,3 +174,12 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnSharedResourceAccessProviderTest, accessProviders)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
+    QnResourceList providers;
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_TRUE(providers.empty());
+}

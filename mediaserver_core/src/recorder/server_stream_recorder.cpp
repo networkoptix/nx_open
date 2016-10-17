@@ -63,7 +63,6 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
-    m_stopOnWriteError = false;
     m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
 
     QnScheduleTask::Data scheduleData;
@@ -104,13 +103,11 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
     }
 }
 
-void QnServerStreamRecorder::at_recordingFinished(
-    const ErrorStruct   &status,
-    const QString       &filename
-)
+void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruct& status,
+    const QString& filename)
 {
     Q_UNUSED(filename)
-    if (status.lastError == QnStreamRecorder::NoError)
+    if (status.lastError == StreamRecorderError::noError)
         return;
 
     NX_ASSERT(m_mediaServer);
@@ -124,8 +121,8 @@ void QnServerStreamRecorder::at_recordingFinished(
                     QnBusiness::StorageIoErrorReason ,
                     status.storage
                 );
+            m_diskErrorWarned = true;
         }
-        m_diskErrorWarned = true;
     }
 }
 
@@ -310,13 +307,13 @@ void QnServerStreamRecorder::updateStreamParams()
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
         if (m_catalog == QnServer::HiQualityCatalog) {
-            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never) {
+            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled()) {
                 liveProvider->setFps(m_currentScheduleTask.getFps());
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
             }
             else {
                 NX_ASSERT(camera);
-                liveProvider->setFps(camera->getMaxFps()-5);
+                liveProvider->setFps(camera->getMaxFps());
                 liveProvider->setQuality(Qn::QualityHighest);
             }
             liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());

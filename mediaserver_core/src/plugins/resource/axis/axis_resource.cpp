@@ -122,6 +122,11 @@ QnPlAxisResource::~QnPlAxisResource()
 {
     m_audioTransmitter.reset();
     stopInputPortMonitoringAsync();
+
+    QnMutexLocker lock(&m_inputPortMutex);
+    while (!m_stoppingHttpClients.empty())
+        m_stopInputMonitoringWaitCondition.wait(lock.mutex());
+
 }
 
 void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
@@ -264,10 +269,17 @@ void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
 
     nx_http::AsyncHttpClientPtr httpClient;
     httpClient.swap(value);
+    m_stoppingHttpClients.insert(httpClient);
 
     lk.unlock();
-    httpClient->pleaseStopSync();
-    httpClient.reset();
+
+    httpClient->pleaseStop([httpClient, this]()
+        {
+            QnMutexLocker lock(&m_inputPortMutex);
+            m_stoppingHttpClients.erase(httpClient);
+            m_stopInputMonitoringWaitCondition.wakeAll();
+        });
+   
 }
 
 bool QnPlAxisResource::isInputPortMonitored() const
@@ -1186,8 +1198,14 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
             break;
         }
     }
+
     if (!found)
+    {
         m_ioStates.push_back(newValue);
+        if (!isActive)
+            return;
+    }
+
     for (const auto& port: m_ioPorts)
     {
         if (port.id == portId) {

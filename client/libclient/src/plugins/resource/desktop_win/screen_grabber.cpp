@@ -1,7 +1,5 @@
 #include "screen_grabber.h"
 
-#ifdef Q_OS_WIN
-
 #include <QtGui/QScreen>
 #include <QtCore/QLibrary>
 #include <nx/utils/log/log.h>
@@ -657,5 +655,3 @@ void QnScreenGrabber::pleaseStop()
     m_needStop = true;
     m_waitCond.wakeAll();
 }
-
-#endif // Q_OS_WIN

@@ -64,11 +64,7 @@ namespace cdb {
 
 static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
 
-CloudDBProcess::CloudDBProcess(int argc, char **argv)
-    :
-#ifdef USE_QAPPLICATION
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
-#endif
+CloudDBProcess::CloudDBProcess(int argc, char **argv):
     m_argc(argc),
     m_argv(argv),
     m_terminated(false),
@@ -87,23 +83,13 @@ CloudDBProcess::CloudDBProcess(int argc, char **argv)
     m_authorizationManager(nullptr),
     m_authProvider(nullptr)
 {
-#ifdef USE_QAPPLICATION
-    setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
-#endif
-
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
 }
 
 void CloudDBProcess::pleaseStop()
 {
-#ifdef USE_QAPPLICATION
-    m_terminated = true;
-    if (application())
-        application()->quit();
-#else
     m_processTerminationEvent.set_value();
-#endif
 }
 
 void CloudDBProcess::setOnStartedEventHandler(
@@ -119,11 +105,7 @@ const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-#ifdef USE_QAPPLICATION
-int CloudDBProcess::executeApplication()
-#else
 int CloudDBProcess::exec()
-#endif
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -141,7 +123,7 @@ int CloudDBProcess::exec()
         settings.load( m_argc, m_argv );
         if( settings.showHelp() )
         {
-            settings.printCmdLineArgsHelp();
+            settings.printCmdLineArgsHelpToCout();
             return 0;
         }
 
@@ -256,7 +238,8 @@ int CloudDBProcess::exec()
         AuthenticationProvider authProvider(
             settings,
             accountManager,
-            systemManager);
+            systemManager,
+            tempPasswordManager);
         m_authProvider = &authProvider;
 
         MaintenanceManager maintenanceManager(
@@ -285,6 +268,16 @@ int CloudDBProcess::exec()
             false,  //TODO #ak enable ssl when it works properly
             SocketFactory::NatTraversalType::nttDisabled );
 
+        if (m_settings->auth().connectionInactivityPeriod.count())
+        {
+            multiAddressHttpServer.forEachListener(
+                [&](nx_http::HttpStreamSocketServer* server)
+                {
+                    server->setConnectionInactivityTimeout(
+                        m_settings->auth().connectionInactivityPeriod);
+                });
+        }
+
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
 
@@ -295,9 +288,6 @@ int CloudDBProcess::exec()
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-#ifdef USE_QAPPLICATION
-        application()->installEventFilter(this);
-#endif
         if (m_terminated)
             return 0;
 
@@ -308,18 +298,8 @@ int CloudDBProcess::exec()
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
-#ifdef USE_QAPPLICATION
-        //starting timer to check for m_terminated again after event loop start
-        m_timerID = application()->startTimer(0);
-
-        //TODO #ak remove qt event loop
-        //application's main loop
-        const int result = application()->exec();
-        return result;
-#else
         m_processTerminationEvent.get_future().wait();
         return 0;
-#endif
     }
     catch (const std::exception& e)
     {
@@ -327,39 +307,6 @@ int CloudDBProcess::exec()
         return 3;
     }
 }
-
-#ifdef USE_QAPPLICATION
-void CloudDBProcess::start()
-{
-    QtSingleCoreApplication* application = this->application();
-
-    if (application->isRunning())
-    {
-        NX_LOG("Server already started", cl_logERROR);
-        application->quit();
-        return;
-    }
-}
-
-void CloudDBProcess::stop()
-{
-    pleaseStop();
-    //TODO #ak wait for executeApplication to return?
-}
-
-bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
-{
-    if (m_timerID != -1)
-    {
-        application()->killTimer(m_timerID);
-        m_timerID = -1;
-    }
-
-    if (m_terminated)
-        application()->quit();
-    return false;
-}
-#endif
 
 void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
@@ -378,11 +325,11 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<PingHandler>(authorizationManager);
         });
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AccountManager
     registerHttpHandler(
         kAccountRegisterPath,
-        &AccountManager::addAccount, accountManager,
+        &AccountManager::registerAccount, accountManager,
         EntityType::account, DataActionType::insert);
 
     registerHttpHandler(
@@ -415,7 +362,7 @@ void CloudDBProcess::registerApiHandlers(
         &AccountManager::createTemporaryCredentials, accountManager,
         EntityType::account, DataActionType::update);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // SystemManager
     registerHttpHandler(
         kSystemBindPath,
@@ -449,7 +396,12 @@ void CloudDBProcess::registerApiHandlers(
 
     registerHttpHandler(
         kSystemRenamePath,
-        &SystemManager::renameSystem, systemManager,
+        &SystemManager::updateSystem, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemUpdatePath,
+        &SystemManager::updateSystem, systemManager,
         EntityType::system, DataActionType::update);
 
     registerHttpHandler(
@@ -458,7 +410,7 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::account, DataActionType::update);
     //< TODO: #ak: current entity:action is not suitable for this request
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
         kAuthGetNoncePath,
@@ -470,7 +422,7 @@ void CloudDBProcess::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // ec2::ConnectionManager
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
@@ -483,7 +435,7 @@ void CloudDBProcess::registerApiHandlers(
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // MaintenanceManager
     registerHttpHandler(
         kMaintenanceGetVmsConnections,
@@ -607,6 +559,8 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
     dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
+    dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
+    dbStructureUpdater.addUpdateScript(db::kAddVmsOpaqueData);
     return dbStructureUpdater.updateStructSync();
 }
 

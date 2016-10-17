@@ -135,7 +135,9 @@ protected:
         return m_resourceDiscoveryManager;
     }
 
-    virtual void updateResource(const QnResourcePtr& resource) override
+    virtual void updateResource(
+        const QnResourcePtr& resource,
+        const QnUuid& /*authorPeerId*/) override
     {
         m_resourcePool->addResource(resource);
     }

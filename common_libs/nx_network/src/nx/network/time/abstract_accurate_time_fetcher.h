@@ -1,38 +1,33 @@
-/**********************************************************
-* 10 jul 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef ABSTRACT_ACCURATE_TIME_FETCHER_H
-#define ABSTRACT_ACCURATE_TIME_FETCHER_H
-
-#include <functional>
+#pragma once
 
 #include <QtGlobal>
 
-#include "utils/common/joinable.h"
-#include "utils/common/stoppable.h"
-#include "utils/common/systemerror.h"
+#include <nx/utils/move_only_func.h>
 
+#include "../aio/basic_pollable.h"
 
-//!Abstract interface for class performing fetching accurate current time from some public server
+/**
+ * Abstract interface for class performing fetching accurate current time from some public server.
+ */
 class NX_NETWORK_API AbstractAccurateTimeFetcher
 :
-    public QnStoppable,
-    public QnJoinable
+    public nx::network::aio::BasicPollable
 {
 public:
-    virtual ~AbstractAccurateTimeFetcher() {}
+    /**
+     * Functor arguments:
+     * - \a qint64 on success UTC millis from epoch. On failure -1.
+     * - \a SystemError::ErrorCode last system error code. \a SystemError::noError in case of success.
+     */
+    typedef nx::utils::MoveOnlyFunc<void(qint64, SystemError::ErrorCode)>
+        CompletionHandler;
 
-    //!Initiates asynchronous time request operation
-    /*!
-        Upon completion \a handlerFunc will be called. Following parameters are passed:\n
-        - \a qint64 on success UTC millis from epoch. On failure -1
-        - \a SystemError::ErrorCode last system error code. \a SystemError::noError in case of success
-        \note Implementation is NOT REQUIRED to support performing multiple simultaneous operations
-        \return \a true if request issued successfully, otherwise \a false
-    */
-    virtual void getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) = 0;
+    virtual ~AbstractAccurateTimeFetcher() = default;
+
+    /**
+     * Initiates asynchronous time request operation.
+     * @note Implementation is NOT REQUIRED to support performing multiple simultaneous operations.
+     * @return \a true if request issued successfully, otherwise \a false.
+     */
+    virtual void getTimeAsync(CompletionHandler handlerFunc) = 0;
 };
-
-#endif  //ABSTRACT_ACCURATE_TIME_FETCHER_H

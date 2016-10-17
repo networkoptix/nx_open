@@ -24,6 +24,7 @@ class QMenu;
 class QLabel;
 class QPropertyAnimation;
 
+class Instrument;
 class InstrumentManager;
 class HandScrollInstrument;
 class WheelZoomInstrument;
@@ -39,6 +40,7 @@ class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 class ZoomWindowInstrument;
+class GridAdjustmentInstrument;
 
 class QnToggle;
 class QnActionManager;
@@ -49,7 +51,6 @@ class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
-class QnScreenRecorder;
 class QnGraphicsMessageBox;
 
 class WeakGraphicsItemPointerList;
@@ -73,45 +74,19 @@ public:
     /**
      * Virtual destructor.
      */
-    virtual ~QnWorkbenchController();
+    virtual ~QnWorkbenchController() = default;
 
     QnWorkbenchGridMapper *mapper() const;
 
-    HandScrollInstrument *handScrollInstrument() const {
-        return m_handScrollInstrument;
-    }
-
-    WheelZoomInstrument *wheelZoomInstrument() const {
-        return m_wheelZoomInstrument;
-    }
-
-    MotionSelectionInstrument *motionSelectionInstrument() const {
-        return m_motionSelectionInstrument;
-    }
-
-    ClickInstrument *itemRightClickInstrument() const {
-        return m_itemRightClickInstrument;
-    }
-
-    MoveInstrument *moveInstrument() const {
-        return m_moveInstrument;
-    }
-
-    ForwardingInstrument *itemMouseForwardingInstrument() const {
-        return m_itemMouseForwardingInstrument;
-    }
-
-    ResizingInstrument *resizingInstrument() const {
-        return m_resizingInstrument;
-    }
-
-    RubberBandInstrument *rubberBandInstrument() const {
-        return m_rubberBandInstrument;
-    }
-
-    ClickInstrument *itemLeftClickInstrument() const {
-        return m_itemLeftClickInstrument;
-    }
+    Instrument* handScrollInstrument() const;
+    Instrument* wheelZoomInstrument() const;
+    Instrument* motionSelectionInstrument() const;
+    Instrument* itemRightClickInstrument() const;
+    Instrument* moveInstrument() const;
+    Instrument* resizingInstrument() const;
+    Instrument* rubberBandInstrument() const;
+    Instrument* itemLeftClickInstrument() const;
+    Instrument* gridAdjustmentInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
     bool isMenuEnabled() const {
@@ -121,10 +96,6 @@ public:
     void setMenuEnabled(bool menuEnabled) {
         m_menuEnabled = menuEnabled;
     }
-
-public slots:
-    void startRecording();
-    void stopRecording();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -196,16 +167,9 @@ protected slots:
     void at_toggleInfoAction_triggered();
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
-    void at_recordingAction_triggered(bool checked);
     void at_toggleTourModeAction_triggered(bool checked);
     void at_fitInViewAction_triggered();
     void at_checkFileSignatureAction_triggered();
-
-    void at_screenRecorder_error(const QString &errorMessage);
-    void at_screenRecorder_recordingStarted();
-    void at_screenRecorder_recordingFinished(const QString &recordedFileName);
-
-    void at_recordingAnimation_finished();
 
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
@@ -268,6 +232,8 @@ private:
 
     ZoomWindowInstrument* m_zoomWindowInstrument;
 
+    GridAdjustmentInstrument* m_gridAdjustmentInstrument;
+
     bool m_selectionOverlayHackInstrumentDisabled;
     bool m_selectionOverlayHackInstrumentDisabled2; // TODO: use toggles?
 
@@ -306,15 +272,6 @@ private:
 
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
-
-
-    /* Screen recording-related state. */
-
-    /** Screen recorder object. */
-    QnScreenRecorder *m_screenRecorder;
-
-    /** Screen recording countdown label. */
-    QnGraphicsMessageBox *m_recordingCountdownLabel;
 
     QnGraphicsMessageBox *m_tourModeHintLabel;
 

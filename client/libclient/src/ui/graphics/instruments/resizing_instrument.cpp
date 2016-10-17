@@ -5,7 +5,7 @@
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/cursor_cache.h>
 
-#include <ui/graphics/items/resource/web_view.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 namespace {
@@ -24,7 +24,7 @@ struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem*, bool>
             return false;
         }
 
-        if (auto webView = dynamic_cast<QnWebView*>(item))
+        if (auto webView = dynamic_cast<QnGraphicsWebView*>(item))
             return false;
 
         return true;
@@ -162,7 +162,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     if (m_affectedWidget && (m_affectedWidget != widget || section == Qt::NoSection))
     {
         m_affectedWidget->unsetCursor();
-        m_affectedWidget = nullptr;
+        m_affectedWidget.clear();
     }
 
     if (!widget || section == Qt::NoSection)

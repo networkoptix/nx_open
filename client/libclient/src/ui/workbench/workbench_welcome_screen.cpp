@@ -16,7 +16,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/ordered_systems_model.h>
+#include <ui/models/filtering_systems_model.h>
 #include <ui/models/recent_local_connections_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
@@ -24,6 +24,8 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+
+#include <utils/common/app_info.h>
 
 namespace
 {
@@ -36,7 +38,7 @@ namespace
 
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
-        qmlRegisterType<QnOrderedSystemsModel>("NetworkOptix.Qml", 1, 0, "QnOrderedSystemsModel");
+        qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
 
         auto holder = new QStackedWidget();
         holder->addWidget(new QWidget());
@@ -97,7 +99,9 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_palette(extractPalette()),
     m_quickView(new QQuickView()),
     m_widget(createMainView(this, m_quickView)),
-    m_pageSize(m_widget->size())
+    m_pageSize(m_widget->size()),
+    m_message(),
+    m_appInfo(new QnAppInfo(this))
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -109,6 +113,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 
     //
     m_widget->installEventFilter(this);
+    m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
     connect(action(QnActions::DisconnectAction), &QAction::triggered,
         this, &QnWorkbenchWelcomeScreen::showScreen);
@@ -201,7 +206,17 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
-void QnWorkbenchWelcomeScreen::resetConnectingToSystem()
+void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
+{
+    const auto systemId = connectingToSystem();
+    if (systemId.isEmpty())
+        return;
+
+    setConnectingToSystem(QString());
+    emit openTile(systemId);
+}
+
+void QnWorkbenchWelcomeScreen::handleConnectingToSystem()
 {
     setConnectingToSystem(QString());
 }
@@ -229,14 +244,36 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
     emit globalPreloaderVisibleChanged();
 }
 
-QString QnWorkbenchWelcomeScreen::softwareVersion() const
-{
-    return QnAppInfo::applicationVersion();
-}
-
 QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
 {
     return QnConnectionValidator::minSupportedVersion().toString();
+}
+
+void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
+{
+    if (m_message == message)
+        return;
+
+    m_message = message;
+
+    emit messageChanged();
+
+    m_widget->repaint();
+    m_widget->window()->repaint();
+    m_widget->window()->update();
+
+    qApp->flush();
+    qApp->sendPostedEvents();
+}
+
+QString QnWorkbenchWelcomeScreen::message() const
+{
+    return m_message;
+}
+
+QnAppInfo* QnWorkbenchWelcomeScreen::appInfo() const
+{
+    return m_appInfo;
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
@@ -317,7 +354,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
     if (!isLoggedInToCloud())
         return;
 
-    connectToSystemInternal(systemId, QUrl::fromUserInput(serverUrl),
+    connectToSystemInternal(systemId, QUrl(serverUrl),
         qnCloudStatusWatcher->credentials(), false, false);
 }
 
@@ -337,7 +374,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             /* We are receiving string with port but without protocol, so we must parse it. */
             const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
 
-            dialog->setUrl(QUrl::fromUserInput(serverUrl));
+            dialog->setUrl(QUrl(serverUrl));
             if (isLoggedInToCloud())
                 dialog->setCloudCredentials(qnCloudStatusWatcher->credentials());
 

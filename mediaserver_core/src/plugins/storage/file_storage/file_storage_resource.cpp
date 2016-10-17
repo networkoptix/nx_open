@@ -163,8 +163,8 @@ QIODevice* QnFileStorageResource::open(const QString& fileName, QIODevice::OpenM
 }
 
 QIODevice* QnFileStorageResource::open(
-    const QString& url, 
-    QIODevice::OpenMode openMode, 
+    const QString& url,
+    QIODevice::OpenMode openMode,
     int bufferSize)
 {
     if (!m_valid)
@@ -189,7 +189,7 @@ QIODevice* QnFileStorageResource::open(
             bufferSize);
 
 #ifdef Q_OS_WIN
-        if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite) 
+        if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
         else if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
@@ -218,7 +218,7 @@ QIODevice* QnFileStorageResource::open(
     return rez.release();
 }
 
-void QnFileStorageResource::setLocalPathSafe(const QString &path) const
+void QnFileStorageResource::setLocalPathSafe(const QString &path)
 {
     QnMutexLocker lk(&m_mutex);
     m_localPath = path;
@@ -240,7 +240,7 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-qint64 QnFileStorageResource::getTotalSpaceWithoutInit() const
+qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
 {
     bool valid = false;
     QString url = getUrl();
@@ -264,7 +264,7 @@ qint64 QnFileStorageResource::getTotalSpaceWithoutInit() const
     return getDiskTotalSpace(getPath());
 }
 
-Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal() const
+Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 {
     if (m_valid)
         return Qn::StorageInit_Ok;
@@ -292,7 +292,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal() const
     else
 	    m_isSystem = false;
 
-    m_valid = result == Qn::StorageInit_Ok; 
+    m_valid = result == Qn::StorageInit_Ok;
 
     return result;
 }
@@ -306,9 +306,6 @@ bool QnFileStorageResource::isSystem() const
 bool QnFileStorageResource::checkWriteCap() const
 {
     if (!m_valid)
-        return false;
-
-    if (hasFlags(Qn::deprecated))
         return false;
 
     QnMutexLocker lock(&m_writeTestMutex);
@@ -475,8 +472,8 @@ QString prepareCommandString(const QUrl& url, const QString& localPath)
 
     QString srcString = lit("//") + url.host() + url.path();
     return lit("mount -t cifs -o %1 %2 %3 2>&1")
-                .arg(cifsOptionsString) 
-                .arg(srcString) 
+                .arg(cifsOptionsString)
+                .arg(srcString)
                 .arg(localPath);
 }
 
@@ -492,7 +489,7 @@ int callMount(const QString& commandString)
         return -1;
     }
 
-    while (fgets(buf, BUFSIZ, pipe) != NULL) 
+    while (fgets(buf, BUFSIZ, pipe) != NULL)
     {
         QString outputString = QString::fromUtf8(buf);
         if (outputString.contains(lit("mount error")) && outputString.contains(lit("13")))
@@ -507,7 +504,7 @@ int callMount(const QString& commandString)
 }
 }
 
-Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlString) const
+Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlString)
 {
     QUrl url(urlString);
     if (!url.isValid())
@@ -562,10 +559,10 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
 
     auto logAndExit = [this] (const char* message, Qn::StorageInitResult result)
     {
-        NX_LOG(lit("%1 Mounting remote drive %2. Result: %3") 
-               .arg(Q_FUNC_INFO) 
-               .arg(getUrl()) 
-               .arg(message), cl_logDEBUG1); 
+        NX_LOG(lit("%1 Mounting remote drive %2. Result: %3")
+               .arg(Q_FUNC_INFO)
+               .arg(getUrl())
+               .arg(message), cl_logDEBUG1);
         return result;
     };
 
@@ -588,7 +585,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
             return Qn::StorageInit_WrongPath;
     };
 
-#undef STR 
+#undef STR
 
     return Qn::StorageInit_WrongPath;
 }
@@ -621,7 +618,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
         auto result = updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes);
         switch (result)
         {
-            case Qn::StorageInit_Ok: 
+            case Qn::StorageInit_Ok:
                 return result;
             case Qn::StorageInit_WrongAuth:
                 wrongAuth = true;
@@ -632,7 +629,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
     return wrongAuth ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
 }
 
-Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url) const
+Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url)
 {
     QUrl storageUrl(url);
     if (!storageUrl.isValid())
@@ -658,8 +655,7 @@ QnFileStorageResource::QnFileStorageResource():
     m_valid(false),
     m_capabilities(0),
     m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted),
-    m_isSystem(false),
-    m_spaceLimit(-1)
+    m_isSystem(false)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -799,7 +795,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
     return file.open(QIODevice::WriteOnly);
 }
 
-Qn::StorageInitResult QnFileStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
     Qn::StorageInitResult result;
     {
@@ -827,6 +823,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate() const
     }
     QString localPath = getLocalPathSafe();
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
+
+    if (getSpaceLimit() == 0)
+        setSpaceLimit(calcInitialSpaceLimit());
+
     return Qn::StorageInit_Ok;
 }
 
@@ -838,52 +838,29 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)
 {
-    QnStorageResource* storage = new QnFileStorageResource();
-    storage->setSpaceLimit(
-        MSSettings::roSettings()->value(
-            nx_ms_conf::MIN_STORAGE_SPACE,
-            nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
-        ).toLongLong()
-    );
-    return storage;
+    return new QnFileStorageResource();
 }
 
-qint64 QnFileStorageResource::calcSpaceLimit(const QString &url)
+qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
-        nx_ms_conf::MIN_STORAGE_SPACE,
-        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
-    ).toLongLong();
+    QString url = getUrl();
+    NX_ASSERT(!url.isEmpty());
+    bool local = isLocal(url);
 
-    return QnFileStorageResource::isLocal(url) ?  defaultStorageSpaceLimit :
-                                                  QnStorageResource::kNasStorageLimit;
-}
+    qint64 baseSpaceLimit = calcSpaceLimit(
+        local
+        ? QnPlatformMonitor::LocalDiskPartition
+        : QnPlatformMonitor::NetworkPartition);
 
-qint64 QnFileStorageResource::getSpaceLimit() const 
-{
-    QnMutexLocker lock(&m_spaceLimitMutex);
-    if (m_spaceLimit < 0)
+    if (m_cachedTotalSpace < 0)
+        return baseSpaceLimit;
+    else
     {
-        qint64 baseSpaceLimit = QnStorageResource::getSpaceLimit();
-        qint64 totalSpace = getTotalSpaceWithoutInit();
-
-        if (totalSpace < 0)
-            return baseSpaceLimit;
-        else
-        {
-            QString url = getUrl();
-            NX_ASSERT(!url.isEmpty());
-            if (url.isEmpty())
-                return baseSpaceLimit;
-
-            bool local = isLocal(url);
-            qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
-
-            m_spaceLimit = qMin(maxSpaceLimit, totalSpace / kMaxSpaceLimitRatio);
-        }
+        qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
+        return qMin(maxSpaceLimit, m_cachedTotalSpace / kMaxSpaceLimitRatio);
     }
 
-    return m_spaceLimit;
+    return baseSpaceLimit;
 }
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)

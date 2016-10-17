@@ -24,10 +24,37 @@
 
 #include <utils/license_usage_helper.h>
 
+namespace {
+
+static const QSize kMinimumSize(900, 560);
+static const QSize kOptimalSize(900, 880);
+
+/* Initial dialog height - 40px less than screen height. */
+static const int kSizeOffset = 40; 
+
+}
+
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
-    base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
+    base_type(parent),
     m_ignoreAccept(false)
 {
+    setMinimumSize(kMinimumSize);
+    
+    int maximumHeight = mainWindow()->geometry().height();
+    if (auto windowHandle = mainWindow()->windowHandle())
+    {
+        if (auto currentScreen = windowHandle->screen())
+            maximumHeight = currentScreen->size().height();
+    }   
+    int optimalHeight = std::min(kOptimalSize.height(), 
+        maximumHeight - kSizeOffset);
+    optimalHeight = std::max(optimalHeight, kMinimumSize.height());
+
+    QSize optimalSize(kOptimalSize.width(), optimalHeight);
+    QRect targetGeometry(QPoint(0, 0), optimalSize);
+    targetGeometry.moveCenter(mainWindow()->geometry().center());
+    setGeometry(targetGeometry);
+
     m_settingsWidget = new QnCameraSettingsWidget(this);
 
     m_buttonBox = new QDialogButtonBox(this);

@@ -83,6 +83,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::autoDiscoveryChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -677,7 +678,9 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
 {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
-    DiscoveryMode discoveryMode = DiscoveryMode::fullyEnabled;
+    DiscoveryMode discoveryMode = qnGlobalSettings->isAutoDiscoveryEnabled() ?
+        DiscoveryMode::fullyEnabled :
+        DiscoveryMode::partiallyEnabled;
     if( searcher->isLocal() ||                  // local resources should always be found
         searcher->isVirtualResource() )         // virtual resources should always be found
     {
@@ -709,7 +712,8 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
     searcher->setDiscoveryMode( discoveryMode );
 }
 
-void QnResourceDiscoveryManager::updateSearchersUsage() {
+void QnResourceDiscoveryManager::updateSearchersUsage()
+{
     ResourceSearcherList searchers;
     {
         QnMutexLocker locker( &m_searchersListMutex );

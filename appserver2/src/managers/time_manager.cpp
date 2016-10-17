@@ -32,9 +32,10 @@
 
 #include <utils/common/joinable.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
-#include <nx/network/time/multiple_internet_time_fetcher.h>
 
 #include "database/db_manager.h"
 #include "ec2_thread_pool.h"
@@ -369,8 +370,7 @@ namespace ec2
 
         if( m_timeSynchronizer )
         {
-            m_timeSynchronizer->pleaseStop();
-            m_timeSynchronizer->join();
+            m_timeSynchronizer->pleaseStopSync();
             m_timeSynchronizer.reset();
         }
     }
@@ -416,12 +416,6 @@ namespace ec2
                 m_broadcastSysTimeTaskID = m_timerManager->addTimer(
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     std::chrono::milliseconds::zero());
-                std::unique_ptr<MultipleInternetTimeFetcher> multiFetcher( new MultipleInternetTimeFetcher() );
-
-                for(const char* timeServer: RFC868_SERVERS)
-                    multiFetcher->addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher>(
-                        new TimeProtocolClient(QLatin1String(timeServer))));
-                m_timeSynchronizer = std::move( multiFetcher );
                 addInternetTimeSynchronizationTask();
 
                 m_checkSystemTimeTaskID = m_timerManager->addTimer(
@@ -1032,10 +1026,22 @@ namespace ec2
 
         //synchronizing with some internet server
         using namespace std::placeholders;
+        if (m_timeSynchronizer)
+        {
+            m_timeSynchronizer->pleaseStopSync(false);
+            m_timeSynchronizer.reset();
+        }
+
+        auto multiFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
+        for (const char* timeServer : RFC868_SERVERS)
+            multiFetcher->addTimeFetcher(
+                std::make_unique<nx::network::TimeProtocolClient>(
+                    QLatin1String(timeServer)));
+        m_timeSynchronizer = std::move(multiFetcher);
         m_timeSynchronizer->getTimeAsync(
             std::bind(
                 &TimeSynchronizationManager::onTimeFetchingDone,
-                this, _1, _2 ) );
+                this, _1, _2));
     }
 
     void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )

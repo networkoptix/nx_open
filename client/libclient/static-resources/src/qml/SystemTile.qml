@@ -19,6 +19,9 @@ BaseTile
     property string wrongVersion;
     property string compatibleVersion;
 
+    // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
+    readonly property bool offlineCloudConnectionsDisabled: true;
+
     isConnecting: ((control.systemId == context.connectingToSystem)
         && context.connectingToSystem.length && !isFactoryTile);
 
@@ -30,7 +33,12 @@ BaseTile
         if (wrongVersion.length || !isCompatibleInternal)
             return false;
 
-        return control.impl.isOnline;
+
+        // TODO: #ynikitenkov remove condition below in 3.1
+        if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
+            return false;
+
+        return control.impl.hasHosts;
     }
 
     tileColor:
@@ -50,9 +58,14 @@ BaseTile
 
     indicator
     {
-        visible: ((impl.tileType !== impl.kFactorySystemTileType) &&
-            (wrongVersion.length ||
-             compatibleVersion.length || !impl.isOnline || !isCompatibleInternal));
+        visible:
+        {
+            if (control.isFactoryTile)
+                return false;    //< We don't have indicator for new systems
+
+            return (wrongVersion.length || compatibleVersion.length
+                || !impl.hasHosts || !isCompatibleInternal);
+        }
 
         text:
         {
@@ -62,7 +75,7 @@ BaseTile
                 return wrongVersion;
             if (compatibleVersion.length)
                 return compatibleVersion;
-            if (!impl.isOnline)
+            if (!impl.hasHosts)
                 return qsTr("OFFLINE");
 
             return "";
@@ -122,7 +135,7 @@ BaseTile
 
     menuButton
     {
-        visible: impl.hasSavedConnection && impl.isOnline;
+        visible: impl.hasSavedConnection && control.isAvailable;
 
         menu: NxPopupMenu
         {
@@ -159,7 +172,7 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
-                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.isOnline; });
+                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.hasHosts; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
@@ -173,16 +186,19 @@ BaseTile
                 currentAreaItem.host = Qt.binding( function()
                 {
                     return (control.impl.hostsModel ?
-                        control.impl.hostsModel.firstHost : "");
+                        control.impl.hostsModel.getData("url", 0): "");
+                });
+                currentAreaItem.displayHost = Qt.binding( function()
+                {
+                    return (control.impl.hostsModel ?
+                        control.impl.hostsModel.getData("display", 0): "");
                 });
             }
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.enabled = Qt.binding( function()
-                {
-                    return control.impl.isOnline && control.isAvailable;
-                });
+                currentAreaItem.hasHosts = Qt.binding( function() { return control.impl.hasHosts; });
+                currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
     }
@@ -225,10 +241,10 @@ BaseTile
                 return kLocalSystemTileType;
         }
 
-        readonly property bool isOnline: !control.impl.hostsModel.isEmpty
-        readonly property color standardColor: Style.colors.custom.systemTile.background
-        readonly property color hoveredColor: Style.lighterColor(standardColor)
-        readonly property color inactiveColor: Style.colors.shadow
+        readonly property bool hasHosts: !control.impl.hostsModel.isEmpty;
+        readonly property color standardColor: Style.colors.custom.systemTile.background;
+        readonly property color hoveredColor: Style.lighterColor(standardColor);
+        readonly property color inactiveColor: Style.colors.shadow;
 
         readonly property bool hasSavedConnection:
         {

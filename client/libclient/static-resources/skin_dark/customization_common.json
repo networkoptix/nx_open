@@ -96,7 +96,11 @@
         "businessRuleInvalidHighlightColor": "opaqueSelection",
         "errorTextColor": "red_l2",
         "warningTextColor": "yellow_core",
-        "successTextColor": "green_l2"
+        "successTextColor": "green_l2",
+        "notificationColorSystem": "red_l2",
+        "notificationColorCritical": "red_l2",
+        "notificationColorImportant": "yellow_core",
+        "notificationColorCommon": "green_l2"
     },
 
     "QApplication": {
@@ -281,12 +285,21 @@
 
     "QnResourceItemDelegate": {
         "colors": {
-            "mainText":          "light12",
+            "mainText":          "light10",
             "mainTextSelected":  "light4",
             "mainTextAccented":  "brand_core",
             "extraText":         "dark17",
             "extraTextSelected": "light10",
             "extraTextAccented": "brand_d3"
+        }
+    },
+
+    "QnRecordingStatsItemDelegate": {
+        "colors": {
+            "chartBackground": "brand_d4",
+            "chartForeground": "light10",
+            "foreignForeground": "dark17",
+            "totalForeground": "light4"
         }
     },
 

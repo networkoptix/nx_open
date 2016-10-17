@@ -39,12 +39,12 @@ class QnScrollableOverlayWidget;
 class QnButtonsOverlay;
 class GraphicsLabel;
 
-class QnResourceWidget: 
+class QnResourceWidget:
     public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
-    public QnWorkbenchContextAware, 
-    public ConstrainedResizable, 
-    public HelpTopicQueryable, 
-    protected QnGeometry 
+    public QnWorkbenchContextAware,
+    public ConstrainedResizable,
+    public HelpTopicQueryable,
+    protected QnGeometry
 {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
@@ -55,11 +55,12 @@ class QnResourceWidget:
     using base_type = Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>;
 
 public:
-    enum Option {
+    enum Option
+    {
         DisplayActivity             = 0x00001,   /**< Whether the paused overlay icon should be displayed. */
         DisplaySelection            = 0x00002,   /**< Whether selected / not selected state should be displayed. */
         DisplayMotion               = 0x00004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        //DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */ supressed by InfoOverlaysForbidden
+
         DisplayMotionSensitivity    = 0x00010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x00020,   /**< Whether PTZ crosshair is to be displayed. */
         DisplayInfo                 = 0x00040,   /**< Whether info panel is to be displayed. */
@@ -73,10 +74,10 @@ public:
         SyncPlayForbidden           = 0x04000,   /**< Whether SyncPlay is forbidden for this widget. */
         InfoOverlaysForbidden       = 0x08000,
 
-        FullScreenMode              = 0x08000,
-        ActivityPresence            = 0x10000,
+        FullScreenMode              = 0x10000,
+        ActivityPresence            = 0x20000,
 
-        AlwaysShowName              = 0x20000
+        AlwaysShowName              = 0x40000
     };
     Q_DECLARE_FLAGS(Options, Option)
 

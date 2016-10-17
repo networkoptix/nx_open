@@ -67,9 +67,9 @@ public:
 
     bool addBookmark(const QnCameraBookmark &bookmark);
     bool updateBookmark(const QnCameraBookmark &bookmark);
-    bool deleteAllBookmarksForCamera(const QString& cameraUniqueId);
+    bool deleteAllBookmarksForCamera(const QnUuid& cameraId);
     bool deleteBookmark(const QnUuid &bookmarkId);
-    bool deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete);
+    bool deleteBookmarksToTime(const QMap<QnUuid, qint64>& dataToDelete);
 
     void setBookmarkCountController(std::function<void(size_t)> handler);
 

@@ -32,7 +32,7 @@ public:
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
-    virtual Qn::StorageInitResult initOrUpdate() const override;
+    virtual Qn::StorageInitResult initOrUpdate() override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
@@ -48,9 +48,7 @@ public:
 
     QnTimePeriodList getTimePeriods(const QnResourcePtr &resource);
 
-    static QString updateNovParent(const QString& novName, const QString& itemName);
-
-    static QString layoutPrefix();
+    static QString itemUniqueId(const QString& layoutUrl, const QString& itemUniqueId);
 
     virtual QString getPath() const override;
 public:
@@ -77,8 +75,6 @@ public:
         QnLayoutFileIndexEntry entries[MAX_FILES_AT_LAYOUT];
     };
 #pragma pack(pop)
-
-    static QString removeProtocolPrefix(const QString& url);
 
 private:
     bool addFileEntry(const QString& fileName);

@@ -205,7 +205,7 @@ public:
     void setPtzConfigurationToken(const QString &src);
 
     QString getPtzProfileToken() const;
-    void setPtzProfileToken(const QString& src); 
+    void setPtzProfileToken(const QString& src);
 
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
@@ -264,6 +264,7 @@ public:
 
     QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
+    static bool isCameraForcedToOnvif(const QString& manufacturer, const QString& model);
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 protected:
@@ -291,7 +292,7 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
-   
+
 
 private:
     void setMaxFps(int f);
@@ -303,7 +304,7 @@ private:
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
-    
+
     CameraDiagnostics::Result fetchVideoSourceToken();
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
@@ -500,11 +501,11 @@ private:
     quint64 m_renewSubscriptionTimerID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
-    
+
     QnMutex m_streamConfMutex;
     QnWaitCondition m_streamConfCond;
     int m_streamConfCounter;
-    CameraDiagnostics::Result m_prevOnvifResultCode; 
+    CameraDiagnostics::Result m_prevOnvifResultCode;
     QString m_onvifNotificationSubscriptionReference;
     QElapsedTimer m_monotonicClock;
     qint64 m_prevPullMessageResponseClock;
@@ -518,7 +519,7 @@ private:
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
     void onPullMessagesResponseReceived(
-        PullPointSubscriptionWrapper* soapWrapper, 
+        PullPointSubscriptionWrapper* soapWrapper,
         int resultCode,
         const _onvifEvents__PullMessagesResponse& response);
         //!Reads relay output list from resource

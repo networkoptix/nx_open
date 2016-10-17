@@ -282,15 +282,19 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
-    for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+    static std::atomic<detail::TransactionDescriptor<Param>*> holder(nullptr);
+    if (!holder.load())
     {
-        auto tdBase = (*it).get();
-        auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
-        if (td)
-            return td;
+        for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+        {
+            auto tdBase = (*it).get();
+            auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+            if (td)
+                holder = td;
+        }
     }
-    NX_ASSERT(0, "Transaciton descriptor for the given param not found");
-    return nullptr;
+    NX_ASSERT(holder.load(), "Transaciton descriptor for the given param not found");
+    return holder;
 }
 
 /**

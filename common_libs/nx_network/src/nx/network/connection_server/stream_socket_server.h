@@ -167,7 +167,7 @@ public:
         if( newConnection )
         {
             auto conn = createConnection( std::unique_ptr<AbstractStreamSocket>(newConnection) );
-            conn->startReadingConnection();
+            conn->startReadingConnection(m_connectionInactivityTimeout);
             this->saveConnection(std::move(conn));
         }
         m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
@@ -184,12 +184,18 @@ public:
         m_socket->post(std::move(handler));
     }
 
+    void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
+    {
+        m_connectionInactivityTimeout = value;
+    }
+
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) = 0;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_socket;
+    boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
 
     StreamSocketServer( StreamSocketServer& );
     StreamSocketServer& operator=( const StreamSocketServer& );

@@ -129,8 +129,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         &QnResourceTreeModel::rebuildTree, Qt::QueuedConnection);
     connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
         &QnResourceTreeModel::at_systemNameChanged);
-    connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged, this,
-        &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged, this,
+        &QnResourceTreeModel::at_autoDiscoveryEnabledChanged);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE),
         &QnPropertyNotifier::valueChanged,
         this,
@@ -422,12 +422,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (node->resourceFlags().testFlag(Qn::server))
     {
         /* Valid servers. */
-        if (!node->resource().dynamicCast<QnFakeMediaServerResource>())
+        if (!node->resourceFlags().testFlag(Qn::fake))
         {
             if (isAdmin)
                 return m_rootNodes[Qn::ServersNode];
 
-            return bastardNode;
+            return m_rootNodes[Qn::UserDevicesNode];
         }
 
         /* Fake servers from other systems. */
@@ -1206,7 +1206,7 @@ void QnResourceTreeModel::at_systemNameChanged()
     m_rootNodes[Qn::CurrentSystemNode]->update();
 }
 
-void QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged()
+void QnResourceTreeModel::at_autoDiscoveryEnabledChanged()
 {
     m_rootNodes[Qn::OtherSystemsNode]->update();
 }

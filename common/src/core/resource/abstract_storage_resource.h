@@ -150,7 +150,7 @@ public:
     ///**
     // * \returns                         Whether the storage is physically accessible.
     // */
-    virtual Qn::StorageInitResult initOrUpdate() const = 0;
+    virtual Qn::StorageInitResult initOrUpdate() = 0;
 
     /**
      * \param url                       Url of the file to delete.

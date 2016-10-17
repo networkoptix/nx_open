@@ -624,6 +624,26 @@ INSERT INTO account_status(code, description)
 
 )sql";
 
+/**
+ * #CLOUD-604. Adding sha256-based HA1.
+ */
+static const char kAddHa1CalculatedUsingSha256[] =
+R"sql(
+
+ALTER TABLE account ADD COLUMN password_ha1_sha256 VARCHAR(255) NULL;
+
+)sql";
+
+/**
+ * #CLOUD-616. Adding opaque VMS data.
+ */
+static const char kAddVmsOpaqueData[] =
+R"sql(
+
+ALTER TABLE system ADD COLUMN opaque VARCHAR(1024) NULL;
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

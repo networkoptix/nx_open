@@ -40,16 +40,20 @@ public: // overrides
 
     QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid& serverId) const override;
+    QUrl getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
 private:
-    void updateServers(const ServersList& oldServers);
-
     void emitHeadChanged();
 
     void onSystemNameChanged(const QnSystemDescriptionPtr& system);
+
+    ServersList gatherServers() const;
+
+    void updateServers();
+
+    void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
 
 private:
     typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;

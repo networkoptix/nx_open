@@ -119,7 +119,7 @@ void TransactionLog::readTransactions(
             completionHandler(
                 dbResult == nx::db::DBResult::ok
                     ? outputData.resultCode
-                    : fromDbResultCode(dbResult),
+                    : dbResultToApiResult(dbResult),
                 std::move(outputData.transactions),
                 std::move(outputData.state));
         });
@@ -130,7 +130,7 @@ nx::db::DBResult TransactionLog::fillCache()
     std::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
-    //starting async operation
+    // Starting async operation.
     using namespace std::placeholders;
     m_dbManager->executeSelect<int>(
         std::bind(&TransactionLog::fetchTransactionState, this, _1, _2),
@@ -142,7 +142,7 @@ nx::db::DBResult TransactionLog::fillCache()
             cacheFilledPromise.set_value(dbResult);
         });
 
-    //waiting for completion
+    // Waiting for completion.
     future.wait();
     return future.get();
 }
@@ -166,7 +166,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
                timestamp
         FROM transaction_log tl
         LEFT JOIN transaction_source_settings tss ON tl.system_id = tss.system_id
-        ORDER BY tl.system_id, peer_guid, db_guid
+        ORDER BY tl.system_id, timestamp_hi, timestamp DESC
         )sql");
 
     if (!selectTransactionStateQuery.exec())
@@ -177,6 +177,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
         return nx::db::DBResult::ioError;
     }
 
+    nx::String prevSystemId;
     while (selectTransactionStateQuery.next())
     {
         const nx::String systemId = selectTransactionStateQuery.value("system_id").toString().toLatin1();
@@ -196,36 +197,21 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
         VmsTransactionLogData& vmsTranLog = m_systemIdToTransactionLog[systemId];
         if (vmsTranLog.systemId.isEmpty())
             vmsTranLog.systemId = systemId;
-        if (settingsTimestampHi > vmsTranLog.timestampSequence)
-            vmsTranLog.timestampSequence = settingsTimestampHi;
+        vmsTranLog.timestampSequence = 
+            std::max(vmsTranLog.timestampSequence, settingsTimestampHi);
         qint32& persistentSequence = vmsTranLog.transactionState.values[tranStateKey];
         if (persistentSequence < sequence)
             persistentSequence = sequence;
         vmsTranLog.transactionHashToUpdateAuthor[tranHash] = 
             UpdateHistoryData{tranStateKey, timestamp};
+
+        if (systemId != prevSystemId)
+        {
+            // Switched to another system.
+            vmsTranLog.timestampCalculator->init(timestamp);
+            prevSystemId = systemId;
+        }
     }
-
-    //// Reading global transaction sequence from DB.
-    //QSqlQuery selectMaxTransactionSequence(*queryContext->connection());
-    //selectMaxTransactionSequence.setForwardOnly(true);
-    //selectMaxTransactionSequence.prepare(
-    //    R"sql(
-    //    SELECT max_sequence FROM cloud_db_transaction_sequence;
-    //    )sql");
-    //if (!selectMaxTransactionSequence.exec() ||
-    //    !selectMaxTransactionSequence.next())
-    //{
-    //    NX_LOGX(QnLog::EC2_TRAN_LOG,
-    //        lm("Error fetching max sequence from transaction log. %1")
-    //        .arg(selectMaxTransactionSequence.lastError().text()), cl_logERROR);
-    //    return nx::db::DBResult::ioError;
-    //}
-    //
-    //m_transactionSequence = selectMaxTransactionSequence.value(0).toLongLong();
-
-    //NX_LOGX(QnLog::EC2_TRAN_LOG,
-    //    lm("Selected max sequence %1 from transaction log")
-    //    .arg(m_transactionSequence.load()), cl_logINFO);
 
     return nx::db::DBResult::ok;
 }
@@ -243,7 +229,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
     //QMap<QnTranStateKey, qint32> values
     ::ec2::QnTranState currentState;
     {
-        // Merging "from" with local state
+        // Merging "from" with local state.
         QnMutexLocker lk(&m_mutex);
         VmsTransactionLogData& transactionLogBySystem = m_systemIdToTransactionLog[systemId];
         // Using copy of current state since we must not hold mutex over sql request.
@@ -347,88 +333,6 @@ bool TransactionLog::isShouldBeIgnored(
     return false;   //< Transaction should be processed.
 }
 
-//bool TransactionLog::checkTransactionSequence(
-//    nx::db::QueryContext* /*queryContext*/,
-//    const nx::String& systemId,
-//    const ::ec2::QnAbstractTransaction& transaction,
-//    const TransactionTransportHeader& cdbTransportHeader)
-//{
-//    using namespace ::ec2;
-//    VmsTransactionLogData* vmsTransactionLog = nullptr;
-//    {
-//        QnMutexLocker lk(&m_mutex);
-//        vmsTransactionLog = &m_systemIdToTransactionLog[systemId];
-//    }
-//    
-//    const QnTransactionTransportHeader& transportHeader = cdbTransportHeader.vmsTransportHeader;
-//
-//    if (transportHeader.sender.isNull())
-//        return true; // old version, nothing to check
-//
-//    // 1. check transport sequence
-//    QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
-//    int transportSeq = vmsTransactionLog->lastTransportSeq[ttSenderKey];
-//    if (transportSeq >= transportHeader.sequence)
-//    {
-//        NX_LOG(QnLog::EC2_TRAN_LOG,
-//            lm("systemId %1. Ignoring transaction %2 (%3) received "
-//                "from %4 because of transport sequence: %5 <= %6")
-//                .arg(systemId).arg(ApiCommand::toString(transaction.command)).str(transaction)
-//                .str(cdbTransportHeader).arg(transportHeader.sequence).arg(transportSeq),
-//            cl_logDEBUG1);
-//        return false; // already processed
-//    }
-//    vmsTransactionLog->lastTransportSeq[ttSenderKey] = transportHeader.sequence;
-//
-//    // 2. check persistent sequence
-//    if (transaction.persistentInfo.isNull())
-//    {
-//        NX_LOG(QnLog::EC2_TRAN_LOG,
-//            lm("systemId %1. Transaction %2 (%3) received "
-//                "from %4 has no persistent info")
-//                .arg(systemId).arg(ApiCommand::toString(transaction.command))
-//                .str(transaction).str(cdbTransportHeader),
-//            cl_logDEBUG1);
-//        return true; // nothing to check
-//    }
-//
-//    return true;
-//
-//#if 0
-//    QnTranStateKey persistentKey(transaction.peerID, transaction.persistentInfo.dbID);
-//    const int persistentSeq = vmsTransactionLog->transactionState.values[persistentKey];
-//
-//    //if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
-//    //    if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
-//    //    {
-//    //        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
-//    //            arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
-//    //    }
-//
-//    if (transaction.persistentInfo.sequence > persistentSeq + 1)
-//    {
-//        if (transport->isSyncDone())
-//        {
-//            // gap in persistent data detect, do resync
-//            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
-//                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
-//
-//            if (!transport->remotePeer().isClient() && !ApiPeerData::isClient(m_localPeerType))
-//                queueSyncRequest(transport);
-//            else
-//                transport->setState(QnTransactionTransport::Error); // reopen
-//            return false;
-//        }
-//        else
-//        {
-//            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
-//                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
-//        }
-//    }
-//    return true;
-//#endif
-//}
-
 nx::db::DBResult TransactionLog::saveToDb(
     nx::db::QueryContext* queryContext,
     const nx::String& systemId,
@@ -509,9 +413,6 @@ int TransactionLog::generateNewTransactionSequence(
     nx::db::QueryContext* /*queryContext*/,
     const nx::String& systemId)
 {
-    // global sequence
-    //return ++m_transactionSequence;
-
     QnMutexLocker lk(&m_mutex);
     int& currentSequence =
         m_systemIdToTransactionLog[systemId].transactionState.
@@ -528,10 +429,12 @@ int TransactionLog::generateNewTransactionSequence(
 
     QnMutexLocker lk(&m_mutex);
 
+    auto& transactionLogData = m_systemIdToTransactionLog[systemId];
     ::ec2::Timestamp timestamp;
-    timestamp.sequence = m_systemIdToTransactionLog[systemId].timestampSequence;
+    timestamp.sequence = transactionLogData.timestampSequence;
     timestamp.ticks = 
-        duration_cast<milliseconds>(nx::utils::timeSinceEpoch()).count();
+        m_systemIdToTransactionLog[systemId]
+            .timestampCalculator->calculateNextTimeStamp().ticks;
     return timestamp;
 }
 

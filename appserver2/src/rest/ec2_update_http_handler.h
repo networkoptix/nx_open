@@ -67,15 +67,12 @@ public:
         if (command == ApiCommand::NotDefined)
             return nx_http::StatusCode::notFound;
 
-        const QByteArray srcFormat = srcBodyContentType.split(';')[0];
-
-        const Qn::SerializationFormat format =
-            Qn::serializationFormatFromHttpContentType(srcFormat);
+        const QByteArray requestContentType = srcBodyContentType.split(';')[0];
 
         RequestData requestData;
         bool success = false;
         auto httpStatusCode = buildRequestData(
-            &requestData, format, body, &resultBody, &contentType, &success, owner);
+            &requestData, requestContentType, body, &resultBody, &contentType, &success, owner);
         if (!success)
             return httpStatusCode;
 
@@ -95,7 +92,7 @@ public:
 private:
     nx_http::StatusCode::Value buildRequestData(
         RequestData* requestData,
-        Qn::SerializationFormat format,
+        const QByteArray& requestContentType,
         const QByteArray& body,
         QByteArray* outResultBody,
         QByteArray* outContentType,
@@ -103,18 +100,22 @@ private:
         const QnRestConnectionProcessor* owner)
     {
         *outSuccess = false;
+
+        const Qn::SerializationFormat format =
+            Qn::serializationFormatFromHttpContentType(requestContentType);
+
         switch (format)
         {
             case Qn::JsonFormat:
             {
                 *outContentType = "application/json";
-
                 auto httpStatusCode = buildRequestDataFromJson(
                     requestData, body, outResultBody, outSuccess, owner);
                 if (!*outSuccess)
                     return httpStatusCode;
                 break;
             }
+
             case Qn::UbjsonFormat:
             {
                 *requestData = QnUbjson::deserialized<RequestData>(
@@ -123,11 +124,11 @@ private:
                     return nx_http::StatusCode::invalidParameter;
                 break;
             }
-            case Qn::UnsupportedFormat:
-                return nx_http::StatusCode::internalServerError;
 
             default:
-                return nx_http::StatusCode::notAcceptable;
+                QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::InvalidParameter,
+                    lit("Unsupported Content Type: \"%1\".").arg(QString(requestContentType)));
+                return nx_http::StatusCode::unsupportedMediaType;
         }
         return nx_http::StatusCode::ok;
     }
@@ -458,7 +459,7 @@ private:
             case QJsonValue::Double:
             case QJsonValue::String:
             case QJsonValue::Array: //< Arrays treated as scalars - no items merging is performed.
-                NX_LOG("Mering: Scalar or array - replacing", cl_logDEBUG2);
+                NX_LOG("Merging: Scalar or array - replacing", cl_logDEBUG2);
                 *existingValue = incompleteValue;
                 break;
 

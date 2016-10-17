@@ -54,13 +54,13 @@ public:
         stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    //-----------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // Public API methods
 
     /**
      * Adds account in "not activated" state and sends verification email to the email address provided.
      */
-    void addAccount(
+    void registerAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountData accountData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
@@ -96,24 +96,30 @@ public:
         data::TemporaryCredentialsParams params,
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
 
-    //-----------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     std::string generateNewAccountId() const;
 
+    /**
+     * Fetches account from cache.
+     */
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
     
     nx::db::DBResult insertAccount(
-        nx::db::QueryContext* const tran,
-        data::AccountData accountData);
+        nx::db::QueryContext* const queryContext,
+        data::AccountData account);
+    nx::db::DBResult updateAccount(
+        nx::db::QueryContext* const queryContext,
+        data::AccountData account);
 
-    nx::db::DBResult fetchExistingAccountByEmail(
+    nx::db::DBResult fetchAccountByEmail(
         nx::db::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData);
 
     nx::db::DBResult createPasswordResetCode(
-        nx::db::QueryContext* const tran,
+        nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);
 
@@ -133,8 +139,6 @@ private:
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);
 
-    //-----------------------------------------------------
-    // add_account DB operations
     nx::db::DBResult registerNewAccountInDb(
         nx::db::QueryContext* const queryContext,
         const data::AccountData& accountData,
@@ -144,13 +148,6 @@ private:
         const std::string& accountEmail,
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
-    void accountAdded(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        bool requestSourceSecured,
-        nx::db::DBResult resultCode,
-        data::AccountData accountData,
-        data::AccountConfirmationCode resultData,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
     void accountReactivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
@@ -160,8 +157,6 @@ private:
         data::AccountConfirmationCode resultData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
-    //-----------------------------------------------------
-    // verify_account DB operations
     nx::db::DBResult verifyAccount(
         nx::db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
@@ -186,12 +181,11 @@ private:
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler);
 
-    void passwordResetCodeGenerated(
-        bool hasRequestCameFromSecureSource,
-        nx::db::DBResult resultCode,
-        std::string accountEmail,
-        data::AccountConfirmationCode confirmationCode,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+    nx::db::DBResult resetPassword(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        data::AccountConfirmationCode* const confirmationCode);
+
     void temporaryCredentialsSaved(
         QnCounter::ScopedIncrement asyncCallLocker,
         api::ResultCode resultCode,

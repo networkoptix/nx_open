@@ -4,6 +4,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include "email_manager_mocked.h"
+#include "test_email_manager.h"
 #include "test_setup.h"
 
 namespace nx {
@@ -1106,34 +1107,6 @@ TEST_F(SystemSharing, changing_own_rights_on_system)
     }
 }
 
-namespace {
-class TestEmailManager:
-    public nx::cdb::AbstractEmailManager
-{
-public:
-    TestEmailManager(
-        nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> _delegate)
-        :
-        m_delegate(std::move(_delegate))
-    {
-    }
-
-    virtual void sendAsync(
-        const AbstractNotification& notification,
-        std::function<void(bool)> completionHandler) override
-    {
-        if (m_delegate)
-            m_delegate(notification);
-
-        if (completionHandler)
-            completionHandler(true);
-    }
-
-private:
-    nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> m_delegate;
-};
-} // namespace
-
 TEST_F(SystemSharing, share_with_email_not_registered_as_account)
 {
     boost::optional<InviteUserNotification> inviteNotification;
@@ -1214,6 +1187,58 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     ASSERT_EQ(1, systems.size());
     ASSERT_EQ(system1.id, systems[0].id);
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
+}
+
+TEST_F(SystemSharing, sharing_notification)
+{
+    EmailManagerMocked mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&))).Times(1);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
+        });
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account1);
+
+    const auto account2 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+
+    // updating existing sharing - notification not sent
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::advancedViewer);
+
+    // removing existing sharing - notification not sent
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::none);
+}
+
+TEST_F(SystemSharing, remove_sharing)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account1);
+
+    const auto account2 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+
+    api::SystemDataEx systemData;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystem(account2.data.email, account2.password, system1.id, &systemData));
+
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::none);
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        getSystem(account2.data.email, account2.password, system1.id, &systemData));
 }
 
 } // namespace cdb

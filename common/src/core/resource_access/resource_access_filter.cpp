@@ -1,34 +1,69 @@
 #include "resource_access_filter.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/webpage_resource.h>
+
+namespace {
+
+static const QList<QnResourceAccessFilter::Filter> kAllFilters {
+    QnResourceAccessFilter::MediaFilter,
+    QnResourceAccessFilter::LayoutsFilter
+};
+
+}
+
+bool QnResourceAccessFilter::isShareable(const QnResourcePtr& resource)
+{
+    return std::any_of(kAllFilters.cbegin(), kAllFilters.cend(),
+        [resource](Filter filter)
+        {
+            return isShareable(filter, resource);
+        });
+}
+
+bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& resource)
+{
+    auto flags = resource->flags();
+    if (flags.testFlag(Qn::desktop_camera))
+        return false;
+
+    switch (filter)
+    {
+        case QnResourceAccessFilter::MediaFilter:
+            return flags.testFlag(Qn::web_page)
+                || flags.testFlag(Qn::server_live_cam)
+                || ( flags.testFlag(Qn::remote_server) && !flags.testFlag(Qn::fake) );
+
+        case QnResourceAccessFilter::LayoutsFilter:
+            return flags.testFlag(Qn::layout) && !flags.testFlag(Qn::exported);
+
+        default:
+            NX_ASSERT(false);
+            break;
+    }
+
+    return false;
+}
 
 QList<QnResourceAccessFilter::Filter> QnResourceAccessFilter::allFilters()
 {
-    return QList<Filter>() << MediaFilter << LayoutsFilter;
+    return kAllFilters;
 }
 
 QnResourceList QnResourceAccessFilter::filteredResources(Filter filter, const QnResourceList& source)
 {
     switch (filter)
     {
-    case QnResourceAccessFilter::MediaFilter:
-        return source.filtered<QnResource>([](const QnResourcePtr& resource)
-        {
-            if (resource->hasFlags(Qn::desktop_camera))
-                return false;
-            return (resource->flags().testFlag(Qn::web_page) || resource->flags().testFlag(Qn::server_live_cam));
-        });
+        case QnResourceAccessFilter::MediaFilter:
+            return source.filtered([](const QnResourcePtr& resource)
+            {
+                return isShareable(resource) && !resource->hasFlags(Qn::layout);
+            });
 
-    case QnResourceAccessFilter::LayoutsFilter:
-        return source.filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
-        {
-            return /*layout->isShared() && */!layout->isFile(); //TODO: #GDM #access user should not see own layouts here, admin should
-        });
+        case QnResourceAccessFilter::LayoutsFilter:
+            return source.filtered([](const QnResourcePtr& resource)
+            {
+                return isShareable(resource) && resource->hasFlags(Qn::layout);
+            });
     }
     return QnResourceList();
 }

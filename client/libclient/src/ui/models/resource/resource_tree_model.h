@@ -118,7 +118,7 @@ private slots:
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_systemNameChanged();
 
-    void at_serverAutoDiscoveryEnabledChanged();
+    void at_autoDiscoveryEnabledChanged();
 
 private:
     friend class QnResourceTreeModelNode;

@@ -17,6 +17,7 @@
 #include <transaction/transaction_descriptor.h>
 
 #include "transaction_serializer.h"
+#include "transaction_timestamp_calculator.h"
 #include "transaction_transport_header.h"
 
 namespace nx {
@@ -111,7 +112,15 @@ public:
             return nx::db::DBResult::cancelled;
         }
 
-        // TODO: Should not serialize transaction here, but receive already serialized version.
+        // Updating timestamp if needed.
+        {
+            QnMutexLocker lk(&m_mutex);
+            auto& transactionLogData = m_systemIdToTransactionLog[systemId];
+            transactionLogData.timestampCalculator->shiftTimestampIfNeeded(
+                transaction.persistentInfo.timestamp);
+        }
+
+        // TODO: #ak: Should not serialize transaction here, but receive already serialized version.
         return saveToDb(
             connection,
             systemId,
@@ -202,19 +211,6 @@ private:
     {
         ::ec2::QnTranStateKey updatedBy;
         ::ec2::Timestamp timestamp;
-
-        //UpdateHistoryData():
-        //    timestamp(0)
-        //{
-        //}
-        //UpdateHistoryData(
-        //    const ::ec2::QnTranStateKey& updatedBy,
-        //    const qint64& timestamp)
-        //    :
-        //    updatedBy(updatedBy),
-        //    timestamp(timestamp)
-        //{
-        //}
     };
 
     struct VmsTransactionLogData
@@ -226,8 +222,14 @@ private:
         std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
         ::ec2::QnTranState transactionState;
         std::uint64_t timestampSequence;
+        std::unique_ptr<TransactionTimestampCalculator> timestampCalculator;
 
-        VmsTransactionLogData(): timestampSequence(0) {}
+        VmsTransactionLogData():
+            timestampSequence(0)
+        {
+            timestampCalculator =
+                std::make_unique<TransactionTimestampCalculator>();
+        }
     };
 
     struct DbTransactionContext
@@ -238,10 +240,6 @@ private:
         std::vector<std::shared_ptr<const TransactionWithSerializedPresentation>> transactions;
         /** Changes done to vms transaction log under Db transaction. */
         VmsTransactionLogData transactionLogUpdate;
-
-        //DbTransactionContext() = default;
-        //DbTransactionContext(DbTransactionContext&&) = default;
-        //DbTransactionContext& operator=(DbTransactionContext&&) = default;
     };
 
     struct TransactionReadResult
@@ -260,7 +258,7 @@ private:
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
 
-    /** Fills transaction state cache. Throws in case of error. */
+    /** Fills transaction state cache. */
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchTransactionState(
         nx::db::QueryContext* connection,

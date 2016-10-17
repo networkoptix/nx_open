@@ -15,7 +15,8 @@ struct ApiCameraData: ApiResourceData
      */
     void fillId()
     {
-        // ATTENTION: This logic is similar to the one in QnStorageManager::loadCameraInfo().
+        // ATTENTION: This logic is similar to the one in
+        // QnSecurityCamResource::makeCameraIdFromUniqueId().
         if (!physicalId.isEmpty())
             id = guidFromArbitraryData(physicalId.toUtf8());
         else

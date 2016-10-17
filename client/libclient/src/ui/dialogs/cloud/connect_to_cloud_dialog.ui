@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ConnectToCloudDialog</class>
- <widget class="QDialog" name="QnLinkToCloudDialog">
+ <widget class="QDialog" name="ConnectToCloudDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>164</height>
+    <width>410</width>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,23 +73,6 @@
       <property name="spacing">
        <number>8</number>
       </property>
-      <item row="2" column="1">
-       <widget class="QLabel" name="invalidCredentialsLabel">
-        <property name="text">
-         <string>Email or password is not recognized.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QnInputField" name="loginInputField" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>10</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QnInputField" name="passwordInputField" native="true">
         <property name="minimumSize">
@@ -100,7 +83,17 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="0">
+       <widget class="QWidget" name="spacer" native="true"/>
+      </item>
       <item row="3" column="1">
+       <widget class="QLabel" name="invalidCredentialsLabel">
+        <property name="text">
+         <string>Email or password is not recognized.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
        <widget class="QWidget" name="linksWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="leftMargin">
@@ -156,8 +149,25 @@
         </layout>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QWidget" name="spacer" native="true"/>
+      <item row="0" column="0" colspan="2">
+       <widget class="QnInputField" name="loginInputField" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>10</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="stayLoggedInCheckBox">
+        <property name="text">
+         <string>Stay logged in</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

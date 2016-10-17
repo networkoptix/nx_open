@@ -88,7 +88,7 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate() 
 {
     QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp")
         + QString::number(nx::utils::random::number<uint>());

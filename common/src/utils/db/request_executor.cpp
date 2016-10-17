@@ -42,5 +42,5 @@ DBResult BaseExecutor::lastDBError(QSqlDatabase* const connection) const
     }
 }
 
-}   //namespace db
-}   //namespace nx
+} // namespace db
+} // namespace nx

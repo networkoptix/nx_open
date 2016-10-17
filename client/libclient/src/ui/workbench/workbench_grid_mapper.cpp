@@ -2,14 +2,19 @@
 
 #include <cmath>
 
+#include <ui/style/globals.h>
+
 #include <nx/utils/math/fuzzy.h>
 
 QnWorkbenchGridMapper::QnWorkbenchGridMapper(QObject *parent):
     QObject(parent),
     m_origin(0.0, 0.0),
-    m_cellSize(1.0, 1.0),
     m_spacing(0.0, 0.0)
-{}
+{
+    qreal unit = qnGlobals->workbenchUnitSize();
+    qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+    m_cellSize = {unit, unit / cellAspectRatio};
+}
 
 QnWorkbenchGridMapper::~QnWorkbenchGridMapper() {
     return;

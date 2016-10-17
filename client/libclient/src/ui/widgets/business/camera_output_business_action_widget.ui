@@ -28,7 +28,7 @@
     <widget class="QComboBox" name="relayComboBox"/>
    </item>
    <item>
-    <widget class="QWidget" name="autoResetWidget" native="true">
+    <widget class="QWidget" name="fixedDurationWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
        <number>0</number>
@@ -43,14 +43,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="autoResetCheckBox">
+       <widget class="QCheckBox" name="fixedDurationCheckBox">
         <property name="text">
-         <string>Auto-reset in (sec):</string>
+         <string>Fixed duration:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="autoResetSpinBox">
+       <widget class="QSpinBox" name="fixedDurationSpinBox">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -65,6 +65,16 @@
         </property>
         <property name="value">
          <number>5</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="fixedDurationSuffixLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>seconds</string>
         </property>
        </widget>
       </item>

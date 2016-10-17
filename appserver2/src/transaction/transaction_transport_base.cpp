@@ -561,11 +561,11 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_localPeer.instanceId.toByteArray() );
 
 
+    q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
+
     // Client reconnects to the server
-    if( m_localPeer.isClient() ) {
-        q.removeQueryItem("isClient");
-        q.removeQueryItem("isMobile");
-        q.addQueryItem("isClient", QString());
+    if( m_localPeer.isClient() )
+    {
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }

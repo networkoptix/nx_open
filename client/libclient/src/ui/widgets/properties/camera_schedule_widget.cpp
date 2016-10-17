@@ -26,6 +26,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -182,6 +183,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     m_motionTypeOverride(Qn::MT_Default)
 {
     ui->setupUi(this);
+
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
 

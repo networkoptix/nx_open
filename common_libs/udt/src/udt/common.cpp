@@ -155,9 +155,6 @@ CTimer::CTimer()
    #else
       m_TickLock = CreateMutex(NULL, false, NULL);
       m_TickCond = CreateEvent(NULL, false, false, NULL);
-      //memset(&m_winVersion, 0, sizeof(m_winVersion));
-      //m_winVersion.dwOSVersionInfoSize = sizeof(m_winVersion);
-      //GetVersionEx(&m_winVersion);
    #endif
 }
 

@@ -104,6 +104,8 @@ namespace nx_ms_conf
     static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 
     static const QLatin1String CDB_ENDPOINT( "cdbEndpoint" );
+
+    static const QLatin1String ONVIF_TIMEOUTS( "onvifTimeouts" );
 }
 
 /*!

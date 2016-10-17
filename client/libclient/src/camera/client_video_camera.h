@@ -24,17 +24,6 @@ class QnClientVideoCamera : public Connective<QObject> {
 
     typedef Connective<QObject> base_type;
 public:
-    enum ClientVideoCameraError {
-        NoError = 0,
-        FirstError = QnStreamRecorder::LastError,
-
-        InvalidResourceType = FirstError,
-
-        ErrorCount
-    };
-
-    static QString errorString(int errCode);
-
     QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnClientVideoCamera();
 
@@ -66,11 +55,12 @@ public:
 
     //TODO: #GDM Refactor parameter set to the structure
     void exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-								 const QString& fileName, const QString& format,
-                                 QnStorageResourcePtr storage, QnStreamRecorder::Role role,
-                                 qint64 serverTimeZoneMs,
-                                 qint64 timelapseFrameStepMs, /* Default value is 0 (timelapse disabled) */
-                                 QnImageFilterHelper transcodeParams);
+        const QString& fileName, const QString& format,
+        QnStorageResourcePtr storage,
+        StreamRecorderRole role,
+        qint64 serverTimeZoneMs,
+        qint64 timelapseFrameStepMs, /* Default value is 0 (timelapse disabled) */
+        QnImageFilterHelper transcodeParams);
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;
@@ -78,7 +68,7 @@ public:
     bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void exportProgress(int progress);
-    void exportFinished(QnStreamRecorder::ErrorStruct reason, const QString &fileName);
+    void exportFinished(StreamRecorderErrorStruct reason, const QString &fileName);
     void exportStopped();
 
 public slots:

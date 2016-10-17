@@ -69,7 +69,8 @@ namespace nx_api
         :
             m_connectionManager(connectionManager),
             m_streamSocket(std::move(streamSocket)),
-            m_bytesToSend(0)
+            m_bytesToSend(0),
+            m_lastActivityTimePoint(std::chrono::steady_clock::now())
         {
             m_readBuffer.reserve( READ_BUFFER_CAPACITY );
         }
@@ -113,8 +114,15 @@ namespace nx_api
         /*!
             \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
         */
-        void startReadingConnection()
+        void startReadingConnection(
+            boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
         {
+            if (inactivityTimeout)
+            {
+                m_inactivityTimeout = inactivityTimeout;
+                setupInactivityTimer(*inactivityTimeout);
+            }
+
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,
                 std::bind( &SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2 ) );
@@ -187,11 +195,14 @@ namespace nx_api
         std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
         nx::Buffer m_readBuffer;
         size_t m_bytesToSend;
+        boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+        std::chrono::steady_clock::time_point m_lastActivityTimePoint;
         std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionCloseHandlers;
         nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
+            m_lastActivityTimePoint = std::chrono::steady_clock::now();
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
 
@@ -215,6 +226,7 @@ namespace nx_api
 
         void onBytesSent( SystemError::ErrorCode errorCode, size_t count )
         {
+            m_lastActivityTimePoint = std::chrono::steady_clock::now();
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
 
@@ -262,6 +274,22 @@ namespace nx_api
         void stopWhileInAioThread()
         {
             triggerConnectionClosedEvent();
+        }
+
+        void setupInactivityTimer(std::chrono::milliseconds timeout)
+        {
+            m_streamSocket->registerTimer(
+                timeout,
+                [this]()
+                {
+                    const auto inactiveTime = std::chrono::duration_cast<decltype(timeout)>(
+                        std::chrono::steady_clock::now() - m_lastActivityTimePoint);
+
+                    if (inactiveTime >= *m_inactivityTimeout)
+                        return handleSocketError(SystemError::timedOut);
+
+                    setupInactivityTimer(*m_inactivityTimeout - inactiveTime);
+                });
         }
     };
 }

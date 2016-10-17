@@ -192,7 +192,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
     //TODO: #GDM Store temporary credentials?
     qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
-    const bool stayLoggedIn = q->ui->stayLoggedInChackBox->isChecked();
+    const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
     qnClientCoreSettings->setCloudPassword(stayLoggedIn
         ? q->ui->passwordInputField->text().trimmed()
         : QString());

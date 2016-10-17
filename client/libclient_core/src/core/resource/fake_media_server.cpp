@@ -4,6 +4,7 @@ QnFakeMediaServerResource::QnFakeMediaServerResource():
     QnMediaServerResource()
 {
     setId(QnUuid::createUuid());
+    addFlags(Qn::fake_server);
 }
 
 QnUuid QnFakeMediaServerResource::getOriginalGuid() const
@@ -14,12 +15,12 @@ QnUuid QnFakeMediaServerResource::getOriginalGuid() const
 
 void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    if (m_serverData == serverData)
-        return;
-
-    m_serverData = serverData;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_serverData == serverData)
+            return;
+        m_serverData = serverData;
+    }
 
     setStatus(serverData.status, true);
 
@@ -39,15 +40,12 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     setVersion(serverData.version);
     setSystemInfo(serverData.systemInformation);
     setSslAllowed(serverData.sslAllowed);
-    //setProperty(protoVersionPropertyName, QString::number(serverData.protoVersion));
-    //setProperty(safeModePropertyName, QnLexical::serialized(serverData.ecDbReadOnly));
 
     if (serverData.ecDbReadOnly)
         addFlags(Qn::read_only);
     else
         removeFlags(Qn::read_only);
 
-    lock.unlock();
     emit moduleInformationChanged(toSharedPointer());
 }
 
@@ -60,7 +58,6 @@ QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
 void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized,
-        Q_FUNC_INFO,
         "Incompatible servers should not take any status but incompatible or unauthorized");
     base_type::setStatus(newStatus, silenceMode);
 }

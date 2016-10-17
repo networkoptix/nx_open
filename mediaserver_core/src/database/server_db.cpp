@@ -627,7 +627,7 @@ bool QnServerDb::bookmarksUniqueIdToCameraGuid()
     // Change uniqueId to cameraId: cameraId = md5(uniqueId).
     for (auto it = uniqueIdByGuid.begin(); it != uniqueIdByGuid.end(); ++it)
     {
-        const QnUuid cameraId = guidFromArbitraryData(it.value());
+        const QnUuid cameraId = QnSecurityCamResource::makeCameraIdFromUniqueId(it.value());
 
         QSqlQuery query(m_sdb);
         query.prepare(
@@ -1192,7 +1192,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
         QSqlQuery insQuery(m_sdb);
         insQuery.prepare(insertOrReplace + R"(
             INTO bookmarks
-                (guid, unique_id, start_time, duration, name, description, timeout)
+                (guid, camera_guid, start_time, duration, name, description, timeout)
             VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout)
         )");
 
@@ -1287,7 +1287,7 @@ void QnServerDb::updateBookmarkCount()
     finalHandler();
 }
 
-bool QnServerDb::deleteAllBookmarksForCamera(const QString& cameraUniqueId)
+bool QnServerDb::deleteAllBookmarksForCamera(const QnUuid& cameraId)
 {
     bool result;
 
@@ -1299,17 +1299,17 @@ bool QnServerDb::deleteAllBookmarksForCamera(const QString& cameraUniqueId)
             delQuery.prepare(R"(
                 DELETE FROM bookmark_tags
                 WHERE bookmark_guid IN
-                    (SELECT guid from bookmarks WHERE unique_id = :id)
+                    (SELECT guid from bookmarks WHERE camera_guid = :id)
             )");
-            delQuery.bindValue(":id", cameraUniqueId);
+            delQuery.bindValue(":id", QnSql::serialized_field(cameraId));
             if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
                 return false;
         }
 
         {
             QSqlQuery delQuery(m_sdb);
-            delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id");
-            delQuery.bindValue(":id", cameraUniqueId);
+            delQuery.prepare("DELETE FROM bookmarks WHERE camera_guid = :id");
+            delQuery.bindValue(":id", QnSql::serialized_field(cameraId));
             if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
                 return false;
         }
@@ -1383,7 +1383,7 @@ void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
     updateBookmarkCount();
 }
 
-bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete)
+bool QnServerDb::deleteBookmarksToTime(const QMap<QnUuid, qint64>& dataToDelete)
 {
     bool result;
 
@@ -1392,7 +1392,7 @@ bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete
 
         for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
         {
-            const QString& cameraUniqueId = itr.key();
+            const QnUuid& cameraId = itr.key();
             qint64 timestampMs = itr.value();
 
             {
@@ -1401,9 +1401,9 @@ bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete
                     DELETE FROM bookmark_tags
                     WHERE bookmark_guid IN
                         (SELECT guid from bookmarks
-                            WHERE unique_id = :id AND start_time < :timestamp)
+                            WHERE camera_guid = :id AND start_time < :timestamp)
                 )");
-                delQuery.bindValue(":id", cameraUniqueId);
+                delQuery.bindValue(":id", QnSql::serialized_field(cameraId));
                 delQuery.bindValue(":timestamp", timestampMs);
                 if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
                     return false;
@@ -1413,9 +1413,9 @@ bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete
                 QSqlQuery delQuery(m_sdb);
                 delQuery.prepare(R"(
                     DELETE FROM bookmarks
-                    WHERE unique_id = :id AND start_time < :timestamp
+                    WHERE camera_guid = :id AND start_time < :timestamp
                 )");
-                delQuery.bindValue(":id", cameraUniqueId);
+                delQuery.bindValue(":id", QnSql::serialized_field(cameraId));
                 delQuery.bindValue(":timestamp", timestampMs);
                 if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
                     return false;

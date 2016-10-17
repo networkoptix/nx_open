@@ -84,6 +84,7 @@ Item
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             comboBoxTextRole: "display";
+            comboBoxValueRole: "url";
             iconUrl: "qrc:/skin/welcome_page/server.png";                   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";
@@ -94,6 +95,9 @@ Item
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
             visible: control.isOnline;
+
+            onAccepted: control.connectRequested();
+
         }
 
         InfoItem
@@ -125,6 +129,8 @@ Item
             {
                 expandedArea.loginTextField.text = value;
             }
+
+            onAccepted: control.connectRequested();
         }
     }
 
@@ -139,7 +145,7 @@ Item
         opacity: control.expandedOpacity;
         hasRecentConnections: control.impl.hasRecentConnections;
 
-        prevTabObject: (userChooseItem ? userChooseItem : control.prevTabObject);
+        prevTabObject: (userChooseItem.visible ? userChooseItem : hostChooseItem);
         nextTabObject: control.prevTabObject;
 
         onConnectButtonClicked: { control.connectRequested(); }

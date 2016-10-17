@@ -3,31 +3,36 @@ import QtQuick.Controls 1.2;
 
 MaskedItem
 {
-    id: thisComponent;
+    id: control;
 
     property var model;
     property string comboBoxTextRole: "display";
+    property string comboBoxValueRole: comboBoxTextRole;
     property bool isEditableComboBox: false;
     property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1);
+
     maskedAreaDelegate: NxComboBox
     {
         id: comboBox;
 
-        textRole: thisComponent.comboBoxTextRole;
-        model: thisComponent.model;
-        width: thisComponent.width;
-        editable: thisComponent.isEditableComboBox;
+        textRole: control.comboBoxTextRole;
+        model: control.model;
+        width: control.width;
+        editable: control.isEditableComboBox;
         isEditMode: editable;
 
-        onVisibleChanged:
+        onTextChanged:
         {
-            if (editable && visible)
-                forceActiveFocus();
+            control.displayValue = text;
+            if (control.currentItemIndex == -1 || !model.getData)
+                control.value = text;
+            else
+                control.value = model.getData(control.comboBoxValueRole, control.currentItemIndex);
+
         }
 
-        onTextChanged: { thisComponent.value = text; }
-
-        KeyNavigation.tab: thisComponent.KeyNavigation.tab;
-        KeyNavigation.backtab: thisComponent.KeyNavigation.backtab;
+        KeyNavigation.tab: control.KeyNavigation.tab;
+        KeyNavigation.backtab: control.KeyNavigation.backtab;
+        onAccepted: control.accepted();
     }
 }

@@ -179,10 +179,11 @@ static QDialogButtonBox::StandardButton execMessageBox(
                 icon,
                 helpTopicId,
                 title,
-                text,
+                title,
                 buttons,
                 parent);
 
+    msgBox.setInformativeText(text);
     msgBox.setDefaultButton(defaultButton);
 
     return static_cast<QDialogButtonBox::StandardButton>(msgBox.exec());

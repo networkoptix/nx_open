@@ -358,13 +358,27 @@ void QnUserSettingsWidget::setupInputFields()
     ui->cloudEmailInputField->setTitle(tr("Email"));
     ui->cloudEmailInputField->setValidator([this](const QString& text)
     {
-        Qn::ValidationResult result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
+        auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
         if (result.state != QValidator::Acceptable)
             return result;
+
+        auto email = text.trimmed().toLower();
+        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        {
+            if (!user->isCloud())
+                continue;
+
+            if (user->getEmail().toLower() != email)
+                continue;
+
+            return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+        }
 
         result = Qn::defaultEmailValidator()(text);
         return result;
     });
+    connect(ui->cloudEmailInputField, &QnInputField::editingFinished, ui->cloudEmailInputField,
+        &QnInputField::validate);
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);

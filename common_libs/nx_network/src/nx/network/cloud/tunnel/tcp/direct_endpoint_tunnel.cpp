@@ -125,6 +125,9 @@ void DirectTcpEndpointTunnel::onConnectDone(
     SystemError::ErrorCode sysErrorCode,
     std::list<ConnectionContext>::iterator connectionContextIter)
 {
+    if (sysErrorCode != SystemError::noError)
+        connectionContextIter->tcpSocket.reset();
+
     reportConnectResult(
         connectionContextIter,
         sysErrorCode,

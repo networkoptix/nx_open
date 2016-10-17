@@ -56,7 +56,9 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
 
         m_pixmapDirty = false;
     }
-    const auto size = renderRect.size();
+
+    const auto aspect = m_pixmap.devicePixelRatio();
+    const auto size = renderRect.size() * aspect;
     const auto topLeft = (renderRect.topLeft() - rect().topLeft()).toPoint();
 
     paintPixmapSharp(painter, m_pixmap, renderRect, QRect(topLeft, size));

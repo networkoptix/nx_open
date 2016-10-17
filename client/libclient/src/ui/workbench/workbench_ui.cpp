@@ -63,7 +63,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/web_view.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 
@@ -71,8 +71,6 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/processors/hover_processor.h>
-
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <ui/statistics/modules/controls_statistics_module.h>
 
@@ -147,33 +145,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_instrumentManager(display()->instrumentManager()),
-    m_fpsCountingInstrument(nullptr),
-    m_controlsActivityInstrument(nullptr),
     m_flags(0),
-    m_controlsWidget(nullptr),
     m_titleUsed(false),
     m_titleVisible(false),
     m_ignoreClickEvent(false),
     m_inactive(false),
-    m_fpsItem(nullptr),
-    m_debugOverlayLabel(nullptr),
-
-    m_inFreespace(false),
-    m_unzoomedOpenedPanels(),
-
-    m_timeline(),
-    m_tree(nullptr),
-
-    m_titleItem(nullptr),
-    m_titleShowButton(nullptr),
-    m_titleOpacityAnimatorGroup(nullptr),
-    m_titleYAnimator(nullptr),
-    m_titleOpacityProcessor(nullptr),
-
-    m_calendar(nullptr)
+    m_inFreespace(false)
 {
-    m_widgetByRole.fill(nullptr);
-
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
@@ -347,7 +325,7 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const
         return Qn::SceneScope;
 
     /* We should not handle any button as an action while the item was focused. */
-    if (dynamic_cast<QnWebView*>(focusItem))
+    if (dynamic_cast<QnGraphicsWebView*>(focusItem))
         return Qn::InvalidScope;
 
     return Qn::MainScope;
@@ -730,7 +708,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
     QRectF rect = controlsWidget->rect();
     if (qFuzzyEquals(m_controlsWidgetRect, rect))
         return;
-    QRectF oldRect = m_controlsWidgetRect;
+
     m_controlsWidgetRect = rect;
 
     /* We lay everything out manually. */

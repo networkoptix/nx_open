@@ -15,7 +15,7 @@ class AbstractCameraNotificationManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void addedOrUpdated(const ec2::ApiCameraData& camera);
+    void addedOrUpdated(const ec2::ApiCameraData& camera, const QnUuid& peerId);
     void cameraHistoryChanged(const ec2::ApiServerFootageData& cameraHistory);
     void removed(const QnUuid& id);
 

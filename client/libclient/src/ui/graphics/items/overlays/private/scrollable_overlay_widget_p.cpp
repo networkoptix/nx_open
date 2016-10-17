@@ -171,8 +171,11 @@ QSizeF QnScrollableOverlayWidgetPrivate::minimumSize() const {
     Q_Q(const QnScrollableOverlayWidget);
     auto margins = q->contentsMargins();
 
+    /* If there are more than one items, leave space for at least two visible. */
+    const int spacer = m_items.size() > 1 ? 2 : 1;
+
     qreal maxWidth  = widest->item->size().width()   + margins.left() + margins.right();
-    qreal maxHeight = tallest->item->size().height() + margins.top()  + margins.bottom();
+    qreal maxHeight = spacer * tallest->item->size().height() + margins.top()  + margins.bottom();
 
     return QSizeF(maxWidth / m_maxFillCoeff.width(), maxHeight / m_maxFillCoeff.height());
 }

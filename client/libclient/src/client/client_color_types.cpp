@@ -192,10 +192,12 @@ QnAuditLogColors::QnAuditLogColors() {
     chartColor = QColor(0x25, 0x92, 0xc3);
 }
 
-QnRecordingStatsColors::QnRecordingStatsColors()
+QnRecordingStatsColors::QnRecordingStatsColors():
+    chartBackground(Qt::cyan),
+    chartForeground(Qt::white),
+    foreignForeground(Qt::white),
+    totalForeground(Qt::white)
 {
-    chartMainColor = QColor(0x25, 0x92, 0xc3);
-    chartForecastColor = QColor(0x0c, 0x51, 0x69);
 }
 
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {

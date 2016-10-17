@@ -135,6 +135,15 @@ nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()
     return m_connectionFactory.get();
 }
 
+std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
+    const std::string& login,
+    const std::string& password)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(login, password);
+    return connection;
+}
+
 api::ModuleInfo CdbLauncher::moduleInfo() const
 {
     return m_moduleInfo;
@@ -167,9 +176,14 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->passwordHa1.empty())
         accountData->passwordHa1 = nx_http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
-            //accountData->email.c_str(),
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
+    if (accountData->passwordHa1Sha256.empty())
+        accountData->passwordHa1Sha256 = nx_http::calcHa1(
+            QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
+            moduleInfo().realm.c_str(),
+            password->c_str(),
+            "SHA-256").constData();
     if (accountData->customization.empty())
         accountData->customization = QnAppInfo::customizationName().toStdString();
 
@@ -177,12 +191,13 @@ api::ResultCode CdbLauncher::addAccount(
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
-        std::bind(
-            &nx::cdb::api::AccountManager::registerNewAccount,
-            connection->accountManager(),
-            *accountData,
-            std::placeholders::_1));
+    std::tie(result, *activationCode) = 
+        makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
+            std::bind(
+                &nx::cdb::api::AccountManager::registerNewAccount,
+                connection->accountManager(),
+                *accountData,
+                std::placeholders::_1));
     return result;
 }
 
@@ -347,6 +362,15 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     const std::string& password,
     api::SystemData* const systemData)
 {
+    return bindRandomNotActivatedSystem(email, password, std::string(), systemData);
+}
+
+api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& opaque,
+    api::SystemData* const systemData)
+{
     auto connection = connectionFactory()->createConnection();
     connection->setCredentials(email, password);
 
@@ -354,6 +378,7 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     std::ostringstream ss;
     ss << "test_sys_" << nx::utils::random::number();
     sysRegData.name = ss.str();
+    sysRegData.opaque = opaque;
 
     api::ResultCode resCode = api::ResultCode::ok;
 
@@ -373,7 +398,16 @@ api::ResultCode CdbLauncher::bindRandomSystem(
     const std::string& password,
     api::SystemData* const systemData)
 {
-    auto resCode = bindRandomNotActivatedSystem(email, password, systemData);
+    return bindRandomSystem(email, password, std::string(), systemData);
+}
+
+api::ResultCode CdbLauncher::bindRandomSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& opaque,
+    api::SystemData* const systemData)
+{
+    auto resCode = bindRandomNotActivatedSystem(email, password, opaque, systemData);
     if (resCode != api::ResultCode::ok)
         return resCode;
 
@@ -603,6 +637,24 @@ api::ResultCode CdbLauncher::renameSystem(
                 connection->systemManager(),
                 systemID,
                 newSystemName,
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::updateSystem(
+    const api::SystemData& system,
+    const api::SystemAttributesUpdate& updatedData)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(system.id, system.authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::update,
+                connection->systemManager(),
+                updatedData,
                 std::placeholders::_1));
     return resCode;
 }

@@ -638,7 +638,8 @@ bool PlayerPrivate::initDataProvider()
     connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
         [this]()
         {
-            setPosition(kLivePosition);
+            Q_Q(Player);
+            q->setPosition(kLivePosition);
         });
 
     if (!liveMode)

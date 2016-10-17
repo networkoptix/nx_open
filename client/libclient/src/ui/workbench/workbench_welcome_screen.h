@@ -9,11 +9,13 @@
 #include <ui/style/generic_palette.h>
 
 #include <nx/utils/raii_guard.h>
+
 #include <utils/common/connective.h>
 #include <utils/common/credentials.h>
 
 class QnCloudStatusWatcher;
 class QQuickView;
+class QnAppInfo;
 typedef QList<QUrl> UrlsList;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
@@ -32,9 +34,11 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
-    Q_PROPERTY(QString softwareVersion READ softwareVersion CONSTANT)
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
+    Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged);
+
+    Q_PROPERTY(QnAppInfo* appInfo READ appInfo CONSTANT);
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
 
@@ -63,7 +67,9 @@ public: // Properties
 
     QString connectingToSystem() const;
 
-    void resetConnectingToSystem();
+    void handleDisconnectedFromSystem();
+
+    void handleConnectingToSystem();
 
     void setConnectingToSystem(const QString& value);
 
@@ -71,9 +77,13 @@ public: // Properties
 
     void setGlobalPreloaderVisible(bool value);
 
-    QString softwareVersion() const;
-
     QString minSupportedVersion() const;
+
+    void setMessage(const QString& message);
+
+    QString message() const;
+
+    QnAppInfo* appInfo() const;
 
 public slots:
     bool isAcceptableDrag(const UrlsList& urls);
@@ -105,6 +115,7 @@ public slots:
 
     void forceActiveFocus();
 
+
 public slots:
     QColor getPaletteColor(const QString& group, int index);
 
@@ -133,6 +144,10 @@ signals:
 
     void globalPreloaderVisibleChanged();
 
+    void messageChanged();
+
+    void openTile(const QString& systemId);
+
 private:
     void connectToSystemInternal(
         const QString& systemId,
@@ -144,8 +159,6 @@ private:
 
 private:
     void showScreen();
-
-    void enableScreen();
 
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;
@@ -162,4 +175,6 @@ private:
     QQuickView* m_quickView;
     const WidgetPtr m_widget;
     QSize m_pageSize;
+    QString m_message;
+    QnAppInfo* m_appInfo;
 };

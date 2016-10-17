@@ -457,23 +457,24 @@ void AddressResolver::mediatorResolve(
     if (kResolveOnMediator)
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
+    SystemError::ErrorCode resolveResult = SystemError::notImplemented;
     if (info->second.isLikelyCloudAddress
         && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
     {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
+        resolveResult = SystemError::noError;
     }
     else
     {
         info->second.setMediatorEntries();
+        resolveResult = SystemError::hostNotFound;
     }
 
-    const auto sysErrorCode =
-        info->second.isResolved(true)
-        ? SystemError::noError
-        : SystemError::hostNotFound;
+    const auto guards = grabHandlers(resolveResult, info);
+    if (needDns && !info->second.isResolved(true))
+        return dnsResolve(info, lk, false, ipVersion);
 
-    const auto guards = grabHandlers(sysErrorCode, info);
-    lk->unlock(); //< fire guards away from mutex scope
+    lk->unlock(); //< Fire guards away from mutex scope.
 }
 
 void AddressResolver::mediatorResolveImpl(

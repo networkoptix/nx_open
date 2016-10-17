@@ -11,7 +11,7 @@ namespace ec2
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiVideowallData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveVideowall);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)

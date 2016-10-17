@@ -263,7 +263,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
     //TODO: #GDM split to server-only and client-only flags as they are always local
-    enum ResourceFlag {
+    enum ResourceFlag
+    {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
         streamprovider              = 0x4,
@@ -286,23 +287,42 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         motion                      = 0x10000,      /**< Resource has motion */
         sync                        = 0x20000,      /**< Resource can be used in sync playback mode. */
+
+        /* Server-only flag. */
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+
+        /* Server-only flag. */
         no_last_gop                 = 0x80000,      /**< Do not use last GOP for this when stream is opened */
 
-        deprecated                  = 0x100000,     /**< Resource absent in Server but still used in memory for some reason */
+        /* Client-only flag */
+        fake                        = 0x100000,     /**< Fake server (belonging to other system). */
+
         videowall                   = 0x200000,     /**< Videowall resource */
         desktop_camera              = 0x400000,     /**< Desktop Camera resource */
-        parent_change               = 0x800000,     /**< Camera discovery internal purpose */
 
-        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
+        /* Server-only flag. */
+        parent_change               = 0x800000,     /**< Camera discovery internal purpose. Server-only flag. */
+
+        /* Client-only flag. */
+        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status. */
+
+        /* Server-only flag. */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
+
         io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
 
-        local_media = local | media,
+        /* Client-only flag. */
+        exported                    = 0x20000000,   /**< Exported media file. */
+
+
+        local_media = local | media | url,
+        exported_media = local_media | exported,
+
         local_layout = local | layout,
+        exported_layout = local_layout | url | exported,
 
         local_server = local | server,
         remote_server = remote | server,
@@ -316,6 +336,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
+        fake_server = remote_server | fake,
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -525,8 +546,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
-        PT_MobileClient = 3,
-        PT_LiteClient = 4,
+        PT_OldMobileClient = 3,
+        PT_MobileClient = 4,
         PT_CloudServer = 5,
         PT_Count
     };
