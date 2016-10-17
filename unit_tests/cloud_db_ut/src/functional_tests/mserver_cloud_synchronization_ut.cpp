@@ -641,8 +641,8 @@ private:
     }
 
     void onTransactionConnectionStateChanged(
-        ec2::QnTransactionTransportBase* connection,
-        ec2::QnTransactionTransportBase::State newState)
+        ec2::QnTransactionTransportBase* /*connection*/,
+        ec2::QnTransactionTransportBase::State /*newState*/)
     {
         m_condition.notify_all();
     }
