@@ -67,7 +67,7 @@ public:
 
     SocketAddress endpoint() const
     {
-        return SocketAddress(m_settings.value("endpoint", "0.0.0.0:7002").toString());
+        return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
     }
 
 private:
