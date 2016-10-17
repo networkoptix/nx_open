@@ -403,10 +403,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnMediaServerResourcePtr& server) const
 {
     NX_ASSERT(server);
-    /* All users must have at least ReadPermission to send api requests
-     * (recorded periods, bookmarks, etc) and view servers on shared layouts. */
-    Qn::Permissions result = Qn::ReadPermission;
 
+    Qn::Permissions result = Qn::NoPermissions;
+    if (!qnResourceAccessProvider->hasAccess(subject, server))
+        return result;
+
+    result |= Qn::ReadPermission;
     if (hasGlobalPermission(subject, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 

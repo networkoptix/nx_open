@@ -22,7 +22,7 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
     , m_parameters(imageParameters)
     , m_serverTimeZoneMs(serverTimeZoneMs)
     , m_timelapseFrameStepMs(timelapseFrameStepMs)
-    , m_status(StreamRecorderError::NoError)
+    , m_status(StreamRecorderError::noError)
 {
     connect(m_camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
     connect(m_camera,     &QnClientVideoCamera::exportFinished,   this,   &QnClientVideoCameraExportTool::at_camera_exportFinished);
@@ -42,7 +42,7 @@ void QnClientVideoCameraExportTool::start() {
                 m_fileName,
                 QFileInfo(m_fileName).suffix(),
                 QnStorageResourcePtr(),
-                StreamRecorderRole::Role_FileExport,
+                StreamRecorderRole::fileExport,
                 m_serverTimeZoneMs,
                 m_timelapseFrameStepMs,
                 m_parameters
@@ -62,7 +62,7 @@ void QnClientVideoCameraExportTool::at_camera_exportFinished(const StreamRecorde
 {
     Q_UNUSED(filename)
     m_status = status.lastError;
-    finishExport(status.lastError == StreamRecorderError::NoError);
+    finishExport(status.lastError == StreamRecorderError::noError);
 }
 
 void QnClientVideoCameraExportTool::at_camera_exportStopped() {

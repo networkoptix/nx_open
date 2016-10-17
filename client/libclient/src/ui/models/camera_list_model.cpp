@@ -222,6 +222,5 @@ void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resourc
 
 bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr &camera) const {
     return camera
-        && !camera->hasFlags(Qn::foreigner)
         && (!m_server  || camera->getParentId() == m_server->getId());
 }

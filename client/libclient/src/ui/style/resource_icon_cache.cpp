@@ -41,6 +41,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(CurrentSystem,           loadIcon(lit("tree/system.png")));
     m_cache.insert(Server,                  loadIcon(lit("tree/server.png")));
     m_cache.insert(Servers,                 loadIcon(lit("tree/servers.png")));
+    m_cache.insert(HealthMonitor,           loadIcon(lit("tree/health_monitor.png")));
     m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
     m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
     m_cache.insert(VideoWallLayout,         loadIcon(lit("tree/layout_videowall.png")));

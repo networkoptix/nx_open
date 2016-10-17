@@ -21,6 +21,17 @@ public:
         LayoutsFilter
     };
 
+    static bool isShareable(const QnResourcePtr& resource);
+    static bool isShareable(Filter filter, const QnResourcePtr& resource);
+    static bool isShareableMedia(const QnResourcePtr& resource)
+    {
+        return isShareable(MediaFilter, resource);
+    }
+    static bool isShareableLayout(const QnResourcePtr& resource)
+    {
+        return isShareable(LayoutsFilter, resource);
+    }
+
     static QList<QnResourceAccessFilter::Filter> allFilters();
 
     static QnResourceList filteredResources(Filter filter, const QnResourceList& source);

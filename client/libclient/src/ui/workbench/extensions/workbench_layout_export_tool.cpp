@@ -414,9 +414,9 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     QString uniqId = resource->toResource()->getUniqueId();
     uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
-    auto role = StreamRecorderRole::Role_FileExport;
+    auto role = StreamRecorderRole::fileExport;
     if (resource->toResource()->hasFlags(Qn::utc))
-        role = StreamRecorderRole::Role_FileExportWithEmptyContext;
+        role = StreamRecorderRole::fileExportWithEmptyContext;
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 
@@ -438,7 +438,7 @@ void QnLayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruc
     const QString& filename)
 {
     Q_UNUSED(filename)
-    if (status.lastError != StreamRecorderError::NoError)
+    if (status.lastError != StreamRecorderError::noError)
     {
         m_errorMessage = QnStreamRecorder::errorString(status.lastError);
         finishExport(false);

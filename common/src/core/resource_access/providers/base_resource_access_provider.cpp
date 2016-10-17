@@ -1,7 +1,9 @@
 #include "base_resource_access_provider.h"
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_filter.h>
+
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/user_resource.h>
@@ -190,13 +192,10 @@ QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubj
 
 bool QnBaseResourceAccessProvider::isLayout(const QnResourcePtr& resource) const
 {
-    return resource->hasFlags(Qn::layout);
+    return QnResourceAccessFilter::isShareableLayout(resource);
 }
 
 bool QnBaseResourceAccessProvider::isMediaResource(const QnResourcePtr& resource) const
 {
-    /* Web Pages behave totally like cameras. */
-    return resource->hasFlags(Qn::live_cam)
-        || resource->hasFlags(Qn::web_page)
-        || resource->hasFlags(Qn::server);
+    return QnResourceAccessFilter::isShareableMedia(resource);
 }

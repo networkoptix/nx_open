@@ -25,6 +25,7 @@ public:
 
         Server,
         Servers,
+        HealthMonitor,
 
         Layout,
         SharedLayout,
@@ -47,6 +48,7 @@ public:
         IOModule,
         WebPage,
         WebPages,
+
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

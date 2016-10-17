@@ -957,7 +957,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
 
         QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."));
     }
-    else if (tool->status() != StreamRecorderError::NoError)
+    else if (tool->status() != StreamRecorderError::noError)
     {
         QnMessageBox::warning(mainWindow(), tr("Unable to export video."),
             QnStreamRecorder::errorString(tool->status()));
