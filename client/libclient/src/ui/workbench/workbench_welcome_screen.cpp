@@ -25,6 +25,8 @@
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
 
+#include <utils/common/app_info.h>
+
 namespace
 {
     typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
@@ -98,7 +100,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_quickView(new QQuickView()),
     m_widget(createMainView(this, m_quickView)),
     m_pageSize(m_widget->size()),
-    m_message()
+    m_message(),
+    m_appInfo(new QnAppInfo(this))
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -241,11 +244,6 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
     emit globalPreloaderVisibleChanged();
 }
 
-QString QnWorkbenchWelcomeScreen::softwareVersion() const
-{
-    return QnAppInfo::applicationVersion();
-}
-
 QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
 {
     return QnConnectionValidator::minSupportedVersion().toString();
@@ -271,6 +269,11 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 QString QnWorkbenchWelcomeScreen::message() const
 {
     return m_message;
+}
+
+QnAppInfo* QnWorkbenchWelcomeScreen::appInfo() const
+{
+    return m_appInfo;
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)

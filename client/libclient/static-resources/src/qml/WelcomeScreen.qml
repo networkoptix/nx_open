@@ -14,11 +14,6 @@ Rectangle
 
     color: Style.colors.window;
 
-    QnAppInfo
-    {
-        id: appInfo
-    }
-
     Item
     {
         id: screenHolder;
@@ -331,7 +326,7 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(appInfo.cloudName());
+            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(context.appInfo.cloudName());
         }
     }
 
@@ -421,11 +416,11 @@ Rectangle
     NxLabel
     {
         x: 8;
-        anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 8;
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
 
-        text: context.softwareVersion;
-        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        text: context.appInfo.applicationVersion()
+        standardColor: Style.darkerColor(Style.colors.windowText, 1)
 
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
     }
