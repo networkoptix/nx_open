@@ -18,6 +18,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
+#include <plugins/resource/archive_camera/archive_camera.h>
 
 
 static const int MAX_PERCENT = 100;
@@ -38,6 +39,8 @@ namespace {
         QnResourcePtr res = qnResPool->getResourceByUniqueId(resource->getUniqueId());
         if (res && qnResPool->getResourceById(res->getParentId()))
         {
+            if (res->getTypeId() == qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName()))
+                return false;
             existResource = true; // already in resource pool
         }
         else

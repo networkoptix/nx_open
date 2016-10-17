@@ -63,6 +63,7 @@ static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
 const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
 
+const QString kArchiveCameraUrlKey = lit("cameraUrl");
 const QString kArchiveCameraNameKey = lit("cameraName");
 const QString kArchiveCameraModelKey = lit("cameraModel");
 const QString kArchiveCameraGroupIdKey = lit("groupId");
@@ -994,6 +995,8 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
             newCamera.coreData.groupId= keyValue.second;
         else if (keyValue.first.contains(kArchiveCameraGroupNameKey))
             newCamera.coreData.groupName = keyValue.second;
+        else if (keyValue.first.contains(kArchiveCameraUrlKey))
+            newCamera.coreData.url = keyValue.second;
         else
             newCamera.properties.emplace_back(cameraGuid, keyValue.first, keyValue.second);
     }
@@ -2205,6 +2208,7 @@ void QnStorageManager::writeCameraInfoFiles()
                 outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
                 outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
                 outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
+                outStream << makeQuotedString(kArchiveCameraUrlKey) << "=" << makeQuotedString(camResource->getUrl()) << endl;
 
                 for (const auto &prop : camResource->getAllProperties())
                     outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
