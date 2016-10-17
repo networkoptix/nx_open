@@ -12,6 +12,8 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/common/html.h>
+
 namespace {
 
 static const int kMaxResourcesInTooltip = 10;
@@ -195,35 +197,26 @@ void QnAccessibleResourcesModel::setAllChecked(bool value)
 
 QString QnAccessibleResourcesModel::getTooltip(const QnResourceList& providers) const
 {
-    int count = 0;
-    QString tooltip;
+    if (providers.empty())
+        return QString();
 
-    for (const auto& resource : providers)
-    {
-        // Show only first kMaxResourcesInTooltip names from the sorted list:
-        if (++count > kMaxResourcesInTooltip)
-            break;
+    static const QString kSpacer = lit("<br>&nbsp;&nbsp;&nbsp;");
 
-        tooltip += lit("<br>&nbsp;&nbsp;&nbsp;%1").arg(resource->getName());
-    }
+    QStringList lines;
+    lines << tr("Access granted by:");
 
-    const auto total = providers.size();
-    if (!tooltip.isEmpty())
-    {
-        QString suffix;
-        if (total > kMaxResourcesInTooltip)
+    const auto maxTooltipLines = std::min(kMaxResourcesInTooltip, providers.size());
+    std::for_each(providers.begin(), providers.begin() + maxTooltipLines,
+        [&lines](const QnResourcePtr& provider)
         {
-            suffix = lit("<br>&nbsp;&nbsp;&nbsp;%1").arg(tr("...and %n more", "",
-                total - kMaxResourcesInTooltip));
-        }
+            lines << htmlBold(provider->getName());
+        });
 
-        tooltip = lit("<div style='white-space: pre'>%1<b>%2</b>%3</div>")
-            .arg(tr("Access granted by:"))
-            .arg(tooltip)
-            .arg(suffix);
-    }
+    const auto more = providers.size() - kMaxResourcesInTooltip;
+    if (more > 0)
+        lines << tr("...and %n more", "", more);
 
-    return tooltip;
+    return lit("<div style='white-space: pre'>%1</div>").arg(lines.join(kSpacer));
 }
 
 void QnAccessibleResourcesModel::accessChanged()
