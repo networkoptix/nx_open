@@ -178,6 +178,9 @@ void Appserver2Process::setOnStartedEventHandler(
 
 int Appserver2Process::exec()
 {
+    nx::utils::TimerManager timerManager;
+    timerManager.start();
+
     QCoreApplication application(m_argc, m_argv);
 
     {
@@ -194,9 +197,6 @@ int Appserver2Process::exec()
         });
 
     registerQtResources();
-
-    nx::utils::TimerManager timerManager;
-    timerManager.start();
 
     QnCommonModule commonModule;
     commonModule.setModuleGUID(QnUuid::createUuid());
