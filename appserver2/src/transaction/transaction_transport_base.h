@@ -18,6 +18,7 @@
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/auth_cache.h>
 #include <nx/network/http/httpstreamreader.h>
@@ -325,7 +326,6 @@ private:
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;
-    quint64 m_sendKeepAliveTask;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
@@ -340,6 +340,7 @@ private:
     std::chrono::milliseconds m_idleConnectionTimeout;
     QAuthenticator m_remotePeerCredentials;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+    nx::network::aio::Timer m_timer;
 
 private:
     QnTransactionTransportBase(
@@ -348,7 +349,7 @@ private:
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
 
-    void sendHttpKeepAlive( quint64 taskID );
+    void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void processTransactionData( const QByteArray& data);

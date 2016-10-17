@@ -111,7 +111,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionType = ConnectionType::none;
     m_compressResponseMsgBody = false;
     m_authOutgoingConnectionByServerKey = true;
-    m_sendKeepAliveTask = 0;
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
@@ -235,14 +234,7 @@ QnTransactionTransportBase::~QnTransactionTransportBase()
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
-    quint64 sendKeepAliveTaskLocal = 0;
-    {
-        QnMutexLocker lock(&m_mutex);
-        sendKeepAliveTaskLocal = m_sendKeepAliveTask;
-        m_sendKeepAliveTask = 0;    //no new task can be added
-    }
-    if( sendKeepAliveTaskLocal )
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer( sendKeepAliveTaskLocal );
+    m_timer.pleaseStopSync();
 
     {
         auto httpClientLocal = m_httpClient;
@@ -835,12 +827,9 @@ void QnTransactionTransportBase::connectionFailure()
     setState( Error );
 }
 
-void QnTransactionTransportBase::sendHttpKeepAlive( quint64 taskID )
+void QnTransactionTransportBase::sendHttpKeepAlive()
 {
     QnMutexLocker lock(&m_mutex);
-
-    if( m_sendKeepAliveTask != taskID )
-        return; //task has been cancelled
 
     if (m_dataToSend.empty())
     {
@@ -861,14 +850,14 @@ void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
         NX_ASSERT( m_outgoingDataSocket );
         m_outgoingDataSocket->registerTimer(
             m_tcpKeepAliveTimeout.count(),
-            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this, 0) );
+            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this) );
     }
     else
     {
         //we using http client to send transactions
-        m_sendKeepAliveTask = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this, std::placeholders::_1),
-            m_tcpKeepAliveTimeout);
+        m_timer.start(
+            m_tcpKeepAliveTimeout,
+            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this));
     }
 }
 
