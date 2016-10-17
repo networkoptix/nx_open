@@ -30,6 +30,8 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_access/resource_access_filter.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -302,26 +304,11 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
-#ifndef DESKTOP_CAMERA_DEBUG
-    if (resource->hasFlags(Qn::desktop_camera))
-        return;
-#endif
 
+    if (!menu()->canTrigger(QnActions::OpenInLayoutAction, QnActionParameters(resource)
+        .withArgument(Qn::LayoutResourceRole, layout)))
     {
-        //TODO: #GDM #Common refactor duplicated code VMS-1725
-        bool isServer = resource->hasFlags(Qn::server);
-        if (isServer && resource.dynamicCast<QnFakeMediaServerResource>())
-            return;
-
-        bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
-        bool isMediaResource = resource->hasFlags(Qn::media);
-        bool isLocalResource = resource->hasFlags(Qn::local);
-        bool isExportedLayout = layout->isFile();
-
-        bool allowed = nonVideo || isMediaResource;
-        bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
-        if (!allowed || forbidden)
-            return;
+        return;
     }
 
     QnLayoutItemData data;
@@ -701,13 +688,14 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(QnActions::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
 }
 
-void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
+void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
 
     QnResourceList filtered;
-    foreach(const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page))
+    for (const auto& resource: parameters.resources())
+    {
+        if (menu()->canTrigger(QnActions::OpenInNewWindowAction, resource))
             filtered << resource;
     }
     if (filtered.isEmpty())

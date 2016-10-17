@@ -1,5 +1,6 @@
 #include "resource_tree_model_user_nodes.h"
 
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 
@@ -19,34 +20,6 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-
-namespace {
-
-bool isLayout(const QnResourcePtr& resource)
-{
-    return resource->hasFlags(Qn::layout);
-}
-
-//TODO: #GDM think where else can we place this check
-bool isMediaResource(const QnResourcePtr& resource)
-{
-    if (resource->hasFlags(Qn::local))
-        return false;
-
-    if (resource->hasFlags(Qn::desktop_camera))
-        return false;
-
-    return resource->hasFlags(Qn::live_cam)
-        || resource->hasFlags(Qn::web_page)
-        || resource->hasFlags(Qn::server);
-}
-
-bool isUser(const QnResourcePtr& resource)
-{
-    return resource->hasFlags(Qn::user);
-}
-
-}
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
@@ -339,14 +312,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureResourceNode(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
 {
-    if (isLayout(resource))
+    if (QnResourceAccessFilter::isShareableLayout(resource))
     {
         auto layout = resource.dynamicCast<QnLayoutResource>();
         NX_ASSERT(layout);
         if (layout && showLayoutForSubject(subject, layout))
             return ensureLayoutNode(subject, layout);
     }
-    else if (isMediaResource(resource))
+    else if (QnResourceAccessFilter::isShareableMedia(resource))
     {
         if (showMediaForSubject(subject, resource))
             return ensureMediaNode(subject, resource);

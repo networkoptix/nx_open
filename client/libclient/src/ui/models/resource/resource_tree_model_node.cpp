@@ -935,11 +935,19 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::OtherSystem);
 
         case Qn::ResourceNode:
-        case Qn::LayoutItemNode:
         case Qn::EdgeNode:
         case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
             return m_resource ? qnResIconCache->icon(m_resource) : QIcon();
+
+        case Qn::LayoutItemNode:
+        case Qn::SharedResourceNode:
+        {
+            if (!m_resource)
+                return QIcon();
+            return m_resource->hasFlags(Qn::server)
+                ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor)
+                : qnResIconCache->icon(m_resource);
+        }
 
         case Qn::SharedLayoutsNode:
         {
