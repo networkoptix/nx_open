@@ -20,6 +20,7 @@
 #include <core/resource_management/resource_properties.h>
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
+#include "plugins/resource/desktop_camera/desktop_camera_resource.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 #include "media_server/settings.h"
@@ -179,6 +180,15 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
         if (newCamRes && newCamRes->needCheckIpConflicts())
         {
+            //if (!it->dynamicCast<QnDesktopCameraResource>() &&
+            //    QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+            //        *it, 
+            //        [](const QnNetworkResourcePtr& res) { return true; },
+            //        true))
+            //{
+            //    it = resources.erase(it);
+            //    continue;
+            //}
             // do not count 2--N channels of multichannel cameras as conflict
             quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
             if (ips)

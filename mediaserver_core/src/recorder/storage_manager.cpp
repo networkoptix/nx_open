@@ -334,7 +334,6 @@ public:
                 }
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
                 scanData.storage->removeFlags(Qn::storage_fastscan);
-                m_owner->resetCameraInfoSavedFlagsForStorage(scanData.storage);
             }
             else
             {
@@ -452,7 +451,8 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
     m_gen(m_rd()),
-    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt())
+    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
+    m_cameraInfoModCounter(0)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -2071,35 +2071,11 @@ void QnStorageManager::testStoragesDone()
         rebuildCatalogAsync(); // continue to rebuild
 }
 
-void QnStorageManager::resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage)
-{
-    auto storageUrl = storage->getUrl();
-    std::vector<QString> cameraUniqueIds[QnServer::ChunksCatalogCount];
-
-    for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
-    {
-        QnMutexLocker lk(&m_mutexCatalog);
-        for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
-            cameraUniqueIds[i].push_back(it.key());
-    }
-
-    for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
-    {
-        for (const QString &cameraUniqueId : cameraUniqueIds[i])
-        {
-            auto resource = qnResPool->getResourceByUniqueId(cameraUniqueId);
-            if (!resource)
-                continue;
-            auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-            if (!camResource)
-                continue;
-            camResource->resetCameraInfoSavedToDisk(storageUrl);
-        } // for catalogs
-    } // for qualities
-}
-
 void QnStorageManager::writeCameraInfoFiles()
 {
+    if (m_cameraInfoModCounter++ % 4 != 0)
+        return;
+
     for (auto &storage : getUsedWritableStorages())
     {
         auto storageUrl = storage->getUrl();
@@ -2117,108 +2093,80 @@ void QnStorageManager::writeCameraInfoFiles()
             ) + separator
         };
 
-        struct InfoFilePaths
-        {
-            bool hasLowQuality;
-            bool hasHiQuality;
+        bool firstCatalogFound = false;
+        bool unwrittenFound = false;
+        QString infoFilePath;
+        QnSecurityCamResourcePtr resource;
 
-            InfoFilePaths(bool low, bool hi) : hasLowQuality(low), hasHiQuality(hi) {}
+        auto makeFullPathForCatalog = [&separator] (const QString& basePath, const QString& cameraUniqueId)
+        {
+            return basePath + cameraUniqueId + separator + lit("info.txt");
         };
 
-        std::map<QString, InfoFilePaths> uniqueIdToPathExistense;
-
-        for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
-            QnMutexLocker lk(&m_mutexCatalog);
-            bool insertSuccess;
-            for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+            for (auto cameraIt = m_devFileCatalog[i].cbegin(); cameraIt != m_devFileCatalog[i].cend(); ++cameraIt)
             {
-                auto uidIt = uniqueIdToPathExistense.find(it.key());
-                if (uidIt == uniqueIdToPathExistense.cend())
-                    std::tie(uidIt, insertSuccess) = uniqueIdToPathExistense.emplace(it.key(), InfoFilePaths(false, false));
-                switch (QnServer::ChunksCatalog(i))
+                QString cameraUniqueId = cameraIt.key();
+                QString cameraInfoPath = makeFullPathForCatalog(paths[i], cameraUniqueId);
+                if (!firstCatalogFound)
                 {
-                case QnServer::ChunksCatalog::HiQualityCatalog: uidIt->second.hasHiQuality = true; break;
-                case QnServer::ChunksCatalog::LowQualityCatalog: uidIt->second.hasLowQuality = true; break;
-                default: NX_ASSERT(0, "Unknown catalog quality"); break;
+                    infoFilePath = cameraInfoPath;
+                    firstCatalogFound = true;
+                    resource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
+                }
+                if (!m_cameraInfoFilesWrittenInfo.contains(cameraInfoPath))
+                {
+                    unwrittenFound = true;
+                    infoFilePath = cameraInfoPath;
+                    resource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
+                    m_cameraInfoFilesWrittenInfo.insert(cameraInfoPath);
+                    break;
                 }
             }
+            if (unwrittenFound)
+                break;
         }
 
-        for (const auto &uidToPath: uniqueIdToPathExistense)
+        auto writeFile = [] (const QnStorageResourcePtr& storage, const QString& filePath, const QnSecurityCamResourcePtr& camResource)
         {
-            QString cameraUniqueId = uidToPath.first;
-            const InfoFilePaths &pathExistense = uidToPath.second;
-            auto resource = qnResPool->getResourceByUniqueId(cameraUniqueId);
-            if (!resource)
-                continue;
-            auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
-            if (resource->getTypeId() == archiveCamTypeId)
-                continue;
-            auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-            if (!camResource || camResource->isCameraInfoSavedToDisk(storageUrl))
-                continue;
-
-            bool infoWriteFailedHi = true, infoWriteFailedLow = true;
-
-            for (int i = 0; i < (int)QnServer::ChunksCatalogCount; ++i)
+            if (!camResource)
             {
-                QString basePath;
-                bool *currentWriteFailed = nullptr;
+                NX_LOG(lit("%1. CameraResource is NULL for this path %2").arg(Q_FUNC_INFO).arg(filePath), cl_logDEBUG1);
+                return;
+            }
+            auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
+            if (camResource->getTypeId() == archiveCamTypeId)
+                return;
 
-                switch (QnServer::ChunksCatalog(i))
-                {
-                case QnServer::HiQualityCatalog:
-                    if (pathExistense.hasHiQuality)
-                    {
-                        basePath = paths[i];
-                        currentWriteFailed = &infoWriteFailedHi;
-                    }
-                    else
-                    {
-                        infoWriteFailedHi = false;
-                        continue;
-                    }
-                    break;
-                case QnServer::LowQualityCatalog:
-                    if (pathExistense.hasLowQuality)
-                    {
-                        basePath = paths[i];
-                        currentWriteFailed = &infoWriteFailedLow;
-                    }
-                    else
-                    {
-                        infoWriteFailedLow = false;
-                        continue;
-                    }
-                    break;
-                default: NX_ASSERT(0, "Unknown catalog quality"); break;
-                }
-
-                auto path = basePath + cameraUniqueId + separator + lit("info.txt");
-                storage->removeFile(path);
-                auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
-                if (!outFile)
-                    continue;
-
-                auto makeQuotedString = [](const QString& s) { return lit("\"") + s + lit("\""); };
-
-                QTextStream outStream(outFile.get());
-                outStream << makeQuotedString(kArchiveCameraNameKey) << "=" << makeQuotedString(camResource->getUserDefinedName()) << endl;
-                outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
-                outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
-                outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
-                outStream << makeQuotedString(kArchiveCameraUrlKey) << "=" << makeQuotedString(camResource->getUrl()) << endl;
-
-                for (const auto &prop : camResource->getAllProperties())
-                    outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
-
-                *currentWriteFailed = false;
+            if (!storage->removeFile(filePath))
+            {
+                NX_LOG(lit("%1. Remove camera info file failed for this path: %2").arg(Q_FUNC_INFO).arg(filePath), cl_logDEBUG1);
+                return;
+            }
+            auto outFile = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::WriteOnly));
+            if (!outFile)
+            {
+                NX_LOG(lit("%1. Create file failed for this path: %2").arg(Q_FUNC_INFO).arg(filePath), cl_logDEBUG1);
+                return;
             }
 
-            if (!infoWriteFailedHi && !infoWriteFailedLow)
-                camResource->setCameraInfoSavedToDisk(storageUrl);
-        } // for catalogs
+            auto makeQuotedString = [](const QString& s) { return lit("\"") + s + lit("\""); };
+
+            QTextStream outStream(outFile.get());
+            outStream << makeQuotedString(kArchiveCameraNameKey) << "=" << makeQuotedString(camResource->getUserDefinedName()) << endl;
+            outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
+            outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
+            outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
+            outStream << makeQuotedString(kArchiveCameraUrlKey) << "=" << makeQuotedString(camResource->getUrl()) << endl;
+
+            for (const auto &prop : camResource->getAllProperties())
+                outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
+        };
+
+        writeFile(storage, infoFilePath, resource);
+        if (!unwrittenFound)
+            m_cameraInfoFilesWrittenInfo.clear();
     } // for storages
 }
 

@@ -190,7 +190,6 @@ public slots:
 private:
     friend class TestStorageThread;
 
-    void resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage);
     void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnSecurityCamResourceList &cameras,
@@ -308,6 +307,9 @@ private:
     bool m_isRenameDisabled;
 	mutable QnMutex m_occupiedSpaceInfoMutex;
 	StorageSpaceInfoMap m_occupiedSpaceInfo;
+
+    QSet<QString> m_cameraInfoFilesWrittenInfo;
+    quint64 m_cameraInfoModCounter;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

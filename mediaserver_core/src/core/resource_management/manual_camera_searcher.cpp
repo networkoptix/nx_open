@@ -46,42 +46,14 @@ namespace {
         else
         {
             // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition checking for IP address
-            QnSecurityCamResourcePtr netRes = resource.dynamicCast<QnSecurityCamResource>();
-            if (netRes)
-            {
-                QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-                existResList = existResList.filtered(
-                    [](const QnNetworkResourcePtr& res)
-                    {
-                        bool hasParent = qnResPool->getResourceById(res->getParentId());
-                        return hasParent && res->getStatus() != Qn::Offline;
-                    });
-
-                for(const QnNetworkResourcePtr& existRes: existResList)
+            existResource = QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+                resource, 
+                [](const QnNetworkResourcePtr& res)
                 {
-                    QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
-                    if (!existCam)
-                        continue;
-
-                    bool newIsRtsp = (netRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-                    bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-                    if (newIsRtsp && !existIsRtsp)
-                        continue; // allow to stack RTSP and non RTSP cameras with same IP:port
-
-                    if (!existCam->isManuallyAdded())
-                    {
-                        existResource = true; // block manual and auto add in same time
-                    }
-                    else if (existRes->getTypeId() != netRes->getTypeId())
-                    {
-                        // allow several manual cameras on the same IP if cameras have different ports
-                        QUrl url1(existRes->getUrl());
-                        QUrl url2(netRes->getUrl());
-                        if (url1.port() == url2.port())
-                            existResource = true; // camera found by different drivers on the same port
-                    }
-                }
-            }
+                    bool hasParent = qnResPool->getResourceById(res->getParentId());
+                    return hasParent && res->getStatus() != Qn::Offline;
+                },
+                false);
         }
         return existResource;
     }
