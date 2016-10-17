@@ -1149,6 +1149,18 @@ String SslEngine::makeCertificateAndKey(
     return String(writeBuffer);
 }
 
+static String x509info(X509& x509)
+{
+    auto issuer = utils::wrapUnique(X509_NAME_oneline(
+        X509_get_issuer_name(&x509), NULL, 0), &CRYPTO_free);
+
+    if (!issuer || !issuer.get())
+        return String("unavaliable");
+
+    String info(issuer.get() + 1);
+    return info.replace("/", ", ");
+}
+
 bool SslEngine::useCertificateAndPkey(const String& certData)
 {
     Buffer certBytes(certData);
@@ -1158,19 +1170,35 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
             BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
             &BIO_free);
 
-        auto x509 = utils::wrapUnique(
-            PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
-
+        auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
         if (!x509)
         {
-            NX_LOG("SSL cannot read X509", cl_logDEBUG1);
+            NX_LOG("SSL: Unable to read primary X509", cl_logDEBUG1);
             return false;
         }
 
         if (!SSL_CTX_use_certificate(data->serverContext.get(), x509.get()))
         {
-            NX_LOG("SSL cannot use X509", cl_logWARNING);
+            NX_LOG(lm("SSL: Unable to use primary X509: %1").arg(x509info(*x509)), cl_logWARNING);
             return false;
+        }
+
+        NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
+        while (true)
+        {
+            x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+            if (!x509)
+                continue;
+
+            if (!SSL_CTX_add_extra_chain_cert(data->serverContext.get(), x509.get()))
+            {
+                NX_LOG(lm("SSL: Unable to use chained X509: %1").arg(x509info(*x509)),
+                    cl_logWARNING);
+
+                continue;
+            }
+
+            NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
         }
     }
 
@@ -1182,17 +1210,18 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
         data->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
         if (!data->pkey)
         {
-            NX_LOG("SSL cannot read PKEY", cl_logDEBUG1);
+            NX_LOG("SSL: Unable to read PKEY", cl_logDEBUG1);
             return false;
         }
 
         if (!SSL_CTX_use_PrivateKey(data->serverContext.get(), data->pkey.get()))
         {
-            NX_LOG("SSL cannot use PKEY", cl_logWARNING);
+            NX_LOG("SSL: Unable to use PKEY", cl_logWARNING);
             return false;
         }
     }
 
+    NX_LOG("SSL: PKEY is loaded (SSL init is complete)", cl_logINFO);
     return true;
 }
 
@@ -1207,7 +1236,7 @@ void SslEngine::useOrCreateCertificate(
         || (certData = file.readAll()).isEmpty())
     {
         file.close();
-        NX_LOG(lm("Could not find valid SSL certificate '%1', generate new one")
+        NX_LOG(lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
             .arg(filePath), cl_logALWAYS);
 
         certData = makeCertificateAndKey(name, country, company);
@@ -1219,13 +1248,14 @@ void SslEngine::useOrCreateCertificate(
             if (!file.open(QIODevice::WriteOnly) ||
                 file.write(certData) != certData.size())
             {
-                NX_LOG(lm("Could not write SSL certificate to file"), cl_logERROR);
+                NX_LOG("SSL: Unable to write SSL certificate to file", cl_logERROR);
             }
 
             file.close();
         }
     }
 
+    NX_LOG(lm("SSL: Load certificate from '%1'").arg(filePath), cl_logINFO);
     useCertificateAndPkey(certData);
 }
 
