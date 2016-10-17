@@ -47,7 +47,7 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )
     {
-        case attr::systemID:
+        case attr::systemId:
             *value = QString::fromStdString(id);
             return true;
         case attr::systemStatus:
@@ -70,8 +70,8 @@ bool SystemSharing::getAsVariant(int resID, QVariant* const value) const
         case attr::accountEmail:
             *value = QString::fromStdString(accountEmail);
             return true;
-        case attr::systemID:
-            *value = QString::fromStdString(systemID);
+        case attr::systemId:
+            *value = QString::fromStdString(systemId);
             return true;
         case attr::systemAccessRole:
             *value = QVariant(QnLexical::serialized(accessRole));
@@ -95,15 +95,15 @@ bool loadFromUrlQuery(
 
 
 ////////////////////////////////////////////////////////////
-//// class SystemID
+//// class SystemId
 ////////////////////////////////////////////////////////////
 
-bool SystemID::getAsVariant(int resID, QVariant* const value) const
+bool SystemId::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
-        case attr::systemID:
-            *value = QString::fromStdString(systemID);
+        case attr::systemId:
+            *value = QString::fromStdString(systemId);
             return true;
         default:
             return false;
@@ -119,8 +119,8 @@ bool SystemAttributesUpdate::getAsVariant(int resID, QVariant* const value) cons
 {
     switch (resID)
     {
-        case attr::systemID:
-            *value = QString::fromStdString(systemID);
+        case attr::systemId:
+            *value = QString::fromStdString(systemId);
             return true;
         default:
             return false;
@@ -134,7 +134,7 @@ bool UserSessionDescriptor::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
-        case attr::systemID:
+        case attr::systemId:
             if (!systemId)
                 return false;
             *value = QString::fromStdString(*systemId);
@@ -153,7 +153,7 @@ bool UserSessionDescriptor::getAsVariant(int resID, QVariant* const value) const
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemID),
+    (SystemRegistrationData)(SystemId),
     (sql_record),
     _Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

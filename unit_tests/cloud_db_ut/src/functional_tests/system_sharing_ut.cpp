@@ -62,10 +62,10 @@ TEST_F(SystemSharing, get_users)
 
     //sharing system1 with account2 as viewer
     api::SystemSharing system1ToAccount2SharingData;
-    system1ToAccount2SharingData.systemID = system1.id;
+    system1ToAccount2SharingData.systemId = system1.id;
     system1ToAccount2SharingData.accountEmail = account2.email;
     system1ToAccount2SharingData.accessRole = api::SystemAccessRole::viewer;
-    system1ToAccount2SharingData.groupID = "customGroupID";
+    system1ToAccount2SharingData.groupId = "customGroupID";
     system1ToAccount2SharingData.customPermissions = "customPermissions123123";
     system1ToAccount2SharingData.isEnabled = false;
     ASSERT_EQ(
@@ -172,13 +172,13 @@ TEST_F(SystemSharing, get_users)
         bool found = false;
         for (const auto& sharingData : sharings)
         {
-            if (sharingData.systemID == system1ToAccount2SharingData.systemID &&
+            if (sharingData.systemId == system1ToAccount2SharingData.systemId &&
                 sharingData.accountEmail == system1ToAccount2SharingData.accountEmail)
             {
                 found = true;
                 ASSERT_TRUE((const api::SystemSharing&)sharingData == system1ToAccount2SharingData);
                 ASSERT_EQ(account2.fullName, sharingData.accountFullName);
-                ASSERT_EQ(account2.id, sharingData.accountID);
+                ASSERT_EQ(account2.id, sharingData.accountId);
             }
         }
         ASSERT_TRUE(found);

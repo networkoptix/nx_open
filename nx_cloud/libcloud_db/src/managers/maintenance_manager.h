@@ -40,7 +40,7 @@ public:
      */
     void getTransactionLog(
         const AuthorizationInfo& authzInfo,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(
             api::ResultCode,
             ::ec2::ApiTransactionDataList)> completionHandler);

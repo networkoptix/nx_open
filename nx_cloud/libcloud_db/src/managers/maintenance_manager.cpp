@@ -42,7 +42,7 @@ void MaintenanceManager::getVmsConnections(
 
 void MaintenanceManager::getTransactionLog(
     const AuthorizationInfo& /*authzInfo*/,
-    data::SystemID systemID,
+    data::SystemId systemId,
     std::function<void(
         api::ResultCode,
         ::ec2::ApiTransactionDataList)> completionHandler)
@@ -55,13 +55,13 @@ void MaintenanceManager::getTransactionLog(
     maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
 
     m_syncronizationEngine->transactionLog().readTransactions(
-        systemID.systemID.c_str(),
+        systemId.systemId.c_str(),
         ::ec2::QnTranState(),
         maxTranState,
         std::numeric_limits<int>::max(),
         std::bind(&MaintenanceManager::onTransactionLogRead, this, 
             m_startedAsyncCallsCounter.getScopedIncrement(),
-            systemID.systemID,
+            systemId.systemId,
             _1, _2, _3, std::move(completionHandler)));
 }
 

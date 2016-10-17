@@ -89,8 +89,8 @@ void EventManager::subscribeToEvents(
         void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
     > completionHandler)
 {
-    std::string systemID;
-    if (!authzInfo.get(cdb::attr::authSystemID, &systemID))
+    std::string systemId;
+    if (!authzInfo.get(cdb::attr::authSystemId, &systemId))
     {
         NX_ASSERT(false);
         completionHandler(
@@ -99,7 +99,7 @@ void EventManager::subscribeToEvents(
         return;
     }
 
-    NX_LOGX(lm("System %1 subscribing to events").arg(systemID), cl_logDEBUG2);
+    NX_LOGX(lm("System %1 subscribing to events").arg(systemId), cl_logDEBUG2);
 
     auto msgBody =
         std::make_unique<nx_http::MultipartMessageBodySource>(
@@ -110,7 +110,7 @@ void EventManager::subscribeToEvents(
 
         //checking if such connection is already present
         const auto iterAndInsertionFlag = m_activeMediaServerConnections.emplace(
-            ServerConnectionContext(httpConnection, systemID));
+            ServerConnectionContext(httpConnection, systemId));
 
         msgBody->setOnBeforeDestructionHandler(
             std::bind(&EventManager::beforeMsgBodySourceDestruction, this, httpConnection));

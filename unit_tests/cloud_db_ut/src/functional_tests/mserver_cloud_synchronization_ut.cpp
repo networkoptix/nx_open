@@ -161,7 +161,7 @@ TEST_F(Ec2MserverCloudSynchronization, mergingOfflineChanges)
         // Adding users to the cloud.
         api::SystemSharing sharing;
         sharing.accountEmail = account.first.email;
-        sharing.systemID = registeredSystemData().id;
+        sharing.systemId = registeredSystemData().id;
         sharing.accessRole = static_cast<api::SystemAccessRole>(
             nx::utils::random::number<int>(
                 static_cast<int>(api::SystemAccessRole::liveViewer),
@@ -217,7 +217,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserInCloudAndRemovingLocally)
 
         api::SystemSharing sharing;
         sharing.accountEmail = testAccount.email;
-        sharing.systemID = registeredSystemData().id;
+        sharing.systemId = registeredSystemData().id;
         sharing.accessRole = api::SystemAccessRole::cloudAdmin;
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -253,7 +253,7 @@ TEST_F(Ec2MserverCloudSynchronization, syncFromCloud)
 
     api::SystemSharing sharing;
     sharing.accountEmail = testAccount.email;
-    sharing.systemID = registeredSystemData().id;
+    sharing.systemId = registeredSystemData().id;
     sharing.accessRole = api::SystemAccessRole::cloudAdmin;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -280,7 +280,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
     {
         api::SystemSharing sharing;
         sharing.accountEmail = testAccount.email;
-        sharing.systemID = registeredSystemData().id;
+        sharing.systemId = registeredSystemData().id;
         sharing.accessRole = api::SystemAccessRole::cloudAdmin;
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -339,7 +339,7 @@ TEST_F(Ec2MserverCloudSynchronization, newTransactionTimestamp)
 
             api::SystemSharing sharing;
             sharing.accountEmail = testAccount.email;
-            sharing.systemID = registeredSystemData().id;
+            sharing.systemId = registeredSystemData().id;
             sharing.accessRole = api::SystemAccessRole::cloudAdmin;
             ASSERT_EQ(
                 api::ResultCode::ok,

@@ -33,7 +33,7 @@ constexpr const auto kNonceTrailerLength =
     sizeof(kMagicBytes) + kNonceTrailingRandomByteCount;
 
 void calcNonceHash(
-    const std::string& systemID,
+    const std::string& systemId,
     uint32_t timestamp,
     char* md5HashBuf)
 {
@@ -41,7 +41,7 @@ void calcNonceHash(
 
     MD5_CTX md5Ctx;
     MD5_Init(&md5Ctx);
-    MD5_Update(&md5Ctx, systemID.c_str(), systemID.size());
+    MD5_Update(&md5Ctx, systemId.c_str(), systemId.size());
     MD5_Update(&md5Ctx, ":", 1);
     MD5_Update(&md5Ctx, &timestampInNetworkByteOrder, sizeof(timestampInNetworkByteOrder));
     MD5_Update(&md5Ctx, ":", 1);
@@ -51,18 +51,18 @@ void calcNonceHash(
 }   // namespace
 
 std::string calcNonceHash(
-    const std::string& systemID,
+    const std::string& systemId,
     uint32_t timestamp)
 {
     std::string nonceHash;
     nonceHash.resize(MD5_DIGEST_LENGTH);
-    calcNonceHash(systemID, timestamp, &nonceHash[0]);
+    calcNonceHash(systemId, timestamp, &nonceHash[0]);
     return nonceHash;
 }
 
-std::string generateCloudNonceBase(const std::string& systemID)
+std::string generateCloudNonceBase(const std::string& systemId)
 {
-    //{random_3_bytes}base64({ timestamp }MD5(systemID:timestamp:secret_key))
+    //{random_3_bytes}base64({ timestamp }MD5(systemId:timestamp:secret_key))
 
     const uint32_t timestamp = 
         std::chrono::duration_cast<std::chrono::seconds>(
@@ -77,7 +77,7 @@ std::string generateCloudNonceBase(const std::string& systemID)
 
     QByteArray md5Hash;
     md5Hash.resize(MD5_DIGEST_LENGTH);
-    calcNonceHash(systemID, timestamp, md5Hash.data());
+    calcNonceHash(systemId, timestamp, md5Hash.data());
 
     //TODO #ak timestamp byte order
 
