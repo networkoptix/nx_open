@@ -305,7 +305,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
-    <h2>Couldn't connect to cloud</h2>
+    <h2>Couldn't connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
