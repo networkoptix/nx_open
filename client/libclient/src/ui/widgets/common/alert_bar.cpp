@@ -9,9 +9,9 @@ QnAlertBar::QnAlertBar(QWidget* parent):
     base_type(parent),
     m_label(new QLabel(this))
 {
-    setFixedHeight(style::Metrics::kHeaderSize);
+    setFixedHeight(style::Metrics::kHeaderSize); //< Height equal to table headers
 
-    setPaletteColor(this, QPalette::Window, Qt::red); //< sensible default
+    setPaletteColor(this, QPalette::Window, Qt::red); //< Sensible default
     m_label->setAutoFillBackground(true);
 
     m_label->setForegroundRole(QPalette::Text);
