@@ -18,8 +18,7 @@ static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
-    m_connectionOptions(connectionOptions),
-    m_connectionsBeingAdded(0)
+    m_connectionOptions(connectionOptions)
 {
     m_dropConnectionThread =
         nx::utils::thread(
@@ -52,41 +51,27 @@ bool AsyncSqlQueryExecutor::init()
 
 bool AsyncSqlQueryExecutor::openOneMoreConnectionIfNeeded()
 {
-    {
-        QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lk(&m_mutex);
 
-        dropClosedConnections(&lk);
+    dropClosedConnections(&lk);
 
-        //checking whether we really need a new connection
-        const auto effectiveDBConnectionCount = 
-            m_dbThreadPool.size() + m_connectionsBeingAdded;
-        const auto queueSize = static_cast< size_t >(m_requestQueue.size());
-        const auto maxDesiredQueueSize = 
-            effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
-        if (queueSize < maxDesiredQueueSize)
-            return true;    //< Task number is not too high.
-        if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
-            return true;    //< Pool size is already at maximum.
-        ++m_connectionsBeingAdded;
-    }
+    //checking whether we really need a new connection
+    const auto effectiveDBConnectionCount = m_dbThreadPool.size();
+    const auto queueSize = static_cast< size_t >(m_requestQueue.size());
+    const auto maxDesiredQueueSize = 
+        effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
+    if (queueSize < maxDesiredQueueSize)
+        return true;    //< Task number is not too high.
+    if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
+        return true;    //< Pool size is already at maximum.
 
     //adding another connection
     auto executorThread = std::make_unique<DbRequestExecutionThread>(
         m_connectionOptions,
         &m_requestQueue);
-    //avoiding locking mutex for connecting phase
-    if (!executorThread->open())
-    {
-        NX_LOG(lit("Failed to initialize connection to DB"), cl_logWARNING);
-        QnMutexLocker lk(&m_mutex);
-        --m_connectionsBeingAdded;
-        return false;
-    }
     executorThread->start();
 
-    QnMutexLocker lk(&m_mutex);
     m_dbThreadPool.push_back(std::move(executorThread));
-    --m_connectionsBeingAdded;
     return true;
 }
 
@@ -97,7 +82,7 @@ void AsyncSqlQueryExecutor::dropClosedConnections(QnMutexLockerBase* const /*lk*
         m_dbThreadPool.begin(), m_dbThreadPool.end(),
         [](const std::unique_ptr<DbRequestExecutionThread>& dbConnectionThread)
         {
-            return !dbConnectionThread->isOpen();
+            return dbConnectionThread->state() == ConnectionState::closed;
         });
     if (firstConnectionToDropIter == m_dbThreadPool.end())
         return;

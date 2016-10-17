@@ -30,7 +30,7 @@ DBResult Transaction::begin()
     }
     else
     {
-        return DBResult::ioError;
+        return DBResult::connectionError;
     }
 }
 

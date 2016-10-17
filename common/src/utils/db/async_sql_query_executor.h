@@ -124,7 +124,6 @@ private:
     nx::utils::SyncQueueWithItemStayTimeout<std::unique_ptr<AbstractExecutor>>
         m_requestQueue;
     std::vector<std::unique_ptr<DbRequestExecutionThread>> m_dbThreadPool;
-    size_t m_connectionsBeingAdded;
     nx::utils::thread m_dropConnectionThread;
     CLThreadQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
 

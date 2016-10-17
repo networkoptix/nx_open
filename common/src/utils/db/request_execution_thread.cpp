@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "request_execution_thread.h"
 
 #include <QtCore/QUuid>
@@ -10,7 +5,6 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
-
 
 namespace nx {
 namespace db {
@@ -21,7 +15,7 @@ DbRequestExecutionThread::DbRequestExecutionThread(
 :
     m_connectionOptions(connectionOptions),
     m_queryExecutorQueue(queryExecutorQueue),
-    m_isOpen(false)
+    m_state(ConnectionState::beingInitialized)
 {
 }
 
@@ -51,18 +45,24 @@ bool DbRequestExecutionThread::open()
             cl_logWARNING);
         return false;
     }
-    m_isOpen = true;
     return true;
 }
 
-bool DbRequestExecutionThread::isOpen() const
+ConnectionState DbRequestExecutionThread::state() const
 {
-    return m_isOpen;
+    return m_state;
 }
 
 void DbRequestExecutionThread::run()
 {
     constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
+
+    if (!open())
+    {
+        m_state = ConnectionState::closed;
+        return;
+    }
+    m_state = ConnectionState::opened;
 
     auto previousActivityTime = std::chrono::steady_clock::now();
 
@@ -79,7 +79,7 @@ void DbRequestExecutionThread::run()
                 NX_LOGX(lm("Closing DB connection by timeout (%1)")
                     .arg(m_connectionOptions.inactivityTimeout), cl_logDEBUG2);
                 m_dbConnection.close();
-                m_isOpen = false;
+                m_state = ConnectionState::closed;
                 return;
             }
             continue;
@@ -88,15 +88,44 @@ void DbRequestExecutionThread::run()
         const auto result = (*task)->execute(&m_dbConnection);
         if (result != DBResult::ok)
         {
-            NX_LOGX(lit("DB request failed with error %1. Db text %2")
+            NX_LOGX(lit("DB query failed with error %1. Db text %2")
                 .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
                 cl_logWARNING);
-            //TODO #ak reopen connection?
+            if (!isDbErrorRecoverable(result))
+            {
+                NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
+                    .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                    cl_logWARNING);
+                m_dbConnection.close();
+                m_state = ConnectionState::closed;
+                return;
+            }
         }
 
         previousActivityTime = std::chrono::steady_clock::now();
     }
 }
 
-}   //db
-}   //nx
+bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)
+{
+    switch (dbResult)
+    {
+        case DBResult::notFound:
+        case DBResult::statementError:
+        case DBResult::cancelled:
+        case DBResult::retryLater:
+        case DBResult::uniqueConstraintViolation:
+            return true;
+
+        case DBResult::ioError:
+        case DBResult::connectionError:
+            return false;
+
+        default:
+            NX_ASSERT(false);
+            return false;
+    }
+}
+
+} // namespace db
+} // namespace nx
