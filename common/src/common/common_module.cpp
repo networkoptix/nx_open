@@ -89,7 +89,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     nx::network::SocketGlobals::init();
 
-    m_dirtyModuleInformation = false;
+    m_dirtyModuleInformation = true;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 

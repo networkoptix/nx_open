@@ -2183,6 +2183,11 @@ void MediaServerProcess::run()
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
+    const bool sslAllowed = 
+        MSSettings::roSettings()->value(
+            nx_ms_conf::ALLOW_SSL_CONNECTIONS,
+            nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
+
     bool isNewServerInstance = false;
     bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     m_moduleFinder = new QnModuleFinder(false);
@@ -2219,7 +2224,7 @@ void MediaServerProcess::run()
         setServerUrls(
             server,
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
-            qnCommon->moduleInformation().sslAllowed);
+            sslAllowed);
         cloudConnectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
@@ -2313,7 +2318,7 @@ void MediaServerProcess::run()
     selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
     selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
-    selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
+    selfInformation.sslAllowed = sslAllowed;
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
