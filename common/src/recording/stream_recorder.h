@@ -40,8 +40,6 @@ class QnFfmpegVideoTranscoder;
 class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
 {
     Q_OBJECT
-    Q_ENUMS(StreamRecorderError)
-    Q_ENUMS(StreamRecorderRole)
 
 public:
     static QString errorString(StreamRecorderError errCode);
