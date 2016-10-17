@@ -140,28 +140,25 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 
 bool QnConnectionDiagnosticsHelper::checkApplaucherRunning()
 {
-    int counter = 0;
+    using namespace applauncher;
     QList<QnSoftwareVersion> versions;
-    auto errCode = applauncher::getInstalledVersions(&versions);
-    while (errCode != applauncher::api::ResultType::ok)
-    {
-        /* Try to run applauncher but only once. */
-        if (counter == 0 && errCode == applauncher::api::ResultType::connectError)
-        {
-            bool success = nx::vms::client::SelfUpdater::runMinilaucher();
-            if (!success)
-                return false;
-        }
-        ++counter;
-        if (counter > 5)
-            return false;
 
-        /* Wait a bit and try again. */
+    /* Try to run applauncher if it is not running. */
+    if (getInstalledVersions(&versions) == api::ResultType::connectError)
+    {
+        if (!nx::vms::client::SelfUpdater::runMinilaucher())
+            return false;
+    }
+
+    static const int kMaxTries = 5;
+    for (int i = 0; i < kMaxTries; ++i)
+    {
         QThread::msleep(100);
         qApp->processEvents();
-        errCode = applauncher::getInstalledVersions(&versions);
+        if (getInstalledVersions(&versions) == api::ResultType::ok)
+            return true;
     }
-    return true;
+    return false;
 }
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
