@@ -138,24 +138,25 @@ void QnCloudSystemsFinder::updateSystemInternal(
 
     auto &resolver = nx::network::SocketGlobals::addressResolver();
     const QPointer<QnCloudSystemsFinder> guard(this);
-    const auto resolvedHandler = [this, guard, cloudId](const AddressVector &hosts)
-    {
-        if (!guard)
-            return;
-
+    const auto resolvedHandler =
+        [this, guard, cloudId](const AddressVector &hosts)
         {
-            const QnMutexLocker lock(&m_mutex);
-            const auto it = m_systems.find(cloudId);
-            if (it == m_systems.end())
+            if (!guard)
                 return;
-        }
 
-        for (const auto &host : hosts)
-        {
-            pingServerInternal(host.address.toString()
-                , static_cast<int>(host.type), cloudId);
-        }
-    };
+            {
+                const QnMutexLocker lock(&m_mutex);
+                const auto it = m_systems.find(cloudId);
+                if (it == m_systems.end())
+                    return;
+            }
+
+            for (const auto &host : hosts)
+            {
+                pingServerInternal(host.address.toString(),
+                    static_cast<int>(host.type), cloudId);
+            }
+        };
 
     const auto cloudHost = HostAddress(cloudId);
     resolver.resolveDomain(cloudHost, resolvedHandler);
