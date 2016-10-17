@@ -570,18 +570,7 @@ angular.module('webadminApp')
             systemName:{
                 back: 'start',
                 skip: 'merge',
-                next: function(){
-                    if(!$scope.hasInternetOnServer){
-                        $scope.next('noInternetOnServer');
-                        return;
-                    }
-
-                    if(!$scope.hasInternetOnClient){
-                        $scope.next('noInternetOnClient');
-                        return;
-                    }
-                    $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
-                },
+                next: 'chooseLocal',
                 valid: function(){
                     return checkForm($scope.forms.systemNameForm);
                 }
@@ -604,6 +593,30 @@ angular.module('webadminApp')
                 back:'systemName',
                 skip:'localLogin'
             },
+
+            chooseLocal:{
+                back:'systemName',
+                next:'localLogin',
+                skip:'chooseCloud'
+            },
+            chooseCloud:{
+                back:'systemName',
+                next:function(){
+                    if(!$scope.hasInternetOnServer){
+                        $scope.next('noInternetOnServer');
+                        return;
+                    }
+
+                    if(!$scope.hasInternetOnClient){
+                        $scope.next('noInternetOnClient');
+                        return;
+                    }
+
+                    $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
+                },
+                skip:'chooseLocal'
+            },
+
             cloudIntro:{
                 back: 'systemName',
                 skip: 'localLogin'
