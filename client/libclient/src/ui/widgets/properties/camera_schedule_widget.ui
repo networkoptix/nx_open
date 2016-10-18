@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>742</width>
-    <height>670</height>
+    <height>679</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -27,11 +27,11 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>705</width>
-        <height>683</height>
+        <width>722</width>
+        <height>659</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,1">
        <item>
         <layout class="QHBoxLayout" name="topButtonsLayout">
          <item>
@@ -670,37 +670,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QStackedWidget" name="warningStackedWidget">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="currentIndex">
-               <number>1</number>
-              </property>
-              <widget class="QWidget" name="warningPage">
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
-                <item>
-                 <widget class="QLabel" name="minArchiveDaysWarningLabel">
-                  <property name="text">
-                   <string notr="true">&lt;High minimum value can lead to archive length decrease on other cameras.&gt;</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-                  </property>
-                  <property name="wordWrap">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="noWarningPage"/>
-             </widget>
-            </item>
-            <item>
              <spacer name="verticalSpacer_6">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -875,6 +844,19 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

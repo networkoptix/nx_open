@@ -34,6 +34,8 @@ public: // overrides
 
     bool isCloudSystem() const override;
 
+    bool isNewSystem() const override;
+
     ServersList servers() const override;
 
     bool containsServer(const QnUuid& serverId) const override;

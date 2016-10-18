@@ -5,13 +5,14 @@
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "ui/workbench/workbench_context_aware.h"
-#include <ui/common/updatable.h>
 
 namespace Ui {
 class MultipleCameraSettingsWidget;
 }
 
-class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware, public QnUpdatable
+class QnMultipleCameraSettingsWidget :
+    public QWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -39,12 +40,6 @@ public:
 
     bool hasDbChanges() const;
 
-    /** Checks if user changed controls but not applied them to the schedule */
-    bool hasScheduleControlsChanges() const;
-
-    /** Clear flag that user changed schedule controls but not applied them */
-    void clearScheduleControlsChanges();
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
@@ -59,6 +54,7 @@ private slots:
 
 private:
     void setHasDbChanges(bool hasChanges);
+    void updateAlertBar();
 
     int tabIndex(Qn::CameraSettingsTab tab) const;
     void setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled);
@@ -79,4 +75,8 @@ private:
     bool m_hasScheduleControlsChanges;
 
     bool m_readOnly;
+
+    bool m_updating;
+
+    QString m_alertText;
 };

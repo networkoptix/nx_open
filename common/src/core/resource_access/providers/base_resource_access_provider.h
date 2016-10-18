@@ -8,6 +8,7 @@
 class QnBaseResourceAccessProvider: public QnAbstractResourceAccessProvider
 {
     using base_type = QnAbstractResourceAccessProvider;
+
 public:
     QnBaseResourceAccessProvider(QObject* parent = nullptr);
     virtual ~QnBaseResourceAccessProvider();
@@ -18,8 +19,7 @@ public:
     virtual Source accessibleVia(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList* providers = nullptr
-    ) const override;
+        QnResourceList* providers = nullptr) const override;
 
 protected:
     virtual Source baseSource() const = 0;
@@ -39,8 +39,8 @@ protected:
     virtual void fillProviders(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList& providers
-    ) const;
+        QnResourceList& providers) const;
+
     virtual void handleResourceAdded(const QnResourcePtr& resource);
     virtual void handleResourceRemoved(const QnResourcePtr& resource);
 
@@ -57,5 +57,4 @@ protected:
 private:
     /** Hash of accessible resources by subject id. */
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
-
 };

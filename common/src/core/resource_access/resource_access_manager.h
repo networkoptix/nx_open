@@ -15,7 +15,8 @@
 #include <utils/common/connective.h>
 #include "user_access_data.h"
 
-class QnResourceAccessManager : public Connective<QObject>,
+class QnResourceAccessManager:
+    public Connective<QObject>,
     public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT

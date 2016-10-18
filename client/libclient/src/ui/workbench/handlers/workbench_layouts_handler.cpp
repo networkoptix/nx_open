@@ -397,7 +397,7 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
         messageBox.setInformativeText(question);
         messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
         messageBox.setDefaultButton(QDialogButtonBox::Yes);
-        messageBox.addCustomWidget(new QnResourceListView(QnActionParameterTypes::resources(items)));
+        messageBox.addCustomWidget(new QnResourceListView(QnActionParameterTypes::resources(items), true));
         auto result = messageBox.exec();
         if (result != QDialogButtonBox::Yes)
             return;
