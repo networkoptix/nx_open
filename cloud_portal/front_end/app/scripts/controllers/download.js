@@ -19,9 +19,18 @@ angular.module('cloudApp')
             'Mac OS': 'MacOS'
         }
 
+        var activeOs = $routeParams.platform ||platformMatch[window.jscd.os] || window.jscd.os;
         _.each($scope.downloads.platforms,function(platform){
-            platform.active = (platform.os || platform.name) === ($routeParams.platform || platformMatch[window.jscd.os] || window.jscd.os);
+            platform.active = (platform.os || platform.name) === activeOs;
         });
+
+
+        for(var mobile in DownloadsConfig.mobile){
+            if(DownloadsConfig.mobile[mobile].os === activeOs){
+                window.location.href = DownloadsConfig.mobile[mobile].src;
+                break;
+            }
+        }
 
         $scope.changeHash = function(platform){
             var addHash = (platform.os || platform.name);
