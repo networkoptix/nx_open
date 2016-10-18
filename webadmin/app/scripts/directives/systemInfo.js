@@ -67,7 +67,7 @@ angular.module('webadminApp')
                     $scope.settings.remoteAddresses = _.filter($scope.settings.remoteAddresses,function(addr){
                         return addr.indexOf('-')==-1;
                     });
-                    $scope.settings.remoteAddressesDisplay = $scope.settings.remoteAddresses.join('\n');
+                    $scope.settings.remoteAddressesDisplay = $scope.settings.remoteAddresses.join('<br>');
 
                     mediaserver.resolveNewSystemAndUser().then(function(user){
                         if(user === null){
