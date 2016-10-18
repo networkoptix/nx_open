@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 
@@ -249,7 +250,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
                 emit archiveRangeChanged();
         };
 
-    auto cellValueChanged =
+    auto handleCellValueChanged =
         [this](const QPoint& cell)
         {
             if (m_updating)
@@ -258,7 +259,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
             if (ui->gridWidget->cellValue(cell).recordingType != Qn::RT_Never)
                 checkRecordingEnabled();
 
-            scheduleTasksChanged();
+            emit scheduleTasksChanged();
         };
 
     connect(ui->recordAlwaysButton, &QToolButton::toggled, this,
@@ -301,7 +302,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         &QnCameraScheduleWidget::at_gridWidget_cellActivated);
 
     connect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged,
-        this, cellValueChanged);
+        this, handleCellValueChanged);
 
     connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
         &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
@@ -1261,9 +1262,9 @@ void QnCameraScheduleWidget::validateArchiveLength()
 
     if (alertVisible)
     {
-        alertText = (qnResPool && qnResPool->containsIoModules())
-            ? tr("High minimum value can lead to archive length decrease on other devices.")
-            : tr("High minimum value can lead to archive length decrease on other cameras.");
+        alertText = QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("High minimum value can lead to archive length decrease on other devices."),
+            tr("High minimum value can lead to archive length decrease on other cameras."));
     }
 
     setArchiveLengthAlert(alertText);
@@ -1271,12 +1272,14 @@ void QnCameraScheduleWidget::validateArchiveLength()
 
 void QnCameraScheduleWidget::setScheduleAlert(const QString& scheduleAlert)
 {
+    /* We want to force update - emit a signal - even if the text didn't change: */
     m_scheduleAlert = scheduleAlert;
     emit alert(m_scheduleAlert.isEmpty() ? m_archiveLengthAlert : m_scheduleAlert);
 }
 
 void QnCameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)
 {
+    /* We want to force update - emit a signal - even if the text didn't change: */
     m_archiveLengthAlert = archiveLengthAlert;
     emit alert(m_archiveLengthAlert.isEmpty() ? m_scheduleAlert : m_archiveLengthAlert);
 }
