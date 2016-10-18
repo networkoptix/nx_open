@@ -220,7 +220,7 @@ void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
     emit permissionsChanged(::toSharedPointer(this));
 }
 
-bool QnUserResource::isAdmin() const
+bool QnUserResource::isBuildInAdmin() const
 {
     return getId() == kAdminGuid;
 }
