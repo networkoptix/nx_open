@@ -3,8 +3,10 @@
 <uib-tabset>
     <uib-tab ng-repeat="platform in downloads.platforms"
              active="platform.active"
-             heading="{{platform.name}}"
              select="changeHash(platform)" >
+        <uib-tab-heading>
+            <span class="tab-heading-hack">{{platform.name}}</span>
+        </uib-tab-heading>
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="col-md-3  col-md-push-9 border-left">

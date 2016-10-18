@@ -49,7 +49,7 @@ var DownloadsConfig = {
         },
         {
             os: 'Linux',
-            name: 'Linux',
+            name: 'Ubuntu Linux',
             description: '<b>Supported versions:</b><br> Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS',
             installers:[
                 {
