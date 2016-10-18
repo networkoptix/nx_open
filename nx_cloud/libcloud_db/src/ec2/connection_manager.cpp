@@ -93,10 +93,7 @@ void ConnectionManager::createTransactionConnection(
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")
             .str(connection->socket()->getForeignAddress()), cl_logDEBUG1);
-        return completionHandler(
-            nx_http::StatusCode::ok,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::ok);
     }
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
@@ -107,10 +104,7 @@ void ConnectionManager::createTransactionConnection(
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME)
             .str(connection->socket()->getForeignAddress()),
             cl_logDEBUG1);
-        return completionHandler(
-            nx_http::StatusCode::badRequest,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::badRequest);
     }
     auto connectionId = connectionIdIter->second;
 
@@ -122,10 +116,7 @@ void ConnectionManager::createTransactionConnection(
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
             .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
             cl_logDEBUG1);
-        return completionHandler(
-            nx_http::StatusCode::badRequest,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::badRequest);
     }
 
     NX_LOGX(QnLog::EC2_TRAN_LOG, 
@@ -159,10 +150,7 @@ void ConnectionManager::createTransactionConnection(
             .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
             .arg(connectionId),
             cl_logDEBUG1);
-        return completionHandler(
-            nx_http::StatusCode::forbidden,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::forbidden);
     }
 
     nx_http::ConnectionEvents connectionEvents;
@@ -195,11 +183,12 @@ void ConnectionManager::createTransactionConnection(
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
 
     completionHandler(
-        nx_http::StatusCode::ok,
-        std::make_unique<nx_http::EmptyMessageBodySource>(
-            ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
-            boost::none),
-        std::move(connectionEvents));
+        nx_http::RequestResult(
+            nx_http::StatusCode::ok,
+            std::make_unique<nx_http::EmptyMessageBodySource>(
+                ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
+                boost::none),
+            std::move(connectionEvents)));
 }
 
 void ConnectionManager::pushTransaction(
@@ -210,10 +199,7 @@ void ConnectionManager::pushTransaction(
     nx_http::HttpRequestProcessedHandler completionHandler)
 {
     if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath))
-        return completionHandler(
-            nx_http::StatusCode::notFound,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::notFound);
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
@@ -223,10 +209,7 @@ void ConnectionManager::pushTransaction(
             .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME),
             cl_logDEBUG1);
-        return completionHandler(
-            nx_http::StatusCode::badRequest,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::badRequest);
     }
     const auto connectionId = connectionIdIter->second;
 
@@ -241,10 +224,7 @@ void ConnectionManager::pushTransaction(
             .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
             .arg(connectionId),
             cl_logDEBUG1);
-        return completionHandler(
-            nx_http::StatusCode::notFound,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::notFound);
     }
 
     NX_LOGX(QnLog::EC2_TRAN_LOG, 
@@ -262,7 +242,7 @@ void ConnectionManager::pushTransaction(
                 std::move(request.messageBody));
         });
 
-    completionHandler(nx_http::StatusCode::ok, nullptr, nx_http::ConnectionEvents());
+    completionHandler(nx_http::StatusCode::ok);
 }
 
 void ConnectionManager::dispatchTransaction(

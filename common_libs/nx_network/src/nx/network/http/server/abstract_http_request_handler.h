@@ -1,10 +1,4 @@
-/**********************************************************
-* 20 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef libcommon_abstract_http_request_handler_h
-#define libcommon_abstract_http_request_handler_h
+#pragma once
 
 #include <atomic>
 #include <memory>
@@ -15,61 +9,69 @@
 #include "http_server_connection.h"
 #include "../abstract_msg_body_source.h"
 
+namespace nx_http {
 
-namespace nx_http
+class NX_NETWORK_API RequestResult
 {
-    typedef nx::utils::MoveOnlyFunc<void(
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
-        ConnectionEvents connectionEvents)> HttpRequestProcessedHandler;
+public:
+    nx_http::StatusCode::Value statusCode;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource;
+    ConnectionEvents connectionEvents;
 
-    //!Base class for all HTTP request processors
-    /*!
-        \note Class methods are not thread-safe
-    */
-    class NX_NETWORK_API AbstractHttpRequestHandler
-    {
-    public:
-        AbstractHttpRequestHandler();
-        virtual ~AbstractHttpRequestHandler();
+    RequestResult(StatusCode::Value _statusCode = StatusCode::notImplemented);
+    RequestResult(
+        nx_http::StatusCode::Value _statusCode,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> _dataSource);
+    RequestResult(
+        nx_http::StatusCode::Value _statusCode,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> _dataSource,
+        ConnectionEvents _connectionEvents);
+};
 
-        /*!
-            \param connection This object is valid only in this method. 
-                One cannot rely on its availability after return of this method
-            \param request Message received
-            \param completionHandler Functor to be invoked to send response
-        */
-        bool processRequest(
-            nx_http::HttpServerConnection* const connection,
-            nx_http::Message&& request,
-            stree::ResourceContainer&& authInfo,
-            ResponseIsReadyHandler completionHandler);
+typedef nx::utils::MoveOnlyFunc<void(RequestResult)> HttpRequestProcessedHandler;
 
-    protected:
-        //!Implement this method to handle request
-        /*!
-            \param response Implementation is allowed to modify response as it wishes
-            \warning This object can be removed in \a completionHandler 
-        */
-        virtual void processRequest(
-            nx_http::HttpServerConnection* const connection,
-            stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::HttpRequestProcessedHandler completionHandler ) = 0;
+/**
+ * Base class for all HTTP request processors
+ * @note Class methods are not thread-safe
+ */
+class NX_NETWORK_API AbstractHttpRequestHandler
+{
+public:
+    AbstractHttpRequestHandler();
+    virtual ~AbstractHttpRequestHandler();
 
-        nx_http::Response* response();
+    /**
+     * @param connection This object is valid only in this method. 
+     *       One cannot rely on its availability after return of this method
+     * @param request Message received
+     * @param completionHandler Functor to be invoked to send response
+     */
+    bool processRequest(
+        nx_http::HttpServerConnection* const connection,
+        nx_http::Message&& request,
+        stree::ResourceContainer&& authInfo,
+        ResponseIsReadyHandler completionHandler);
 
-    private:
-        nx_http::Message m_responseMsg;
-        ResponseIsReadyHandler m_completionHandler;
+protected:
+    /**
+     * Implement this method to handle request
+     * @param response Implementation is allowed to modify response as it wishes
+     * @warning This object can be removed in \a completionHandler 
+     */
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        stree::ResourceContainer authInfo,
+        nx_http::Request request,
+        nx_http::Response* const response,
+        nx_http::HttpRequestProcessedHandler completionHandler ) = 0;
 
-        void requestDone(
-            //size_t reqID,
-            nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
-            ConnectionEvents connectionEvents);
-    };
-}
+    nx_http::Response* response();
 
-#endif  //libcommon_abstract_http_request_handler_h
+private:
+    nx_http::Message m_responseMsg;
+    ResponseIsReadyHandler m_completionHandler;
+
+    void requestDone(RequestResult requestResult);
+};
+
+} // namespace nx_http

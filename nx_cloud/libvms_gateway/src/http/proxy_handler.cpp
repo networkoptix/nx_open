@@ -35,10 +35,7 @@ void ProxyHandler::processRequest(
     auto requestOptions = cutTargetFromRequest(*connection, &request);
     if (!nx_http::StatusCode::isSuccessCode(requestOptions.status))
     {
-        completionHandler(
-            requestOptions.status,
-            nullptr,
-            nx_http::ConnectionEvents());
+        completionHandler(requestOptions.status);
         return;
     }
 
@@ -56,10 +53,7 @@ void ProxyHandler::processRequest(
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Failed to set socket options. %1")
             .arg(SystemError::toString(osErrorCode)), cl_logINFO);
-        completionHandler(
-            nx_http::StatusCode::internalServerError,
-            nullptr,
-            nx_http::ConnectionEvents());
+        completionHandler(nx_http::StatusCode::internalServerError);
         return;
     }
 
@@ -85,10 +79,7 @@ void ProxyHandler::closeConnection(
     NX_ASSERT(m_requestCompletionHandler);
 
     auto handler = std::move(m_requestCompletionHandler);
-    handler(
-        nx_http::StatusCode::serviceUnavailable,
-        nullptr,
-        nx_http::ConnectionEvents());  //TODO #ak better status code
+    handler(nx_http::StatusCode::serviceUnavailable);  //TODO #ak better status code
 }
 
 ProxyHandler::TargetWithOptions::TargetWithOptions(
@@ -232,9 +223,7 @@ void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
             (errorCode == SystemError::hostNotFound ||
                 errorCode == SystemError::hostUnreach)
                 ? nx_http::StatusCode::notFound
-                : nx_http::StatusCode::serviceUnavailable,
-            nullptr,
-            nx_http::ConnectionEvents());
+                : nx_http::StatusCode::serviceUnavailable);
         return;
     }
 
@@ -266,10 +255,7 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
             .str(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
 
         auto handler = std::move(m_requestCompletionHandler);
-        handler(
-            nx_http::StatusCode::serviceUnavailable,
-            nullptr,
-            nx_http::ConnectionEvents());  //TODO #ak better status code
+        handler(nx_http::StatusCode::serviceUnavailable);  //TODO #ak better status code
         return;
     }
 
@@ -298,9 +284,9 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
     *response() = std::move(*message.response);
     auto handler = std::move(m_requestCompletionHandler);
     handler(
-        static_cast<nx_http::StatusCode::Value>(statusCode),
-        std::move(msgBody),
-        nx_http::ConnectionEvents());
+        nx_http::RequestResult(
+            static_cast<nx_http::StatusCode::Value>(statusCode),
+            std::move(msgBody)));
 }
 
 }   //namespace gateway
