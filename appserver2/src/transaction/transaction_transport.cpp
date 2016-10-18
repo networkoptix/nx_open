@@ -37,9 +37,12 @@ QnTransactionTransport::QnTransactionTransport(
     setOutgoingConnection(std::move(socket));
 }
 
-QnTransactionTransport::QnTransactionTransport(const ApiPeerData& localPeer)
+QnTransactionTransport::QnTransactionTransport(
+    ConnectionGuardSharedState* const connectionGuardSharedState,
+    const ApiPeerData& localPeer)
 :
     QnTransactionTransportBase(
+        connectionGuardSharedState,
         localPeer,
         QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
         QnGlobalSettings::instance()->keepAliveProbeCount()),
