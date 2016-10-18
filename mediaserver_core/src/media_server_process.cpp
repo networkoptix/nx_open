@@ -3011,20 +3011,11 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
-
-    updateAllowedInterfaces(cmdLineArguments);
-
-    #ifdef __linux__
-        if( !disableCrashHandler )
-            linux_exception::installCrashSignalHandler();
-    #endif
-
     if( showVersion )
     {
         std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;
         return 0;
     }
-
     if( showHelp )
     {
         QTextStream stream(stdout);
@@ -3032,15 +3023,20 @@ int MediaServerProcess::main(int argc, char* argv[])
         return 0;
     }
 
-
-    if (!enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(enforceSocketType);
-
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
+    updateAllowedInterfaces( cmdLineArguments );
+
+    #ifdef __linux__
+        if( !disableCrashHandler )
+            linux_exception::installCrashSignalHandler();
+    #endif
+
+    if (!enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(enforceSocketType);
     if( ipVersion.isEmpty() )
         ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
 
