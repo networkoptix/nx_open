@@ -321,9 +321,9 @@ public:
             connection->closeConnection(SystemError::connectionReset);
 
         completionHandler(
-            nx_http::StatusCode::ok,
-            std::make_unique< nx_http::BufferSource >(m_mimeType, m_response),
-            nx_http::ConnectionEvents());
+            nx_http::RequestResult(
+                nx_http::StatusCode::ok,
+                std::make_unique< nx_http::BufferSource >(m_mimeType, m_response)));
     }
 
 private:

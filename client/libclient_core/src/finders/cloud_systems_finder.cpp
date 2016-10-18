@@ -91,7 +91,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
-        updatedSystems.insert(system.localId
+        updatedSystems.insert(system.cloudId
             , QnSystemDescription::createCloudSystem(system.localId
                 , system.name, system.ownerAccountEmail
                 , system.ownerFullName));
@@ -100,35 +100,37 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     typedef QSet<QString> IdsSet;
 
     const auto newIds = updatedSystems.keys().toSet();
-    IdsSet removedIds;
 
+    IdsSet removedLocalIds;
     {
         const QnMutexLocker lock(&m_mutex);
 
         const auto oldIds = m_systems.keys().toSet();
-        const auto addedIds = IdsSet(newIds).subtract(oldIds);
+        const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
 
-        removedIds = IdsSet(oldIds).subtract(newIds);
-        for (const auto added : addedIds)
-            m_systems.insert(added, updatedSystems[added]);
-        for (const auto removed : removedIds)
-            m_systems.remove(removed);
-
-        for (const auto system : m_systems)
+        const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
+        for (const auto addedCloudId : addedCloudIds)
         {
-            if (addedIds.contains(system->id()))
-            {
-                updateSystemInternal(system);
-                emit systemDiscovered(system);
-            }
+            const auto system = updatedSystems[addedCloudId];
+            emit systemDiscovered(system);
+            m_systems.insert(addedCloudId, system);
+            updateSystemInternal(addedCloudId, system);
+        }
+
+        for (const auto removedCloudId : removedCloudIds)
+        {
+            const auto system = m_systems[removedCloudId];
+            removedLocalIds.insert(system->id());
+            m_systems.remove(removedCloudId);
         }
     }
 
-    for (const auto removedId : removedIds)
-        emit systemLost(removedId);
+    for (const auto removedLocalId : removedLocalIds)
+        emit systemLost(removedLocalId);
 }
 
 void QnCloudSystemsFinder::updateSystemInternal(
+    const QString& cloudId,
     const QnSystemDescription::PointerType& system)
 {
     using namespace nx::network;
@@ -136,27 +138,27 @@ void QnCloudSystemsFinder::updateSystemInternal(
 
     auto &resolver = nx::network::SocketGlobals::addressResolver();
     const QPointer<QnCloudSystemsFinder> guard(this);
-    const auto systemId = system->id();
-    const auto resolvedHandler = [this, guard, systemId](const AddressVector &hosts)
-    {
-        if (!guard)
-            return;
-
+    const auto resolvedHandler =
+        [this, guard, cloudId](const AddressVector &hosts)
         {
-            const QnMutexLocker lock(&m_mutex);
-            const auto it = m_systems.find(systemId);
-            if (it == m_systems.end())
+            if (!guard)
                 return;
-        }
 
-        for (const auto &host : hosts)
-        {
-            pingServerInternal(host.address.toString()
-                , static_cast<int>(host.type), systemId);
-        }
-    };
+            {
+                const QnMutexLocker lock(&m_mutex);
+                const auto it = m_systems.find(cloudId);
+                if (it == m_systems.end())
+                    return;
+            }
 
-    const auto cloudHost = HostAddress(systemId);
+            for (const auto &host : hosts)
+            {
+                pingServerInternal(host.address.toString(),
+                    static_cast<int>(host.type), cloudId);
+            }
+        };
+
+    const auto cloudHost = HostAddress(cloudId);
     resolver.resolveDomain(cloudHost, resolvedHandler);
 
     checkOutdatedServersInternal(system);
@@ -165,11 +167,13 @@ void QnCloudSystemsFinder::updateSystemInternal(
 void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serverInfo)
 {
     const auto serverId = serverInfo.id;
-    for (const auto system : m_systems)
+    for (auto it = m_systems.begin(); it != m_systems.end(); ++it)
     {
-        const bool remove = ((system->id() != serverInfo.cloudSystemId)
+        const auto cloudSystemId = it.key();
+        const bool remove = ((cloudSystemId != serverInfo.cloudSystemId)
             || serverInfo.serverFlags.testFlag(Qn::SF_NewSystem));
 
+        const auto system = it.value();
         if (remove && system->containsServer(serverId))
             system->removeServer(serverId);
     }
@@ -177,15 +181,15 @@ void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serve
 
 void QnCloudSystemsFinder::processFactoryServer(const QnModuleInformation& serverInfo)
 {
-    const auto cloudFactorySystemId = serverInfo.id.toString();
-    const auto it = m_factorySystems.find(cloudFactorySystemId);
+    const auto factoryId = serverInfo.id.toString();
+    const auto it = m_factorySystems.find(factoryId);
     if (it == m_factorySystems.end())
     {
         // Add new cloud-factory system tile
-        const auto system = QnSystemDescription::createCloudSystem(cloudFactorySystemId,
-            cloudFactorySystemId, QString(), QString());
+        const auto system = QnSystemDescription::createCloudSystem(factoryId,
+            factoryId, QString(), QString());
 
-        m_factorySystems.insert(cloudFactorySystemId, system);
+        m_factorySystems.insert(factoryId, system);
         emit systemDiscovered(system);
         system->addServer(serverInfo, 0);
     }
@@ -278,7 +282,7 @@ void QnCloudSystemsFinder::checkOutdatedServersInternal(
         {
             system->removeServer(serverId);
 
-            // Removes factory systems
+            // Removes factory systems. Note: factory id is just id of server
             if (system->servers().isEmpty() && m_factorySystems.remove(system->id()))
                 emit systemLost(system->id());
         }
@@ -290,6 +294,10 @@ void QnCloudSystemsFinder::updateSystems()
 {
     const QnMutexLocker lock(&m_mutex);
     const auto targetSystems = SystemsHash(m_systems).unite(m_factorySystems);
-    for (const auto system : targetSystems)
-        updateSystemInternal(system);
+    for (auto it = targetSystems.begin(); it != targetSystems.end(); ++it)
+    {
+        const auto cloudId = it.key();
+        const auto system = it.value();
+        updateSystemInternal(cloudId, system);
+    }
 }

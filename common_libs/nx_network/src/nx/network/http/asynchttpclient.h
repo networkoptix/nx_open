@@ -428,9 +428,9 @@ namespace nx_http
 
         void reset()
         {
-            //MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete
+            // MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete.
             if (m_obj.use_count() == 1)
-                m_obj->pleaseStopSync();
+                m_obj->pleaseStopSync(false);   //< pleaseStopSync should have already been called explicitly.
             m_obj.reset();
         }
 

@@ -75,7 +75,7 @@ private:
         QnAudioDeviceInfo m_audioDevice;
         //QString m_audioDeviceName;
         QnAudioFormat m_audioFormat;
-        CLThreadQueue<QnWritableCompressedAudioDataPtr>  m_audioQueue;
+        QnSafeQueue<QnWritableCompressedAudioDataPtr>  m_audioQueue;
         QnWritableCompressedAudioData m_tmpAudioBuffer;
         SpeexPreprocessState* m_speexPreprocess;
 

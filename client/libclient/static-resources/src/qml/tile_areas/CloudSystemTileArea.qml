@@ -7,38 +7,44 @@ Column
     id: control;
 
     property string userName;
-    property bool enabled;
+    property bool hasHosts: true;
 
     spacing: 10; // TODO: check is bottom margin is 8px
 
     NxLabel
     {
-       id: login;
+        id: login;
 
-       anchors.left: parent.left;
-       anchors.right: parent.right;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
 
-       anchors.leftMargin: 4;
+        anchors.leftMargin: 4;
 
-       disableable: false;
-       enabled: control.enabled;
-       text: control.userName;
-       font: Style.fonts.systemTile.info;
-       standardColor: Style.colors.text;
-       disabledColor: Style.colors.midlight;
+        disableable: false;
+        enabled: control.enabled;
+        text: control.userName;
+        font: Style.fonts.systemTile.info;
+        standardColor: Style.colors.text;
+        disabledColor: Style.colors.midlight;
     }
 
     Image
     {
-       id: imageItem;
-       enabled: control.enabled;
+        id: imageItem;
+        enabled: control.enabled;
 
-       anchors.left: parent.left;
+        anchors.left: parent.left;
 
-       width: 24;
-       height: 24;
-       source: (enabled
-           ? "qrc:/skin/welcome_page/cloud_online.png"
-           : "qrc:/skin/welcome_page/cloud_offline.png");
+        width: 24;
+        height: 24;
+        source:
+        {
+           if (!context.isCloudEnabled)
+               return "qrc:/skin/welcome_page/cloud_unavailable.png";
+
+           return (control.hasHosts
+            ? "qrc:/skin/welcome_page/cloud_online.png"
+            : "qrc:/skin/welcome_page/cloud_offline.png");
+        }
     }
 }

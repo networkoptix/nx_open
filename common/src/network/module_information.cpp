@@ -34,7 +34,7 @@ QString getTargetSystemIdImpl(
         return systemName; //< No cloud, no local id, no new systems
 
     if (localSystemId.isEmpty())
-        return QUuid::createUuid().toString();  //< New System id
+        return serverId;  //< New System id
 
     return localSystemId;
 }

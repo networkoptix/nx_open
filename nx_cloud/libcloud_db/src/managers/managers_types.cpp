@@ -26,6 +26,7 @@ api::ResultCode dbResultToApiResult( nx::db::DBResult dbResult )
 
         case nx::db::DBResult::ioError:
         case nx::db::DBResult::statementError:
+        case nx::db::DBResult::connectionError:
             return api::ResultCode::dbError;
 
         case nx::db::DBResult::retryLater:

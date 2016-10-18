@@ -293,6 +293,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
     stopInputPortMonitoringAsync();
 
+    QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();
 }
 

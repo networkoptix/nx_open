@@ -180,3 +180,25 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallRemoved)
     ASSERT_FALSE(accessProvider()->hasAccess(user, layout));
     ASSERT_FALSE(accessProvider()->hasAccess(user, camera));
 }
+
+
+TEST_F(QnVideoWallItemAccessProviderTest, accessProviders)
+{
+    auto camera = addCamera();
+    auto layout = addLayout();
+    auto videoWall = addVideoWall();
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    layout->addItem(layoutItem);
+
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    QnResourceList providers;
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_EQ(1, providers.size());
+    ASSERT_TRUE(providers.contains(videoWall));
+}

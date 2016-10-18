@@ -209,12 +209,12 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                 delete tmpReader;
 
                 const auto errorStruct = StreamRecorderErrorStruct(
-                    StreamRecorderError::InvalidResourceType, QnStorageResourcePtr());
+                    StreamRecorderError::invalidResourceType, QnStorageResourcePtr());
                 emit exportFinished(errorStruct, fileName);
                 return;
             }
             archiveReader->setCycleMode(false);
-            if (role == StreamRecorderRole::Role_FileExport)
+            if (role == StreamRecorderRole::fileExport)
                 archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
             QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());

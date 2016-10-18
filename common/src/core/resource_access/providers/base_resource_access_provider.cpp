@@ -1,7 +1,9 @@
 #include "base_resource_access_provider.h"
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_filter.h>
+
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/user_resource.h>
@@ -44,11 +46,17 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
 }
 
 QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibleVia(
-    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource,
+    QnResourceList* providers) const
 {
-    if (hasAccess(subject, resource))
-        return baseSource();
-    return Source::none;
+    if (!hasAccess(subject, resource))
+        return Source::none;
+
+    if (providers)
+        fillProviders(subject, resource, *providers);
+
+    return baseSource();
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
@@ -102,6 +110,13 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     for (const auto& dependent: dependentSubjects(subject))
         updateAccess(dependent, resource);
+}
+
+void QnBaseResourceAccessProvider::fillProviders(
+    const QnResourceAccessSubject& /*subject*/,
+    const QnResourcePtr& /*resource*/,
+    QnResourceList& /*providers*/) const
+{
 }
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
@@ -177,13 +192,10 @@ QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubj
 
 bool QnBaseResourceAccessProvider::isLayout(const QnResourcePtr& resource) const
 {
-    return resource->hasFlags(Qn::layout);
+    return QnResourceAccessFilter::isShareableLayout(resource);
 }
 
 bool QnBaseResourceAccessProvider::isMediaResource(const QnResourcePtr& resource) const
 {
-    /* Web Pages behave totally like cameras. */
-    return resource->hasFlags(Qn::live_cam)
-        || resource->hasFlags(Qn::web_page)
-        || resource->hasFlags(Qn::server);
+    return QnResourceAccessFilter::isShareableMedia(resource);
 }

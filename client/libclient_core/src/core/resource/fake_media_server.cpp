@@ -4,6 +4,7 @@ QnFakeMediaServerResource::QnFakeMediaServerResource():
     QnMediaServerResource()
 {
     setId(QnUuid::createUuid());
+    addFlags(Qn::fake_server);
 }
 
 QnUuid QnFakeMediaServerResource::getOriginalGuid() const

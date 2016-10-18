@@ -14,11 +14,6 @@ Rectangle
 
     color: Style.colors.window;
 
-    QnAppInfo
-    {
-        id: appInfo
-    }
-
     Item
     {
         id: screenHolder;
@@ -41,6 +36,7 @@ Rectangle
         NxSearchEdit
         {
             id: searchEdit;
+
             visible: grid.totalItemsCount > grid.itemsPerPage
             visualParent: screenHolder
 
@@ -90,7 +86,7 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: model.totalCount
+                readonly property int totalItemsCount: model.sourceRowsCount;
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -188,11 +184,10 @@ Rectangle
                     }
                 }
 
-                model: QnOrderedSystemsModel
+                model: QnFilteringSystemsModel
                 {
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
-                    readonly property int totalCount: rowCount();
                 }
 
                 delegate: Item
@@ -285,7 +280,29 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: foundServersCount == 0;
+            visible: (grid.model.sourceRowsCount == 0);
+        }
+
+        Item
+        {
+            height: 208;
+            width: parent.width;
+            anchors.top: searchEdit.bottom;
+            anchors.topMargin: 16;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+
+            visible: (grid.count == 0) && !emptyTilePreloader.visible;
+
+            NxLabel
+            {
+                anchors.centerIn: parent;
+                font: Style.fonts.notFoundMessages.caption;
+                color: Style.colors.windowText;
+
+                text: qsTr("Nothing found");
+            }
+
         }
 
         NxButton
@@ -309,7 +326,7 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(appInfo.cloudName());
+            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(context.appInfo.cloudName());
         }
     }
 
@@ -399,11 +416,11 @@ Rectangle
     NxLabel
     {
         x: 8;
-        anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 8;
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
 
-        text: context.softwareVersion;
-        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        text: context.appInfo.applicationVersion()
+        standardColor: Style.darkerColor(Style.colors.windowText, 1)
 
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
     }

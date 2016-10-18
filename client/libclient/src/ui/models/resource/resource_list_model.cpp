@@ -23,7 +23,6 @@ QnResourceListModel::QnResourceListModel(QObject *parent) :
 
 QnResourceListModel::~QnResourceListModel()
 {
-    return;
 }
 
 bool QnResourceListModel::isReadOnly() const
@@ -293,6 +292,9 @@ QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
     if (!m_statusIgnored)
         return qnResIconCache->icon(resource);
+
+    if (resource->hasFlags(Qn::server))
+        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
 
     QnResourceIconCache::Key key = qnResIconCache->key(resource);
     key &= ~QnResourceIconCache::StatusMask;

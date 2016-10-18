@@ -10,6 +10,7 @@
         <?include BuildVars.wxi ?>
 
         <Property Id="REINSTALLMODE" Value="dmus"/>
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"></Property>        
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>

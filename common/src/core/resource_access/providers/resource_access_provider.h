@@ -20,8 +20,11 @@ public:
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
-    virtual Source accessibleVia(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource) const override;
+    virtual Source accessibleVia(
+        const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource,
+        QnResourceList* providers = nullptr
+    ) const override;
 
     /**
      * Add new base provider to the end of the list.

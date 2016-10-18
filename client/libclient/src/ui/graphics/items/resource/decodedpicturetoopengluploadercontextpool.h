@@ -47,7 +47,7 @@ protected:
     virtual void run();
 
 private:
-    //CLThreadQueue<QRunnable*> m_taskQueue;
+    //QnSafeQueue<QRunnable*> m_taskQueue;
     GLContext* m_glContext;
     std::deque<UploadFrameRunnable*> m_taskQueue;
     mutable QnMutex m_mutex;

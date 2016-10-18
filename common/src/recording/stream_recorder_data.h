@@ -6,22 +6,23 @@ struct AVFormatContext;
 
 enum class StreamRecorderRole
 {
-    Role_ServerRecording,
-    Role_FileExport,
-    Role_FileExportWithEmptyContext
+    serverRecording,
+    fileExport,
+    fileExportWithEmptyContext
 };
 
 enum class StreamRecorderError
 {
-    NoError,
-    ContainerNotFoundError,
-    FileCreateError,
-    VideoStreamAllocationError,
-    AudioStreamAllocationError,
-    InvalidAudioCodecError,
-    IncompatibleCodecError,
-    FileWriteError,
-    InvalidResourceType,
+    noError,
+    containerNotFound,
+    fileCreate,
+    videoStreamAllocation,
+    audioStreamAllocation,
+    invalidAudioCodec,
+    incompatibleCodec,
+    fileWrite,
+    invalidResourceType,
+
     LastError
 };
 

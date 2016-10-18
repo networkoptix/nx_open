@@ -12,12 +12,14 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
+class Settings;
+
 class SyncronizationEngine
 {
 public:
     SyncronizationEngine(
         const QnUuid& moduleGuid,
-        const conf::Settings& settings,
+        const Settings& settings,
         nx::db::AsyncSqlQueryExecutor* const dbManager);
     ~SyncronizationEngine();
 

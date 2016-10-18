@@ -8,6 +8,7 @@
 #include <nx/utils/singleton.h>
 
 #include <utils/common/credentials.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QSettings;
 
@@ -24,12 +25,14 @@ struct QnCloudSystem
 
     bool operator ==(const QnCloudSystem &other) const;
 
-    bool fullEqual(const QnCloudSystem& other) const;
+    bool visuallyEqual(const QnCloudSystem& other) const;
 
     void writeToSettings(QSettings* settings) const;
 
     static QnCloudSystem fromSettings(QSettings* settings);
 };
+#define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)(authKey)
+QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
 Q_DECLARE_METATYPE(QnCloudSystemList);
