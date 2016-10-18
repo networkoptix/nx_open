@@ -1,4 +1,57 @@
 <div class="container">
+    <h1>Generate stream links</h1>
+    <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">System host (IP:port)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.system">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">nonce</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.nonce">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">realm</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.realm">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">method</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.method">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">login</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.login">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">password</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.password">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">link</label>
+            <div class="col-sm-9"><p ng-repeat="camId in linkSettings.cameraIds" class="form-control-static">{{formatLink(camId)}}</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container">
 
     <h1>Generate events </h1>
 
