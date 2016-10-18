@@ -178,8 +178,9 @@
     <h2>Set up administrator's password</h2>
     <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
-            <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                   type="text" placeholder="Login" required readonly>
+            <!-- <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                   type="text" placeholder="Login" required readonly> -->
+            <div class="form-control text-left readonly" readonly>{{settings.localLogin}}</div>
         </div>
         <password-input ng-model="settings.localPassword"></password-input>
         <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
