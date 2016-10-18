@@ -67,7 +67,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     m_cameraSupportsMotion(false),
     m_hasDbChanges(false),
     m_scheduleEnabledChanged(false),
-    m_hasScheduleControlsChanges(false),
     m_hasMotionControlsChanges(false),
     m_readOnly(false),
     m_updating(false),
@@ -130,17 +129,14 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged);
     connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::recordingSettingsChanged,
         this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged);
-    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::gridParamsChanged,
-        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged);
-    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::controlsChangesApplied,
-        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied);
     connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::scheduleEnabledChanged,
         this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-
     connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::scheduleEnabledChanged,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::archiveRangeChanged,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::alert, this,
+        [this](const QString& text) { m_recordingAlert = text; updateAlertBar(); });
 
     connect(ui->webPageLink, &QLabel::linkActivated,
         this, &QnSingleCameraSettingsWidget::at_linkActivated);
@@ -150,6 +146,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         bool enabled = ui->motionDetectionCheckBox->isChecked();
         ui->detectionTypeComboBox->setEnabled(enabled);
         ui->detectionHintLabel->setEnabled(enabled);
+        updateMotionAlert();
         at_motionTypeChanged();
     });
 
@@ -375,11 +372,6 @@ bool QnSingleCameraSettingsWidget::hasChanges() const
     return hasDbChanges() || hasAdvancedCameraChanges();
 }
 
-bool QnSingleCameraSettingsWidget::hasScheduleControlsChanges() const
-{
-    return m_hasScheduleControlsChanges;
-}
-
 Qn::MotionType QnSingleCameraSettingsWidget::selectedMotionType() const
 {
     if (!ui->motionDetectionCheckBox->isChecked())
@@ -417,7 +409,7 @@ void QnSingleCameraSettingsWidget::submitToResource()
         m_camera->setLicenseUsed(ui->licensingWidget->state() == Qt::Checked);
 
         ui->cameraScheduleWidget->submitToResources();
-        m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        m_camera->setScheduleDisabled(!isScheduleEnabled());
 
         if (!m_camera->isDtsBased())
         {
@@ -451,6 +443,9 @@ bool QnSingleCameraSettingsWidget::licensedParametersModified() const
 void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
+    m_recordingAlert = QString();
+    updateAlertBar();
 
     QnVirtualCameraResourceList cameras;
     if (m_camera)
@@ -555,7 +550,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 
     setHasDbChanges(false);
     m_scheduleEnabledChanged = false;
-    m_hasScheduleControlsChanges = false;
     m_hasMotionControlsChanges = false;
 
     if (m_camera)
@@ -610,21 +604,6 @@ void QnSingleCameraSettingsWidget::submitMotionWidgetToResource()
         return;
 
     m_camera->setMotionRegionList(m_motionWidget->motionRegionList());
-}
-
-void QnSingleCameraSettingsWidget::clearScheduleControlsChanges()
-{
-    m_hasScheduleControlsChanges = false;
-}
-
-bool QnSingleCameraSettingsWidget::hasMotionControlsChanges() const
-{
-    return m_hasMotionControlsChanges;
-}
-
-void QnSingleCameraSettingsWidget::clearMotionControlsChanges()
-{
-    m_hasMotionControlsChanges = false;
 }
 
 bool QnSingleCameraSettingsWidget::isReadOnly() const
@@ -768,6 +747,19 @@ void QnSingleCameraSettingsWidget::updateMotionCapabilities()
     ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 }
 
+void QnSingleCameraSettingsWidget::updateMotionAlert()
+{
+    m_motionAlert = QString();
+
+    if (ui->motionDetectionCheckBox->isChecked() && !isScheduleEnabled())
+    {
+        m_motionAlert =
+            tr("Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.");
+    }
+
+    updateAlertBar();
+}
+
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity()
 {
     if (m_motionWidget)
@@ -781,6 +773,23 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion()
     if (!m_motionWidget)
         return true;
     return m_motionWidget->isValidMotionRegion();
+}
+
+void QnSingleCameraSettingsWidget::updateAlertBar()
+{
+    switch (currentTab())
+    {
+        case Qn::RecordingSettingsTab:
+            ui->alertBar->setText(m_recordingAlert);
+            break;
+
+        case Qn::MotionSettingsTab:
+            ui->alertBar->setText(m_motionAlert);
+            break;
+
+        default:
+            ui->alertBar->setText(QString());
+    }
 }
 
 bool QnSingleCameraSettingsWidget::isValidSecondStream()
@@ -980,7 +989,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
         case Qn::MotionSettingsTab:
         {
             if (m_motionWidget)
-                return;
+                break;
 
             m_motionWidget = new QnCameraMotionMaskWidget(this);
 
@@ -1043,6 +1052,8 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
         default:
             break;
     }
+
+    updateAlertBar();
 }
 
 void QnSingleCameraSettingsWidget::at_dbDataChanged()
@@ -1056,8 +1067,6 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged()
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged()
 {
     at_dbDataChanged();
-
-    m_hasScheduleControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged()
@@ -1065,19 +1074,10 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChan
     at_dbDataChanged();
 }
 
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged()
-{
-    m_hasScheduleControlsChanges = true;
-}
-
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied()
-{
-    m_hasScheduleControlsChanges = false;
-}
-
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged()
 {
-    ui->licensingWidget->setState(ui->cameraScheduleWidget->isScheduleEnabled() ? Qt::Checked : Qt::Unchecked);
+    ui->licensingWidget->setState(isScheduleEnabled() ? Qt::Checked : Qt::Unchecked);
+    updateMotionAlert();
     m_scheduleEnabledChanged = true;
 }
 

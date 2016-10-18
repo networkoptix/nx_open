@@ -91,6 +91,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
+        NX_ASSERT(!system.localId.isEmpty(), "Cloud system can't be NEW system");
         updatedSystems.insert(system.cloudId
             , QnSystemDescription::createCloudSystem(system.localId
                 , system.name, system.ownerAccountEmail
@@ -170,33 +171,10 @@ void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serve
     for (auto it = m_systems.begin(); it != m_systems.end(); ++it)
     {
         const auto cloudSystemId = it.key();
-        const bool remove = ((cloudSystemId != serverInfo.cloudSystemId)
-            || serverInfo.serverFlags.testFlag(Qn::SF_NewSystem));
-
+        const bool remove = (cloudSystemId != serverInfo.cloudSystemId);
         const auto system = it.value();
         if (remove && system->containsServer(serverId))
             system->removeServer(serverId);
-    }
-}
-
-void QnCloudSystemsFinder::processFactoryServer(const QnModuleInformation& serverInfo)
-{
-    const auto factoryId = serverInfo.id.toString();
-    const auto it = m_factorySystems.find(factoryId);
-    if (it == m_factorySystems.end())
-    {
-        // Add new cloud-factory system tile
-        const auto system = QnSystemDescription::createCloudSystem(factoryId,
-            factoryId, QString(), QString());
-
-        m_factorySystems.insert(factoryId, system);
-        emit systemDiscovered(system);
-        system->addServer(serverInfo, 0);
-    }
-    else
-    {
-        const auto systemInfo = it.value();
-        systemInfo->updateServer(serverInfo);
     }
 }
 
@@ -245,11 +223,6 @@ void QnCloudSystemsFinder::pingServerInternal(
             // To prevent hanging on of fake online cloud servers
             // It is almost not hack.
             tryRemoveAlienServer(moduleInformation);
-            if (moduleInformation.serverFlags.testFlag(Qn::SF_NewSystem))
-            {
-                processFactoryServer(moduleInformation);
-                return;
-            }
 
             if (systemId != moduleInformation.cloudSystemId)
                 return;

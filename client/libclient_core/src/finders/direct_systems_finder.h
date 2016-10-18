@@ -36,6 +36,8 @@ private:
 
     SystemsHash::iterator getSystemItByServer(const QnUuid &serverId);
 
+    void removeSystem(const SystemsHash::iterator& it);
+
 private:
     typedef QHash<QnUuid, QString> ServerToSystemHash;
 

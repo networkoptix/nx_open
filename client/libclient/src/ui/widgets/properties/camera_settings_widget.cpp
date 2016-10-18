@@ -156,53 +156,6 @@ bool QnCameraSettingsWidget::hasDbChanges() const
     }
 }
 
-bool QnCameraSettingsWidget::hasScheduleControlsChanges() const
-{
-    switch (mode())
-    {
-        case SingleMode: return m_singleWidget->hasScheduleControlsChanges();
-        case MultiMode: return m_multiWidget->hasScheduleControlsChanges();
-        default: return false;
-    }
-}
-
-void QnCameraSettingsWidget::clearScheduleControlsChanges()
-{
-    switch (mode())
-    {
-        case SingleMode:
-            m_singleWidget->clearScheduleControlsChanges();
-            break;
-        case MultiMode:
-            m_multiWidget->clearScheduleControlsChanges();
-            break;
-        default:
-            break;
-    }
-}
-
-bool QnCameraSettingsWidget::hasMotionControlsChanges() const
-{
-    switch (mode())
-    {
-        case SingleMode: return m_singleWidget->hasMotionControlsChanges();
-        case MultiMode: return false;
-        default: return false;
-    }
-}
-
-void QnCameraSettingsWidget::clearMotionControlsChanges()
-{
-    switch (mode())
-    {
-        case SingleMode:
-            m_singleWidget->clearMotionControlsChanges();
-            break;
-        default:
-            break;
-    }
-}
-
 bool QnCameraSettingsWidget::isReadOnly() const
 {
     return m_singleWidget->isReadOnly();
