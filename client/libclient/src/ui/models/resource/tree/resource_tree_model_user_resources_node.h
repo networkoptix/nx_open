@@ -11,6 +11,9 @@ public:
     QnResourceTreeModelUserResourcesNode(QnResourceTreeModel* model);
     virtual ~QnResourceTreeModelUserResourcesNode();
 
+    virtual void initialize() override;
+    virtual void deinitialize() override;
+
 private:
     void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
 
@@ -26,9 +29,6 @@ private:
 
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
-
-    /** Remove node from the model. */
-    void removeNodeInternal(const QnResourceTreeModelNodePtr& node);
 
     /** Remove all nodes. */
     void clean();

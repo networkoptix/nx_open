@@ -274,6 +274,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
 
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, role.id,
             Qn::RoleNode));
+        node->initialize();
         node->setParent(m_rootNode);
         m_allNodes.append(node);
 
@@ -293,7 +294,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, user,
             Qn::ResourceNode));
-
+        node->initialize();
         auto parent = m_rootNode;
         if (user->role() == Qn::UserRole::CustomUserGroup)
         {
@@ -344,6 +345,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureLayoutNode(
         : Qn::ResourceNode;
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelLayoutNode(m_model, layout, nodeType));
+    node->initialize();
     auto parent = ensureSubjectNode(subject);
     if (placeholderAllowedForSubject(subject, Qn::SharedLayoutsNode))
         parent = ensurePlaceholderNode(subject, Qn::SharedLayoutsNode);
@@ -368,7 +370,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureMediaNode(
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, media,
         Qn::SharedResourceNode));
-
+    node->initialize();
     auto parent = ensureSubjectNode(subject);
     if (placeholderAllowedForSubject(subject, Qn::SharedResourcesNode))
         parent = ensurePlaceholderNode(subject, Qn::SharedResourcesNode);
@@ -401,6 +403,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensurePlaceholderNode(
     }
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, nodeType));
+    node->initialize();
     node->setParent(ensureSubjectNode(subject));
     node->update();
 
@@ -420,6 +423,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRecorderNode(
     if (pos == recorders.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(m_model, camera));
+        node->initialize();
         node->setParent(parentNode);
 
         pos = recorders.insert(id, node);
@@ -494,19 +498,13 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
             break;
     }
 
-    removeNodeInternal(node);
-}
-
-void QnResourceTreeModelUserNodes::removeNodeInternal(const QnResourceTreeModelNodePtr& node)
-{
-    node->setParent(QnResourceTreeModelNodePtr());
-    node->setResource(QnResourcePtr());
+    node->deinitialize();
 }
 
 void QnResourceTreeModelUserNodes::clean()
 {
     for (auto node : m_allNodes)
-        removeNodeInternal(node);
+        node->deinitialize();
     m_recorders.clear();
     m_shared.clear();
     m_placeholders.clear();

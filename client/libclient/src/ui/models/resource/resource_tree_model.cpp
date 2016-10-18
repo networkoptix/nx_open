@@ -112,6 +112,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         m_rootNodes[t] = QnResourceTreeModelNodePtr(t == Qn::UserResourcesNode
             ? new QnResourceTreeModelUserResourcesNode(this)
             : new QnResourceTreeModelNode(this, t));
+        m_rootNodes[t]->initialize();
         m_allNodes.append(m_rootNodes[t]);
     }
 
@@ -159,6 +160,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
 QnResourceTreeModel::~QnResourceTreeModel()
 {
+    for (auto node: m_allNodes)
+        node->deinitialize();
 }
 
 QnResourcePtr QnResourceTreeModel::resource(const QModelIndex &index) const
@@ -200,13 +203,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResou
             if (QnMediaServerResource::isHiddenServer(resource->getParentResource()))
                 nodeType = Qn::EdgeNode;
 
-        auto node = resource->hasFlags(Qn::layout)
+        QnResourceTreeModelNodePtr node(resource->hasFlags(Qn::layout)
             ? new QnResourceTreeModelLayoutNode(this, resource, nodeType)
-            : new QnResourceTreeModelNode(this, resource, nodeType);
+            : new QnResourceTreeModelNode(this, resource, nodeType));
+        node->initialize();
 
-        pos = m_resourceNodeByResource.insert(resource, QnResourceTreeModelNodePtr(node));
-        m_nodesByResource[resource].push_back(*pos);
-        m_allNodes.append(*pos);
+        pos = m_resourceNodeByResource.insert(resource, node);
+        m_nodesByResource[resource].push_back(node);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -219,10 +223,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureItemNode(const QnResourceT
     if (pos == items.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, uuid, nodeType));
+        node->initialize();
         node->setParent(parentNode);
 
         pos = items.insert(uuid, node);
-        m_allNodes.append(*pos);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -237,10 +242,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRecorderNode(
     if (pos == recorders.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(this, camera));
+        node->initialize();
         node->setParent(parentNode);
 
         pos = recorders.insert(id, node);
-        m_allNodes.append(*pos);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -251,13 +257,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSystemNode(const QString &
     if (pos == m_systemNodeBySystemName.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, Qn::SystemNode, systemName));
+        node->initialize();
         if (m_scope == FullScope)
             node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
         else
             node->setParent(m_rootNodes[Qn::BastardNode]);
 
         pos = m_systemNodeBySystemName.insert(systemName, node);
-        m_allNodes.append(*pos);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -269,6 +276,8 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         return;
 
     /* Remove node from all hashes where node can be the key. */
+    updateNodeResource(node, QnResourcePtr());
+    node->deinitialize();
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
@@ -305,9 +314,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     default:
         break;
     }
-
-    node->setParent(QnResourceTreeModelNodePtr());
-    updateNodeResource(node, QnResourcePtr());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceTreeModelNodePtr& node)

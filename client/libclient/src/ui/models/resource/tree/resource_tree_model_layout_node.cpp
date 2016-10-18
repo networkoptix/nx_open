@@ -41,42 +41,43 @@ QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     connect(layout, &QnLayoutResource::itemRemoved, this,
         &QnResourceTreeModelLayoutNode::at_layout_itemRemoved);
 
-    for (const auto& item : layout->getItems())
-        at_layout_itemAdded(layout, item);
+
 }
 
 QnResourceTreeModelLayoutNode::~QnResourceTreeModelLayoutNode()
 {
 }
 
-void QnResourceTreeModelLayoutNode::setResource(const QnResourcePtr &resource)
-{
-    NX_ASSERT(!resource);
-    if (!this->resource())
-        return;
-
-    disconnect(qnResPool, nullptr, this, nullptr);
-    base_type::setResource(resource);
-    for (auto node : m_items)
-        removeNode(node);
-    m_items.clear();
-}
-
-void QnResourceTreeModelLayoutNode::setParent(const QnResourceTreeModelNodePtr& parent)
-{
-    base_type::setParent(parent);
-    for (auto item: m_items)
-        item->setParent(toSharedPointer());
-}
-
 void QnResourceTreeModelLayoutNode::updateRecursive()
 {
-    /* Updating node may cause it to be deleted. */
-    auto guard = toSharedPointer();
-
     update();
     for (auto item: m_items)
         item->update();
+}
+
+void QnResourceTreeModelLayoutNode::initialize()
+{
+    base_type::initialize();
+    auto layout = resource().dynamicCast<QnLayoutResource>();
+    NX_ASSERT(layout);
+    if (!layout)
+        return;
+
+    for (const auto& item : layout->getItems())
+        at_layout_itemAdded(layout, item);
+}
+
+void QnResourceTreeModelLayoutNode::deinitialize()
+{
+    disconnect(qnResPool, nullptr, this, nullptr);
+    disconnect(snapshotManager(), nullptr, this, nullptr);
+    disconnect(qnResourceAccessProvider, nullptr, this, nullptr);
+
+    for (auto node: m_items)
+        node->deinitialize();
+    m_items.clear();
+
+    base_type::deinitialize();
 }
 
 QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
@@ -121,12 +122,6 @@ QIcon QnResourceTreeModelLayoutNode::iconBySubject(const QnResourceAccessSubject
     return base_type::calculateIcon();
 }
 
-void QnResourceTreeModelLayoutNode::removeNode(const QnResourceTreeModelNodePtr& node)
-{
-    node->setResource(QnResourcePtr());
-    node->setParent(QnResourceTreeModelNodePtr());
-}
-
 void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& resource)
 {
     /* There is a possible situation when layout is ready before its item's resource. */
@@ -165,9 +160,6 @@ void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSu
 
 void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
 {
-    /* Updating node may cause it to be deleted. */
-    auto guard = toSharedPointer();
-
     base_type::handlePermissionsChanged(resource);
     for (auto item : m_items)
     {
@@ -205,6 +197,7 @@ void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePt
         return;
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid));
+    node->initialize();
     node->setParent(toSharedPointer());
 
     auto resource = qnResPool->getResourceByDescriptor(item.resource);
@@ -217,7 +210,7 @@ void QnResourceTreeModelLayoutNode::at_layout_itemRemoved(const QnLayoutResource
     const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
-        removeNode(node);
+        node->deinitialize();
 }
 
 void QnResourceTreeModelLayoutNode::at_snapshotManager_flagsChanged(

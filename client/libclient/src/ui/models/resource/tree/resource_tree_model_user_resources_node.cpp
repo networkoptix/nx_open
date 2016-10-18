@@ -22,14 +22,26 @@ QnResourceTreeModelUserResourcesNode::QnResourceTreeModelUserResourcesNode(
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModelUserResourcesNode::rebuild);
-
-    rebuild();
 }
 
 QnResourceTreeModelUserResourcesNode::~QnResourceTreeModelUserResourcesNode()
 {
     /* Make sure all nodes are removed from the parent model. */
     clean();
+}
+
+void QnResourceTreeModelUserResourcesNode::initialize()
+{
+    base_type::initialize();
+    rebuild();
+}
+
+void QnResourceTreeModelUserResourcesNode::deinitialize()
+{
+    disconnect(qnResourceAccessProvider, nullptr, this, nullptr);
+    disconnect(context(), nullptr, this, nullptr);
+    clean();
+    base_type::deinitialize();
 }
 
 void QnResourceTreeModelUserResourcesNode::handleAccessChanged(
@@ -80,6 +92,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserResourcesNode::ensureResourceN
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), resource,
         Qn::SharedResourceNode));
+    node->initialize();
 
     auto parent = toSharedPointer();
 
@@ -107,6 +120,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserResourcesNode::ensureRecorderN
     {
         //TODO: #GDM move to factory
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(model(), camera));
+        node->initialize();
         node->setParent(parent);
 
         pos = m_recorders.insert(id, node);
@@ -152,23 +166,17 @@ void QnResourceTreeModelUserResourcesNode::removeNode(const QnResourceTreeModelN
         m_items.removeOne(node);
     }
 
-    removeNodeInternal(node);
-}
-
-void QnResourceTreeModelUserResourcesNode::removeNodeInternal(const QnResourceTreeModelNodePtr& node)
-{
-    node->setParent(QnResourceTreeModelNodePtr());
-    node->setResource(QnResourcePtr());
+    node->deinitialize();
 }
 
 void QnResourceTreeModelUserResourcesNode::clean()
 {
     for (auto node : m_items)
-        removeNodeInternal(node);
+        node->deinitialize();
     m_items.clear();
 
     for (auto node: m_recorders.values())
-        removeNodeInternal(node);
+        node->deinitialize();
     m_recorders.clear();
 }
 

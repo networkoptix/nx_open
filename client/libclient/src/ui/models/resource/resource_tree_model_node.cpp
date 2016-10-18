@@ -57,6 +57,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QnUuid& uuid) :
     base_type(),
     QnWorkbenchContextAware(model),
+    m_initialized(false),
     m_model(model),
     m_type(nodeType),
     m_uuid(uuid),
@@ -255,9 +256,6 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 
 void QnResourceTreeModelNode::update()
 {
-    /* Updating node may cause it to be deleted. */
-    auto guard = toSharedPointer();
-
     /* Update stored fields. */
     switch (m_type)
     {
@@ -366,6 +364,22 @@ void QnResourceTreeModelNode::updateRecursive()
     auto nodesToUpdate = m_model->children(toSharedPointer());
     for (auto child: nodesToUpdate)
         child->updateRecursive();
+}
+
+void QnResourceTreeModelNode::initialize()
+{
+    NX_ASSERT(!m_initialized);
+    m_initialized = true;
+}
+
+void QnResourceTreeModelNode::deinitialize()
+{
+    NX_ASSERT(m_initialized);
+    for (auto child: children())
+        child->deinitialize();
+
+    setParent(QnResourceTreeModelNodePtr());
+    setResource(QnResourcePtr());
 }
 
 Qn::NodeType QnResourceTreeModelNode::type() const
@@ -872,6 +886,11 @@ void QnResourceTreeModelNode::setModified(bool modified)
     changeInternal();
 }
 
+bool QnResourceTreeModelNode::isInitialized() const
+{
+    return m_initialized;
+}
+
 QnResourceTreeModel* QnResourceTreeModelNode::model() const
 {
     return m_model;
@@ -1052,4 +1071,39 @@ void QnResourceTreeModelNode::changeInternal()
 void QnResourceTreeModelNode::setName(const QString& name)
 {
     m_displayName = m_name = name;
+}
+
+
+QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)
+{
+    if (!node)
+        return dbg.space() << "INVALID";
+
+    auto p = node->parent();
+    if (p)
+        dbg.nospace() << "+";
+    while (p)
+    {
+        dbg.nospace() << "-";
+        p = p->parent();
+    }
+
+    /* Print name. */
+    dbg.nospace() << node->data(Qt::EditRole, Qn::NameColumn).toString() << " (" << node->type() << ")";
+    bool bastard = node->parent()
+        && !node->parent()->children().contains(node->toSharedPointer());
+    if (bastard)
+        dbg.nospace() << " (bastard)";
+
+    dbg.nospace() << "\n";
+
+    for (auto c: node->children())
+        dbg.nospace() << c;
+
+    return dbg.nospace();
+}
+
+QDebug operator<<(QDebug dbg, const QnResourceTreeModelNodePtr& node)
+{
+    return dbg << node.data();
 }

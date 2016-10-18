@@ -59,7 +59,6 @@ public:
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 
     Scope scope() const;
-
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
