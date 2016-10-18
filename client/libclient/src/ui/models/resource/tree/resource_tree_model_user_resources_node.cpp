@@ -72,13 +72,19 @@ void QnResourceTreeModelUserResourcesNode::handleAccessChanged(
 
 bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr& resource) const
 {
-    if (!QnResourceAccessFilter::isShareableMedia(resource))
-        return false;
-
     if (model()->scope() == QnResourceTreeModel::UsersScope)
         return false;
 
-    return qnResourceAccessProvider->hasAccess(context()->user(), resource);
+    if (!QnResourceAccessFilter::isShareableMedia(resource))
+        return false;
+
+    if (!qnResourceAccessProvider->hasAccess(context()->user(), resource))
+        return false;
+
+    if (model()->scope() == QnResourceTreeModel::CamerasScope)
+        return resource->hasFlags(Qn::live_cam);
+
+    return true;
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserResourcesNode::ensureResourceNode(
