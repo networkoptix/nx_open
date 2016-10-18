@@ -93,24 +93,13 @@ void ConnectionManager::createTransactionConnection(
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")
             .str(connection->socket()->getForeignAddress()), cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::ok);
-    }
-
-    auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
-    if (connectionIdIter == request.headers.end())
-    {
-        NX_LOGX(QnLog::EC2_TRAN_LOG, 
-            lm("Ignoring createTransactionConnection request without %1 header from %2")
-            .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME)
-            .str(connection->socket()->getForeignAddress()),
-            cl_logDEBUG1);
         return completionHandler(nx_http::StatusCode::badRequest);
     }
-    auto connectionId = connectionIdIter->second;
 
+    nx::String connectionId;
     ::ec2::ApiPeerData remotePeer;
     nx::String contentEncoding;
-    if (!fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding))
+    if (!fetchDataFromConnectRequest(request, &connectionId, &remotePeer, &contentEncoding))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG, 
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
@@ -129,6 +118,7 @@ void ConnectionManager::createTransactionConnection(
     const nx::String systemIdLocal(systemId.c_str());
     auto newTransport = std::make_unique<TransactionTransport>(
         connection->getAioThread(),
+        &m_connectionGuardSharedState,
         m_transactionLog,
         systemIdLocal,
         connectionId,
@@ -153,42 +143,12 @@ void ConnectionManager::createTransactionConnection(
         return completionHandler(nx_http::StatusCode::forbidden);
     }
 
-    nx_http::ConnectionEvents connectionEvents;
-    connectionEvents.onResponseHasBeenSent = 
-        [this, connectionId = std::move(connectionId)](
-            nx_http::HttpServerConnection* connection)
-        {
-            QnMutexLocker lk(&m_mutex);
-
-            const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
-            auto connectionIter = connectionByIdIndex.find(connectionId);
-            NX_ASSERT(connectionIter != connectionByIdIndex.end());
-
-            connectionIter->connection->setOutgoingConnection(
-                QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()));
-            connectionIter->connection->startOutgoingChannel();
-        };
-
-    response->headers.emplace("Content-Type", ec2::TransactionTransport::TUNNEL_CONTENT_TYPE);
-    response->headers.emplace("Content-Encoding", contentEncoding);
-    response->headers.emplace(Qn::EC2_GUID_HEADER_NAME, m_localPeerData.id.toByteArray());
-    response->headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        m_localPeerData.instanceId.toByteArray());
-    // TODO: #ak have to support different proto versions and add runtime conversion between them.
-    response->headers.emplace(
-        Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx::String::number(nx_ec::EC2_PROTO_VERSION));
-    response->headers.emplace("X-Nx-Cloud", "true");
-    response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
-
-    completionHandler(
-        nx_http::RequestResult(
-            nx_http::StatusCode::ok,
-            std::make_unique<nx_http::EmptyMessageBodySource>(
-                ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
-                boost::none),
-            std::move(connectionEvents)));
+    auto requestResult = 
+        prepareOkResponseToCreateTransactionConnection(
+            connectionId,
+            contentEncoding,
+            response);
+    completionHandler(std::move(requestResult));
 }
 
 void ConnectionManager::pushTransaction(
@@ -492,9 +452,15 @@ void ConnectionManager::onTransactionDone(
 
 bool ConnectionManager::fetchDataFromConnectRequest(
     const nx_http::Request& request,
+    nx::String* const connectionId,
     ::ec2::ApiPeerData* const remotePeer,
     nx::String* const contentEncoding)
 {
+    auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+    if (connectionIdIter == request.headers.end())
+        return false;
+    *connectionId = connectionIdIter->second;
+
     QUrlQuery query = QUrlQuery(request.requestLine.url.query());
     const bool isClient = query.hasQueryItem("isClient");
     const bool isMobileClient = query.hasQueryItem("isMobile");
@@ -553,6 +519,50 @@ void ConnectionManager::processSpecialTransaction(
         transportHeader,
         std::move(data),
         std::move(handler));
+}
+
+nx_http::RequestResult 
+    ConnectionManager::prepareOkResponseToCreateTransactionConnection(
+        const nx::String& connectionId,
+        const nx::String& contentEncoding,
+        nx_http::Response* const response)
+{
+    response->headers.emplace("Content-Type", ec2::TransactionTransport::TUNNEL_CONTENT_TYPE);
+    response->headers.emplace("Content-Encoding", contentEncoding);
+    response->headers.emplace(Qn::EC2_GUID_HEADER_NAME, m_localPeerData.id.toByteArray());
+    response->headers.emplace(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+        m_localPeerData.instanceId.toByteArray());
+    // TODO: #ak have to support different proto versions and add runtime conversion between them.
+    response->headers.emplace(
+        Qn::EC2_PROTO_VERSION_HEADER_NAME,
+        nx::String::number(nx_ec::EC2_PROTO_VERSION));
+    response->headers.emplace("X-Nx-Cloud", "true");
+    response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
+
+    nx_http::RequestResult requestResult;
+
+    requestResult.statusCode = nx_http::StatusCode::ok;
+    requestResult.connectionEvents.onResponseHasBeenSent =
+        [this, connectionId](
+            nx_http::HttpServerConnection* connection)
+        {
+            QnMutexLocker lk(&m_mutex);
+
+            const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
+            auto connectionIter = connectionByIdIndex.find(connectionId);
+            NX_ASSERT(connectionIter != connectionByIdIndex.end());
+
+            connectionIter->connection->setOutgoingConnection(
+                QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()));
+            connectionIter->connection->startOutgoingChannel();
+        };
+    requestResult.dataSource = 
+        std::make_unique<nx_http::EmptyMessageBodySource>(
+            ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
+            boost::none);
+
+    return requestResult;
 }
 
 } // namespace ec2

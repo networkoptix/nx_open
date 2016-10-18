@@ -18,6 +18,8 @@
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_tran_state_data.h>
 
+#include <transaction/connection_guard_shared_state.h>
+
 #include <utils/common/counter.h>
 #include <utils/common/subscription.h>
 
@@ -123,6 +125,7 @@ private:
     constexpr static const int kConnectionBySystemIdAndPeerIdIndex = 1;
 
     const conf::Settings& m_settings;
+    ::ec2::ConnectionGuardSharedState m_connectionGuardSharedState;
     TransactionLog* const m_transactionLog;
     IncomingTransactionDispatcher* const m_transactionDispatcher;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
@@ -152,6 +155,7 @@ private:
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
     bool fetchDataFromConnectRequest(
         const nx_http::Request& request,
+        nx::String* const connectionId,
         ::ec2::ApiPeerData* const remotePeer,
         nx::String* const contentEncoding);
 
@@ -161,6 +165,11 @@ private:
         const TransactionTransportHeader& transportHeader,
         ::ec2::QnTransaction<TransactionDataType> data,
         TransactionProcessedHandler handler);
+
+    nx_http::RequestResult prepareOkResponseToCreateTransactionConnection(
+        const nx::String& connectionId,
+        const nx::String& contentEncoding,
+        nx_http::Response* const response);
 };
 
 } // namespace ec2

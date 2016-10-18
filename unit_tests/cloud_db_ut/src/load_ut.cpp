@@ -23,6 +23,7 @@ class CdbLoadTest
 {
 };
 
+// Disabled since not ready yet.
 TEST_F(CdbLoadTest, DISABLED_manyConnections)
 {
     constexpr const int connectionCount = 10000;
