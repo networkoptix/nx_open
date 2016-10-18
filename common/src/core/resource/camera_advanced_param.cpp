@@ -3,6 +3,7 @@
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/find_if.hpp>
+#include <functional>
 
 #include <core/resource/resource.h>
 #include <core/resource/param.h>
@@ -292,6 +293,58 @@ QnCameraAdvancedParams QnCameraAdvancedParams::filtered(const QSet<QString> &all
             result.groups.push_back(group);
     }
     return result;
+}
+
+void QnCameraAdvancedParams::applyOverloads(const std::vector<QnCameraAdvancedParameterOverload>& overloads)
+{
+    if (overloads.empty())
+        return;
+
+    const QString kDefaultOverload = lit("default");
+    std::map<QString, std::map<QString, QnCameraAdvancedParameterOverload>> overloadsMap;
+
+    for (const auto& overload: overloads)
+    {
+        auto depId = overload.dependencyId.isEmpty() ? kDefaultOverload : overload.dependencyId;
+        auto paramId = overload.paramId;
+        overloadsMap[paramId][depId] = overload;
+    }
+
+    std::function<void(QnCameraAdvancedParamGroup& group)> traverseGroup;
+    traverseGroup = [&kDefaultOverload, &overloadsMap, &traverseGroup] (QnCameraAdvancedParamGroup& group)
+        {
+            for (auto& param: group.params)
+            {
+                if (!overloadsMap.count(param.id))
+                    continue;
+
+                auto paramOverload = overloadsMap[param.id];
+
+                if (paramOverload.count(kDefaultOverload))
+                {
+                    param.range = paramOverload[kDefaultOverload].range;
+                    param.internalRange = paramOverload[kDefaultOverload].internalRange;
+                }
+
+                for (auto& dep: param.dependencies)
+                {
+                    if (dep.id.isEmpty())
+                        continue;
+
+                    if (paramOverload.count(dep.id))
+                    {
+                        dep.range = paramOverload[dep.id].range;
+                        dep.internalRange = paramOverload[dep.id].internalRange;
+                    }
+                }
+            }
+
+            for (auto& subgroup: group.groups)
+                traverseGroup(subgroup);
+        };
+
+    for (auto& group: groups)
+        traverseGroup(group);
 }
 
 bool deserialize(QnJsonContext *, const QJsonValue &value, QnCameraAdvancedParameter::DataType *target) 

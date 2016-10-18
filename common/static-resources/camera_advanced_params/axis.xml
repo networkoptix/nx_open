@@ -76,17 +76,23 @@
                 <param id="root.Image.I0.Text.DateEnabled"
                     name="Include Date"
                     description="Place date on overlay"
-                    dataType="Bool"
+                    dataType="Enumeration"
+                    range="Yes,No"
+                    internalRange="yes,no"
                     readCmd="param.cgi"/>
                 <param id="root.Image.I0.Text.ClockEnabled"
                     name="Include Time"
                     description="Place time on overlay"
-                    dataType="Bool"
+                    dataType="Enumeration"
+                    range="Yes,No"
+                    internalRange="yes,no"
                     readCmd="param.cgi"/>
                 <param id="root.Image.I0.Text.TextEnabled"
                     name="Include Text"
                     description="Place text on overlay"
-                    dataType="Bool"
+                    dataType="Enumeration"
+                    range="Yes,No"
+                    internalRange="yes,no"
                     readCmd="param.cgi"/>
                 <param id="root.Image.I0.Text.String"
                     name="Text"
@@ -124,12 +130,12 @@
                     <dependencies>
                         
                         <dependencies-ranges>
-                            <conditional-range range="8" internalRange="8000">
+                            <conditional-range range="8" internalRange="8000" id="pcmRange">
                                 <condition 
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="valueIn=G711 ulaw,G726"/>    
                             </conditional-range>
-                            <conditional-range range="8,16" internalRange="8000,16000">
+                            <conditional-range range="8,16" internalRange="8000,16000" id="aacRange">
                                 <condition 
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=AAC"/>
@@ -146,18 +152,17 @@
                     <dependencies>
                         
                         <dependencies-ranges>
-                            <conditional-range range="64" internalRange="64000">
+                            <conditional-range range="64" id="g711Range">
                                 <condition 
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=G711 ulaw"/>    
                             </conditional-range>
-                            <conditional-range range="24,32" internalRange="24000,32000">
+                            <conditional-range range="24,32" id="g726Range">
                                 <condition 
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=G726"/>
                             </conditional-range>
-                            <conditional-range range="12,16,24,32,48,64" 
-                                internalRange="12000,16000,24000,32000,48000,64000">
+                            <conditional-range range="12,16,24,32,48,64" id="aacRange">
                                 <condition
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=AAC"/>
@@ -248,7 +253,7 @@
                             </dependencies-show>
                         </dependencies>
                     </param>                                
-                    <param id="rodeoot.Network.Interface.I0.Manual.DefaultRouter"
+                    <param id="root.Network.Interface.I0.Manual.DefaultRouter"
                         name="DefaultGateway"
                         dataType="String"
                         readCmd="param.cgi">                                

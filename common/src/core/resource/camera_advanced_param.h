@@ -68,6 +68,7 @@ struct QnCameraAdvancedParameterDependency
         Unknown
     };
 
+    QString id;
     DependencyType type = DependencyType::Unknown;
     QString range;
     QString internalRange;
@@ -77,7 +78,7 @@ struct QnCameraAdvancedParameterDependency
     static QString fromDependencyTypeToString(const DependencyType& dependencyType);
 };
 
-#define QnCameraAdvancedParameterDependency_Fields (type)(range)(internalRange)(conditions)
+#define QnCameraAdvancedParameterDependency_Fields (id)(type)(range)(internalRange)(conditions)
 
 struct QnCameraAdvancedParameter
 {
@@ -135,6 +136,15 @@ struct QnCameraAdvancedParamGroup
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
+struct QnCameraAdvancedParameterOverload
+{
+    QString paramId;
+    QString dependencyId;
+    QString range;
+    QString internalRange;
+};
+#define QnCameraAdvancedParameterOverload_Fields (paramId)(dependencyId)(range)(internalRange)
+
 struct QnCameraAdvancedParams
 {
     QString name;
@@ -149,10 +159,11 @@ struct QnCameraAdvancedParams
 
     void clear();
     QnCameraAdvancedParams filtered(const QSet<QString> &allowedIds) const;
+    void applyOverloads(const std::vector<QnCameraAdvancedParameterOverload>& overloads);
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 
-#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)(QnCameraAdvancedParameterDependency)(QnCameraAdvancedParameterCondition)
+#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)(QnCameraAdvancedParameterDependency)(QnCameraAdvancedParameterCondition)(QnCameraAdvancedParameterOverload)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 	QnCameraAdvancedParameterTypes,

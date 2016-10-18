@@ -1493,18 +1493,21 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
 {
     QnMutexLocker lock( &m_physicalParamsMutex );
     m_advancedParameters.clear();
-    auto resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-
-    qDebug() << "ResourceData" << resourceData.value<QMap<QString, QString>>("advancedParametersOverload");
 
     auto templateFile = getAdvancedParametersTemplate();
     QnCameraAdvancedParams params;
     if (!loadAdvancedParametersTemplateFromFile(
             params,
-            lit("/home/fp/develop/nx_vms/common/static-resources/camera_advanced_params/") + templateFile))
+            lit(":/camera_advanced_params/") + templateFile))
     {
         return;
     }
+
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
+                Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
+
+    params.applyOverloads(overloads);
 
     auto supportedParams = calculateSupportedAdvancedParameters(params);
     m_advancedParameters = params.filtered(supportedParams);
@@ -1549,8 +1552,9 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         else
         {
             isSuccessful = false;
-            NX_LOG(lit("Failed to execute params query from path %1 of camera %2. Result: %3")
+            NX_LOG(lit("Failed to execute params query. Param: %1, device: %2 (%3), result: %3")
                 .arg(query)
+                .arg(getModel())
                 .arg(getHostAddress())
                 .arg(::toString(status)),
                 cl_logDEBUG2);

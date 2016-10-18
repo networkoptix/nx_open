@@ -192,6 +192,33 @@ private:
 
     QList<QnCameraAdvancedParameter> getParamsByIds(const QSet<QString>& idList) const;
 
+    /**
+     * Example of advanced parameter ranges overload via resource_data.json
+     *
+     *    {
+     *       "keys": ["Axis|AXISM1031W"],
+     *       "advancedParameterOverloads": [
+     *           {
+     *               "paramId": "root.AudioSource.A0.SampleRate",
+     *               "dependencyId" : null,
+     *               "internalRange": "1000,2000,3000,4000",
+     *               "range": "1,2,3,4"
+     *           },
+     *           {
+     *               "paramId": "root.AudioSource.A0.SampleRate",
+     *               "dependencyId" : "pcmRange",
+     *               "internalRange": "1000,2000",
+     *               "range": "1,2"
+     *           },
+     *           {
+     *               "paramId": "root.AudioSource.A0.BitRate",
+     *               "dependencyId": "g726Range",
+     *               "range": "1,2,3",
+     *               "internalRange": "100,200,300"
+     *           }
+     *       ]
+     *   }
+     */
     void fetchAndSetAdvancedParameters();
 
     QString getAdvancedParametersTemplate() const;

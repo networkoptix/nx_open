@@ -316,6 +316,8 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
             dependency.internalRange = depNode.attribute(QnXmlTag::paramInternalRange);
         }
 
+        dependency.id = depNode.attribute(QnXmlTag::dependencyId);
+
         isOk = parseConditionsXml(depNode, dependency.conditions);
 
         if (!isOk)
