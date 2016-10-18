@@ -16,6 +16,7 @@
 #include "outgoing_transaction_dispatcher.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
+#include "p2p_sync_settings.h"
 
 namespace nx {
 namespace cdb {
@@ -23,7 +24,7 @@ namespace ec2 {
 
 ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
-    const conf::Settings& settings,
+    const Settings& settings,
     TransactionLog* const transactionLog,
     IncomingTransactionDispatcher* const transactionDispatcher,
     OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
@@ -131,7 +132,7 @@ void ConnectionManager::createTransactionConnection(
     ConnectionContext context{
         std::move(newTransport),
         connectionId,
-        std::make_pair(systemIdLocal, remotePeer.id.toByteArray()) };
+        {systemIdLocal, remotePeer.id.toByteArray()} };
 
     if (!addNewConnection(std::move(context)))
     {
@@ -223,17 +224,17 @@ void ConnectionManager::dispatchTransaction(
 
     QnMutexLocker lk(&m_mutex);
     const auto& connectionBySystemIdAndPeerIdIndex =
-        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+        m_connections.get<kConnectionByFullPeerNameIndex>();
 
     std::size_t connectionCount = 0;
     std::array<TransactionTransport*, 7> connectionsToSendTo;
     for (auto connectionIt = connectionBySystemIdAndPeerIdIndex
-            .lower_bound(std::make_pair(systemId, nx::String()));
+            .lower_bound(FullPeerName{systemId, nx::String()});
         connectionIt != connectionBySystemIdAndPeerIdIndex.end()
-            && connectionIt->systemIdAndPeerId.first == systemId;
+            && connectionIt->fullPeerName.systemId == systemId;
         ++connectionIt)
     {
-        if (connectionIt->systemIdAndPeerId.second ==
+        if (connectionIt->fullPeerName.peerId ==
                 transactionSerializer->transactionHeader().peerID.toByteArray())
         {
             // Not sending transaction to peer which has generated it.
@@ -274,7 +275,7 @@ api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
     for (const auto& connectionContext: m_connections)
     {
         api::VmsConnectionData connectionData;
-        connectionData.systemId = connectionContext.systemIdAndPeerId.first.toStdString();
+        connectionData.systemId = connectionContext.fullPeerName.systemId.toStdString();
         connectionData.mediaserverEndpoint =
             connectionContext.connection->remoteSocketAddr().toString().toStdString();
         result.connections.push_back(std::move(connectionData));
@@ -288,13 +289,13 @@ bool ConnectionManager::isSystemConnected(const std::string& systemId) const
     QnMutexLocker lk(&m_mutex);
 
     const auto& connectionBySystemIdAndPeerIdIndex =
-        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+        m_connections.get<kConnectionByFullPeerNameIndex>();
     const auto systemIter = connectionBySystemIdAndPeerIdIndex.lower_bound(
-        std::make_pair(nx::String(systemId.c_str()), nx::String()));
+        FullPeerName{nx::String(systemId.c_str()), nx::String()});
 
     return 
         systemIter != connectionBySystemIdAndPeerIdIndex.end() &&
-        systemIter->systemIdAndPeerId.first == systemId;
+        systemIter->fullPeerName.systemId == systemId;
 }
 
 void ConnectionManager::closeConnectionsToSystem(
@@ -306,11 +307,11 @@ void ConnectionManager::closeConnectionsToSystem(
     QnMutexLocker lk(&m_mutex);
 
     auto& connectionBySystemIdAndPeerIdIndex =
-        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+        m_connections.get<kConnectionByFullPeerNameIndex>();
     auto it = connectionBySystemIdAndPeerIdIndex.lower_bound(
-        std::make_pair(systemId, nx::String()));
+        FullPeerName{systemId, nx::String()});
     while (it != connectionBySystemIdAndPeerIdIndex.end() &&
-           it->systemIdAndPeerId.first == systemId)
+           it->fullPeerName.systemId == systemId)
     {
         removeConnectionByIter(
             &lk,
@@ -325,8 +326,11 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     QnMutexLocker lk(&m_mutex);
 
     removeExistingConnection<
-        kConnectionBySystemIdAndPeerIdIndex,
-        decltype(context.systemIdAndPeerId)>(&lk, context.systemIdAndPeerId);
+        kConnectionByFullPeerNameIndex,
+        decltype(context.fullPeerName)>(&lk, context.fullPeerName);
+
+    if (!isOneMoreConnectionFromSystemAllowed(lk, context))
+        return false;
 
     context.connection->setOnConnectionClosed(
         std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
@@ -348,9 +352,44 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         return false;
     }
 
-    // TODO: later this method will return false in real cases
+    return true;
+}
+
+bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
+    const QnMutexLockerBase& lk,
+    const ConnectionContext& context) const
+{
+    if (getConnectionCountBySystemId(lk, context.fullPeerName.systemId) >=
+        m_settings.maxConcurrentConnectionsFromSystem)
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Refusing connection %1 from %2 since "
+                "there are already %3 connections from that system"),
+            cl_logDEBUG2);
+        return false;
+    }
 
     return true;
+}
+
+unsigned int ConnectionManager::getConnectionCountBySystemId(
+    const QnMutexLockerBase& /*lk*/,
+    const nx::String& systemId) const
+{
+    const auto& connectionByFullPeerName =
+        m_connections.get<kConnectionByFullPeerNameIndex>();
+
+    auto it = connectionByFullPeerName.lower_bound(
+        FullPeerName{systemId, nx::String()});
+    unsigned int activeConnections = 0;
+    for (; it != connectionByFullPeerName.end(); ++it)
+    {
+         if (it->fullPeerName.systemId != systemId)
+             break;
+         ++activeConnections;
+    }
+
+    return activeConnections;
 }
 
 template<int connectionIndexNumber, typename ConnectionKeyType>

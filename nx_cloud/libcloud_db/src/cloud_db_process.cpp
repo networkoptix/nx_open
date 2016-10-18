@@ -184,7 +184,7 @@ int CloudDBProcess::exec()
 
         ec2::SyncronizationEngine ec2SyncronizationEngine(
             kCdbGuid,
-            settings,
+            settings.p2pDb(),
             &dbManager);
 
         SystemHealthInfoProvider systemHealthInfoProvider(

@@ -6,7 +6,7 @@ namespace ec2 {
 
 SyncronizationEngine::SyncronizationEngine(
     const QnUuid& moduleGuid,
-    const conf::Settings& settings,
+    const Settings& settings,
     nx::db::AsyncSqlQueryExecutor* const dbManager)
     :
     m_transactionLog(
