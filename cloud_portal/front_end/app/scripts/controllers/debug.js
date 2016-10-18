@@ -127,10 +127,4 @@ angular.module('cloudApp')
                 $scope.linkSettings.auth = "couldn't retrieve temporary auth_key from cloud_portal";
             });
         }
-        $scope.usePermCreds = function(){
-            var username = account.getEmail();
-            var password = account.getPassword();
-            $scope.linkSettings.auth = $base64.encode(username + ':' + password);
-        }
-
     }]);
