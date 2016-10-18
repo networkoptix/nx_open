@@ -39,6 +39,7 @@
 #include <ui/models/resource/tree/resource_tree_model_user_nodes.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
+#include <ui/models/resource/tree/resource_tree_model_user_resources_node.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -82,7 +83,7 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::SeparatorNode
             << Qn::UsersNode
             << Qn::ServersNode
-            << Qn::UserDevicesNode
+            << Qn::UserResourcesNode
             << Qn::LayoutsNode
             << Qn::WebPagesNode
             << Qn::LocalResourcesNode
@@ -107,7 +108,10 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
     {
-        m_rootNodes[t] = QnResourceTreeModelNodePtr(new QnResourceTreeModelNode(this, t));
+        //TODO: #GDM move to factory
+        m_rootNodes[t] = QnResourceTreeModelNodePtr(t == Qn::UserResourcesNode
+            ? new QnResourceTreeModelUserResourcesNode(this)
+            : new QnResourceTreeModelNode(this, t));
         m_allNodes.append(m_rootNodes[t]);
     }
 
@@ -370,7 +374,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
             return rootNode;
         return bastardNode;
 
-    case Qn::UserDevicesNode:
+    case Qn::UserResourcesNode:
         if (m_scope == CamerasScope && !isAdmin)
             return QnResourceTreeModelNodePtr(); /*< Be the root node in this scope. */
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
@@ -427,7 +431,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             if (isAdmin)
                 return m_rootNodes[Qn::ServersNode];
 
-            return m_rootNodes[Qn::UserDevicesNode];
+            return bastardNode;
         }
 
         /* Fake servers from other systems. */
@@ -505,7 +509,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         auto parentNode = isAdmin
             ? ensureResourceNode(parentResource)
-            : m_rootNodes[Qn::UserDevicesNode];
+            : bastardNode;
 
         QString groupId = camera->getGroupId();
         if (!groupId.isEmpty())
@@ -543,7 +547,7 @@ Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
     case QnResourceTreeModel::CamerasScope:
         return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
             ? Qn::ServersNode
-            : Qn::UserDevicesNode;
+            : Qn::UserResourcesNode;
     case QnResourceTreeModel::UsersScope:
         return Qn::UsersNode;
     default:

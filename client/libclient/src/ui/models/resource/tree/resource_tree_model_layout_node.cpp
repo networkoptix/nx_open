@@ -71,6 +71,9 @@ void QnResourceTreeModelLayoutNode::setParent(const QnResourceTreeModelNodePtr& 
 
 void QnResourceTreeModelLayoutNode::updateRecursive()
 {
+    /* Updating node may cause it to be deleted. */
+    auto guard = toSharedPointer();
+
     update();
     for (auto item: m_items)
         item->update();
@@ -162,6 +165,9 @@ void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSu
 
 void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
 {
+    /* Updating node may cause it to be deleted. */
+    auto guard = toSharedPointer();
+
     base_type::handlePermissionsChanged(resource);
     for (auto item : m_items)
     {

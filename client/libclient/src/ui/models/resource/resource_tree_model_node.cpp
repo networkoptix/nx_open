@@ -40,7 +40,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::OtherSystemsNode
         << Qn::WebPagesNode
         << Qn::ServersNode
-        << Qn::UserDevicesNode
+        << Qn::UserResourcesNode
         << Qn::RecorderNode
         << Qn::SystemNode
         << Qn::RoleUsersNode
@@ -113,11 +113,8 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::WebPagesNode:
         setName(tr("Web Pages"));
         break;
-    case Qn::UserDevicesNode:
-        setName(QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Devices"),
-            tr("Cameras")
-        ));
+    case Qn::UserResourcesNode:
+        setName(tr("Cameras && Resources"));
         break;
     case Qn::LayoutsNode:
         setName(tr("Layouts"));
@@ -258,6 +255,9 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 
 void QnResourceTreeModelNode::update()
 {
+    /* Updating node may cause it to be deleted. */
+    auto guard = toSharedPointer();
+
     /* Update stored fields. */
     switch (m_type)
     {
@@ -467,7 +467,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
     case Qn::ServersNode:
         return !isAdmin;
 
-    case Qn::UserDevicesNode:
+    case Qn::UserResourcesNode:
         return !isLoggedIn || isAdmin;
 
     case Qn::LayoutsNode:
@@ -919,7 +919,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         case Qn::WebPagesNode:
             return qnResIconCache->icon(QnResourceIconCache::WebPages);
 
-        case Qn::UserDevicesNode:
+        case Qn::UserResourcesNode:
         case Qn::AllCamerasAccessNode:
         case Qn::SharedResourcesNode:
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
@@ -944,6 +944,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         {
             if (!m_resource)
                 return QIcon();
+
             return m_resource->hasFlags(Qn::server)
                 ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor)
                 : qnResIconCache->icon(m_resource);
