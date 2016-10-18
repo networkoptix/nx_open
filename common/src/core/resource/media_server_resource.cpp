@@ -149,8 +149,10 @@ void QnMediaServerResource::setName( const QString& name )
 
 void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
 {
-    QnMutexLocker lock( &m_mutex );
-    m_netAddrList = netAddrList;
+    {
+        QnMutexLocker lock( &m_mutex );
+        m_netAddrList = netAddrList;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
