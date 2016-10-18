@@ -570,7 +570,9 @@ angular.module('webadminApp')
             systemName:{
                 back: 'start',
                 skip: 'merge',
-                next: 'chooseLocal',
+                next: function(){
+                    $scope.next(cloudAuthorized?'chooseCloud':'chooseLocal');
+                },
                 valid: function(){
                     return checkForm($scope.forms.systemNameForm);
                 }
