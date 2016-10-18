@@ -714,15 +714,6 @@ QString getDefaultServerName()
     return lit("Server %1").arg(id);
 }
 
-void setServerUrls(
-    QnMediaServerResourcePtr server,
-    const SocketAddress& address,
-    bool sslAllowed)
-{
-    server->setSslAllowed(sslAllowed);
-    server->setPrimaryAddress(address);
-}
-
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
     ec2::ApiMediaServerDataList servers;
@@ -1110,7 +1101,7 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
+        m_mediaServer->setPrimaryAddress(newAddress);
     }
 
     ec2::ApiMediaServerData server;
@@ -2221,10 +2212,9 @@ void MediaServerProcess::run()
         }
 
 
-        setServerUrls(
-            server,
-            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
-            sslAllowed);
+        server->setPrimaryAddress(
+            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
+        server->setSslAllowed(sslAllowed);
         cloudConnectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
