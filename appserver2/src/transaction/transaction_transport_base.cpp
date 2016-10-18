@@ -12,6 +12,8 @@
 #include <nx/network/socket_factory.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+
 #include <utils/bsf/sized_data_decoder.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
