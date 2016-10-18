@@ -1199,6 +1199,7 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
             }
 
             NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
+            break;
         }
     }
 
