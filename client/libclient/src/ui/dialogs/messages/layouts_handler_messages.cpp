@@ -45,7 +45,7 @@ bool QnLayoutsHandlerMessages::changeUserLocalLayout(QWidget* parent,
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Save Layout..."));
-    messageBox.setText(tr("User will keep access to %n removed cameras", "",
+    messageBox.setText(tr("User will keep access to %n removed cameras & resources", "",
         stillAccessible.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
@@ -76,7 +76,7 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Save Layout..."));
-    messageBox.setText(tr("All users with this role will get access to these %n cameras", "",
+    messageBox.setText(tr("All users with this role will get access to these %n cameras & resources", "",
         toShare.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
@@ -108,7 +108,7 @@ bool QnLayoutsHandlerMessages::removeFromRoleLocalLayout(QWidget* parent,
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Save Layout..."));
-    messageBox.setText(tr("All users with this role will keep access to %n removed cameras", "",
+    messageBox.setText(tr("All users with this role will keep access to %n removed cameras & resources", "",
         stillAccessible.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
@@ -161,14 +161,14 @@ bool QnLayoutsHandlerMessages::stopSharingLayouts(QWidget* parent,
         return true;
 
     QString informativeText = subject.user()
-        ? tr("User will lose access to the following %n cameras:", "", mediaResources.size())
-        : tr("All users with this role will lose access to the following %n cameras:", "",
+        ? tr("User will lose access to the following %n cameras & resources:", "", mediaResources.size())
+        : tr("All users with this role will lose access to the following %n cameras & resources:", "",
             mediaResources.size());
 
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Stop Sharing Layout..."));
-    messageBox.setText(tr("If sharing layout is stopped some cameras will become inaccessible"));
+    messageBox.setText(tr("If sharing layout is stopped some cameras & resources will become inaccessible"));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.addCustomWidget(new QnResourceListView(mediaResources, true));
@@ -206,7 +206,7 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Delete Layouts..."));
-    messageBox.setText(tr("User will keep access to %n removed cameras", "",
+    messageBox.setText(tr("User will keep access to %n removed cameras & resources", "",
         stillAccessible.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
