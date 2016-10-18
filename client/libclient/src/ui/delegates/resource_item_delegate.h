@@ -47,10 +47,10 @@ public:
     Options options() const;
     void setOptions(Options value);
 
-protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const override;
 
+protected:
     virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
 
     virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;

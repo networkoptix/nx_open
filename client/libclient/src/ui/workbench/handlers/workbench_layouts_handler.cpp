@@ -14,6 +14,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/resources_changes_manager.h>
 
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -108,6 +109,26 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
         &QnWorkbenchLayoutsHandler::at_removeLayoutItemAction_triggered);
     connect(action(QnActions::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
         &QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (!resource->hasFlags(Qn::layout))
+                return;
+
+            auto layoutResource = resource.dynamicCast<QnLayoutResource>();
+            if (!layoutResource)
+                return;
+
+            if (auto layout = QnWorkbenchLayout::instance(layoutResource))
+            {
+                workbench()->removeLayout(layout);
+                delete layout;
+            }
+
+            if (workbench()->layouts().empty())
+                action(QnActions::OpenNewTabAction)->trigger();
+        });
 }
 
 QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler()
@@ -551,11 +572,10 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
 
     auto inaccessible = [user](const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
-                return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
+            if (!QnResourceAccessFilter::isShareableMedia(resource))
+                return false;
 
-            /* Silently ignoring servers. */
-            return false;
+            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
         };
     QnResourceList toShare = change.added.filtered(inaccessible); //TODO: #GDM code duplication
 
@@ -652,11 +672,10 @@ void QnWorkbenchLayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr
 
     auto inaccessible = [user](const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
-                return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
+            if (!QnResourceAccessFilter::isShareableMedia(resource))
+                return false;
 
-            /* Silently ignoring servers. */
-            return false;
+            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
         };
 
     auto accessible = qnSharedResourcesManager->sharedResources(user);

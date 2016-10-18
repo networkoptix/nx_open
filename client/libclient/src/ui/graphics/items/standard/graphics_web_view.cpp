@@ -1,8 +1,9 @@
-#include "web_view.h"
+#include "graphics_web_view.h"
 
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKit/QWebHistory>
 
+#include <ui/style/webview_style.h>
 #include <ui/widgets/common/web_page.h>
 
 namespace
@@ -30,7 +31,7 @@ namespace
     }
 }
 
-QnWebView::QnWebView(const QUrl &url
+QnGraphicsWebView::QnGraphicsWebView(const QUrl &url
     , QGraphicsItem *item)
     : QGraphicsWebView(item)
     , m_status(kPageLoadFailed)
@@ -40,7 +41,7 @@ QnWebView::QnWebView(const QUrl &url
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
     settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true);
 
-    setupStyle();
+    NxUi::setupWebViewStyle(this);
     setPage(new QnWebPage(this));
 
     connect(page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
@@ -74,7 +75,7 @@ QnWebView::QnWebView(const QUrl &url
         setPageUrl(linkUrl);
     };
 
-    connect(this, &QGraphicsWebView::linkClicked, this, &QnWebView::setPageUrl);
+    connect(this, &QGraphicsWebView::linkClicked, this, &QnGraphicsWebView::setPageUrl);
     connect(this, &QGraphicsWebView::loadStarted, this, loadStartedHander);
     connect(this, &QGraphicsWebView::loadFinished, this, loadFinishedHandler);
     connect(this, &QGraphicsWebView::loadProgress, this, progressHandler);
@@ -84,21 +85,21 @@ QnWebView::QnWebView(const QUrl &url
     setPageUrl(url);
 }
 
-QnWebView::~QnWebView()
+QnGraphicsWebView::~QnGraphicsWebView()
 {
 }
 
-WebViewPageStatus QnWebView::status() const
+WebViewPageStatus QnGraphicsWebView::status() const
 {
     return m_status;
 }
 
-bool QnWebView::canGoBack() const
+bool QnGraphicsWebView::canGoBack() const
 {
     return m_canGoBack;
 }
 
-void QnWebView::setCanGoBack(bool value)
+void QnGraphicsWebView::setCanGoBack(bool value)
 {
     if (m_canGoBack == value)
         return;
@@ -107,7 +108,7 @@ void QnWebView::setCanGoBack(bool value)
     emit canGoBackChanged();
 }
 
-void QnWebView::setPageUrl(const QUrl &newUrl)
+void QnGraphicsWebView::setPageUrl(const QUrl &newUrl)
 {
     stop();
 
@@ -115,54 +116,7 @@ void QnWebView::setPageUrl(const QUrl &newUrl)
     setUrl(newUrl);
 }
 
-
-void QnWebView::setupStyle()
-{
-    //TODO: #GDM 90% of this is not used really.
-
-    QStyle* style = QStyleFactory().create(lit("fusion"));
-    setStyle(style);
-
-    QPalette palette = this->palette();
-
-    // Outline around the menu
-    palette.setColor(QPalette::Window, Qt::gray);
-    palette.setColor(QPalette::WindowText, Qt::black);
-
-    palette.setColor(QPalette::BrightText, Qt::gray);
-    palette.setColor(QPalette::BrightText, Qt::black);
-
-    // combo button
-    palette.setColor(QPalette::Button, Qt::gray);
-    palette.setColor(QPalette::ButtonText, Qt::black);
-
-    // combo menu
-    palette.setColor(QPalette::Base, Qt::gray);
-    palette.setColor(QPalette::Text, Qt::black);
-
-    // tool tips
-    palette.setColor(QPalette::ToolTipBase, Qt::gray);
-    palette.setColor(QPalette::ToolTipText, Qt::black);
-
-    palette.setColor(QPalette::NoRole, Qt::gray);
-    palette.setColor(QPalette::AlternateBase, Qt::gray);
-
-    palette.setColor(QPalette::Link, Qt::black);
-    palette.setColor(QPalette::LinkVisited, Qt::black);
-
-    // highlight button & menu
-    palette.setColor(QPalette::Highlight, Qt::gray);
-    palette.setColor(QPalette::HighlightedText, Qt::black);
-
-    // to customize the disabled color
-    palette.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
-
-    setPalette(palette);
-    setAutoFillBackground(true);
-}
-
-void QnWebView::setStatus(WebViewPageStatus value)
+void QnGraphicsWebView::setStatus(WebViewPageStatus value)
 {
     if (m_status == value)
         return;

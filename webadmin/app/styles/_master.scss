@@ -85,29 +85,52 @@
     text-decoration: underline;
   }
 
-  .master-success {
+  .master-icon {
     height: 70px;
-    font-size: 80px;
 
-    .glyphicon.glyphicon-cloud {
-      @include kill-glyphicon;
-      width: 64px;
-      height: 64px;
-      background-position: 0px -90px;
-    }
-
-    .glyphicon.glyphicon-ok {
-      @include kill-glyphicon;
-      width: 88px;
-      height: 88px;
+    .icon-success {
+      @include icon;
+      width: 86px;
+      height: 86px;
       background-position: 0px 0px;
     }
 
-    .glyphicon.glyphicon-remove-circle {
-      @include kill-glyphicon;
-      width: 16px;
-      height: 16px;
-      background-position: -88px 0px;
+    .icon-fail {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -86px 0px;
+    }
+
+
+    .icon-account {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -176px 0;
+    }
+
+
+    .icon-cloud {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -264px 0;
+    }
+
+    .icon-localSystem{
+      @include icon;
+      width: 176px;
+      height: 68px;
+      background-position: 0 -99px;
+
+    }
+    .icon-cloudSystem{
+      @include icon;
+      width: 176px;
+      height: 68px;
+      background-position: -176px -99px;
+
     }
 
     .preloader {
@@ -125,7 +148,7 @@
     @include kill-glyphicon;
     width: 20px;
     height: 12px;
-    background-position: -64px -88px;
+    background-position: 0 -175px;
 
   }
 
@@ -133,8 +156,7 @@
     @include kill-glyphicon;
     width: 20px;
     height: 12px;
-    background-position: -64px -100px;
-
+    background-position:  0 -188px;
   }
 }
 
@@ -190,4 +212,20 @@
   -webkit-transition-duration: 0s;
   -moz-transition-duration: 0s;
   transition-duration: 0s;
+}
+
+
+
+button, select, .form-control{
+  &.disabled,
+  &[disabled],
+  &.readonly,
+  &[readonly] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border-color: $input-border;
+    box-shadow: none;
+  }
 }

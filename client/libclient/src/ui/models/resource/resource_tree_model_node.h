@@ -87,6 +87,9 @@ protected:
 
     QnResourceTreeModel* model() const;
 
+    virtual void handlePermissionsChanged(const QnResourcePtr& resource);
+    virtual QIcon calculateIcon() const;
+
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();

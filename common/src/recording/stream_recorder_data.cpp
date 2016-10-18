@@ -2,7 +2,7 @@
 #include "stream_recorder_data.h"
 
 StreamRecorderErrorStruct::StreamRecorderErrorStruct() :
-    lastError(StreamRecorderError::NoError),
+    lastError(StreamRecorderError::noError),
     storage(QnStorageResourcePtr())
 {}
 

@@ -58,6 +58,10 @@ bool QnResourceCompareHelper::resourceLessThan(const QModelIndex& left, const QM
                 && leftLayout->isShared() != rightLayout->isShared())
                 return leftLayout->isShared();
         }
+
+        /* Servers should go below other resources. */
+        if (l->hasFlags(Qn::server) ^ r->hasFlags(Qn::server))
+            return r->hasFlags(Qn::server);
     }
 
     /* Sort by name. */

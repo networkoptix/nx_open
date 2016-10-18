@@ -31,19 +31,23 @@ body {
   display: inline-block;
 }
 
-@mixin kill-glyphicon{
-  background-size: 176px 152px;
+@mixin icon{
+  display: inline-block;
+  background-size: 350px 200px;
   background-image: url('../images/native-theme/wizard_sprite.png');
-  &:before{
-    content:none;
-  }
-
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('../images/native-theme/wizard_sprite@2x.png');
   }
 }
 
-.master-success .preloader{
+@mixin kill-glyphicon{
+  @include icon;
+  &:before{
+    content:none;
+  }
+}
+
+.master-icon .preloader{
 
   background-image: url('../images/native-theme/preloader.gif');
 

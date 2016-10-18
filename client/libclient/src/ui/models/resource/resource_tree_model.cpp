@@ -422,12 +422,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (node->resourceFlags().testFlag(Qn::server))
     {
         /* Valid servers. */
-        if (!node->resource().dynamicCast<QnFakeMediaServerResource>())
+        if (!node->resourceFlags().testFlag(Qn::fake))
         {
             if (isAdmin)
                 return m_rootNodes[Qn::ServersNode];
 
-            return bastardNode;
+            return m_rootNodes[Qn::UserDevicesNode];
         }
 
         /* Fake servers from other systems. */

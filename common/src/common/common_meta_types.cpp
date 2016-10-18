@@ -282,28 +282,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
-    /*
-     * Following code requires full-scale refactor in the classes that uses signals with such parameters.
-     * MOC-generated code contains names, based on signal methods declaration. Example:
-     * ...
-     * class QnStreamRecorder:
-     * ...
-     * signals:
-     *     void recordingFinished(const ErrorStruct &status, const QString &fileName);
-     * ...
-     *
-     * This code will require metatype, registered as:
-     *    qRegisterMetaType<StreamRecorderErrorStruct>("ErrorStruct");
-     *
-     * Much more correct behavior is to change signal declaration to following:
-     * ...
-     * signals:
-     *     void recordingFinished(const StreamRecorderErrorStruct &status, const QString &fileName);
-     * ...
-     * and therefore we can use simple registration:
-     *    qRegisterMetaType<StreamRecorderErrorStruct>();
-     */
-
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );

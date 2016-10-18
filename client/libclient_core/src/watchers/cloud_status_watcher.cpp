@@ -15,8 +15,11 @@
 
 #include <utils/common/delayed.h>
 
+#include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
 
 using namespace nx::cdb;
 
@@ -27,18 +30,23 @@ using namespace nx::cdb;
 #define TRACE(...)
 #endif
 
-
 namespace {
 
-const auto kCloudSystemId = lit("cloudId");
-const auto kLocalSystemIdTag = lit("localId");
-const auto kNameTag = lit("name");
-const auto kOwnerAccounEmail = lit("email");
-const auto kOwnerFullName = lit("owner_full_name");
-const auto kWeight = lit("weight");
-const auto kLastLoginTimeUtcMs = lit("kLastLoginTimeUtcMs");
+const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
+
+QString getLocalSystemId(const std::string& opaque)
+{
+    QMap<QByteArray, QByteArray> params;
+    nx::utils::parseNameValuePairs(QByteArray::fromStdString(opaque), ',', &params);
+
+    static const auto kOpaqueLocalSystemIdTag = QByteArray("localSystemId");
+    if (!params.contains(kOpaqueLocalSystemIdTag))
+        return QString();
+
+    return QString::fromUtf8(params.value(kOpaqueLocalSystemIdTag));
+}
 
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 {
@@ -51,7 +59,10 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 
         QnCloudSystem system;
         system.cloudId = QString::fromStdString(systemData.id);
-        system.localId = system.cloudId;// TODO: !! change for local system id when available
+        system.localId = getLocalSystemId(systemData.opaque);
+        if (system.localId.isEmpty())
+            system.localId = system.cloudId;
+
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -66,6 +77,8 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 }
 
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCloudSystem), (json), _Fields)
 
 class QnCloudStatusWatcherPrivate : public QObject
 {
@@ -148,6 +161,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         [this]()
         {
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
+            qnClientCoreSettings->save();
         });
 
     setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
@@ -542,7 +556,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
     if (it == cloudSystems.end())
         return;
 
-    if (!it->fullEqual(currentSystem))
+    if (!it->visuallyEqual(currentSystem))
     {
         currentSystem = *it;
         emit q->currentSystemChanged(currentSystem);
@@ -658,7 +672,7 @@ bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
         && qFuzzyEquals(weight, other.weight));
 }
 
-bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
+bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const
 {
     return (cloudId == other.cloudId
         && (localId == other.localId)
@@ -670,25 +684,17 @@ bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
 
 void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-    settings->setValue(kCloudSystemId, cloudId);
-    settings->setValue(kLocalSystemIdTag, localId);
-    settings->setValue(kNameTag, name);
-    settings->setValue(kOwnerAccounEmail, ownerAccountEmail);
-    settings->setValue(kOwnerFullName, ownerFullName);
-    settings->setValue(kWeight, weight);
-    settings->setValue(kLastLoginTimeUtcMs, lastLoginTimeUtcMs);
+
+    QByteArray json;
+    QJson::serialize(*this, &json);
+    const auto value = QVariant::fromValue(json);
+    settings->setValue(kCloudSystemJsonHolderTag, value);
 }
 
 QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
 {
     QnCloudSystem result;
-
-    result.cloudId = settings->value(kCloudSystemId).toString();
-    result.localId = settings->value(kLocalSystemIdTag).toString();
-    result.name = settings->value(kNameTag).toString();
-    result.ownerAccountEmail = settings->value(kOwnerAccounEmail).toString();
-    result.ownerFullName = settings->value(kOwnerFullName).toString();
-    result.weight = settings->value(kWeight, 0.0).toReal();
-    result.lastLoginTimeUtcMs = settings->value(kLastLoginTimeUtcMs, 0).toLongLong();
+    const auto json = settings->value(kCloudSystemJsonHolderTag).toByteArray();
+    QJson::deserialize(json, &result);
     return result;
 }

@@ -133,9 +133,9 @@ angular.module('webadminApp')
                 $localStorage.$reset();
                 return $http.post(proxy + '/web/api/cookieLogout');
             },
-            digest:function(login,password,realm,nonce,post){
+            digest:function(login,password,realm,nonce,method){
                 var digest = md5(login + ':' + realm + ':' + password);
-                var method = md5(post?'POST:':'GET:');
+                var method = md5((method||'GET') + ':');
                 var authDigest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
@@ -326,8 +326,8 @@ angular.module('webadminApp')
                     // 2. calculate digest
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
-                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
-                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'POST');
 
                     // 3. pass it to merge request
                     if(url.indexOf('http')!=0){
@@ -346,8 +346,8 @@ angular.module('webadminApp')
                 return self.getNonce(remoteLogin, url).then(function(data) {
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
-                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
-                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'POST');
 
                     if (url.indexOf('http') != 0) {
                         url = 'http://' + url;

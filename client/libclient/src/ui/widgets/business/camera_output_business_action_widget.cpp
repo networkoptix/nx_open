@@ -20,26 +20,24 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 {
     ui->setupUi(this);
 
-    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->fixedDurationSpinBox,
-        &QWidget::setEnabled);
-    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->fixedDurationSuffixLabel,
-        &QWidget::setEnabled);
-    connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this,
-        &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
+        [this](bool checked)
+        {
+            ui->fixedDurationSpinBox->setEnabled(checked);
+            ui->fixedDurationSuffixLabel->setEnabled(checked);
+
+            // Prolonged type of event has changed. In case of instant
+            // action event state should be updated
+            if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
+                model()->setEventState(QnBusiness::UndefinedState);
+
+            emit paramsChanged();
+        });
 
     connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
     connect(ui->fixedDurationSpinBox, QnSpinboxIntValueChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
-
-    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
-        [this](bool checked)
-        {
-            // Prolonged type of event has changed. In case of instant
-            // action event state should be updated
-            if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
-                model()->setEventState(QnBusiness::UndefinedState);
-        });
 
     setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }

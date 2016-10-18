@@ -120,7 +120,7 @@ protected:
 /** Fix permissions for exported layouts (files). */
 TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
 {
-    auto layout = createLayout(Qn::url | Qn::local);
+    auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
     qnResPool->addResource(layout);
 
@@ -146,7 +146,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
 /** Fix permissions for locked exported layouts (files). */
 TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 {
-    auto layout = createLayout(Qn::url | Qn::local, true);
+    auto layout = createLayout(Qn::exported_layout, true);
     layout->setUrl("path/to/file");
     qnResPool->addResource(layout);
 

@@ -25,9 +25,11 @@ public:
 
         Server,
         Servers,
+        HealthMonitor,
 
         Layout,
         SharedLayout,
+        VideoWallLayout,    /**< Layout, accessible through videowall. */
         Layouts,
 
         Camera,
@@ -46,6 +48,7 @@ public:
         IOModule,
         WebPage,
         WebPages,
+
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,
