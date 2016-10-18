@@ -11,6 +11,7 @@ class QnAbstractResourceAccessProvider: public Connective<QObject>
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
+
 public:
     /** Types of base providers, sorted by priority. */
     enum class Source
@@ -40,15 +41,15 @@ public:
     virtual Source accessibleVia(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList* providers = nullptr
-    ) const = 0;
+        QnResourceList* providers = nullptr) const = 0;
 
     //TODO: #GDM Think if we have a better place for this method
     static QList<QnResourceAccessSubject> allSubjects();
 
     /** List of users, belonging to given role. */
     static QList<QnResourceAccessSubject> dependentSubjects(const QnResourceAccessSubject& subject);
+
 signals:
-    void accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        Source value);
+    void accessChanged(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource, Source value);
 };
