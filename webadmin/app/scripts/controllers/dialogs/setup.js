@@ -87,12 +87,12 @@ angular.module('webadminApp')
         function checkInternet(reload){
             $log.log("check internet connection");
 
-            mediaserver.checkInternet().then(function(hasInternetOnServer){
+            mediaserver.checkInternet(reload).then(function(hasInternetOnServer){
                 $scope.hasInternetOnServer = hasInternetOnServer;
                 $log.log("internet on server: " + $scope.hasInternetOnServer);
             });
 
-            cloudAPI.checkConnection().then(function(){
+            cloudAPI.checkConnection(reload).then(function(){
                 $scope.hasInternetOnClient = true;
             },function(error){
                 $scope.hasInternetOnClient = false;
