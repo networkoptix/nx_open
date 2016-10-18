@@ -1183,24 +1183,24 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
             return false;
         }
 
-        NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
-        while (true)
-        {
-            x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
-            if (!x509)
-                continue;
+        //NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
+        //while (true)
+        //{
+        //    x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+        //    if (!x509)
+        //        continue;
 
-            if (!SSL_CTX_add_extra_chain_cert(data->serverContext.get(), x509.get()))
-            {
-                NX_LOG(lm("SSL: Unable to use chained X509: %1").arg(x509info(*x509)),
-                    cl_logWARNING);
+        //    if (!SSL_CTX_add_extra_chain_cert(data->serverContext.get(), x509.get()))
+        //    {
+        //        NX_LOG(lm("SSL: Unable to use chained X509: %1").arg(x509info(*x509)),
+        //            cl_logWARNING);
 
-                continue;
-            }
+        //        continue;
+        //    }
 
-            NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
-            break;
-        }
+        //    NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
+        //    break;
+        //}
     }
 
     {
