@@ -1089,21 +1089,21 @@ String SslEngine::makeCertificateAndKey(
     auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
     {
-        NX_LOG("SSL cant generate big number", cl_logWARNING);
+        NX_LOG("SSL: Unable to generate big number", cl_logWARNING);
         return String();
     }
 
     auto rsa = utils::wrapUnique(RSA_new(), &RSA_free);
     if (!rsa || !RSA_generate_key_ex(rsa.get(), kRsaLength, number.get(), NULL))
     {
-        NX_LOG("SSL cant generate RSA", cl_logWARNING);
+        NX_LOG("SSL: Unable to generate RSA", cl_logWARNING);
         return String();
     }
 
     auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
     if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
     {
-        NX_LOG("SSL cant generate PKEY", cl_logWARNING);
+        NX_LOG("SSL: Unable to generate PKEY", cl_logWARNING);
         return String();
     }
 
@@ -1114,7 +1114,7 @@ String SslEngine::makeCertificateAndKey(
         || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
         || !X509_set_pubkey(x509.get(), pkey.get()))
     {
-        NX_LOG("SSL cant generate X509 cert", cl_logWARNING);
+        NX_LOG("SSL: Unable to generate X509 cert", cl_logWARNING);
         return String();
     }
 
@@ -1131,7 +1131,7 @@ String SslEngine::makeCertificateAndKey(
         || !X509_set_issuer_name(x509.get(), name)
         || !X509_sign(x509.get(), pkey.get(), EVP_sha1()))
     {
-        NX_LOG("SSL cant sign X509 cert", cl_logWARNING);
+        NX_LOG("SSL: Unable to sign X509 cert", cl_logWARNING);
         return String();
     }
 
@@ -1142,7 +1142,7 @@ String SslEngine::makeCertificateAndKey(
         || !PEM_write_bio_X509(bio.get(), x509.get())
         || !BIO_read(bio.get(), writeBuffer, kBufferSize))
     {
-        NX_LOG("SSL cant generate cert string", cl_logWARNING);
+        NX_LOG("SSL: Unable to generate cert string", cl_logWARNING);
         return String();
     }
 
@@ -1183,24 +1183,24 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
             return false;
         }
 
-        //NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
-        //while (true)
-        //{
-        //    x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
-        //    if (!x509)
-        //        continue;
+        NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
+        while (true)
+        {
+            x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+            if (!x509)
+                break;
 
-        //    if (!SSL_CTX_add_extra_chain_cert(data->serverContext.get(), x509.get()))
-        //    {
-        //        NX_LOG(lm("SSL: Unable to use chained X509: %1").arg(x509info(*x509)),
-        //            cl_logWARNING);
-
-        //        continue;
-        //    }
-
-        //    NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
-        //    break;
-        //}
+            if (SSL_CTX_add_extra_chain_cert(data->serverContext.get(), x509.get()))
+            {
+                NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
+                x509.release();
+            }
+            else
+            {
+                NX_LOG(lm("SSL: Unable to load chained X509: %1").arg(x509info(*x509)), cl_logWARNING);
+                x509.reset();
+            }
+        }
     }
 
     {
