@@ -818,6 +818,10 @@ TEST(MediaDbTest, StorageDB)
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
+#ifdef Q_OS_LINUX
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+#endif
+
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
         statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
