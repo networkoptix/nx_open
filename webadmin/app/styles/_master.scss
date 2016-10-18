@@ -132,6 +132,27 @@
       background-position: -176px -99px;
 
     }
+    .icon-arrow-right{
+      @include icon;
+      width: 40px;
+      height: 40px;
+      margin: 15px 0;
+      background-position: -124px -180px;
+    }
+    a:hover .icon-arrow-right{
+      background-position: -172px -180px;
+    }
+    .icon-arrow-left{
+      @include icon;
+      width: 40px;
+      height: 40px;
+      margin: 15px 0;
+      background-position: -20px -180px;
+    }
+
+    a:hover .icon-arrow-left{
+      background-position: -68px -180px;
+    }
 
     .preloader {
       display: inline-block;
