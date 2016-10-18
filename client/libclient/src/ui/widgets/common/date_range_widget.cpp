@@ -31,10 +31,16 @@ qint64 getEndOfTheDayMs(qint64 timeMs)
     return getStartOfTheDayMs(timeMs) + kMillisecondsInDay;
 }
 
-QDateTime maxAllowedDate()
+QDate minAllowedDate()
+{
+    static const QDate kMinAllowedDate(2000, 1, 1);
+    return kMinAllowedDate;
+}
+
+QDate maxAllowedDate()
 {
     // 1 month forward should cover all local timezones diffs.
-    return QDateTime::currentDateTime().addMonths(1);
+    return QDate::currentDate().addMonths(1);
 }
 
 }
@@ -83,11 +89,11 @@ void QnDateRangeWidget::setRange(qint64 startTimeMs, qint64 endTimeMs)
     m_endTimeMs = end;
 
     QSignalBlocker blockFrom(ui->dateEditFrom);
-    ui->dateEditFrom->setDateRange(defaultStartDate(), maxAllowedDate().date());
+    ui->dateEditFrom->setDateRange(minAllowedDate(), maxAllowedDate());
     ui->dateEditFrom->setDate(displayDate(start));
 
     QSignalBlocker blockTo(ui->dateEditTo);
-    ui->dateEditTo->setDateRange(defaultStartDate(), maxAllowedDate().date());
+    ui->dateEditTo->setDateRange(minAllowedDate(), maxAllowedDate());
     ui->dateEditTo->setDate(displayDate(end));
 
     updateAllowedRange();
@@ -125,8 +131,8 @@ void QnDateRangeWidget::updateRange()
 
 void QnDateRangeWidget::updateAllowedRange()
 {
-    ui->dateEditFrom->setDateRange(defaultStartDate(), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), maxAllowedDate().date());
+    ui->dateEditFrom->setDateRange(minAllowedDate(), ui->dateEditTo->date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), maxAllowedDate());
 }
 
 QDateTime QnDateRangeWidget::actualDateTime(const QDate &userDate) const
