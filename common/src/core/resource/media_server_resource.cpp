@@ -30,10 +30,12 @@
 #include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 #include <common/common_module.h>
+#include <api/global_settings.h>
 
 namespace {
     const QString kUrlScheme = lit("rtsp");
-
+    const QString protoVersionPropertyName = lit("protoVersion");
+    const QString safeModePropertyName = lit("ecDbReadOnly");
 }
 
 QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
@@ -486,7 +488,31 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    return qnCommon->moduleInformation();
+    if (getId() == qnCommon->moduleGUID())
+        return qnCommon->moduleInformation();
+
+    // build module information for other server
+
+    QnModuleInformation moduleInformation;
+    moduleInformation.type = QnModuleInformation::nxMediaServerId();
+    moduleInformation.customization = QnAppInfo::customizationName();
+    moduleInformation.sslAllowed = false;
+    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
+    moduleInformation.name = getName();
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+
+    if (hasProperty(safeModePropertyName))
+        moduleInformation.ecDbReadOnly = QnLexical::deserialized(getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+
+    moduleInformation.systemName = qnGlobalSettings->systemName();
+    moduleInformation.id = getId();
+    moduleInformation.port = getPort();
+    moduleInformation.version = getVersion();
+    moduleInformation.systemInformation = getSystemInfo();
+    moduleInformation.serverFlags = getServerFlags();
+
+    return moduleInformation;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
