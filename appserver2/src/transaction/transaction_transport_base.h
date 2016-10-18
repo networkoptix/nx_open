@@ -180,6 +180,7 @@ public:
 
     void processExtraData();
     void startListening();
+    bool remotePeerSupportsKeepAlive() const;
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
 
@@ -341,6 +342,7 @@ private:
     QAuthenticator m_remotePeerCredentials;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     nx::network::aio::Timer m_timer;
+    bool m_remotePeerSupportsKeepAlive;
 
 private:
     QnTransactionTransportBase(

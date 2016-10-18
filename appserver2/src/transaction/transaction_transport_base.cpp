@@ -114,6 +114,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
+    m_remotePeerSupportsKeepAlive = false;
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
@@ -146,6 +147,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
     if (keepAliveHeaderIter != request.headers.end())
     {
+        m_remotePeerSupportsKeepAlive = true;
         nx_http::header::KeepAlive keepAliveHeader;
         if (keepAliveHeader.parse(keepAliveHeaderIter->second))
             m_tcpKeepAliveTimeout = std::max(
@@ -931,6 +933,11 @@ void QnTransactionTransportBase::aggregateOutgoingTransactionsNonSafe()
     m_dataToSend.erase( std::next(saveToIter), it );
 }
 
+bool QnTransactionTransportBase::remotePeerSupportsKeepAlive() const
+{
+    return m_remotePeerSupportsKeepAlive;
+}
+
 bool QnTransactionTransportBase::isHttpKeepAliveTimeout() const
 {
     QnMutexLocker lock( &m_mutex );
@@ -1297,6 +1304,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
         if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
         {
+            m_remotePeerSupportsKeepAlive = true;
             nx_http::header::KeepAlive keepAliveHeader;
             if (keepAliveHeader.parse(keepAliveHeaderIter->second))
                 m_tcpKeepAliveTimeout = std::max(

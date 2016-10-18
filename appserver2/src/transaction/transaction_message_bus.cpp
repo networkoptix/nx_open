@@ -1386,7 +1386,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
         {
             QnTransactionTransport* transport = itr.value();
 
-            if (transport->getState() >= QnTransactionTransport::Connected &&
+            if (transport->remotePeerSupportsKeepAlive() &&
+                transport->getState() >= QnTransactionTransport::Connected &&
                 transport->getState() < QnTransactionTransport::Closed &&
                 transport->isHttpKeepAliveTimeout())
             {
