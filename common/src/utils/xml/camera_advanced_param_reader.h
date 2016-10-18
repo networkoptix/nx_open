@@ -43,8 +43,13 @@ private:
 	static bool parsePluginXml(const QDomElement &pluginXml, QnCameraAdvancedParams &params);
 	static bool parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group);
 	static bool parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param);
+
+    static bool parseDependencyGroupsXml(
+        const QDomElement& elementXml,
+        std::vector<QnCameraAdvancedParameterDependency>& dependencies);
+
     static bool parseDependenciesXml(
-        const QDomElement &elementXml,
+        const QDomElement& elementXml,
         std::vector<QnCameraAdvancedParameterDependency>& dependencies);
 
     static bool parseConditionsXml(

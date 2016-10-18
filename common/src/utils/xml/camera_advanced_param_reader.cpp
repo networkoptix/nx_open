@@ -151,10 +151,13 @@ namespace QnXmlTag {
     const QString paramReadOnly         = lit("readOnly");
     const QString paramReadCmd          = lit("readCmd");
     const QString paramWriteCmd         = lit("writeCmd");
+
     const QString dependenciesRoot      = lit("dependencies");
+    const QString dependenciesShow      = lit("dependencies-ranges");
     const QString conditionalShow       = lit("conditional-show");
-    const QString conditionalRanges     = lit("conditional-ranges");
+    const QString dependenciesRanges    = lit("dependencies-ranges");
     const QString conditionalRange      = lit("conditional-range");
+
     const QString dependencyId          = lit("id");
     const QString conditionId           = lit("id");
     const QString conditionWatch        = lit("watch");
@@ -242,7 +245,6 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
     param.readCmd       = elementXml.attribute(QnXmlTag::paramReadCmd);
     param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
 
-    //parse conditions
     auto childNodes = elementXml.childNodes();
 
     if (childNodes.isEmpty())
@@ -250,10 +252,14 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
 
     for (int i = 0; i < childNodes.size(); ++i)
     {
-        auto node = childNodes.at(i);
+        auto node = childNodes.at(i).toElement();
+
+        if (node.isNull())
+            continue;
+
         if (node.nodeName() == QnXmlTag::dependenciesRoot)
         {
-            if (!parseDependenciesXml(node.toElement(), param.dependencies))
+            if (!parseDependencyGroupsXml(node.toElement(), param.dependencies))
                 return false;
         }
     }
@@ -261,52 +267,64 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
     return true;
 }
 
+bool QnCameraAdvacedParamsXmlParser::parseDependencyGroupsXml(
+    const QDomElement& elementXml,
+    std::vector<QnCameraAdvancedParameterDependency>& dependencies)
+{
+    auto dependencyGroupNodes = elementXml.childNodes();
+
+    bool isOk = true;
+    for (int i = 0; i < dependencyGroupNodes.size(); ++i)
+    {
+        auto depGroup = dependencyGroupNodes.at(i).toElement();
+
+        if (depGroup.isNull())
+            continue;
+
+        isOk = parseDependenciesXml(depGroup, dependencies);
+
+        if (!isOk)
+            break;
+    }
+
+    return isOk;
+}
+
 bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
     const QDomElement& elementXml,
     std::vector<QnCameraAdvancedParameterDependency>& dependencies)
 {
-    auto childNodes = elementXml.childNodes();
-
-    for (int i = 0; i < childNodes.size(); ++i)
+    bool isOk = true;
+    auto dependencyNodes = elementXml.childNodes();
+    for (int i = 0;  i < dependencyNodes.size(); ++i)
     {
-        auto node = childNodes.at(i);
+        auto depNode = dependencyNodes.at(i).toElement();
 
-        if (!node.isElement())
+        if (depNode.isNull())
             continue;
 
-        if (node.nodeName() == QnXmlTag::conditionalShow)
-        {
-            QnCameraAdvancedParameterDependency dependency;
+        QnCameraAdvancedParameterDependency dependency;
 
+        if (depNode.nodeName() == QnXmlTag::conditionalShow)
+        {
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Show;
-            parseConditionsXml(node.toElement(), dependency.conditions);
-            dependencies.push_back(dependency);
         }
-        else if (node.nodeName() == QnXmlTag::conditionalRanges)
+        else if (depNode.nodeName() == QnXmlTag::conditionalRange)
         {
-            auto conditionNodes = node.childNodes();
-            for (int i = 0; i < conditionNodes.size(); ++i)
-            {
-                auto condRangeXmlElement = conditionNodes.at(i).toElement();
-                if (condRangeXmlElement.isNull())
-                    continue;
-
-                QnCameraAdvancedParameterDependency dependency;
-
-                if (condRangeXmlElement.nodeName() != QnXmlTag::conditionalRange)
-                    return false;
-
-                dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
-                dependency.range = condRangeXmlElement.attribute(QnXmlTag::paramRange);
-                dependency.internalRange = condRangeXmlElement.attribute(QnXmlTag::paramInternalRange);
-
-                parseConditionsXml(condRangeXmlElement, dependency.conditions);
-                dependencies.push_back(dependency);
-            }
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.range = depNode.attribute(QnXmlTag::paramRange);
+            dependency.internalRange = depNode.attribute(QnXmlTag::paramInternalRange);
         }
+
+        isOk = parseConditionsXml(depNode, dependency.conditions);
+
+        if (!isOk)
+            break;
+
+        dependencies.push_back(dependency);
     }
 
-    return true;
+    return isOk;
 }
 
 bool QnCameraAdvacedParamsXmlParser::parseConditionsXml(

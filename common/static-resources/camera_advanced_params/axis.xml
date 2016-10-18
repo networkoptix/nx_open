@@ -123,7 +123,7 @@
                     readCmd="param.cgi">
                     <dependencies>
                         
-                        <conditional-ranges>
+                        <dependencies-ranges>
                             <conditional-range range="8" internalRange="8000">
                                 <condition 
                                     watch="root.AudioSource.A0.AudioEncoding"
@@ -134,7 +134,7 @@
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=AAC"/>
                             </conditional-range>
-                        </conditional-ranges>
+                        </dependencies-ranges>
                     </dependencies>
                 </param>
                 <param id="root.AudioSource.A0.BitRate"
@@ -145,7 +145,7 @@
                     readCmd="param.cgi">
                     <dependencies>
                         
-                        <conditional-ranges>
+                        <dependencies-ranges>
                             <conditional-range range="64" internalRange="64000">
                                 <condition 
                                     watch="root.AudioSource.A0.AudioEncoding"
@@ -162,7 +162,7 @@
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=AAC"/>
                             </conditional-range>
-                        </conditional-ranges>
+                        </dependencies-ranges>
                     </dependencies>
                 </param>
                 <param id="root.Audio.A0.AlarmLevel"
@@ -203,11 +203,13 @@
                         readCmd="param.cgi">
 
                         <dependencies>
-                            <conditional-show>
-                                <condition 
-                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition 
+                                        watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
                     <param id="root.Network.Interface.I0.Manual.IPAddress"
@@ -216,14 +218,16 @@
                         readCmd="param.cgi">
 
                         <dependencies>
-                            <conditional-show>
-                                <condition 
-                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                                <condition
-                                    watch="root.Network.Interface.I0.Link.BootProto"
-                                    condition="value=Static"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition 
+                                        watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                    <condition
+                                        watch="root.Network.Interface.I0.Link.BootProto"
+                                        condition="value=Static"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
                     <param id="root.Network.Interface.I0.Manual.SubnetMask"
@@ -232,30 +236,34 @@
                         readCmd="param.cgi">
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition 
-                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                                <condition
-                                    watch="root.Network.Interface.I0.Link.BootProto"
-                                    condition="value=Static"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition 
+                                        watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                    <condition
+                                        watch="root.Network.Interface.I0.Link.BootProto"
+                                        condition="value=Static"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>                                
-                    <param id="root.Network.Interface.I0.Manual.DefaultRouter"
+                    <param id="rodeoot.Network.Interface.I0.Manual.DefaultRouter"
                         name="DefaultGateway"
                         dataType="String"
                         readCmd="param.cgi">                                
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition 
-                                    watch="root.Network.Interface.I0.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                                <condition
-                                    watch="root.Network.Interface.I0.Link.BootProto"
-                                    condition="value=Static"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition 
+                                        watch="root.Network.Interface.I0.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                    <condition
+                                        watch="root.Network.Interface.I0.Link.BootProto"
+                                        condition="value=Static"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>    
                     <param id="root.Network.Interface.I1.Link.IPv4Enabled"
@@ -272,11 +280,13 @@
                         readCmd="param.cgi">
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
                     <param id="root.Network.Interface.I1.Manual.IPAddress"
@@ -285,14 +295,16 @@
                         readCmd="param.cgi">
 
                         <dependencies>
-                            <conditional-show>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.BootProto"
-                                    condition="value=Static"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.BootProto"
+                                        condition="value=Static"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
                     <param id="root.Network.Interface.I1.Manual.SubnetMask"
@@ -301,14 +313,16 @@
                         readCmd="param.cgi">
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.BootProto"
-                                    condition="value=Static"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.BootProto"
+                                        condition="value=Static"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>                                
                     <param id="root.Network.Interface.I1.Manual.DefaultRouter"
@@ -317,14 +331,16 @@
                         readCmd="param.cgi">
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.IPv4Enabled"
-                                    condition="value=Yes"/>
-                                <condition
-                                    watch="root.Network.Interface.I1.Link.BootProto"
-                                    condition="value=Static"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.IPv4Enabled"
+                                        condition="value=Yes"/>
+                                    <condition
+                                        watch="root.Network.Interface.I1.Link.BootProto"
+                                        condition="value=Static"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
 
@@ -385,11 +401,13 @@
                         dataType="String">
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition
-                                    watch="root.Network.UPnP.Enabled"
-                                    condition="value=Yes"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition
+                                        watch="root.Network.UPnP.Enabled"
+                                        condition="value=Yes"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
                 </group>
@@ -404,11 +422,13 @@
                         dataType="String">
                         
                         <dependencies>
-                            <conditional-show>
-                                <condition
-                                    watch="root.Network.Bonjour.Enabled"
-                                    condition="value=Yes"/>
-                            </conditional-show>
+                            <dependencies-show>
+                                <conditional-show>
+                                    <condition
+                                        watch="root.Network.Bonjour.Enabled"
+                                        condition="value=Yes"/>
+                                </conditional-show>
+                            </dependencies-show>
                         </dependencies>
                     </param>
                 </group>
@@ -427,11 +447,13 @@
                     readCmd="param.cgi">
 
                     <dependencies>
-                        <conditional-show>
-                            <condition
-                                watch="root.StatusLED.Usage"
-                                condition="value=Flash"/>
-                        </conditional-show>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="root.StatusLED.Usage"
+                                    condition="value=Flash"/>
+                            </conditional-show>
+                        </dependencies-show>
                     </dependencies>
                 </param>
             </group>
