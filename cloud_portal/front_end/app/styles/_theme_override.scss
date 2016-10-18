@@ -97,6 +97,14 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   background-color: $light2 !important;
 }
 
+.nav-tabs > li > a{
+  line-height: 16px;
+}
+.nav-tabs > li > a:hover {
+  background-color: #fff !important;
+}
+
+
 h1{
   margin-bottom: $line-height-computed;
 }
@@ -368,4 +376,17 @@ select {
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('/static/images/arrow_down@2x.png') !important;
   }
+}
+
+.uib-tab.active{
+    .tab-heading-hack{
+        border-bottom:1px solid $nav-tabs-border-color;
+        padding: 14px 0;
+    }
+}
+
+.tab-pane>.panel{
+    border-top: none;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
 }

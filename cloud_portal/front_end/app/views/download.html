@@ -1,28 +1,68 @@
-<h1>Download VMS_NAME</h1>
-<p>Latest version: <b>{{downloads.version}}</b></p>
-<p ng-if="downloads.description" ng-bind-html="downloads.description"></p>
-<p><a ng-href="{{downloads.readMoreLink}}" target="_blank">What's new in this version?</a></p>
+<h1>Download</h1>
 
 <uib-tabset>
     <uib-tab ng-repeat="platform in downloads.platforms"
              active="platform.active"
-             heading="{{platform.name}}"
              select="changeHash(platform)" >
+        <uib-tab-heading>
+            <span class="tab-heading-hack">{{platform.name}}</span>
+        </uib-tab-heading>
         <div class="panel panel-default">
-            <div class="panel-heading" ng-if="platform.description" ng-bind-html="platform.description"></div>
             <div class="panel-body">
-                <div class="container">
-                    <div class="col-md-6" ng-repeat="group in platform.linksGroups">
-                        <h2 ng-if="group.name">{{group.name}}</h2>
-                        <br ng-if="group.name">
-                        <p ng-repeat="link in group.links">
-                            <a ng-href="{{link.src}}" ng-class="link.classes">
-                                {{link.name}}
-                            </a>
-                        </p>
+                <div class="col-md-3  col-md-push-9 border-left">
+                    <p>
+                        <b>Latest version</b>
+                        <h2><b>{{downloads.version}}</b></h2>
+                    </p>
+                    <p ng-if="platform.description" ng-bind-html="platform.description"></p>
+                    <p><a ng-href="{{downloads.readMoreLink}}" target="_blank">What's new?</a></p>
+                </div>
+
+                <div class="col-md-9 col-md-pull-3 ">
+                    <div class="row">
+                        <a ng-href="{{platform.installers[0].src}}" class="col-md-6 col-sm-8">
+                            <div class="panel panel-default hoverable">
+                                <div class="panel-body">
+                                    <span class="download-link pull-left"></span>
+                                    <h2><b>Download VMS_NAME</b></h2>
+                                    {{platform.installers[0].name}}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div ng-if="platform.installers.length>1">
+
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6">
+                                <p><b>Other packages:</b></p>
+                            </div>
+                            <div class="col-md-4 col-sm-6" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
+                                <p>
+                                    <a ng-href="{{link.src}}">
+                                        {{link.name}}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
+                                <p>
+                                    <a ng-href="{{link.src}}">
+                                        {{link.name}}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </uib-tab>
 </uib-tabset>
+
+
+<a ng-repeat="platform in downloads.mobile"
+   class="mobile-link"
+   ng-class="platform.os"
+   ng-href="{{platform.src}}">
+</a>

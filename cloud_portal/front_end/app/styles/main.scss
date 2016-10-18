@@ -180,6 +180,13 @@ footer {
   box-shadow:none;
 }
 
+.border-left{
+  border-left:1px solid $common-border-color;
+}
+
+.border-right{
+  border-right:1px solid $common-border-color;
+}
 .border-top{
   border-top:1px solid $common-border-color;
 }
@@ -538,4 +545,46 @@ h1.process-success{
 .inactive{
     opacity:0.7;
     cursor: pointer;
+}
+
+.download-link{
+    display:inline-block;
+    width:32px;
+    height:32px;
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    margin-right:10px;
+
+    background-image: url('/static/images/download.png') !important;
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+        background-image: url('/static/images/download@2x.png') !important;
+    }
+}
+.mobile-link {
+    display:inline-block;
+    width:140px;
+    height:40px;
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: 140px 40px;
+
+    margin-right:10px;
+
+    &.iOS,&.ios{
+        background-image: url('/static/images/appstore.png') !important;
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+            background-image: url('/static/images/appstore@2x.png') !important;
+        }
+    }
+
+    &.Android,&.android{
+        background-image: url('/static/images/googleplay.png') !important;
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+            background-image: url('/static/images/googleplay@2x.png') !important;
+        }
+    }
 }

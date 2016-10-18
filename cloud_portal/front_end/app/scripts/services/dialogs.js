@@ -168,7 +168,13 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 }).result;
             },
             noClientDetected:function(){
-                return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
+                // message, title, actionLabel, actionType
+                return this.confirm(L.downloads.noClientDetectedMessage,
+                    L.downloads.noClientDetectedTitle, L.downloads.action)
+                    .then(function(){
+                        $location.path("/download");
+                    });
+                // return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
             },
 
 
