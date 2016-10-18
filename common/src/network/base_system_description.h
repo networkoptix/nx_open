@@ -51,6 +51,7 @@ public:
 
     virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
+    // TODO: #ynikitenkov Rename host "field" to appropriate
     virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
