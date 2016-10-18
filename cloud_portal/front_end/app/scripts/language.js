@@ -2,7 +2,9 @@
 
 var L = {
     productName: 'PRODUCT_NAME',
-    clientProtocol: 'CLIENT_PROTOCOL:',
+    //clientProtocol: 'CLIENT_PROTOCOL:',
+    clientProtocol: 'nx-vms:',
+
     clientDomain: '{{portalDomain}}',
 
     dialogs:{
@@ -154,5 +156,10 @@ var L = {
         successDeleted: 'System {systemName} was successfully deleted from your account',
 
         permissionsRemoved: 'Permissions were removed from {accountEmail}'
+    },
+    downloads:{
+        noClientDetectedTitle: 'Install VMS_NAME to view your system',
+        noClientDetectedMessage: null,
+        action: 'Download VMS_NAME'
     }
 };
