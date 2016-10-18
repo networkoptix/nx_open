@@ -1,6 +1,8 @@
 #include "media_file_settings_dialog.h"
 #include "ui_media_file_settings_dialog.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <core/resource/media_resource.h>
 #include <core/ptz/media_dewarping_params.h>
 
@@ -15,7 +17,7 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/ffmpeg_image_provider.h>
-#include <utils/common/scoped_value_rollback.h>
+
 
 QnMediaFileSettingsDialog::QnMediaFileSettingsDialog(QWidget* parent):
     base_type(parent),
@@ -37,19 +39,15 @@ void QnMediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr& res
     if (m_resource == resource)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> updateRollback(m_updating, true);
 
     m_resource = resource;
+    auto resourcePtr = resource->toResourcePtr();
 
-    if (m_resource->toResourcePtr()->hasFlags(Qn::still_image))
-    {
-        m_imageProvider.reset(new QnBasicImageProvider(
-            QImage(m_resource->toResourcePtr()->getUrl()), this));
-    }
+    if (resourcePtr->hasFlags(Qn::still_image))
+        m_imageProvider.reset(new QnBasicImageProvider(QImage(resourcePtr->getUrl()), this));
     else
-    {
-        m_imageProvider.reset(new QnFfmpegImageProvider(resource->toResourcePtr(), this));
-    }
+        m_imageProvider.reset(new QnFfmpegImageProvider(resourcePtr, this));
 
     m_imageProvider->loadAsync();
 
