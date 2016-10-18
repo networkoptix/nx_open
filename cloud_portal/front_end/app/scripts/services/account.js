@@ -60,18 +60,13 @@ angular.module('cloudApp')
                 return $rootScope.session.email;
             },
 
-            setPassword:function(password){
-                $rootScope.session.password = password; // TODO: This is dirty security hole, but I need this to make "Open in client" work
-            },
-            getPassword:function(){
-                return $rootScope.session.password;
-            },
             login:function (email, password, remember){
                 this.setEmail(email);
-                this.setPassword(password);
+                var self = this;
                 return cloudApi.login(email, password, remember).then(function(result){
                     if(result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
-                        $rootScope.session.loginState = result.data.email;
+                        self.setEmail(result.data.email);
+                        $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface
                     }
                 });
             },

@@ -68,13 +68,6 @@ angular.module('cloudApp')
                     linkSettings.auth = authKey;
                     defer.resolve(self.generateLink(linkSettings));
                 },function(no_account){
-                    console.error("couldn't retrieve temporary auth_key from cloud_portal",no_account);
-                    console.warn("fallback to permanent credentials");
-
-                    var username = account.getEmail();
-                    var password = account.getPassword();
-                    linkSettings.auth = $base64.encode(username + ':' + password);
-
                     defer.resolve(self.generateLink(linkSettings));
                     // defer.reject(null);
                 });
