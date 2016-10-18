@@ -308,8 +308,8 @@ private:
 	mutable QnMutex m_occupiedSpaceInfoMutex;
 	StorageSpaceInfoMap m_occupiedSpaceInfo;
 
-    QSet<QString> m_cameraInfoFilesWrittenInfo;
-    quint64 m_cameraInfoModCounter;
+    QMap<QString, QByteArray> m_storageUrlToCameraInfo;
+    QElapsedTimer m_cameraInfoWriteTimer;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
