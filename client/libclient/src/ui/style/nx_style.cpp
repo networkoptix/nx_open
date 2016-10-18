@@ -3091,6 +3091,9 @@ int QnNxStyle::pixelMetric(
     {
         case PM_ButtonMargin:
         {
+            if (qobject_cast<const QAbstractItemView*>(widget))
+                return 0;
+
             if (isCheckableButton(option))
                 return Metrics::kSwitchMargin * 2;
 
