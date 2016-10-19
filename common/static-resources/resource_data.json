@@ -1463,7 +1463,21 @@
 			"showUrl": true,
 			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
-		}
+		},
+        {
+            "keys":[
+                "Digital_Watchdog|DWC-PF5M1TIR"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 32,
+                "max": 8000
+            },
+            "lowStreamBitrateBounds": {
+                "min": 32,
+                "max": 8000
+            }
+        }
+
     ]
 }
 
