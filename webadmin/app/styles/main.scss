@@ -5,7 +5,7 @@ $icon-font-path: "../fonts/";
 
 @mixin icon{
   display: inline-block;
-  background-size: 350px 200px;
+  background-size: 352px 224px;
   background-image: url('../images/icons/wizard_sprite.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('../images/icons/wizard_sprite@2x.png');
