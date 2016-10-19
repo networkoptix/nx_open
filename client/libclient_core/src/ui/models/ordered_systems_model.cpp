@@ -25,10 +25,10 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
             handleLocalWeightsChanged();
     });
 
-    setSourceModel(new QnSystemsModel(this));
-
-    handleCloudSystemsChanged();
     handleLocalWeightsChanged();
+    handleCloudSystemsChanged();
+
+    setSourceModel(new QnSystemsModel(this));
 
     setDynamicSortFilter(true);
     sort(0);
@@ -183,6 +183,7 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
         return;
 
     m_cloudWeights = newCloudSystemsData;
+
     updateFinalWeights();
 }
 
@@ -205,6 +206,7 @@ void QnOrderedSystemsModel::handleLocalWeightsChanged()
 
     m_localWeights = newWeights;
     m_newSystemWeights.clear();
+
     updateFinalWeights();
 }
 
@@ -220,7 +222,7 @@ void QnOrderedSystemsModel::updateFinalWeights()
         auto& currentWeightData = newWeights[it.key()];
 
         // Force to replace with greater weight to prevent "jumping"
-        if (currentWeightData.weight > nextWeightData.weight)
+        if (nextWeightData.weight > currentWeightData.weight)
             currentWeightData = nextWeightData;
     }
 
@@ -232,5 +234,5 @@ void QnOrderedSystemsModel::updateFinalWeights()
         return;
 
     m_finalWeights = newWeights;
-    invalidate();
+    sort(0);
 }

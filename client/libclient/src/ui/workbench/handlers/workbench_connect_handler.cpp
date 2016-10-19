@@ -585,6 +585,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
+    const QUrl& url,
     const QnConnectionInfo& info,
     const ConnectionSettingsPtr& storeSettings)
 {
@@ -608,7 +609,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     storeLocalSystemConnection(
         info.systemName,
         helpers::getTargetSystemId(serverModuleInfo),   //< getTargetSystemId is used for consistency
-        info.ecUrl,
+        url,
         storeSettings->storePassword,
         storeSettings->autoLogin,
         storeSettings->forceRemoveOldConnection);
@@ -964,7 +965,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
-            storeConnectionRecord(connectionInfo, storeSettings);
+            storeConnectionRecord(url, connectionInfo, storeSettings);
             break;
         default:
             break;
