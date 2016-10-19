@@ -136,6 +136,7 @@ public:
     QnTransactionTransport( const ApiPeerData& localPeer );
     ~QnTransactionTransport();
 
+    void monitorConnectionForClosure();
     void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
 
 signals:
@@ -374,7 +375,7 @@ private:
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
-    void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onMonitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
     QUrl generatePostTranUrl();
     void aggregateOutgoingTransactionsNonSafe();
 
