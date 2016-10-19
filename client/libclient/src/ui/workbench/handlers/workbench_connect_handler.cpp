@@ -172,6 +172,7 @@ void updateWeightData(const QString& systemId)
     currentWeightData.weight = helpers::calculateSystemWeight(
         currentWeightData.weight, currentWeightData.lastConnectedUtcMs) + 1;
     currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+    currentWeightData.realConnection = true;
 
     if (itWeightData == weightData.end())
         weightData.append(currentWeightData);
