@@ -9,6 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
+#include <utils/db/filter.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
@@ -192,6 +193,10 @@ private:
         const std::string& accountEmail,
         api::TemporaryCredentials temporaryCredentials,
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
+
+    void prepareAccountFieldsToUpdate(
+        const data::AccountUpdateDataWithEmail& accountData,
+        std::vector<nx::db::SqlFilterField>* const fieldsToSet);
 };
 
 } // namespace cdb

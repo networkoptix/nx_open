@@ -14,6 +14,7 @@ class TransactionTransport
 {
 public:
     TransactionTransport(
+        ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         ec2::ApiPeerData localPeer,
         const std::string& systemId,
         const std::string& systemAuthKey);

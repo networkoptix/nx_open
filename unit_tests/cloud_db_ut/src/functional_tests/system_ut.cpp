@@ -806,6 +806,10 @@ TEST_F(System, sorting_order_unknown_system)
 
 TEST_F(System, update)
 {
+    constexpr const char kOpaqueValue[] = 
+        "SELECT * FROM account WHERE email like 'test@example.com'\r\n "
+        "OR email like '\\slashed_test@example.com'\n";
+
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto account1 = addActivatedAccount2();
@@ -813,7 +817,7 @@ TEST_F(System, update)
 
     api::SystemAttributesUpdate updatedData;
     updatedData.systemID = system1.id;
-    updatedData.opaque = "qweasdasdqwewqeqw";
+    updatedData.opaque = kOpaqueValue;
     ASSERT_EQ(
         api::ResultCode::ok,
         updateSystem(system1, updatedData));

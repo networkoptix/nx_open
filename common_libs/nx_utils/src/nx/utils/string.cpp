@@ -533,24 +533,24 @@ std::vector<QnByteArrayConstRef> splitQuotedString(const QnByteArrayConstRef& sr
 }
 
 NX_UTILS_API QMap<QByteArray, QByteArray> parseNameValuePairs(
-    const QnByteArrayConstRef& authenticateParamsStr,
+    const QnByteArrayConstRef& serializedData,
     char separator)
 {
     QMap<QByteArray, QByteArray> nameValueContainer;
     parseNameValuePairs(
-        authenticateParamsStr,
+        serializedData,
         separator,
         &nameValueContainer);
     return nameValueContainer;
 }
 
 void parseNameValuePairs(
-    const QnByteArrayConstRef& authenticateParamsStr,
+    const QnByteArrayConstRef& serializedData,
     char separator,
     QMap<QByteArray, QByteArray>* const params)
 {
     const std::vector<QnByteArrayConstRef>& paramsList = 
-        splitQuotedString(authenticateParamsStr, separator);
+        splitQuotedString(serializedData, separator);
     for (const QnByteArrayConstRef& token : paramsList)
     {
         const auto& nameAndValue = splitQuotedString(token.trimmed(), '=');

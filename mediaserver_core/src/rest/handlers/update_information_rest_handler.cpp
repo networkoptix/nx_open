@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <network/tcp_listener.h>
 #include <network/module_finder.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -47,7 +48,7 @@ void requestRemotePeers(
     QnMultiserverRequestContext<QnEmptyRequestData>* context,
     const MergeFunction& mergeFunction)
 {
-    const auto systemName = qnCommon->moduleInformation().systemName;
+    const auto systemName = qnGlobalSettings->systemName();
 
     auto servers = QSet<QnMediaServerResourcePtr>::fromList(qnResPool->getAllServers(Qn::Online));
 
@@ -173,7 +174,7 @@ int QnUpdateInformationRestHandler::executeGet(
         QnMultiserverRequestContext<QnEmptyRequestData> context(
             request, processor->owner()->getPort());
 
-        reply.cloudHost = qnCommon->moduleInformation().cloudHost;
+        reply.cloudHost = qnGlobalSettings->cloudHost();
 
         if (!request.isLocal)
             checkCloudHostRemotely(path, reply, &context);

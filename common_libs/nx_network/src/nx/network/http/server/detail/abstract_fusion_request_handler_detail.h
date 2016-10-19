@@ -60,9 +60,9 @@ protected:
     {
         auto completionHandler = std::move( m_completionHandler );
         completionHandler(
-            statusCode,
-            std::move(outputMsgBody),
-            ConnectionEvents());    //TODO #ak provide it to a upper level?
+            nx_http::RequestResult(
+                statusCode,
+                std::move(outputMsgBody)));
     }
 
     bool getDataFormat(

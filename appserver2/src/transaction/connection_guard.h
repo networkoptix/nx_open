@@ -1,9 +1,12 @@
 #pragma once
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
+
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
+
+#include "connection_guard_shared_state.h"
 
 namespace ec2
 {
@@ -29,8 +32,11 @@ namespace ec2
             Connected
         };
 
-        ConnectionLockGuard();
-        ConnectionLockGuard(const QnUuid& peerGuid, Direction direction);
+        ConnectionLockGuard(ConnectionGuardSharedState* const sharedState);
+        ConnectionLockGuard(
+            ConnectionGuardSharedState* const sharedState,
+            const QnUuid& peerGuid,
+            Direction direction);
         ConnectionLockGuard(ConnectionLockGuard&&);
         ConnectionLockGuard& operator=(ConnectionLockGuard&&);
         ~ConnectionLockGuard();
@@ -38,24 +44,17 @@ namespace ec2
         bool tryAcquireConnecting();
         bool tryAcquireConnected();
         bool isNull() const;
+
     private:
+        ConnectionGuardSharedState* const m_sharedState;
         QnUuid m_peerGuid;
         Direction m_direction;
         State m_state;
 
-        ConnectionLockGuard(const ConnectionLockGuard&);
-        ConnectionLockGuard& operator=(const ConnectionLockGuard&);
+        ConnectionLockGuard(const ConnectionLockGuard&) = delete;
+        ConnectionLockGuard& operator=(const ConnectionLockGuard&) = delete;
 
         void removeFromConnectingListNoLock();
-
-        /** first - true if connecting to remove peer in progress,
-         * second - true if getting connection from remove peer in progress
-         */
-        typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
-
-        static ConnectingInfoMap m_connectingList;
-        static QSet<QnUuid> m_connectedList;
-        static QnMutex m_staticMutex;
     };
 
 } // namespace ec2

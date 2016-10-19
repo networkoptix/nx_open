@@ -64,18 +64,18 @@
     <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
+    <OutDir>x64\$(Configuration)\</OutDir>
+    <IntDir>x64\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>x64\$(Configuration)\</OutDir>
+    <IntDir>x64\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <BuildLog>
-      <Path>..\..\x64\$(IntDir)BuildLog.htm</Path>
+      <Path>.\$(IntDir)BuildLog.htm</Path>
     </BuildLog>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -88,33 +88,33 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader />
-      <ObjectFileName>..\..\x64\$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\x64\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
-      <XMLDocumentationFileName>..\..\x64\$(IntDir)</XMLDocumentationFileName>
+      <ObjectFileName>.\$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>.\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <XMLDocumentationFileName>.\$(IntDir)</XMLDocumentationFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <ResourceOutputFileName>..\..\x64\$(IntDir)%(Filename).res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)%(Filename).res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\x64\resources\$(ProjectName).exe</OutputFile>
-      <ManifestFile>..\..\x64\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
+      <ManifestFile>.\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <Manifest>
-      <OutputManifestFile>..\..\x64\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
+      <OutputManifestFile>.\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
     </Manifest>
     <ManifestResourceCompile>
-      <ResourceOutputFileName>..\..\x64\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <BuildLog>
-      <Path>..\..\x64\$(IntDir)BuildLog.htm</Path>
+      <Path>.\$(IntDir)BuildLog.htm</Path>
     </BuildLog>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -127,19 +127,19 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader />
-      <ObjectFileName>..\..\x64\$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\x64\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
-      <XMLDocumentationFileName>..\..\x64\$(IntDir)</XMLDocumentationFileName>
+      <ObjectFileName>.\$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>.\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <XMLDocumentationFileName>.\$(IntDir)</XMLDocumentationFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <ResourceOutputFileName>..\..\x64\$(IntDir)%(Filename).res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)%(Filename).res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\x64\resources\$(ProjectName).exe</OutputFile>
-      <ManifestFile>..\..\x64\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
+      <ManifestFile>.\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -147,21 +147,27 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <Manifest>
-      <OutputManifestFile>..\..\x64\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
+      <OutputManifestFile>.\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
     </Manifest>
     <ManifestResourceCompile>
-      <ResourceOutputFileName>..\..\x64\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\develop\projects\netoptix_vms\launcher\x64;../x64/;../../build_environment/target/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\develop\projects\netoptix_vms\launcher\x64;../x64/;../../build_environment/target/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

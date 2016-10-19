@@ -24,7 +24,9 @@ public:
         const QByteArray& contentEncoding,
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
-    QnTransactionTransport(const ApiPeerData& localPeer);
+    QnTransactionTransport(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
+        const ApiPeerData& localPeer);
 
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)

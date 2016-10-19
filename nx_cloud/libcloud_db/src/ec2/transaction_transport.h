@@ -38,6 +38,7 @@ public:
      */
     TransactionTransport(
         nx::network::aio::AbstractAioThread* aioThread,
+        ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         TransactionLog* const transactionLog,
         const nx::String& systemId,
         const nx::String& connectionId,

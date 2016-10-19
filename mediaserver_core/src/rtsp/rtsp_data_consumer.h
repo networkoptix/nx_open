@@ -76,9 +76,13 @@ protected:
     void setLiveQualityInternal(MediaQuality quality);
     qint64 dataQueueDuration();
     void sendMetadata(const QByteArray& metadata);
-    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
+    void getEdgePackets(
+        const QnDataPacketQueue::RandomAccess& unsafeQueue,
+        qint64& firstVTime,
+        qint64& lastVTime,
+        bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
-    void cleanupQueueToPos(int lastIndex, int ch);
+    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, int ch);
     void setNeedKeyData();
 private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
@@ -116,7 +120,7 @@ private:
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
     int m_fastChannelZappingSize;
-    
+
     qint64 m_firstLiveTime;
     qint64 m_lastLiveTime;
     QElapsedTimer m_liveTimer;

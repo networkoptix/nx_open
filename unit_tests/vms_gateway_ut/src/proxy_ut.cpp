@@ -45,26 +45,23 @@ public:
             {
                 response->headers.emplace("Transfer-Encoding", "chunked");
                 completionHandler(
-                    nx_http::StatusCode::ok,
-                    std::make_unique< nx_http::BufferSource >(
-                        testMsgContentType,
-                        nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n"),
-                    nx_http::ConnectionEvents());
+                    nx_http::RequestResult(
+                        nx_http::StatusCode::ok,
+                        std::make_unique< nx_http::BufferSource >(
+                            testMsgContentType,
+                            nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n")));
             }
             else
             {
                 completionHandler(
-                    nx_http::StatusCode::ok,
-                    std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody),
-                    nx_http::ConnectionEvents());
+                    nx_http::RequestResult(
+                        nx_http::StatusCode::ok,
+                        std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody)));
             }
         }
         else
         {
-            completionHandler(
-                nx_http::StatusCode::badRequest,
-                nullptr,
-                nx_http::ConnectionEvents());
+            completionHandler(nx_http::StatusCode::badRequest);
         }
     }
 };

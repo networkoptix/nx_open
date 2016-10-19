@@ -225,7 +225,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    bool isLocalInCloud = !qnCommon->moduleInformation().cloudSystemId.isEmpty();
+    bool isLocalInCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
     bool isRemoteInCloud = !remoteModuleInformation.cloudSystemId.isEmpty();
     if (isLocalInCloud && isRemoteInCloud)
     {
@@ -236,7 +236,7 @@ int QnMergeSystemsRestHandler::execute(
     }
 
     bool canMerge = true;
-    if (remoteModuleInformation.cloudSystemId != qnCommon->moduleInformation().cloudSystemId)
+    if (remoteModuleInformation.cloudSystemId != qnGlobalSettings->cloudSystemId())
     {
         if (data.takeRemoteSettings && isLocalInCloud)
             canMerge = false;

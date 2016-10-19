@@ -125,6 +125,15 @@ void TransactionLog::readTransactions(
         });
 }
 
+void TransactionLog::clearTransactionLogCacheForSystem(
+    const nx::String& systemId)
+{
+    NX_LOGX(lm("Cleaning transaction log for system %1").arg(systemId), cl_logDEBUG2);
+
+    QnMutexLocker lk(&m_mutex);
+    m_systemIdToTransactionLog.erase(systemId);
+}
+
 nx::db::DBResult TransactionLog::fillCache()
 {
     std::promise<db::DBResult> cacheFilledPromise;
