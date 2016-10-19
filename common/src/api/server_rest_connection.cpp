@@ -104,7 +104,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
     if (!server)
         return Handle(); //< can't process request now. No internet access
 
-    Request request = prepareRequest(HttpMethod::Get, prepareUrl(path, kEmptyParams.toParams()));
+    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, kEmptyParams.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
@@ -128,8 +128,8 @@ Handle ServerConnection::sendStatisticsAsync(
     if (data.isEmpty())
         return Handle();
 
-    Request request = prepareRequest(
-        HttpMethod::Post,
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::POST,
         prepareUrl(path, statisticsData.toParams()),
         kJsonContentType,
         data);
