@@ -1,8 +1,8 @@
 #include "merge_systems_rest_handler.h"
 
-#include <QtCore/QRegExp>
+#include <chrono>
 
-#include <nx/utils/std/chrono.h>
+#include <QtCore/QRegExp>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
@@ -47,9 +47,9 @@
 
 namespace {
 
-    using namespace std::chrono_literals;
+    using namespace std::chrono;
 
-    static const std::chrono::milliseconds kRequestTimeout = 60s;
+    static const milliseconds kRequestTimeout = seconds(60);
 
     // Minimal server version which could be configured.
     static const QnSoftwareVersion kMinimalVersion(2, 3);

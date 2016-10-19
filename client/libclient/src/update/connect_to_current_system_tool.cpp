@@ -1,6 +1,6 @@
 #include "connect_to_current_system_tool.h"
 
-#include <nx/utils/std/chrono.h>
+#include <chrono>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -14,12 +14,12 @@
 
 namespace {
 
-    using namespace std::chrono_literals;
+    using namespace std::chrono;
 
     static const int kEmptyProgress = 0;
     static const int kUpdateProgress = 50;
     static const int kCompleteProgress = 100;
-    static const std::chrono::milliseconds kWaitTimeout = 2min;
+    static const milliseconds kWaitTimeout = seconds(2);
 
 } // namespace
 
