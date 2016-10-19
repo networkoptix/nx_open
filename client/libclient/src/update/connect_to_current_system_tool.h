@@ -1,41 +1,39 @@
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
+#include <utils/merge_systems_common.h>
 #include <update/updates_common.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-class QnNetworkPeerTask;
 class QnMediaServerUpdateTool;
-struct QnUpdateResult;
+class QnMergeSystemsTool;
 
-class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnSessionAwareDelegate
+class QnConnectToCurrentSystemTool: public Connective<QObject>, public QnSessionAwareDelegate
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
     enum ErrorCode
     {
         NoError,
-        AuthentificationFailed,
-        ConfigurationFailed,
+        MergeFailed,
         UpdateFailed,
         Canceled
     };
 
-    explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
+    QnConnectToCurrentSystemTool(QObject* parent = nullptr);
     ~QnConnectToCurrentSystemTool();
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
-    void start(const QSet<QnUuid> &targets, const QString &adminPassword);
+    void start(const QnUuid& targetId, const QString& adminPassword);
 
-    QSet<QnUuid> targets() const;
-    QString adminPassword() const;
+    utils::MergeSystemsStatus::Value mergeError() const;
+    QString mergeErrorMessage() const;
+    QnUpdateResult updateResult() const;
 
 public slots:
     void cancel();
@@ -43,28 +41,22 @@ public slots:
 signals:
     void finished(int errorCode);
     void progressChanged(int progress);
-    void stateChanged(const QString &stateText);
+    void stateChanged(const QString& stateText);
 
 private:
     void finish(ErrorCode errorCode);
-    void waitPeers();
-    void updatePeers();
-
-private slots:
-    void at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
-    void at_waitTask_finished(int errorCode);
-    void at_updateTool_finished(const QnUpdateResult &result);
-    void at_updateTool_stageProgressChanged(QnFullUpdateStage stage, int progress);
+    void mergeServer();
+    void waitServer();
+    void updateServer();
 
 private:
-    QSet<QnUuid> m_targets;
-    QString m_user;
+    QnUuid m_targetId;
+    QnUuid m_originalTargetId;
     QString m_adminPassword;
 
-    QSet<QnUuid> m_restartTargets;
-    QSet<QnUuid> m_updateTargets;
-    QHash<QnUuid, QnUuid> m_waitTargets;
-    QPointer<QnNetworkPeerTask> m_currentTask;
+    QPointer<QnMergeSystemsTool> m_mergeTool;
     QPointer<QnMediaServerUpdateTool> m_updateTool;
-    bool m_restartAllPeers;
+    utils::MergeSystemsStatus::Value m_mergeError = utils::MergeSystemsStatus::ok;
+    QString m_mergeErrorMessage;
+    QnUpdateResult m_updateResult;
 };
