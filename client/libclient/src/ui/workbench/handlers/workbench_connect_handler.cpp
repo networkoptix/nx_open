@@ -82,6 +82,83 @@ namespace {
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 
+bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
+{
+    return ((first.host() == second.host())
+        && (first.port() == second.port())
+        && (first.userName() == second.userName()));
+}
+
+QString getConnectionName(const QnLocalConnectionData& data)
+{
+    static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
+        "%1 is user name, %2 is name of system");
+
+    return kNameTemplate.arg(data.url.userName(), data.systemName);
+}
+
+void removeCustomConnection(const QnLocalConnectionData& data)
+{
+    if (data.isStoredPassword)
+        return;
+
+    auto customConnections = qnSettings->customConnections();
+    const auto it = std::find_if(customConnections.begin(), customConnections.end(),
+        [url = data.url](const QnConnectionData& value)
+        {
+            return isSameConnectionUrl(value.url, url);
+        });
+
+    if ((it == customConnections.end()) || it->isCustom)
+        return;
+
+    customConnections.erase(it);
+    qnSettings->setCustomConnections(customConnections);
+}
+
+void storeCustomConnection(const QnLocalConnectionData& data)
+{
+    if (!data.isStoredPassword)
+        return;
+
+    auto customConnections = qnSettings->customConnections();
+
+    static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
+        "%1 is user name, %2 is name of system");
+
+    const auto connectionName = getConnectionName(data);
+    auto connection = QnConnectionData(connectionName, data.url, false);
+
+    const auto it = std::find_if(customConnections.begin(), customConnections.end(),
+        [connectionName](const QnConnectionData& value) { return (value.name == connectionName); });
+    if (it != customConnections.end())
+    {
+        auto& targetConnection = *it;
+
+        if (targetConnection.isCustom)
+        {
+            if (isSameConnectionUrl(targetConnection.url, connection.url))
+            {
+                targetConnection.url = connection.url;
+            }
+            else
+            {
+                // We have to add new connection data with different name
+                connection.name = customConnections.generateUniqueName(connectionName);
+                customConnections.append(connection);
+            }
+        }
+        else
+        {
+            targetConnection = connection;
+        }
+    }
+    else
+        customConnections.append(connection);
+
+    qnSettings->setCustomConnections(customConnections);
+}
+
 void updateWeightData(const QString& systemId)
 {
     auto weightData = qnClientCoreSettings->localSystemWeightsData();
@@ -153,9 +230,15 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
 
     updateWeightData(systemId);
 
-    qnSettings->setLastUsedConnection(targetConnection);
-    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+    const auto lastUsed = QnConnectionData(targetConnection.systemName, targetConnection.url, false);
+    qnSettings->setLastUsedConnection(lastUsed);
     qnSettings->setAutoLogin(autoLogin);
+    if (targetConnection.isStoredPassword)
+        storeCustomConnection(targetConnection);
+    else
+        removeCustomConnection(targetConnection);
+
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
 
     qnSettings->save();
     qnClientCoreSettings->save();
@@ -847,7 +930,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
     if (!force)
     {
         QnGlobalSettings::instance()->synchronizeNow();
-        qnSettings->setLastUsedConnection(QnLocalConnectionData());
+        qnSettings->setLastUsedConnection(QnConnectionData());
     }
 
     setState(LogicalState::disconnected, PhysicalState::disconnected);
