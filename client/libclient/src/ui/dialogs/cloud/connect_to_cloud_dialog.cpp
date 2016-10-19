@@ -1,16 +1,20 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <cdb/connection.h>
+
+#include <cloud/cloud_connection.h>
+
+#include <client_core/client_core_settings.h>
 
 #include <common/common_module.h>
-#include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
 #include <utils/common/delayed.h>
@@ -24,8 +28,9 @@
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 #include <utils/common/app_info.h>
-#include <api/global_settings.h>
 
 using namespace nx::cdb;
 
@@ -71,9 +76,6 @@ private:
     void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
 
 public:
-    std::unique_ptr<
-        nx::cdb::api::ConnectionFactory,
-        decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
     QnBusyIndicatorButton* indicatorButton;
@@ -166,21 +168,9 @@ void QnConnectToCloudDialog::accept()
 QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent) :
     QObject(parent),
     q_ptr(parent),
-    connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
     linkedSuccessfully(false),
     indicatorButton(new QnBusyIndicatorButton(parent))
 {
-    const auto cdbEndpoint = qnClientCoreSettings->cdbEndpoint();
-    if (!cdbEndpoint.isEmpty())
-    {
-        const auto hostAndPort = cdbEndpoint.split(lit(":"));
-        if (hostAndPort.size() == 2)
-        {
-            connectionFactory->setCloudEndpoint(
-                    hostAndPort[0].toStdString(),
-                    hostAndPort[1].toInt());
-        }
-    }
 }
 
 void QnConnectToCloudDialogPrivate::updateUi()
@@ -235,7 +225,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 
     indicatorButton->setEnabled(false);
 
-    cloudConnection = connectionFactory->createConnection();
+    cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(
         q->ui->loginInputField->text().trimmed().toStdString(),
         q->ui->passwordInputField->text().trimmed().toStdString());

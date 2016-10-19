@@ -11,7 +11,7 @@
 
 #include <client_core/client_core_settings.h>
 
-#include <cdb/connection.h>
+#include <cloud/cloud_connection.h>
 
 #include <utils/common/delayed.h>
 
@@ -97,7 +97,6 @@ public:
 
     QTimer *updateTimer;
 
-    std::unique_ptr<api::ConnectionFactory, decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> temporaryConnection;
 
@@ -164,7 +163,6 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
             qnClientCoreSettings->save();
         });
 
-    setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
     //TODO: #GDM store temporary credentials
     setCloudCredentials(QnCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
@@ -296,32 +294,6 @@ QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
         QString::fromStdString(d->temporaryCredentials.password));
 }
 
-QString QnCloudStatusWatcher::cloudEndpoint() const
-{
-    Q_D(const QnCloudStatusWatcher);
-    return lit("%1:%2").arg(QString::fromStdString(d->cloudHost)).arg(d->cloudPort);
-}
-
-void QnCloudStatusWatcher::setCloudEndpoint(const QString &endpoint)
-{
-    Q_D(QnCloudStatusWatcher);
-
-    QUrl url = QUrl::fromUserInput(endpoint);
-
-    if (!url.isValid())
-        return;
-
-    d->cloudHost = url.host().toStdString();
-    d->cloudPort = url.port();
-
-    if (!d->cloudHost.empty() || d->cloudPort <= 0)
-        return;
-
-    d->connectionFactory->setCloudEndpoint(d->cloudHost, d->cloudPort);
-
-    d->updateConnection();
-}
-
 QnCloudStatusWatcher::ErrorCode QnCloudStatusWatcher::error() const
 {
     Q_D(const QnCloudStatusWatcher);
@@ -420,7 +392,6 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     stayConnected(false),
     errorCode(QnCloudStatusWatcher::NoError),
     updateTimer(new QTimer(this)),
-    connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
     status(QnCloudStatusWatcher::LoggedOut),
     cloudSystems(),
     recentCloudSystems(qnClientCoreSettings->recentCloudSystems()),
@@ -437,7 +408,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
-    connect(m_pingTimer, &QTimer::timeout, this, &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
+    connect(m_pingTimer, &QTimer::timeout, this,
+        &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
 }
 
 bool QnCloudStatusWatcherPrivate::cloudIsEnabled() const
@@ -455,7 +427,6 @@ void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
     m_cloudIsEnabled = enabled;
     emit q->isCloudEnabledChanged();
 }
-
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 {
@@ -480,7 +451,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         return;
     }
 
-    cloudConnection = connectionFactory->createConnection();
+    cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(credentials.user.toStdString(),
         credentials.password.toStdString());
 
@@ -631,7 +602,7 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
     if (!temporaryConnection)
     {
         TRACE("Creating new temporary connection");
-        temporaryConnection = connectionFactory->createConnection();
+        temporaryConnection = qnCloudConnectionProvider->createConnection();
         temporaryConnection->setCredentials(temporaryCredentials.login, temporaryCredentials.password);
     }
 

@@ -10,6 +10,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <cloud/cloud_connection.h>
+
 #include <client/client_settings.h>
 
 #include <ui/actions/action_manager.h>
@@ -54,6 +56,8 @@ public:
 
     void setupUi();
     bool validateAuth();
+
+    bool checkCloudPassword(const QString& password);
 private:
     Scenario calculateScenario() const;
     void createAuthorizeWidget();
@@ -272,6 +276,39 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
     return authorizePasswordField->validate();
 }
 
+bool QnDisconnectFromCloudDialogPrivate::checkCloudPassword(const QString& password)
+{
+    auto connection = qnCloudConnectionProvider->createConnection();
+    connection->setCredentials(
+        context()->user()->getName().toStdString(),
+        password.toStdString());
+
+    QEventLoop loop;
+    bool success = false;
+
+    qDebug() << "checking cloud credentials" << context()->user()->getName() << password;
+    Q_Q(QnDisconnectFromCloudDialog);
+    auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
+    auto handler =
+        [guard, &loop, &success](nx::cdb::api::ResultCode code, nx::cdb::api::AccountData /*data*/)
+    {
+        qDebug() << "we are in handler, result" << QString::fromStdString(nx::cdb::api::toString(code));
+        if (!guard)
+            return;
+
+        guard->d_ptr->lockUi(false);
+        success = (code == nx::cdb::api::ResultCode::ok);
+        loop.exit();
+    };
+
+    lockUi(true);
+    connection->accountManager()->getAccount(handler);
+    loop.exec();
+
+    qDebug() << "returning result" << success;
+    return success;
+}
+
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
     return tr("All %1 users and features will be disabled.").arg(QnAppInfo::cloudName());
@@ -381,10 +418,7 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                 case Scenario::CloudOwnerOnly:
                 {
                     NX_ASSERT(user->isCloud());
-                    auto actualPassword = QnAppServerConnectionFactory::url().password();
-
-                    //temporary hack solution --gdm
-                    return password == actualPassword
+                    return checkCloudPassword(password)
                         ? Qn::kValidResult
                         : Qn::ValidationResult(tr("Wrong Password"));
                 }

@@ -92,9 +92,6 @@ public:
 
     QnCredentials createTemporaryCredentials() const;
 
-    QString cloudEndpoint() const;
-    void setCloudEndpoint(const QString &endpoint);
-
     Status status() const;
 
     ErrorCode error() const;
