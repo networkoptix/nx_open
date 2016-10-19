@@ -65,15 +65,14 @@ void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool sil
 QUrl QnFakeMediaServerResource::getApiUrl() const
 {
     auto url = base_type::getApiUrl();
-    url.setUserName(m_user);
-    url.setPassword(m_password);
+    url.setUserName(m_authenticator.user());
+    url.setPassword(m_authenticator.password());
     return url;
 }
 
-void QnFakeMediaServerResource::setUserCredentials(const QString& user, const QString& password)
+void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authenticator)
 {
-    m_user = user;
-    m_password = password;
+    m_authenticator = authenticator;
     apiConnection()->setUrl(getApiUrl());
 }
 

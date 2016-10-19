@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtNetwork/QAuthenticator>
+
 #include <core/resource/media_server_resource.h>
 #include <nx_ec/data/api_discovery_data.h>
 
@@ -21,7 +23,7 @@ public:
 
     virtual QUrl getApiUrl() const override;
 
-    void setUserCredentials(const QString& user, const QString& password);
+    void setAuthenticator(const QAuthenticator& authenticator);
 
 protected:
     virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
@@ -31,8 +33,7 @@ signals:
 
 private:
     ec2::ApiDiscoveredServerData m_serverData;
-    QString m_user;
-    QString m_password;
+    QAuthenticator m_authenticator;
 };
 
 typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;
