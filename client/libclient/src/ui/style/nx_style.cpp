@@ -3681,7 +3681,6 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
             {
                 case QEvent::Leave:
                 case QEvent::HoverLeave:
-                case QEvent::Destroy:
                 {
                     if (d->lastProxiedWidgetUnderMouse == widget)
                         d->lastProxiedWidgetUnderMouse = nullptr;
