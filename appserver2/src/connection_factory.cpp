@@ -97,13 +97,10 @@ int Ec2DirectConnectionFactory::testConnectionAsync(
     QUrl url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (m_transactionMessageBus->localPeer().isMobileClient())
-    {
-        QUrlQuery query(url);
-        query.removeQueryItem(lit("format"));
-        query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-        url.setQuery(query);
-    }
+    QUrlQuery query(url);
+    query.removeQueryItem(lit("format"));
+    query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+    url.setQuery(query);
 
     if (url.isEmpty())
         return testDirectConnection(url, handler);

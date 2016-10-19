@@ -49,7 +49,7 @@ QString getTargetSystemIdImpl(
 QString helpers::getTargetSystemId(const QnConnectionInfo& info)
 {
     return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
-        QnUuid::fromStringSafe(info.ecsGuid), info.version);
+        info.serverId(), info.version);
 }
 
 QString helpers::getTargetSystemId(const QnModuleInformation& info)
