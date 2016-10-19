@@ -325,14 +325,10 @@ private:
     std::atomic<bool> m_asyncSendIssued;
     const int m_ipVersion;
 
-    bool isNonBlockingMode()
+    bool isNonBlockingMode() const
     {
         bool value;
-        bool result = m_abstractSocketPtr->getNonBlockingMode(&value);
-        if (result && value)
-            return true;
-
-        return false;
+        return m_abstractSocketPtr->getNonBlockingMode(&value) && value;
     }
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
@@ -446,7 +442,6 @@ private:
                 m_recvHandlerTerminatedFlag = &terminated;
 
                 std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_read)> cleanupGuard( this, __finally_read );
-
                 assert( m_recvHandler );
                 if( !isNonBlockingMode() )
                 {
@@ -486,14 +481,13 @@ private:
                 else
                 {
                     //can send some bytes
+                    std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)> cleanupGuard( this, __finally_write );
                     assert( m_sendHandler );
                     if( !isNonBlockingMode() )
                     {
                         recvHandlerLocal( SystemError::invalidData, (size_t) -1 );
                         break;
                     }
-
-                    std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)> cleanupGuard( this, __finally_write );
 
                     const int bytesWritten = m_abstractSocketPtr->send(
                         m_sendBuffer->constData() + m_sendBufPos,
