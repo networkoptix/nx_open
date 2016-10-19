@@ -8,6 +8,8 @@
 #include <map>
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QAtomicInt>
 
 #include "log/log.h"
@@ -252,6 +254,23 @@ void TimerManager::joinAndDeleteTimer(const TimerId& timerID)
 constexpr static std::chrono::milliseconds kErrorSkipTimeout =
     std::chrono::milliseconds(3000);
 
+class QnMutexUnlocker
+{
+public:
+    QnMutexUnlocker(QnMutexLockerBase* const locker):
+        m_locker(locker)
+    {
+        m_locker->unlock();
+    }
+    ~QnMutexUnlocker()
+    {
+        m_locker->relock();
+    }
+
+private:
+    QnMutexLockerBase* const m_locker;
+};
+
 void TimerManager::run()
 {
     QnMutexLocker lk(&m_mtx);
@@ -260,10 +279,12 @@ void TimerManager::run()
 
     while (!m_terminated)
     {
+        boost::optional<std::chrono::milliseconds> timeToWait;
+
         try
         {
             qint64 currentTime = m_monotonicClock.elapsed();
-            for (;;)
+            while (!m_terminated)
             {
                 if (m_timeToTask.empty())
                     break;
@@ -278,13 +299,15 @@ void TimerManager::run()
                 m_taskToTime.erase(timerID);
                 m_timeToTask.erase(taskIter);
                 m_runningTaskID = timerID;
-                lk.unlock();
 
-                NX_LOGX(lm("Executing task %1").arg(timerID), cl_logDEBUG2);
-                taskContext.func(timerID);
-                NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
+                {
+                    // Using unlocker to ensure exception-safety.
+                    QnMutexUnlocker unlocker(&lk);
 
-                lk.relock();
+                    NX_LOGX(lm("Executing task %1").arg(timerID), cl_logDEBUG2);
+                    taskContext.func(timerID);
+                    NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
+                }
 
                 if (!taskContext.singleShot)
                     addTaskNonSafe(
@@ -299,27 +322,37 @@ void TimerManager::run()
                 lk.unlock();
                 //giving chance to another thread to remove task
                 lk.relock();
-
-                if (m_terminated)
-                    break;
             }
 
-            currentTime = m_monotonicClock.elapsed();
-            if (m_timeToTask.empty())
-                m_cond.wait(lk.mutex());
-            else if (m_timeToTask.begin()->first.first > currentTime)
-                m_cond.wait(lk.mutex(), m_timeToTask.begin()->first.first - currentTime);
+            if (m_terminated)
+                break;
 
-            continue;
+            currentTime = m_monotonicClock.elapsed();
+            if (!m_timeToTask.empty())
+            {
+                if (m_timeToTask.begin()->first.first <= currentTime)
+                    continue;   //< Time to execute another task.
+
+                timeToWait = std::chrono::milliseconds(
+                    m_timeToTask.begin()->first.first - currentTime);
+            }
         }
         catch (exception& e)
         {
             NX_LOG(lit("TimerManager. Error. Exception in %1:%2. %3")
                 .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())),
                 cl_logERROR);
+            timeToWait = kErrorSkipTimeout;
+            m_runningTaskID = 0;
         }
 
-        m_cond.wait(lk.mutex(), kErrorSkipTimeout.count());
+        if (m_terminated)
+            break;
+
+        if (timeToWait)
+            m_cond.wait(lk.mutex(), timeToWait->count());
+        else
+            m_cond.wait(lk.mutex());
     }
 
     NX_LOG(lit("TimerManager stopped"), cl_logDEBUG1);
