@@ -57,7 +57,7 @@ public:
         QIcon::State state = QIcon::Off);
 
     static QPixmap maximumSizePixmap(const QIcon& icon, QIcon::Mode mode = QIcon::Normal,
-        QIcon::State state = QIcon::Off);
+        QIcon::State state = QIcon::Off, bool correctDevicePixelRatio = true);
 
     static QStyle* newStyle(const QnGenericPalette& genericPalette);
 

@@ -65,7 +65,7 @@ void QnSelectDevicesButton::updateData()
         case All:
         {
             QIcon icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
-            setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected));
+            setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected, QIcon::Off, false));
             setText(QnDeviceDependentStrings::getDefaultNameFromSet(
                 tr("All Devices..."),
                 tr("All Cameras...")));
@@ -75,7 +75,7 @@ void QnSelectDevicesButton::updateData()
         case Any:
         {
             QIcon icon = qnResIconCache->icon(QnResourceIconCache::Camera);
-            setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected));
+            setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected, QIcon::Off, false));
             setText(QnDeviceDependentStrings::getDefaultNameFromSet(
                 tr("Any Device..."),
                 tr("Any Camera...")));
@@ -101,7 +101,7 @@ void QnSelectDevicesButton::updateData()
                         ? qnResIconCache->icon(m_selectedDevices[0])
                         : qnResIconCache->icon(qnResIconCache->key(m_selectedDevices[0]) & QnResourceIconCache::TypeMask);
 
-                    setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected));
+                    setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected, QIcon::Off, false));
                     setText(m_singleDeviceParameters.showName
                         ? (m_selectedDevices[0]->getName() + lit("..."))
                         : QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -113,7 +113,7 @@ void QnSelectDevicesButton::updateData()
                 default:
                 {
                     QIcon icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
-                    setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected));
+                    setIcon(QnSkin::maximumSizePixmap(icon, QIcon::Selected, QIcon::Off, false));
                     setText(QnDeviceDependentStrings::getDefaultNameFromSet(
                         tr("%n Devices...", "", m_selectedDevices.size()),
                         tr("%n Cameras...", "", m_selectedDevices.size())));
@@ -123,6 +123,8 @@ void QnSelectDevicesButton::updateData()
 
             break;
         }
+
+        setIconSize(QnSkin::maximumSize(icon()));
     }
 }
 

@@ -361,6 +361,8 @@ void QnNxStylePrivate::drawTextButton(
     QPalette::ColorRole foregroundRole,
     const QWidget* widget) const
 {
+    Q_UNUSED(widget);
+
     bool enabled = option->state.testFlag(QStyle::State_Enabled);
     bool hovered = option->state.testFlag(QStyle::State_MouseOver);
     bool pressed = option->state.testFlag(QStyle::State_Sunken);

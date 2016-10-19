@@ -191,10 +191,11 @@ QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode, QIcon::State stat
     return icon.actualSize(kHugeSize, mode, state) / scale;
 }
 
-QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
+QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
+    QIcon::State state, bool correctDevicePixelRatio)
 {
     auto pixmap = icon.pixmap(kHugeSize, mode, state);
-    if (isHiDpi())
+    if (correctDevicePixelRatio && isHiDpi())
         pixmap.setDevicePixelRatio(2.0);
     return pixmap;
 }
