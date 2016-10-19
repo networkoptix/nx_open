@@ -61,6 +61,8 @@ public:
 
     static QStyle* newStyle(const QnGenericPalette& genericPalette);
 
+    static bool isHiDpi();
+
 private:
     void init(const QStringList& paths);
 

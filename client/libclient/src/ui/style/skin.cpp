@@ -126,9 +126,8 @@ QPixmap QnSkin::pixmap(const QString& name,
     Qt::TransformationMode mode)
 {
     static const auto kHiDpiSuffix = lit("@2x");
-    static const bool kIsHiDpi = (qApp->devicePixelRatio() > 1);
 
-    if (kIsHiDpi)
+    if (isHiDpi())
     {
         QFileInfo info(name);
         const auto suffix = info.completeSuffix();
@@ -188,12 +187,16 @@ QMovie* QnSkin::newMovie(const char* name, QObject* parent)
 
 QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
 {
-    bool hiDpi = qApp->devicePixelRatio() > 1.0;
-    int scale = hiDpi ? 2 : 1; //< we have only 1x and 2x scale icons
+    int scale = isHiDpi() ? 2 : 1; //< we have only 1x and 2x scale icons
     return icon.actualSize(kHugeSize, mode, state) / scale;
 }
 
 QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
 {
     return icon.pixmap(kHugeSize, mode, state);
+}
+
+bool QnSkin::isHiDpi()
+{
+    return qApp->devicePixelRatio() > 1.0;
 }
