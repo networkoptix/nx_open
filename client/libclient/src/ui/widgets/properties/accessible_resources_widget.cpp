@@ -193,7 +193,6 @@ bool QnAccessibleResourcesWidget::hasChanges() const
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    qDebug() << "refreshing model";
     refreshModel();
 
     if (m_controlsVisible)
