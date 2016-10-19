@@ -44,6 +44,8 @@ public:
     QnDbHelper();
     virtual ~QnDbHelper();
 
+    static bool tuneDBAfterOpen(QSqlDatabase* const sqlDb);
+
     virtual QnDbTransaction* getTransaction() = 0;
 
     bool applyUpdates(const QString &dirName);
@@ -238,6 +240,7 @@ protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
     void removeDatabase();
+
 protected:
     QSqlDatabase m_sdb;
     mutable QnReadWriteLock m_mutex;

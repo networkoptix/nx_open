@@ -15,7 +15,7 @@ DbRequestExecutionThread::DbRequestExecutionThread(
 :
     m_connectionOptions(connectionOptions),
     m_queryExecutorQueue(queryExecutorQueue),
-    m_state(ConnectionState::beingInitialized)
+    m_state(ConnectionState::initializing)
 {
 }
 
