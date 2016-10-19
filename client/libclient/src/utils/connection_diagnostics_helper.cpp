@@ -143,11 +143,24 @@ bool QnConnectionDiagnosticsHelper::checkApplaucherRunning()
     using namespace applauncher;
     QList<QnSoftwareVersion> versions;
 
+    qDebug() << "checkApplaucherRunning";
+
     /* Try to run applauncher if it is not running. */
-    if (getInstalledVersions(&versions) == api::ResultType::connectError)
+    auto result = getInstalledVersions(&versions);
+    if (result == api::ResultType::connectError)
     {
+        qDebug() << "trying to start applaucher";
         if (!nx::vms::client::SelfUpdater::runMinilaucher())
             return false;
+    }
+    else if (result == api::ResultType::ok)
+    {
+        qDebug() << "getInstalledVersions success";
+        return true;
+    }
+    else
+    {
+        qDebug() << "unknown applaucher error" << result;
     }
 
     static const int kMaxTries = 5;
@@ -158,6 +171,7 @@ bool QnConnectionDiagnosticsHelper::checkApplaucherRunning()
         if (getInstalledVersions(&versions) == api::ResultType::ok)
             return true;
     }
+    qDebug() << "still cannot get running applaucher";
     return false;
 }
 
@@ -193,6 +207,22 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     {
         bool isInstalled = false;
         int errCode = applauncher::isVersionInstalled(connectionInfo.version, &isInstalled);
+
+        if (errCode == applauncher::api::ResultType::connectError)
+        {
+            qDebug() << "Trying to start applaucher again and again...";
+            if (!checkApplaucherRunning())
+            {
+                QnMessageBox::critical(
+                    parentWidget,
+                    tr("Launcher process not found."),
+                    tr("Please close the application and start it again using the shortcut in the start menu.")
+                );
+                return Qn::IncompatibleVersionConnectionResult;
+            }
+            errCode = applauncher::isVersionInstalled(connectionInfo.version, &isInstalled);
+        }
+
         if (errCode != applauncher::api::ResultType::ok)
         {
             QnMessageBox::warning(
