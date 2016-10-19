@@ -2204,6 +2204,9 @@ void QnNxStyle::drawControl(
                         textRect.setLeft(option->rect.left() + iconRect.width());
                     }
 
+                    iconRect = alignedRect(option->direction, Qt::AlignCenter,
+                        buttonOption->iconSize, iconRect);
+
                     buttonOption->icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
                     textHorizontalAlignment = Qt::AlignLeft;
                 }
