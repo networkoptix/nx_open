@@ -46,12 +46,12 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(QList<QnLocalConnectionData>,
+        QN_DECLARE_RW_PROPERTY(QnLocalConnectionDataList,
             recentLocalConnections, setRecentLocalConnections,
-            RecentLocalConnections, QList<QnLocalConnectionData>())
-        QN_DECLARE_RW_PROPERTY(QList<QnWeightData>,
+            RecentLocalConnections, QnLocalConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(QnWeightDataList,
             localSystemWeightsData, setLocalSystemWeightsData,
-            LocalSystemWeightsData, QList<QnWeightData>())
+            LocalSystemWeightsData, QnWeightDataList())
         QN_DECLARE_RW_PROPERTY(QString,
             cdbEndpoint, setCdbEndpoint,
             CdbEndpoint, QString())

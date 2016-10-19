@@ -21,8 +21,7 @@ namespace
     const auto kWeight = lit("weight");
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData), (datastream)(eq), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnWeightData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData)(QnWeightData), (datastream)(eq)(json), _Fields)
 
 QnLocalConnectionData::QnLocalConnectionData() :
     name(),

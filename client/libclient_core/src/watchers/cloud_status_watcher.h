@@ -32,7 +32,7 @@ struct QnCloudSystem
     static QnCloudSystem fromSettings(QSettings* settings);
 };
 #define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)(authKey)
-QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype)(json))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
 Q_DECLARE_METATYPE(QnCloudSystemList);
