@@ -348,11 +348,11 @@ void QnEventLogDialog::requestFinished()
 
     if (start != end)
         ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::SystemLocaleLongDate))
-        .arg(end.toString(Qt::SystemLocaleLongDate)));
+        .arg(start.toString(Qt::DefaultLocaleLongDate))
+        .arg(end.toString(Qt::DefaultLocaleLongDate)));
     else
         ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::SystemLocaleLongDate)));
+        .arg(start.toString(Qt::DefaultLocaleLongDate)));
     ui->loadingProgressBar->hide();
     ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }

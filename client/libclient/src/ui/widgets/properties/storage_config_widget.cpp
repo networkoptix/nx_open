@@ -868,7 +868,9 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
     const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
-    return lit("%1 %2").arg(backupDateTime.date().toString()).arg(backupDateTime.time().toString(Qt::SystemLocaleLongDate));
+    return lit("%1 %2").arg(
+        backupDateTime.date().toString(Qt::DefaultLocaleLongDate)).arg(
+        backupDateTime.time().toString(Qt::DefaultLocaleShortDate));
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
