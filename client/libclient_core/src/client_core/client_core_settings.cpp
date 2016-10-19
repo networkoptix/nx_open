@@ -39,6 +39,10 @@ void QnClientCoreSettings::writeValueToSettings(
     auto processedValue = value;
     switch (id)
     {
+        /* This value should not be modified by the client. */
+        case CdbEndpoint:
+            return;
+
         case RecentLocalConnections:
         {
             auto list = value.value<QnLocalConnectionDataList>();
