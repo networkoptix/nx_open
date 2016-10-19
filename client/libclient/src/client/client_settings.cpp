@@ -129,10 +129,10 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         {
             settings->beginGroup(QLatin1String("AppServerConnections"));
             settings->beginGroup(QLatin1String("lastUsed"));
-            auto result = QnLocalConnectionData::fromSettings(settings);
+            auto result = readConnectionData(settings);
             settings->endGroup();
             settings->endGroup();
-            return QVariant::fromValue<QnLocalConnectionData>(result);
+            return QVariant::fromValue<QnConnectionData>(result);
         }
         case CUSTOM_CONNECTIONS:
         {
@@ -202,7 +202,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         case LAST_USED_CONNECTION:
             settings->beginGroup(QLatin1String("AppServerConnections"));
             settings->beginGroup(QLatin1String("lastUsed"));
-            value.value<QnLocalConnectionData>().writeToSettings(settings);
+            writeConnectionData(settings, value.value<QnConnectionData>());
             settings->endGroup();
             settings->endGroup();
             break;
