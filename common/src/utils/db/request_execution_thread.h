@@ -14,7 +14,7 @@ namespace db {
 
 enum class ConnectionState
 {
-    beingInitialized,
+    initializing,
     opened,
     closed
 };
