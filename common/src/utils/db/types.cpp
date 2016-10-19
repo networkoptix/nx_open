@@ -20,4 +20,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::db, DBResult,
     (nx::db::DBResult::cancelled, "cancelled")
     (nx::db::DBResult::retryLater, "retryLater")
     (nx::db::DBResult::uniqueConstraintViolation, "uniqueConstraintViolation")
+    (nx::db::DBResult::connectionError, "connectionError")
 )

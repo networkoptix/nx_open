@@ -22,7 +22,7 @@ public:
     typedef nx::utils::Subscription<
         const nx::String&,
         std::shared_ptr<const TransactionWithSerializedPresentation>> OnNewTransactionSubscription;
-    typedef OnNewTransactionSubscription::Handler OnNewTransactionHandler;
+    typedef OnNewTransactionSubscription::NotificationCallback OnNewTransactionHandler;
 
     OutgoingTransactionDispatcher();
 

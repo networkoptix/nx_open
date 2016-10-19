@@ -220,6 +220,11 @@ void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
     emit permissionsChanged(::toSharedPointer(this));
 }
 
+bool QnUserResource::isBuiltInAdmin() const
+{
+    return getId() == kAdminGuid;
+}
+
 bool QnUserResource::isOwner() const
 {
     QnMutexLocker locker(&m_mutex);

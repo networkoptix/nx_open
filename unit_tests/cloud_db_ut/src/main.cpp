@@ -15,7 +15,7 @@
 int main(int argc, char **argv)
 {
     Q_INIT_RESOURCE(cloud_db_ut);
-    return nx::utils::runTest(
+    const auto resultCode = nx::utils::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
@@ -38,4 +38,5 @@ int main(int argc, char **argv)
             nx::cdb::CdbFunctionalTest::setDbConnectionOptions(
                 std::move(connectionOptions));
         });
+    return resultCode;
 }

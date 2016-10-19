@@ -144,8 +144,14 @@ bool CloudStreamSocket::connect(
             SystemError::setLastErrorCode(SystemError::interrupted);
             return false;
         }
-        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
-        NX_ASSERT(oldPromisePtr == nullptr);
+
+        SocketResultPrimisePtr expected = nullptr;
+        if (!m_sendPromisePtr.compare_exchange_strong(expected, &promise))
+        {
+            NX_ASSERT(false);
+            SystemError::setLastErrorCode(SystemError::already);
+            return false;
+        }
     }
 
     connectAsync(
