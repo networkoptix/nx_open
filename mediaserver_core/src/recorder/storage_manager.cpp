@@ -2075,7 +2075,7 @@ void QnStorageManager::testStoragesDone()
 void QnStorageManager::writeCameraInfoFiles()
 {
     if (m_cameraInfoWriteTimer.isValid() &&
-        (m_cameraInfoWriteTimer.elapsed() <
+        m_cameraInfoWriteTimer.hasExpired(
             std::chrono::duration_cast<std::chrono::milliseconds>(kWriteInfoFilesInterval).count()))
     {
         return;
