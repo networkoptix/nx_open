@@ -5,6 +5,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
+#include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 
 #include <camera/single_thumbnail_loader.h>
@@ -44,7 +45,6 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/license_usage_helper.h>
 #include <utils/aspect_ratio.h>
@@ -442,7 +442,7 @@ bool QnSingleCameraSettingsWidget::licensedParametersModified() const
 
 void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> updateRollback(m_updating, true);
 
     m_recordingAlert = QString();
     updateAlertBar();
