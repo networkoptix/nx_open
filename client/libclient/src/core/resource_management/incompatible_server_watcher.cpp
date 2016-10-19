@@ -209,7 +209,7 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
         if (serverData.status != Qn::Online)
             addResource(serverData);
         else
-            removeResource(serverData.id);
+            removeResource(getFakeId(serverData.id));
         break;
 
     default:
