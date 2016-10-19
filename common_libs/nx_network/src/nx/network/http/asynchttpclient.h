@@ -326,17 +326,27 @@ namespace nx_http
 
         AsyncHttpClient();
 
-        void asyncConnectDone(AbstractSocket* sock, SystemError::ErrorCode errorCode);
-        void asyncSendDone(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten);
-        void onSomeBytesReadAsync(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead);
+        void asyncConnectDone(SystemError::ErrorCode errorCode);
+        void asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWritten);
+        void onSomeBytesReadAsync(SystemError::ErrorCode errorCode, size_t bytesRead);
 
         void resetDataBeforeNewRequest();
         void initiateHttpMessageDelivery(const QUrl& url);
         void initiateTcpConnection();
-        /*!
-        \return Number of bytes, read from socket. -1 in case of read error
-        */
-        size_t readAndParseHttp(size_t bytesRead);
+        /**
+         * @return Bytes parsed or -1 in case of error.
+         */
+        size_t parseReceivedBytes(size_t bytesRead);
+        void processReceivedBytes(
+            std::shared_ptr<AsyncHttpClient> sharedThis,
+            std::size_t bytesParsed);
+        void processResponseHeadersBytes(
+            std::shared_ptr<AsyncHttpClient> sharedThis,
+            bool* const continueReceiving);
+        void processResponseMessageBodyBytes(
+            std::shared_ptr<AsyncHttpClient> sharedThis,
+            std::size_t bytesRead,
+            bool* const continueReceiving);
         void composeRequest(const nx_http::StringType& httpMethod);
         void serializeRequest();
         /*!
