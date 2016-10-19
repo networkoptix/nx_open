@@ -243,3 +243,12 @@ input[type="radio"], input[type="checkbox"] {
    margin-left: -22px;
 
 }
+.dropdown-menu {
+  padding: 2px 0;
+  border:none;
+  @include box-shadow(0 10px 20px transparentize($dark4,0.5));
+  &> li > a {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}

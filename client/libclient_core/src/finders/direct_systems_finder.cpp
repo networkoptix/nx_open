@@ -60,13 +60,47 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
         ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
 }
 
+void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
+{
+    if (it == m_systems.end())
+        return;
+
+    const auto system = it.value();
+    for (const auto server: system->servers())
+        system->removeServer(server.id);
+
+    m_systems.erase(it);
+    emit systemLost(system->id());
+}
+
 void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
+    bool checkForSystemRemoval = true;
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
     {
-        updateServer(systemIt, moduleInformation);
-        return;
+        // checks if it is new system
+        const bool wasNewSystem = systemIt.value()->isNewSystem();
+        const bool isNewSystem = helpers::isNewSystem(moduleInformation);
+
+        /**
+         * We can check for system state change only here because in this
+         * finder system exists only if at least one server is attached
+         */
+        if (wasNewSystem == isNewSystem)
+        {
+            // "New system" state is not changed, just update system
+            updateServer(systemIt, moduleInformation);
+            return;
+        }
+        else
+        {
+            /**
+             * "New system" state is changed - remove old system in
+             * order to create a new one with updated state. Id of system will be changed.
+             */
+            removeSystem(systemIt);
+        }
     }
 
     const auto systemId = helpers::getTargetSystemId(moduleInformation);
@@ -78,8 +112,10 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
             ? tr("System")
             : moduleInformation.systemName);
 
-        const auto systemDescription = QnSystemDescription::createLocalSystem(
-            systemId, systemName);
+        const bool isNewSystem = helpers::isNewSystem(moduleInformation);
+        const auto systemDescription = (isNewSystem
+            ? QnSystemDescription::createFactorySystem(systemId)
+            : QnSystemDescription::createLocalSystem(systemId, systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }
@@ -91,6 +127,9 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
         systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
 
     m_serverToSystem[moduleInformation.id] = systemId;
+
+    const auto host = qnModuleFinder->primaryAddress(moduleInformation.id);
+    updatePrimaryAddress(moduleInformation, host);
 
     if (createNewSystem)
         emit systemDiscovered(systemDescription);
@@ -113,8 +152,7 @@ void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInform
     if (!systemDescription->servers().isEmpty())
         return;
 
-    m_systems.erase(systemIt);
-    emit systemLost(systemDescription->id());
+    removeSystem(systemIt);
 }
 
 void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
@@ -128,7 +166,6 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(moduleInformation);
     if (!changes.testFlag(QnServerField::SystemNameField)
-        && !changes.testFlag(QnServerField::IsFactoryFlag)
         && !changes.testFlag(QnServerField::CloudIdField))
     {
         return;

@@ -12,9 +12,10 @@ public:
         Qn::NodeType nodeType = Qn::ResourceNode);
     virtual ~QnResourceTreeModelLayoutNode();
 
-    virtual void setResource(const QnResourcePtr &resource) override;
-    virtual void setParent(const QnResourceTreeModelNodePtr& parent) override;
     virtual void updateRecursive() override;
+
+    virtual void initialize() override;
+    virtual void deinitialize() override;
 
 protected:
     void handleAccessChanged(const QnResourceAccessSubject& subject,
@@ -25,8 +26,6 @@ protected:
 private:
     QnResourceAccessSubject getOwner() const;
     QIcon iconBySubject(const QnResourceAccessSubject& subject) const;
-
-    void removeNode(const QnResourceTreeModelNodePtr& node);
 
     void handleResourceAdded(const QnResourcePtr& resource);
 

@@ -1603,7 +1603,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->systemName = qnGlobalSettings->systemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
     connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemId();
-    connectionInfo->localSystemId = qnGlobalSettings->localSystemId().toString();
+    connectionInfo->localSystemId = qnGlobalSettings->localSystemId();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif

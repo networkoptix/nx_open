@@ -40,6 +40,7 @@ protected:
 private slots:
     void reset();
     void updateData();
+    void updateTabWidgetSize();
     void at_gotdata(int httpStatus, const QnAuditRecordList& data, int requestNum);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
