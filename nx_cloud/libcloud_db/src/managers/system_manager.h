@@ -299,14 +299,14 @@ private:
         api::SystemSharingEx sharing);
 
     template<typename Notification>
-    void fillSystemSharedNotification(
+    nx::db::DBResult fillSystemSharedNotification(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const std::string& systemId,
         const std::string& inviteeEmail,
         Notification* const notification);
 
-    void scheduleSystemHasBeenSharedNotification(
+    nx::db::DBResult scheduleSystemHasBeenSharedNotification(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const api::SystemSharing& sharing);
@@ -423,7 +423,14 @@ private:
 
     nx::db::DBResult fillCache();
     template<typename Func> nx::db::DBResult doBlockingDbQuery(Func func);
-    nx::db::DBResult fetchSystems(nx::db::QueryContext* queryContext, int* const /*dummy*/);
+    nx::db::DBResult fetchSystems(
+        nx::db::QueryContext* queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<data::SystemData>* const systems);
+    nx::db::DBResult fetchSystemById(
+        nx::db::QueryContext* queryContext,
+        const std::string& systemId,
+        data::SystemData* const system);
     nx::db::DBResult fetchSystemToAccountBinder(
         nx::db::QueryContext* queryContext,
         int* const /*dummy*/);
