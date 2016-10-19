@@ -47,7 +47,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
             if (auto user = resource.dynamicCast<QnUserResource>())
             {
                 connect(user, &QnUserResource::enabledChanged, this,
-                    &QnResourceTreeModelUserNodes::handleUserEnabledChanged);
+                    &QnResourceTreeModelUserNodes::rebuildSubjectTree);
             }
         });
 
@@ -437,6 +437,14 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
+    if (subject.user() && !subject.user()->isEnabled())
+    {
+        auto id = subject.user()->getId();
+        if (m_users.contains(id))
+            removeNode(m_users.take(id));
+        return;
+    }
+
     ensureSubjectNode(subject);
     for (auto nodetype : allPlaceholders())
     {
@@ -570,12 +578,4 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     //TODO: #GDM really we need only handle permissions change that modifies placeholders
     rebuildSubjectTree(subject);
     cleanupRecorders();
-}
-
-void QnResourceTreeModelUserNodes::handleUserEnabledChanged(const QnUserResourcePtr& user)
-{
-    if (user->isEnabled())
-        ensureSubjectNode(user);
-    else if (m_users.contains(user->getId()))
-        removeNode(m_users.take(user->getId()));
 }

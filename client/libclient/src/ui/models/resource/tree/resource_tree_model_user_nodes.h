@@ -82,7 +82,7 @@ private:
 
     void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
     void handleGlobalPermissionsChanged(const QnResourceAccessSubject& subject);
-    void handleUserEnabledChanged(const QnUserResourcePtr& user);
+
 private:
     QnResourceTreeModel* m_model;
 
