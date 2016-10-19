@@ -74,25 +74,70 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
 }
 
-Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type callback
-    , QThread *targetThread)
+QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
 {
-    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
-    return executeGet(lit("/ec2/statistics/settings"), kEmptyParams.toParams(), callback, targetThread);
+    QnMediaServerResourcePtr server =
+        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    if (!server)
+        return QnMediaServerResourcePtr(); //< something wrong. No current server available
+
+    if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        return server;
+
+    // Current server doesn't have internet access. Try to find another one
+    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    {
+        if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+            return server;
+    }
+    return QnMediaServerResourcePtr(); //< no internet access found
 }
 
-Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &request
-    , PostCallback callback
-    , QThread *targetThread)
+Handle ServerConnection::getStatisticsSettingsAsync(
+    Result<QByteArray>::type callback,
+    QThread *targetThread)
+{
+    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
+    static const auto path = lit("/ec2/statistics/settings");
+
+    QnMediaServerResourcePtr server = getServerWithInternetAccess();
+    if (!server)
+        return Handle(); //< can't process request now. No internet access
+
+    Request request = prepareRequest(HttpMethod::Get, prepareUrl(path, kEmptyParams.toParams()));
+    nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    nx_http::insertOrReplaceHeader(&request.headers, header);
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
+}
+
+Handle ServerConnection::sendStatisticsAsync(
+    const QnSendStatisticsRequestData& statisticsData,
+    PostCallback callback,
+    QThread *targetThread)
 {
     static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    static const auto path = lit("/ec2/statistics/send");
 
-    const nx_http::BufferType data = QJson::serialized(request.metricsList);
+    auto server = getServerWithInternetAccess();
+    if (!server)
+        return Handle(); //< can't process request now. No internet access
+
+    const nx_http::BufferType data = QJson::serialized(statisticsData.metricsList);
     if (data.isEmpty())
         return Handle();
 
-    return executePost(lit("/ec2/statistics/send"), request.toParams()
-        , kJsonContentType, data, callback, targetThread);
+    Request request = prepareRequest(
+        HttpMethod::Post,
+        prepareUrl(path, statisticsData.toParams()),
+        kJsonContentType,
+        data);
+    nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    nx_http::insertOrReplaceHeader(&request.headers, header);
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 Handle ServerConnection::detachSystemFromCloud(
