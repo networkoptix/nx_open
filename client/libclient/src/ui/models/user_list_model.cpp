@@ -93,8 +93,12 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr& 
     if (!user)
         return;
 
-    connect(user, &QnUserResource::nameChanged,        this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::fullNameChanged,    this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::nameChanged, this,
+        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::fullNameChanged, this,
+        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::enabledChanged, this,
+        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
     if (userIndex(user->getId()) != -1)
         return;
