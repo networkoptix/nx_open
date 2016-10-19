@@ -19,6 +19,12 @@
 #include "noptix_icon_loader.h"
 #include "nx_style.h"
 
+namespace {
+
+static const QSize kHugeSize(100000, 100000);
+
+} // namespace
+
 QnSkin::QnSkin(QObject* parent): QObject(parent)
 {
     init(QStringList());
@@ -180,18 +186,14 @@ QMovie* QnSkin::newMovie(const char* name, QObject* parent)
     return newMovie(QLatin1String(name), parent);
 }
 
-QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode,
-    QIcon::State state, const QWindow* window)
+QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
 {
-    static const QSize huge(32768, 32768);
-    qreal pixelRatio = window ? window->devicePixelRatio() : qApp->devicePixelRatio();
-    return icon.actualSize(huge, mode, state) / pixelRatio;
+    bool hiDpi = qApp->devicePixelRatio() > 1.0;
+    int scale = hiDpi ? 2.0 : 1.0; //< we have only 1x and 2x scale icons
+    return icon.actualSize(kHugeSize, mode, state) / scale;
 }
 
-QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
-    QIcon::State state, const QWindow* window)
+QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
 {
-    static const QSize huge(32768, 32768);
-    return icon.pixmap(huge, mode, state);
-    //return icon.pixmap(maximumSize(icon, mode, state, window), mode, state);
+    return icon.pixmap(kHugeSize, mode, state);
 }
