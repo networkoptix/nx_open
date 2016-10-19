@@ -13,6 +13,7 @@
 #include <audit/audit_manager.h>
 #include <rest/server/rest_connection_processor.h>
 #include <transaction/transaction_descriptor.h>
+#include <core/resource_access/resource_access_manager.h>
 
 int QnSystemSettingsHandler::executeGet(
     const QString& /*path*/,
@@ -37,6 +38,10 @@ int QnSystemSettingsHandler::executeGet(
             ahlp::Mode::write,
             owner->accessRights(),
             setting->key());
+
+        writeAllowed &= qnResourceAccessManager->hasGlobalPermission(
+            owner->accessRights(),
+            Qn::GlobalPermission::GlobalAdminPermission);
 
         if (!params.isEmpty())
         {
