@@ -191,5 +191,7 @@ QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode,
 QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
     QIcon::State state, const QWindow* window)
 {
-    return icon.pixmap(maximumSize(icon, mode, state, window), mode, state);
+    static const QSize huge(32768, 32768);
+    return icon.pixmap(huge, mode, state);
+    //return icon.pixmap(maximumSize(icon, mode, state, window), mode, state);
 }
