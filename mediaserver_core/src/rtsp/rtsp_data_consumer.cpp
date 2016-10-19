@@ -585,7 +585,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (trackInfo == nullptr || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    const QnRtspEncoderPtr& codecEncoder = trackInfo->encoder;
+    QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
     {
         QnMutexLocker lock( &m_mutex );
         int cseq = media->opaque;
