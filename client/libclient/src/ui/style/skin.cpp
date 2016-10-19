@@ -189,7 +189,7 @@ QMovie* QnSkin::newMovie(const char* name, QObject* parent)
 QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
 {
     bool hiDpi = qApp->devicePixelRatio() > 1.0;
-    int scale = hiDpi ? 2.0 : 1.0; //< we have only 1x and 2x scale icons
+    int scale = hiDpi ? 2 : 1; //< we have only 1x and 2x scale icons
     return icon.actualSize(kHugeSize, mode, state) / scale;
 }
 
