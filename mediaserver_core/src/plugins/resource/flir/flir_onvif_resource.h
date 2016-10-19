@@ -5,22 +5,21 @@
 
 #include <plugins/resource/onvif/onvif_resource.h>
 
+#include "flir_ws_io_manager.h"
+
 class QnFlirOnvifResource : public QnPlOnvifResource
 {
     Q_OBJECT
-    static int MAX_RESOLUTION_DECREASES_NUM;
+
 public:
     QnFlirOnvifResource();
-    //virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     virtual CameraDiagnostics::Result initInternal() override;
+    virtual bool startInputPortMonitoringAsync(std::function<void (bool)> &completionHandler) override;
+    virtual void stopInputPortMonitoringAsync() override;
 
-    /*void fetchAndSetAdvancedParameters();
-
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;*/
+private:
+    std::unique_ptr<FlirWsIOManager> m_ioManager;
 };
 
 typedef QnSharedResourcePointer<QnFlirOnvifResource> QnFlirOnvifResourcePtr;
