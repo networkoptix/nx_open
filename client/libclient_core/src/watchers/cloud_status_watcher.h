@@ -109,7 +109,8 @@ signals:
     void passwordChanged();
     void effectiveUserNameChanged();
     void statusChanged(Status status);
-    void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
+    void beforeCloudSystemsChanged(const QnCloudSystemList &newCloudSystems);
+    void cloudSystemsChanged(const QnCloudSystemList &currectCloudSystems);
     void recentCloudSystemsChanged();
     void currentSystemChanged(const QnCloudSystem& system);
     void errorChanged();

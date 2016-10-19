@@ -15,7 +15,7 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_newSystemWeights(),
     m_updatingWeights(false)
 {
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged,
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::beforeCloudSystemsChanged,
         this, &QnOrderedSystemsModel::handleCloudSystemsChanged);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -26,7 +26,7 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     });
 
     handleLocalWeightsChanged();
-    handleCloudSystemsChanged();
+    handleCloudSystemsChanged(qnCloudStatusWatcher->cloudSystems());
 
     setSourceModel(new QnSystemsModel(this));
 
@@ -155,9 +155,8 @@ bool QnOrderedSystemsModel::filterAcceptsRow(int row,
     return (weight > kMinWeight);
 }
 
-void QnOrderedSystemsModel::handleCloudSystemsChanged()
+void QnOrderedSystemsModel::handleCloudSystemsChanged(const QnCloudSystemList& systems)
 {
-    const auto onlineSystems = qnCloudStatusWatcher->cloudSystems();
     const auto recentSystems = qnClientCoreSettings->recentCloudSystems();
 
     static const auto getWeightsData =
@@ -173,7 +172,7 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
             return result;
         };
 
-    const auto onlineWeights = getWeightsData(onlineSystems);
+    const auto onlineWeights = getWeightsData(systems);
 
     auto newCloudSystemsData = getWeightsData(recentSystems);
     for (auto it = onlineWeights.begin(); it != onlineWeights.end(); ++it)

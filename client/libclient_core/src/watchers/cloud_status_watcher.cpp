@@ -495,9 +495,11 @@ void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCl
     if (cloudSystems == newCloudSystems)
         return;
 
+    Q_Q(QnCloudStatusWatcher);
+    emit q->beforeCloudSystemsChanged(newCloudSystems);
+
     cloudSystems = newCloudSystems;
 
-    Q_Q(QnCloudStatusWatcher);
     emit q->cloudSystemsChanged(cloudSystems);
 
     updateCurrentSystem();
