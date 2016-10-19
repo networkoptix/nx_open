@@ -28,7 +28,7 @@ namespace
 {
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
-        { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Cameras && Resources") },
+        { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Cameras & Resources") },
         { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Shared Layouts") }
     };
 

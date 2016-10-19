@@ -6,6 +6,7 @@
 class QnPermissionsResourceAccessProvider: public QnBaseResourceAccessProvider
 {
     using base_type = QnBaseResourceAccessProvider;
+
 public:
     QnPermissionsResourceAccessProvider(QObject* parent = nullptr);
     virtual ~QnPermissionsResourceAccessProvider();
@@ -17,8 +18,8 @@ protected:
         const QnResourcePtr& resource) const override;
 
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;
+
 private:
     bool hasAccessToDesktopCamera(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
-
 };

@@ -5,7 +5,6 @@
 #include <core/misc/schedule_task.h>
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
@@ -15,8 +14,7 @@ class CameraScheduleWidget;
 }
 
 class QnCameraScheduleWidget: public Connective<QWidget>,
-    public QnWorkbenchContextAware,
-    public QnUpdatable
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -54,6 +52,9 @@ public:
     int maxRecordedDays() const;
     int minRecordedDays() const;
 
+    /** Returns true if there's any recording requested in the schedule */
+    bool isRecordingScheduled() const;
+
 signals:
     void archiveRangeChanged();
     void scheduleTasksChanged();
@@ -61,18 +62,15 @@ signals:
     void scheduleEnabledChanged(int);
     void gridParamsChanged();
     void controlsChangesApplied();
+    void alert(const QString& text);
 
 protected:
-    virtual void beforeUpdate() override;
-    virtual void afterUpdate() override;
-
     virtual void afterContextInitialized() override;
 
 private:
-
     void updateRecordThresholds(QnScheduleTaskList& tasks);
 
-    void updateGridParams(bool fromUserInput = false);
+    void updateGridParams(bool pickedFromGrid = false);
     void updateGridEnabledState();
     void updateArchiveRangeEnabledState();
     void validateArchiveLength();
@@ -93,8 +91,14 @@ private:
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
 
-private:
+    void setScheduleAlert(const QString& scheduleAlert);
+    void setArchiveLengthAlert(const QString& archiveLengthAlert);
 
+    void checkRecordingEnabled();
+    void checkScheduleParamsSet();
+    void checkScheduleSet();
+
+private:
     /**
     * @brief getGridMaxFps         Get maximum fps value placed on a grid. If parameter motionPlusLqOnly set, then
     *                              only cells with recording type RecordingType_MotionPlusLQ will be taken into account.
@@ -113,10 +117,8 @@ private:
 
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
-    void connectToGridWidget();
-    void disconnectFromGridWidget();
-
     void retranslateUi();
+
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 
@@ -138,6 +140,10 @@ private:
      */
     int m_maxDualStreamingFps;
 
-
     Qn::MotionType m_motionTypeOverride;
+
+    QString m_scheduleAlert;
+    QString m_archiveLengthAlert;
+
+    bool m_updating;
 };

@@ -40,7 +40,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::OtherSystemsNode
         << Qn::WebPagesNode
         << Qn::ServersNode
-        << Qn::UserDevicesNode
+        << Qn::UserResourcesNode
         << Qn::RecorderNode
         << Qn::SystemNode
         << Qn::RoleUsersNode
@@ -57,6 +57,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QnUuid& uuid) :
     base_type(),
     QnWorkbenchContextAware(model),
+    m_initialized(false),
     m_model(model),
     m_type(nodeType),
     m_uuid(uuid),
@@ -113,11 +114,8 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::WebPagesNode:
         setName(tr("Web Pages"));
         break;
-    case Qn::UserDevicesNode:
-        setName(QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Devices"),
-            tr("Cameras")
-        ));
+    case Qn::UserResourcesNode:
+        setName(tr("Cameras && Resources"));
         break;
     case Qn::LayoutsNode:
         setName(tr("Layouts"));
@@ -368,6 +366,22 @@ void QnResourceTreeModelNode::updateRecursive()
         child->updateRecursive();
 }
 
+void QnResourceTreeModelNode::initialize()
+{
+    NX_ASSERT(!m_initialized);
+    m_initialized = true;
+}
+
+void QnResourceTreeModelNode::deinitialize()
+{
+    NX_ASSERT(m_initialized);
+    for (auto child: children())
+        child->deinitialize();
+
+    setParent(QnResourceTreeModelNodePtr());
+    setResource(QnResourcePtr());
+}
+
 Qn::NodeType QnResourceTreeModelNode::type() const
 {
     return m_type;
@@ -467,7 +481,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
     case Qn::ServersNode:
         return !isAdmin;
 
-    case Qn::UserDevicesNode:
+    case Qn::UserResourcesNode:
         return !isLoggedIn || isAdmin;
 
     case Qn::LayoutsNode:
@@ -872,6 +886,11 @@ void QnResourceTreeModelNode::setModified(bool modified)
     changeInternal();
 }
 
+bool QnResourceTreeModelNode::isInitialized() const
+{
+    return m_initialized;
+}
+
 QnResourceTreeModel* QnResourceTreeModelNode::model() const
 {
     return m_model;
@@ -919,7 +938,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         case Qn::WebPagesNode:
             return qnResIconCache->icon(QnResourceIconCache::WebPages);
 
-        case Qn::UserDevicesNode:
+        case Qn::UserResourcesNode:
         case Qn::AllCamerasAccessNode:
         case Qn::SharedResourcesNode:
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
@@ -944,6 +963,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         {
             if (!m_resource)
                 return QIcon();
+
             return m_resource->hasFlags(Qn::server)
                 ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor)
                 : qnResIconCache->icon(m_resource);
@@ -1051,4 +1071,39 @@ void QnResourceTreeModelNode::changeInternal()
 void QnResourceTreeModelNode::setName(const QString& name)
 {
     m_displayName = m_name = name;
+}
+
+
+QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)
+{
+    if (!node)
+        return dbg.space() << "INVALID";
+
+    auto p = node->parent();
+    if (p)
+        dbg.nospace() << "+";
+    while (p)
+    {
+        dbg.nospace() << "-";
+        p = p->parent();
+    }
+
+    /* Print name. */
+    dbg.nospace() << node->data(Qt::EditRole, Qn::NameColumn).toString() << " (" << node->type() << ")";
+    bool bastard = node->parent()
+        && !node->parent()->children().contains(node->toSharedPointer());
+    if (bastard)
+        dbg.nospace() << " (bastard)";
+
+    dbg.nospace() << "\n";
+
+    for (auto c: node->children())
+        dbg.nospace() << c;
+
+    return dbg.nospace();
+}
+
+QDebug operator<<(QDebug dbg, const QnResourceTreeModelNodePtr& node)
+{
+    return dbg << node.data();
 }

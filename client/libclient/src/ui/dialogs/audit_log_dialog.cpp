@@ -89,6 +89,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     setTabShape(ui->mainTabWidget->tabBar(), style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), style::TabShape::Compact);
 
+    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::updateTabWidgetSize);
+
     /* Setup details label and its aligning by detailsTabWidget: */
     QnSingleEventSignalizer* resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
@@ -117,7 +119,6 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     connect(m_sessionModel, &QnAuditLogModel::colorsChanged,    this, &QnAuditLogDialog::at_updateCheckboxes);
     connect(ui->selectAllCheckBox, &QCheckBox::stateChanged,    this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
-
 
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
@@ -203,9 +204,6 @@ void QnAuditLogDialog::setupCamerasGrid()
     ui->gridCameras->setModel(m_camerasModel);
 
     setupGridCommon(ui->gridCameras, true);
-
-    ui->gridCameras->horizontalHeader()->setSectionResizeMode(columns.indexOf(QnAuditLogModel::CameraNameColumn), QHeaderView::Stretch);
-    ui->gridCameras->horizontalHeader()->setSectionResizeMode(columns.indexOf(QnAuditLogModel::UserActivityColumn), QHeaderView::Stretch);
 }
 
 void QnAuditLogDialog::setupDetailsGrid()
@@ -516,6 +514,8 @@ void QnAuditLogDialog::at_updateDetailModel()
 
     ui->gridDetails->setUpdatesEnabled(true);
     ui->gridDetails->update();
+
+    updateTabWidgetSize();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()
@@ -735,6 +735,12 @@ void QnAuditLogDialog::reset()
     auto now = QDateTime::currentMSecsSinceEpoch();
     ui->dateRangeWidget->setRange(now, now);
     enableUpdateData();
+}
+
+void QnAuditLogDialog::updateTabWidgetSize()
+{
+    auto widget = ui->mainTabWidget->currentWidget();
+    ui->mainTabWidget->setFixedWidth(widget->sizeHint().width());
 }
 
 void QnAuditLogDialog::updateData()

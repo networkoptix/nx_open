@@ -30,7 +30,7 @@ static const QSize kMinimumSize(900, 560);
 static const QSize kOptimalSize(900, 880);
 
 /* Initial dialog height - 40px less than screen height. */
-static const int kSizeOffset = 40; 
+static const int kSizeOffset = 40;
 
 }
 
@@ -39,14 +39,14 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_ignoreAccept(false)
 {
     setMinimumSize(kMinimumSize);
-    
+
     int maximumHeight = mainWindow()->geometry().height();
     if (auto windowHandle = mainWindow()->windowHandle())
     {
         if (auto currentScreen = windowHandle->screen())
             maximumHeight = currentScreen->size().height();
-    }   
-    int optimalHeight = std::min(kOptimalSize.height(), 
+    }
+    int optimalHeight = std::min(kOptimalSize.height(),
         maximumHeight - kSizeOffset);
     optimalHeight = std::max(optimalHeight, kMinimumSize.height());
 
@@ -189,7 +189,7 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
     {
         case QDialogButtonBox::Ok:
         case QDialogButtonBox::Apply:
-            submitToResources(true);
+            submitToResources();
             break;
         case QDialogButtonBox::Cancel:
             m_settingsWidget->reject();
@@ -273,46 +273,9 @@ void QnCameraSettingsDialog::setCurrentTab(Qn::CameraSettingsTab tab)
     m_settingsWidget->setCurrentTab(tab);
 }
 
-void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/)
+void QnCameraSettingsDialog::submitToResources()
 {
     bool hasDbChanges = m_settingsWidget->hasDbChanges();
-
-    if (checkControls && m_settingsWidget->hasScheduleControlsChanges())
-    {
-        QString message = tr("Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.");
-        int button = QnMessageBox::warning(
-            this, tr("Changes have not been applied."),
-            message,
-            QDialogButtonBox::Retry | QDialogButtonBox::Ignore,
-            QDialogButtonBox::Ignore);
-        if (button == QDialogButtonBox::Retry)
-        {
-            m_ignoreAccept = true;
-            return;
-        }
-        else
-        {
-            m_settingsWidget->clearScheduleControlsChanges();
-        }
-    }
-    else if (checkControls && m_settingsWidget->hasMotionControlsChanges())
-    {
-        QString message = tr("Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.");
-        int button = QnMessageBox::warning(
-            this, tr("Changes have not been applied."),
-            message,
-            QDialogButtonBox::Retry | QDialogButtonBox::Ignore,
-            QDialogButtonBox::Ignore);
-        if (button == QDialogButtonBox::Retry)
-        {
-            m_ignoreAccept = true;
-            return;
-        }
-        else
-        {
-            m_settingsWidget->clearMotionControlsChanges();
-        }
-    }
 
     if (!hasDbChanges)
         return;

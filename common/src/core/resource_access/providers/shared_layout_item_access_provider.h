@@ -6,6 +6,7 @@
 class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
 {
     using base_type = QnBaseResourceAccessProvider;
+
 public:
     QnSharedLayoutItemAccessProvider(QObject* parent = nullptr);
     virtual ~QnSharedLayoutItemAccessProvider();
@@ -19,8 +20,7 @@ protected:
     virtual void fillProviders(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList& providers
-    ) const override;
+        QnResourceList& providers) const override;
 
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;
     virtual void handleResourceRemoved(const QnResourcePtr& resource) override;

@@ -9,10 +9,12 @@
  * Governs ways of access to resources. For example, camera may be accessible
  * directly - or by shared layout where it is located.
  */
-class QnResourceAccessProvider: public QnAbstractResourceAccessProvider,
+class QnResourceAccessProvider:
+    public QnAbstractResourceAccessProvider,
     public Singleton<QnResourceAccessProvider>
 {
     using base_type = QnAbstractResourceAccessProvider;
+
 public:
     QnResourceAccessProvider(QObject* parent = nullptr);
     virtual ~QnResourceAccessProvider();
@@ -23,8 +25,7 @@ public:
     virtual Source accessibleVia(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        QnResourceList* providers = nullptr
-    ) const override;
+        QnResourceList* providers = nullptr) const override;
 
     /**
      * Add new base provider to the end of the list.

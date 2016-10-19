@@ -522,7 +522,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const auto serverModuleInfo =
         qnModuleFinder->moduleInformation(QnUuid::fromStringSafe(info.ecsGuid));
 
-    if (serverModuleInfo.serverFlags.testFlag(Qn::SF_NewSystem))
+    if (helpers::isNewSystem(serverModuleInfo))
         return;
 
     storeLocalSystemConnection(

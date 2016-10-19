@@ -14,9 +14,15 @@ class QnResourceListView: public QnTreeView
 public:
     explicit QnResourceListView(QWidget* parent = nullptr);
     QnResourceListView(const QnResourceList& resources, QWidget* parent = nullptr);
+    QnResourceListView(const QnResourceList& resources, bool simplify,
+        QWidget* parent = nullptr);
 
     QnResourceList resources() const;
     void setResources(const QnResourceList& resources);
+
+    /** Simplified view hides resource statuses and displays servers as health monitors. */
+    bool isSimplified() const;
+    void setSimplified(bool value);
 
 protected:
     virtual QSize sizeHint() const override;

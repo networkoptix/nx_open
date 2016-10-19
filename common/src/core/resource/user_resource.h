@@ -66,7 +66,7 @@ public:
      * Predefined local owner.
      * 'isOwner=true' for 'admin' user and can't be reset. Could be disabled for login. Can't be removed.
      */
-    bool isBuildInAdmin() const;
+    bool isBuiltInAdmin() const;
 
     QnUuid userGroup() const;
     void setUserGroup(const QnUuid& group);
