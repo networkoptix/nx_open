@@ -7,15 +7,12 @@ QnWebPageResource::QnWebPageResource()
     addFlags(Qn::web_page);
 }
 
-QnWebPageResource::QnWebPageResource(const QUrl &url)
-    : base_type()
+QnWebPageResource::QnWebPageResource(const QUrl& url)
+    : QnWebPageResource()
 {
     setId(guidFromArbitraryData(url.toString().toUtf8()));
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId));
-    setUrl(url.toString());
     setName(url.host());
-    setStatus(Qn::Online);
-    addFlags(Qn::web_page);
+    setUrl(url.toString());
 }
 
 QnWebPageResource::~QnWebPageResource()
@@ -25,4 +22,10 @@ QnWebPageResource::~QnWebPageResource()
 QString QnWebPageResource::getUniqueId() const
 {
     return getUrl();
+}
+
+void QnWebPageResource::setUrl(const QString& url)
+{
+    base_type::setUrl(url);
+    setStatus(Qn::Online);
 }
