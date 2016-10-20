@@ -17,7 +17,7 @@ QString serverNamesString(const QnMediaServerResourceList& servers)
         if (!result.isEmpty())
             result += lit("\n");
 
-        result.append(QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree()));
+        result.append(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl));
     }
 
     return result;

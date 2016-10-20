@@ -39,17 +39,25 @@ public:
 
 private slots:
     void at_pingSystem_finished(
-        int status, const QnModuleInformation& moduleInformation,
-        int handle, const QString& errorString);
+        int status,
+        const QnModuleInformation& moduleInformation,
+        int handle,
+        const QString& errorString);
     void at_mergeSystem_finished(
-        int status, const QnModuleInformation& moduleInformation,
-        int handle, const QString& errorString);
+        int status,
+        const QnModuleInformation& moduleInformation,
+        int handle,
+        const QString& errorString);
     void at_getNonceForMergeFinished(
-        int status, const QnGetNonceReply& nonce,
-        int handle, const QString& errorString);
+        int status,
+        const QnGetNonceReply& nonce,
+        int handle,
+        const QString& errorString);
     void at_getNonceForPingFinished(
-        int status, const QnGetNonceReply& nonceReply,
-        int handle, const QString& errorString);
+        int status,
+        const QnGetNonceReply& nonceReply,
+        int handle,
+        const QString& errorString);
 
 private:
     struct TwoStepRequestCtx
