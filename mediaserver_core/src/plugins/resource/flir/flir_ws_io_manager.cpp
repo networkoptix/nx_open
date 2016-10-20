@@ -2,8 +2,6 @@
 
 #include "flir_ws_io_manager.h"
 
-#include <nx/utils/timer_manager.h>
-
 namespace {
     const QString kCommandPrefix = lit("Nexus.cgi?action=");
     const QString kServerWhoAmICommand = lit("SERVERWhoAmI");
@@ -14,7 +12,7 @@ namespace {
 using namespace nx::utils;
 
 FlirWsIOManager::FlirWsIOManager():
-    m_nexusSessionId(lit("-1")),
+    m_nexusSessionId(-1),
     m_monitoringIsInProgress(false),
     m_controlWebSocket(new QWebSocket()),
     m_notificationWebSocket(new QWebSocket())
@@ -31,6 +29,7 @@ FlirWsIOManager::~FlirWsIOManager()
 
 bool FlirWsIOManager::startIOMonitoring()
 {
+    //TODO: #dmsihin need mutex here
     if (m_monitoringIsInProgress)
         return true;
 
@@ -113,8 +112,8 @@ void FlirWsIOManager::at_connected()
     qDebug() << "Websocket connected";
 
     requestControlToken();
-    connect(
-        m_webSocket.get(), &QWebSocket::textMessageReceived,
+    QObject::connect(
+        m_notificationWebSocket.get(), &QWebSocket::textMessageReceived,
         this, &FlirWsIOManager::parseNotification);
 
 }
@@ -127,12 +126,16 @@ void FlirWsIOManager::at_disconnected()
 bool FlirWsIOManager::initiateWsConnection()
 {
     QObject::connect(
-        m_webSocket.get(), &QWebSocket::connected,
+        m_controlWebSocket.get(), &QWebSocket::connected,
         this, &FlirWsIOManager::at_connected);
 
     QObject::connect(
-        m_webSocket.get(), &QWebSocket::disconnected,
+        m_controlWebSocket.get(), &QWebSocket::disconnected,
         this, &FlirWsIOManager::at_disconnected);
+
+    //Connect here
+
+    return true;
 }
 
 void FlirWsIOManager::requestControlToken()
@@ -142,24 +145,39 @@ void FlirWsIOManager::requestControlToken()
 
     auto message = kCommandPrefix + kServerWhoAmICommand;
 
-    auto scheduleKeepAlive = [this](const QString& message)
+    auto paresResponseAndScheduleKeepAlive = [this](const QString& message)
         {
             //TODO: #dmishin parse response
-            parseControlMessage(message);
+            m_nexusSessionId = parseControlMessage(message);
             TimerManager::instance()->addTimer(
-                [this]()
+                [this](nx::utils::TimerId timerId)
                 {
+                    if (timerId != m_timerId)
+                        return;
+
+                    // It's QObject::disconnect, does not related to some "network disconnect"
                     m_controlWebSocket->disconnect();
                     sendKeepAlive();
-                });
+                },
+                kKeepAliveTimeout);
         };
 
     QObject::connect(
         m_controlWebSocket.get(), &QWebSocket::textMessageReceived,
-        scheduleKeepAlive);
+        paresResponseAndScheduleKeepAlive);
 
     auto bytesSent = m_controlWebSocket->sendTextMessage(message);
     //TODO: #dmishin check number of sent bytes;
+}
+
+qint64 FlirWsIOManager::parseControlMessage(const QString& message)
+{
+    return 1;
+}
+
+void FlirWsIOManager::parseNotification(const QString& message)
+{
+
 }
 
 void FlirWsIOManager::sendKeepAlive()
@@ -176,7 +194,13 @@ void FlirWsIOManager::sendKeepAlive()
     auto bytesSent = m_controlWebSocket->sendTextMessage(keepAliveMessage);
     //TODO: #dmishin check number of sent bytes;
 
-    TimerManager::instance()->addTimer(
-        [this](){sendKeepAlive();},
+    m_timerId = TimerManager::instance()->addTimer(
+        [this](nx::utils::TimerId timerId)
+        {
+            if (timerId != m_timerId)
+                return;
+
+            sendKeepAlive();
+        },
         kKeepAliveTimeout);
 }

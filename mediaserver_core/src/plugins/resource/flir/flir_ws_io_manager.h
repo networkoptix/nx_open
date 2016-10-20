@@ -3,9 +3,13 @@
 #include <QtWebSockets/QWebSocket>
 
 #include <plugins/common_interfaces/abstract_io_manager.h>
+#include <nx/utils/timer_manager.h>
 
-class FlirWsIOManager : public nx_io_managment::QnAbstractIOManager
+class FlirWsIOManager : public QObject, public QnAbstractIOManager
 {
+    Q_OBJECT
+
+public:
     FlirWsIOManager();
 
     virtual ~FlirWsIOManager();
@@ -41,14 +45,15 @@ private slots:
 private:
     bool initiateWsConnection();
     void requestControlToken();
-    void parseControlMessage();
+    qint64 parseControlMessage(const QString& message);
     void parseNotification(const QString& message);
     void sendKeepAlive();
 
 private:
-    QString m_nexusSessionId;
+    qint64 m_nexusSessionId;
+    nx::utils::TimerId m_timerId;
     std::atomic<bool> m_monitoringIsInProgress;
     std::unique_ptr<QWebSocket> m_controlWebSocket;
     std::unique_ptr<QWebSocket> m_notificationWebSocket;
 
-}
+};
