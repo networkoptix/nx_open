@@ -156,6 +156,8 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     Q_D(QnCloudStatusWatcher);
     connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
         d, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
+    connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
+        d, &QnCloudStatusWatcherPrivate::setRecentCloudSystems);
     connect(this, &QnCloudStatusWatcher::recentCloudSystemsChanged, this,
         [this]()
         {
@@ -355,7 +357,6 @@ void QnCloudStatusWatcher::updateSystems()
                     {
                         case api::ResultCode::ok:
                             d->setCloudSystems(cloudSystems);
-                            d->setRecentCloudSystems(cloudSystems);
                             d->setStatus(QnCloudStatusWatcher::Online,
                                 QnCloudStatusWatcher::NoError);
                             break;
