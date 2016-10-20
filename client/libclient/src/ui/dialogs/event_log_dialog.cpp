@@ -300,14 +300,10 @@ void QnEventLogDialog::retranslateUi()
     ui->retranslateUi(this);
     auto cameraList = cameras(m_filterCameraList);
 
-    const QString cameraButtonText = (cameraList.empty()
-        ? QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("<Any Device>"),
-            tr("<Any Camera>")
-            )
-        : lit("<%1>").arg(QnDeviceDependentStrings::getNumericName(cameraList, false)));
-
-    ui->cameraButton->setText(cameraButtonText);
+    if (cameraList.empty())
+        ui->cameraButton->selectAny();
+    else
+        ui->cameraButton->selectFew(cameraList);
 
     /// Updates action type combobox model
     for (int row = 0; row != m_actionTypesModel->rowCount(); ++row)
