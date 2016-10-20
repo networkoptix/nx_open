@@ -88,7 +88,7 @@ var PasswordFieldSuite = function () {
                 checkPasswordWarning(self.passwordCommon);
 
                 self.maskedInput.clear()
-                    .sendKeys('asdoiurf');
+                    .sendKeys('asdoiurFf');
                 checkPasswordWarning(self.passwordFair);
 
                 self.maskedInput.clear()

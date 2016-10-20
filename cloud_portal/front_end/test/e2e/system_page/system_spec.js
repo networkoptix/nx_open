@@ -62,10 +62,6 @@ describe('System suite', function () {
             'only from local network. If you don\'t have local administator account, you will have to ' +
             'create it first time when you connect to the system.');
         p.cancelDisconnectButton.click();
-        // TODO: delete condition when CLOUD-363 is fixed
-        p.disconnectDialog.isPresent().then( function(is) {
-            if (is) p.cancelDisconnectButton.click();
-        });
     });
 
     it("should confirm, if not owner deletes system (You will loose access to this system)", function() {
@@ -75,10 +71,6 @@ describe('System suite', function () {
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
         expect(p.disconnectDialog.getText()).toContain('You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?');
         p.cancelDisconnectButton.click();
-        // TODO: delete condition when CLOUD-363 is fixed
-        p.disconnectDialog.isPresent().then( function(is) {
-            if (is) p.cancelDisconnectButton.click();
-        });
     });
 
     it("has Share button, visible for admin and owner", function() {
