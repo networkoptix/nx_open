@@ -121,7 +121,10 @@ void QnDisconnectFromCloudDialog::accept()
                 return;
             }
             else
+            {
                 d->unbindSystem();
+            }
+            break;
         }
         case QnDisconnectFromCloudDialogPrivate::Scenario::CloudOwner:
         {
