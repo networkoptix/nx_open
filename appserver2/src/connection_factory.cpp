@@ -1690,7 +1690,9 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
     auto func =
         [this, reqId, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
-            remoteTestConnectionFinished(reqId, errorCode, connectionInfo, addr, handler);
+            auto infoWithUrl = connectionInfo;
+            infoWithUrl.ecUrl = addr;
+            remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<nullptr_t, QnConnectionInfo>(
         addr, ApiCommand::testConnection, nullptr_t(), func);
