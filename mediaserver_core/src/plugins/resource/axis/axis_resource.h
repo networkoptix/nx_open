@@ -88,8 +88,6 @@ protected:
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
-    virtual bool isInitialized() const override;
-
 private:
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
@@ -114,7 +112,7 @@ private:
     QnIOStateDataList m_ioStates;
     mutable QnMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
-    
+
     struct IOMonitor {
         nx_http::AsyncHttpClientPtr httpClient;
         std::shared_ptr<nx_http::MultipartContentParser> contentParser;
@@ -123,7 +121,7 @@ private:
     IOMonitor m_ioHttpMonitor[2];
     nx_http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
-    
+
 
     nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx_http::BufferType m_currentMonitorData;

@@ -526,7 +526,9 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    auto serverManager = ec2Connection()->getMediaServerManager(owner->accessRights());
+    // Users (include administrator) is not allowed to save media server directly via API.
+    // Exec this call with system super user permissions.
+    auto serverManager = ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
     errorCode = serverManager->saveSync(mediaServerData);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
@@ -558,7 +560,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    auto miscManager = ec2Connection()->getMiscManager(owner->accessRights());
+    auto miscManager = ec2Connection()->getMiscManager(Qn::kSystemAccess);
     errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)

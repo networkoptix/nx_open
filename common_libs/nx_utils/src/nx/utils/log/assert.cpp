@@ -1,5 +1,6 @@
-#include "log.h"
 #include "assert.h"
+
+#include "log.h"
 
 namespace nx {
 namespace utils {

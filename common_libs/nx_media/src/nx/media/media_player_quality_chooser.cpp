@@ -173,6 +173,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
             lowResolution = stream.getResolution();
         }
     }
+    QN_UNUSED(lowCodec);
 
     const bool highStreamRequested = videoQuality == Player::HighVideoQuality
         || (!highResolution.isEmpty() && videoQuality == highResolution.height());

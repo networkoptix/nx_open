@@ -10,15 +10,14 @@
 #include <iostream>
 #include <map>
 
+#if defined(ANDROID) || defined(__ANDROID__)
+    #include <nx/utils/std/android.h>
+#endif // defined(ANDROID) || defined(__ANDROID__)
+
 #define OUTPUT_PREFIX ""
 #include "debug_utils.h"
 
 #define WRITE if (!s_isOutputAllowed || outputType != OutputType::verbose) {} else PRINT
-
-#if defined(ANDROID) || defined(__ANDROID__)
-    #include <nx/utils/std/android.h>
-    #include <QtCore/QStandardPaths>
-#endif // defined(ANDROID) || defined(__ANDROID__)
 
 namespace nx {
 namespace utils {
@@ -391,14 +390,22 @@ FlagConfig::Impl::Impl(const char* moduleName):
     m_tempPath[0] = '\0';
 
     #if defined(ANDROID) || defined(__ANDROID__)
-    {
-        // NOTE: On Android, both QDir::tempPath() and std::tmpnam() return "/tmp", which is wrong.
-        // Typical path on Android 5: /data/user/0/com.networkoptix.nxwitness/cache/
-        const QByteArray path =
-            QStandardPaths::writableLocation(QStandardPaths::CacheLocation).toLatin1();
-        if (!path.isEmpty() && path.size() + sizeof('/') + sizeof('\0') <= sizeof(m_tempPath))
-            strcpy(m_tempPath, (path + "/").constData());
-    }
+        // NOTE: On Android, both QDir::tempPath() and std::tmpnam() return "/tmp", which does not
+        // exist on Android.
+        strncpy(m_tempPath, "/sdcard/", sizeof(m_tempPath));
+
+        // NOTE: Another approach would be to use app cache dir, but this is not convenient because
+        // this dir is not accessible from the outside on non-rooted devices for app release build.
+        #if 0
+        {
+            // Typical path on Android 5: /data/user/0/com.networkoptix.nxwitness/cache/
+            #include <QtCore/QStandardPaths>
+            const QByteArray path =
+                QStandardPaths::writableLocation(QStandardPaths::CacheLocation).toLatin1();
+            if (!path.isEmpty() && path.size() + sizeof('/') + sizeof('\0') <= sizeof(m_tempPath))
+                strcpy(m_tempPath, (path + "/").constData());
+        }
+        #endif
     #else // defined(ANDROID) || defined(__ANDROID__)
         if (std::tmpnam(m_tempPath))
         {

@@ -279,19 +279,13 @@ void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
             m_stoppingHttpClients.erase(httpClient);
             m_stopInputMonitoringWaitCondition.wakeAll();
         });
-   
+
 }
 
 bool QnPlAxisResource::isInputPortMonitored() const
 {
     QnMutexLocker lk( &m_inputPortMutex );
     return m_ioHttpMonitor[0].httpClient.get() != nullptr;
-}
-
-bool QnPlAxisResource::isInitialized() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
 }
 
 void QnPlAxisResource::clear()

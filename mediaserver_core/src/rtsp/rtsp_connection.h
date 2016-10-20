@@ -15,7 +15,23 @@ class QnArchiveStreamReader;
 
 struct RtspServerTrackInfo
 {
-    RtspServerTrackInfo(): clientPort(-1), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0)
+    enum class MediaType
+    {
+        Undefined,
+        Video,
+        Audio,
+        Subtitles,
+        MetaData
+    };
+
+    RtspServerTrackInfo():
+        clientPort(-1),
+        clientRtcpPort(0),
+        sequence(0),
+        firstRtpTime(-1),
+        mediaSocket(0),
+        rtcpSocket(0),
+        mediaType(MediaType::Undefined)
     {
 
     }
@@ -38,8 +54,11 @@ struct RtspServerTrackInfo
     AbstractDatagramSocket* mediaSocket;
     AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
+    MediaType mediaType;
+
     static QnMutex m_createSocketMutex;
 };
+
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
@@ -104,6 +123,7 @@ private:
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
+    void updatePredefinedTracks();
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
