@@ -331,7 +331,13 @@
                 "Axis|AXISQ7404*",
                 "Axis|M7014*",
                 "Axis|M7016*",
-                "Axis|Q7404*"
+                "Axis|Q7404*",
+                "Axis|AXISP7214*",
+                "Axis|AXISM70114*",
+                "Axis|AXISP7016*",
+                "Axis|P7214*",
+                "Axis|M70114*",
+                "Axis|P7016*"
             ],
             "analogEncoder": true
         },
