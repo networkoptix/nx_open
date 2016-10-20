@@ -477,17 +477,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="detectionTypeComboBox"/>
-            </item>
-            <item>
-             <widget class="QLabel" name="detectionHintLabel">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
+             <spacer name="horizontalSpacer_2">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>

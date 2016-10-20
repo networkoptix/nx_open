@@ -141,35 +141,12 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->webPageLink, &QLabel::linkActivated,
         this, &QnSingleCameraSettingsWidget::at_linkActivated);
 
-    connect(ui->motionDetectionCheckBox, &QCheckBox::toggled, this, [this]()
-    {
-        bool enabled = ui->motionDetectionCheckBox->isChecked();
-        ui->detectionTypeComboBox->setEnabled(enabled);
-        ui->detectionHintLabel->setEnabled(enabled);
-        updateMotionAlert();
-        at_motionTypeChanged();
-    });
-
-    connect(ui->detectionTypeComboBox, QnComboboxCurrentIndexChanged, this, [this](int index)
-    {
-
-        if (index == -1)
+    connect(ui->motionDetectionCheckBox, &QCheckBox::toggled, this,
+        [this]
         {
-            ui->detectionHintLabel->setText(QString());
-        }
-        else switch (ui->detectionTypeComboBox->itemData(index).toInt())
-        {
-            case Qn::MT_SoftwareGrid:
-                ui->detectionHintLabel->setText(tr("Consumes a bit of server resources."));
-                break;
-
-            case Qn::MT_HardwareGrid:
-                ui->detectionHintLabel->setText(tr("Camera built-in."));
-                break;
-        }
-
-        at_motionTypeChanged();
-    });
+            updateMotionAlert();
+            at_motionTypeChanged();
+        });
 
     connect(m_sensitivityButtons, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this, &QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity);
@@ -374,15 +351,13 @@ bool QnSingleCameraSettingsWidget::hasChanges() const
 
 Qn::MotionType QnSingleCameraSettingsWidget::selectedMotionType() const
 {
+    if (!m_camera)
+        return Qn::MT_Default;
+
     if (!ui->motionDetectionCheckBox->isChecked())
         return Qn::MT_NoMotion;
 
-    if (ui->detectionTypeComboBox->currentData().toInt() == Qn::MT_SoftwareGrid)
-        return Qn::MT_SoftwareGrid;
-
-    return m_camera
-        ? m_camera->getCameraBasedMotionType()
-        : Qn::MT_Default;
+    return m_camera->getDefaultMotionType();
 }
 
 void QnSingleCameraSettingsWidget::submitToResource()
@@ -450,8 +425,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     ui->licensingWidget->setCameras(cameras);
     ui->imageControlWidget->updateFromResources(cameras);
 
-    ui->detectionTypeComboBox->clear();
-
     if (!m_camera)
     {
         ui->nameEdit->clear();
@@ -498,30 +471,19 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         if (!dtsBased)
         {
             auto supported = m_camera->supportedMotionType();
-            if (supported.testFlag(Qn::MT_HardwareGrid) || supported.testFlag(Qn::MT_MotionWindow))
-                ui->detectionTypeComboBox->addItem(tr("Hardware"), Qn::MT_HardwareGrid);
+            auto motionType = m_camera->getMotionType();
+            auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
+            if (!mdEnabled)
+                motionType = Qn::MT_NoMotion;
+            ui->motionDetectionCheckBox->setChecked(mdEnabled);
 
-            if (supported.testFlag(Qn::MT_SoftwareGrid))
-                ui->detectionTypeComboBox->addItem(tr("Software"), Qn::MT_SoftwareGrid);
+            ui->cameraScheduleWidget->overrideMotionType(motionType);
+
+            updateMotionCapabilities();
+            updateMotionWidgetFromResource();
 
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);
-
-            int index = ui->detectionTypeComboBox->findData(m_camera->getMotionType());
-            if (index < 0)
-            {
-                ui->detectionTypeComboBox->setCurrentIndex(0);
-                ui->motionDetectionCheckBox->setChecked(false);
-            }
-            else
-            {
-                ui->detectionTypeComboBox->setCurrentIndex(index);
-                ui->motionDetectionCheckBox->setChecked(true);
-            }
-            ui->cameraScheduleWidget->overrideMotionType(m_camera->getMotionType());
-
-            updateMotionCapabilities();
-
             ui->expertSettingsWidget->updateFromResources(cameras);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
@@ -539,7 +501,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 
     /* After overrideMotionType is set. */
     ui->cameraScheduleWidget->updateFromResources();
-    updateMotionWidgetFromResource();
+
     updateIpAddressText();
     updateWebPageText();
     ui->advancedSettingsWidget->updateFromResource();
@@ -629,7 +591,6 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly)
         setReadOnly(button, readOnly);
 
     setReadOnly(ui->motionDetectionCheckBox, readOnly);
-    setReadOnly(ui->detectionTypeComboBox, readOnly);
 
     if (m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
@@ -735,8 +696,8 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect()
     if (!m_motionWidget)
         return;
 
-    m_motionWidget->setControlMaxRects(m_camera && m_cameraSupportsMotion
-        && ui->detectionTypeComboBox->currentData().toInt() == Qn::MT_HardwareGrid);
+    m_motionWidget->setControlMaxRects(m_camera
+        && m_camera->getDefaultMotionType() == Qn::MT_HardwareGrid);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionCapabilities()
