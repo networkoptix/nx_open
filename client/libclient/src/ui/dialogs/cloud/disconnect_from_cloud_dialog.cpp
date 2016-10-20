@@ -20,6 +20,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/style/helper.h>
+#include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -56,8 +57,6 @@ public:
 
     void setupUi();
     bool validateAuth();
-
-    bool checkCloudPassword(const QString& password);
 private:
     Scenario calculateScenario() const;
     void createAuthorizeWidget();
@@ -67,6 +66,7 @@ private:
     QString enterPasswordMessage() const;
     QString disconnectWarnMessage() const;
 
+    void validateCloudPassword();
     void setupResetPasswordPage();
     void setupConfirmationPage();
 public:
@@ -76,8 +76,12 @@ public:
     QWidget* resetPasswordWidget;
     QnInputField* resetPasswordField;
     QnInputField* confirmPasswordField;
-    QPushButton* nextButton;
+    QnBusyIndicatorButton* nextButton;
+    QnBusyIndicatorButton* okButton;
     bool unlinkedSuccessfully;
+
+private:
+    QHash<QString, bool> m_cloudPasswordCache;
 };
 
 QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
@@ -95,31 +99,34 @@ void QnDisconnectFromCloudDialog::accept()
 {
     Q_D(QnDisconnectFromCloudDialog);
 
+    if (d->unlinkedSuccessfully)
+        base_type::accept();
+
     switch (d->scenario)
     {
         case QnDisconnectFromCloudDialogPrivate::Scenario::Invalid:
+        {
             base_type::accept();
             break;
+        }
         case QnDisconnectFromCloudDialogPrivate::Scenario::LocalOwner:
-        case QnDisconnectFromCloudDialogPrivate::Scenario::CloudOwner:
         {
-            if (d->unlinkedSuccessfully)
-                base_type::accept();
-            else if (!d->validateAuth())
+            if (!d->validateAuth())
             {
-                button(QDialogButtonBox::Ok)->setFocus(Qt::OtherFocusReason);
+                d->okButton->setFocus(Qt::OtherFocusReason);
                 return;
             }
             else
                 d->unbindSystem();
+        }
+        case QnDisconnectFromCloudDialogPrivate::Scenario::CloudOwner:
+        {
+            d->validateCloudPassword();
             break;
         }
         case QnDisconnectFromCloudDialogPrivate::Scenario::CloudOwnerOnly:
         {
-            if (d->unlinkedSuccessfully)
-                base_type::accept();
-            else
-                d->unbindSystem();
+            d->unbindSystem();
             break;
         }
         default:
@@ -138,6 +145,7 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
     resetPasswordField(nullptr),
     confirmPasswordField(nullptr),
     nextButton(nullptr),
+    okButton(nullptr),
     unlinkedSuccessfully(false)
 {
     createAuthorizeWidget();
@@ -146,12 +154,15 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
 
 void QnDisconnectFromCloudDialogPrivate::lockUi(bool lock)
 {
-    Q_Q(QnDisconnectFromCloudDialog);
-
     const bool enabled = !lock;
 
-    auto okButton = q->defaultButton();
+    authorizeWidget->setEnabled(enabled);
+
     okButton->setEnabled(enabled);
+    okButton->showIndicator(lock);
+
+    nextButton->setEnabled(enabled);
+    nextButton->showIndicator(lock);
 }
 
 void QnDisconnectFromCloudDialogPrivate::unbindSystem()
@@ -159,22 +170,22 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
     Q_Q(QnDisconnectFromCloudDialog);
 
     auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
-    auto handleReply = [this, guard](bool success, rest::Handle handleId, const QnRestResult& reply)
-    {
-        if (!guard)
-            return;
+    auto handleReply =
+        [this, guard](bool success, rest::Handle /*handleId*/, const QnRestResult& reply)
+        {
+            if (!guard)
+                return;
 
-        Q_UNUSED(handleId);
-        if (success && reply.error == QnRestResult::NoError)
-        {
-            unlinkedSuccessfully = true;
-            guard->accept();
-        }
-        else
-        {
-            showFailure(reply.errorString);
-        }
-    };
+            if (success && reply.error == QnRestResult::NoError)
+            {
+                unlinkedSuccessfully = true;
+                guard->accept();
+            }
+            else
+            {
+                showFailure(reply.errorString);
+            }
+        };
 
     if (!qnCommon->currentServer())
         return;
@@ -217,6 +228,23 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     q->setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
     q->setFixedWidth(kDialogWidth);
 
+    /* We replace standard button instead of simply adding our one to keep OS theme values: */
+    QScopedPointer<QAbstractButton> baseOkButton(q->button(QDialogButtonBox::Ok));
+    okButton = new QnBusyIndicatorButton(q);
+    okButton->setText(baseOkButton->text()); // Title from OS theme
+    okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
+    okButton->setDefault(true);
+    okButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    q->removeButton(baseOkButton.data());
+    q->addButton(okButton, QDialogButtonBox::AcceptRole);
+
+    nextButton = new QnBusyIndicatorButton(q);
+    nextButton->setText(tr("Next")); // Title from OS theme
+    nextButton->setDefault(true);
+    nextButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    q->addButton(nextButton, QDialogButtonBox::ActionRole);
+    nextButton->setVisible(false);
+
     switch (scenario)
     {
         case Scenario::LocalOwner:
@@ -228,7 +256,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + enterPasswordMessage(),
                 false);
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
-            q->setDefaultButton(QDialogButtonBox::Ok);
+            q->setDefaultButton(okButton);
             break;
         }
         case Scenario::CloudOwner:
@@ -241,30 +269,27 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + L'\n'
                 + enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
-            q->setDefaultButton(QDialogButtonBox::Ok);
+            q->setDefaultButton(okButton);
             break;
         }
         case Scenario::CloudOwnerOnly:
         {
             q->setText(enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
-            q->setStandardButtons(QDialogButtonBox::NoButton);
-            auto cancelButton = q->addButton(QDialogButtonBox::tr("Cancel"), QDialogButtonBox::HelpRole);
-            QObject::connect(cancelButton, &QPushButton::clicked, q, &QnMessageBox::reject);
-            if (!nextButton)
-                nextButton = q->addButton(tr("Next"), QDialogButtonBox::ActionRole);
+            okButton->setVisible(false);
+            nextButton->setVisible(true);
+            q->setDefaultButton(nextButton);
             disconnect(nextButton, nullptr, this, nullptr);
             connect(nextButton, &QPushButton::clicked, this,
-                &QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage);
-            q->setDefaultButton(nextButton);
+                &QnDisconnectFromCloudDialogPrivate::validateCloudPassword);
             break;
         }
         default:
             NX_ASSERT(false, "Invalid scenario");
             q->setIcon(QnMessageBox::Warning);
             q->setText(tr("Internal system error"));
-            q->setStandardButtons(QDialogButtonBox::Ok);
-            q->setDefaultButton(QDialogButtonBox::Ok);
+            q->setStandardButtons(QDialogButtonBox::NoButton);
+            q->setDefaultButton(okButton);
             break;
     }
 
@@ -274,39 +299,6 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
 {
     NX_ASSERT(authorizePasswordField);
     return authorizePasswordField->validate();
-}
-
-bool QnDisconnectFromCloudDialogPrivate::checkCloudPassword(const QString& password)
-{
-    auto connection = qnCloudConnectionProvider->createConnection();
-    connection->setCredentials(
-        context()->user()->getName().toStdString(),
-        password.toStdString());
-
-    QEventLoop loop;
-    bool success = false;
-
-    qDebug() << "checking cloud credentials" << context()->user()->getName() << password;
-    Q_Q(QnDisconnectFromCloudDialog);
-    auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
-    auto handler =
-        [guard, &loop, &success](nx::cdb::api::ResultCode code, nx::cdb::api::AccountData /*data*/)
-    {
-        qDebug() << "we are in handler, result" << QString::fromStdString(nx::cdb::api::toString(code));
-        if (!guard)
-            return;
-
-        guard->d_ptr->lockUi(false);
-        success = (code == nx::cdb::api::ResultCode::ok);
-        loop.exit();
-    };
-
-    lockUi(true);
-    connection->accountManager()->getAccount(handler);
-    loop.exec();
-
-    qDebug() << "returning result" << success;
-    return success;
 }
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
@@ -324,12 +316,59 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
     return tr("You will be disconnected from this system and able to login again through local network with local account");
 }
 
+void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
+{
+    NX_ASSERT(scenario == Scenario::CloudOwnerOnly || scenario == Scenario::CloudOwner);
+    const QString password = authorizePasswordField->text();
+
+    auto connection = qnCloudConnectionProvider->createConnection();
+    connection->setCredentials(
+        context()->user()->getName().toStdString(),
+        password.toStdString());
+
+    Q_Q(QnDisconnectFromCloudDialog);
+    auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
+    auto handler =
+        [guard, this, password](nx::cdb::api::ResultCode code, nx::cdb::api::AccountData /*data*/)
+        {
+            qDebug() << "we are in handler, result" << QString::fromStdString(nx::cdb::api::toString(code));
+            if (!guard)
+                return;
+
+            bool success = (code == nx::cdb::api::ResultCode::ok);
+            executeDelayed(
+                [guard, this, success, password]
+                {
+                    if (!guard)
+                        return;
+
+                    m_cloudPasswordCache[password] = success;
+                    lockUi(false);
+                    if (success)
+                    {
+                        if (scenario == Scenario::CloudOwnerOnly)
+                            setupResetPasswordPage();
+                        else
+                            unbindSystem();
+                    }
+                    else
+                    {
+                        if (scenario == Scenario::CloudOwnerOnly)
+                            nextButton->setFocus(Qt::OtherFocusReason);
+                        else
+                            okButton->setFocus(Qt::OtherFocusReason);
+                    }
+
+                }, kDefaultDelay, guard->thread());
+        };
+
+    lockUi(true);
+    connection->accountManager()->getAccount(handler);
+}
+
 void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
 {
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
-    nextButton->setFocus(Qt::OtherFocusReason);
-    if (!validateAuth())
-        return;
 
     Q_Q(QnDisconnectFromCloudDialog);
 
@@ -375,10 +414,9 @@ void QnDisconnectFromCloudDialogPrivate::setupConfirmationPage()
         + disconnectWarnMessage());
     q->removeCustomWidget(resetPasswordWidget);
     resetPasswordWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
-    delete nextButton;
-    nextButton = nullptr;
-    q->setStandardButtons(QDialogButtonBox::Ok);
-    q->setDefaultButton(QDialogButtonBox::Ok);
+    nextButton->setVisible(false);
+    okButton->setVisible(true);
+    q->setDefaultButton(okButton);
 }
 
 void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
@@ -418,7 +456,10 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                 case Scenario::CloudOwnerOnly:
                 {
                     NX_ASSERT(user->isCloud());
-                    return checkCloudPassword(password)
+                    if (!m_cloudPasswordCache.contains(password))
+                        return Qn::kValidResult;
+
+                    return m_cloudPasswordCache[password]
                         ? Qn::kValidResult
                         : Qn::ValidationResult(tr("Wrong Password"));
                 }
