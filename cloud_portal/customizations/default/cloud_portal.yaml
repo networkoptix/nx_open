@@ -31,3 +31,6 @@ admins:
     -
         - 'Evgeny'
         - 'ebalashov@networkoptix.com'
+
+notification_module:
+    secret: '$NOTIFICATION_SECRET'
