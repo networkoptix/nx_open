@@ -143,6 +143,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_resizerWidget);
     m_hidingProcessor->addTargetItem(m_showWidget);
+    m_hidingProcessor->addTargetItem(item->timeSlider()->toolTipItem());
     m_hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
