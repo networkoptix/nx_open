@@ -97,7 +97,6 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
                 video = camera->getLastVideoFrame(!useHQ, prefferedChannel);
         }
         if (!video) {
-            video = camera->getLastVideoFrame(!useHQ, prefferedChannel);
             if (!serverDelegate.isOpened()) {
                 serverDelegate.open(res);
                 serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
@@ -116,11 +115,11 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
         }
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
 
-        if (!video) {
+        if (!video && camera) {
             video = camera->getFrameByTime(useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
             time = DATETIME_NOW;
         }
-        if (!video)
+        if (!video && camera)
             video = camera->getFrameByTime(!useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
     }
     if (!video)
