@@ -542,6 +542,9 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
     }
 }
 
+constexpr static auto timeForConnectionToChangeState = std::chrono::seconds(10);
+constexpr static auto allowedConnectionClosureTimeError = std::chrono::seconds(10);
+
 class Ec2MserverCloudSynchronizationKeepAlive:
     public Ec2MserverCloudSynchronization
 {
@@ -552,9 +555,6 @@ public:
     }
 
 protected:
-    constexpr static auto timeForConnectionToChangeState = std::chrono::seconds(10);
-    constexpr static auto allowedConnectionClosureTimeError = std::chrono::seconds(10);
-
     std::chrono::milliseconds m_connectionInactivityTimeout;
     TransactionConnectionHelper m_transactionConnectionHelper;
     int m_connectionId;
