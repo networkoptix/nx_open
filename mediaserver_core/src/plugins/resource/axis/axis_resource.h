@@ -140,7 +140,6 @@ private:
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
     QnCameraAdvancedParams m_advancedParameters;
-    mutable QnMutex m_physicalParamsMutex;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

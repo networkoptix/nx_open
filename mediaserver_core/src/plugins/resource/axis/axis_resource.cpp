@@ -1435,7 +1435,7 @@ QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QSt
     QList<QnCameraAdvancedParameter> params;
 
     {
-        QnMutexLocker lock(&m_physicalParamsMutex);
+        QnMutexLocker lock(&m_mutex);
         for (const auto& id: ids)
         {
             auto param = m_advancedParameters.getParameterById(id);
@@ -1512,12 +1512,14 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
 
     auto supportedParams = calculateSupportedAdvancedParameters(params);
 
+    auto filteredParams = params.filtered(supportedParams);
+
     {
-        QnMutexLocker lock( &m_physicalParamsMutex );
-        m_advancedParameters.clear();
-        m_advancedParameters = params.filtered(supportedParams);
-        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
+        QnMutexLocker lock(&m_mutex);
+        m_advancedParameters = filteredParams;
     }
+
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), filteredParams);
 }
 
 bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
@@ -1619,7 +1621,7 @@ QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueLi
     QUrlQuery query;
 
     {
-        QnMutexLocker lock(&m_physicalParamsMutex);
+        QnMutexLocker lock(&m_mutex);
         for (const auto& paramIdAndValue: params)
         {
             auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
@@ -1647,7 +1649,7 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
     QString query = lit("axis-cgi/admin/");
 
     {
-        QnMutexLocker lock(&m_physicalParamsMutex);
+        QnMutexLocker lock(&m_mutex);
         for (const auto& paramIdAndValue: params)
         {
             auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
