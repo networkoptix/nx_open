@@ -19,7 +19,6 @@
 #include "../abstract_socket.h"
 #include "../host_address_resolver.h"
 
-
 //TODO #ak come up with new name for this class or remove it
 //TODO #ak also, some refactor needed to use AsyncSocketImplHelper with server socket
 //TODO #ak move timers to AbstractSocket
@@ -164,6 +163,7 @@ public:
             return true;
         }
 
+        Q_ASSERT( isNonBlockingMode() ); //< NX_ASSERT/NX_CRITICAL by FlagConfig in 3.0.0
         m_connectHandler = std::move( handler );
 
         //TODO #ak if address is already resolved (or is an ip address) better make synchronous non-blocking call
@@ -192,6 +192,7 @@ public:
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
+        Q_ASSERT( isNonBlockingMode() ); //< NX_ASSERT/NX_CRITICAL by FlagConfig in 3.0.0
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
         //this assert is not critical but is a signal of possible
@@ -213,6 +214,7 @@ public:
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
+        Q_ASSERT( isNonBlockingMode() ); //< NX_ASSERT/NX_CRITICAL by FlagConfig in 3.0.0
         assert( buf.size() > 0 );
 
         //assert does not stop all threads immediately, so performing segmentation fault
@@ -322,6 +324,12 @@ private:
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     std::atomic<bool> m_asyncSendIssued;
     const int m_ipVersion;
+
+    bool isNonBlockingMode() const
+    {
+        bool value;
+        return m_abstractSocketPtr->getNonBlockingMode(&value) && value;
+    }
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
@@ -434,8 +442,12 @@ private:
                 m_recvHandlerTerminatedFlag = &terminated;
 
                 std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_read)> cleanupGuard( this, __finally_read );
-
                 assert( m_recvHandler );
+                if( !isNonBlockingMode() )
+                {
+                    recvHandlerLocal( SystemError::invalidData, (size_t) -1 );
+                    break;
+                }
 
                 //reading to buffer
                 const auto bufSizeBak = m_recvBuffer->size();
@@ -469,9 +481,13 @@ private:
                 else
                 {
                     //can send some bytes
-                    assert( m_sendHandler );
-
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)> cleanupGuard( this, __finally_write );
+                    assert( m_sendHandler );
+                    if( !isNonBlockingMode() )
+                    {
+                        recvHandlerLocal( SystemError::invalidData, (size_t) -1 );
+                        break;
+                    }
 
                     const int bytesWritten = m_abstractSocketPtr->send(
                         m_sendBuffer->constData() + m_sendBufPos,

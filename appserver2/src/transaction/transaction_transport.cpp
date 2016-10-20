@@ -247,21 +247,6 @@ QnTransactionTransport::QnTransactionTransport(
     incomingTransactionsRequestsParser->setNextFilter( std::move(extensionHeadersProcessor) );
 
     m_incomingTransactionStreamParser = std::move(incomingTransactionsRequestsParser);
-
-    startSendKeepAliveTimerNonSafe();
-
-    //monitoring m_outgoingDataSocket for connection close
-    m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
-    if( !m_outgoingDataSocket->readSomeAsync(
-            &m_dummyReadBuffer,
-            std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) ) )
-    {
-        const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG(QnLog::EC2_TRAN_LOG,
-            lit("Error scheduling async read on transaction connection %1 received from %2. %3").
-            arg(connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
-            arg(SystemError::toString(osErrorCode)), cl_logWARNING );
-    }
 }
 
 QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
@@ -344,6 +329,25 @@ QnTransactionTransport::~QnTransactionTransport()
 
     if (m_ttFinishCallback)
         m_ttFinishCallback();
+}
+
+void QnTransactionTransport::monitorConnectionForClosure()
+{
+    using namespace std::placeholders;
+    startSendKeepAliveTimerNonSafe();
+
+    m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
+    if( !m_outgoingDataSocket->setNonBlockingMode( true ) ||
+        !m_outgoingDataSocket->readSomeAsync(
+            &m_dummyReadBuffer,
+            std::bind(&QnTransactionTransport::onMonitorConnectionForClosure, this, _1, _2) ) )
+    {
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("Error scheduling async read on transaction connection %1 received from %2. %3").
+            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
+            arg(SystemError::toString(osErrorCode)), cl_logWARNING );
+    }
 }
 
 void QnTransactionTransport::addData(QByteArray data)
@@ -986,7 +990,7 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
     }
 }
 
-void QnTransactionTransport::monitorConnectionForClosure(
+void QnTransactionTransport::onMonitorConnectionForClosure(
     SystemError::ErrorCode errorCode,
     size_t bytesRead)
 {
@@ -1017,7 +1021,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
     m_dummyReadBuffer.resize( 0 );
     if( !m_outgoingDataSocket->readSomeAsync(
             &m_dummyReadBuffer,
-            std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) ) )
+            std::bind(&QnTransactionTransport::onMonitorConnectionForClosure, this, _1, _2) ) )
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error scheduling async read on transaction connection %1 received from %2. %3").
@@ -1746,7 +1750,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_outgoingDataSocket->readSomeAsync(
         &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+        std::bind(&QnTransactionTransport::onMonitorConnectionForClosure, this, _1, _2) );
     //----------------------------------------------------------------------------------------
 #endif //PIPELINE_POST_REQUESTS
 

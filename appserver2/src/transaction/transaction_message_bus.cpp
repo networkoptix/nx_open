@@ -1501,6 +1501,7 @@ namespace ec2
         {
             if(connection->connectionGuid() == connectionGuid)
             {
+                connection->monitorConnectionForClosure();
                 connection->setState(QnTransactionTransport::Connected);
                 return true;
             }
