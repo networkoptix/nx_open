@@ -82,6 +82,7 @@ public:
 
 private:
     QHash<QString, bool> m_cloudPasswordCache;
+    std::unique_ptr<nx::cdb::api::Connection> m_connection;
 };
 
 QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
@@ -100,7 +101,10 @@ void QnDisconnectFromCloudDialog::accept()
     Q_D(QnDisconnectFromCloudDialog);
 
     if (d->unlinkedSuccessfully)
+    {
         base_type::accept();
+        return;
+    }
 
     switch (d->scenario)
     {
@@ -146,7 +150,8 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
     confirmPasswordField(nullptr),
     nextButton(nullptr),
     okButton(nullptr),
-    unlinkedSuccessfully(false)
+    unlinkedSuccessfully(false),
+    m_connection(qnCloudConnectionProvider->createConnection())
 {
     createAuthorizeWidget();
     createResetPasswordWidget();
@@ -168,11 +173,11 @@ void QnDisconnectFromCloudDialogPrivate::lockUi(bool lock)
 void QnDisconnectFromCloudDialogPrivate::unbindSystem()
 {
     Q_Q(QnDisconnectFromCloudDialog);
-
     auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
     auto handleReply =
         [this, guard](bool success, rest::Handle /*handleId*/, const QnRestResult& reply)
         {
+            qDebug() << "server request reply received";
             if (!guard)
                 return;
 
@@ -200,6 +205,7 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
         ? resetPasswordField->text()
         : QString();
 
+    qDebug() << "send server request";
     serverConnection->detachSystemFromCloud(updatedPassword, handleReply, q->thread());
 }
 
@@ -321,8 +327,7 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly || scenario == Scenario::CloudOwner);
     const QString password = authorizePasswordField->text();
 
-    auto connection = qnCloudConnectionProvider->createConnection();
-    connection->setCredentials(
+    m_connection->setCredentials(
         context()->user()->getName().toStdString(),
         password.toStdString());
 
@@ -331,7 +336,6 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
     auto handler =
         [guard, this, password](nx::cdb::api::ResultCode code, nx::cdb::api::AccountData /*data*/)
         {
-            qDebug() << "we are in handler, result" << QString::fromStdString(nx::cdb::api::toString(code));
             if (!guard)
                 return;
 
@@ -353,6 +357,7 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
                     }
                     else
                     {
+                        authorizePasswordField->validate();
                         if (scenario == Scenario::CloudOwnerOnly)
                             nextButton->setFocus(Qt::OtherFocusReason);
                         else
@@ -363,7 +368,7 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
         };
 
     lockUi(true);
-    connection->accountManager()->getAccount(handler);
+    m_connection->accountManager()->getAccount(handler);
 }
 
 void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
