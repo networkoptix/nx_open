@@ -68,11 +68,7 @@ void QnSelectResourcesButton::setAppearance(const Appearance& appearance)
 {
     setText(appearance.text);
     setIcon(appearance.icon);
-
-    if (!appearance.icon.isNull())
-        setIconSize(QnSkin::maximumSize(appearance.icon));
-    else
-        setIconSize(QSize(-8, 0));
+    setIconSize(QnSkin::maximumSize(appearance.icon));
 }
 
 QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResource(const QnResourcePtr& resource)
