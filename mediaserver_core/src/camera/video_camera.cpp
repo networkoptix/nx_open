@@ -152,10 +152,10 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
 int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
 {
     int rez = 0;
-    QnMutexLocker lock( &m_queueMtx );
-    for (int i = 0; i < m_dataQueue.size(); ++i)
+    auto randomAccess = m_dataQueue.lock();
+    for (int i = 0; i < randomAccess.size(); ++i)
     {
-        const QnConstAbstractDataPacketPtr& data = m_dataQueue.atUnsafe(i);
+        const QnConstAbstractDataPacketPtr& data = randomAccess.at(i);
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
         if (video)
         {

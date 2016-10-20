@@ -26,7 +26,7 @@ void QnAbstractAudioTransmitter::endOfRun()
 void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioDataPtr& audioData)
 {
     m_transmittedPacketDuration += audioData->getDurationMs();
-    qint64  diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();    
+    qint64  diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();
     if(diff > 0)
         QnSleep::msleep(diff);
 }
@@ -85,18 +85,17 @@ void QnAbstractAudioTransmitter::removePacketsByProvider(QnAbstractStreamDataPro
 
         if (!removeSince)
             continue;
-        
+
         providersToFlush.insert(it->second.data());
     }
 
-    m_dataQueue.lock();
-    for (int i = m_dataQueue.size() - 1; i >= 0; --i)
+    auto randomAccess = m_dataQueue.lock();
+    for (int i = randomAccess.size() - 1; i >= 0; --i)
     {
-        auto packet = m_dataQueue.atUnsafe(i);
+        auto packet = randomAccess.at(i);
         if (packet && providersToFlush.count(packet->dataProvider))
-            m_dataQueue.removeAtUnsafe(i);
+            randomAccess.removeAt(i);
     }
-    m_dataQueue.unlock();
 }
 
 void QnAbstractAudioTransmitter::unsubscribeUnsafe(QnAbstractStreamDataProvider* dataProvider)

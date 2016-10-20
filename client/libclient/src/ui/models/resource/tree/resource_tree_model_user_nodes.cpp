@@ -1,5 +1,6 @@
 #include "resource_tree_model_user_nodes.h"
 
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 
@@ -19,34 +20,6 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-
-namespace {
-
-bool isLayout(const QnResourcePtr& resource)
-{
-    return resource->hasFlags(Qn::layout);
-}
-
-//TODO: #GDM think where else can we place this check
-bool isMediaResource(const QnResourcePtr& resource)
-{
-    if (resource->hasFlags(Qn::local))
-        return false;
-
-    if (resource->hasFlags(Qn::desktop_camera))
-        return false;
-
-    return resource->hasFlags(Qn::live_cam)
-        || resource->hasFlags(Qn::web_page)
-        || resource->hasFlags(Qn::server);
-}
-
-bool isUser(const QnResourcePtr& resource)
-{
-    return resource->hasFlags(Qn::user);
-}
-
-}
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
@@ -301,6 +274,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
 
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, role.id,
             Qn::RoleNode));
+        node->initialize();
         node->setParent(m_rootNode);
         m_allNodes.append(node);
 
@@ -320,7 +294,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, user,
             Qn::ResourceNode));
-
+        node->initialize();
         auto parent = m_rootNode;
         if (user->role() == Qn::UserRole::CustomUserGroup)
         {
@@ -339,14 +313,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureResourceNode(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
 {
-    if (isLayout(resource))
+    if (QnResourceAccessFilter::isShareableLayout(resource))
     {
         auto layout = resource.dynamicCast<QnLayoutResource>();
         NX_ASSERT(layout);
         if (layout && showLayoutForSubject(subject, layout))
             return ensureLayoutNode(subject, layout);
     }
-    else if (isMediaResource(resource))
+    else if (QnResourceAccessFilter::isShareableMedia(resource))
     {
         if (showMediaForSubject(subject, resource))
             return ensureMediaNode(subject, resource);
@@ -371,6 +345,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureLayoutNode(
         : Qn::ResourceNode;
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelLayoutNode(m_model, layout, nodeType));
+    node->initialize();
     auto parent = ensureSubjectNode(subject);
     if (placeholderAllowedForSubject(subject, Qn::SharedLayoutsNode))
         parent = ensurePlaceholderNode(subject, Qn::SharedLayoutsNode);
@@ -395,7 +370,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureMediaNode(
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, media,
         Qn::SharedResourceNode));
-
+    node->initialize();
     auto parent = ensureSubjectNode(subject);
     if (placeholderAllowedForSubject(subject, Qn::SharedResourcesNode))
         parent = ensurePlaceholderNode(subject, Qn::SharedResourcesNode);
@@ -428,6 +403,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensurePlaceholderNode(
     }
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, nodeType));
+    node->initialize();
     node->setParent(ensureSubjectNode(subject));
     node->update();
 
@@ -447,6 +423,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRecorderNode(
     if (pos == recorders.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(m_model, camera));
+        node->initialize();
         node->setParent(parentNode);
 
         pos = recorders.insert(id, node);
@@ -521,19 +498,13 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
             break;
     }
 
-    removeNodeInternal(node);
-}
-
-void QnResourceTreeModelUserNodes::removeNodeInternal(const QnResourceTreeModelNodePtr& node)
-{
-    node->setParent(QnResourceTreeModelNodePtr());
-    node->setResource(QnResourcePtr());
+    node->deinitialize();
 }
 
 void QnResourceTreeModelUserNodes::clean()
 {
     for (auto node : m_allNodes)
-        removeNodeInternal(node);
+        node->deinitialize();
     m_recorders.clear();
     m_shared.clear();
     m_placeholders.clear();

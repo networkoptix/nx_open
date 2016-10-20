@@ -262,7 +262,7 @@ void QnCommonModule::updateModuleInformationUnsafe()
     NX_ASSERT(!moduleGUID().isNull());
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
-    NX_ASSERT(server);
+    //NX_ASSERT(server);
     if (!server)
         return;
 

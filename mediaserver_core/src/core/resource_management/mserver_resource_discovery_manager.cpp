@@ -20,6 +20,7 @@
 #include <core/resource_management/resource_properties.h>
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
+#include "plugins/resource/desktop_camera/desktop_camera_resource.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 #include "media_server/settings.h"
@@ -148,6 +149,16 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     {
         if (needToStop())
             return false;
+
+        if (QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+                *it, 
+                [](const QnNetworkResourcePtr& res) { return true; },
+                false))
+        {
+            it = resources.erase(it);
+            continue;
+        }
+
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes) {

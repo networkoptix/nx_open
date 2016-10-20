@@ -37,7 +37,7 @@ bool QnResourceCompareHelper::resourceLessThan(const QModelIndex& left, const QM
     {
         bool leftIncompatible = (l->getStatus() == Qn::Incompatible);
         bool rightIncompatible = (r->getStatus() == Qn::Incompatible);
-        if (leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+        if (leftIncompatible != rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
             return rightIncompatible;
 
         /* Local resources should be ordered by type first */
@@ -58,6 +58,10 @@ bool QnResourceCompareHelper::resourceLessThan(const QModelIndex& left, const QM
                 && leftLayout->isShared() != rightLayout->isShared())
                 return leftLayout->isShared();
         }
+
+        /* Servers should go below other resources. */
+        if (l->hasFlags(Qn::server) != r->hasFlags(Qn::server))
+            return r->hasFlags(Qn::server);
     }
 
     /* Sort by name. */

@@ -18,7 +18,7 @@ Column
         wrapMode: Text.WordWrap;
 
         text: (searchingTimer.running ? impl.kSearchingServersText : impl.kNoServersFoundText);
-        font: Style.fonts.emptyTilesPreloader.caption;
+        font: Style.fonts.notFoundMessages.caption;
         color: Style.colors.windowText;
     }
 
@@ -33,7 +33,7 @@ Column
         wrapMode: Text.WordWrap;
 
         text: impl.kDescription;
-        font: Style.fonts.emptyTilesPreloader.description;
+        font: Style.fonts.notFoundMessages.description;
         color: Style.colors.windowText;
     }
 

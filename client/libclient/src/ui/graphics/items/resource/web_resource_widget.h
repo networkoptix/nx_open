@@ -2,7 +2,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 
-class QnWebView;
+class QnGraphicsWebView;
 
 class QnWebResourceWidget : public QnResourceWidget
 {
@@ -32,5 +32,5 @@ private:
         , QEvent *event) override;
 
 private:
-    QnWebView * const m_webView;
+    QnGraphicsWebView * const m_webView;
 };

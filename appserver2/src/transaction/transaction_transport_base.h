@@ -113,6 +113,7 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
@@ -180,6 +181,7 @@ public:
 
     void processExtraData();
     void startListening();
+    bool remotePeerSupportsKeepAlive() const;
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
 
@@ -322,7 +324,8 @@ private:
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
-    ConnectionLockGuard m_connectionLockGuard;
+    ConnectionGuardSharedState* const m_connectionGuardSharedState;
+    std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;
@@ -341,9 +344,11 @@ private:
     QAuthenticator m_remotePeerCredentials;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     nx::network::aio::Timer m_timer;
+    bool m_remotePeerSupportsKeepAlive;
 
 private:
     QnTransactionTransportBase(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,
         std::chrono::milliseconds tcpKeepAliveTimeout,

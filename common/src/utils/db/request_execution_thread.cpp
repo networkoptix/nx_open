@@ -15,7 +15,7 @@ DbRequestExecutionThread::DbRequestExecutionThread(
 :
     m_connectionOptions(connectionOptions),
     m_queryExecutorQueue(queryExecutorQueue),
-    m_state(ConnectionState::beingInitialized)
+    m_state(ConnectionState::initializing)
 {
 }
 
@@ -86,7 +86,8 @@ void DbRequestExecutionThread::run()
         }
 
         const auto result = (*task)->execute(&m_dbConnection);
-        if (result != DBResult::ok)
+        if (result != DBResult::ok && 
+            result != DBResult::cancelled)
         {
             NX_LOGX(lit("DB query failed with error %1. Db text %2")
                 .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),

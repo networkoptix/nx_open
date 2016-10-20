@@ -32,9 +32,8 @@ private:
 
     void setCloudSystems(const QnCloudSystemList &systems);
 
-    void updateSystemInternal(const QnSystemDescription::PointerType &system);
-
-    void processFactoryServer(const QnModuleInformation& serverInfo);
+    void updateSystemInternal(const QString& cloudId,
+        const QnSystemDescription::PointerType& system);
 
     void pingServerInternal(const QString &host
         , int serverPriority

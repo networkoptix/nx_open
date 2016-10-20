@@ -46,9 +46,6 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
     {
         for (const auto& storage: storages)
         {
-            if (storage->hasFlags(Qn::deprecated))
-                continue;
-
             QnStorageSpaceData data(storage, fastRequest);
             if (!fastRequest)
                 data.isWritable = writableStorages.contains(storage);

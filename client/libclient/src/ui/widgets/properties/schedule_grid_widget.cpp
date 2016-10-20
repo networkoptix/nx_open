@@ -569,6 +569,7 @@ void QnScheduleGridWidget::setCellValue(const QPoint& cell, const CellParams& va
 
     localValue = value;
 
+    update();
     emit cellValueChanged(cell);
 }
 

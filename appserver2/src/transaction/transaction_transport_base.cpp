@@ -12,6 +12,8 @@
 #include <nx/network/socket_factory.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+
 #include <utils/bsf/sized_data_decoder.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
@@ -84,6 +86,7 @@ const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary
 const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     PeerRole peerRole,
     std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -91,6 +94,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 :
     m_localPeer(localPeer),
     m_peerRole(peerRole),
+    m_connectionGuardSharedState(connectionGuardSharedState),
     m_tcpKeepAliveTimeout(tcpKeepAliveTimeout),
     m_keepAliveProbeCount(keepAliveProbeCount),
     m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount)
@@ -114,6 +118,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
+    m_remotePeerSupportsKeepAlive = false;
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
@@ -128,6 +133,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
+        nullptr,
         localPeer,
         prAccepting,
         tcpKeepAliveTimeout,
@@ -137,7 +143,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionType = connectionType;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
-    m_connectionLockGuard = std::move(connectionLockGuard);
+    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
+        std::move(connectionLockGuard));
 
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
@@ -146,6 +153,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
     if (keepAliveHeaderIter != request.headers.end())
     {
+        m_remotePeerSupportsKeepAlive = true;
         nx_http::header::KeepAlive keepAliveHeader;
         if (keepAliveHeader.parse(keepAliveHeaderIter->second))
             m_tcpKeepAliveTimeout = std::max(
@@ -185,11 +193,13 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
+        connectionGuardSharedState,
         localPeer,
         prOriginating,
         tcpKeepAliveTimeout,
@@ -931,6 +941,11 @@ void QnTransactionTransportBase::aggregateOutgoingTransactionsNonSafe()
     m_dataToSend.erase( std::next(saveToIter), it );
 }
 
+bool QnTransactionTransportBase::remotePeerSupportsKeepAlive() const
+{
+    return m_remotePeerSupportsKeepAlive;
+}
+
 bool QnTransactionTransportBase::isHttpKeepAliveTimeout() const
 {
     QnMutexLocker lock( &m_mutex );
@@ -1199,8 +1214,14 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     if (watcher.objectDestroyed())
         return; //connection has been removed by handler
 
-    if (m_connectionLockGuard.isNull())
-        m_connectionLockGuard = ConnectionLockGuard(m_remotePeer.id, ConnectionLockGuard::Direction::Outgoing);
+    if (!m_connectionLockGuard)
+    {
+        NX_CRITICAL(m_connectionGuardSharedState);
+        m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
+            m_connectionGuardSharedState,
+            m_remotePeer.id,
+            ConnectionLockGuard::Direction::Outgoing);
+    }
 
     if( !nx_http::StatusCode::isSuccessCode(statusCode) ) //checking that statusCode is 2xx
     {
@@ -1261,7 +1282,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
 
     if (getState() == ConnectingStage1)
     {
-        if (m_connectionLockGuard.tryAcquireConnecting())
+        if (m_connectionLockGuard->tryAcquireConnecting())
         {
             setState(ConnectingStage2);
             NX_ASSERT( data.isEmpty() );
@@ -1297,6 +1318,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
         if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
         {
+            m_remotePeerSupportsKeepAlive = true;
             nx_http::header::KeepAlive keepAliveHeader;
             if (keepAliveHeader.parse(keepAliveHeaderIter->second))
                 m_tcpKeepAliveTimeout = std::max(
@@ -1314,7 +1336,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         }
 
         m_httpClient.reset();
-        if (m_connectionLockGuard.tryAcquireConnected())
+        if (m_connectionLockGuard->tryAcquireConnected())
         {
             setExtraDataBuffer(data);
             setState(QnTransactionTransportBase::Connected);

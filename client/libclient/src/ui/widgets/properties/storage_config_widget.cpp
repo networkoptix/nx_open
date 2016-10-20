@@ -793,7 +793,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     };
 
     if (!any_of(m_model->storages(), isCorrectStorage))
-        return error(tr("Change \"Main\" to \"Backup\" for some of the storages above to enable backup."));
+        return error(tr("Change \"Main\" to \"Backup\" for some of the storage above to enable backup."));
 
     if (hasChanges())
         return error(tr("Apply changes to start backup."));

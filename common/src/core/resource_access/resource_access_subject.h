@@ -31,6 +31,7 @@ public:
 
     void operator=(const QnResourceAccessSubject& other);
     bool operator==(const QnResourceAccessSubject& other) const;
+    bool operator!=(const QnResourceAccessSubject& other) const;
 private:
     QScopedPointer<QnResourceAccessSubjectPrivate> d_ptr;
 };

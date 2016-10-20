@@ -45,6 +45,8 @@ public:
     void setAllChecked(bool value);
 
 private:
+    QString getTooltip(const QnResourceList& providers) const;
+
     void accessChanged();
 
 private:

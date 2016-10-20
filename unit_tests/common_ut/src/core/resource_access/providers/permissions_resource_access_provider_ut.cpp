@@ -407,3 +407,12 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkParentIdChange)
     target->setParentId(QnUuid());
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, accessProviders)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    QnResourceList providers;
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_TRUE(providers.empty());
+}

@@ -15,8 +15,7 @@ enum class QnServerField
     SystemNameField = 0x02,
     HostField = 0x04,
     FlagsField = 0x08,
-    IsFactoryFlag = 0x10,
-    CloudIdField = 0x20
+    CloudIdField = 0x10
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -43,6 +42,8 @@ public:
 
     virtual bool isCloudSystem() const = 0;
 
+    virtual bool isNewSystem() const = 0;
+
     typedef QList<QnModuleInformation> ServersList;
     virtual ServersList servers() const = 0;
 
@@ -50,6 +51,7 @@ public:
 
     virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
+    // TODO: #ynikitenkov Rename host "field" to appropriate
     virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;

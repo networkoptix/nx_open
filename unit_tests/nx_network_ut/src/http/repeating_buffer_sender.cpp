@@ -27,7 +27,7 @@ void RepeatingBufferSender::processRequest(
     nx_http::HttpRequestProcessedHandler completionHandler)
 {
     completionHandler(
-        nx_http::StatusCode::ok,
-        std::make_unique<RepeatingBufferMsgBodySource>(m_mimeType, m_buffer),
-        nx_http::ConnectionEvents());
+        nx_http::RequestResult(
+            nx_http::StatusCode::ok,
+            std::make_unique<RepeatingBufferMsgBodySource>(m_mimeType, m_buffer)));
 }

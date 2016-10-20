@@ -79,7 +79,6 @@ namespace
         return QnDeviceDependentStrings::getNumericName(cameras);
     }
 
-
 }
 
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -184,34 +183,30 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 {
     if (auto user = qnResPool->getResourceById<QnUserResource>(resourceId))
         return isValidUser(user);
-    return true;
+
+    /* We can get here either user id or role id. User should be checked additionally, role is
+     * always counted as valid (if exists). */
+    return !qnUserRolesManager->userRole(resourceId).isNull();
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
 {
-    bool any = false;
-
-    auto roles = qnUserRolesManager->userRoles(ids);
-    if (!roles.empty())
-        any = true;
-
+    /* Return true if there are no invalid emails and there is at least one recipient. */
     auto users = qnResPool->getResources<QnUserResource>(ids);
-    for (auto user : users)
-    {
-        QString email = user->getEmail();
-        if (email.isEmpty() || !QnEmailAddress::isValid(email))
-            return false;
-        any = true;
-    }
 
-    for (const auto& email : parseAdditional(additional))
-    {
-        if (!QnEmailAddress::isValid(email))
-            return false;
-        any = true;
-    }
+    if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
+        return false;
 
-    return any;
+    auto isValidEmail = [](const QString& email) { return QnEmailAddress::isValid(email); };
+
+    const auto additionalRecipients = parseAdditional(additional);
+    if (!std::all_of(additionalRecipients.cbegin(), additionalRecipients.cend(), isValidEmail))
+        return false;
+
+    /* Using lazy calculations to avoid counting roles when not needed. */
+    return !users.empty()
+        || !additionalRecipients.empty()
+        || !qnUserRolesManager->userRoles(ids).empty();
 }
 
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
@@ -291,5 +286,6 @@ QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional
 
 bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 {
-    return QnEmailAddress::isValid(user->getEmail());
+    const auto email = user->getEmail();
+    return !email.isEmpty() && QnEmailAddress::isValid(email);
 }

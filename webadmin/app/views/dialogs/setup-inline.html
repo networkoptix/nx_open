@@ -1,12 +1,12 @@
 <div class="panel-body text-center" ng-if="stepIs(0)">
-    <div class="master-success"><span class="preloader"></span></div>
+    <div class="master-icon"><span class="preloader"></span></div>
     <div class="vertical-center">
         <h2>Loading ...</h2>
     </div>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('initFailure')">
-    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Couldn't initiate your system</h2>
     <p class="master-description">
         Authorization failed for some reason.
@@ -76,18 +76,50 @@
     </form>
 </div>
 
-<div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
-    <h2>Connect your System to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
+
+<div class="panel-body text-center" ng-if="stepIs('chooseLocal')">
+    <h2>Choose system type</h2>
+    <div class="master-icon">
+        <a class="pull-left" href="" ng-click="skip()"><span class="icon-arrow-left"></span></a>
+        <span class="icon-localSystem"></span>
+        <a class="pull-right" href="" ng-click="skip()"><span class="icon-arrow-right"></span></a>
+    </div>
+    <h2>Local</h2>
     <p class="master-description">
-       Connect your system anywhere, anytime.<br>
-        <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a><br/>
+        Works in local network only<br>
+        Does not require Internet connection
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('chooseCloud')">
+    <h2>Choose system type</h2>
+    <div class="master-icon">
+        <a class="pull-left" href="" ng-click="skip()"><span class="icon-arrow-left"></span></a>
+        <span class="icon-cloudSystem"></span>
+        <a class="pull-right" href="" ng-click="skip()"><span class="icon-arrow-right"></span></a>
+    </div>
+    <h2>Cloud</h2>
+    <p class="master-description">
+        Available from everywhere<br>
+        Requires Internet connection<br>
+        <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a>
+    </p>
+</div>
+
+
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
+    <div class="master-icon">
+        <span class="icon-account"></span>
+    </div>
+    <h2>{{Config.cloud.productName}} account</h2>
+    <p class="master-description">
+        To use cloud system you should have an account on {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" autofocus>Create new account</button>&nbsp;&nbsp;
         <button class="btn btn-default" ng-click="next('cloudLogin', true)">Use existing</button>
-    </p>
-    <p class="vertical-bottom">
-        <a href="" ng-click="skip()">Skip this step for now</a>
     </p>
 </div>
 
@@ -95,23 +127,19 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
     <p>Your system will be connected to</p>
 
-    <div class="master-success"><span class="glyphicon glyphicon-cloud"></span></div>
+    <div class="master-icon"><span class="icon-cloud"></span></div>
 
     <h2>{{settings.presetCloudEmail}}</h2>
 
     <p class="vertical-bottom">
         <a href="" ng-click="next('cloudLogin', true)">Connect to another account</a>
-        <br>
-        <a href="" ng-click="skip()">Skip this step for now</a>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
+    <div class="master-icon"><span class="icon-cloud"></span></div>
 
-    <h2>Connect your System to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
-    <p class="master-description">
-        Login to your account<br>
-    </p>
+    <h2>Login to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
 
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
@@ -150,8 +178,9 @@
     <h2>Set up administrator's password</h2>
     <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
-            <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                   type="text" placeholder="Login" required readonly>
+            <!-- <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                   type="text" placeholder="Login" required readonly> -->
+            <div class="form-control text-left readonly" readonly>{{settings.localLogin}}</div>
         </div>
         <password-input ng-model="settings.localPassword"></password-input>
         <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
@@ -236,14 +265,14 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
-    <div class="master-success"><span class="preloader"></span></div>
+    <div class="master-icon"><span class="preloader"></span></div>
     <h2>Merging systems ...</h2>
     <p class="master-description">It may take several minutes</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
-    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Couldn't merge systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
@@ -255,13 +284,13 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
-    <div class="master-success"><span class="preloader"></span></div>
+    <div class="master-icon"><span class="preloader"></span></div>
     <h2>Connecting to cloud ...</h2>
     <p class="master-description">It may take several moments</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
-    <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
+    <div class="master-icon"><span class="icon-success"></span></div>
     <h2>System is ready for use</h2>
     <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
@@ -270,7 +299,7 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
-    <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
+    <div class="master-icon"><span class="icon-success"></span></div>
     <h2>System is ready for use</h2>
     <p>Server address</p>
     <h4>{{serverAddress}}</h4>
@@ -287,7 +316,7 @@
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local system</button>
     </p>
 </div>
 
@@ -299,24 +328,24 @@
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local system</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
-    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
-    <h2>Couldn't connect to cloud</h2>
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Couldn't connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local system</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
-    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Couldn't setup your system</h2>
     <p class="master-description">Something went totally wrong. <br>
         Error description: {{settings.localError}}

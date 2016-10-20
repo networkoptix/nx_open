@@ -15,7 +15,7 @@ QnResourceListModel::QnResourceListModel(QObject *parent) :
     m_readOnly(false),
     m_hasCheckboxes(false),
     m_userCheckable(true),
-    m_statusIgnored(false),
+    m_simplified(false),
     m_resources(),
     m_checkedResources()
 {
@@ -23,7 +23,6 @@ QnResourceListModel::QnResourceListModel(QObject *parent) :
 
 QnResourceListModel::~QnResourceListModel()
 {
-    return;
 }
 
 bool QnResourceListModel::isReadOnly() const
@@ -60,18 +59,18 @@ void QnResourceListModel::setUserCheckable(bool value)
     m_userCheckable = value;
 }
 
-bool QnResourceListModel::isStatusIgnored() const
+bool QnResourceListModel::isSimplified() const
 {
-    return m_statusIgnored;
+    return m_simplified;
 }
 
-void QnResourceListModel::setStatusIgnored(bool value)
+void QnResourceListModel::setSimplified(bool value)
 {
-    if (m_statusIgnored == value)
+    if (m_simplified == value)
         return;
 
     ScopedReset resetModel(this);
-    m_statusIgnored = value;
+    m_simplified = value;
 }
 
 const QnResourceList &QnResourceListModel::resources() const
@@ -230,6 +229,10 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
             return resource->toSearchString();
         case Qn::ResourceStatusRole:
             return static_cast<int>(resource->getStatus());
+        case Qn::NodeTypeRole:
+            return m_simplified
+                ? qVariantFromValue(Qn::LayoutItemNode)
+                : qVariantFromValue(Qn::ResourceNode);
 
         default:
             break;
@@ -291,8 +294,11 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
-    if (!m_statusIgnored)
+    if (!m_simplified)
         return qnResIconCache->icon(resource);
+
+    if (resource->hasFlags(Qn::server))
+        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
 
     QnResourceIconCache::Key key = qnResIconCache->key(resource);
     key &= ~QnResourceIconCache::StatusMask;

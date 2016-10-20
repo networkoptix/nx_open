@@ -96,6 +96,7 @@ const int kUpdateBookmarksInterval = 2000;
 const qreal kCatchUpTimeFactor = 30.0;
 
 const qint64 kCatchUpThresholdMs = 500;
+const qint64 kAdvanceIntervalMs = 200;
 
 enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
@@ -1209,7 +1210,7 @@ void QnWorkbenchNavigator::stopPositionAnimations()
 }
 
 /* Advance timeline forward or backward with current playback speed (when media updates are less frequent than display updates) */
-void QnWorkbenchNavigator::timelineAdvance()
+void QnWorkbenchNavigator::timelineAdvance(qint64 fromMs)
 {
     qreal speedFactor = speed();
     if (qFuzzyIsNull(speedFactor))
@@ -1218,10 +1219,10 @@ void QnWorkbenchNavigator::timelineAdvance()
         return;
     }
 
-    const qint64 kAdvanceIntervalMs = 60LL * 1000LL; // something big; 1 minute for nicety
-
     m_positionAnimator->setSpeed(qAbs(speedFactor) * 1000.0);
-    m_positionAnimator->animateTo(m_animatedPosition + static_cast<qint64>(speedFactor * kAdvanceIntervalMs));
+
+    m_positionAnimator->animateTo(fromMs +
+        static_cast<qint64>(kAdvanceIntervalMs * qSign(speedFactor)));
 }
 
 /* Advance timeline forward or backward with speed adjusted to position deviation (this is the main animation mode) */
@@ -1242,7 +1243,9 @@ void QnWorkbenchNavigator::timelineCorrect(qint64 toMs)
     qreal correctionFactor = (correctionTimeMs + delta) / correctionTimeMs;
 
     m_positionAnimator->setSpeed(qAbs(speedFactor * correctionFactor) * 1000.0);
-    m_positionAnimator->animateTo(toMs + static_cast<qint64>(correctionTimeMs));
+
+    m_positionAnimator->animateTo(toMs +
+        static_cast<qint64>(kAdvanceIntervalMs * qSign(speedFactor)));
 }
 
 /* Quickly catch timeline up with current media position */
@@ -1409,7 +1412,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             /* Position was reset: */
             m_animatedPosition = timeMSec;
             m_previousMediaPosition = timeMSec;
-            timelineAdvance();
+            timelineAdvance(timeMSec);
         }
         else
         {
@@ -1421,7 +1424,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 {
                     /* If distance is less than 1 pixel or we catch up backwards, do it instantly: */
                     m_animatedPosition = timeMSec;
-                    timelineAdvance();
+                    timelineAdvance(timeMSec);
                 }
                 else
                 {
@@ -1438,7 +1441,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 /* Advance timeline position if it's not already being advanced, corrected or caught-up.
                  * It's easier to handle mode switches here instead of AbstractAnimator::finished signal. */
                 if (m_positionAnimator->isStopped())
-                    timelineAdvance();
+                    timelineAdvance(timeMSec);
             }
         }
 

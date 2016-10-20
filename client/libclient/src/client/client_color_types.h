@@ -272,13 +272,17 @@ struct QnAuditLogColors {
 };
 #define QnAuditLogColors_Fields (httpLink)(loginAction)(unsucessLoginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)(chartColor)
 
-struct QnRecordingStatsColors {
+struct QnRecordingStatsColors
+{
     QnRecordingStatsColors();
 
-    QColor chartMainColor;
-    QColor chartForecastColor;
+    QColor chartBackground;
+    QColor chartForeground;
+    QColor foreignForeground;
+    QColor totalForeground;
 };
-#define QnRecordingStatsColors_Fields (chartMainColor)(chartForecastColor)
+#define QnRecordingStatsColors_Fields (chartBackground) \
+    (chartForeground)(foreignForeground)(totalForeground)
 
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();

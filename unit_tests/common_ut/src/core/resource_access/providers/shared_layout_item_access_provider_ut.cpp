@@ -197,3 +197,21 @@ TEST_F(QnSharedLayoutItemAccessProviderTest, layoutRemoved)
     qnResPool->removeResource(layout);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnSharedLayoutItemAccessProviderTest, accessProviders)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = addLayout();
+
+    QnLayoutItemData item;
+    item.resource.id = camera->getId();
+    layout->addItem(item);
+
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
+
+    QnResourceList providers;
+    accessProvider()->accessibleVia(user, camera, &providers);
+    ASSERT_EQ(1, providers.size());
+    ASSERT_TRUE(providers.contains(layout));
+}

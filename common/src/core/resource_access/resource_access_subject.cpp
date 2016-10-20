@@ -99,6 +99,11 @@ QString QnResourceAccessSubject::name() const
     return d_ptr->user ? d_ptr->user->getName() : d_ptr->role.name;
 }
 
+bool QnResourceAccessSubject::operator!=(const QnResourceAccessSubject& other) const
+{
+    return !(*this == other);
+}
+
 void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
 {
     d_ptr->user = other.d_ptr->user;

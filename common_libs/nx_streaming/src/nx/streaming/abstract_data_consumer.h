@@ -38,9 +38,12 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void beforeRun();
     virtual void endOfRun();
-
+private:
+    void resumeDataQueue();
 protected:
     QnDataPacketQueue m_dataQueue;
+private:
+    QnMutex m_pleaseStopMutex;
 };
 
 #endif // abstract_data_consumer_h_2111

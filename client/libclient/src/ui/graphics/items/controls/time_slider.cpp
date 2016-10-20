@@ -831,6 +831,7 @@ void QnTimeSlider::setOptions(Options options)
         updateSteps();
         updateTickmarkTextSteps();
         updateToolTipText();
+        invalidateWindow();
     }
 }
 

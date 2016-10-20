@@ -107,7 +107,7 @@ void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruc
     const QString& filename)
 {
     Q_UNUSED(filename)
-    if (status.lastError == StreamRecorderError::NoError)
+    if (status.lastError == StreamRecorderError::noError)
         return;
 
     NX_ASSERT(m_mediaServer);

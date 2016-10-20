@@ -7,7 +7,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/button_ids.h>
-#include <ui/graphics/items/resource/web_view.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
@@ -15,7 +15,7 @@
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
-    , m_webView(new QnWebView(resource()->getUrl(), this))
+    , m_webView(new QnGraphicsWebView(resource()->getUrl(), this))
 {
     setOption(AlwaysShowName, true);
 
@@ -40,7 +40,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
         updateStatusOverlay();
     };
 
-    connect(m_webView, &QnWebView::statusChanged, this, updateStatusesHandler);
+    connect(m_webView, &QnGraphicsWebView::statusChanged, this, updateStatusesHandler);
 
     setupOverlays();
     updateButtonsVisibility();
@@ -60,11 +60,11 @@ void QnWebResourceWidget::setupOverlays()
 
         auto backButton = createStatisticAwareButton(lit("web_widget_back"));
         backButton->setIcon(qnSkin->icon("item/back.png"));
-        connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::back);
+        connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnGraphicsWebView::back);
         buttonsBar->addButton(Qn::BackButton, backButton);
         buttonsBar->setButtonsEnabled(Qn::BackButton, false);
 
-        connect(m_webView, &QnWebView::canGoBackChanged, this, [this, buttonsBar, backButton]()
+        connect(m_webView, &QnGraphicsWebView::canGoBackChanged, this, [this, buttonsBar, backButton]()
         {
             buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
         });
@@ -73,7 +73,7 @@ void QnWebResourceWidget::setupOverlays()
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
         connect(reloadButton, &QnImageButtonWidget::clicked, this, [this]()
         {
-            // We can't use QnWebView::reload because if it was an
+            // We can't use QnGraphicsWebView::reload because if it was an
             // error previously, reload does not work
 
             m_webView->setPageUrl(m_webView->url());

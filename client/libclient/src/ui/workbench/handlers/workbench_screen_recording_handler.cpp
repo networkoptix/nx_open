@@ -207,7 +207,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     m_dataProvider->addDataProcessor(m_recorder.data());
     m_recorder->addRecordingContext(filePath);
     m_recorder->setContainer(lit("avi"));
-    m_recorder->setRole(StreamRecorderRole::Role_FileExport);
+    m_recorder->setRole(StreamRecorderRole::fileExport);
 
     connect(m_recorder, &QnStreamRecorder::recordingFinished, this,
         &QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished);
@@ -239,7 +239,7 @@ void QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished(
     const QString& filename)
 {
     Q_UNUSED(filename)
-    if (status.lastError == StreamRecorderError::NoError)
+    if (status.lastError == StreamRecorderError::noError)
         return;
 
     action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
