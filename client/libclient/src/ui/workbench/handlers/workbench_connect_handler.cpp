@@ -644,6 +644,7 @@ void QnWorkbenchConnectHandler::stopReconnecting()
         m_reconnectDialog->deleteLater(); /*< We may get here from this dialog 'reject' handler. */
     m_reconnectDialog.clear();
     m_reconnectHelper.reset();
+    m_connectingHandle = 0;
 }
 
 void QnWorkbenchConnectHandler::setState(LogicalState logicalValue, PhysicalState physicalValue)
@@ -873,7 +874,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
     disconnectFromServer(true);
 
     // Do not store connections in case of reconnection
-    setLogicalState(LogicalState::reconnecting);
+    setLogicalState(LogicalState::connecting_to_target);
     connectToServer(currentUrl);
 }
 
@@ -996,7 +997,6 @@ void QnWorkbenchConnectHandler::showLoginDialog()
 
 void QnWorkbenchConnectHandler::clearConnection()
 {
-    m_connectingHandle = 0;
     stopReconnecting();
 
     qnClientMessageProcessor->init(nullptr);

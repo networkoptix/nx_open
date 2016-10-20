@@ -180,7 +180,6 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
     auto handleReply =
         [this, guard](bool success, rest::Handle /*handleId*/, const QnRestResult& reply)
         {
-            qDebug() << "server request reply received";
             if (!guard)
                 return;
 
@@ -208,7 +207,6 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
         ? resetPasswordField->text()
         : QString();
 
-    qDebug() << "send server request";
     serverConnection->detachSystemFromCloud(updatedPassword, handleReply, q->thread());
 }
 
