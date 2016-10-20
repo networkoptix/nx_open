@@ -444,9 +444,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 {
     QScopedValueRollback<bool> updateRollback(m_updating, true);
 
-    m_recordingAlert = QString();
-    updateAlertBar();
-
     QnVirtualCameraResourceList cameras;
     if (m_camera)
         cameras << m_camera;
@@ -551,6 +548,9 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     setHasDbChanges(false);
     m_scheduleEnabledChanged = false;
     m_hasMotionControlsChanges = false;
+
+    m_recordingAlert = QString();
+    updateMotionAlert();
 
     if (m_camera)
     {
@@ -751,7 +751,9 @@ void QnSingleCameraSettingsWidget::updateMotionAlert()
 {
     m_motionAlert = QString();
 
-    if (ui->motionDetectionCheckBox->isChecked() && !isScheduleEnabled())
+    if (m_camera && m_cameraSupportsMotion
+        && ui->motionDetectionCheckBox->isChecked()
+        && !isScheduleEnabled())
     {
         m_motionAlert =
             tr("Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.");
