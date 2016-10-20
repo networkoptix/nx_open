@@ -3,7 +3,6 @@
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/find_if.hpp>
-#include <functional>
 
 #include <core/resource/resource.h>
 #include <core/resource/param.h>
@@ -315,12 +314,12 @@ void QnCameraAdvancedParams::applyOverloads(const std::vector<QnCameraAdvancedPa
         {
             for (auto& param: group.params)
             {
-                if (!overloadsMap.count(param.id))
+                if (overloadsMap.find(param.id) == overloadsMap.end())
                     continue;
 
                 auto paramOverload = overloadsMap[param.id];
 
-                if (paramOverload.count(kDefaultOverload))
+                if (paramOverload.find(kDefaultOverload) != paramOverload.end())
                 {
                     param.range = paramOverload[kDefaultOverload].range;
                     param.internalRange = paramOverload[kDefaultOverload].internalRange;
@@ -331,7 +330,7 @@ void QnCameraAdvancedParams::applyOverloads(const std::vector<QnCameraAdvancedPa
                     if (dep.id.isEmpty())
                         continue;
 
-                    if (paramOverload.count(dep.id))
+                    if (paramOverload.find(dep.id) != paramOverload.end())
                     {
                         dep.range = paramOverload[dep.id].range;
                         dep.internalRange = paramOverload[dep.id].internalRange;
@@ -347,39 +346,6 @@ void QnCameraAdvancedParams::applyOverloads(const std::vector<QnCameraAdvancedPa
         traverseGroup(group);
 }
 
-bool deserialize(QnJsonContext *, const QJsonValue &value, QnCameraAdvancedParameter::DataType *target) 
-{
-	*target = QnCameraAdvancedParameter::stringToDataType(value.toString());
-	return true;
-}
-
-void serialize(QnJsonContext *ctx, const QnCameraAdvancedParameter::DataType &value, QJsonValue *target) 
-{
-	QJson::serialize(ctx, QnCameraAdvancedParameter::dataTypeToString(value), target);
-}
-
-bool deserialize(QnJsonContext*, const QJsonValue& value, ConditionType* target)
-{
-    *target = QnCameraAdvancedParameterCondition::fromStringToConditionType(value.toString());
-    return true;
-}
-
-void serialize(QnJsonContext* ctx, const ConditionType& value, QJsonValue* target)
-{
-    QJson::serialize(ctx, QnCameraAdvancedParameterCondition::fromConditionTypeToString(value), target);
-}
-
-bool deserialize(QnJsonContext*, const QJsonValue& value, DependencyType* target)
-{
-    *target = QnCameraAdvancedParameterDependency::fromStringToDependencyType(value.toString());
-    return true;
-}
-
-void serialize(QnJsonContext* ctx, const DependencyType& value, QJsonValue* target)
-{
-    QJson::serialize(ctx, QnCameraAdvancedParameterDependency::fromDependencyTypeToString(value), target);
-}
-
 bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck) const
 {
     switch (type)
@@ -388,13 +354,13 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
             return value == valueToCheck;
         case ConditionType::InRange:
         {
-            auto valuesList = value.split(lit(","));
-            return valuesList.indexOf(valueToCheck) != -1;
+            auto valuesList = value.split(L',');
+            return valuesList.contains(valueToCheck);
         }
         case ConditionType::NotInRange:
         {
-            auto valuesList = value.split(lit(","));
-            return valuesList.indexOf(valueToCheck) == -1;
+            auto valuesList = value.split(L',');
+            return !valuesList.contains(valueToCheck);
         }
         case ConditionType::Default:
             return true;
@@ -407,18 +373,20 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
 }
 
 ConditionType QnCameraAdvancedParameterCondition::fromStringToConditionType(
-    const QString& conditionType)
+    const QString& conditionTypeString)
 {
-    if (conditionType == kEqualConditionType)
-        return ConditionType::Equal;
-    else if (conditionType == kInRangeConditionType)
-        return ConditionType::InRange;
-    else if (conditionType == kNotInRangeConditionType)
-        return ConditionType::NotInRange;
-    else if (conditionType == kDefaultConditionType)
-        return ConditionType::Default;
+    ConditionType conditionType = ConditionType::Unknown;
 
-    return ConditionType::Unknown;
+    if (conditionTypeString == kEqualConditionType)
+        conditionType = ConditionType::Equal;
+    else if (conditionTypeString == kInRangeConditionType)
+        conditionType = ConditionType::InRange;
+    else if (conditionTypeString == kNotInRangeConditionType)
+        conditionType = ConditionType::NotInRange;
+    else if (conditionTypeString == kDefaultConditionType)
+        conditionType = ConditionType::Default;
+
+    return conditionType;
 }
 
 QString QnCameraAdvancedParameterCondition::fromConditionTypeToString(const ConditionType& conditionType)
@@ -438,14 +406,15 @@ QString QnCameraAdvancedParameterCondition::fromConditionTypeToString(const Cond
     }
 }
 
-DependencyType QnCameraAdvancedParameterDependency::fromStringToDependencyType(const QString& dependencyType)
+DependencyType QnCameraAdvancedParameterDependency::fromStringToDependencyType(const QString& dependencyTypeString)
 {
-    if (dependencyType == kShowDependencyType)
-        return DependencyType::Show;
-    else if(dependencyType == kRangeDependencyType)
-        return DependencyType::Range;
+    DependencyType dependencyType = DependencyType::Unknown;
+    if (dependencyTypeString == kShowDependencyType)
+        dependencyType = DependencyType::Show;
+    else if(dependencyTypeString == kRangeDependencyType)
+        dependencyType = DependencyType::Range;
 
-    return DependencyType::Unknown;
+    return dependencyType;
 }
 
 QString QnCameraAdvancedParameterDependency::fromDependencyTypeToString(const DependencyType& dependencyType)
@@ -460,5 +429,25 @@ QString QnCameraAdvancedParameterDependency::fromDependencyTypeToString(const De
             return QString();
     }
 }
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
+    (QnCameraAdvancedParameter::DataType::Bool, "Bool")
+    (QnCameraAdvancedParameter::DataType::String, "String")
+    (QnCameraAdvancedParameter::DataType::Enumeration, "Enumeration")
+    (QnCameraAdvancedParameter::DataType::Number, "Number")
+    (QnCameraAdvancedParameter::DataType::Button, "Button")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,
+    (QnCameraAdvancedParameterCondition::ConditionType::Equal, "value")
+    (QnCameraAdvancedParameterCondition::ConditionType::InRange, "valueIn")
+    (QnCameraAdvancedParameterCondition::ConditionType::NotInRange, "valueNotIn")
+    (QnCameraAdvancedParameterCondition::ConditionType::Default, "default")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, DependencyType,
+    (QnCameraAdvancedParameterDependency::DependencyType::Show, "Show")
+    (QnCameraAdvancedParameterDependency::DependencyType::Range, "Range")
+)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)

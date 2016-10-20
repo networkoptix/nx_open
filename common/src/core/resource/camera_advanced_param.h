@@ -53,9 +53,11 @@ struct QnCameraAdvancedParameterCondition
     QString value;
 
     bool checkValue(const QString& valueToCheck) const;
-    static ConditionType fromStringToConditionType(const QString& conditionType);
+    static ConditionType fromStringToConditionType(const QString& conditionTypeString);
     static QString fromConditionTypeToString(const ConditionType& conditionType);
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition::ConditionType, (lexical))
 
 #define QnCameraAdvancedParameterCondition_Fields (type)(paramId)(value)
 
@@ -77,6 +79,8 @@ struct QnCameraAdvancedParameterDependency
     static DependencyType fromStringToDependencyType(const QString& dependencyType);
     static QString fromDependencyTypeToString(const DependencyType& dependencyType);
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))
 
 #define QnCameraAdvancedParameterDependency_Fields (id)(type)(range)(internalRange)(conditions)
 
@@ -119,7 +123,19 @@ struct QnCameraAdvancedParameter
 
 	static bool dataTypeHasValue(DataType value);
 };
-#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)(readCmd)(writeCmd)(internalRange)(dependencies)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
+#define QnCameraAdvancedParameter_Fields (id)\
+    (dataType)\
+    (range)\
+    (name)\
+    (description)\
+    (tag)\
+    (readOnly)\
+    (readCmd)\
+    (writeCmd)\
+    (internalRange)\
+    (dependencies)
 
 struct QnCameraAdvancedParamGroup
 {
@@ -163,7 +179,13 @@ struct QnCameraAdvancedParams
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 
-#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)(QnCameraAdvancedParameterDependency)(QnCameraAdvancedParameterCondition)(QnCameraAdvancedParameterOverload)
+#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)\
+    (QnCameraAdvancedParameter)\
+    (QnCameraAdvancedParamGroup)\
+    (QnCameraAdvancedParams)\
+    (QnCameraAdvancedParameterDependency)\
+    (QnCameraAdvancedParameterCondition)\
+    (QnCameraAdvancedParameterOverload)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 	QnCameraAdvancedParameterTypes,

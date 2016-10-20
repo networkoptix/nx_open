@@ -28,6 +28,7 @@ void QnCameraAdvancedParamWidgetsManager::clear() {
 		disconnect(widget, NULL, this, NULL);
 
 	m_paramWidgetsById.clear();
+    m_paramLabelsById.clear();
 	m_groupWidget->clear();
 	while (m_contentsWidget->count() > 0)
 		m_contentsWidget->removeWidget(m_contentsWidget->widget(0));

@@ -776,7 +776,7 @@ bool QnPlAxisResource::setRelayOutputState(
         portNum = portIdToIndex(outputID);
     }
     QString cmd = lit("axis-cgi/io/port.cgi?action=%1:%2").arg(portIndexToReqParam(portNum)).arg(QLatin1String(activate ? "/" : "\\"));
-    if( autoResetTimeoutMS > 0 )
+    if (autoResetTimeoutMS > 0)
     {
         //adding auto-reset
         cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "");
@@ -792,7 +792,7 @@ bool QnPlAxisResource::setRelayOutputState(
     //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1");
 
     CLHttpStatus status = httpClient.doGET( cmd );
-    if( status / 100 != 2 )
+    if (status / 100 != 2)
     {
         NX_LOG( lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
             arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
@@ -809,7 +809,7 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
 {
     params.clear();
     CLHttpStatus status = httpClient->doGET( lit("axis-cgi/param.cgi?action=list&group=%1").arg(rootPath).toLatin1() );
-    if( status == CL_HTTP_SUCCESS )
+    if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
         httpClient->readAll( body );
@@ -835,7 +835,7 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
 {
     params.clear();
     CLHttpStatus status = httpClient->doGET( lit("axis-cgi/param.cgi?action=list&group=%1").arg(rootPath).toLatin1() );
-    if( status == CL_HTTP_SUCCESS )
+    if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
         httpClient->readAll( body );
@@ -921,14 +921,14 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     NX_ASSERT( httpClient );
     int index = -1;
     QnMutexLocker lk( &m_inputPortMutex );
-    if( m_ioHttpMonitor[0].httpClient == httpClient )
+    if (m_ioHttpMonitor[0].httpClient == httpClient)
         index = 0;
-    else if( m_ioHttpMonitor[1].httpClient == httpClient )
+    else if (m_ioHttpMonitor[1].httpClient == httpClient)
         index = 1;
     else
         return;
 
-    if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         NX_LOG( lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
             arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
@@ -936,7 +936,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     }
 
     //analyzing response headers (if needed)
-    if( !m_ioHttpMonitor[index].contentParser->setContentType(httpClient->contentType()) )
+    if (!m_ioHttpMonitor[index].contentParser->setContentType(httpClient->contentType()))
     {
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
@@ -955,7 +955,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
     {
         NX_LOG( lit("Axis camera %1. Failed to read current IO state. No HTTP response").arg(getUrl()), cl_logWARNING );
     }
-    else if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    else if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         NX_LOG( lit("Axis camera %1. Failed to read current IO state. %2").
             arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
@@ -974,7 +974,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
     }
 
     QnMutexLocker lk( &m_inputPortMutex );
-    if( m_inputPortStateReader == httpClient )
+    if (m_inputPortStateReader == httpClient)
         m_inputPortStateReader.reset();
 }
 
@@ -984,9 +984,9 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
 
     int index = -1;
     QnMutexLocker lk( &m_inputPortMutex );
-    if( m_ioHttpMonitor[0].httpClient == httpClient )
+    if (m_ioHttpMonitor[0].httpClient == httpClient)
         index = 0;
-    else if( m_ioHttpMonitor[1].httpClient == httpClient )
+    else if(m_ioHttpMonitor[1].httpClient == httpClient)
         index = 1;
     else
         return;
@@ -1268,20 +1268,20 @@ QnIOStateDataList QnPlAxisResource::ioStates() const
 void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& notification )
 {
     //1I:H, 1I:L, 1I:/, "1I:\"
-    if( notification.isEmpty() )
+    if (notification.isEmpty())
         return;
     NX_LOG( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
 
     //notification
     size_t sepPos = nx_http::find_first_of( notification, ":" );
-    if( sepPos == nx_http::BufferNpos || sepPos+1 >= notification.size() )
+    if (sepPos == nx_http::BufferNpos || sepPos+1 >= notification.size())
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
     const char eventType = notification[sepPos+1];
     size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
-    if( portTypePos == nx_http::BufferNpos )
+    if (portTypePos == nx_http::BufferNpos)
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
@@ -1339,7 +1339,7 @@ int QnPlAxisResource::getChannel() const
 
 bool QnPlAxisResource::readCurrentIOStateAsync()
 {
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+    if (hasFlags(Qn::foreigner) ||      //we do not own camera
         m_ioPorts.empty() )    //camera report no io
     {
         return false;
@@ -1430,14 +1430,19 @@ QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
     return m_audioTransmitter;
 }
 
-QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& idList) const
+QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& ids) const
 {
     QList<QnCameraAdvancedParameter> params;
-    for(const auto& id: idList)
+
     {
-        auto param = m_advancedParameters.getParameterById(id);
-        params.append(param);
+        QnMutexLocker lock(&m_physicalParamsMutex);
+        for (const auto& id: ids)
+        {
+            auto param = m_advancedParameters.getParameterById(id);
+            params.append(param);
+        }
     }
+
     return params;
 }
 
@@ -1455,8 +1460,7 @@ bool QnPlAxisResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPa
 #endif
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 #ifdef _DEBUG
-    if (!result)
-        qWarning() << "Error while parsing xml" << templateFilename;
+    NX_ASSERT(result, lm("Error while parsing xml: %1").arg(templateFilename));
 #endif
     return result;
 }
@@ -1468,10 +1472,10 @@ QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(const QnCam
     auto paramIds = allParams.allParameterIds();
     bool success = true;
 
-    for(const auto& paramId: paramIds)
+    for (const auto& paramId: paramIds)
     {
         auto param = allParams.getParameterById(paramId);
-        if(!isMaintenanceParam(param))
+        if (!isMaintenanceParam(param))
             paramList.push_back(param);
         else
             supported.insert(paramId);
@@ -1480,9 +1484,9 @@ QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(const QnCam
     auto queries = buildGetParamsQueries(paramList);
     auto response = executeParamsQueries(queries, success);
 
-    for(const auto& paramId: paramIds)
+    for (const auto& paramId: paramIds)
     {
-        if(response.contains(paramId))
+        if (response.contains(paramId))
             supported.insert(paramId);
     }
 
@@ -1491,9 +1495,6 @@ QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(const QnCam
 
 void QnPlAxisResource::fetchAndSetAdvancedParameters()
 {
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    m_advancedParameters.clear();
-
     auto templateFile = getAdvancedParametersTemplate();
     QnCameraAdvancedParams params;
     if (!loadAdvancedParametersTemplateFromFile(
@@ -1510,8 +1511,13 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
     params.applyOverloads(overloads);
 
     auto supportedParams = calculateSupportedAdvancedParameters(params);
-    m_advancedParameters = params.filtered(supportedParams);
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
+
+    {
+        QnMutexLocker lock( &m_physicalParamsMutex );
+        m_advancedParameters.clear();
+        m_advancedParameters = params.filtered(supportedParams);
+        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
+    }
 }
 
 bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
@@ -1525,21 +1531,21 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
     CLHttpStatus status;
     isSuccessful = true;
 
-    CLSimpleHTTPClient httpClient (
+    CLSimpleHTTPClient httpClient(
         getHostAddress(),
         QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
         getNetworkTimeout(),
         getAuth());
 
-    for(const auto& query: queries)
+    for (const auto& query: queries)
     {
         status = httpClient.doGET(query);
-        if( status == CL_HTTP_SUCCESS )
+        if ( status == CL_HTTP_SUCCESS )
         {
             QByteArray body;
             httpClient.readAll( body );
 
-            if(body.startsWith("OK"))
+            if (body.startsWith("OK"))
                 continue;
 
             for (const QByteArray& line: body.split('\n'))
@@ -1577,13 +1583,13 @@ QnCameraAdvancedParamValueList QnPlAxisResource::parseParamsQueriesResult(
     const QList<QnCameraAdvancedParameter> &params) const
 {
     QnCameraAdvancedParamValueList result;
-    for(const auto& param: params)
+    for (const auto& param: params)
     {
-        if(queriesResult.contains(param.id))
+        if (queriesResult.contains(param.id))
         {
-            auto paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration ?
-                param.fromInternalRange(queriesResult[param.id]):
-                queriesResult[param.id];
+            auto paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration
+                ? param.fromInternalRange(queriesResult[param.id])
+                : queriesResult[param.id];
 
             result.append(QnCameraAdvancedParamValue(param.id, paramValue));
         }
@@ -1595,9 +1601,9 @@ QnCameraAdvancedParamValueList QnPlAxisResource::parseParamsQueriesResult(
 QSet<QString> QnPlAxisResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
 {
     QSet<QString> result;
-    for(const auto& param: params)
+    for (const auto& param: params)
     {
-        if(isMaintenanceParam(param))
+        if (isMaintenanceParam(param))
             continue;
 
         auto paramPath = param.id.left(param.id.lastIndexOf('.'));
@@ -1609,34 +1615,45 @@ QSet<QString> QnPlAxisResource::buildGetParamsQueries(const QList<QnCameraAdvanc
 
 QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueList &params) const
 {
-    QString query = lit("axis-cgi/admin/param.cgi?action=update&");
-    bool hasParamsToSet = false;
-    for(const auto& paramIdAndValue: params)
-    {
-        auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
-        if(!isMaintenanceParam(param))
-        {
-            auto paramValue = paramIdAndValue.value;
-            hasParamsToSet = true;
-            paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration ?
-                param.toInternalRange(paramValue):
-                paramValue;
+    const QString kPrefix = lit("axis-cgi/admin/param.cgi?");
+    QUrlQuery query;
 
-            query += paramIdAndValue.id + lit("=") + paramValue + lit("&");
+    {
+        QnMutexLocker lock(&m_physicalParamsMutex);
+        for (const auto& paramIdAndValue: params)
+        {
+            auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+            if (isMaintenanceParam(param))
+                continue;
+
+            auto paramValue = paramIdAndValue.value;
+            paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration
+                ? param.toInternalRange(paramValue)
+                : paramValue;
+
+            query.addQueryItem(paramIdAndValue.id, paramValue);
         }
     }
 
-    return hasParamsToSet ? query.left(query.size() - 1) : lit("");
+    if (query.isEmpty())
+        return QString();
+
+    query.addQueryItem(lit("action"), lit("update"));
+    return kPrefix + query.toString();
 }
 
 QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValueList& params) const
 {
     QString query = lit("axis-cgi/admin/");
-    for(const auto& paramIdAndValue: params)
+
     {
-        auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
-        if(isMaintenanceParam(param))
-            return query + param.readCmd;
+        QnMutexLocker lock(&m_physicalParamsMutex);
+        for (const auto& paramIdAndValue: params)
+        {
+            auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+            if (isMaintenanceParam(param))
+                return query + param.readCmd;
+        }
     }
     return QString();
 }
@@ -1647,7 +1664,7 @@ bool QnPlAxisResource::getParamPhysical(const QString &id, QString &value)
     QnCameraAdvancedParamValueList paramValueList;
     idList.insert(id);
     auto result = getParamsPhysical(idList, paramValueList);
-    if(!paramValueList.isEmpty())
+    if (!paramValueList.isEmpty())
         value = paramValueList.first().value;
 
     return result;
@@ -1681,11 +1698,16 @@ bool QnPlAxisResource::setParamsPhysical(const QnCameraAdvancedParamValueList &v
     const auto query = buildSetParamsQuery(values);
     const auto maintenanceQuery = buildMaintenanceQuery(values);
 
-    if(!query.isEmpty())
+    result.clear();
+
+    if (!query.isEmpty())
         executeParamsQueries(query, success);
 
-    if(!maintenanceQuery.isEmpty())
+    if (!maintenanceQuery.isEmpty())
         executeParamsQueries(maintenanceQuery, success);
+
+    if (success)
+        result.append(values);
 
     return success;
 }

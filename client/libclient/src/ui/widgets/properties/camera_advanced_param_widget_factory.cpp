@@ -118,7 +118,7 @@ public:
 
     virtual void setRange(const QString& range)
     {
-        auto rangeToSet = range.split(lit(","));
+        auto rangeToSet = range.split(L',');
         setRange(rangeToSet);
     }
 
