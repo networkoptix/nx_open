@@ -320,9 +320,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             parentGuard = QPointer<QnConnectToCloudDialog>(q),
             stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked(),
             cloudLogin = q->ui->loginInputField->text().trimmed(),
-            cloudPassword = q->ui->passwordInputField->text().trimmed(),
-            windowTitle = q->windowTitle(),
-            helpTopicId = helpTopic(q)]
+            cloudPassword = q->ui->passwordInputField->text().trimmed()]
 
             (bool success, rest::Handle /* handleId */, const QnRestResult& reply)
         {
