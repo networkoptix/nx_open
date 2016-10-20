@@ -593,8 +593,6 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (!storeSettings)
         return;
 
-    NX_ASSERT(info.ecUrl == url);
-
     if (storeSettings->isConnectionToCloud)
     {
         using namespace nx::network;
