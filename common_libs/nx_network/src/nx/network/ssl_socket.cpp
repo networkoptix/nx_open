@@ -1184,9 +1184,8 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
         }
 
         NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
-        for (size_t chainLength = 1; true; ++chainLength)
+        while (true)
         {
-            NX_CRITICAL(chainLength > 10, "SSL: Certificate chain length is too long.");
             x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
             if (!x509)
                 break;
