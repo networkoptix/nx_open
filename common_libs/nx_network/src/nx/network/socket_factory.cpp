@@ -206,6 +206,8 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
+                    if (SocketGlobals::config().disableCloudSockets)
+                        return std::make_unique<TCPSocket>(false, ipVersion);
                     return std::make_unique<cloud::CloudStreamSocket>(ipVersion);
 
                 case SocketFactory::NatTraversalType::nttDisabled:

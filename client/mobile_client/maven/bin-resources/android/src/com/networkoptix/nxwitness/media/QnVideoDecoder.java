@@ -23,9 +23,9 @@ import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 
-public class QnVideoDecoder 
+public class QnVideoDecoder
 {
-
+    private static final String TAG = "QnVideoDecoder";
 
     public boolean init(String codecName, int width, int height)
     {
@@ -33,41 +33,40 @@ public class QnVideoDecoder
         {
             gotOutputData = false;
 
-            System.out.println("codecName=" + codecName);
-            System.out.print("width=");
-            System.out.println(width);
-            System.out.print("height=");
-            System.out.println(height);
+            Log.i(TAG, "codecName: " + codecName);
+            Log.i(TAG, "width: " + width);
+            Log.i(TAG, "height: " + height);
 
             format = MediaFormat.createVideoFormat(codecName, width, height);
 
-            System.out.println("after create format");
+            Log.i(TAG, "after create format");
 
             // "video/avc"  - H.264/AVC video
             // "video/hevc" - H.265/HEVC video
             codec = MediaCodec.createDecoderByType(codecName);
 
-            System.out.println("after create codec");
+            Log.i(TAG, "after create codec");
 
             surfaceTexture = new SurfaceTexture(0, false);
-            System.out.println("after create surface");
+            Log.i(TAG, "after create surface");
 
             surface = new Surface(surfaceTexture);
             codec.configure(format, surface, null, 0);
 
             codec.start();
             inputBuffers = codec.getInputBuffers();
-            System.out.println("codec started");
+            Log.i(TAG, "codec started");
             return true;
-        } catch(java.io.IOException e)
+        }
+        catch(java.io.IOException e)
         {
-            System.out.println("codec start failed");
+            Log.i(TAG, "codec start failed");
             return false;
         }
         catch(Exception e)
         {
-            System.out.println("Exception" + e.toString());
-            System.out.println("Exception" + e.getMessage());
+            Log.i(TAG, "Exception: " + e.toString());
+            Log.i(TAG, "Exception message: " + e.getMessage());
             return false;
         }
     }
@@ -75,26 +74,26 @@ public class QnVideoDecoder
     private static MediaCodecInfo selectCodec(String mimeType)
     {
          int numCodecs = MediaCodecList.getCodecCount();
-         for (int i = 0; i < numCodecs; i++) {
+         for (int i = 0; i < numCodecs; ++i)
+         {
              MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
 
-             if (codecInfo.isEncoder()) {
+             if (codecInfo.isEncoder())
                  continue;
-             }
 
              String[] types = codecInfo.getSupportedTypes();
-             for (int j = 0; j < types.length; j++) {
-                 if (types[j].equalsIgnoreCase(mimeType)) {
+             for (int j = 0; j < types.length; ++j)
+             {
+                 if (types[j].equalsIgnoreCase(mimeType))
                      return codecInfo;
-                 }
              }
          }
          return null;
     }
 
-    /** It requires API level 21 */
     public int maxDecoderWidth(String mimeType)
     {
+        // Requires API level 21.
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion < android.os.Build.VERSION_CODES.LOLLIPOP)
             return 1920;
@@ -112,9 +111,9 @@ public class QnVideoDecoder
         }
     }
 
-    /** It requires API level 21 */
     public int maxDecoderHeight(String mimeType)
     {
+        // Requires API level 21.
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion < android.os.Build.VERSION_CODES.LOLLIPOP)
             return 1080;
@@ -132,7 +131,6 @@ public class QnVideoDecoder
         }
     }
 
-
     public long decodeFrame(long srcDataPtr, int frameSize, long frameNum)
     {
         try
@@ -142,50 +140,55 @@ public class QnVideoDecoder
             int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
             if (inputBufferId >= 0)
             {
-              ByteBuffer inputBuffer = inputBuffers[inputBufferId];
-              fillInputBuffer(inputBuffer, srcDataPtr, frameSize, inputBuffer.capacity()); //< C++ callback
-              codec.queueInputBuffer(inputBufferId, 0, frameSize, frameNum, 0);
+                ByteBuffer inputBuffer = inputBuffers[inputBufferId];
+
+                // C++ callback.
+                fillInputBuffer(inputBuffer, srcDataPtr, frameSize, inputBuffer.capacity());
+
+                codec.queueInputBuffer(inputBufferId, 0, frameSize, frameNum, 0);
             }
-            else {
-                System.out.println("error dequeueInputBuffer");
-                return kNoInputBuffers; // no input buffers left
+            else
+            {
+                Log.i(TAG, "error dequeueInputBuffer");
+                return kNoInputBuffers; //< No input buffers left.
             }
 
-            while (true)
+            for (;;)
             {
                 MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-                int outputBufferId = codec.dequeueOutputBuffer(info, gotOutputData ? timeoutUs : 1000 * 10);
-                //System.out.println("dequee buffer result=" + outputBufferId);
+                int outputBufferId =
+                    codec.dequeueOutputBuffer(info, gotOutputData ? timeoutUs : 1000 * 10);
+                //Log.i(TAG, "dequee buffer result=" + outputBufferId);
                 switch (outputBufferId)
                 {
-                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                    //System.out.println("MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED");
-                    break;
-                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                    format = codec.getOutputFormat(); // option B
-                    //System.out.println("MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
-                    gotOutputData = true;
-                    break;
-                case MediaCodec.INFO_TRY_AGAIN_LATER:
-                    //System.out.println("MediaCodec.INFO_TRY_AGAIN_LATER");
-                    return 0; // no error
-                default:
-                    long outFrameNum = info.presentationTimeUs;
-                    codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
-                    return outFrameNum;
+                    case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                        //Log.i(TAG, "MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED");
+                        break;
+                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                        format = codec.getOutputFormat(); // option B
+                        //Log.i(TAG, "MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
+                        gotOutputData = true;
+                        break;
+                    case MediaCodec.INFO_TRY_AGAIN_LATER:
+                        //Log.i(TAG, "MediaCodec.INFO_TRY_AGAIN_LATER");
+                        return 0; // no error
+                    default:
+                        long outFrameNum = info.presentationTimeUs;
+                        codec.releaseOutputBuffer(outputBufferId, /*render*/ true);
+                        return outFrameNum;
                 }
             }
         }
         catch(IllegalStateException e)
         {
-            System.out.println("IllegalStateException" + e.toString());
-            System.out.println("IllegalStateException" + e.getMessage());
+            Log.i(TAG, "IllegalStateException" + e.toString());
+            Log.i(TAG, "IllegalStateException" + e.getMessage());
             return -1;
         }
         catch(Exception e)
         {
-            System.out.println("Exception" + e.toString());
-            System.out.println("Exception" + e.getMessage());
+            Log.i(TAG, "Exception" + e.toString());
+            Log.i(TAG, "Exception" + e.getMessage());
             return -1;
         }
     }
@@ -195,31 +198,35 @@ public class QnVideoDecoder
         try
         {
             //codec.flush();
-
+            //Log.i(TAG, "flushFrame(" + timeoutUsec + ") BEGIN");
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int outputBufferId = codec.dequeueOutputBuffer(info, timeoutUsec);
             switch (outputBufferId)
             {
-            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-            case MediaCodec.INFO_TRY_AGAIN_LATER:
-                return 0; // no more frames left
-            default:
-                long outFrameNum = info.presentationTimeUs;
-                codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
-                return outFrameNum;
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                case MediaCodec.INFO_TRY_AGAIN_LATER:
+                    //Log.i(TAG, "flushFrame(" + timeoutUsec + ") END -> 0");
+                    return 0; // no more frames left
+                default:
+                    long outFrameNum = info.presentationTimeUs;
+                    codec.releaseOutputBuffer(outputBufferId, /*render*/ true);
+                    //Log.i(TAG, "flushFrame(" + timeoutUsec + ") END -> " + outFrameNum);
+                    return outFrameNum;
             }
         }
         catch(IllegalStateException e)
         {
-            System.out.println("IllegalStateException" + e.toString());
-            System.out.println("IllegalStateException" + e.getMessage());
+            Log.i(TAG, "IllegalStateException" + e.toString());
+            Log.i(TAG, "IllegalStateException" + e.getMessage());
+            Log.i(TAG, "flushFrame(" + timeoutUsec + ") END -> -1");
             return -1;
         }
         catch(Exception e)
         {
-            System.out.println("Exception" + e.toString());
-            System.out.println("Exception" + e.getMessage());
+            Log.i(TAG, "Exception" + e.toString());
+            Log.i(TAG, "Exception" + e.getMessage());
+            Log.i(TAG, "flushFrame(" + timeoutUsec + ") END -> -1");
             return -1;
         }
     }
@@ -238,13 +245,17 @@ public class QnVideoDecoder
     {
         if (codec != null)
         {
+            //Log.i(TAG, "releaseDecoder() BEGIN");
             codec.stop();
+            //Log.i(TAG, "releaseDecoder(): stop() finished, calling release()...");
             codec.release();
-            System.out.println("Decoder release");
+            //Log.i(TAG, "releaseDecoder() END");
         }
     }
 
-    private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize, int capacity);
+    private static native void fillInputBuffer(
+        ByteBuffer buffer, long srcDataPtr, int frameSize, int capacity);
+
     ByteBuffer[] inputBuffers;
     private MediaCodec codec;
     private MediaFormat format;

@@ -1,5 +1,6 @@
 #include "player_data_consumer.h"
 
+#include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/debug_utils.h>
 
@@ -29,7 +30,7 @@ QSize qMax(const QSize& size1, const QSize& size2)
 
 PlayerDataConsumer::PlayerDataConsumer(
     const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
-:
+    :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_awaitJumpCounter(0),
     m_buffering(0),
@@ -153,13 +154,20 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
-    int videoChannel = videoFrame->channelNumber;
+    quint32 videoChannel = videoFrame->channelNumber;
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
     if (archiveReader)
     {
-        auto videoLayout = archiveReader->getDPVideoLayout();
-        if (videoLayout)
-            m_awaitingFramesMask.setChannelCount(videoLayout->channelCount());
+        auto resource = archiveReader->getResource();
+        if (resource)
+        {
+            if (auto camera = resource.dynamicCast<QnMediaResource>())
+            {
+                auto videoLayout = camera->getVideoLayout();
+                if (videoLayout)
+                    m_awaitingFramesMask.setChannelCount(videoLayout->channelCount());
+            }
+        }
     }
 
     {

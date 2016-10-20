@@ -254,23 +254,6 @@ void TimerManager::joinAndDeleteTimer(const TimerId& timerID)
 constexpr static std::chrono::milliseconds kErrorSkipTimeout =
     std::chrono::milliseconds(3000);
 
-class QnMutexUnlocker
-{
-public:
-    QnMutexUnlocker(QnMutexLockerBase* const locker):
-        m_locker(locker)
-    {
-        m_locker->unlock();
-    }
-    ~QnMutexUnlocker()
-    {
-        m_locker->relock();
-    }
-
-private:
-    QnMutexLockerBase* const m_locker;
-};
-
 void TimerManager::run()
 {
     QnMutexLocker lk(&m_mtx);

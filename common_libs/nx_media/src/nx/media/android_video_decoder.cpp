@@ -97,17 +97,17 @@ public:
 
     FboPtr getFbo()
     {
-#ifdef USE_GUI_RENDERING
-        while (m_data.size() < 3)
-            m_data.push_back(FboPtr(new QOpenGLFramebufferObject(m_frameSize)));
-        return m_data[m_index++ % m_data.size()];
-        //if (!m_fbo)
-        //    m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
-        //return m_fbo;
+        #ifdef USE_GUI_RENDERING
+            while (m_data.size() < 3)
+                m_data.push_back(FboPtr(new QOpenGLFramebufferObject(m_frameSize)));
+            return m_data[m_index++ % m_data.size()];
+            //if (!m_fbo)
+            //    m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
+            //return m_fbo;
 
-#else
-        return FboPtr(new QOpenGLFramebufferObject(m_frameSize));
-#endif
+        #else
+            return FboPtr(new QOpenGLFramebufferObject(m_frameSize));
+        #endif
     }
 private:
     FboPtr m_fbo;
@@ -162,8 +162,7 @@ class AndroidVideoDecoderPrivate: public QObject
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
     AndroidVideoDecoder *q_ptr;
 public:
-    AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator)
-    :
+    AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator):
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
@@ -198,8 +197,6 @@ public:
 
     void registerNativeMethods()
     {
-        using namespace std::placeholders;
-
         JNINativeMethod methods[] {
             {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
         };
@@ -397,13 +394,11 @@ void AndroidVideoDecoderPrivate::createGlResources()
 // ---------------------- AndroidVideoDecoder ----------------------
 
 AndroidVideoDecoder::AndroidVideoDecoder(
-    const ResourceAllocatorPtr& allocator, const QSize& resolution)
-:
+    const ResourceAllocatorPtr& allocator, const QSize& /*resolution*/)
+    :
     AbstractVideoDecoder(),
     d(new AndroidVideoDecoderPrivate(allocator))
 {
-    QN_UNUSED(resolution);
-
     #if defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
         QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();
         if (sharedContext)
@@ -421,11 +416,12 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
                 d->threadGlCtx->makeCurrent(d->offscreenSurface.get());
             }
-            else {
+            else
+            {
                 d->threadGlCtx.reset();
             }
         }
-    #endif // USE_SHARED_CTX && !USE_GUI_RENDERING
+    #endif // defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
 }
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
@@ -504,16 +500,17 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
                 (jlong) frame->data(),
                 (jint) frame->dataSize(),
                 (jlong) ++d->frameNumber); //< put input frames in range [1..N]
+            if (outFrameNum == kNoInputBuffers)
+            {
+                if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)
+                    break;
+            }
         }
-        else {
-            outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", 0);
+        else
+        {
+            outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) 0);
         }
 
-        if (outFrameNum == kNoInputBuffers)
-        {
-            if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", kDecodeOneFrameTimeout) <= 0)
-                break;
-        }
     } while (outFrameNum == kNoInputBuffers && ++retryCounter < kDequeueInputBufferRetyrCounter);
 
     if (outFrameNum <= 0)
@@ -524,16 +521,21 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     // got frame
 
     FboPtr fboToRender;
-#if defined(USE_GUI_RENDERING)
-#else
-    if (d->threadGlCtx)
-        fboToRender = d->renderFrameToFbo();
-    else
-        d->allocator->execAtGlThread([&fboToRender, this](void*)
+    #if !defined(USE_GUI_RENDERING)
+        if (d->threadGlCtx)
         {
             fboToRender = d->renderFrameToFbo();
-        }, nullptr);
-#endif // USE_GUI_RENDERING
+        }
+        else
+        {
+            d->allocator->execAtGlThread(
+                [&fboToRender, this](void*)
+                {
+                    fboToRender = d->renderFrameToFbo();
+                },
+                nullptr);
+        }
+    #endif // USE_GUI_RENDERING
 
     //NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
 
@@ -567,4 +569,4 @@ QVariant TextureBuffer::handle() const
 } // namespace media
 } // namespace nx
 
-#endif // Q_OS_ANDROID
+#endif // defined(Q_OS_ANDROID)

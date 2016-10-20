@@ -1122,9 +1122,21 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
     Q_D(const QnRtspConnectionProcessor);
 
     QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
-    if (isVideo && !d->transcodedVideoSize.isEmpty() && d->codecId != AV_CODEC_ID_NONE)
+    if (isVideo && d->transcodedVideoSize.height() > 0 && d->codecId != AV_CODEC_ID_NONE)
         result->setDstResolution(d->transcodedVideoSize, d->codecId);
     return result;
+}
+
+void QnRtspConnectionProcessor::updatePredefinedTracks()
+{
+    Q_D(QnRtspConnectionProcessor);
+
+    // update encode resolution
+    for (const auto& track: d->trackInfo)
+    {
+        if (track->mediaType == RtspServerTrackInfo::MediaType::Video)
+            track->encoder = QnRtspEncoderPtr(createRtspFfmpegEncoder(true));
+    }
 }
 
 void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
@@ -1138,6 +1150,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
         vTrack->encoder = QnRtspEncoderPtr(createRtspFfmpegEncoder(true));
         vTrack->clientPort = trackNum*2;
         vTrack->clientRtcpPort = trackNum*2 + 1;
+        vTrack->mediaType = RtspServerTrackInfo::MediaType::Video;
         d->trackInfo.insert(trackNum, vTrack);
     }
 
@@ -1187,6 +1200,10 @@ int QnRtspConnectionProcessor::composePlay()
             if (!layoutStr.isEmpty())
                 d->response.headers.insert( std::make_pair(nx_http::StringType("x-video-layout"), layoutStr.toLatin1()) );
         }
+    }
+    else if (d->useProprietaryFormat)
+    {
+        updatePredefinedTracks();
     }
 
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
