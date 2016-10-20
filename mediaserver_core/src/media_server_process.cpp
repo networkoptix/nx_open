@@ -1858,8 +1858,16 @@ void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& clo
     if (systemName.isDefault())
         resetCloudParams(cloudConnectionManager);
 
+    auto generateLocalId = [systemName]()
+    {
+        QString serverKey;
+        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+            serverKey = qMax(serverKey, server->getAuthKey());
+        return guidFromArbitraryData(systemName.value() + serverKey);
+    };
+
     qnGlobalSettings->setLocalSystemId(
-        systemName.isDefault() ? QnUuid() : guidFromArbitraryData(systemName.value()));
+        systemName.isDefault() ? QnUuid() : generateLocalId());
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
