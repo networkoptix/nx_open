@@ -119,6 +119,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_sentTranSequence = 0;
     m_waiterCount = 0;
     m_remotePeerSupportsKeepAlive = false;
+    m_isKeepAliveEnabled = true;
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
@@ -611,6 +612,8 @@ void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCo
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::onSomeBytesRead. errorCode = %1, bytesRead = %2").
         arg((int)errorCode).arg(bytesRead), cl_logDEBUG2 );
 
+    onSomeDataReceivedFromRemotePeer();
+
     QnMutexLocker lock( &m_mutex );
 
     m_asyncReadScheduled = false;
@@ -722,6 +725,8 @@ void QnTransactionTransportBase::receivedTransaction(
     const nx_http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData )
 {
+    onSomeDataReceivedFromRemotePeer();
+
     QnMutexLocker lock(&m_mutex);
 
     processChunkExtensions( headers );
@@ -837,6 +842,11 @@ void QnTransactionTransportBase::connectionFailure()
     setState( Error );
 }
 
+void QnTransactionTransportBase::setKeepAliveEnabled(bool value)
+{
+    m_isKeepAliveEnabled = value;
+}
+
 void QnTransactionTransportBase::sendHttpKeepAlive()
 {
     QnMutexLocker lock(&m_mutex);
@@ -852,15 +862,17 @@ void QnTransactionTransportBase::sendHttpKeepAlive()
 
 void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
 {
-    if( m_remotePeer.isClient() )
+    if (m_remotePeer.isClient())
         return; //not sending keep-alive to a client
+    if (!m_isKeepAliveEnabled)
+        return;
 
-    if( m_peerRole == prAccepting )
+    if (m_peerRole == prAccepting)
     {
-        NX_ASSERT( m_outgoingDataSocket );
+        NX_ASSERT(m_outgoingDataSocket);
         m_outgoingDataSocket->registerTimer(
             m_tcpKeepAliveTimeout.count(),
-            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this) );
+            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this));
     }
     else
     {

@@ -199,6 +199,8 @@ public:
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
 
+    void setKeepAliveEnabled(bool value);
+
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
 signals:
@@ -212,6 +214,7 @@ signals:
 
 protected:
     virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
+    virtual void onSomeDataReceivedFromRemotePeer() {};
 
     template<class T>
     void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header)
@@ -345,6 +348,7 @@ private:
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     nx::network::aio::Timer m_timer;
     bool m_remotePeerSupportsKeepAlive;
+    bool m_isKeepAliveEnabled;
 
 private:
     QnTransactionTransportBase(
