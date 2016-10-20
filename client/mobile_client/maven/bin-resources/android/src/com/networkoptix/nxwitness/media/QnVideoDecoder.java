@@ -35,6 +35,7 @@ public class QnVideoDecoder
     {
         try
         {
+            releaseDecoder();
             m_hasCodecFailed = true; //< Will be reset to false after creating the codec.
             m_gotOutputData = false;
 
@@ -68,17 +69,20 @@ public class QnVideoDecoder
         {
             Log.i(TAG, "CodecException: " + e.toString());
             Log.i(TAG, "CodecException message: " + e.getMessage());
+            releaseDecoder();
             return false;
         }
         catch (java.io.IOException e)
         {
             Log.i(TAG, "m_codec start failed");
+            releaseDecoder();
             return false;
         }
         catch (Exception e)
         {
             Log.i(TAG, "Exception: " + e.toString());
             Log.i(TAG, "Exception message: " + e.getMessage());
+            releaseDecoder();
             return false;
         }
     }
