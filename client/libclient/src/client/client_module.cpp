@@ -27,6 +27,8 @@
 
 #include <client_core/client_core_settings.h>
 
+#include <cloud/cloud_connection.h>
+
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -294,6 +296,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
     /* Just to feel safe */
+    common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object

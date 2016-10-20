@@ -84,6 +84,8 @@ void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status sta
         setCloudSystems(QnCloudSystemList());
     else if (status == QnCloudStatusWatcher::Offline)
         setCloudSystems(qnCloudStatusWatcher->recentCloudSystems());
+    else if (status == QnCloudStatusWatcher::Online)
+        setCloudSystems(qnCloudStatusWatcher->cloudSystems());
 }
 
 void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)

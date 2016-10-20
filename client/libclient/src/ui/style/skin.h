@@ -50,17 +50,18 @@ public:
         Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
         Qt::TransformationMode mode = Qt::FastTransformation);
 
-
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);
 
     static QSize maximumSize(const QIcon& icon, QIcon::Mode mode = QIcon::Normal,
-        QIcon::State state = QIcon::Off, const QWindow* window = nullptr);
+        QIcon::State state = QIcon::Off);
 
     static QPixmap maximumSizePixmap(const QIcon& icon, QIcon::Mode mode = QIcon::Normal,
-        QIcon::State state = QIcon::Off, const QWindow* window = nullptr);
+        QIcon::State state = QIcon::Off, bool correctDevicePixelRatio = true);
 
     static QStyle* newStyle(const QnGenericPalette& genericPalette);
+
+    static bool isHiDpi();
 
 private:
     void init(const QStringList& paths);

@@ -15,7 +15,7 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_newSystemWeights(),
     m_updatingWeights(false)
 {
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged,
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::beforeCloudSystemsChanged,
         this, &QnOrderedSystemsModel::handleCloudSystemsChanged);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -25,10 +25,10 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
             handleLocalWeightsChanged();
     });
 
-    setSourceModel(new QnSystemsModel(this));
-
-    handleCloudSystemsChanged();
     handleLocalWeightsChanged();
+    handleCloudSystemsChanged(qnCloudStatusWatcher->cloudSystems());
+
+    setSourceModel(new QnSystemsModel(this));
 
     setDynamicSortFilter(true);
     sort(0);
@@ -155,9 +155,8 @@ bool QnOrderedSystemsModel::filterAcceptsRow(int row,
     return (weight > kMinWeight);
 }
 
-void QnOrderedSystemsModel::handleCloudSystemsChanged()
+void QnOrderedSystemsModel::handleCloudSystemsChanged(const QnCloudSystemList& systems)
 {
-    const auto onlineSystems = qnCloudStatusWatcher->cloudSystems();
     const auto recentSystems = qnClientCoreSettings->recentCloudSystems();
 
     static const auto getWeightsData =
@@ -173,7 +172,7 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
             return result;
         };
 
-    const auto onlineWeights = getWeightsData(onlineSystems);
+    const auto onlineWeights = getWeightsData(systems);
 
     auto newCloudSystemsData = getWeightsData(recentSystems);
     for (auto it = onlineWeights.begin(); it != onlineWeights.end(); ++it)
@@ -183,6 +182,7 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
         return;
 
     m_cloudWeights = newCloudSystemsData;
+
     updateFinalWeights();
 }
 
@@ -205,6 +205,7 @@ void QnOrderedSystemsModel::handleLocalWeightsChanged()
 
     m_localWeights = newWeights;
     m_newSystemWeights.clear();
+
     updateFinalWeights();
 }
 
@@ -220,7 +221,7 @@ void QnOrderedSystemsModel::updateFinalWeights()
         auto& currentWeightData = newWeights[it.key()];
 
         // Force to replace with greater weight to prevent "jumping"
-        if (currentWeightData.weight > nextWeightData.weight)
+        if (nextWeightData.weight > currentWeightData.weight)
             currentWeightData = nextWeightData;
     }
 
@@ -232,5 +233,5 @@ void QnOrderedSystemsModel::updateFinalWeights()
         return;
 
     m_finalWeights = newWeights;
-    invalidate();
+    sort(0);
 }

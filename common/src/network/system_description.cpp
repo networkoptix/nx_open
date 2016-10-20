@@ -67,7 +67,7 @@ QnSystemDescription::QnSystemDescription(const QString& systemId, const QString&
     m_ownerFullName(),
     m_isCloudSystem(false),
     m_isNewSystem(false),
-    m_systemName(systemName),
+    m_systemName(extractSystemName(systemName)),
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
@@ -85,7 +85,7 @@ QnSystemDescription::QnSystemDescription(
     m_ownerFullName(ownerFullName),
     m_isCloudSystem(true),
     m_isNewSystem(false),
-    m_systemName(systemName),
+    m_systemName(extractSystemName(systemName)),
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
@@ -94,6 +94,11 @@ QnSystemDescription::QnSystemDescription(
 
 QnSystemDescription::~QnSystemDescription()
 {}
+
+QString QnSystemDescription::extractSystemName(const QString& systemName)
+{
+    return (systemName.isEmpty() ? tr("<Unnamed system>") : systemName);
+}
 
 QString QnSystemDescription::id() const
 {

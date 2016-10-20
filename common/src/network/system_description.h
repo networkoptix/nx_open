@@ -9,6 +9,8 @@
 
 class QnSystemDescription : public QnBaseSystemDescription
 {
+    Q_OBJECT
+
     typedef QnBaseSystemDescription base_type;
 
 public:
@@ -76,6 +78,8 @@ private:
         const QString& systemName,
         const QString& cloudOwnerAccountEmail,
         const QString& ownerFullName);
+
+    static QString extractSystemName(const QString& systemName);
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;

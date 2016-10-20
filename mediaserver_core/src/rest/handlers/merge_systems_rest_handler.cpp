@@ -1,5 +1,7 @@
 #include "merge_systems_rest_handler.h"
 
+#include <chrono>
+
 #include <QtCore/QRegExp>
 
 #include "core/resource_management/resource_pool.h"
@@ -43,10 +45,19 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-namespace
-{
-    const int requestTimeout = 60000;
-    ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
+namespace {
+
+    using namespace std::chrono;
+
+    static const milliseconds kRequestTimeout = seconds(60);
+
+    // Minimal server version which could be configured.
+    static const QnSoftwareVersion kMinimalVersion(2, 3);
+
+    ec2::AbstractECConnectionPtr ec2Connection()
+    {
+        return QnAppServerConnectionFactory::getConnection2();
+    }
 
     bool isResponseOK(const nx_http::HttpClient& client)
     {
@@ -69,7 +80,8 @@ namespace
         query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
         request.setQuery(query);
     }
-}
+
+} // namespace
 
 struct MergeSystemData
 {
@@ -98,13 +110,9 @@ struct MergeSystemData
     bool ignoreIncompatible;
 };
 
-#define MergeSystemData_Fields (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (MergeSystemData),
-    (json),
-    _Fields)
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    MergeSystemData, (json),
+    (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
 
 
 int QnMergeSystemsRestHandler::executeGet(
@@ -135,11 +143,12 @@ int QnMergeSystemsRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
+    using MergeStatus = utils::MergeSystemsStatus::Value;
+
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
-
 
     if (data.mergeOneServer)
         data.takeRemoteSettings = false;
@@ -182,9 +191,9 @@ int QnMergeSystemsRestHandler::execute(
     QByteArray moduleInformationData;
     {
         nx_http::HttpClient client;
-        client.setResponseReadTimeoutMs(requestTimeout);
-        client.setSendTimeoutMs(requestTimeout);
-        client.setMessageBodyReadTimeoutMs(requestTimeout);
+        client.setResponseReadTimeoutMs(kRequestTimeout.count());
+        client.setSendTimeoutMs(kRequestTimeout.count());
+        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
 
         QUrlQuery query;
         query.addQueryItem("checkOwnerPermissions", lit("true"));
@@ -202,26 +211,27 @@ int QnMergeSystemsRestHandler::execute(
                 .arg(data.url).arg(QLatin1String(nx_http::StatusCode::toString(status))),
                 cl_logDEBUG1);
             if (status == nx_http::StatusCode::unauthorized)
-                result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
+                setMergeError(result, MergeStatus::unauthorized);
             else if (status == nx_http::StatusCode::unauthorized)
-                result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
+                setMergeError(result, MergeStatus::forbidden);
             else
-                result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
+                setMergeError(result, MergeStatus::notFound);
             return nx_http::StatusCode::ok;
         }
         /* if we've got it successfully we know system name and admin password */
         moduleInformationData = client.fetchMessageBodyBuffer();
     }
 
-    QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
-    QnModuleInformationWithAddresses remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
+    const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
+    const auto remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
-    if (remoteModuleInformation.localSystemId.isNull())
+    result.setReply(remoteModuleInformation);
+
+    if (remoteModuleInformation.version < kMinimalVersion)
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system id is empty")
-            .arg(data.url), cl_logDEBUG1);
-        /* Hmm there's no system name. It would be wrong system. Reject it. */
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
+        NX_LOG(lit("QnMergeSystemsRestHandler. Remote system has too old version %2 (%1)")
+            .arg(data.url).arg(remoteModuleInformation.version.toString()), cl_logDEBUG1);
+        setMergeError(result, MergeStatus::incompatibleVersion);
         return nx_http::StatusCode::ok;
     }
 
@@ -231,7 +241,7 @@ int QnMergeSystemsRestHandler::execute(
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge because both systems are bound to the cloud")
             .arg(data.url), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("BOTH_SYSTEM_BOUND_TO_CLOUD"));
+        setMergeError(result, MergeStatus::bothSystemBoundToCloud);
         return nx_http::StatusCode::ok;
     }
 
@@ -248,7 +258,7 @@ int QnMergeSystemsRestHandler::execute(
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge systems bound to cloud")
             .arg(data.url), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD"));
+        setMergeError(result, MergeStatus::dependentSystemBoundToCloud);
         return nx_http::StatusCode::ok;
     }
 
@@ -266,7 +276,7 @@ int QnMergeSystemsRestHandler::execute(
             .arg(remoteModuleInformation.cloudHost)
             .arg(remoteModuleInformation.version.toString()),
             cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
+        setMergeError(result, MergeStatus::incompatibleVersion);
         return nx_http::StatusCode::ok;
     }
 
@@ -278,7 +288,7 @@ int QnMergeSystemsRestHandler::execute(
             .arg(QnAppInfo::ec2ProtoVersion())
             .arg(remoteModuleInformation.protoVersion),
             cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
+        setMergeError(result, MergeStatus::incompatibleVersion);
         return nx_http::StatusCode::ok;
     }
 
@@ -291,7 +301,7 @@ int QnMergeSystemsRestHandler::execute(
     if (isDefaultSystemName)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Can not merge to the non configured system"), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("UNCONFIGURED_SYSTEM"));
+        setMergeError(result, MergeStatus::unconfiguredSystem);
         return nx_http::StatusCode::ok;
     }
 
@@ -299,7 +309,7 @@ int QnMergeSystemsRestHandler::execute(
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
             .arg(data.takeRemoteSettings), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
+        setMergeError(result, MergeStatus::backupFailed);
         return nx_http::StatusCode::ok;
     }
 
@@ -309,7 +319,7 @@ int QnMergeSystemsRestHandler::execute(
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings), cl_logDEBUG1);
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
+            setMergeError(result, MergeStatus::configurationFailed);
             return nx_http::StatusCode::ok;
         }
     }
@@ -319,7 +329,7 @@ int QnMergeSystemsRestHandler::execute(
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
                 .arg(data.takeRemoteSettings), cl_logDEBUG1);
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
+            setMergeError(result, MergeStatus::configurationFailed);
             return nx_http::StatusCode::ok;
         }
     }
@@ -345,11 +355,8 @@ int QnMergeSystemsRestHandler::execute(
     if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
         QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
 
-    result.setReply(remoteModuleInformation);
-
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
     qnAuditManager->addAuditRecord(auditRecord);
-
 
     return nx_http::StatusCode::ok;
 }
@@ -400,9 +407,9 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     QByteArray serializedData = QJson::serialized(data);
 
     nx_http::HttpClient client;
-    client.setResponseReadTimeoutMs(requestTimeout);
-    client.setSendTimeoutMs(requestTimeout);
-    client.setMessageBodyReadTimeoutMs(requestTimeout);
+    client.setResponseReadTimeoutMs(kRequestTimeout.count());
+    client.setSendTimeoutMs(kRequestTimeout.count());
+    client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
     QUrl requestUrl(remoteUrl);
@@ -425,10 +432,9 @@ bool executeRequest(
     const QString& path)
 {
     nx_http::HttpClient client;
-    client.setResponseReadTimeoutMs(requestTimeout);
-    client.setSendTimeoutMs(requestTimeout);
-    client.setMessageBodyReadTimeoutMs(requestTimeout);
-
+    client.setResponseReadTimeoutMs(kRequestTimeout.count());
+    client.setSendTimeoutMs(kRequestTimeout.count());
+    client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
 
     QUrl requestUrl(remoteUrl);
     requestUrl.setPath(path);
@@ -453,7 +459,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     const QString& postKey,
     const QnRestConnectionProcessor* owner)
 {
-
     /* Read admin user from the remote server */
 
     ec2::ApiUserDataList users;
@@ -566,4 +571,13 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     }
 
     return true;
+}
+
+void QnMergeSystemsRestHandler::setMergeError(
+    QnJsonRestResult& result,
+    utils::MergeSystemsStatus::Value mergeStatus)
+{
+    result.setError(
+        QnJsonRestResult::CantProcessRequest,
+        utils::MergeSystemsStatus::toString(mergeStatus));
 }

@@ -18,6 +18,7 @@
 #include <network/module_finder.h>
 #include <network/multicast_module_finder.h>
 #include <network/router.h>
+#include <cloud/cloud_connection.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
@@ -79,6 +80,7 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
     connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
+    common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());

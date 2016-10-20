@@ -244,8 +244,31 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
     ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
     ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
 
-    connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnUserGroupSettingsWidget::applyChanges);
-    connect(ui->deleteGroupButton, &QPushButton::clicked, d, &QnUserGroupSettingsWidgetPrivate::deleteCurrentGroup);
+    ui->nameInputField->setValidator([this](const QString& text)
+        {
+            auto name = text.trimmed().toLower();
+            if (name.isEmpty())
+                return Qn::ValidationResult(tr("Role name cannot be empty."));
+
+            auto model = d_ptr->model;
+            for (const auto& role: model->groups())
+            {
+                if (role.id == model->selectedGroup())
+                    continue;
+
+                if (role.name.trimmed().toLower() != name)
+                    continue;
+
+                return Qn::ValidationResult(tr("Role with same name already exists."));
+            }
+
+            return Qn::kValidResult;
+        });
+
+    connect(ui->nameInputField, &QnInputField::textChanged, this,
+        &QnUserGroupSettingsWidget::applyChanges);
+    connect(ui->deleteGroupButton, &QPushButton::clicked, d,
+        &QnUserGroupSettingsWidgetPrivate::deleteCurrentGroup);
 }
 
 QnUserGroupSettingsWidget::~QnUserGroupSettingsWidget()
@@ -261,16 +284,20 @@ void QnUserGroupSettingsWidget::loadDataToUi()
 {
     Q_D(QnUserGroupSettingsWidget);
 
-    QSignalBlocker blocker(ui->nameLineEdit);
-    ui->nameLineEdit->setText(d->model->groupName());
+    QSignalBlocker blocker(ui->nameInputField);
+    ui->nameInputField->setText(d->model->groupName());
 
     d->resetUsers();
 }
 
 void QnUserGroupSettingsWidget::applyChanges()
 {
+    ui->nameInputField->validate();
+    if (!ui->nameInputField->isValid())
+        return;
+
     Q_D(QnUserGroupSettingsWidget);
 
-    d->model->setGroupName(ui->nameLineEdit->text());
+    d->model->setGroupName(ui->nameInputField->text());
     emit hasChangesChanged();
 }

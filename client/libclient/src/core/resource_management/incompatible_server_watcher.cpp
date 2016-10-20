@@ -191,43 +191,53 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
 
     switch (serverData.status)
     {
-    case Qn::Online:
-    case Qn::Incompatible:
-    case Qn::Unauthorized:
-        if (it != discoveredServerItemById.end())
+        case Qn::Online:
+        case Qn::Incompatible:
+        case Qn::Unauthorized:
         {
-            it->removed = false;
-            it->serverData = serverData;
+            if (it != discoveredServerItemById.end())
+            {
+                it->removed = false;
+                it->serverData = serverData;
+            }
+            else
+            {
+                discoveredServerItemById.insert(serverData.id, serverData);
+            }
+
+            lock.unlock();
+
+            const bool createResource =
+                serverData.status == Qn::Incompatible
+                    || (serverData.status == Qn::Unauthorized
+                        && !qnResPool->getResourceById<QnMediaServerResource>(serverData.id));
+
+            if (createResource)
+                addResource(serverData);
+            else
+                removeResource(getFakeId(serverData.id));
+
+            break;
         }
-        else
+
+        default:
         {
-            discoveredServerItemById.insert(serverData.id, serverData);
+            if (it == discoveredServerItemById.end())
+                break;
+
+            it->removed = true;
+
+            if (it->keep)
+                break;
+
+            discoveredServerItemById.remove(serverData.id);
+
+            lock.unlock();
+
+            removeResource(getFakeId(serverData.id));
+
+            break;
         }
-
-        lock.unlock();
-
-        if (serverData.status != Qn::Online)
-            addResource(serverData);
-        else
-            removeResource(serverData.id);
-        break;
-
-    default:
-        if (it == discoveredServerItemById.end())
-            break;
-
-        it->removed = true;
-
-        if (it->keep)
-            break;
-
-        discoveredServerItemById.remove(serverData.id);
-
-        lock.unlock();
-
-        removeResource(getFakeId(serverData.id));
-
-        break;
     }
 }
 

@@ -32,7 +32,7 @@ struct QnCloudSystem
     static QnCloudSystem fromSettings(QSettings* settings);
 };
 #define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)(authKey)
-QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype)(json))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
 Q_DECLARE_METATYPE(QnCloudSystemList);
@@ -92,9 +92,6 @@ public:
 
     QnCredentials createTemporaryCredentials() const;
 
-    QString cloudEndpoint() const;
-    void setCloudEndpoint(const QString &endpoint);
-
     Status status() const;
 
     ErrorCode error() const;
@@ -112,7 +109,8 @@ signals:
     void passwordChanged();
     void effectiveUserNameChanged();
     void statusChanged(Status status);
-    void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
+    void beforeCloudSystemsChanged(const QnCloudSystemList &newCloudSystems);
+    void cloudSystemsChanged(const QnCloudSystemList &currectCloudSystems);
     void recentCloudSystemsChanged();
     void currentSystemChanged(const QnCloudSystem& system);
     void errorChanged();

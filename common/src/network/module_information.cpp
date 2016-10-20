@@ -36,7 +36,12 @@ QString getTargetSystemIdImpl(
         return serverId.toString();    //< We have only one hub-server if version is less than 2.3
 
     if (serverVersion < kMinVersionWithLocalId)
+    {
+        if (systemName.isEmpty())
+            return serverId.toString(); // Sometimes it happens and causes empty tile.
+
         return systemName; //< No cloud, no local id, no new systems
+    }
 
     if (localSystemId.isNull())
         return getFactorySystemIdImpl(serverId);  //< New System id
@@ -49,7 +54,7 @@ QString getTargetSystemIdImpl(
 QString helpers::getTargetSystemId(const QnConnectionInfo& info)
 {
     return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
-        QnUuid::fromStringSafe(info.ecsGuid), info.version);
+        info.serverId(), info.version);
 }
 
 QString helpers::getTargetSystemId(const QnModuleInformation& info)

@@ -97,13 +97,10 @@ int Ec2DirectConnectionFactory::testConnectionAsync(
     QUrl url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (m_transactionMessageBus->localPeer().isMobileClient())
-    {
-        QUrlQuery query(url);
-        query.removeQueryItem(lit("format"));
-        query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-        url.setQuery(query);
-    }
+    QUrlQuery query(url);
+    query.removeQueryItem(lit("format"));
+    query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+    url.setQuery(query);
 
     if (url.isEmpty())
         return testDirectConnection(url, handler);
@@ -1693,7 +1690,9 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
     auto func =
         [this, reqId, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
-            remoteTestConnectionFinished(reqId, errorCode, connectionInfo, addr, handler);
+            auto infoWithUrl = connectionInfo;
+            infoWithUrl.ecUrl = addr;
+            remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<nullptr_t, QnConnectionInfo>(
         addr, ApiCommand::testConnection, nullptr_t(), func);

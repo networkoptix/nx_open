@@ -31,7 +31,7 @@ struct QnLocalConnectionData
 };
 
 #define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
-QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq)(json))
 
 struct QnWeightData
 {
@@ -47,7 +47,7 @@ struct QnWeightData
 typedef QList<QnWeightData> QnWeightDataList;
 
 #define QnWeightData_Fields (systemId)(weight)(lastConnectedUtcMs)(realConnection)
-QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq)(json))
 Q_DECLARE_METATYPE(QnWeightDataList)
 
 struct QnLocalConnectionDataList : public QList<QnLocalConnectionData>

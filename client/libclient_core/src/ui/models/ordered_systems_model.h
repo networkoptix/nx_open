@@ -24,7 +24,7 @@ protected: // overrides
         const QModelIndex &parent) const override;
 
 private:
-    void handleCloudSystemsChanged();
+    void handleCloudSystemsChanged(const QnCloudSystemList& systems);
 
     void handleLocalWeightsChanged();
 

@@ -158,7 +158,7 @@ void QnResourceTreeModelUserResourcesNode::removeNode(const QnResourceTreeModelN
             return;
 
         /* Recursively remove all child nodes. */
-        for (auto child : children())
+        for (auto child : node->children())
             removeNode(child);
 
         m_recorders.remove(key);

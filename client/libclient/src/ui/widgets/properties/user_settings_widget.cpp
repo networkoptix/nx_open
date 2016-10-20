@@ -420,7 +420,7 @@ void QnUserSettingsWidget::updateRoleComboBox()
     if (!m_model->user())
         return;
 
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
+    Qn::GlobalPermissions permissions = m_model->user()->getRawPermissions();
 
     /* If there is only one entry in permissions combobox, this check doesn't matter. */
     int customPermissionsIndex = ui->roleComboBox->count() - 1;
