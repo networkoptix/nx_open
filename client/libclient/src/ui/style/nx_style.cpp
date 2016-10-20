@@ -2181,7 +2181,11 @@ void QnNxStyle::drawControl(
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
+
                 Qt::Alignment textHorizontalAlignment = Qt::AlignHCenter;
+
+                if (widget && widget->property(Properties::kPushButtonMargin).canConvert<int>())
+                    textHorizontalAlignment = Qt::AlignLeft;
 
                 /* Draw icon left-aligned: */
                 if (!buttonOption->icon.isNull())
@@ -2252,7 +2256,7 @@ void QnNxStyle::drawControl(
                         | Qt::TextHideMnemonic;
 
                     QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
-                        Qt::ElideRight, textRect.width() + margin, textFlags);
+                        Qt::ElideRight, textRect.width(), textFlags);
 
                     proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
                         buttonOption->state.testFlag(State_Enabled), text, foregroundRole);
@@ -3109,6 +3113,14 @@ int QnNxStyle::pixelMetric(
             {
                 if (!button->icon.isNull())
                     return Metrics::kPushButtonIconMargin * 2;
+            }
+
+            if (widget)
+            {
+                bool ok;
+                int margin = widget->property(Properties::kPushButtonMargin).toInt(&ok);
+                if (ok && margin >= 0)
+                    return margin;
             }
 
             return Metrics::kStandardPadding * 2;
