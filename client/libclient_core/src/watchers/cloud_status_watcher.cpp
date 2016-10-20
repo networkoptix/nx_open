@@ -276,10 +276,13 @@ void QnCloudStatusWatcher::setCloudCredentials(const QnCredentials& credentials,
 {
     Q_D(QnCloudStatusWatcher);
 
-    if (d->credentials == credentials)
+    const auto loweredCredentials =
+        QnCredentials(credentials.user.toLower(), credentials.password);
+
+    if (d->credentials == loweredCredentials)
         return;
 
-    d->credentials = credentials;
+    d->credentials = loweredCredentials;
 
     d->updateConnection(initial);
     emit loginChanged();
