@@ -303,13 +303,9 @@ void addFakeVideowallUser()
     qnResPool->addResource(fakeUser);
 }
 
-}
+} // namespace
 
-//#include "device_plugins/arecontvision/devices/av_device_server.h"
 
-//#define TEST_RTSP_SERVER
-
-//static const int PROXY_POOL_SIZE = 8;
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
 #else
@@ -327,6 +323,7 @@ public:
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
+    QString ifListFilter;
     bool cleanupDb;
 
     CmdLineArguments()
@@ -457,8 +454,6 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
 
-    auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
-    storage->setSpaceLimit(spaceLimit);
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
@@ -715,15 +710,6 @@ QString getDefaultServerName()
     return lit("Server %1").arg(id);
 }
 
-void setServerUrls(
-    QnMediaServerResourcePtr server,
-    const SocketAddress& address,
-    bool sslAllowed)
-{
-    server->setSslAllowed(sslAllowed);
-    server->setPrimaryAddress(address);
-}
-
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
     ec2::ApiMediaServerDataList servers;
@@ -916,7 +902,7 @@ void initAppServerConnection(QSettings &settings)
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
-    QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
+    QString userName = settings.value("appserverLogin", QnServer::kDefaultAdminPassword).toString();
     QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
     QByteArray authKey = nx::ServerSetting::getAuthKey();
     QString appserverHostString = settings.value("appserverHost").toString();
@@ -1111,7 +1097,7 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
+        m_mediaServer->setPrimaryAddress(newAddress);
     }
 
     ec2::ApiMediaServerData server;
@@ -1641,7 +1627,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
@@ -1767,6 +1753,56 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
         });
 
     return mapper;
+}
+
+Qn::ServerFlags MediaServerProcess::calcServerFlags()
+{
+    Qn::ServerFlags serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
+
+#ifdef EDGE_SERVER
+    serverFlags |= Qn::SF_Edge;
+#endif
+    if (QnAppInfo::isBpi())
+    {
+        serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+        serverFlags |= Qn::SF_HasLiteClient;
+    }
+
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    if (compatibilityMode) // check compatibilityMode here for testing purpose
+    {
+        serverFlags |= Qn::SF_HasLiteClient;
+    }
+
+#ifdef __arm__
+    serverFlags |= Qn::SF_ArmServer;
+
+    struct stat st;
+    memset(&st, 0, sizeof(st));
+    const bool hddPresent =
+        ::stat("/dev/sda", &st) == 0 ||
+        ::stat("/dev/sdb", &st) == 0 ||
+        ::stat("/dev/sdc", &st) == 0 ||
+        ::stat("/dev/sdd", &st) == 0;
+    if (hddPresent)
+        serverFlags |= Qn::SF_Has_HDD;
+#else
+    serverFlags |= Qn::SF_Has_HDD;
+#endif
+
+    if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
+        serverFlags |= Qn::SF_SupportsTranscoding;
+
+    const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    bool isLocal = isLocalAppServer(appserverHostString);
+    if (!isLocal)
+        serverFlags |= Qn::SF_RemoteEC;
+
+    initPublicIpDiscovery();
+    if (!m_ipDiscovery->publicIP().isNull())
+        serverFlags |= Qn::SF_HasPublicIP;
+
+    return serverFlags;
 }
 
 void MediaServerProcess::initPublicIpDiscovery()
@@ -1952,43 +1988,6 @@ void MediaServerProcess::run()
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-    bool isLocal = isLocalAppServer(appserverHostString);
-    int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
-#ifdef EDGE_SERVER
-    serverFlags |= Qn::SF_Edge;
-#endif
-    if (QnAppInfo::isBpi())
-    {
-        serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
-        serverFlags |= Qn::SF_HasLiteClient;
-    }
-
-    if (compatibilityMode) // check compatibilityMode here for testing purpose
-    {
-        serverFlags |= Qn::SF_HasLiteClient;
-    }
-
-#ifdef __arm__
-    serverFlags |= Qn::SF_ArmServer;
-
-    struct stat st;
-    memset(&st, 0, sizeof(st));
-    const bool hddPresent =
-        ::stat("/dev/sda", &st) == 0 ||
-        ::stat("/dev/sdb", &st) == 0 ||
-        ::stat("/dev/sdc", &st) == 0 ||
-        ::stat("/dev/sdd", &st) == 0;
-    if (hddPresent)
-        serverFlags |= Qn::SF_Has_HDD;
-#else
-    serverFlags |= Qn::SF_Has_HDD;
-#endif
-
-    if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
-        serverFlags |= Qn::SF_SupportsTranscoding;
-
-    if (!isLocal)
-        serverFlags |= Qn::SF_RemoteEC;
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
@@ -2013,11 +2012,6 @@ void MediaServerProcess::run()
 
     runtimeData.hardwareIds = m_hardwareGuidList;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
-
-    initPublicIpDiscovery();
-    if (!m_ipDiscovery->publicIP().isNull())
-        serverFlags |= Qn::SF_HasPublicIP;
-
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory(
@@ -2184,6 +2178,11 @@ void MediaServerProcess::run()
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
+    const bool sslAllowed =
+        MSSettings::roSettings()->value(
+            nx_ms_conf::ALLOW_SSL_CONNECTIONS,
+            nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
+
     bool isNewServerInstance = false;
     bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     m_moduleFinder = new QnModuleFinder(false);
@@ -2206,9 +2205,10 @@ void MediaServerProcess::run()
                 isNewServerInstance = true;
         }
 
-        server->setServerFlags((Qn::ServerFlags) serverFlags);
+        server->setServerFlags((Qn::ServerFlags) calcServerFlags());
 
         QHostAddress appserverHost;
+        bool isLocal = isLocalAppServer(appserverHostString);
         if (!isLocal) {
             do
             {
@@ -2217,10 +2217,9 @@ void MediaServerProcess::run()
         }
 
 
-        setServerUrls(
-            server,
-            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
-            qnCommon->moduleInformation().sslAllowed);
+        server->setPrimaryAddress(
+            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
+        server->setSslAllowed(sslAllowed);
         cloudConnectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
@@ -2314,7 +2313,7 @@ void MediaServerProcess::run()
     selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
     selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
-    selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
+    selfInformation.sslAllowed = sslAllowed;
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
@@ -2387,6 +2386,9 @@ void MediaServerProcess::run()
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 
+    auto upnpPortMapper = initializeUpnpPortMapper();
+    updateAddressesList();
+
     loadResourcesFromECS(messageProcessor.data());
 	qnGlobalSettings->initialize();
     migrateSystemNameFromConfig(cloudConnectionManager);
@@ -2431,9 +2433,6 @@ void MediaServerProcess::run()
         qnGlobalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
         qnGlobalSettings->synchronizeNow();
     }
-
-    auto upnpPortMapper = initializeUpnpPortMapper();
-    updateAddressesList();
 
     qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
 
@@ -2908,6 +2907,23 @@ void SIGUSR1_handler(int)
 }
 #endif
 
+void updateAllowedInterfaces(const CmdLineArguments& cmdLineArguments)
+{
+    // check registry
+    QString ifList = MSSettings::roSettings()->value(lit("if")).toString();
+    // check startup parameter
+    if (ifList.isEmpty())
+        ifList = cmdLineArguments.ifListFilter;
+
+    QList<QHostAddress> allowedInterfaces;
+    for (const QString& s: ifList.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        allowedInterfaces << QHostAddress(s);
+
+    if (!allowedInterfaces.isEmpty())
+        qWarning() << "Using net IF filter:" << allowedInterfaces;
+    setInterfaceListFilter(allowedInterfaces);
+}
+
 int MediaServerProcess::main(int argc, char* argv[])
 {
 #if 0
@@ -2961,6 +2977,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.ifListFilter, "--if", NULL,
+        "Strict media server network interface list (comma delimited list)");
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL,
         "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL,
@@ -2988,18 +3006,11 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
-
-    #ifdef __linux__
-        if( !disableCrashHandler )
-            linux_exception::installCrashSignalHandler();
-    #endif
-
     if( showVersion )
     {
         std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;
         return 0;
     }
-
     if( showHelp )
     {
         QTextStream stream(stdout);
@@ -3007,15 +3018,20 @@ int MediaServerProcess::main(int argc, char* argv[])
         return 0;
     }
 
-
-    if (!enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(enforceSocketType);
-
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
+    updateAllowedInterfaces( cmdLineArguments );
+
+    #ifdef __linux__
+        if( !disableCrashHandler )
+            linux_exception::installCrashSignalHandler();
+    #endif
+
+    if (!enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(enforceSocketType);
     if( ipVersion.isEmpty() )
         ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
 

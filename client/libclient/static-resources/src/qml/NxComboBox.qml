@@ -19,6 +19,8 @@ ComboBox
 
     property int overflowCurrentIndex: -1;
 
+    signal accepted();
+
     onCountChanged:
     {
         if (overflowCurrentIndex === -1)
@@ -158,7 +160,7 @@ ComboBox
 
             KeyNavigation.tab: thisComponent.KeyNavigation.tab;
             KeyNavigation.backtab: thisComponent.KeyNavigation.backtab;
-
+            onAccepted: thisComponent.accepted();
             onTextChanged:
             {
                 thisComponent.currentIndex = thisComponent.find(text.trim()

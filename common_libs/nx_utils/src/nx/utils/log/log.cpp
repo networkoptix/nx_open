@@ -92,7 +92,11 @@ public:
 
         {
             std::unique_lock<std::mutex> lk( m_mutex );
-            if (m_file.fail())
+            if (m_baseName == lit("-"))
+            {
+                qWarning().nospace().noquote() << ostr.str().c_str();
+            }
+            else if (m_file.fail())
             {
                 switch (logLevel)
                 {
@@ -121,7 +125,7 @@ public:
     QString syncCurrFileName() const
     {
         std::unique_lock<std::mutex> lk( m_mutex );
-        return m_baseName + QLatin1String(".log");
+        return currFileName();
     }
 
 private:

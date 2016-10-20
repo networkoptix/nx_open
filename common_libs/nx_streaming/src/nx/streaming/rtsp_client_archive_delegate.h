@@ -95,7 +95,7 @@ private:
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_fixedServer;
     //bool m_waitBOF;
-    int m_lastPacketFlags;
+    int m_lastMediaFlags;
     bool m_closing;
     bool m_singleShotMode;
     quint8 m_sendedCSec;

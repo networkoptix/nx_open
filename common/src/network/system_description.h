@@ -13,6 +13,9 @@ class QnSystemDescription : public QnBaseSystemDescription
 
 public:
     typedef QSharedPointer<QnSystemDescription> PointerType;
+
+    static PointerType createFactorySystem(const QString& systemId);
+
     static PointerType createLocalSystem(
         const QString &systemId,
         const QString &systemName);
@@ -35,6 +38,8 @@ public: // overrides
     QString ownerFullName() const override;
 
     bool isCloudSystem() const override;
+
+    bool isNewSystem() const override;
 
     ServersList servers() const override;
 
@@ -59,8 +64,13 @@ public:
     void setName(const QString& value);
 
 private:
+    // Ctor for factory (new) system
+    QnSystemDescription(const QString& systemId);
+
+    // Ctor for local system
     QnSystemDescription(const QString& systemId, const QString& systemName);
 
+    // Ctor for cloud system
     QnSystemDescription(
         const QString& systemId,
         const QString& systemName,
@@ -77,6 +87,7 @@ private:
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     const bool m_isCloudSystem;
+    const bool m_isNewSystem;
     QString m_systemName;
     ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;

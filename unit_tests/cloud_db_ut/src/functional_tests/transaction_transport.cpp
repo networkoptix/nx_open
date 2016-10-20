@@ -10,11 +10,13 @@ constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::
 constexpr static const int kKeepAliveProbeCount = 3;
 
 TransactionTransport::TransactionTransport(
+    ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
     ec2::ApiPeerData localPeer,
     const std::string& systemId,
     const std::string& systemAuthKey)
 :
     ec2::QnTransactionTransportBase(
+        connectionGuardSharedState,
         std::move(localPeer),
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount),

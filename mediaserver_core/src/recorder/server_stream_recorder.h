@@ -99,10 +99,9 @@ private:
     bool cleanupQueueIfOverflow();
     void addQueueSizeUnsafe(qint64 value);
 private slots:
-    void at_recordingFinished(
-        const ErrorStruct   &status,
-        const QString       &filename
-    );
+    void at_recordingFinished(const StreamRecorderErrorStruct& status,
+        const QString& filename);
+
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
     const qint64 m_maxRecordQueueSizeBytes;

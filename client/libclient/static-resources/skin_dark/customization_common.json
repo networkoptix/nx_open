@@ -251,6 +251,14 @@
         }
     },
 
+    "QnAlertBar": {
+        "palette": { 
+            "default": {
+                "window": "#61282b"
+            }
+        }
+    },
+
     "QHeaderView": {
         "palette": {
             "default": {
@@ -285,12 +293,21 @@
 
     "QnResourceItemDelegate": {
         "colors": {
-            "mainText":          "light12",
+            "mainText":          "light10",
             "mainTextSelected":  "light4",
             "mainTextAccented":  "brand_core",
             "extraText":         "dark17",
             "extraTextSelected": "light10",
             "extraTextAccented": "brand_d3"
+        }
+    },
+
+    "QnRecordingStatsItemDelegate": {
+        "colors": {
+            "chartBackground": "brand_d4",
+            "chartForeground": "light10",
+            "foreignForeground": "dark17",
+            "totalForeground": "light4"
         }
     },
 

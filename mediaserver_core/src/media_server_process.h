@@ -86,6 +86,7 @@ private:
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
+    Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);

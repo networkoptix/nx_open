@@ -5,6 +5,7 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
@@ -99,7 +100,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         return nx_http::StatusCode::internalServerError;
     }
 
-
     qnGlobalSettings->setCloudSystemId(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
     qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
@@ -118,18 +118,26 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //crash can result in unsynchronized unrecoverable state: there
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
-    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
-        (std::function<void(api::ResultCode, api::NonceData)>);
+
+    QMap<QByteArray, QByteArray> systemAttributes;
+    systemAttributes.insert(
+        nx::settings_names::kNameLocalSystemId.toUtf8(),
+        qnGlobalSettings->localSystemId().toByteArray());
+
+    api::SystemAttributesUpdate systemAttributesUpdate;
+    systemAttributesUpdate.systemID = data.cloudSystemID.toStdString();
+    systemAttributesUpdate.opaque =
+        nx::utils::serializeNameValuePairs(systemAttributes).toStdString();
 
     auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);
     api::ResultCode cdbResultCode = api::ResultCode::ok;
-    api::NonceData nonceData;
-    std::tie(cdbResultCode, nonceData) =
-        makeSyncCall<api::ResultCode, api::NonceData>(
+    std::tie(cdbResultCode) =
+        makeSyncCall<api::ResultCode>(
             std::bind(
-                static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
-                cloudConnection->authProvider(),
+                &api::SystemManager::update,
+                cloudConnection->systemManager(),
+                std::move(systemAttributesUpdate),
                 std::placeholders::_1));
 
     if (cdbResultCode != api::ResultCode::ok)

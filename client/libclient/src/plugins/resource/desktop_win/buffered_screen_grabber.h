@@ -41,7 +41,7 @@ protected:
 private:
     QnScreenGrabber m_grabber;
     int m_frameRate;
-    CLThreadQueue<CaptureInfoPtr> m_queue;
+    QnSafeQueue<CaptureInfoPtr> m_queue;
     QVector<AVFrame*> m_frames;
     int m_frameIndex;
     //QTime m_timer;

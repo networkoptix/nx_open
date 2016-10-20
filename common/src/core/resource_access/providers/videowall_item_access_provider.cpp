@@ -65,6 +65,38 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
     return false;
 }
 
+void QnVideoWallItemAccessProvider::fillProviders(
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource,
+    QnResourceList& providers) const
+{
+    if (!qnGlobalPermissionsManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+        return;
+
+    auto resourceId = resource->getId();
+    for (const auto& videoWall : qnResPool->getResources<QnVideoWallResource>())
+    {
+        QSet<QnUuid> layoutIds = videoWallLayouts(videoWall);
+        if (layoutIds.contains(resourceId))
+        {
+            providers << videoWall;
+            continue;
+        }
+        auto layouts = qnResPool->getResources<QnLayoutResource>(layoutIds);
+        for (const auto& layout : layouts)
+        {
+            for (const auto& item : layout->getItems())
+            {
+                if (item.resource.id == resourceId)
+                {
+                    providers << videoWall;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
     base_type::handleResourceAdded(resource);

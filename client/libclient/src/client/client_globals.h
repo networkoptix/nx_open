@@ -17,7 +17,7 @@ namespace Qn
         CurrentUserNode,        /**< Root node, displaying current user. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
         ServersNode,            /**< Root node for servers for admin user. */
-        UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
+        UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
@@ -242,7 +242,6 @@ namespace Qn
 
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
 
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */

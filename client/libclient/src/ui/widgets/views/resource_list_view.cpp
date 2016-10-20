@@ -38,6 +38,14 @@ QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget*
     setResources(resources);
 }
 
+QnResourceListView::QnResourceListView(const QnResourceList& resources, bool ignoreStatus,
+    QWidget* parent)
+    :
+    QnResourceListView(resources, parent)
+{
+    setSimplified(ignoreStatus);
+}
+
 QnResourceList QnResourceListView::resources() const
 {
     return m_model->resources();
@@ -47,6 +55,16 @@ void QnResourceListView::setResources(const QnResourceList& resources)
 {
     m_model->setResources(resources);
     model()->sort(QnResourceListModel::NameColumn);
+}
+
+bool QnResourceListView::isSimplified() const
+{
+    return m_model->isSimplified();
+}
+
+void QnResourceListView::setSimplified(bool value)
+{
+    m_model->setSimplified(value);
 }
 
 QSize QnResourceListView::sizeHint() const

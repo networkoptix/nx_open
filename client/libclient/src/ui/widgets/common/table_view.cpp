@@ -20,15 +20,17 @@ QSize QnTableView::viewportSizeHint() const
      *  But isVisible() deals with global visibility and returns false if QTableView is hidden (while its scrollbar is not)
      *  To check local visibility isHidden() must be used
      *  So as a workaround we adjust sizeHint after Qt if !scrollbar.isVisible() && !scrollbar.isHidden()
+     *  It can happen during complicated layout recalculation, and sometimes scrollbar sizes are weird at this place.
+     *  So we use style()->pixelMetric(QStyle::PM_ScrollBarExtent).
      */
 
     QSize size = base_type::viewportSizeHint();
 
     if (!verticalScrollBar()->isVisible() && !verticalScrollBar()->isHidden())
-        size.setWidth(size.width() + verticalScrollBar()->width());
+        size.rwidth() += style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
     if (!horizontalScrollBar()->isVisible() && !horizontalScrollBar()->isHidden())
-        size.setHeight(size.height() + horizontalScrollBar()->height());
+        size.rheight() += style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
     return size;
 }

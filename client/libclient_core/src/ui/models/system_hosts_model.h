@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <QtCore/QUrl>
 #include <QtCore/QAbstractListModel>
 
@@ -40,8 +39,8 @@ public: // overrides
 
     QHash<int, QByteArray> roleNames() const override;
 
-public slots:
-    QVariant getData(const QString& dataRole, int row);
+public: // QML reachable functions
+    Q_INVOKABLE QVariant getData(const QString& dataRole, int row);
 
 private:
     void reloadHosts();

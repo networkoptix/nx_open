@@ -233,7 +233,7 @@ private:
     void initializePositionAnimations();
     void stopPositionAnimations();
 
-    void timelineAdvance();
+    void timelineAdvance(qint64 fromMs);
     void timelineCorrect(qint64 toMs);
     void timelineCatchUp(qint64 toMs);
     bool isTimelineCatchingUp() const;

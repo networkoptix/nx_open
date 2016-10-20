@@ -21,6 +21,7 @@
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 
+#include "connection_guard_shared_state.h"
 
 class QTimer;
 class QnRuntimeTransactionLog;
@@ -144,6 +145,8 @@ public:
     * Otherwise return route gateway.
     */
     QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
+
+    ConnectionGuardSharedState* connectionGuardSharedState();
 
 signals:
     void peerLost(ApiPeerAliveData data);
@@ -313,6 +316,8 @@ private:
 
     QMap<QnUuid, DelayedAliveData> m_delayedAliveTran;
     QElapsedTimer m_relativeTimer;
+
+    ConnectionGuardSharedState m_connectionGuardSharedState;
 };
 
 } //namespace ec2

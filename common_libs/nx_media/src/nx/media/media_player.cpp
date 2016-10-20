@@ -742,19 +742,27 @@ void Player::setMaxTextureSize(int value)
 void Player::play()
 {
     Q_D(Player);
-    d->log(lit("play()"));
+    d->log(lit("play() BEGIN"));
 
     if (d->state == State::Playing)
+    {
+        d->log(lit("play() END: already playing"));
         return;
+    }
 
     if (!d->archiveReader && !d->initDataProvider())
+    {
+        d->log(lit("play() END: no data"));
         return;
+    }
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
 
     d->lastVideoPtsMs.reset();
     d->at_hurryUp(); //< renew receiving frames
+
+    d->log(lit("play() END"));
 }
 
 void Player::pause()
@@ -767,20 +775,21 @@ void Player::pause()
 void Player::stop()
 {
     Q_D(Player);
-    d->log(lit("stop()"));
+    d->log(lit("stop() BEGIN"));
 
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
-
     if (d->dataConsumer)
-	    d->dataConsumer->pleaseStop();
+        d->dataConsumer->pleaseStop();
     if (d->archiveReader)
-	    d->archiveReader->pleaseStop();
+        d->archiveReader->pleaseStop();
 
     d->dataConsumer.reset();
     d->archiveReader.reset();
     d->videoFrameToRender.reset();
+
     d->setState(State::Stopped);
+    d->log(lit("stop() END"));
 }
 
 void Player::setSource(const QUrl& url)

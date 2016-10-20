@@ -61,10 +61,7 @@ public:
             std::chrono::seconds(5),
             [completionHandler = std::move(completionHandler)]
             {
-                completionHandler(
-                    nx_http::StatusCode::ok,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource>(),
-                    nx_http::ConnectionEvents());
+                completionHandler(nx_http::StatusCode::ok);
             });
     }
 
@@ -126,9 +123,9 @@ public:
             "Seq",
             nx_http::getHeaderValue( request.headers, "Seq" ) );
         completionHandler(
-            nx_http::StatusCode::ok,
-            std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla"),
-            nx_http::ConnectionEvents());
+            nx_http::RequestResult(
+                nx_http::StatusCode::ok,
+                std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla")));
     }
 };
 

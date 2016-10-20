@@ -843,7 +843,7 @@ QnActionManager::QnActionManager(QObject *parent):
         false;
 #endif
 
-    if (screenRecordingSupported)
+    if (screenRecordingSupported && qnRuntime->isDesktopMode())
     {
         factory(QnActions::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).
@@ -1071,10 +1071,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, this));
 
     /* Resource actions. */
-    factory(QnActions::OpenInLayoutAction).
-        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
-        text(tr("Open in Layout"));
+    factory(QnActions::OpenInLayoutAction)
+        .flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget)
+        .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
+        .text(tr("Open in Layout"))
+        .condition(new QnOpenInLayoutActionCondition(this));
 
     factory(QnActions::OpenInCurrentLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1088,10 +1089,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Tab")).
         conditionalText(tr("Monitor in New Tab"), hasFlags(Qn::server), Qn::All).
-        condition(new QnConjunctionActionCondition(
-            new QnOpenInNewEntityActionCondition(this),
-            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
-            this));
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(QnActions::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
@@ -1106,7 +1104,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnOpenInNewEntityActionCondition(this),
             new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
-            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
             this));
 
     factory(QnActions::OpenSingleLayoutAction).

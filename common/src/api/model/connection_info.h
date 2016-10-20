@@ -9,7 +9,7 @@
 #ifndef QN_NO_BASE
 #include <utils/common/software_version.h>
 #include <nx/fusion/model_functions_fwd.h>
-
+#include <nx/utils/uuid.h>
 #include "compatibility_item.h"
 
 #endif
@@ -37,7 +37,7 @@ struct QnConnectionInfo
     QString effectiveUserName;
     QString cloudHost;
     QString cloudSystemId;
-	QString localSystemId;
+	QnUuid localSystemId;
 
     /* Check if https protocol can be used. */
     QUrl effectiveUrl() const;

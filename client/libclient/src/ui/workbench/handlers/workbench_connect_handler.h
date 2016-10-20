@@ -101,6 +101,7 @@ private:
     void setState(LogicalState logicalValue, PhysicalState physicalValue);
     void setLogicalState(LogicalState value);
     void setPhysicalState(PhysicalState value);
+    void handleStateChanged(LogicalState logicalValue, PhysicalState physicalValue);
 
 signals:
     void stateChanged(LogicalState logicalValue, PhysicalState physicalValue);

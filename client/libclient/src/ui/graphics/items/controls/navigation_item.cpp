@@ -100,15 +100,11 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_bookmarksModeButton = newActionButton(QnActions::BookmarksModeAction);
     m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
-    m_bookmarksModeButton->setPreferredSize(34, 24);
+    m_bookmarksModeButton->setPreferredSize(52, 24);
 
     m_calendarButton = newActionButton(QnActions::ToggleCalendarAction);
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
-    m_calendarButton->setPreferredSize(34, 24);
-
-    m_thumbnailsButton = newActionButton(QnActions::ToggleThumbnailsAction);
-    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
-    m_thumbnailsButton->setPreferredSize(34, 24);
+    m_calendarButton->setPreferredSize(52, 24);
 
     /* Create clock label. */
     QnClockLabel* clockLabel = new QnClockLabel(this);
@@ -200,7 +196,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     rightLayoutBottom->setSpacing(2);
     rightLayoutBottom->addItem(m_bookmarksModeButton);
     rightLayoutBottom->addItem(m_calendarButton);
-    rightLayoutBottom->addItem(m_thumbnailsButton);
 
     QGraphicsLinearLayout* rightLayout = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -319,7 +314,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
-    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_bookmarksModeButton, Qn::Bookmarks_Usage_Help);
 
     /* Run handlers */

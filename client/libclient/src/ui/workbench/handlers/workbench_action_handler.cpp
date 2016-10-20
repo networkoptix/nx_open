@@ -30,6 +30,8 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_access/resource_access_filter.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -86,8 +88,6 @@
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -230,8 +230,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
     connect(action(QnActions::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(QnActions::CameraDiagnosticsAction), SIGNAL(triggered()), this, SLOT(at_cameraDiagnosticsAction_triggered()));
-    connect(action(QnActions::LayoutSettingsAction), SIGNAL(triggered()), this, SLOT(at_layoutSettingsAction_triggered()));
-    connect(action(QnActions::CurrentLayoutSettingsAction), SIGNAL(triggered()), this, SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(QnActions::ServerAddCameraManuallyAction), SIGNAL(triggered()), this, SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(QnActions::PingAction), SIGNAL(triggered()), this, SLOT(at_pingAction_triggered()));
     connect(action(QnActions::ServerLogsAction), SIGNAL(triggered()), this, SLOT(at_serverLogsAction_triggered()));
@@ -306,26 +304,11 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
-#ifndef DESKTOP_CAMERA_DEBUG
-    if (resource->hasFlags(Qn::desktop_camera))
-        return;
-#endif
 
+    if (!menu()->canTrigger(QnActions::OpenInLayoutAction, QnActionParameters(resource)
+        .withArgument(Qn::LayoutResourceRole, layout)))
     {
-        //TODO: #GDM #Common refactor duplicated code VMS-1725
-        bool isServer = resource->hasFlags(Qn::server);
-        if (isServer && resource.dynamicCast<QnFakeMediaServerResource>())
-            return;
-
-        bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
-        bool isMediaResource = resource->hasFlags(Qn::media);
-        bool isLocalResource = resource->hasFlags(Qn::local);
-        bool isExportedLayout = layout->isFile();
-
-        bool allowed = nonVideo || isMediaResource;
-        bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
-        if (!allowed || forbidden)
-            return;
+        return;
     }
 
     QnLayoutItemData data;
@@ -705,13 +688,14 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(QnActions::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
 }
 
-void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
+void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
 
     QnResourceList filtered;
-    foreach(const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page))
+    for (const auto& resource: parameters.resources())
+    {
+        if (menu()->canTrigger(QnActions::OpenInNewWindowAction, resource))
             filtered << resource;
     }
     if (filtered.isEmpty())
@@ -964,29 +948,6 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
 
     if (!dirName.isEmpty())
         menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(dirName));
-}
-
-void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
-    if (!layout)
-        return;
-
-    if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
-        return;
-
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->readFromResource(layout);
-
-    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec() || !dialog->submitToResource(layout))
-        return;
-
-    /* Move layout items to grid center to best fit the background */
-    if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty()) {
-        QnWorkbenchLayout* wlayout = QnWorkbenchLayout::instance(layout);
-        if (wlayout)
-            wlayout->centralizeItems();
-    }
 }
 
 void QnWorkbenchActionHandler::openFailoverPriorityDialog() {
@@ -1730,8 +1691,13 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered()
 {
     QnResourceList resources = menu()->currentParameters(sender()).resources();
 
-    /* Layouts will be removed in their own handler. */
-    resources = resources.filtered([](const QnResourcePtr& resource) { return !resource->hasFlags(Qn::layout); });
+    /* Layouts will be removed in their own handler. Also separately check each resource. */
+    resources = resources.filtered(
+        [this](const QnResourcePtr& resource)
+        {
+            return menu()->canTrigger(QnActions::RemoveFromServerAction, resource)
+                && !resource->hasFlags(Qn::layout);
+        });
 
     if (resources.isEmpty())
         return;
@@ -1772,14 +1738,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
     adjustVideoDialog()->setWidget(widget);
 }
 
-void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
-    QnActionParameters params = menu()->currentParameters(sender());
-    openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
-}
-
-void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
-    openLayoutSettingsDialog(workbench()->currentLayout()->resource());
-}
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(0.0);

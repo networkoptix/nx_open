@@ -56,6 +56,12 @@ public:
     virtual void setParent(const QnResourceTreeModelNodePtr& parent);
     virtual void updateRecursive();
 
+    /** Setup node. Called when its shared pointer is ready. */
+    virtual void initialize();
+
+    /** Cleanup node to make sure it can be destroyed safely. */
+    virtual void deinitialize();
+
     void update();
 
     Qn::NodeType type() const ;
@@ -84,8 +90,12 @@ public:
     void setModified(bool modified) ;
 
 protected:
+    bool isInitialized() const;
 
     QnResourceTreeModel* model() const;
+
+    virtual void handlePermissionsChanged(const QnResourcePtr& resource);
+    virtual QIcon calculateIcon() const;
 
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
@@ -111,6 +121,7 @@ private:
     friend class QnResourceTreeModel;
 
     /* Node state. */
+    bool m_initialized;
 
     /** Model that this node belongs to. */
     QPointer<QnResourceTreeModel> const m_model;
@@ -171,4 +182,5 @@ private:
     } m_editable;
 };
 
-
+QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node);
+QDebug operator<<(QDebug dbg, const QnResourceTreeModelNodePtr& node);

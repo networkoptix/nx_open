@@ -287,10 +287,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         motion                      = 0x10000,      /**< Resource has motion */
         sync                        = 0x20000,      /**< Resource can be used in sync playback mode. */
+
+        /* Server-only flag. */
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+
+        /* Server-only flag. */
         no_last_gop                 = 0x80000,      /**< Do not use last GOP for this when stream is opened */
 
-        deprecated                  = 0x100000,     /**< Resource absent in Server but still used in memory for some reason */
+        /* Client-only flag */
+        fake                        = 0x100000,     /**< Fake server (belonging to other system). */
+
         videowall                   = 0x200000,     /**< Videowall resource */
         desktop_camera              = 0x400000,     /**< Desktop Camera resource */
 
@@ -330,6 +336,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
+        fake_server = remote_server | fake,
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)

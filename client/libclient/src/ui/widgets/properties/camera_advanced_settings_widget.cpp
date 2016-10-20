@@ -16,6 +16,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <ui/common/aligner.h>
+#include <ui/style/webview_style.h>
 #include <ui/widgets/properties/camera_advanced_settings_web_page.h>
 
 #include <vms_gateway_embeddable.h>
@@ -253,57 +254,11 @@ void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 
 void QnCameraAdvancedSettingsWidget::initWebView()
 {
-    //TODO: #GDM use QnWebView
-
+    NxUi::setupWebViewStyle(ui->webView);
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
 
     ui->webView->setContent(tr("Loading...").toUtf8());
-
-    QStyle* style = QStyleFactory().create(lit("fusion"));
-    ui->webView->setStyle(style);
-
-    QPalette palGreenHlText = this->palette();
-
-    // Outline around the menu
-    palGreenHlText.setColor(QPalette::Window, Qt::gray);
-    palGreenHlText.setColor(QPalette::WindowText, Qt::black);
-
-    palGreenHlText.setColor(QPalette::BrightText, Qt::gray);
-    palGreenHlText.setColor(QPalette::BrightText, Qt::black);
-
-    // combo button
-    palGreenHlText.setColor(QPalette::Button, Qt::gray);
-    palGreenHlText.setColor(QPalette::ButtonText, Qt::black);
-
-    // combo menu
-    palGreenHlText.setColor(QPalette::Base, Qt::gray);
-    palGreenHlText.setColor(QPalette::Text, Qt::black);
-
-    // tool tips
-    palGreenHlText.setColor(QPalette::ToolTipBase, Qt::gray);
-    palGreenHlText.setColor(QPalette::ToolTipText, Qt::black);
-
-    palGreenHlText.setColor(QPalette::NoRole, Qt::gray);
-    palGreenHlText.setColor(QPalette::AlternateBase, Qt::gray);
-
-    palGreenHlText.setColor(QPalette::Link, Qt::black);
-    palGreenHlText.setColor(QPalette::LinkVisited, Qt::black);
-
-    // highlight button & menu
-    palGreenHlText.setColor(QPalette::Highlight, Qt::gray);
-    palGreenHlText.setColor(QPalette::HighlightedText, Qt::black);
-
-    // to customize the disabled color
-    palGreenHlText.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
-    palGreenHlText.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
-
-    ui->webView->setPalette(palGreenHlText);
-
-    ui->webView->setAutoFillBackground(true);
-
-    ui->webView->setBackgroundRole(palGreenHlText.Base);
-    ui->webView->setForegroundRole(palGreenHlText.Base);
 
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
         this, [](QNetworkReply* reply, const QList<QSslError> &) { reply->ignoreSslErrors(); });
@@ -311,8 +266,6 @@ void QnCameraAdvancedSettingsWidget::initWebView()
         this, &QnCameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection);
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
         this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
-
-
 }
 
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator)

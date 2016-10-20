@@ -49,11 +49,11 @@ public:
         if (m_cloudSystemId)
             moduleInformation.cloudSystemId = m_cloudSystemId.get();
         handler(
-            nx_http::StatusCode::ok,
-            std::make_unique<nx_http::BufferSource>(
-                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-                QJson::serialized(moduleInformation)),
-            nx_http::ConnectionEvents());
+            nx_http::RequestResult(
+                nx_http::StatusCode::ok,
+                std::make_unique<nx_http::BufferSource>(
+                    Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                    QJson::serialized(moduleInformation))));
     }
 
 private:
