@@ -127,8 +127,10 @@
         <Property Id="SERVER_LOGIN" Value="admin"/>
         
         <!-- Demo only!!! -->
-        <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
-        <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>        
+        <?if NOT $(var.VmsUpgrading) ?>
+            <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
+            <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
+        <?endif?>
         <!-- <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
         <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/> -->
 

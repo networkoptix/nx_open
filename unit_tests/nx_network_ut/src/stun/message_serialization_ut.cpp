@@ -158,7 +158,7 @@ TEST( StunMessageSerialization, CustomIndication )
                nx_api::SerializerState::done );
 
     static const auto MESSAGE = Buffer(
-            "0013" "0018" "2112A442"        // indication 3, lenght=12, magic cookie
+            "00B1" "0018" "2112A442"        // indication 3, lenght=12, magic cookie
         ) + DEFAULT_TID
           + Buffer( "9001" "0006" ) + Buffer( "ua1val" ).toHex().toUpper() + Buffer( "0000" )
           + Buffer( "9002" "0006" ) + Buffer( "ua2val" ).toHex().toUpper() + Buffer( "0000" );

@@ -1161,70 +1161,83 @@ static String x509info(X509& x509)
     return info.replace("/", ", ");
 }
 
-bool SslEngine::useCertificateAndPkey(const String& certData)
+static bool x509load(SslStaticData* sslData, const Buffer& certBytes)
 {
-    Buffer certBytes(certData);
-    const auto data = SslStaticData::instance();
+    const size_t maxChainSize = (size_t) SSL_CTX_get_max_cert_list(sslData->serverContext.get());
+    auto bio = utils::wrapUnique(
+        BIO_new_mem_buf(const_cast<void*>((const void*) certBytes.data()), certBytes.size()),
+        &BIO_free);
+
+    auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+    auto certSize = i2d_X509(x509.get(), 0);
+    if (!x509 || certSize <= 0)
     {
-        auto bio = utils::wrapUnique(
-            BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
-            &BIO_free);
-
-        auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
-        if (!x509)
-        {
-            NX_LOG("SSL: Unable to read primary X509", cl_logDEBUG1);
-            return false;
-        }
-
-        if (!SSL_CTX_use_certificate(data->serverContext.get(), x509.get()))
-        {
-            NX_LOG(lm("SSL: Unable to use primary X509: %1").arg(x509info(*x509)), cl_logWARNING);
-            return false;
-        }
-
-        NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
-        for (size_t chainLength = 1; true; ++chainLength)
-        {
-            NX_CRITICAL(chainLength > 10, "SSL: Certificate chain length is too long.");
-            x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
-            if (!x509)
-                break;
-
-            if (SSL_CTX_add_extra_chain_cert(data->serverContext.get(), x509.get()))
-            {
-                NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
-                x509.release();
-            }
-            else
-            {
-                NX_LOG(lm("SSL: Unable to load chained X509: %1").arg(x509info(*x509)), cl_logWARNING);
-                x509.reset();
-            }
-        }
+        NX_LOG("SSL: Unable to read primary X509", cl_logDEBUG1);
+        return false;
     }
 
+    size_t chainSize = (size_t) certSize;
+    if (!SSL_CTX_use_certificate(sslData->serverContext.get(), x509.get()))
     {
-        auto bio = utils::wrapUnique(
-            BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
-            &BIO_free);
+        NX_LOG(lm("SSL: Unable to use primary X509: %1").arg(x509info(*x509)), cl_logWARNING);
+        return false;
+    }
 
-        data->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
-        if (!data->pkey)
+    NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
+    while (true)
+    {
+        x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+        certSize = i2d_X509(x509.get(), 0);
+        if (!x509 || certSize <= 0)
+            return true;
+
+        chainSize += (size_t) certSize;
+        if (chainSize > maxChainSize)
         {
-            NX_LOG("SSL: Unable to read PKEY", cl_logDEBUG1);
-            return false;
+            NX_ASSERT(false, "SSL: Certificate chain leght is too long");
+            return true;
         }
 
-        if (!SSL_CTX_use_PrivateKey(data->serverContext.get(), data->pkey.get()))
+        if (SSL_CTX_add_extra_chain_cert(sslData->serverContext.get(), x509.get()))
         {
-            NX_LOG("SSL: Unable to use PKEY", cl_logWARNING);
+            NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
+            x509.release();
+        }
+        else
+        {
+            NX_LOG(lm("SSL: Unable to load chained X509: %1").arg(x509info(*x509)), cl_logWARNING);
             return false;
         }
+    }
+}
+
+static bool pKeyLoad(SslStaticData* sslData, const Buffer& certBytes)
+{
+    auto bio = utils::wrapUnique(
+        BIO_new_mem_buf(const_cast<void*>((const void*)certBytes.data()), certBytes.size()),
+        &BIO_free);
+
+    sslData->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
+    if (!sslData->pkey)
+    {
+        NX_LOG("SSL: Unable to read PKEY", cl_logDEBUG1);
+        return false;
+    }
+
+    if (!SSL_CTX_use_PrivateKey(sslData->serverContext.get(), sslData->pkey.get()))
+    {
+        NX_LOG("SSL: Unable to use PKEY", cl_logWARNING);
+        return false;
     }
 
     NX_LOG("SSL: PKEY is loaded (SSL init is complete)", cl_logINFO);
     return true;
+}
+
+bool SslEngine::useCertificateAndPkey(const String& certData)
+{
+    const auto sslData = SslStaticData::instance();
+    return x509load(sslData, certData) && pKeyLoad(sslData, certData);
 }
 
 void SslEngine::useOrCreateCertificate(
