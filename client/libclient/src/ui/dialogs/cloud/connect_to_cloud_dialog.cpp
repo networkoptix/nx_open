@@ -34,24 +34,39 @@
 
 using namespace nx::cdb;
 
-namespace
+namespace {
+QString kCreateAccountPath = lit("/static/index.html#/register");
+
+const int kHeaderFontSizePixels = 15;
+const int kHeaderFontWeight = QFont::DemiBold;
+
+rest::QnConnectionPtr getPublicServerConnection()
 {
-    QString kCreateAccountPath = lit("/static/index.html#/register");
-
-    const int kHeaderFontSizePixels = 15;
-    const int kHeaderFontWeight = QFont::DemiBold;
-
-    rest::QnConnectionPtr getPublicServerConnection()
+    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
     {
-        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
-        {
-            if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
-                continue;
+        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+            continue;
 
-            return server->restConnection();
-        }
-        return rest::QnConnectionPtr();
+        return server->restConnection();
     }
+    return rest::QnConnectionPtr();
+}
+
+void showFailureImpl(const QString &message, int helpTopicId, QWidget *parent)
+{
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
+        helpTopicId,
+        QnConnectToCloudDialog::tr("Error"),
+        QnConnectToCloudDialog::tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
+        QDialogButtonBox::Ok,
+        parent);
+
+    if (!message.isEmpty())
+        messageBox.setInformativeText(message);
+
+    messageBox.exec();
+}
+
 }
 
 class QnConnectToCloudDialogPrivate : public QObject
@@ -68,9 +83,9 @@ public:
     void lockUi(bool locked);
     void bindSystem();
 
-    void showSuccess();
-    void showFailure(const QString &message = QString());
     void showCredentialsError(bool show);
+
+    void showFailure(const QString& message);
 
 private:
     void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
@@ -250,38 +265,6 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     });
 }
 
-void QnConnectToCloudDialogPrivate::showSuccess()
-{
-    Q_Q(QnConnectToCloudDialog);
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            q->windowTitle(),
-                            tr("The system is successfully connected to %1").arg(q->ui->loginInputField->text().trimmed()),
-                            QDialogButtonBox::Ok,
-                            q->parentWidget());
-
-    messageBox.exec();
-    linkedSuccessfully = true;
-    q->accept();
-}
-
-void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
-{
-    Q_Q(QnConnectToCloudDialog);
-
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
-                            QDialogButtonBox::Ok,
-                            q);
-
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
-}
-
 void QnConnectToCloudDialogPrivate::at_bindFinished(
         api::ResultCode result,
         const api::SystemData &systemData,
@@ -312,28 +295,49 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
-    {
-        Q_UNUSED(handleId)
+    QPointer<QnConnectToCloudDialogPrivate> guard(this);
+    QPointer<QnConnectToCloudDialog> parentGuard(q);
+    auto handleReply =
+        [guard = QPointer<QnConnectToCloudDialogPrivate>(this),
+            parentGuard = QPointer<QnConnectToCloudDialog>(q),
+            stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked(),
+            cloudLogin = q->ui->loginInputField->text().trimmed(),
+            cloudPassword = q->ui->passwordInputField->text().trimmed(),
+            windowTitle = q->windowTitle(),
+            helpTopicId = helpTopic(q)]
 
-        if (!success || (reply.error != QnRestResult::NoError))
+            (bool success, rest::Handle handleId, const QnRestResult& reply)
         {
-            showFailure(reply.errorString);
-            return;
-        }
+            Q_UNUSED(handleId)
 
-        const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
-        if (stayLoggedIn)
-        {
-            qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
-            qnClientCoreSettings->setCloudPassword(q->ui->passwordInputField->text().trimmed());
-            qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
-                q->ui->loginInputField->text().trimmed(),
-                q->ui->passwordInputField->text().trimmed()));
-        }
+            if (!success || (reply.error != QnRestResult::NoError))
+            {
+                showFailureImpl(reply.errorString, helpTopicId, parentGuard);
+                return;
+            }
 
-        showSuccess();
-    };
+            if (stayLoggedIn)
+            {
+                qnClientCoreSettings->setCloudLogin(cloudLogin);
+                qnClientCoreSettings->setCloudPassword(cloudPassword);
+                qnCloudStatusWatcher->setCloudCredentials(QnCredentials(cloudLogin, cloudPassword));
+            }
+
+            QnMessageBox messageBox(QnMessageBox::NoIcon,
+                helpTopicId,
+                windowTitle,
+                QnConnectToCloudDialog::tr("The system is successfully connected to %1").arg(cloudLogin),
+                QDialogButtonBox::Ok,
+                parentGuard);
+
+            messageBox.exec();
+
+            if (guard)
+                guard->linkedSuccessfully = true;
+
+            if (parentGuard)
+                parentGuard->accept();
+        };
 
     connection->saveCloudSystemCredentials(
         QString::fromStdString(systemData.id),
@@ -341,4 +345,11 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         q->ui->loginInputField->text().trimmed(),
         handleReply,
         q->thread());
+}
+
+
+void QnConnectToCloudDialogPrivate::showFailure(const QString& message)
+{
+    Q_Q(QnConnectToCloudDialog);
+    showFailureImpl(message, helpTopic(q), q);
 }
