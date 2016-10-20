@@ -355,6 +355,7 @@ void QnCloudStatusWatcher::updateSystems()
                     {
                         case api::ResultCode::ok:
                             d->setCloudSystems(cloudSystems);
+                            d->setRecentCloudSystems(cloudSystems);
                             d->setStatus(QnCloudStatusWatcher::Online,
                                 QnCloudStatusWatcher::NoError);
                             break;
