@@ -498,21 +498,26 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
     QnModuleInformation moduleInformation;
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.sslAllowed = false;
-    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
+    moduleInformation.sslAllowed = m_sslAllowed;
     moduleInformation.name = getName();
+    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
     if (hasProperty(safeModePropertyName))
-        moduleInformation.ecDbReadOnly = QnLexical::deserialized(getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+    {
+        moduleInformation.ecDbReadOnly = QnLexical::deserialized(
+            getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+    }
 
+    moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
     moduleInformation.systemName = qnGlobalSettings->systemName();
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
     moduleInformation.systemInformation = getSystemInfo();
     moduleInformation.serverFlags = getServerFlags();
+    moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
 
     return moduleInformation;
 }
