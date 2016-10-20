@@ -34,7 +34,8 @@ public:
         ec2::ErrorCode errorCode);
 
 private:
-    static bool checkApplaucherRunning();
+    static bool getInstalledVersions(QList<QnSoftwareVersion>* versions);
+    static Qn::ConnectionResult showApplauncherError(QWidget* parentWidget, const QString& details);
 
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,
