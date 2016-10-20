@@ -129,7 +129,7 @@ const QnVirtualCameraResourceList& QnBackupSettingsDialog::camerasToBackup() con
 void QnBackupSettingsDialog::setCamerasToBackup(const QnVirtualCameraResourceList& cameras)
 {
     m_camerasToBackup = cameras;
-    ui->backupResourcesButton->selectFew(cameras);
+    ui->backupResourcesButton->selectDevices(cameras);
 }
 
 bool QnBackupSettingsDialog::backupNewCameras() const

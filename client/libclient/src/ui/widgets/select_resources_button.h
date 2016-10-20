@@ -16,20 +16,9 @@ class QnSelectResourcesButton : public QPushButton
 public:
     QnSelectResourcesButton(QWidget* parent = nullptr);
 
-    void selectOne(const QnResourcePtr& one);
-
     void selectAny();
     void selectAll();
-
-    template<class ResourceListType>
-    void selectFew(const ResourceListType& few)
-    {
-        int count = few.size();
-        if (count == 1)
-            setAppearance(appearanceForResource(few[0]));
-        else
-            setAppearance(appearanceForSelected(count));
-    }
+    void selectNone();
 
     struct SingleSelectionParameters
     {
@@ -50,12 +39,24 @@ protected:
         QString text;
     };
 
-    virtual Appearance appearanceForAny() = 0;
-    virtual Appearance appearanceForAll() = 0;
-    virtual Appearance appearanceForSelected(int count) = 0;
+    /* PURE VIRTUAL OVERRIDABLES: */
+    virtual Appearance appearanceForAny() const = 0;
+    virtual Appearance appearanceForAll() const = 0;
+    virtual Appearance appearanceForSelected(int count) const = 0;
 
-    virtual Appearance appearanceForResource(const QnResourcePtr& resource);
+    virtual Appearance appearanceForResource(const QnResourcePtr& resource) const;
 
+    template<class ResourceListType>
+    void selectList(const ResourceListType& list)
+    {
+        int count = list.size();
+        if (count == 1)
+            setAppearance(appearanceForResource(list[0]));
+        else
+            setAppearance(appearanceForSelected(count));
+    }
+
+private:
     void setAppearance(const Appearance& appearance);
 
 private:
@@ -72,11 +73,12 @@ class QnSelectDevicesButton : public QnSelectResourcesButton
 
 public:
     QnSelectDevicesButton(QWidget* parent = nullptr);
+    void selectDevices(const QnVirtualCameraResourceList& devices);
 
 protected:
-    virtual Appearance appearanceForAny() override;
-    virtual Appearance appearanceForAll() override;
-    virtual Appearance appearanceForSelected(int count) override;
+    virtual Appearance appearanceForAny() const override;
+    virtual Appearance appearanceForAll() const override;
+    virtual Appearance appearanceForSelected(int count) const override;
 };
 
 /**
@@ -89,11 +91,12 @@ class QnSelectUsersButton : public QnSelectResourcesButton
 
 public:
     QnSelectUsersButton(QWidget* parent = nullptr);
+    void selectUsers(const QnUserResourceList& users);
 
 protected:
-    virtual Appearance appearanceForAny() override;
-    virtual Appearance appearanceForAll() override;
-    virtual Appearance appearanceForSelected(int count) override;
+    virtual Appearance appearanceForAny() const override;
+    virtual Appearance appearanceForAll() const override;
+    virtual Appearance appearanceForSelected(int count) const override;
 };
 
 /**
@@ -106,9 +109,10 @@ class QnSelectServersButton : public QnSelectResourcesButton
 
 public:
     QnSelectServersButton(QWidget* parent = nullptr);
+    void selectServers(const QnMediaServerResourceList& servers);
 
 protected:
-    virtual Appearance appearanceForAny() override;
-    virtual Appearance appearanceForAll() override;
-    virtual Appearance appearanceForSelected(int count) override;
+    virtual Appearance appearanceForAny() const override;
+    virtual Appearance appearanceForAll() const override;
+    virtual Appearance appearanceForSelected(int count) const override;
 };
