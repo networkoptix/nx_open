@@ -52,21 +52,6 @@ rest::QnConnectionPtr getPublicServerConnection()
     return rest::QnConnectionPtr();
 }
 
-void showFailureImpl(const QString &message, int helpTopicId, QWidget *parent)
-{
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-        helpTopicId,
-        QnConnectToCloudDialog::tr("Error"),
-        QnConnectToCloudDialog::tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
-        QDialogButtonBox::Ok,
-        parent);
-
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
-}
-
 }
 
 class QnConnectToCloudDialogPrivate : public QObject
@@ -86,6 +71,8 @@ public:
     void showCredentialsError(bool show);
 
     void showFailure(const QString& message);
+
+    void showSuccess(const QString& cloudLogin);
 
 private:
     void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
@@ -265,6 +252,38 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     });
 }
 
+void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
+{
+    Q_Q(QnConnectToCloudDialog);
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
+        helpTopic(q),
+        q->windowTitle(),
+        tr("The system is successfully connected to %1").arg(cloudLogin),
+        QDialogButtonBox::Ok,
+        q->parentWidget());
+
+    messageBox.exec();
+    linkedSuccessfully = true;
+    q->accept();
+}
+
+void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
+{
+    Q_Q(QnConnectToCloudDialog);
+
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
+        helpTopic(q),
+        tr("Error"),
+        tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
+        QDialogButtonBox::Ok,
+        q);
+
+    if (!message.isEmpty())
+        messageBox.setInformativeText(message);
+
+    messageBox.exec();
+}
+
 void QnConnectToCloudDialogPrivate::at_bindFinished(
         api::ResultCode result,
         const api::SystemData &systemData,
@@ -295,10 +314,9 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    QPointer<QnConnectToCloudDialogPrivate> guard(this);
-    QPointer<QnConnectToCloudDialog> parentGuard(q);
     auto handleReply =
-        [guard = QPointer<QnConnectToCloudDialogPrivate>(this),
+        [this,
+            guard = QPointer<QnConnectToCloudDialogPrivate>(this),
             parentGuard = QPointer<QnConnectToCloudDialog>(q),
             stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked(),
             cloudLogin = q->ui->loginInputField->text().trimmed(),
@@ -306,13 +324,11 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             windowTitle = q->windowTitle(),
             helpTopicId = helpTopic(q)]
 
-            (bool success, rest::Handle handleId, const QnRestResult& reply)
+            (bool success, rest::Handle /* handleId */, const QnRestResult& reply)
         {
-            Q_UNUSED(handleId)
-
-            if (!success || (reply.error != QnRestResult::NoError))
+            if (guard && parentGuard && (!success || (reply.error != QnRestResult::NoError)))
             {
-                showFailureImpl(reply.errorString, helpTopicId, parentGuard);
+                showFailure(reply.errorString);
                 return;
             }
 
@@ -323,20 +339,8 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
                 qnCloudStatusWatcher->setCloudCredentials(QnCredentials(cloudLogin, cloudPassword));
             }
 
-            QnMessageBox messageBox(QnMessageBox::NoIcon,
-                helpTopicId,
-                windowTitle,
-                QnConnectToCloudDialog::tr("The system is successfully connected to %1").arg(cloudLogin),
-                QDialogButtonBox::Ok,
-                parentGuard);
-
-            messageBox.exec();
-
-            if (guard)
-                guard->linkedSuccessfully = true;
-
-            if (parentGuard)
-                parentGuard->accept();
+            if (guard && parentGuard)
+                showSuccess(cloudLogin);
         };
 
     connection->saveCloudSystemCredentials(
@@ -345,11 +349,4 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         q->ui->loginInputField->text().trimmed(),
         handleReply,
         q->thread());
-}
-
-
-void QnConnectToCloudDialogPrivate::showFailure(const QString& message)
-{
-    Q_Q(QnConnectToCloudDialog);
-    showFailureImpl(message, helpTopic(q), q);
 }
