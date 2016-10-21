@@ -7,17 +7,17 @@ from django.core.exceptions import ValidationError
 from cloud import settings
 
 
-def check_api_secret(func):
+def check_secret(func):
     def handler(*args, **kwargs):
         request = args[0]
 
-        if 'api_secret' not in request.data or not request.data['api_secret']:
-            raise APINotAuthorisedException('No api_secret provided', ErrorCodes.forbidden)
+        if 'secret' not in request.data or not request.data['secret']:
+            raise APINotAuthorisedException('No secret provided', ErrorCodes.forbidden)
 
-        key = request.data['api_secret']
+        key = request.data['secret']
 
-        if key != settings.CLOUD_CONNECT['api_secret']:
-            raise APINotAuthorisedException('Wrong api_secret provided', ErrorCodes.forbidden)
+        if key != settings.CLOUD_CONNECT['secret']:
+            raise APINotAuthorisedException('Wrong secret provided', ErrorCodes.forbidden)
 
         return func(*args, **kwargs)
     return handler
@@ -26,7 +26,7 @@ def check_api_secret(func):
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-@check_api_secret  # @ip_allow_only('local')
+@check_secret  # @ip_allow_only('local')
 def send_notification(request):
     try:
         validation_error = False
