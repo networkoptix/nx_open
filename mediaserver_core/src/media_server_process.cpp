@@ -1379,35 +1379,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     processor->startReceivingLocalNotifications(connection);
 }
 
-void MediaServerProcess::resetCloudParams(CloudConnectionManager& cloudConnectionManager)
-{
-    while (1)
-    {
-        auto adminUser = qnResPool->getAdministrator();
-        if (adminUser)
-        {
-            PasswordData data;
-            data.password = QnServer::kDefaultAdminPassword;
-            if (!updateUserCredentials(data, QnOptionalBool(true), adminUser, nullptr))
-            {
-                qWarning() << "Error while clearing cloud information. Trying again...";
-                QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-                continue;
-            }
-            qWarning() << "Enable admin user and reset its password to default value due to automatic cloud disconnect and admin user was disabled";
-        }
-
-        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
-        {
-            qWarning() << "Error while clearing cloud information. Trying again...";
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            continue;
-        }
-
-        break;
-    }
-}
-
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
     if (isStopping())
@@ -1856,22 +1827,44 @@ void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& clo
     qnGlobalSettings->setSystemName(systemName.value());
 
     if (systemName.isDefault())
-        resetCloudParams(cloudConnectionManager);
-
-    auto generateLocalId = [systemName]()
+    {
+        resetSystemState(cloudConnectionManager);
+    }
+    else
     {
         QString serverKey;
         for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
             serverKey = qMax(serverKey, server->getAuthKey());
-        return guidFromArbitraryData(systemName.value() + serverKey);
-    };
+        const auto generatedLocalSystemId = guidFromArbitraryData(systemName.value() + serverKey);
 
-    qnGlobalSettings->setLocalSystemId(
-        systemName.isDefault() ? QnUuid() : generateLocalId());
+        qnGlobalSettings->setLocalSystemId(generatedLocalSystemId);
+    }
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
     qnGlobalSettings->synchronizeNow();
+}
+
+void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
+{
+    for (;;)
+    {
+        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
+        {
+            qWarning() << "Error while clearing cloud information. Trying again...";
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            continue;
+        }
+
+        if (!resetSystemToStateNew())
+        {
+            qWarning() << "Error while resetting system to state \"new \". Trying again...";
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            continue;
+        }
+
+        break;
+    }
 }
 
 void MediaServerProcess::run()
@@ -2413,8 +2406,8 @@ void MediaServerProcess::run()
             if (isCloudInstanceChanged)
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
                     "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
-            resetCloudParams(cloudConnectionManager);
-            qnGlobalSettings->setLocalSystemId(QnUuid()); //< go to new state
+
+            resetSystemState(cloudConnectionManager);
         }
         if (isCloudInstanceChanged)
         {

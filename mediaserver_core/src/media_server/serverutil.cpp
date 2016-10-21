@@ -29,7 +29,6 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
@@ -37,6 +36,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <api/resource_property_adaptor.h>
+
+#include "server_connector.h"
+#include "server/server_globals.h"
 
 namespace
 {
@@ -279,19 +281,14 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
 
 bool resetSystemToStateNew()
 {
-    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Resetting system to a "new" state.
+    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Marking system as a "new".
     if (!qnGlobalSettings->synchronizeNowSync())
         return false;
 
     auto adminUserResource = qnResPool->getAdministrator();
-    adminUserResource->setPassword(lit("admin"));
-    adminUserResource->setEnabled(true);
-
-    ec2::ApiUserData adminUser;
-    ec2::fromResourceToApi(adminUserResource, adminUser);
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    return connection->getUserManager(Qn::kSystemAccess)->saveSync(adminUser)
-        == ec2::ErrorCode::ok;
+    PasswordData data;
+    data.password = QnServer::kDefaultAdminPassword;
+    return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 
 // -------------- nx::ServerSetting -----------------------
