@@ -26,17 +26,17 @@ public:
         connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
 
         connect(qnResPool, &QnResourcePool::resourceAdded,   this,
-            [this, signal, receiver, slot](const QnResourcePtr &resource)
+            [signal, receiver, slot](const QnResourcePtr &resource)
             {
                 if (const ResourceClassPtr &target = resource.dynamicCast<ResourceClass>())
                     connect(target, signal, receiver, slot);
             });
 
         connect(qnResPool, &QnResourcePool::resourceRemoved, this,
-            [this, signal, receiver, slot](const QnResourcePtr &resource)
+            [signal, receiver, slot](const QnResourcePtr &resource)
             {
                 if (const ResourceClassPtr &target = resource.dynamicCast<ResourceClass>())
-                    disconnect(target, signal, receiver, slot);
+                    Qn::disconnect(target, signal, receiver, slot);
             });
 
         for (const ResourceClassPtr &target: qnResPool->getResources<ResourceClass>())
