@@ -56,6 +56,8 @@ public:
         func(it == m_connections.end() ? nullptr : it->second.connection.get());
     }
 
+    void closeAllConnections();
+
 private:
     struct ConnectionContext
     {

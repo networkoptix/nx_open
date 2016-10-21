@@ -287,7 +287,7 @@ int CloudDBProcess::exec()
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
-        // This is actually a main loop.
+        // This is actually the main loop.
         m_processTerminationEvent.get_future().wait();
 
         // First of all, cancelling accepting new requests.

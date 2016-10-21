@@ -124,16 +124,32 @@ void CloudConnectionManager::processCloudErrorCode(
             .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
 
         //system has been disconnected from cloud: cleaning up cloud credentials...
-        if (!cleanUpCloudDataInLocalDb())
+        if (!detachFromCloudSilently())
         {
             NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         }
     }
 }
 
+bool CloudConnectionManager::detachFromCloudSilently()
+{
+    auto adminUser = qnResPool->getAdministrator();
+    if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
+    {
+        if (!resetSystemToStateNew())
+        {
+            NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
+            return false;
+        }
+    }
+
+    return cleanUpCloudDataInLocalDb();
+}
+
 bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
 {
     qnGlobalSettings->resetCloudParams();
+
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);

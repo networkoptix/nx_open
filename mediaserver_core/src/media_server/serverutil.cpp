@@ -29,7 +29,6 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
@@ -37,6 +36,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <api/resource_property_adaptor.h>
+
+#include "server_connector.h"
+#include "server/server_globals.h"
 
 namespace
 {
@@ -275,6 +277,18 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
         resumeConnectionsToRemotePeers();
 
     return true;
+}
+
+bool resetSystemToStateNew()
+{
+    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Marking system as a "new".
+    if (!qnGlobalSettings->synchronizeNowSync())
+        return false;
+
+    auto adminUserResource = qnResPool->getAdministrator();
+    PasswordData data;
+    data.password = QnServer::kDefaultAdminPassword;
+    return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 
 // -------------- nx::ServerSetting -----------------------

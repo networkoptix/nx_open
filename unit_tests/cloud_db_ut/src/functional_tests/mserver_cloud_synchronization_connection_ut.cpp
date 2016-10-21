@@ -98,5 +98,33 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
     ASSERT_EQ(maxAllowedConcurrentConnections, activeConnections);
 }
 
+TEST_F(Ec2MserverCloudSynchronizationConnection, checking_connection_blink_stability)
+{
+    constexpr int maxConcurrentConnectionsToCreate = 50;
+    constexpr auto delayBeforeCheckingConnectionState = std::chrono::seconds(3);
+    constexpr auto testRunTime = std::chrono::seconds(10);
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system = addRandomSystemToAccount(account);
+
+    const auto runUntil = std::chrono::steady_clock::now() + testRunTime;
+    while (std::chrono::steady_clock::now() < runUntil)
+    {
+        std::vector<int> connectionIds;
+        for (int i = 0; i < maxConcurrentConnectionsToCreate; ++i)
+            connectionIds.push_back(
+                connectionHelper.establishTransactionConnection(
+                    endpoint(),
+                    system.id,
+                    system.authKey));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        connectionHelper.closeAllConnections();
+    }
+}
+
 } // namespace cdb
 } // namespace nx

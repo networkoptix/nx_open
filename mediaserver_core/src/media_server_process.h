@@ -93,8 +93,9 @@ private:
     void dumpSystemUsageStats();
     void saveAdminPswdHash();
     bool isStopping() const;
-    void resetCloudParams(CloudConnectionManager& cloudConnectionManager);
     void migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager);
+    void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+
 private:
     int m_argc;
     char** m_argv;

@@ -171,7 +171,7 @@ void AccountManager::getAccount(
         return;
     }
 
-    //very strange: account has been authenticated, but not found in the database
+    // Very strange. Account has been authenticated, but not found in cache.
     completionHandler(api::ResultCode::notFound, data::AccountData());
 }
 
@@ -693,6 +693,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
     }
 
     notification->setActivationCode(resultData->code);
+    notification->setSecret(m_settings.notification().secret.toStdString());
     notification->setAddressee(accountEmail);
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, notification = std::move(notification)]()

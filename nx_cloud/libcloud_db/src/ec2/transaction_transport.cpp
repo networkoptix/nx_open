@@ -89,7 +89,7 @@ TransactionTransport::~TransactionTransport()
 void TransactionTransport::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    ParentType::bindToAioThread(aioThread);
 
     m_transactionLogReader->bindToAioThread(aioThread);
     m_inactivityTimer->bindToAioThread(aioThread);
@@ -97,7 +97,8 @@ void TransactionTransport::bindToAioThread(
 
 void TransactionTransport::stopWhileInAioThread()
 {
-    close();
+    ParentType::stopWhileInAioThread();
+
     m_transactionLogReader.reset();
     m_inactivityTimer.reset();
 }

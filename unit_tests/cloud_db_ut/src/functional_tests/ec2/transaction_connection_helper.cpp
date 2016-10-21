@@ -16,6 +16,7 @@ TransactionConnectionHelper::TransactionConnectionHelper():
 
 TransactionConnectionHelper::~TransactionConnectionHelper()
 {
+    closeAllConnections();
     m_aioTimer.pleaseStopSync();
 }
 
@@ -124,6 +125,17 @@ bool TransactionConnectionHelper::isConnectionActive(
     return state == ::ec2::QnTransactionTransportBase::Connected
         || state == ::ec2::QnTransactionTransportBase::NeedStartStreaming
         || state == ::ec2::QnTransactionTransportBase::ReadyForStreaming;
+}
+
+void TransactionConnectionHelper::closeAllConnections()
+{
+    QnMutexLocker lk(&m_mutex);
+    auto connections = std::move(m_connections);
+    m_connections.clear();
+    lk.unlock();
+
+    for (auto& connectionContext: connections)
+        connectionContext.second.connection->pleaseStopSync();
 }
 
 ec2::ApiPeerData TransactionConnectionHelper::localPeer() const

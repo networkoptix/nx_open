@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include <nx/utils/log/assert.h>
 
+// Current version of google test doesn't support it for WIN32
+#ifndef Q_OS_WIN32
+
 #ifdef _DEBUG
 TEST(NxExpect, All3)
 #else
@@ -29,3 +32,5 @@ TEST(NxCritical, All3)
     EXPECT_DEATH(NX_CRITICAL(false, "oops"), "");
     EXPECT_DEATH(NX_CRITICAL(false, "here", "oops"), "");
 }
+
+#endif // Q_OS_WIN32
