@@ -9,6 +9,22 @@ class FlirWsIOManager : public QObject, public QnAbstractIOManager
 {
     Q_OBJECT
 
+    struct FlirAlarmNotification
+    {
+        int deviceId;
+        int health;
+        int lastBIT;
+        quint64 timestamp;
+        int deviceType;
+        int sourceIndex;
+        int sourceName;
+        int timestamp2;
+        double latitude;
+        double longitude;
+        double altitude;
+        int autoacknowledge;
+    };
+
 public:
     FlirWsIOManager();
 
@@ -46,7 +62,11 @@ private:
     bool initiateWsConnection();
     void requestControlToken();
     qint64 parseControlMessage(const QString& message);
-    void parseNotification(const QString& message);
+
+    QString buildNotificationSubsctionString(const QString& subscriptionType);
+    void subscribeToNotifications();
+    FlirAlarmNotification parseNotification(const QString& message);
+
     void sendKeepAlive();
 
 private:

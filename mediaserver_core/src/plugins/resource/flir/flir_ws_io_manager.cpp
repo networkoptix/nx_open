@@ -3,10 +3,33 @@
 #include "flir_ws_io_manager.h"
 
 namespace {
-    const QString kCommandPrefix = lit("Nexus.cgi?action=");
+    const QString kConfigurationFile("/api/server/status/full");
+    const QString kControlPrefix = lit("Nexus.cgi?action=");
+    const QString kSubscriptionPrefix = lit("NexusWS_Status.cgi?");
     const QString kServerWhoAmICommand = lit("SERVERWhoAmI");
+
     const QString kSessionParamName = lit("session");
+    const QString kSubscriptionNumParamName = lit("numSubscriptions");
+    const QString kNotificationFormatParamName = lit("NotificationFormat");
+
+    const QString kJsonNotificationFormat = lit("JSON");
+    const QString kStringNotificationFormat = lit("String");
+
     const std::chrono::milliseconds kKeepAliveTimeout(10000);
+    const std::chrono::milliseconds kMinNotificationInterval(500);
+    const std::chrono::milliseconds kMaxNotificationInterval(500);
+
+    const int kAnyDevice = -1;
+    const QString kAlarmSubscription = lit("ALARM");
+    const QString kIOSubscription = lit("IO");
+    const QString kThgSpotSubscription = lit("THGSPOT");
+    const QString kThgAreaSubscription = lit("THGAREA");
+
+    const int kMdDeviceType = 12;
+    const int kIODeviceType = 28;
+    const int kThgSpotDeviceType = 53;
+    const int kThgAreaDeviceType = 54;
+
 } //< anonymous namespace
 
 using namespace nx::utils;
@@ -143,13 +166,11 @@ void FlirWsIOManager::requestControlToken()
     if (!m_monitoringIsInProgress)
         return;
 
-    auto message = kCommandPrefix + kServerWhoAmICommand;
+    auto message = kControlPrefix + kServerWhoAmICommand;
 
     auto paresResponseAndScheduleKeepAlive = [this](const QString& message)
         {
-            //TODO: #dmishin parse response
-            m_nexusSessionId = parseControlMessage(message);
-            TimerManager::instance()->addTimer(
+            auto sendKeepAliveWrapper =
                 [this](nx::utils::TimerId timerId)
                 {
                     if (timerId != m_timerId)
@@ -158,7 +179,11 @@ void FlirWsIOManager::requestControlToken()
                     // It's QObject::disconnect, does not related to some "network disconnect"
                     m_controlWebSocket->disconnect();
                     sendKeepAlive();
-                },
+                };
+
+            m_nexusSessionId = parseControlMessage(message);
+            TimerManager::instance()->addTimer(
+                sendKeepAliveWrapper,
                 kKeepAliveTimeout);
         };
 
@@ -175,9 +200,41 @@ qint64 FlirWsIOManager::parseControlMessage(const QString& message)
     return 1;
 }
 
-void FlirWsIOManager::parseNotification(const QString& message)
+QString FlirWsIOManager::buildNotificationSubsctionString(const QString& subscriptionType)
 {
+    const int kPeriodicNotificationsMode = 0;
 
+    auto subscriptionString = lit("%1,%2,%3,%4,%5")
+        .arg(subscriptionType)
+        .arg(kAnyDevice)
+        .arg(kMinNotificationInterval.count())
+        .arg(kMaxNotificationInterval.count())
+        .arg(kPeriodicNotificationsMode);
+
+    return subscriptionString;
+}
+
+void FlirWsIOManager::subscribeToNotifications()
+{
+    QUrlQuery query;
+
+    const int kSubscriptionNumber = 1;
+
+    query.addQueryItem(kSessionParamName, QString::number(m_nexusSessionId));
+    query.addQueryItem(kSubscriptionNumParamName, QString::number(kSubscriptionNumber));
+    query.addQueryItem(kNotificationFormatParamName, kStringNotificationFormat);
+    query.addQueryItem(lit("subscription1"), buildNotificationSubsctionString(kAlarmSubscription));
+
+    auto subscriptionMessage = kSubscriptionPrefix + query.toString();
+
+    auto bytesSent = m_notificationWebSocket->sendTextMessage(subscriptionMessage);
+    //TODO: #dmishin check number of sent bytes
+}
+
+FlirWsIOManager::FlirAlarmNotification FlirWsIOManager::parseNotification(const QString& message)
+{
+    FlirAlarmNotification notification;
+    return notification;
 }
 
 void FlirWsIOManager::sendKeepAlive()
@@ -186,7 +243,7 @@ void FlirWsIOManager::sendKeepAlive()
         return;
 
     auto keepAliveMessage = lit("%1%2&%3=%4")
-        .arg(kCommandPrefix)
+        .arg(kControlPrefix)
         .arg(kServerWhoAmICommand)
         .arg(kSessionParamName)
         .arg(m_nexusSessionId);
@@ -194,13 +251,16 @@ void FlirWsIOManager::sendKeepAlive()
     auto bytesSent = m_controlWebSocket->sendTextMessage(keepAliveMessage);
     //TODO: #dmishin check number of sent bytes;
 
-    m_timerId = TimerManager::instance()->addTimer(
+    auto sendKeepAliveWrapper =
         [this](nx::utils::TimerId timerId)
         {
             if (timerId != m_timerId)
                 return;
 
             sendKeepAlive();
-        },
+        };
+
+    m_timerId = TimerManager::instance()->addTimer(
+        sendKeepAliveWrapper,
         kKeepAliveTimeout);
 }
