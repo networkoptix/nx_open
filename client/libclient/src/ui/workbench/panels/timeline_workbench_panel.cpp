@@ -145,9 +145,11 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_showWidget);
     m_hidingProcessor->addTargetItem(item->timeSlider()->toolTipItem());
     m_hidingProcessor->addTargetItem(item->timeSlider()->bookmarksViewer());
+    m_hidingProcessor->addTargetItem(item->speedSlider()->toolTipItem());
+    m_hidingProcessor->addTargetItem(item->volumeSlider()->toolTipItem());
     m_hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
             /* Do not auto-hide slider if we have opened context menu. */
@@ -272,8 +274,6 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateGeometry();
-
-
 }
 
 bool TimelineWorkbenchPanel::isPinned() const
@@ -316,6 +316,12 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_resizerWidget->setEnabled(opened);
     item->timeSlider()->setTooltipVisible(opened);
+
+    if (!opened)
+    {
+        item->speedSlider()->hideToolTip();
+        item->volumeSlider()->hideToolTip();
+    }
 
     emit openedChanged(opened, animate);
 }
