@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/panels/buttons.h>
 
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -79,6 +80,19 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_widget->installEventFilter(item);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &CalendarWorkbenchPanel::updateControlsGeometry);
+
+    /* Hide pin/unpin button when any child line edit is visible: */
+    auto showHideSignalizer = new QnMultiEventSignalizer(this);
+    showHideSignalizer->addEventType(QEvent::Show);
+    showHideSignalizer->addEventType(QEvent::Hide);
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+        [this](QObject* object, QEvent* event)
+        {
+            m_pinButton->setVisible(event->type() == QEvent::Hide);
+        });
+
+    for (auto lineEdit : m_widget->findChildren<QLineEdit*>())
+        lineEdit->installEventFilter(showHideSignalizer);
 
     action(QnActions::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);
@@ -155,7 +169,7 @@ void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
     action(QnActions::ToggleCalendarAction)->setEnabled(enabled);
     if (!isOpened())
         return;
-   
+
     if (enabled)
     {
         /* Minor hack to make animation look better. */
