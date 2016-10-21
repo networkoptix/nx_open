@@ -684,16 +684,6 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
-    /* Make sure scheduled backup will stop in no backup storages left after 'Apply' button. */
-    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo& info)
-    {
-        return info.isBackup;
-    });
-    if (!backupStoragesExist)
-    {
-        m_backupSchedule.backupType = Qn::Backup_Manual;
-    }
-
     if (m_backupSchedule != m_server->getBackupSchedule())
     {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr& server)
