@@ -1509,6 +1509,15 @@
                     "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
                 ]
             }
+        },
+        {
+            "keys": [
+                "DW|DWC-MV950TIR","DW|DWC-MB950TIR"
+            ],
+            "forcedDefaultCredentials": {
+                "user": "root",
+                "password": "pass"
+            }
         }
     ]
 }
