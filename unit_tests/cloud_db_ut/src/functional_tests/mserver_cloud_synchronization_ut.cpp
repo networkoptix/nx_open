@@ -40,7 +40,7 @@ TEST_F(Ec2MserverCloudSynchronization, general)
         testSynchronizingUserFromMediaServerToCloud();
 
         if (i == 0)
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
     }
 }
 
@@ -295,7 +295,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
             appserver2()->moduleInstance()->ecConnection()
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
             ASSERT_EQ(api::ResultCode::ok, unbindSystem());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
             ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
         }
     }
@@ -335,7 +335,7 @@ TEST_F(Ec2MserverCloudSynchronization, newTransactionTimestamp)
         {
             appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
 
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
 
             api::SystemSharing sharing;
             sharing.accountEmail = testAccount.email;
@@ -365,7 +365,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
         {
             appserver2()->moduleInstance()->ecConnection()
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
             appserver2()->moduleInstance()->ecConnection()
                 ->addRemotePeer(cdbEc2TransactionUrl());
         }
@@ -509,7 +509,7 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
         {
             appserver2()->moduleInstance()->ecConnection()
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
             appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
         }
 
