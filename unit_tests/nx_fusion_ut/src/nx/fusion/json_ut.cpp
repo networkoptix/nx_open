@@ -49,3 +49,19 @@ TEST_F(QnFusionTestFixture, flagsValue)
     ASSERT_EQ(value, QJson::serialized(flags));
     ASSERT_EQ(flags, QJson::deserialized<nx::TestFlags>(value));
 }
+
+TEST_F(QnFusionTestFixture, invalidFlagsLexical)
+{
+    const auto value = str("Flag7");
+    nx::TestFlags flags = nx::Flag0;
+    ASSERT_FALSE(QJson::deserialize(value, &flags));
+    ASSERT_EQ(nx::Flag0, flags);
+}
+
+TEST_F(QnFusionTestFixture, flagsNumeric)
+{
+    const auto value = str("3");
+    nx::TestFlags flags = nx::Flag0;
+    ASSERT_TRUE(QJson::deserialize(value, &flags));
+    ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
+}
