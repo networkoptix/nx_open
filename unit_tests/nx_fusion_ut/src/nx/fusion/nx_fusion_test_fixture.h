@@ -10,3 +10,18 @@ protected:
     virtual void SetUp();
     virtual void TearDown();
 };
+
+namespace nx {
+
+enum TestFlag
+{
+    Flag0 = 0x00,
+    Flag1 = 0x01,
+    Flag2 = 0x02,
+    Flag4 = 0x04,
+};
+Q_DECLARE_FLAGS(TestFlags, TestFlag)
+
+}
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::TestFlag)(nx::TestFlags), (lexical))
