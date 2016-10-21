@@ -15,10 +15,12 @@
 
 #include <utils/common/delayed.h>
 
+#include <nx_ec/data/api_cloud_system_data.h>
+
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/fusion/serialization/json.h>
+
 #include <nx/fusion/model_functions.h>
 
 using namespace nx::cdb;
@@ -36,18 +38,6 @@ const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
-QString getLocalSystemId(const std::string& opaque)
-{
-    QMap<QByteArray, QByteArray> params;
-    nx::utils::parseNameValuePairs(QByteArray::fromStdString(opaque), ',', &params);
-
-    static const auto kOpaqueLocalSystemIdTag = QByteArray("localSystemId");
-    if (!params.contains(kOpaqueLocalSystemIdTag))
-        return QString();
-
-    return QString::fromUtf8(params.value(kOpaqueLocalSystemIdTag));
-}
-
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 {
     QnCloudSystemList result;
@@ -57,11 +47,16 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         if (systemData.status != api::SystemStatus::ssActivated)
             continue;
 
+        auto data = QJson::deserialized<ec2::ApiCloudSystemData>(
+            QByteArray::fromStdString(systemData.opaque));
+
         QnCloudSystem system;
         system.cloudId = QString::fromStdString(systemData.id);
-        system.localId = getLocalSystemId(systemData.opaque);
-        if (system.localId.isEmpty())
-            system.localId = system.cloudId;
+
+        QnUuid localId = data.localSystemId;
+        if (localId.isNull())
+            localId = guidFromArbitraryData(system.cloudId);
+        system.localId = localId.toString();
 
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
@@ -662,17 +657,11 @@ bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const
 
 void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-
-    QByteArray json;
-    QJson::serialize(*this, &json);
-    const auto value = QVariant::fromValue(json);
-    settings->setValue(kCloudSystemJsonHolderTag, value);
+    settings->setValue(kCloudSystemJsonHolderTag, QVariant::fromValue(QJson::serialized(this)));
 }
 
 QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
 {
-    QnCloudSystem result;
     const auto json = settings->value(kCloudSystemJsonHolderTag).toByteArray();
-    QJson::deserialize(json, &result);
-    return result;
+    return QJson::deserialized<QnCloudSystem>(json);
 }
