@@ -2,9 +2,6 @@
 
 #include "api_data.h"
 
-#include <QByteArray>
-#include <QString>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2 {
