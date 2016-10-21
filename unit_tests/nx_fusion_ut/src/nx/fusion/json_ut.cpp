@@ -41,3 +41,11 @@ TEST_F(QnFusionTestFixture, enumValue)
     ASSERT_EQ(value, QJson::serialized(flag));
     ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value));
 }
+
+TEST_F(QnFusionTestFixture, flagsValue)
+{
+    const auto value = str("Flag1|Flag2");
+    nx::TestFlags flags = nx::Flag1 | nx::Flag2;
+    ASSERT_EQ(value, QJson::serialized(flags));
+    ASSERT_EQ(flags, QJson::deserialized<nx::TestFlags>(value));
+}

@@ -21,6 +21,7 @@ enum TestFlag
     Flag4 = 0x04,
 };
 Q_DECLARE_FLAGS(TestFlags, TestFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(TestFlags)
 
 }
 
