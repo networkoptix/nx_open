@@ -61,12 +61,23 @@ boost::optional<Result> SyncQueue<Result>::pop(std::chrono::milliseconds timeout
     using namespace std::chrono;
 
     QnMutexLocker lock(&m_mutex);
-    if (m_queue.empty()) // no false positive in QWaitCondition
+
+    boost::optional<steady_clock::time_point> deadline;
+    if (timeout.count())
+        deadline = steady_clock::now() + timeout;
+    while (m_queue.empty())
     {
-        if (timeout.count() != 0)
+        if (deadline)
         {
-            if (!m_condition.wait(&m_mutex, timeout.count()))
+            const auto currentTime = steady_clock::now();
+            if (currentTime >= *deadline)
                 return boost::none;
+            if (!m_condition.wait(
+                    &m_mutex,
+                    duration_cast<milliseconds>(*deadline-currentTime).count()))
+            {
+                return boost::none;
+            }
         }
         else
         {
