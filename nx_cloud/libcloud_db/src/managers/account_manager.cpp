@@ -171,7 +171,7 @@ void AccountManager::getAccount(
         return;
     }
 
-    //very strange: account has been authenticated, but not found in the database
+    // Very strange. Account has been authenticated, but not found in cache.
     completionHandler(api::ResultCode::notFound, data::AccountData());
 }
 
