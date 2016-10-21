@@ -199,11 +199,11 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_zoomButtonsWidget->setOpacity(0.0);
     m_zoomButtonsWidget->setZValue(NxUi::ControlItemZOrder);
 
-    m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
-        [this]()
+    m_zoomButtonsWidget->setVisible(navigator()->isTimelineRelevant());
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
+        [this](bool value)
         {
-            m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
+            m_zoomButtonsWidget->setVisible(value);
         });
 
     enum { kSliderLeaveTimeout = 100 };
