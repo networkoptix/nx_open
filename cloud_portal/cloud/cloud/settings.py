@@ -194,7 +194,8 @@ CLOUD_CONNECT = {
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
     'customization': CUSTOMIZATION,
-    'password_realm': 'VMS'
+    'password_realm': 'VMS',
+    'secret': conf['notification_module']['secret']
 }
 
 # whitelist for unauthorized IP addresses. Supports addresses with masks

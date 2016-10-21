@@ -1,6 +1,6 @@
 'use strict';
 var SystemPage = require('./po.js');
-fdescribe('User list', function () {
+describe('User list', function () {
 
     var p = new SystemPage();
 

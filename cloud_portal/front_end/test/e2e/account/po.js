@@ -40,7 +40,7 @@ var AccountPage = function () {
 
     this.currentPasswordInput = element(by.model('pass.password'));
     this.passwordInput = element(by.model('pass.newPassword')).element(by.css('input[type=password]'));
-    this.submitButton = element(by.css('[form=passwordForm]')).element(by.buttonText('Change password'));
+    this.submitButton = element(by.css('[form=passwordForm]')).element(by.buttonText('Change Password'));
 
     this.invalidClassRequired = 'ng-invalid-required';
 

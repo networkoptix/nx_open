@@ -82,11 +82,11 @@ var Helper = function () {
         restorePassEmail: {
             emailInput: element(by.model('data.email')),
             emailInputWrap: element(by.model('data.email')).element(by.xpath('../..')),
-            submitButton: element(by.buttonText('Restore password'))
+            submitButton: element(by.buttonText('Reset Password'))
         },
         restorePassPassword: {
             passwordInput: element(by.model('data.newPassword')).element(by.css('input[type=password]')),
-            submitButton: element(by.buttonText('Save password'))
+            submitButton: element(by.buttonText('Save Password'))
         }
     };
 
@@ -134,7 +134,7 @@ var Helper = function () {
     this.userPasswordSymb = '~!@#$%^&*()_:";\'{}[]+<>?,./qweasdzxc';
     this.userPasswordTm = 'qweasdzxc123®™';
 
-    this.inputLong300 = 'qwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkl' +
+    this.inputLong300 = 'QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkl' +
         'jzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnm' +
         'qwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyui' +
         'opasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfgh' +

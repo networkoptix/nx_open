@@ -6,7 +6,7 @@ exports.config = {
     //chromeDriver: 'node_modules/protractor/selenium/chromedriver',
 
     //baseUrl: 'http://127.0.0.1:9000', // Local grunt serve
-    baseUrl: 'http://cloud-demo.hdw.mx',
+    baseUrl: 'http://cloud-test.hdw.mx',
     //baseUrl: 'http://cloud-local', // local vagrant
 
 
@@ -21,8 +21,8 @@ exports.config = {
 
     // Spec patterns are relative to the current working directly when
     // protractor is called.
-    //specs: ['test/e2e/**/*spec.js'],
-    specs: ['test/e2e/system*/*spec.js'],
+    specs: ['test/e2e/**/*spec.js'],
+    //specs: ['test/e2e/system*/*spec.js'],
 
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
