@@ -1110,6 +1110,8 @@ nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
     const api::SystemSharing& sharing)
 {
     auto notification = std::make_unique<SystemSharedNotification>();
+    notification->setSecret(m_settings.notification().secret.toStdString());
+
     auto dbResult = fillSystemSharedNotification(
         queryContext,
         grantorEmail, sharing.systemID, sharing.accountEmail,
@@ -1294,6 +1296,7 @@ nx::db::DBResult SystemManager::scheduleInvintationNotificationDelivery(
     const std::string& systemId)
 {
     auto notification = std::make_unique<InviteUserNotification>();
+    notification->setSecret(m_settings.notification().secret.toStdString());
     auto dbResult = prepareInviteNotification(
         queryContext, inviterEmail, inviteeAccount, systemId, notification.get());
     if (dbResult != nx::db::DBResult::ok)
