@@ -111,6 +111,11 @@ struct ConfigureSystemData : public PasswordData
 */
 bool changeLocalSystemId(const ConfigureSystemData& data);
 
+/**
+ * @return false if failed to save some data.
+ */
+bool resetSystemToStateNew();
+
 
 #define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUser)(foreignSettings)
 

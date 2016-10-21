@@ -45,7 +45,8 @@ TransactionTransport::TransactionTransport(
     m_connectionId(connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_haveToSendSyncDone(false),
-    m_closed(false)
+    m_closed(false),
+    m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
     using namespace std::placeholders;
 
@@ -54,8 +55,7 @@ TransactionTransport::TransactionTransport(
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = remotePeer.id;
 
-    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
-    m_transactionLogReader->bindToAioThread(aioThread);
+    bindToAioThread(aioThread);
     setState(ReadyForStreaming);
     //ignoring "state changed to Connected" signal
 
@@ -67,6 +67,13 @@ TransactionTransport::TransactionTransport(
         this, &::ec2::QnTransactionTransportBase::stateChanged,
         this, &TransactionTransport::onStateChanged,
         Qt::DirectConnection);
+
+    if (remotePeerSupportsKeepAlive())
+    {
+        m_inactivityTimer->start(
+            connectionKeepAliveTimeout() * keepAliveProbeCount(),
+            std::bind(&TransactionTransport::onInactivityTimeout, this));
+    }
 }
 
 TransactionTransport::~TransactionTransport()
@@ -79,21 +86,21 @@ TransactionTransport::~TransactionTransport()
     stopWhileInAioThread();
 }
 
-void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+void TransactionTransport::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
 {
-    // Implementation should be done in ::ec2::QnTransactionTransportBase.
-    NX_CRITICAL(false);
+    ParentType::bindToAioThread(aioThread);
 
-    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
-
-    //socket()->bindToAioThread(aioThread);
+    m_inactivityTimer->bindToAioThread(aioThread);
 }
 
 void TransactionTransport::stopWhileInAioThread()
 {
-    close();
+    ParentType::stopWhileInAioThread();
+
     m_transactionLogReader.reset();
+    m_inactivityTimer.reset();
 }
 
 void TransactionTransport::setOnConnectionClosed(
@@ -232,6 +239,17 @@ void TransactionTransport::fillAuthInfo(
 {
     //this TransactionTransport is never used to setup outgoing connection
     NX_ASSERT(false);
+}
+
+void TransactionTransport::onSomeDataReceivedFromRemotePeer()
+{
+    NX_CRITICAL(isInSelfAioThread());
+    NX_CRITICAL(m_inactivityTimer->isInSelfAioThread());
+
+    m_inactivityTimer->cancelSync();
+    m_inactivityTimer->start(
+        connectionKeepAliveTimeout() * keepAliveProbeCount(),
+        std::bind(&TransactionTransport::onInactivityTimeout, this));
 }
 
 void TransactionTransport::onGotTransaction(
@@ -401,6 +419,11 @@ void TransactionTransport::enableOutputChannel()
         transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
         sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
     }
+}
+
+void TransactionTransport::onInactivityTimeout()
+{
+    setState(::ec2::QnTransactionTransportBase::Error);
 }
 
 } // namespace ec2

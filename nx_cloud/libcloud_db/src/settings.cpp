@@ -61,6 +61,7 @@ const QLatin1String kChangeUser("changeUser");
 
 //notification settings
 const QLatin1String kNotificationServiceEndpoint("notification/serviceEndpoint");
+const QLatin1String kNotificationSecret("notification/secret");
 
 const QLatin1String kNotificationEnabled("notification/enabled");
 const bool kDefaultNotificationEnabled = true;
@@ -280,6 +281,9 @@ void Settings::loadConfiguration()
     //email
     m_notification.serviceEndpoint =
         m_settings.value(kNotificationServiceEndpoint).toString();
+
+    m_notification.secret =
+        m_settings.value(kNotificationSecret).toString();
 
     m_notification.enabled =
         m_settings.value(

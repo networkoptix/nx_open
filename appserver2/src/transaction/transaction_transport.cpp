@@ -50,6 +50,24 @@ QnTransactionTransport::QnTransactionTransport(
 {
 }
 
+QnTransactionTransport::~QnTransactionTransport()
+{
+    pleaseStopSync();
+
+    if (m_ttFinishCallback)
+        m_ttFinishCallback();
+}
+
+void QnTransactionTransport::close()
+{
+    setState(State::Closed);    //changing state before freeing socket so that everyone
+                                //stop using socket before it is actually freed
+
+    pleaseStopSync();
+
+    markAsNotSynchronized();
+}
+
 void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
 {
     if (!QnAppServerConnectionFactory::videowallGuid().isNull())
@@ -138,6 +156,12 @@ bool QnTransactionTransport::sendSerializedTransaction(
     }
 
     return true;
+}
+
+void QnTransactionTransport::setBeforeDestroyCallback(
+    std::function<void()> ttFinishCallback)
+{
+    m_ttFinishCallback = ttFinishCallback;
 }
 
 }   // namespace ec2

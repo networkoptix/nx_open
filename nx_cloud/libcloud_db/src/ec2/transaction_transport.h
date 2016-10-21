@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
@@ -23,9 +23,10 @@ class TransactionLog;
 
 class TransactionTransport
 :
-    public ::ec2::QnTransactionTransportBase,
-    public nx::network::aio::BasicPollable
+    public ::ec2::QnTransactionTransportBase
 {
+    typedef ::ec2::QnTransactionTransportBase ParentType;
+
 public:
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectionClosedEventHandler;
     typedef nx::utils::MoveOnlyFunc<void(
@@ -125,6 +126,7 @@ protected:
     virtual void fillAuthInfo(
         const nx_http::AsyncHttpClientPtr& httpClient,
         bool authByKey) override;
+    virtual void onSomeDataReceivedFromRemotePeer() override;
 
 private:
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
@@ -144,23 +146,31 @@ private:
     ::ec2::QnTranState m_remotePeerTranState;
     bool m_haveToSendSyncDone;
     bool m_closed;
+    std::unique_ptr<network::aio::Timer> m_inactivityTimer;
 
     void onGotTransaction(
         Qn::SerializationFormat tranFormat,
         QByteArray data,
         ::ec2::QnTransactionTransportHeader transportHeader);
+
     void forwardTransactionToProcessor(
         Qn::SerializationFormat tranFormat,
         QByteArray data,
         ::ec2::QnTransactionTransportHeader transportHeader);
+
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
+
     void forwardStateChangedEvent(
         ::ec2::QnTransactionTransportBase::State newState);
+
     void onTransactionsReadFromLog(
         api::ResultCode resultCode,
         std::vector<TransactionData> serializedTransaction,
         ::ec2::QnTranState readedUpTo);
+
     void enableOutputChannel();
+
+    void onInactivityTimeout();
 };
 
 } // namespace ec2

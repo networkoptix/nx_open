@@ -100,6 +100,7 @@ void EMailManager::sendAsync(
         QnMutexLocker lk(&m_mutex);
         m_ongoingRequests.insert(httpClient);
     }
+
     httpClient->doPost(
         url,
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),

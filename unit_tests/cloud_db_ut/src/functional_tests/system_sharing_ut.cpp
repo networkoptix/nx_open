@@ -89,7 +89,7 @@ TEST_F(SystemSharing, get_users)
             account2.email,
             api::SystemAccessRole::cloudAdmin));
 
-    restart();
+    ASSERT_TRUE(restart());
 
     //checking account1 system list
     {
@@ -305,7 +305,7 @@ TEST_F(SystemSharing, maintenance)
             accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 
-    restart();
+    ASSERT_TRUE(restart());
 
     //account1: trying to modify (change access rights) sharing to account2
     //(failure: maintenance sharing cannot be updated)
@@ -399,7 +399,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(0, sharings.size());
     }
 
-    restart();
+    ASSERT_TRUE(restart());
 
     //checking system list for both accounts
     {
@@ -777,7 +777,7 @@ TEST_F(SystemSharing, remove_system)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         //checking that sharing has also been removed (before and after restart)
         {
@@ -888,7 +888,7 @@ TEST_F(SystemSharing, get_access_role_list)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         {
             std::set<api::SystemAccessRole> accessRoles;

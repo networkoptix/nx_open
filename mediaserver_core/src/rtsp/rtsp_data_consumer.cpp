@@ -583,9 +583,11 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         trackNum = 0; // multichannel video is going to be transcoded to a single track
     RtspServerTrackInfo* trackInfo = m_owner->getTrackInfo(trackNum);
 
-    if (trackInfo == nullptr || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
+    if (trackInfo == nullptr || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
+    QnRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
+    if (!codecEncoder)
+        return true; // skip data (for example audio is disabled)
     {
         QnMutexLocker lock( &m_mutex );
         int cseq = media->opaque;
