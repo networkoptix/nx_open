@@ -2232,8 +2232,6 @@ void MediaServerProcess::run()
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
-        const auto port = server->getPort();
-
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
         server->setVersion(qnCommon->engineVersion());
