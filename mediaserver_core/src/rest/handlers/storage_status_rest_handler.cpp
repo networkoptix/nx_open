@@ -33,9 +33,14 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
                             nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE :
                             QnFileStorageResource::kNasStorageLimit;
 
-        storage->setUrl(storageUrl);
-        storage->setSpaceLimit(spaceLimit);
-        if (!storage || !storage->initOrUpdate())
+        if (storage)
+        {
+            storage->setUrl(storageUrl);
+            storage->setSpaceLimit(spaceLimit);
+            if (!storage->initOrUpdate())
+                return CODE_INVALID_PARAMETER;
+        }
+        else
             return CODE_INVALID_PARAMETER;
     }
 

@@ -328,6 +328,7 @@ private:
     DeviceSoapWrapper(const DeviceSoapWrapper&);
     QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
     std::list<QnCredentials> getPossibleCredentials(const QString& manufacturer, const QString& model) const;
+    QnCredentials getForcedCredentials(const QString& manufacturer, const QString& model);
     void calcTimeDrift();
 
     PasswordHelper &m_passwordsData;
