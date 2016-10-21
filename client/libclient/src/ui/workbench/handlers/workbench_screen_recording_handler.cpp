@@ -145,8 +145,12 @@ void QnWorkbenchScreenRecordingHandler::stopRecordingCountdown()
         m_timerId = 0;
     }
     m_countdown.invalidate();
+
     if (m_messageBox)
         m_messageBox->hideImmideately();
+
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setMessage(QString());
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const
