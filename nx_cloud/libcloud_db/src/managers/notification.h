@@ -45,8 +45,9 @@ public:
     std::string user_email;
     std::string type;
     MessageData message;
+    std::string secret;
 };
-#define NotificationData_Fields (user_email)(type)(message)
+#define NotificationData_Fields (user_email)(type)(message)(secret)
 
 typedef NotificationData<ActivateAccountData> ActivateAccountNotificationData;
 #define ActivateAccountNotificationData_Fields NotificationData_Fields
@@ -75,6 +76,7 @@ public:
     virtual ~AbstractNotification() = default;
 
     virtual void setAddressee(std::string addressee) = 0;
+    virtual void setSecret(std::string secret) = 0;
     virtual QByteArray serializeToJson() const = 0;
 };
 
@@ -97,6 +99,12 @@ public:
     {
         static_cast<FusionEnabledDescendantType*>(this)->user_email
             = std::move(addressee);
+    }
+
+    virtual void setSecret(std::string secret) override
+    {
+        static_cast<FusionEnabledDescendantType*>(this)->secret
+            = std::move(secret);
     }
 
     virtual QByteArray serializeToJson() const override

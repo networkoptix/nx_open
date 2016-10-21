@@ -693,6 +693,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
     }
 
     notification->setActivationCode(resultData->code);
+    notification->setSecret(m_settings.notification().secret.toStdString());
     notification->setAddressee(accountEmail);
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, notification = std::move(notification)]()
