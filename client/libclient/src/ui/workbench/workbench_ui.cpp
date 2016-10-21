@@ -493,8 +493,7 @@ bool QnWorkbenchUi::isHovered() const
         || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notifications && m_notifications->isHovered())
-        || (m_calendar && m_calendar->isHovered())
-        ;
+        || (m_calendar && m_calendar->isHovered());
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
