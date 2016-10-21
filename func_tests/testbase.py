@@ -35,7 +35,7 @@ class FuncTestError(AssertionError):
 
 def boxssh(box, command):
     return check_output(
-        ['./vssh.sh', box, 'sudo'] + list(command),
+        ['./vssh-ip.sh', box, 'sudo'] + list(command),
         shell=False, stderr=STDOUT
     )
 
@@ -58,7 +58,11 @@ def _reportResult(resData, resType, name):
         for res in resData:
             where = res[0]
             print "%s.%s (%s)" % (type(where).__name__, where._testMethodName, where._testMethodDoc)
-            print res[1].split('\n')[-2]
+            trace = res[1].split('\n')
+            if len(trace) > 1:
+                print res[1].split('\n')[-2]
+            else:
+                print "((%s))" % res[1]
             if len(res) > 2:
                 print "Other data: %s" % (res,)
 
@@ -662,6 +666,9 @@ class FuncTestMaster(object):
     need_dump = False
     api = ServerApi
 
+    # specific test flags
+    _natconTest = False
+
     _argFlags = {
         '--autorollback': 'auto_rollback',
         '--arb': 'auto_rollback', # an alias for the previous
@@ -706,7 +713,10 @@ class FuncTestMaster(object):
 
     def _loadConfig(self):
         parser = self.getConfig()
-        self.clusterTestServerList = parser.get("General","serverList").split(",")
+
+        _section = "Nat" if self._natconTest else "General" # Fixme: ugly hack :(
+        self.clusterTestServerList = parser.get(_section,"serverList").split(",")
+
         parser.rtset('ServerList', self.clusterTestServerList)
         self.clusterTestSleepTime = parser.getint("General","clusterTestSleepTime")
         parser.rtset('SleepTime', self.clusterTestSleepTime)
@@ -749,12 +759,14 @@ class FuncTestMaster(object):
                 print "Use config", self.configFname
             elif arg in self._argFlags:
                 setattr(self, self._argFlags[arg], True)
-            elif arg == '--config':
+            elif arg in ('--config', '-c'):
                 config_next = True
             elif arg.startswith('--config='):
                 self.configFname = arg[len('--config='):]
                 print "Use config", self.configFname
             else:
+                if arg == '--natcon':
+                    self._natconTest = True
                 other.append(arg)
         self.argv = other
         return other

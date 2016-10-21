@@ -92,12 +92,13 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
         self._prepare_test_phase(self._stop_and_init)
         passwd = self.config.get("General","password")
         func = ("api/mergeSystems?url=http://%s&"
-               "password=%s&currentPassword=%s&takeRemoteSetting=false&oneServer=false&ignoreIncompatible=false" %
+               "password=%s&currentPassword=%s&takeRemoteSetting=false&"
+               "oneServer=false&ignoreIncompatible=false" %
                 (self.sl[0], passwd, passwd))
         answer = self._server_request(HOST_BEHIND_NAT, func)
         #print "Answer: %s" % (answer,)
         if answer is not None and answer.get("error", '') not in ['', '0', 0]:
-            self.fail("mergeSystems request returned API error %s: %s" % (answer["error"], answer.get("errorString","")))
+            self.fail("mergeSystems request returned API error %s: %s\nRequest was: %s" % (answer["error"], answer.get("errorString",""), func))
         #print "mergeSystems sent, waiting"
         time.sleep(1)
         # get server's IDs
@@ -145,6 +146,4 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
                 "Multi-proto streaming test failed")
         self.assertTrue(NatHlsStreamingTest(self.config).run(),
                 "HLS streaming test failed")
-
-
 

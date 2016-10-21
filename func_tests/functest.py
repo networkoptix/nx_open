@@ -1192,7 +1192,7 @@ def CallTest(testClass):
     ###if not testMaster.openerReady:
     ###    testMaster.setUpPassword()
     # this print is used by FunctestParser.parse_timesync_start
-    print "%s suits: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
+    print "%s suites: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
     return RunBoxTests(testClass, testMaster.getConfig())
 
 
