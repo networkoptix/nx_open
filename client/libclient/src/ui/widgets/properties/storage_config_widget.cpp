@@ -1030,7 +1030,7 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
     bool canStartRebuild =
             m_server
         &&  reply.state == Qn::RebuildState_None
-        &&  !hasChanges()
+        &&  !hasStoragesChanges(m_model->storages())
         &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo& info) {
                 return info.isWritable
                     && info.isBackup != isMainPool
