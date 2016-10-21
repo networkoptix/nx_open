@@ -151,6 +151,8 @@ void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrLi
 {
     {
         QnMutexLocker lock( &m_mutex );
+        if (m_netAddrList == netAddrList)
+            return;
         m_netAddrList = netAddrList;
     }
     emit auxUrlsChanged(::toSharedPointer(this));
@@ -324,7 +326,6 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
-    emit sslAllowedChanged(toSharedPointer(this));
 }
 
 SocketAddress QnMediaServerResource::getPrimaryAddress() const
@@ -386,18 +387,23 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 {
     /* Calculate primary address before the url is changed. */
     const SocketAddress oldPrimaryAddress = getPrimaryAddress();
+    const auto oldApiUrl = getUrl();
 
     base_type::updateInternal(other, notifiers);
+    if (getUrl() != oldApiUrl)
+        notifiers << [r = toSharedPointer(this)]{ emit r->apiUrlChanged(r); };
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
     if (localOther)
     {
         if (m_version != localOther->m_version)
-        {
-            m_version = localOther->m_version;
             notifiers << [r = toSharedPointer(this)]{ emit r->versionChanged(r); };
-        }
+        if (m_serverFlags != localOther->m_serverFlags)
+            notifiers << [r = toSharedPointer(this)]{ emit r->serverFlagsChanged(r); };
+        if (m_netAddrList != localOther->m_netAddrList)
+            notifiers << [r = toSharedPointer(this)]{ emit r->auxUrlsChanged(r); };
 
+        m_version = localOther->m_version;
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
         m_systemInfo = localOther->m_systemInfo;
