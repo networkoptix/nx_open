@@ -88,6 +88,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
         [this](QObject* object, QEvent* event)
         {
+            Q_UNUSED(object);
             m_pinButton->setVisible(event->type() == QEvent::Hide);
         });
 
