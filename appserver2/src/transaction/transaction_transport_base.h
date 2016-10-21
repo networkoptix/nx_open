@@ -18,6 +18,7 @@
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/auth_cache.h>
@@ -53,7 +54,8 @@ namespace ConnectionType
 
 class QnTransactionTransportBase
 :
-    public QObject
+    public QObject,
+    public nx::network::aio::BasicPollable
 {
     Q_OBJECT
 
@@ -119,7 +121,8 @@ public:
         int keepAliveProbeCount);
     ~QnTransactionTransportBase();
 
-    void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
 
     /** Enables outgoing transaction channel. */
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
@@ -128,10 +131,6 @@ public:
     int keepAliveProbeCount() const;
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
-    /**
-     * \note This method is non-blocking if called within internal socket's aio thread.
-     */
-    void close();
 
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
@@ -140,6 +139,8 @@ public:
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
+
+    void markAsNotSynchronized();
 
     bool isSyncDone() const { return m_syncDone; }
     void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
@@ -340,13 +341,12 @@ private:
     //!Number of threads waiting on \a QnTransactionTransportBase::waitForNewTransactionsReady
     int m_waiterCount;
     QnWaitCondition m_cond;
-    std::function<void ()> m_ttFinishCallback;
     std::chrono::milliseconds m_tcpKeepAliveTimeout;
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
     QAuthenticator m_remotePeerCredentials;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
-    nx::network::aio::Timer m_timer;
+    std::unique_ptr<nx::network::aio::Timer> m_timer;
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
 
@@ -359,8 +359,6 @@ private:
         int keepAliveProbeCount);
 
     void sendHttpKeepAlive();
-    //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
-    void closeSocket();
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
@@ -24,9 +23,10 @@ class TransactionLog;
 
 class TransactionTransport
 :
-    public ::ec2::QnTransactionTransportBase,
-    public nx::network::aio::BasicPollable
+    public ::ec2::QnTransactionTransportBase
 {
+    typedef ::ec2::QnTransactionTransportBase ParentType;
+
 public:
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectionClosedEventHandler;
     typedef nx::utils::MoveOnlyFunc<void(

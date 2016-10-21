@@ -97,8 +97,11 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionGuardSharedState(connectionGuardSharedState),
     m_tcpKeepAliveTimeout(tcpKeepAliveTimeout),
     m_keepAliveProbeCount(keepAliveProbeCount),
-    m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount)
+    m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount),
+    m_timer(std::make_unique<nx::network::aio::Timer>())
 {
+    m_timer->bindToAioThread(getAioThread());
+
     m_lastConnectTime = 0;
     m_readSync = false;
     m_writeSync = false;
@@ -245,19 +248,11 @@ QnTransactionTransportBase::~QnTransactionTransportBase()
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
-    m_timer.pleaseStopSync();
+    stopWhileInAioThread();
 
-    {
-        auto httpClientLocal = m_httpClient;
-        if( httpClientLocal )
-            httpClientLocal->pleaseStopSync();
-    }
-    {
-        auto outgoingTranClientLocal = m_outgoingTranClient;
-        if( outgoingTranClientLocal )
-            outgoingTranClientLocal->pleaseStopSync();
-    }
-
+    // TODO: #ak: move following logic to ::ec2::QnTransactionTransport
+    // since it can result in deadlock if used in aio thread.
+    // Though, currently cloud_db does not use following logic.
     {
         QnMutexLocker lk( &m_mutex );
         m_state = Closed;
@@ -266,12 +261,31 @@ QnTransactionTransportBase::~QnTransactionTransportBase()
         while( m_waiterCount > 0 )
             m_cond.wait( lk.mutex() );
     }
-    closeSocket();
-    //not calling QnTransactionTransportBase::close since it will emit stateChanged,
-        //which can potentially lead to some trouble
+}
 
-    if (m_ttFinishCallback)
-        m_ttFinishCallback();
+void QnTransactionTransportBase::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+
+    m_timer->bindToAioThread(aioThread);
+    if (m_httpClient)
+        m_httpClient->bindToAioThread(aioThread);
+    if (m_outgoingTranClient)
+        m_outgoingTranClient->bindToAioThread(aioThread);
+    if (m_outgoingDataSocket)
+        m_outgoingDataSocket->bindToAioThread(aioThread);
+    if (m_incomingDataSocket)
+        m_incomingDataSocket->bindToAioThread(aioThread);
+}
+
+void QnTransactionTransportBase::stopWhileInAioThread()
+{
+    m_timer.reset();
+    m_httpClient.reset();
+    m_outgoingTranClient.reset();
+    m_outgoingDataSocket.reset();
+    m_incomingDataSocket.reset();
 }
 
 void QnTransactionTransportBase::setOutgoingConnection(
@@ -281,6 +295,7 @@ void QnTransactionTransportBase::setOutgoingConnection(
     using namespace std::placeholders;
 
     m_outgoingDataSocket = std::move(socket);
+    m_outgoingDataSocket->bindToAioThread(getAioThread());
     if (!m_outgoingDataSocket->setSendTimeout(
             duration_cast<milliseconds>(kSocketSendTimeout).count()))
     {
@@ -339,25 +354,6 @@ void QnTransactionTransportBase::addData(QByteArray data)
     }
     if( m_dataToSend.size() == 1 )
         serializeAndSendNextDataBuffer();
-}
-
-void QnTransactionTransportBase::closeSocket()
-{
-    if( m_outgoingDataSocket )
-    {
-        m_outgoingDataSocket->pleaseStopSync();
-        m_outgoingDataSocket->close();
-    }
-
-    if( m_incomingDataSocket &&
-        m_incomingDataSocket != m_outgoingDataSocket )   //they are equal in case of bidirectional connection
-    {
-        m_incomingDataSocket->pleaseStopSync();
-        m_incomingDataSocket->close();
-    }
-
-    m_outgoingDataSocket.reset();
-    m_incomingDataSocket.reset();
 }
 
 void QnTransactionTransportBase::setState(State state)
@@ -477,20 +473,6 @@ void QnTransactionTransportBase::removeEventHandler( int eventHandlerID )
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
-void QnTransactionTransportBase::close()
-{
-    setState(State::Closed);    //changing state before freeing socket so that everyone
-                                //stop using socket before it is actually freed
-
-    closeSocket();
-    {
-        QnMutexLocker lock( &m_mutex );
-        NX_ASSERT( !m_incomingDataSocket && !m_outgoingDataSocket );
-        m_readSync = false;
-        m_writeSync = false;
-    }
-}
-
 void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 {
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").
@@ -499,6 +481,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
     setState(ConnectingStage1);
 
     m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient->bindToAioThread(getAioThread());
     m_httpClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
     m_httpClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
     connect(
@@ -586,6 +569,13 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
     QUrl url = remoteAddr();
     url.setPath(url.path() + lit("/") + toString(getState()));
     m_httpClient->doGet(url);
+}
+
+void QnTransactionTransportBase::markAsNotSynchronized()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_readSync = false;
+    m_writeSync = false;
 }
 
 void QnTransactionTransportBase::repeatDoGet()
@@ -795,6 +785,7 @@ void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
     NX_ASSERT( m_connectionType != ConnectionType::bidirectional );
 
     m_incomingDataSocket = std::move(socket);
+    m_incomingDataSocket->bindToAioThread(getAioThread());
 
     //checking transactions format
     if( !m_incomingTransactionStreamParser->processData( requestBuf ) )
@@ -877,7 +868,8 @@ void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
     else
     {
         //we using http client to send transactions
-        m_timer.start(
+        m_timer->cancelSync();
+        m_timer->start(
             m_tcpKeepAliveTimeout,
             std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this));
     }
@@ -1031,8 +1023,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         {
             using namespace std::chrono;
             m_outgoingTranClient = nx_http::AsyncHttpClient::create();
-            if (m_incomingDataSocket)
-                m_outgoingTranClient->bindToAioThread(m_incomingDataSocket->getAioThread());
+            m_outgoingTranClient->bindToAioThread(getAioThread());
             m_outgoingTranClient->setSendTimeoutMs(
                 duration_cast<milliseconds>(kSocketSendTimeout).count());   //it can take a long time to send large transactions
             m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
@@ -1578,11 +1569,6 @@ void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpCl
         return;
 
     serializeAndSendNextDataBuffer();
-}
-
-void QnTransactionTransportBase::setBeforeDestroyCallback(std::function<void ()> ttFinishCallback)
-{
-    m_ttFinishCallback = ttFinishCallback;
 }
 
 }
