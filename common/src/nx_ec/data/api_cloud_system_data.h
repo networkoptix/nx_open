@@ -13,6 +13,7 @@ struct ApiCloudSystemData: ApiData
 
 #define ApiCloudSystemData_Fields (localSystemId)
 
+QN_FUSION_DECLARE_FUNCTIONS(ApiCloudSystemData, (json))
+
 }
 
-QN_FUSION_DECLARE_FUNCTIONS(ec2::ApiCloudSystemData, (json))

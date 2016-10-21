@@ -2,4 +2,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ec2::ApiCloudSystemData, (json), ApiCloudSystemData_Fields)
+namespace ec2 {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiCloudSystemData, (json), ApiCloudSystemData_Fields)
+
+}
+
