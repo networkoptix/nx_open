@@ -58,6 +58,8 @@ Result SyncQueue<Result>::pop()
 template< typename Result>
 boost::optional<Result> SyncQueue<Result>::pop(std::chrono::milliseconds timeout)
 {
+    using namespace std::chrono;
+
     QnMutexLocker lock(&m_mutex);
     if (m_queue.empty()) // no false positive in QWaitCondition
     {
