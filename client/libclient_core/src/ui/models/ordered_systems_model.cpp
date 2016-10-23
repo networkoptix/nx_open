@@ -13,6 +13,8 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_updateTimer(new QTimer(this)),
     m_cloudWeights(),
     m_localWeights(),
+    m_finalWeights(),
+    m_maxRealWeight(0.0),
     m_newSystemWeights(),
     m_updatingWeights(false)
 {
@@ -249,11 +251,17 @@ void QnOrderedSystemsModel::updateFinalWeights()
     if (newWeights == m_finalWeights)
         return;
 
+
+    qDebug() << "/n";
+    for (const auto weight : newWeights)
+        qDebug() << weight.weight;
+
+    qDebug() << "/n";
     m_finalWeights = newWeights;
 
     updateMaxRealWeight();
 
-    sort(0);
+    invalidate();
 }
 
 void QnOrderedSystemsModel::updateMaxRealWeight()
