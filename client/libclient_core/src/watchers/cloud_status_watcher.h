@@ -8,35 +8,10 @@
 #include <nx/utils/singleton.h>
 
 #include <utils/common/credentials.h>
-#include <nx/fusion/model_functions_fwd.h>
+#include <network/cloud_system_data.h>
 
 class QSettings;
-
-struct QnCloudSystem
-{
-    QString cloudId;
-    QString localId;
-    QString name;
-    QString ownerAccountEmail;
-    QString ownerFullName;
-    std::string authKey;
-    qreal weight;
-    qint64 lastLoginTimeUtcMs;
-
-    bool operator ==(const QnCloudSystem &other) const;
-
-    bool visuallyEqual(const QnCloudSystem& other) const;
-
-    void writeToSettings(QSettings* settings) const;
-
-    static QnCloudSystem fromSettings(QSettings* settings);
-};
-#define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)(authKey)
-QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype)(json))
-
-typedef QList<QnCloudSystem> QnCloudSystemList;
-Q_DECLARE_METATYPE(QnCloudSystemList);
-
+class QnSystemDescription;
 class QnCloudStatusWatcherPrivate;
 
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>

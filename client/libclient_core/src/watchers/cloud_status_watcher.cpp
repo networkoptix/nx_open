@@ -20,8 +20,9 @@
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-
 #include <nx/fusion/model_functions.h>
+
+#include <network/cloud_system_data.h>
 
 using namespace nx::cdb;
 
@@ -53,10 +54,9 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         QnCloudSystem system;
         system.cloudId = QString::fromStdString(systemData.id);
 
-        QnUuid localId = data.localSystemId;
-        if (localId.isNull())
-            localId = guidFromArbitraryData(system.cloudId);
-        system.localId = localId.toString();
+        system.localId = data.localSystemId;
+        if (system.localId.isNull())
+            system.localId = guidFromArbitraryData(system.cloudId);
 
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
@@ -72,8 +72,6 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 }
 
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCloudSystem), (json), _Fields)
 
 class QnCloudStatusWatcherPrivate : public QObject
 {
@@ -633,35 +631,4 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
             Q_UNUSED(info);
             executeDelayed([callback, result]{ callback(result); }, 0, targetThread);
         });
-}
-
-bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
-{
-    return ((cloudId == other.cloudId)
-        && (localId == other.localId)
-        && (name == other.name)
-        && (authKey == other.authKey)
-        && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
-        && qFuzzyEquals(weight, other.weight));
-}
-
-bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const
-{
-    return (cloudId == other.cloudId
-        && (localId == other.localId)
-        && (name == other.name)
-        && (authKey == other.authKey)
-        && (ownerAccountEmail == other.ownerAccountEmail)
-        && (ownerFullName == other.ownerFullName));
-}
-
-void QnCloudSystem::writeToSettings(QSettings* settings) const
-{
-    settings->setValue(kCloudSystemJsonHolderTag, QVariant::fromValue(QJson::serialized(this)));
-}
-
-QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
-{
-    const auto json = settings->value(kCloudSystemJsonHolderTag).toByteArray();
-    return QJson::deserialized<QnCloudSystem>(json);
 }

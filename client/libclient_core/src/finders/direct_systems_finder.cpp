@@ -2,6 +2,7 @@
 #include "direct_systems_finder.h"
 
 #include <network/module_finder.h>
+#include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
 
 namespace {
@@ -113,9 +114,10 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
             : moduleInformation.systemName);
 
         const bool isNewSystem = helpers::isNewSystem(moduleInformation);
+        const auto localId = helpers::getLocalSystemId(moduleInformation);
         const auto systemDescription = (isNewSystem
             ? QnSystemDescription::createFactorySystem(systemId)
-            : QnSystemDescription::createLocalSystem(systemId, systemName));
+            : QnSystemDescription::createLocalSystem(systemId, localId, systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }

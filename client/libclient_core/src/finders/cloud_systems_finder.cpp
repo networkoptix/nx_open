@@ -10,6 +10,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
+#include <network/system_helpers.h>
 
 static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(7);
 static const std::chrono::milliseconds kCloudServerOutdateTimeout = std::chrono::seconds(10);
@@ -93,18 +94,19 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
-        NX_ASSERT(!system.localId.isEmpty(), "Cloud system can't be NEW system");
-        updatedSystems.insert(system.cloudId
-            , QnSystemDescription::createCloudSystem(system.localId
-                , system.name, system.ownerAccountEmail
-                , system.ownerFullName));
+        NX_ASSERT(!helpers::isNewSystem(system), "Cloud system can't be NEW system");
+
+        const auto targetId = helpers::getTargetSystemId(system);
+        const auto systemDescription = QnSystemDescription::createCloudSystem(targetId,
+            system.localId, system.name, system.ownerAccountEmail, system.ownerFullName);
+        updatedSystems.insert(system.cloudId, systemDescription);
     }
 
     typedef QSet<QString> IdsSet;
 
     const auto newIds = updatedSystems.keys().toSet();
 
-    IdsSet removedLocalIds;
+    IdsSet removedTargetIds;
     {
         const QnMutexLocker lock(&m_mutex);
 
@@ -116,6 +118,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         {
             const auto system = updatedSystems[addedCloudId];
             emit systemDiscovered(system);
+
             m_systems.insert(addedCloudId, system);
             updateSystemInternal(addedCloudId, system);
         }
@@ -123,13 +126,13 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         for (const auto removedCloudId : removedCloudIds)
         {
             const auto system = m_systems[removedCloudId];
-            removedLocalIds.insert(system->id());
+            removedTargetIds.insert(system->id());
             m_systems.remove(removedCloudId);
         }
     }
 
-    for (const auto removedLocalId : removedLocalIds)
-        emit systemLost(removedLocalId);
+    for (const auto removedId : removedTargetIds)
+        emit systemLost(removedId);
 }
 
 void QnCloudSystemsFinder::updateSystemInternal(

@@ -31,24 +31,27 @@ QnSystemDescription::PointerType QnSystemDescription::createFactorySystem(const 
 
 QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
     const QString& systemId,
+    const QnUuid &localId,
     const QString& systemName)
 {
-    return PointerType(new QnSystemDescription(systemId, systemName));
+    return PointerType(new QnSystemDescription(systemId, localId, systemName));
 }
 
 QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
     const QString& systemId,
+    const QnUuid &localId,
     const QString& systemName,
     const QString& ownerAccountEmail,
     const QString& ownerFullName)
 {
     return PointerType(
-        new QnSystemDescription(systemId, systemName
-            , ownerAccountEmail, ownerFullName));
+        new QnSystemDescription(systemId, localId, systemName,
+            ownerAccountEmail, ownerFullName));
 }
 
 QnSystemDescription::QnSystemDescription(const QString& systemId) :
     m_id(systemId),
+    m_localId(systemId),
     m_ownerAccountEmail(),
     m_ownerFullName(),
     m_isCloudSystem(false),
@@ -61,8 +64,12 @@ QnSystemDescription::QnSystemDescription(const QString& systemId) :
 {}
 
 
-QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName) :
+QnSystemDescription::QnSystemDescription(const QString& systemId,
+    const QnUuid &localId,
+    const QString& systemName)
+    :
     m_id(systemId),
+    m_localId(localId),
     m_ownerAccountEmail(),
     m_ownerFullName(),
     m_isCloudSystem(false),
@@ -76,11 +83,13 @@ QnSystemDescription::QnSystemDescription(const QString& systemId, const QString&
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
+    const QnUuid &localId,
     const QString& systemName,
     const QString& cloudOwnerAccountEmail,
     const QString& ownerFullName)
     :
     m_id(systemId),
+    m_localId(localId),
     m_ownerAccountEmail(cloudOwnerAccountEmail),
     m_ownerFullName(ownerFullName),
     m_isCloudSystem(true),
@@ -103,6 +112,11 @@ QString QnSystemDescription::extractSystemName(const QString& systemName)
 QString QnSystemDescription::id() const
 {
     return m_id;
+}
+
+QnUuid QnSystemDescription::localId() const
+{
+    return m_localId;
 }
 
 QString QnSystemDescription::name() const

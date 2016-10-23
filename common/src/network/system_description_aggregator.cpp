@@ -146,7 +146,18 @@ QString QnSystemDescriptionAggregator::id() const
     if (emptySystems)
         return QString();
 
+    qDebug() << "-------- " << m_systems.first()->id();
     return m_systems.first()->id();
+}
+
+QnUuid QnSystemDescriptionAggregator::localId() const
+{
+    const bool emptySystems = m_systems.empty();
+    NX_ASSERT(!emptySystems, "Invalid aggregator");
+    if (emptySystems)
+        return QString();
+
+    return m_systems.first()->localId();
 }
 
 QString QnSystemDescriptionAggregator::name() const

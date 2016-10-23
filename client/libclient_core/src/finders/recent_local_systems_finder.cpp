@@ -4,9 +4,25 @@
 #include <client_core/local_connection_data.h>
 #include <nx/network/http/asynchttpclient.h>
 
+namespace {
+
+const auto isAcceptablePred =
+    [](const QnSystemDescriptionPtr& system,
+        const QnSystemDescriptionPtr& filteringSystem)
+{
+    // Filters out all systems with local id that exists in discovered systems
+    return ((filteringSystem->localId().toString() != system->id())
+        && (filteringSystem->id() != system->id()));
+};
+
+}
+
 QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent) :
     base_type(parent),
-    m_recentSystems()
+    m_filteringSystems(),
+    m_unfilteredSystems(),
+
+    m_finalSystems()
 {
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
         [this](int valueId)
@@ -20,12 +36,12 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent) :
 
 QnAbstractSystemsFinder::SystemDescriptionList QnRecentLocalSystemsFinder::systems() const
 {
-    return m_recentSystems.values();
+    return m_finalSystems.values();
 }
 
 QnSystemDescriptionPtr QnRecentLocalSystemsFinder::getSystem(const QString &id) const
 {
-    return m_recentSystems.value(id, QnSystemDescriptionPtr());
+    return m_finalSystems.value(id, QnSystemDescriptionPtr());
 }
 
 void QnRecentLocalSystemsFinder::updateSystems()
@@ -33,33 +49,87 @@ void QnRecentLocalSystemsFinder::updateSystems()
     SystemsHash newSystems;
     for (const auto connection : qnClientCoreSettings->recentLocalConnections())
     {
-        if (connection.systemId.isEmpty())
+        if (connection.localId.isNull())
             continue;
 
         const auto system = QnSystemDescription::createLocalSystem(
-            connection.systemId, connection.systemName);
+            connection.localId.toString(), connection.localId, connection.systemName);
 
-        newSystems.insert(connection.systemId, system);
+        newSystems.insert(system->id(), system);
     }
 
-    const auto newSystemsKeys = newSystems.keys().toSet();
-    const auto currentKeys = m_recentSystems.keys().toSet();
-    const auto added = newSystemsKeys - currentKeys;
-    const auto removed = currentKeys - newSystemsKeys;
+    const auto newFinalSystems = filterOutSystems(newSystems);
+    setFinalSystems(newFinalSystems);
+}
 
-    QList<QString> IdsList;
-
-    for (const auto systemId : removed)
-        m_recentSystems.remove(systemId);
-
-    for (const auto systemId : added)
-    {
-        const auto system = newSystems.value(systemId);
-        m_recentSystems.insert(systemId, system);
-        emit systemDiscovered(system);
-    }
-
-    for (const auto id : removed)
+void QnRecentLocalSystemsFinder::removeFinalSystem(const QString& id)
+{
+    if (m_finalSystems.remove(id))
         emit systemLost(id);
 }
 
+void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
+{
+    m_filteringSystems.insert(system->id(), system);
+
+    QSet<QString> forRemove;
+    for (const auto finalSystem : m_finalSystems)
+    {
+        if (!isAcceptablePred(finalSystem, system))
+            forRemove.insert(finalSystem->id());
+    }
+
+    for (const auto id : forRemove)
+        removeFinalSystem(id);
+}
+
+void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
+{
+    if (m_filteringSystems.remove(systemId))
+        updateSystems();
+}
+
+
+QnRecentLocalSystemsFinder::SystemsHash
+    QnRecentLocalSystemsFinder::filterOutSystems(const SystemsHash& source)
+{
+    const auto isAcceptable =
+        [this](const QnSystemDescriptionPtr& system)
+        {
+            // Filters out all systems with local id that exists in discovered systems
+            return std::all_of(m_filteringSystems.begin(), m_filteringSystems.end(),
+                [system](const QnSystemDescriptionPtr& value)
+                {
+                    return isAcceptablePred(system, value);
+                });
+        };
+
+    SystemsHash result;
+    for (const auto unfiltered : m_unfilteredSystems)
+    {
+        if (isAcceptable(unfiltered))
+            result.insert(unfiltered->id(), unfiltered);
+    }
+    return result;
+}
+
+void QnRecentLocalSystemsFinder::setFinalSystems(const SystemsHash& newFinalSystems)
+{
+    if (m_finalSystems == newFinalSystems)
+        return;
+
+    const auto newSystemsKeys = newFinalSystems.keys().toSet();
+    const auto currentKeys = m_finalSystems.keys().toSet();
+    const auto added = newSystemsKeys - currentKeys;
+    const auto removed = currentKeys - newSystemsKeys;
+
+    for (const auto systemId : added)
+    {
+        const auto system = newFinalSystems.value(systemId);
+        m_finalSystems.insert(systemId, system);
+        emit systemDiscovered(system);
+    }
+
+    for (const auto systemId : removed)
+        removeFinalSystem(systemId);
+}

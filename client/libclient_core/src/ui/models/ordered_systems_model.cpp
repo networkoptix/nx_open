@@ -1,3 +1,4 @@
+
 #include "ordered_systems_model.h"
 
 #include <ui/models/systems_model.h>
@@ -40,49 +41,69 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_updateTimer->start();
 }
 
+bool QnOrderedSystemsModel::getWeightFromData(
+    const QModelIndex& modelIndex,
+    const IdWeightDataHash& data,
+    qreal& weight) const
+{
+    const auto fillWeightByRole =
+        [this, modelIndex, data](int role, qreal& weight)
+    {
+        const auto systemId = modelIndex.data(role).toString(); // CHECK BEFOREREVIEW.
+        const auto itWeight = data.find(systemId);
+        if (itWeight == data.end())
+            return false;
+
+        weight = itWeight.value().weight;
+        return true;
+    };
+
+
+    // Searching for maximum weight
+    static const QVector<int> kIdRoles =
+        { QnSystemsModel::SystemIdRoleId, QnSystemsModel::LocalIdRoleId };
+
+    weight = 0.0;
+    bool result = false;
+    for (const auto role : kIdRoles)
+    {
+        qreal foundWeight = 0.0;
+        if (fillWeightByRole(role, foundWeight))
+        {
+            weight = std::max(weight, foundWeight);
+            result = true;
+        }
+    }
+    return result;
+}
+
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
-    const auto systemId = modelIndex.data(QnSystemsModel::SystemIdRoleId).toString();
-    auto itWeight = m_finalWeights.find(systemId);
-    if (itWeight != m_finalWeights.end())
-        return itWeight.value().weight;
+    qreal result = 0.0;
+    if (getWeightFromData(modelIndex, m_finalWeights, result)
+        || getWeightFromData(modelIndex, m_newSystemWeights, result))
+    {
+        return result;
+    }
 
-    // Check for uncommited new system weights
-    const auto itNewSystemWeight = m_newSystemWeights.find(systemId);
-    if (itNewSystemWeight != m_newSystemWeights.end())
-        return itNewSystemWeight.value().weight;
-
-    // Add new system weight
-    const auto getRealConnectionMaxWeight =
-        [](const IdWeightDataHash& weights) -> qreal
-        {
-            qreal result = 0;
-            for (const auto& data : weights)
-            {
-                if (data.realConnection)
-                    result = std::max(result, data.weight);
-            }
-            return result;
-        };
-
-    const auto maxWeight = std::max(getRealConnectionMaxWeight(m_localWeights),
-        getRealConnectionMaxWeight(m_cloudWeights));
-
+    // No weights found: add new system weight
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingWeights, true);
-    const auto newSystemWeight = maxWeight + 1;
+    const auto localId = QnUuid(modelIndex.data(QnSystemsModel::LocalIdRoleId).toUuid());
+    const auto newSystemWeight = m_maxRealWeight + 1;
     const auto lastLoginTime = QDateTime::currentMSecsSinceEpoch();
 
-    m_newSystemWeights.insert(systemId,
-        QnWeightData({ systemId, newSystemWeight, lastLoginTime, false }));
+    m_newSystemWeights.insert(localId.toString(),
+        QnWeightData({ localId, newSystemWeight, lastLoginTime, false }));
 
     auto weightsData = qnClientCoreSettings->localSystemWeightsData();
     const auto it = std::find_if(weightsData.begin(), weightsData.end(),
-        [systemId](const QnWeightData& data) { return data.systemId == systemId; });
+        [localId](const QnWeightData& data) { return data.localId == localId; });
 
     NX_ASSERT(it == weightsData.end(), "We don't expect weight data presence here");
     if (it == weightsData.end())
     {
-        weightsData.append({ systemId, newSystemWeight, lastLoginTime, false });
+        const QnWeightData data = { localId, newSystemWeight, lastLoginTime, false };
+        weightsData.append(data);
     }
     else
     {
@@ -165,15 +186,16 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged(const QnCloudSystemList& s
             IdWeightDataHash result;
             for (const auto system : systems)
             {
-                const auto weightData = QnWeightData( {system.localId, system.weight,
-                    system.lastLoginTimeUtcMs, true });   // Cloud connections are real always
-                result.insert(system.localId, weightData);
+                const auto weightData = QnWeightData();
+
+                // Cloud connections are real always
+                result.insert(system.cloudId, {system.cloudId, system.weight,
+                    system.lastLoginTimeUtcMs, true });
             }
             return result;
         };
 
     const auto onlineWeights = getWeightsData(systems);
-
     auto newCloudSystemsData = getWeightsData(recentSystems);
     for (auto it = onlineWeights.begin(); it != onlineWeights.end(); ++it)
         newCloudSystemsData[it.key()] = it.value(); // << Replaces with updated online data
@@ -195,10 +217,7 @@ void QnOrderedSystemsModel::handleLocalWeightsChanged()
 
     IdWeightDataHash newWeights;
     for (const auto data : localWeightData)
-    {
-        newWeights[data.systemId] = QnWeightData({ data.systemId, data.weight,
-            data.lastConnectedUtcMs, data.realConnection });
-    }
+        newWeights.insert(data.localId.toString(), data);
 
     if (newWeights == m_localWeights)
         return;
@@ -233,5 +252,18 @@ void QnOrderedSystemsModel::updateFinalWeights()
         return;
 
     m_finalWeights = newWeights;
+
+    updateMaxRealWeight();
+
     sort(0);
+}
+
+void QnOrderedSystemsModel::updateMaxRealWeight()
+{
+    m_maxRealWeight = 0.0;
+    for (const auto& weightData : m_finalWeights)
+    {
+        if (weightData.realConnection)
+            m_maxRealWeight = std::max(m_maxRealWeight, weightData.weight);
+    }
 }
