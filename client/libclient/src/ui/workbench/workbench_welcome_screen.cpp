@@ -212,7 +212,7 @@ void QnWorkbenchWelcomeScreen::openConnectingTile()
     if (systemId.isEmpty())
         return;
 
-    emit openTile(systemId);
+    executeDelayedParented([this, systemId]() { emit openTile(systemId);  }, 0, this);
 }
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
