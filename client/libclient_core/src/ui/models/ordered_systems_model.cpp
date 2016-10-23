@@ -189,8 +189,9 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged(const QnCloudSystemList& s
                 const auto weightData = QnWeightData();
 
                 // Cloud connections are real always
-                result.insert(system.cloudId, {system.cloudId, system.weight,
-                    system.lastLoginTimeUtcMs, true });
+                result.insert(system.cloudId,
+                    { system.localId, //< generally, we don't use this field for cloud systems
+                    system.weight, system.lastLoginTimeUtcMs, true });
             }
             return result;
         };
