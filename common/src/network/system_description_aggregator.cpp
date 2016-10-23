@@ -154,7 +154,7 @@ QnUuid QnSystemDescriptionAggregator::localId() const
     const bool emptySystems = m_systems.empty();
     NX_ASSERT(!emptySystems, "Invalid aggregator");
     if (emptySystems)
-        return QString();
+        return QnUuid();
 
     return m_systems.first()->localId();
 }
