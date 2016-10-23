@@ -14,15 +14,27 @@ public:
 
     virtual ~QnRecentLocalSystemsFinder() = default;
 
+    void processSystemAdded(const QnSystemDescriptionPtr& system);
+
+    void processSystemRemoved(const QString& systemId);
+
 public: // overrides
     virtual SystemDescriptionList systems() const override;
 
     virtual QnSystemDescriptionPtr getSystem(const QString &id) const override;
 
-private:
     void updateSystems();
 
-private:
     typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
-    SystemsHash m_recentSystems;
+    void setFinalSystems(const SystemsHash& newFinalSystems);
+
+    SystemsHash filterOutSystems(const SystemsHash& source);
+
+    void removeFinalSystem(const QString& id);
+
+private:
+    SystemsHash m_filteringSystems;
+
+    SystemsHash m_unfilteredSystems;
+    SystemsHash m_finalSystems;
 };
