@@ -49,15 +49,14 @@ bool QnOrderedSystemsModel::getWeightFromData(
     const auto fillWeightByRole =
         [this, modelIndex, data](int role, qreal& weight)
     {
-        const auto systemId = modelIndex.data(role).toString(); // CHECK BEFOREREVIEW.
-        const auto itWeight = data.find(systemId);
+        const auto id = modelIndex.data(role).toString(); // CHECK BEFOREREVIEW.
+        const auto itWeight = data.find(id);
         if (itWeight == data.end())
             return false;
 
         weight = itWeight.value().weight;
         return true;
     };
-
 
     // Searching for maximum weight
     static const QVector<int> kIdRoles =
@@ -99,7 +98,6 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     const auto it = std::find_if(weightsData.begin(), weightsData.end(),
         [localId](const QnWeightData& data) { return data.localId == localId; });
 
-    NX_ASSERT(it == weightsData.end(), "We don't expect weight data presence here");
     if (it == weightsData.end())
     {
         const QnWeightData data = { localId, newSystemWeight, lastLoginTime, false };
