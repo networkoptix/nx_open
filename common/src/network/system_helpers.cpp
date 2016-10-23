@@ -11,9 +11,9 @@ namespace {
 static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
 static const auto kMinVersionWithLocalId = QnSoftwareVersion(3, 0);
 
-QString getFactorySystemIdImpl(const QnUuid& serverId)
+QnUuid getFactorySystemIdImpl(const QnUuid& serverId)
 {
-    return serverId.toString();
+    return serverId;
 }
 
 QString generateTargetId(const QString& cloudSystemId,
@@ -29,12 +29,12 @@ QnUuid getLocalSystemIdImpl(
     const QnSoftwareVersion& serverVersion)
 {
     if (serverVersion < kMinVersionWithSystem)
-        return serverId.toString();    //< We have only one hub-server if version is less than 2.3
+        return serverId;    //< We have only one hub-server if version is less than 2.3
 
     if (serverVersion < kMinVersionWithLocalId)
     {
         if (systemName.isEmpty())
-            return serverId.toString(); // Sometimes it happens and causes empty tile.
+            return serverId; // Sometimes it happens and causes empty tile.
 
         return guidFromArbitraryData(systemName); //< No cloud, no local id, no new systems
     }
@@ -89,7 +89,7 @@ QnUuid helpers::getLocalSystemId(const QnConnectionInfo& info)
 
 QString helpers::getFactorySystemId(const QnModuleInformation& info)
 {
-    return getFactorySystemIdImpl(info.id);
+    return getFactorySystemIdImpl(info.id).toString();
 }
 
 bool helpers::isNewSystem(const QnModuleInformation& info)
