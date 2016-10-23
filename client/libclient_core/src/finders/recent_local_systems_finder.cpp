@@ -7,12 +7,10 @@
 namespace {
 
 const auto isAcceptablePred =
-    [](const QnSystemDescriptionPtr& system,
-        const QnSystemDescriptionPtr& filteringSystem)
+    [](const QnSystemDescriptionPtr& system, const QString& systemId, const QnUuid& localId)
 {
     // Filters out all systems with local id that exists in discovered systems
-    return ((filteringSystem->localId().toString() != system->id())
-        && (filteringSystem->id() != system->id()));
+    return ((systemId != system->id()) && (localId.toString() != system->id()));
 };
 
 }
@@ -20,8 +18,6 @@ const auto isAcceptablePred =
 QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent) :
     base_type(parent),
     m_filteringSystems(),
-    m_unfilteredSystems(),
-
     m_finalSystems()
 {
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -70,12 +66,19 @@ void QnRecentLocalSystemsFinder::removeFinalSystem(const QString& id)
 
 void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
 {
-    m_filteringSystems.insert(system->id(), system);
+    const auto systemId = system->id();
+    auto it = m_filteringSystems.find(systemId);
+    if (it == m_filteringSystems.end())
+        it = m_filteringSystems.insert(systemId, IdCountPair(system->localId(), 0));
+
+    auto& localIdUsageCount = it.value().second;
+    ++localIdUsageCount;
 
     QSet<QString> forRemove;
+    const auto localId = system->localId();
     for (const auto finalSystem : m_finalSystems)
     {
-        if (!isAcceptablePred(finalSystem, system))
+        if (!isAcceptablePred(finalSystem, systemId, localId))
             forRemove.insert(finalSystem->id());
     }
 
@@ -85,8 +88,16 @@ void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr
 
 void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
 {
-    if (m_filteringSystems.remove(systemId))
-        updateSystems();
+    const auto it = m_filteringSystems.find(systemId);
+    if (it == m_filteringSystems.end())
+        return;
+
+    auto& localIdUsageCount = it.value().second;
+    if (--localIdUsageCount)
+        return;
+
+    m_filteringSystems.erase(it);
+    updateSystems();
 }
 
 
@@ -97,15 +108,18 @@ QnRecentLocalSystemsFinder::SystemsHash
         [this](const QnSystemDescriptionPtr& system)
         {
             // Filters out all systems with local id that exists in discovered systems
-            return std::all_of(m_filteringSystems.begin(), m_filteringSystems.end(),
-                [system](const QnSystemDescriptionPtr& value)
-                {
-                    return isAcceptablePred(system, value);
-                });
+            for (auto it = m_filteringSystems.begin(); it != m_filteringSystems.end(); ++it)
+            {
+                const auto systemId = it.key();
+                const auto localId = it.value().first;
+                if (!isAcceptablePred(system, systemId, localId))
+                    return false;
+            }
+            return true;
         };
 
     SystemsHash result;
-    for (const auto unfiltered : m_unfilteredSystems)
+    for (const auto unfiltered : source)
     {
         if (isAcceptable(unfiltered))
             result.insert(unfiltered->id(), unfiltered);

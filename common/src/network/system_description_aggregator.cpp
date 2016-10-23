@@ -146,7 +146,6 @@ QString QnSystemDescriptionAggregator::id() const
     if (emptySystems)
         return QString();
 
-    qDebug() << "-------- " << m_systems.first()->id();
     return m_systems.first()->id();
 }
 

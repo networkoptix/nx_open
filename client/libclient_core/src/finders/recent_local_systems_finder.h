@@ -33,8 +33,8 @@ public: // overrides
     void removeFinalSystem(const QString& id);
 
 private:
-    SystemsHash m_filteringSystems;
-
-    SystemsHash m_unfilteredSystems;
+    typedef QPair<QnUuid, int> IdCountPair;
+    typedef QHash<QString, IdCountPair> IdsDataHash;
+    IdsDataHash m_filteringSystems;
     SystemsHash m_finalSystems;
 };
