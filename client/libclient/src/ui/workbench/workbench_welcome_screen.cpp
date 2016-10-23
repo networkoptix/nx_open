@@ -206,6 +206,14 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
+void QnWorkbenchWelcomeScreen::openConnectingTile()
+{
+    const auto systemId = connectingToSystem();
+    if (systemId.isEmpty())
+        return;
+
+    emit openTile(systemId);
+}
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
     const auto systemId = connectingToSystem();
@@ -213,7 +221,6 @@ void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
         return;
 
     setConnectingToSystem(QString());
-    emit openTile(systemId);
 }
 
 void QnWorkbenchWelcomeScreen::handleConnectingToSystem()

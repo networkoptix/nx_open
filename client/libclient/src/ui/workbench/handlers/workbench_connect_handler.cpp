@@ -461,7 +461,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             }
             else
             {
-                disconnectFromServer(true);
+                disconnectFromServer(true, true);
             }
             break;
     }
@@ -895,7 +895,7 @@ void QnWorkbenchConnectHandler::connectToServer(const QUrl &url)
         url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
 }
 
-bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
+bool QnWorkbenchConnectHandler::disconnectFromServer(bool force, bool isErrorReason)
 {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
     {
@@ -907,6 +907,12 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
     {
         QnGlobalSettings::instance()->synchronizeNow();
         qnSettings->setLastUsedConnection(QnConnectionData());
+    }
+
+    if (isErrorReason && qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->openConnectingTile();
     }
 
     setState(LogicalState::disconnected, PhysicalState::disconnected);
@@ -956,7 +962,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break;
         default:
-            disconnectFromServer(true);
+            disconnectFromServer(true, true);
             break;
     }
 }

@@ -75,7 +75,7 @@ private:
 
     void connectToServer(const QUrl& url);
 
-    bool disconnectFromServer(bool force);
+    bool disconnectFromServer(bool force, bool isErrorReason = false);
 
     void handleTestConnectionReply(
         int handle,

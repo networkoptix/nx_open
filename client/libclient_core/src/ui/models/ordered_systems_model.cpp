@@ -251,12 +251,6 @@ void QnOrderedSystemsModel::updateFinalWeights()
     if (newWeights == m_finalWeights)
         return;
 
-
-    qDebug() << "/n";
-    for (const auto weight : newWeights)
-        qDebug() << weight.weight;
-
-    qDebug() << "/n";
     m_finalWeights = newWeights;
 
     updateMaxRealWeight();
