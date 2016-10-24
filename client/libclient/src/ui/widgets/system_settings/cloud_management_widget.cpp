@@ -12,7 +12,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
-
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>

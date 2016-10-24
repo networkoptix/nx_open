@@ -303,7 +303,7 @@ void QnEventLogDialog::retranslateUi()
     if (cameraList.empty())
         ui->cameraButton->selectAny();
     else
-        ui->cameraButton->selectFew(cameraList);
+        ui->cameraButton->selectDevices(cameraList);
 
     /// Updates action type combobox model
     for (int row = 0; row != m_actionTypesModel->rowCount(); ++row)

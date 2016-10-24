@@ -8,73 +8,17 @@
 #include <api/model/connection_info.h>
 #include <utils/common/app_info.h>
 #include <utils/common/software_version.h>
+#include <network/cloud_system_data.h>
 
 namespace {
-/*!
-This string represents client during search with NetworkOptixModuleFinder class.
-It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
-*/
-const QString nxClientId = lit("client.exe");
-const QString nxECId = lit("Enterprise Controller");
-const QString nxMediaServerId = lit("Media Server");
-
-static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
-static const auto kMinVersionWithLocalId = QnSoftwareVersion(3, 0);
-
-QString getFactorySystemIdImpl(const QnUuid& serverId)
-{
-    return serverId.toString();
-}
-
-QString getTargetSystemIdImpl(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    const QnUuid& serverId,
-    const QnSoftwareVersion& serverVersion)
-{
-    if (serverVersion < kMinVersionWithSystem)
-        return serverId.toString();    //< We have only one hub-server if version is less than 2.3
-
-    if (serverVersion < kMinVersionWithLocalId)
-    {
-        if (systemName.isEmpty())
-            return serverId.toString(); // Sometimes it happens and causes empty tile.
-
-        return systemName; //< No cloud, no local id, no new systems
-    }
-
-    if (localSystemId.isNull())
-        return getFactorySystemIdImpl(serverId);  //< New System id
-
-    return localSystemId.toString();
-}
-
-}
-
-QString helpers::getTargetSystemId(const QnConnectionInfo& info)
-{
-    return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
-        info.serverId(), info.version);
-}
-
-QString helpers::getTargetSystemId(const QnModuleInformation& info)
-{
-    return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
-        info.id, info.version);
-}
-
-QString helpers::getFactorySystemId(const QnModuleInformation& info)
-{
-    return getFactorySystemIdImpl(info.id);
-}
-
-bool helpers::isNewSystem(const QnModuleInformation& info)
-{
-    if (info.version < kMinVersionWithLocalId)
-        return false; //< No new systems until 3.0
-
-    return info.localSystemId.isNull();
-}
+    /*!
+    This string represents client during search with NetworkOptixModuleFinder class.
+    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
+    */
+    const QString nxClientId = lit("client.exe");
+    const QString nxECId = lit("Enterprise Controller");
+    const QString nxMediaServerId = lit("Media Server");
+} // namespace
 
 QnModuleInformation::QnModuleInformation():
     type(),

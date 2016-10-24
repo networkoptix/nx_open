@@ -340,7 +340,7 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
     if (m_allCamerasChoosen)
         m_ui->cameraButton->selectAll();
     else
-        m_ui->cameraButton->selectFew(cameras);
+        m_ui->cameraButton->selectDevices(cameras);
 }
 
 void QnSearchBookmarksDialogPrivate::chooseCamera()

@@ -67,6 +67,8 @@ public: // Properties
 
     QString connectingToSystem() const;
 
+    void openConnectingTile();
+
     void handleDisconnectedFromSystem();
 
     void handleConnectingToSystem();

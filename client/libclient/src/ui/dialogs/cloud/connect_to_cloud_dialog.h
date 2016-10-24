@@ -20,7 +20,6 @@ public:
     ~QnConnectToCloudDialog();
 
     void accept() override;
-
 private:
     QScopedPointer<Ui::ConnectToCloudDialog> ui;
     QScopedPointer<QnConnectToCloudDialogPrivate> d_ptr;

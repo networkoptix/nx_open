@@ -2,14 +2,16 @@
 
 #include <QtWidgets/QDialog>
 
+#include <ui/dialogs/common/dialog.h>
+
 #include <utils/common/credentials.h>
 
 class QnSetupWizardDialogPrivate;
-class QnSetupWizardDialog : public QDialog
+class QnSetupWizardDialog : public QnDialog
 {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnDialog base_type;
 
 public:
     explicit QnSetupWizardDialog(QWidget *parent = nullptr);
@@ -24,6 +26,6 @@ public:
     QnCredentials cloudCredentials() const;
     void setCloudCredentials(const QnCredentials& value);
 private:
-    Q_DECLARE_PRIVATE(QnSetupWizardDialog);
+    Q_DECLARE_PRIVATE(QnSetupWizardDialog)
     QScopedPointer<QnSetupWizardDialogPrivate> d_ptr;
 };

@@ -21,6 +21,7 @@ public:
         SearchRoleId = FirstRoleId,
         SystemNameRoleId,
         SystemIdRoleId,
+        LocalIdRoleId,
 
         OwnerDescriptionRoleId,
         LastPasswordRoleId,

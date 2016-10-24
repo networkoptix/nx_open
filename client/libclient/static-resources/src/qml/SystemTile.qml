@@ -12,6 +12,7 @@ BaseTile
     property string ownerDescription;
 
     property string systemId;
+    property string localId;
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
     property bool isCompatibleInternal: false;
@@ -224,7 +225,7 @@ BaseTile
     property QtObject impl: QtObject
     {
         property var hostsModel: QnSystemHostsModel { systemId: control.systemId; }
-        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemId: control.systemId; }
+        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemId: control.localId; }
 
         // TODO: add enum to c++ code, add type info to model
         readonly property int kFactorySystemTileType: 0;

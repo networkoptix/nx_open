@@ -65,6 +65,9 @@ public:
     static Q_INVOKABLE bool isArm();
     static Q_INVOKABLE bool isBpi();
     static Q_INVOKABLE bool isNx1();
+    static Q_INVOKABLE bool isAndroid();
+    static Q_INVOKABLE bool isIos();
+    static Q_INVOKABLE bool isMobile();
 
     static Q_INVOKABLE QString applicationFullVersion();
 };

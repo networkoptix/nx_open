@@ -516,55 +516,49 @@ bool QnSecurityCamResource::isAudioSupported() const {
     return val.toInt() > 0;
 }
 
-Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {
-    Qn::MotionTypes rez = supportedMotionType();
-    if (rez & Qn::MT_HardwareGrid)
-        return Qn::MT_HardwareGrid;
-    else if (rez & Qn::MT_MotionWindow)
-        return Qn::MT_MotionWindow;
-    else
-        return Qn::MT_NoMotion;
-}
-
 Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const
 {
     Qn::MotionTypes value = supportedMotionType();
-    if (value & Qn::MT_HardwareGrid)
-        return Qn::MT_HardwareGrid;
-    else if (value & Qn::MT_SoftwareGrid)
+    if (value.testFlag(Qn::MT_SoftwareGrid))
         return Qn::MT_SoftwareGrid;
-    else if (value & Qn::MT_MotionWindow)
+
+    if (value.testFlag(Qn::MT_HardwareGrid))
+        return Qn::MT_HardwareGrid;
+
+    if (value.testFlag(Qn::MT_MotionWindow))
         return Qn::MT_MotionWindow;
-    else
-        return Qn::MT_NoMotion;
+
+    return Qn::MT_NoMotion;
 }
 
 Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
     return m_cachedSupportedMotionType.get();
 }
 
-
-bool QnSecurityCamResource::hasMotion() const {
+bool QnSecurityCamResource::hasMotion() const
+{
     Qn::MotionType motionType = getDefaultMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
         return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
-    else
-        return motionType != Qn::MT_NoMotion;
+
+    return motionType != Qn::MT_NoMotion;
 }
 
 Qn::MotionType QnSecurityCamResource::getMotionType() const {
     return m_motionType.get();
 }
 
-Qn::MotionType QnSecurityCamResource::calculateMotionType() const {
+Qn::MotionType QnSecurityCamResource::calculateMotionType() const
+{
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     Qn::MotionType value = (*userAttributesLock)->motionType;
     if (value == Qn::MT_NoMotion)
         return value;
+
     if (value == Qn::MT_Default || !(supportedMotionType() & value))
         return getDefaultMotionType();
-    else
-        return value;
+
+    return value;
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value) {

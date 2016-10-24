@@ -17,7 +17,6 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
-
 #include <utils/common/html.h>
 
 namespace
@@ -73,8 +72,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
-
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
+
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
@@ -96,9 +95,15 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
 
-    ui->loginInputField->setFocus();
     d->updateUi();
     d->lockUi(false);
+
+    setTabOrder(ui->loginInputField, ui->passwordInputField);
+    setTabOrder(ui->passwordInputField, ui->stayLoggedInCheckBox);
+    setTabOrder(ui->stayLoggedInCheckBox, ui->loginButton);
+    setTabOrder(ui->loginButton, ui->restorePasswordLabel);
+    setTabOrder(ui->restorePasswordLabel, ui->createAccountLabel);
+    ui->loginInputField->setFocus();
 
     ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 

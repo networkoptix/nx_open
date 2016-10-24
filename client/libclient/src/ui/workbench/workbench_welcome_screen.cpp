@@ -206,6 +206,14 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
+void QnWorkbenchWelcomeScreen::openConnectingTile()
+{
+    const auto systemId = connectingToSystem();
+    if (systemId.isEmpty())
+        return;
+
+    executeDelayedParented([this, systemId]() { emit openTile(systemId);  }, 0, this);
+}
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
     const auto systemId = connectingToSystem();
@@ -213,7 +221,6 @@ void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
         return;
 
     setConnectingToSystem(QString());
-    emit openTile(systemId);
 }
 
 void QnWorkbenchWelcomeScreen::handleConnectingToSystem()
@@ -338,7 +345,6 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             QnActionParameters params;
             params.setArgument(Qn::UrlRole, url);
             params.setArgument(Qn::StorePasswordRole, storePassword);
-            params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
             menu()->trigger(QnActions::ConnectAction, params);
         };

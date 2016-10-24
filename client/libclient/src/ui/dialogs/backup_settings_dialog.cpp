@@ -29,17 +29,26 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
     ui->comboBoxBackupType->addItem(tr("Realtime"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"), Qn::Backup_Manual);
 
-    connect(ui->comboBoxBackupType, QnComboboxCurrentIndexChanged, this,
-        [this]()
+    auto updatePage = [this]
         {
-            m_schedule.backupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->currentData().toInt());
+            m_schedule.backupType = static_cast<Qn::BackupType>(
+                ui->comboBoxBackupType->currentData().toInt());
             switch (m_schedule.backupType)
             {
-                case Qn::Backup_Manual   : ui->stackedWidget->setCurrentWidget(ui->onDemandPage);   break;
-                case Qn::Backup_Schedule : ui->stackedWidget->setCurrentWidget(ui->bySchedulePage); break;
-                case Qn::Backup_RealTime : ui->stackedWidget->setCurrentWidget(ui->realtimePage);   break;
+                case Qn::Backup_Manual:
+                    ui->stackedWidget->setCurrentWidget(ui->onDemandPage);
+                    break;
+                case Qn::Backup_Schedule:
+                    ui->stackedWidget->setCurrentWidget(ui->bySchedulePage);
+                    break;
+                case Qn::Backup_RealTime:
+                    ui->stackedWidget->setCurrentWidget(ui->realtimePage);
+                    break;
             }
-        });
+        };
+
+    connect(ui->comboBoxBackupType, QnComboboxCurrentIndexChanged, this, updatePage);
+    updatePage();
 
     connect(ui->pushButtonSchedule, &QPushButton::clicked, this,
         [this]()
@@ -129,7 +138,7 @@ const QnVirtualCameraResourceList& QnBackupSettingsDialog::camerasToBackup() con
 void QnBackupSettingsDialog::setCamerasToBackup(const QnVirtualCameraResourceList& cameras)
 {
     m_camerasToBackup = cameras;
-    ui->backupResourcesButton->selectFew(cameras);
+    ui->backupResourcesButton->selectDevices(cameras);
 }
 
 bool QnBackupSettingsDialog::backupNewCameras() const

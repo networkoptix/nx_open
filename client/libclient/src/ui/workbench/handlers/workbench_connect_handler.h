@@ -52,13 +52,11 @@ public:
         bool isConnectionToCloud;
         bool storePassword;
         bool autoLogin;
-        bool forceRemoveOldConnection;
 
         static ConnectionSettingsPtr create(
             bool isConnectionToCloud,
             bool storePassword,
-            bool autoLogin,
-            bool forceRemoveOldConnection);
+            bool autoLogin);
     };
 
 private:
@@ -77,7 +75,7 @@ private:
 
     void connectToServer(const QUrl& url);
 
-    bool disconnectFromServer(bool force);
+    bool disconnectFromServer(bool force, bool isErrorReason = false);
 
     void handleTestConnectionReply(
         int handle,

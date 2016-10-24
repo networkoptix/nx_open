@@ -40,6 +40,14 @@ public:
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr& user = QnUserResourcePtr());
 
+    bool isUserEnabled(const QnUserResourcePtr& user) const;
+    void setUserEnabled(const QnUserResourcePtr& user, bool enabled);
+
+    QnUserResourceList users() const;
+    void resetUsers(const QnUserResourceList& value);
+    void addUser(const QnUserResourcePtr& user);
+    void removeUser(const QnUserResourcePtr& user);
+
     static bool isInteractiveColumn(int column);
 
 private:

@@ -1,6 +1,8 @@
 #include "select_resources_button.h"
 
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
 #include <ui/style/helper.h>
@@ -38,9 +40,9 @@ void QnSelectResourcesButton::selectAll()
     setAppearance(appearanceForAll());
 }
 
-void QnSelectResourcesButton::selectOne(const QnResourcePtr& one)
+void QnSelectResourcesButton::selectNone()
 {
-    setAppearance(appearanceForResource(one));
+    setAppearance(appearanceForSelected(0));
 }
 
 QnSelectResourcesButton::SingleSelectionParameters QnSelectResourcesButton::singleSelectionParameters() const
@@ -71,10 +73,10 @@ void QnSelectResourcesButton::setAppearance(const Appearance& appearance)
     setIconSize(QnSkin::maximumSize(appearance.icon));
 }
 
-QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResource(const QnResourcePtr& resource)
+QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResource(const QnResourcePtr& resource) const
 {
     if (!resource)
-        return appearanceForSelected(1);
+        return appearanceForSelected(0);
 
     auto key = qnResIconCache->key(resource);
     if (!m_singleSelectionParameters.showState)
@@ -90,10 +92,19 @@ QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResour
 QnSelectDevicesButton::QnSelectDevicesButton(QWidget* parent) :
     base_type(parent)
 {
-    setAppearance(appearanceForSelected(0));
+    selectNone();
 }
 
-QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny()
+void QnSelectDevicesButton::selectDevices(const QnVirtualCameraResourceList& devices)
+{
+    selectList(devices);
+
+    auto count = devices.size();
+    if (count > 1 || (count == 1 && !singleSelectionParameters().showName))
+        setText(QnDeviceDependentStrings::getNumericName(devices));
+}
+
+QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() const
 {
     return {
         iconHelper(QnResourceIconCache::Camera),
@@ -102,7 +113,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny()
             tr("Any Camera")) };
 }
 
-QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAll()
+QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAll() const
 {
     return {
         iconHelper(QnResourceIconCache::Cameras),
@@ -111,7 +122,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAll()
             tr("All Cameras")) };
 }
 
-QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForSelected(int count)
+QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForSelected(int count) const
 {
     if (count == 0)
     {
@@ -124,28 +135,31 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForSelected
 
     return {
         iconHelper(count == 1 ? QnResourceIconCache::Camera : QnResourceIconCache::Cameras),
-        QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("%n Devices", "", count),
-            tr("%n Cameras", "", count)) };
+        lit("<You should not see this!>") };
 }
 
 QnSelectUsersButton::QnSelectUsersButton(QWidget* parent) :
     base_type(parent)
 {
-    setAppearance(appearanceForSelected(0));
+    selectNone();
 }
 
-QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForAny()
+void QnSelectUsersButton::selectUsers(const QnUserResourceList& users)
+{
+    selectList(users);
+}
+
+QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForAny() const
 {
     return { iconHelper(QnResourceIconCache::User), tr("Any User") };
 }
 
-QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForAll()
+QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForAll() const
 {
     return { iconHelper(QnResourceIconCache::Users), tr("All Users") };
 }
 
-QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForSelected(int count)
+QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForSelected(int count) const
 {
     if (count == 0)
         return{ QIcon(), tr("Select Users...") };
@@ -155,24 +169,28 @@ QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForSelected(i
         tr("%n Users", "", count) };
 }
 
-
 QnSelectServersButton::QnSelectServersButton(QWidget* parent) :
     base_type(parent)
 {
-    setAppearance(appearanceForSelected(0));
+    selectNone();
 }
 
-QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForAny()
+void QnSelectServersButton::selectServers(const QnMediaServerResourceList& servers)
+{
+    selectList(servers);
+}
+
+QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForAny() const
 {
     return { iconHelper(QnResourceIconCache::Server), tr("Any Server") };
 }
 
-QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForAll()
+QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForAll() const
 {
     return { iconHelper(QnResourceIconCache::Servers), tr("All Servers") };
 }
 
-QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForSelected(int count)
+QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForSelected(int count) const
 {
     if (count == 0)
         return{ QIcon(), tr("Select Servers...") };
