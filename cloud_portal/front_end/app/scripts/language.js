@@ -9,7 +9,10 @@ var L = {
 
     dialogs:{
         okButton: 'Ok',
-        loginTitle: 'Login to PRODUCT_NAME'
+        loginTitle: 'Login to PRODUCT_NAME',
+        logoutConfirmText: "Log out to continue, or cancel to go to your systems",
+        logoutConfirmTitle: "You are already logged in to portal.",
+        logoutConfirmButton: "Log out"
     },
     pageTitles:{
         template: '{{title}} PRODUCT_NAME',
