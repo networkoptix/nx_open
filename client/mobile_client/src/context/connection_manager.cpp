@@ -60,8 +60,7 @@ public:
 
     void setUrl(const QUrl& url);
 
-    void storeConnection(
-            const QString& systemName,
+    void storeConnection(const QString& systemName, const QnUuid& localId,
             const QUrl& url,
             bool storePassword);
 
@@ -334,7 +333,7 @@ void QnConnectionManagerPrivate::doConnect()
 
             updateConnectionState();
 
-            storeConnection(connectionInfo.systemName, url, true);
+            storeConnection(connectionInfo.systemName, connectionInfo.localSystemId, url, true);
             qnSettings->setLastUsedSystemId(connectionInfo.systemName);
             url.setPassword(QString());
             qnSettings->setLastUsedUrl(url);
@@ -421,14 +420,15 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
 }
 
 void QnConnectionManagerPrivate::storeConnection(
-        const QString& systemName,
-        const QUrl& url,
-        bool storePassword)
+    const QString& systemName,
+    const QnUuid& localId,
+    const QUrl& url,
+    bool storePassword)
 {
     auto lastConnections = qnClientCoreSettings->recentLocalConnections();
 
     const QnLocalConnectionData connectionInfo(
-        QString(), systemName, systemName, url, storePassword);
+        systemName, localId, url, storePassword);
 
     auto connectionEqual = [connectionInfo](const QnLocalConnectionData& connection)
     {
