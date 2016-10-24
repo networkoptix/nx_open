@@ -420,29 +420,7 @@ void QnUserSettingsWidget::updateRoleComboBox()
     if (!m_model->user())
         return;
 
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
-
-    /* If there is only one entry in permissions combobox, this check doesn't matter. */
-    int customPermissionsIndex = ui->roleComboBox->count() - 1;
-    NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->roleComboBox->itemData(customPermissionsIndex, Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
-    NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->roleComboBox->itemData(customPermissionsIndex, Qn::UuidRole).value<QnUuid>().isNull());
-
-    int permissionsIndex = customPermissionsIndex;
-    if (!m_model->user()->userGroup().isNull())
-    {
-        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(m_model->user()->userGroup()), Qn::UuidRole, Qt::MatchExactly);
-    }
-    else if (permissions != Qn::NoGlobalPermissions)
-    {
-        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(permissions), Qn::GlobalPermissionsRole, Qt::MatchExactly);
-    }
-
-    if (permissionsIndex < 0)
-        permissionsIndex = customPermissionsIndex;
-
-    ui->roleComboBox->setCurrentIndex(permissionsIndex);
+    ui->roleComboBox->setCurrentIndex(m_rolesModel->rowForUser(m_model->user()));
 }
 
 void QnUserSettingsWidget::updateControlsAccess()

@@ -732,17 +732,6 @@ int QnMessageBox::exec()
 {
     Q_D(QnMessageBox);
 
-    Qt::WindowFlags flags = windowFlags();
-    if (helpTopic(this) != Qn::Empty_Help)
-        flags |= Qt::WindowContextHelpButtonHint;
-    else
-        flags &= ~Qt::WindowContextHelpButtonHint;
-    setWindowFlags(flags);
-
-    /* We cannot cancel drag via modal dialog, let parent process it. */
-    if (parentWidget())
-        cancelDrag(parentWidget());
-
     adjustSize();
 
     base_type::exec();

@@ -626,7 +626,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         ? lit("mailto:%1").arg(emailSettings.supportEmail)
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = qnCommon->moduleInformation().systemName;
+    contextMap[tpSystemName] = qnGlobalSettings->systemName();
     contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;

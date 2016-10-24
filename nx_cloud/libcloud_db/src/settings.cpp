@@ -61,6 +61,7 @@ const QLatin1String kChangeUser("changeUser");
 
 //notification settings
 const QLatin1String kNotificationServiceEndpoint("notification/serviceEndpoint");
+const QLatin1String kNotificationSecret("notification/secret");
 
 const QLatin1String kNotificationEnabled("notification/enabled");
 const bool kDefaultNotificationEnabled = true;
@@ -181,6 +182,11 @@ const EventManager& Settings::eventManager() const
     return m_eventManager;
 }
 
+const ec2::Settings& Settings::p2pDb() const
+{
+    return m_p2pDb;
+}
+
 const QString& Settings::changeUser() const
 {
     return m_changeUser;
@@ -276,6 +282,9 @@ void Settings::loadConfiguration()
     m_notification.serviceEndpoint =
         m_settings.value(kNotificationServiceEndpoint).toString();
 
+    m_notification.secret =
+        m_settings.value(kNotificationSecret).toString();
+
     m_notification.enabled =
         m_settings.value(
             kNotificationEnabled,
@@ -328,6 +337,8 @@ void Settings::loadConfiguration()
         nx::utils::parseTimerDuration(
             m_settings.value(kMediaServerConnectionIdlePeriod).toString(),
             kDefaultMediaServerConnectionIdlePeriod));
+
+    m_p2pDb.load(m_settings);
 }
 
 } // namespace conf

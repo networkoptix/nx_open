@@ -11,6 +11,9 @@
 #include <nx_ec/data/api_layout_data.h>
 
 #include <utils/db/db_helper.h>
+#include <nx/fusion/model_functions.h>
+
+#include <nx/utils/log/log.h>
 
 namespace ec2
 {
@@ -135,8 +138,13 @@ namespace ec2
             if (internalUserId <= 0)
                 return false;
 
-            int permissions = getCurrentUserPermissions(database, internalUserId);
-            permissions |= Qn::GlobalLiveViewerPermissionSet;
+            int oldPermissions = getCurrentUserPermissions(database, internalUserId);
+            int newPermissions = oldPermissions | Qn::GlobalLiveViewerPermissionSet;
+
+            QString logMessage = lit("Adding User Permissions: %1 -> %2")
+                .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(oldPermissions)))
+                .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(newPermissions)));
+            NX_LOG(logMessage, cl_logINFO);
 
             QSqlQuery query(database);
             query.setForwardOnly(true);
@@ -144,7 +152,7 @@ namespace ec2
             if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
                 return false;
             query.bindValue(":id", internalUserId);
-            query.bindValue(":permissions", permissions);
+            query.bindValue(":permissions", newPermissions);
             return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
         }
 
@@ -196,6 +204,9 @@ namespace ec2
             {
                 QSet<QnUuid> userCameras = resourcesByUser[userId].intersect(allCameras);
                 bool allCamerasAvailable = userCameras == allCameras;
+                QString logMessage = lit("Checking cameras availability: %1 of %2")
+                    .arg(userCameras.size()).arg(allCameras.size());
+                NX_LOG(logMessage, cl_logINFO);
                 bool success = allCamerasAvailable
                     ? addCommonPermissions(database, userId)
                     : addAccessibleCamerasList(database, userId, userCameras);

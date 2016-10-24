@@ -1679,6 +1679,8 @@ void QnNxStyle::drawControl(
                 {
                     QStyleOptionToolButton optionCopy(*button);
                     optionCopy.state &= ~State_MouseOver;
+                    optionCopy.icon = QnSkin::maximumSizePixmap(button->icon, QnIcon::Pressed,
+                        button->state.testFlag(State_On) ? QIcon::On : QIcon::Off, false);
                     base_type::drawControl(CE_ToolButtonLabel, &optionCopy, painter, widget);
                     return;
                 }
@@ -2179,7 +2181,11 @@ void QnNxStyle::drawControl(
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
+
                 Qt::Alignment textHorizontalAlignment = Qt::AlignHCenter;
+
+                if (widget && widget->property(Properties::kPushButtonMargin).canConvert<int>())
+                    textHorizontalAlignment = Qt::AlignLeft;
 
                 /* Draw icon left-aligned: */
                 if (!buttonOption->icon.isNull())
@@ -2201,6 +2207,9 @@ void QnNxStyle::drawControl(
                     {
                         textRect.setLeft(option->rect.left() + iconRect.width());
                     }
+
+                    iconRect = alignedRect(option->direction, Qt::AlignCenter,
+                        buttonOption->iconSize, iconRect);
 
                     buttonOption->icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
                     textHorizontalAlignment = Qt::AlignLeft;
@@ -2247,7 +2256,7 @@ void QnNxStyle::drawControl(
                         | Qt::TextHideMnemonic;
 
                     QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
-                        Qt::ElideRight, textRect.width() + margin, textFlags);
+                        Qt::ElideRight, textRect.width(), textFlags);
 
                     proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
                         buttonOption->state.testFlag(State_Enabled), text, foregroundRole);
@@ -3106,6 +3115,14 @@ int QnNxStyle::pixelMetric(
                     return Metrics::kPushButtonIconMargin * 2;
             }
 
+            if (widget)
+            {
+                bool ok;
+                int margin = widget->property(Properties::kPushButtonMargin).toInt(&ok);
+                if (ok && margin >= 0)
+                    return margin;
+            }
+
             return Metrics::kStandardPadding * 2;
         }
 
@@ -3681,7 +3698,6 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
             {
                 case QEvent::Leave:
                 case QEvent::HoverLeave:
-                case QEvent::Destroy:
                 {
                     if (d->lastProxiedWidgetUnderMouse == widget)
                         d->lastProxiedWidgetUnderMouse = nullptr;

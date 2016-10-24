@@ -143,9 +143,13 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_resizerWidget);
     m_hidingProcessor->addTargetItem(m_showWidget);
+    m_hidingProcessor->addTargetItem(item->timeSlider()->toolTipItem());
+    m_hidingProcessor->addTargetItem(item->timeSlider()->bookmarksViewer());
+    m_hidingProcessor->addTargetItem(item->speedSlider()->toolTipItem());
+    m_hidingProcessor->addTargetItem(item->volumeSlider()->toolTipItem());
     m_hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
             /* Do not auto-hide slider if we have opened context menu. */
@@ -199,11 +203,11 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_zoomButtonsWidget->setOpacity(0.0);
     m_zoomButtonsWidget->setZValue(NxUi::ControlItemZOrder);
 
-    m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
-        [this]()
+    m_zoomButtonsWidget->setVisible(navigator()->isTimelineRelevant());
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
+        [this](bool value)
         {
-            m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
+            m_zoomButtonsWidget->setVisible(value);
         });
 
     enum { kSliderLeaveTimeout = 100 };
@@ -270,8 +274,6 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateGeometry();
-
-
 }
 
 bool TimelineWorkbenchPanel::isPinned() const
@@ -314,6 +316,12 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_resizerWidget->setEnabled(opened);
     item->timeSlider()->setTooltipVisible(opened);
+
+    if (!opened)
+    {
+        item->speedSlider()->hideToolTip();
+        item->volumeSlider()->hideToolTip();
+    }
 
     emit openedChanged(opened, animate);
 }

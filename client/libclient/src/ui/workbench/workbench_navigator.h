@@ -154,7 +154,7 @@ protected:
     QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
 
-    protected slots:
+protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);
@@ -182,6 +182,7 @@ protected:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+    void updateTimelineRelevancy();
 
     void updateLocalOffset();
 
@@ -191,7 +192,6 @@ protected:
 
     void setAutoPaused(bool autoPaused);
 
-    protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);

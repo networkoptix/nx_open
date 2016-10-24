@@ -88,11 +88,10 @@ public:
     }
 
     //!restarts process
-    void restart()
+    bool restart()
     {
         stop();
-        start();
-        waitUntilStarted();
+        return startAndWaitUntilStarted();
     }
 
     void addArg(const char* arg)

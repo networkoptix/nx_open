@@ -1,3 +1,4 @@
+
 #include "client_recent_connections_manager.h"
 
 #include <client_core/client_core_settings.h>
@@ -41,7 +42,7 @@ void QnClientRecentConnectionsManager::addModel(QnRecentLocalConnectionsModel* m
 
     const auto systemId = model->systemId();
     m_models << model;
-    if (!systemId.isEmpty())
+    if (!systemId.isNull())
         updateModelBinding(model);
 }
 
@@ -72,13 +73,12 @@ void QnClientRecentConnectionsManager::updateModelsData()
     m_dataCache.clear();
     const auto lastConnectionsData = qnClientCoreSettings->recentLocalConnections();
     for (const auto connectionDesc : lastConnectionsData)
-    {
-        m_dataCache[connectionDesc.systemId].append(connectionDesc);
-    }
+        m_dataCache[connectionDesc.localId].append(connectionDesc);
+
     for (const auto model : m_models)
     {
         NX_ASSERT(model);
-        if (!model || model->systemId().isEmpty())
+        if (!model || model->systemId().isNull())
             continue;
 
         model->updateData(m_dataCache.value(model->systemId()));

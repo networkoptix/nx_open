@@ -16,6 +16,7 @@
 #include <utils/email/email.h>
 #include <nx/network/socket_common.h>
 
+#include "ec2/p2p_sync_settings.h"
 
 namespace nx {
 namespace cdb {
@@ -35,6 +36,7 @@ class Notification
 public:
     /** Host:port of notification service. */
     QString serviceEndpoint;
+    QString secret;
     bool enabled;
 
     Notification();
@@ -101,6 +103,7 @@ public:
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
     const EventManager& eventManager() const;
+    const ec2::Settings& p2pDb() const;
     const QString& changeUser() const;
 
     /** Loads settings from both command line and conf file (or win32 registry). */
@@ -120,6 +123,7 @@ private:
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     EventManager m_eventManager;
+    ec2::Settings m_p2pDb;
     QString m_changeUser;
 
     void fillSupportedCmdParameters();

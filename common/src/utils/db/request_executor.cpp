@@ -21,6 +21,8 @@ DBResult BaseExecutor::detailResultCode(
     {
         case QSqlError::StatementError:
             return DBResult::statementError;
+        case QSqlError::ConnectionError:
+            return DBResult::connectionError;
         default:
             return result;
     }
@@ -32,9 +34,10 @@ DBResult BaseExecutor::lastDBError(QSqlDatabase* const connection) const
     {
         case QSqlError::StatementError:
             return DBResult::statementError;
+        case QSqlError::ConnectionError:
+            return DBResult::connectionError;
 
         case QSqlError::NoError:    //Qt not always sets error code correctly
-        case QSqlError::ConnectionError:
         case QSqlError::TransactionError:
         case QSqlError::UnknownError:
         default:

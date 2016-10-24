@@ -4,6 +4,7 @@
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -126,8 +127,11 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
                 delete layout;
             }
 
-            if (workbench()->layouts().empty())
+            if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
+                && workbench()->layouts().empty())
+            {
                 action(QnActions::OpenNewTabAction)->trigger();
+            }
         });
 }
 

@@ -1,16 +1,20 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <cdb/connection.h>
+
+#include <cloud/cloud_connection.h>
+
+#include <client_core/client_core_settings.h>
 
 #include <common/common_module.h>
-#include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
 #include <utils/common/delayed.h>
@@ -24,29 +28,30 @@
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 #include <utils/common/app_info.h>
-#include <api/global_settings.h>
 
 using namespace nx::cdb;
 
-namespace
+namespace {
+QString kCreateAccountPath = lit("/static/index.html#/register");
+
+const int kHeaderFontSizePixels = 15;
+const int kHeaderFontWeight = QFont::DemiBold;
+
+rest::QnConnectionPtr getPublicServerConnection()
 {
-    QString kCreateAccountPath = lit("/static/index.html#/register");
-
-    const int kHeaderFontSizePixels = 15;
-    const int kHeaderFontWeight = QFont::DemiBold;
-
-    rest::QnConnectionPtr getPublicServerConnection()
+    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
     {
-        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
-        {
-            if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
-                continue;
+        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+            continue;
 
-            return server->restConnection();
-        }
-        return rest::QnConnectionPtr();
+        return server->restConnection();
     }
+    return rest::QnConnectionPtr();
+}
+
 }
 
 class QnConnectToCloudDialogPrivate : public QObject
@@ -63,17 +68,16 @@ public:
     void lockUi(bool locked);
     void bindSystem();
 
-    void showSuccess();
-    void showFailure(const QString &message = QString());
     void showCredentialsError(bool show);
+
+    void showFailure(const QString& message);
+
+    void showSuccess(const QString& cloudLogin);
 
 private:
     void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
 
 public:
-    std::unique_ptr<
-        nx::cdb::api::ConnectionFactory,
-        decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
     QnBusyIndicatorButton* indicatorButton;
@@ -117,6 +121,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
 
@@ -141,6 +146,12 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->lockUi(false);
     d->updateUi();
 
+    setTabOrder(ui->loginInputField, ui->passwordInputField);
+    setTabOrder(ui->passwordInputField, ui->stayLoggedInCheckBox);
+    setTabOrder(ui->stayLoggedInCheckBox, ui->forgotPasswordLabel);
+    setTabOrder(ui->forgotPasswordLabel, ui->createAccountLabel);
+    setTabOrder(ui->createAccountLabel, d->indicatorButton);
+    setTabOrder(d->indicatorButton, ui->buttonBox->button(QDialogButtonBox::Cancel));
     ui->loginInputField->setFocus();
 
     setResizeToContentsMode(Qt::Vertical);
@@ -163,24 +174,12 @@ void QnConnectToCloudDialog::accept()
     base_type::accept();
 }
 
-QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent) :
+QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent):
     QObject(parent),
     q_ptr(parent),
-    connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
     linkedSuccessfully(false),
     indicatorButton(new QnBusyIndicatorButton(parent))
 {
-    const auto cdbEndpoint = qnClientCoreSettings->cdbEndpoint();
-    if (!cdbEndpoint.isEmpty())
-    {
-        const auto hostAndPort = cdbEndpoint.split(lit(":"));
-        if (hostAndPort.size() == 2)
-        {
-            connectionFactory->setCloudEndpoint(
-                    hostAndPort[0].toStdString(),
-                    hostAndPort[1].toInt());
-        }
-    }
 }
 
 void QnConnectToCloudDialogPrivate::updateUi()
@@ -235,7 +234,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 
     indicatorButton->setEnabled(false);
 
-    cloudConnection = connectionFactory->createConnection();
+    cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(
         q->ui->loginInputField->text().trimmed().toStdString(),
         q->ui->passwordInputField->text().trimmed().toStdString());
@@ -260,15 +259,15 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     });
 }
 
-void QnConnectToCloudDialogPrivate::showSuccess()
+void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
 {
     Q_Q(QnConnectToCloudDialog);
     QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            q->windowTitle(),
-                            tr("The system is successfully connected to %1").arg(q->ui->loginInputField->text().trimmed()),
-                            QDialogButtonBox::Ok,
-                            q->parentWidget());
+        helpTopic(q),
+        q->windowTitle(),
+        tr("The system is successfully connected to %1").arg(cloudLogin),
+        QDialogButtonBox::Ok,
+        q->parentWidget());
 
     messageBox.exec();
     linkedSuccessfully = true;
@@ -280,11 +279,11 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnConnectToCloudDialog);
 
     QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
-                            QDialogButtonBox::Ok,
-                            q);
+        helpTopic(q),
+        tr("Error"),
+        tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
+        QDialogButtonBox::Ok,
+        q);
 
     if (!message.isEmpty())
         messageBox.setInformativeText(message);
@@ -322,28 +321,32 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
-    {
-        Q_UNUSED(handleId)
+    auto handleReply =
+        [this,
+            guard = QPointer<QnConnectToCloudDialogPrivate>(this),
+            parentGuard = QPointer<QnConnectToCloudDialog>(q),
+            stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked(),
+            cloudLogin = q->ui->loginInputField->text().trimmed(),
+            cloudPassword = q->ui->passwordInputField->text().trimmed()]
 
-        if (!success || (reply.error != QnRestResult::NoError))
+            (bool success, rest::Handle /* handleId */, const QnRestResult& reply)
         {
-            showFailure(reply.errorString);
-            return;
-        }
+            if (guard && parentGuard && (!success || (reply.error != QnRestResult::NoError)))
+            {
+                showFailure(reply.errorString);
+                return;
+            }
 
-        const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
-        if (stayLoggedIn)
-        {
-            qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
-            qnClientCoreSettings->setCloudPassword(q->ui->passwordInputField->text().trimmed());
-            qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
-                q->ui->loginInputField->text().trimmed(),
-                q->ui->passwordInputField->text().trimmed()));
-        }
+            if (stayLoggedIn)
+            {
+                qnClientCoreSettings->setCloudLogin(cloudLogin);
+                qnClientCoreSettings->setCloudPassword(cloudPassword);
+                qnCloudStatusWatcher->setCloudCredentials(QnCredentials(cloudLogin, cloudPassword));
+            }
 
-        showSuccess();
-    };
+            if (guard && parentGuard)
+                showSuccess(cloudLogin);
+        };
 
     connection->saveCloudSystemCredentials(
         QString::fromStdString(systemData.id),

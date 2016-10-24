@@ -35,7 +35,10 @@ public:
     }
 };
 
-QnTransactionTcpProcessor::QnTransactionTcpProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+QnTransactionTcpProcessor::QnTransactionTcpProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* _owner)
+    :
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket)
 {
     Q_UNUSED(_owner)
@@ -164,8 +167,10 @@ void QnTransactionTcpProcessor::run()
         return;
     }
 
-
-    ConnectionLockGuard connectionLockGuard(remoteGuid, ConnectionLockGuard::Direction::Incoming);
+    ConnectionLockGuard connectionLockGuard(
+        QnTransactionMessageBus::instance()->connectionGuardSharedState(),
+        remoteGuid,
+        ConnectionLockGuard::Direction::Incoming);
 
     if (remotePeer.peerType == Qn::PT_Server)
     {

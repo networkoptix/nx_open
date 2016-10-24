@@ -20,6 +20,7 @@ namespace
         RoleNames result;
         result.insert(QnSystemsModel::SystemNameRoleId, "systemName");
         result.insert(QnSystemsModel::SystemIdRoleId, "systemId");
+        result.insert(QnSystemsModel::LocalIdRoleId, "localId");
         result.insert(QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription");
         result.insert(QnSystemsModel::LastPasswordRoleId, "lastPassword");
 
@@ -160,6 +161,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->name();
         case SystemIdRoleId:
             return system->id();
+        case LocalIdRoleId:
+            return system->localId().toQUuid();
         case OwnerDescriptionRoleId:
         {
             if (!system->isCloudSystem())

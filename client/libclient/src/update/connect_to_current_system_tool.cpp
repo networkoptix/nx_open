@@ -1,44 +1,40 @@
 #include "connect_to_current_system_tool.h"
 
+#include <chrono>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/fake_media_server.h>
 #include <common/common_module.h>
-
-#include <update/task/configure_peer_task.h>
-#include <update/task/wait_compatible_servers_peer_task.h>
+#include <utils/merge_systems_tool.h>
+#include <utils/common/software_version.h>
+#include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
 #include <update/media_server_update_tool.h>
 
-#include <utils/common/software_version.h>
+namespace {
 
+    using namespace std::chrono;
 
-#include <utils/common/app_info.h>
+    static const int kEmptyProgress = 0;
+    static const int kUpdateProgress = 50;
+    static const int kCompleteProgress = 100;
+    static const milliseconds kWaitTimeout = seconds(2);
 
-namespace
-{
-    static const int configureProgress = 25;
-    static const int waitProgress = 50;
-    static const int completeProgress = 100;
+} // namespace
 
-    enum UpdateToolState
-    {
-        CheckingForUpdates,
-        Updating
-    };
-}
-
-QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
+QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent),
-    m_currentTask(nullptr),
+    m_mergeTool(nullptr),
     m_updateTool(nullptr)
 {
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-bool QnConnectToCurrentSystemTool::tryClose(bool force)
+bool QnConnectToCurrentSystemTool::tryClose(bool /*force*/)
 {
-    Q_UNUSED(force)
     cancel();
     return true;
 }
@@ -47,57 +43,60 @@ void QnConnectToCurrentSystemTool::forcedUpdate()
 {
 }
 
-void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QString &password)
+void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& password)
 {
-    if (targets.isEmpty())
-    {
-        finish(NoError);
+    NX_ASSERT(!targetId.isNull());
+    if (targetId.isNull())
         return;
-    }
 
-    m_targets = targets;
+    auto server = qnResPool->getIncompatibleResourceById(targetId, true)
+        .dynamicCast<QnMediaServerResource>();
+    NX_ASSERT(server);
+    if (!server)
+        return;
+
+    m_targetId = targetId;
     m_adminPassword = password;
-    m_restartTargets.clear();
-    m_updateTargets.clear();
-    m_waitTargets.clear();
+    m_originalTargetId = server->getOriginalGuid();
 
-    for (const QnUuid &id: m_targets)
+    if (auto fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
     {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            m_targets.remove(id);
+        QAuthenticator authenticator;
+        authenticator.setUser(lit("admin"));
+        authenticator.setPassword(m_adminPassword);
+        fakeServer->setAuthenticator(authenticator);
     }
 
-    emit progressChanged(0);
-    emit stateChanged(tr("Configuring Server(s)"));
-
-    QnConfigurePeerTask *task = new QnConfigurePeerTask(this);
-    task->setAdminPassword(m_adminPassword);
-    m_currentTask = task;
-    connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_configureTask_finished);
-
-    task->start(m_targets);
+    updateServer();
 }
 
-QSet<QnUuid> QnConnectToCurrentSystemTool::targets() const
+utils::MergeSystemsStatus::Value QnConnectToCurrentSystemTool::mergeError() const
 {
-    return m_targets;
+    return m_mergeError;
 }
 
-QString QnConnectToCurrentSystemTool::adminPassword() const
+QString QnConnectToCurrentSystemTool::mergeErrorMessage() const
 {
-    return m_adminPassword;
+    return m_mergeErrorMessage;
+}
+
+QnUpdateResult QnConnectToCurrentSystemTool::updateResult() const
+{
+    return m_updateResult;
 }
 
 void QnConnectToCurrentSystemTool::cancel()
 {
-    if (m_currentTask)
-        m_currentTask->cancel();
+    if (m_mergeTool)
+        m_mergeTool->deleteLater();
 
     if (m_updateTool)
+    {
         m_updateTool->cancelUpdate();
+        m_updateTool->deleteLater();
+    }
 
-    if (m_currentTask || m_updateTool)
+    if (m_mergeTool || m_updateTool)
         emit finished(Canceled);
 }
 
@@ -106,101 +105,150 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode)
     emit finished(errorCode);
 }
 
-void QnConnectToCurrentSystemTool::waitPeers()
+void QnConnectToCurrentSystemTool::mergeServer()
 {
-    QnWaitCompatibleServersPeerTask *task = new QnWaitCompatibleServersPeerTask(this);
-    m_currentTask = task;
+    NX_ASSERT(!m_mergeTool);
 
-    emit progressChanged(configureProgress);
+    m_mergeError = utils::MergeSystemsStatus::ok;
+    m_mergeErrorMessage.clear();
 
-    connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_waitTask_finished);
-    task->start(QSet<QnUuid>::fromList(m_waitTargets.values()));
-}
-
-void QnConnectToCurrentSystemTool::updatePeers()
-{
-    if (m_updateTargets.isEmpty())
+    const auto server = qnResPool->getIncompatibleResourceById(m_targetId, true)
+        .dynamicCast<QnMediaServerResource>();
+    if (!server)
     {
-        finish(NoError);
+        const auto compatibleServer =
+            qnResPool->getResourceById<QnMediaServerResource>(m_originalTargetId);
+        if (compatibleServer && compatibleServer->getStatus() == Qn::Online)
+        {
+            finish(NoError);
+            return;
+        }
+
+        m_mergeError = utils::MergeSystemsStatus::unknownError;
+        finish(MergeFailed);
         return;
     }
 
-    emit stateChanged(tr("Updating Server(s)"));
-    emit progressChanged(waitProgress);
+    const auto ecServer = qnCommon->currentServer();
+    if (!ecServer)
+        return;
+
+    QAuthenticator auth;
+    auth.setUser(lit("admin"));
+    auth.setPassword(m_adminPassword);
+
+    emit progressChanged(0);
+    emit stateChanged(tr("Configuring Server"));
+
+    m_mergeTool = new QnMergeSystemsTool(this);
+
+    connect(m_mergeTool, &QnMergeSystemsTool::mergeFinished, this,
+        [this](
+            utils::MergeSystemsStatus::Value mergeStatus,
+            const QnModuleInformation& moduleInformation)
+        {
+            if (mergeStatus != utils::MergeSystemsStatus::ok)
+            {
+                delete m_mergeTool;
+                m_mergeError = mergeStatus;
+                m_mergeErrorMessage =
+                    utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
+                finish(MergeFailed);
+                return;
+            }
+
+            waitServer();
+        });
+
+    m_mergeTool->configureIncompatibleServer(ecServer, server->getApiUrl(), auth);
+}
+
+void QnConnectToCurrentSystemTool::waitServer()
+{
+    NX_ASSERT(m_mergeTool);
+
+    auto finishMerge = [this](bool success)
+        {
+            qnResPool->disconnect(this);
+            delete m_mergeTool;
+            finish(success ? NoError : MergeFailed);
+        };
+
+    if (qnResPool->getIncompatibleResourceById(m_targetId, true))
+    {
+        finishMerge(true);
+        return;
+    }
+
+    auto handleResourceChanged = [this, finishMerge](const QnResourcePtr& resource)
+        {
+            if (resource->getId() == m_originalTargetId && resource->getStatus() != Qn::Offline)
+                finishMerge(true);
+        };
+
+    // Receiver object is m_mergeTool.
+    // This helps us to break the connection when m_mergeTool is deleted in the cancel() method.
+    connect(qnResPool, &QnResourcePool::resourceAdded, m_mergeTool, handleResourceChanged);
+    connect(qnResPool, &QnResourcePool::statusChanged, m_mergeTool, handleResourceChanged);
+
+    executeDelayedParented(
+        [this, finishMerge]()
+        {
+            finishMerge(false);
+        }, kWaitTimeout.count(), m_mergeTool);
+
+    emit progressChanged(kUpdateProgress);
+}
+
+void QnConnectToCurrentSystemTool::updateServer()
+{
+    NX_ASSERT(!m_updateTool);
+
+    const auto server = qnResPool->getIncompatibleResourceById(m_targetId, true)
+        .dynamicCast<QnMediaServerResource>();
+
+    if (server->getModuleInformation().protoVersion == QnAppInfo::ec2ProtoVersion())
+    {
+        emit progressChanged(kUpdateProgress);
+        mergeServer();
+        return;
+    }
+
+    emit stateChanged(tr("Updating Server"));
+    emit progressChanged(kEmptyProgress);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
-    connect(m_updateTool,   &QnMediaServerUpdateTool::updateFinished,           this,   &QnConnectToCurrentSystemTool::at_updateTool_finished);
-    connect(m_updateTool,   &QnMediaServerUpdateTool::stageProgressChanged,     this,   &QnConnectToCurrentSystemTool::at_updateTool_stageProgressChanged);
 
-    m_updateTool->setTargets(m_updateTargets);
-    QnSoftwareVersion currentVersion(qnCommon->engineVersion().major(), qnCommon->engineVersion().minor());
-    m_updateTool->startUpdate(currentVersion);
-}
-
-void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers)
-{
-    m_currentTask = 0;
-
-    if (errorCode != 0)
-    {
-        if (errorCode == QnConfigurePeerTask::AuthentificationFailed)
-            finish(AuthentificationFailed);
-        else
-            finish(ConfigurationFailed);
-        return;
-    }
-
-    for (const QnUuid &id: m_targets - failedPeers)
-    {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        if (server->getModuleInformation().protoVersion != QnAppInfo::ec2ProtoVersion())
+    connect(m_updateTool, &QnMediaServerUpdateTool::updateFinished, this,
+        [this](const QnUpdateResult& result)
         {
-            m_updateTargets.insert(server->getId());
-        }
-        else
+            m_updateTool->deleteLater();
+            m_updateTool.clear();
+
+            m_updateResult = result;
+
+            if (result.result != QnUpdateResult::Successful)
+            {
+                finish(UpdateFailed);
+                return;
+            }
+
+            emit progressChanged(kUpdateProgress);
+            mergeServer();
+        });
+
+    connect(m_updateTool, &QnMediaServerUpdateTool::stageProgressChanged, this,
+        [this](QnFullUpdateStage stage, int progress)
         {
-            QnUuid originalId = server->getOriginalGuid();
-            if (!originalId.isNull())
-                m_waitTargets.insert(server->getId(), originalId);
-        }
-    }
+            const int updateProgress =
+                ((int) stage * 100 + progress) / (int) QnFullUpdateStage::Count;
+            emit progressChanged(updateProgress * kUpdateProgress / 100);
+        });
 
-    waitPeers();
-}
+    auto targetVersion = qnCommon->engineVersion();
+    if (const auto ecServer = qnCommon->currentServer())
+        targetVersion = ecServer->getVersion();
 
-void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode)
-{
-    m_currentTask = 0;
-
-    if (errorCode != 0)
-    {
-        finish(ConfigurationFailed);
-        return;
-    }
-
-    updatePeers();
-}
-
-void QnConnectToCurrentSystemTool::at_updateTool_finished(const QnUpdateResult &result)
-{
-    m_updateTool = 0;
-
-    if (result.result == QnUpdateResult::Successful)
-    {
-        emit progressChanged(completeProgress);
-        finish(NoError);
-    }
-    else
-    {
-        finish(UpdateFailed);
-    }
-}
-
-void QnConnectToCurrentSystemTool::at_updateTool_stageProgressChanged(QnFullUpdateStage stage, int progress)
-{
-    int updateProgress = (static_cast<int>(stage) * 100 + progress) / static_cast<int>(QnFullUpdateStage::Count);
-    emit progressChanged(waitProgress + updateProgress * (100 - waitProgress) / 100);
+    m_updateTool->setTargets({m_targetId});
+    m_updateTool->startUpdate(targetVersion);
 }

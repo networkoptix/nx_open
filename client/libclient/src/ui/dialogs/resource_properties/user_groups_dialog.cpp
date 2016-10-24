@@ -157,7 +157,7 @@ void QnUserGroupsDialog::applyChanges()
         auto existing = qnUserRolesManager->userRole(group.id);
 
         if (existing != group)
-            qnResourcesChangesManager->saveUserGroup(group);
+            qnResourcesChangesManager->saveUserRole(group);
 
         auto resources = m_model->accessibleResources(group);
         QnLayoutResourceList layoutsToShare = qnResPool->getResources(resources)
@@ -192,7 +192,7 @@ void QnUserGroupsDialog::applyChanges()
                 });
         }
 
-        qnResourcesChangesManager->removeUserGroup(group.id);
+        qnResourcesChangesManager->removeUserRole(group.id);
     }
 
     updateButtonBox();

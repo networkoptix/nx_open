@@ -158,13 +158,16 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr& resource)
     if (m_serverByRealId.isEmpty())
         return;
 
-    const auto server = resource.dynamicCast<QnFakeMediaServerResource>();
+    const auto server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
 
     auto id = server->getOriginalGuid();
 
     if (!m_serverByRealId.contains(id))
+        return;
+
+    if (server->getStatus() == Qn::Offline)
         return;
 
     if (server->getVersion() != m_version)

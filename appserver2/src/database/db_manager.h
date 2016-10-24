@@ -594,7 +594,6 @@ namespace detail
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool removeEmptyLayoutsFromTransactionLog();
-        bool tuneDBAfterOpen();
         bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();

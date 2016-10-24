@@ -24,22 +24,28 @@ protected: // overrides
         const QModelIndex &parent) const override;
 
 private:
-    void handleCloudSystemsChanged();
+    void handleCloudSystemsChanged(const QnCloudSystemList& systems);
 
     void handleLocalWeightsChanged();
 
     void updateFinalWeights();
 
+    void updateMaxRealWeight();
+
     qreal getWeight(const QModelIndex& modelIndex) const;
 
-private:
     typedef QHash<QString, QnWeightData> IdWeightDataHash;
+    bool getWeightFromData(const QModelIndex& modelIndex,
+        const IdWeightDataHash& data,
+        qreal& weight) const;
+
+private:
 
     QTimer* const m_updateTimer;
     IdWeightDataHash m_cloudWeights;
     IdWeightDataHash m_localWeights;
     IdWeightDataHash m_finalWeights;
-
+    qreal m_maxRealWeight;
     mutable IdWeightDataHash m_newSystemWeights;
     mutable bool m_updatingWeights;
 };

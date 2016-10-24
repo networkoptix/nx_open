@@ -102,9 +102,7 @@ void DirectTcpEndpointTunnel::startConnection(
     }
 
     connectionContextIter->tcpSocket = std::make_unique<TCPSocket>(false, AF_INET);
-    if (connectionContextIter->socketAttributes.aioThread)
-        connectionContextIter->tcpSocket->bindToAioThread(
-            connectionContextIter->socketAttributes.aioThread.get());
+    connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
         !connectionContextIter->tcpSocket->setSendTimeout(timeout.count()))
     {
@@ -125,14 +123,18 @@ void DirectTcpEndpointTunnel::onConnectDone(
     SystemError::ErrorCode sysErrorCode,
     std::list<ConnectionContext>::iterator connectionContextIter)
 {
-    if (sysErrorCode != SystemError::noError)
-        connectionContextIter->tcpSocket.reset();
+    connectionContextIter->tcpSocket->post(
+        [this, sysErrorCode, connectionContextIter]()
+        {
+            if (sysErrorCode != SystemError::noError)
+                connectionContextIter->tcpSocket.reset();
 
-    reportConnectResult(
-        connectionContextIter,
-        sysErrorCode,
-        std::move(connectionContextIter->tcpSocket),
-        sysErrorCode == SystemError::noError);
+            reportConnectResult(
+                connectionContextIter,
+                sysErrorCode,
+                std::move(connectionContextIter->tcpSocket),
+                sysErrorCode == SystemError::noError);
+        });
 }
 
 void DirectTcpEndpointTunnel::reportConnectResult(
@@ -147,6 +149,13 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         m_connections.erase(connectionContextIter);
     }
     
+    if (!context.socketAttributes.applyTo(tcpSocket.get()))
+    {
+        sysErrorCode = SystemError::getLastOSErrorCode();
+        stillValid = false;
+        tcpSocket.reset();
+    }
+
     nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
     context.handler(sysErrorCode, std::move(tcpSocket), stillValid);
     if (watcher.objectDestroyed())

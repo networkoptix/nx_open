@@ -73,6 +73,41 @@ QnUserRolesModelPrivate::QnUserRolesModelPrivate(
     }
 }
 
+int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
+{
+    /* Rows order: standard, user-defined, custom. */
+
+    int defaultRow = m_customRoleEnabled
+        ? count() - 1
+        : -1;
+
+    auto role = user->role();
+    switch (role)
+    {
+        case Qn::UserRole::CustomUserGroup:
+        {
+            auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
+                [roleId = user->userGroup()](const ec2::ApiUserGroupData& role)
+                {
+                    return role.id == roleId;
+                });
+
+            if (roleIterator == m_userRoles.end())
+                return defaultRow;
+
+            return std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
+        }
+
+        case Qn::UserRole::CustomPermissions:
+            return defaultRow;
+
+        default:
+            break;
+    }
+
+    return m_standardRoles.indexOf(role);
+}
+
 void QnUserRolesModelPrivate::setUserRoles(ec2::ApiUserGroupDataList value)
 {
     std::sort(value.begin(), value.end(), lessRoleByName);
@@ -185,9 +220,9 @@ bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
     if (roleIterator == m_userRoles.end())
         return false;
 
-    Q_Q(QnUserRolesModel);
     int row = std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
 
+    Q_Q(QnUserRolesModel);
     QnUserRolesModel::ScopedRemoveRows removeRows(q, QModelIndex(), row, row);
     m_userRoles.erase(roleIterator);
     return true;

@@ -37,14 +37,35 @@ QnTransactionTransport::QnTransactionTransport(
     setOutgoingConnection(std::move(socket));
 }
 
-QnTransactionTransport::QnTransactionTransport(const ApiPeerData& localPeer)
+QnTransactionTransport::QnTransactionTransport(
+    ConnectionGuardSharedState* const connectionGuardSharedState,
+    const ApiPeerData& localPeer)
 :
     QnTransactionTransportBase(
+        connectionGuardSharedState,
         localPeer,
         QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
         QnGlobalSettings::instance()->keepAliveProbeCount()),
     m_userAccessData(Qn::kSystemAccess)
 {
+}
+
+QnTransactionTransport::~QnTransactionTransport()
+{
+    pleaseStopSync();
+
+    if (m_ttFinishCallback)
+        m_ttFinishCallback();
+}
+
+void QnTransactionTransport::close()
+{
+    setState(State::Closed);    //changing state before freeing socket so that everyone
+                                //stop using socket before it is actually freed
+
+    pleaseStopSync();
+
+    markAsNotSynchronized();
 }
 
 void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
@@ -135,6 +156,12 @@ bool QnTransactionTransport::sendSerializedTransaction(
     }
 
     return true;
+}
+
+void QnTransactionTransport::setBeforeDestroyCallback(
+    std::function<void()> ttFinishCallback)
+{
+    m_ttFinishCallback = ttFinishCallback;
 }
 
 }   // namespace ec2

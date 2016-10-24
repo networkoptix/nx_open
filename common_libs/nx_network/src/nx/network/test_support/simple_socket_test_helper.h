@@ -11,6 +11,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
+#include <utils/common/guard.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
@@ -314,6 +315,13 @@ void socketSimpleAsync(
     nx::utils::TestSyncQueue< SystemError::ErrorCode > clientResults;
 
     auto server = serverMaker();
+
+    const auto serverGuard = makeScopedGuard(
+        [&server, &stopSocket]()
+        {
+            stopSocket(std::move(server));
+        });
+
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(5000));
@@ -420,6 +428,13 @@ void socketSimpleAsync(
     for (int i = clientCount; i > 0; --i)
     {
         auto testClient = clientMaker();
+
+        const auto testClientGuard = makeScopedGuard(
+            [&testClient, &stopSocket]()
+            {
+                stopSocket(std::move(testClient));
+            });
+
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
         ASSERT_TRUE(testClient->setSendTimeout(3000));
         ASSERT_TRUE(testClient->setRecvTimeout(3000));
@@ -516,11 +531,7 @@ void socketSimpleAsync(
         ASSERT_EQ(serverResults.pop(), SystemError::noError) << i; // accept
         ASSERT_EQ(clientResults.pop(), SystemError::noError) << i; // send
         ASSERT_EQ(serverResults.pop(), SystemError::noError) << i; // recv
-
-        stopSocket(std::move(testClient));
     }
-
-    stopSocket(std::move(server));
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>

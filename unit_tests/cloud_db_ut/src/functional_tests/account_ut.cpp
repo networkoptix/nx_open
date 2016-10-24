@@ -42,7 +42,8 @@ TEST_F(Account, activation)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -92,7 +93,8 @@ TEST_F(Account, reactivation)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -138,7 +140,7 @@ TEST_F(Account, reactivation)
         ASSERT_EQ(api::ResultCode::notFound, result);
 
         if (i == 0)
-            restart();
+            ASSERT_TRUE(restart());
     }
 }
 
@@ -148,7 +150,8 @@ TEST_F(Account, reactivation_activated_account)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -178,16 +181,18 @@ TEST_F(Account, reactivation_activated_account)
 TEST_F(Account, general)
 {
     EmailManagerMocked mockedEmailManager;
+
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(
-            GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&)))
-            .Times(3);
+            GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(3);
+
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(
-            GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&)))
-            .Times(2);
+            GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&))
+    ).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -277,7 +282,8 @@ TEST_F(Account, bad_registration)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -424,7 +430,7 @@ TEST_F(Account, update)
         getAccount(account1.email, account1NewPassword, &newAccount));
     ASSERT_EQ(newAccount, account1);
 
-    restart();
+    ASSERT_TRUE(restart());
 
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -437,10 +443,12 @@ TEST_F(Account, reset_password_general)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(2);
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(2);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))
+    ).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -467,7 +475,7 @@ TEST_F(Account, reset_password_general)
         ASSERT_EQ(api::ResultCode::ok, result);
 
         if (i == 1)
-            restart();  //checking that code is valid after cloud_db restart
+            ASSERT_TRUE(restart());  //checking that code is valid after cloud_db restart
 
         //confirmation code has format base64(tmp_password:email)
         const auto tmpPasswordAndEmail = QByteArray::fromBase64(
@@ -499,10 +507,12 @@ TEST_F(Account, reset_password_expiration)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(1);
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))
+    ).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -541,7 +551,7 @@ TEST_F(Account, reset_password_expiration)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         api::AccountUpdateData update;
         update.passwordHa1 = nx_http::calcHa1(
@@ -613,7 +623,7 @@ TEST_F(Account, reset_password_links_expiration_after_changing_password)
         }
 
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
     }
 }
 
@@ -653,7 +663,7 @@ TEST_F(Account, reset_password_authorization)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         //verifying that only /account/update is allowed with this temporary password
         api::AccountData accountData;
@@ -705,7 +715,7 @@ TEST_F(Account, reset_password_authorization)
     result = updateAccount(account1.email, tmpPassword, update);
     ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 
-    restart();
+    ASSERT_TRUE(restart());
 
     result = updateAccount(account1.email, tmpPassword, update);
     ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
@@ -751,7 +761,7 @@ TEST_F(Account, reset_password_activates_account)
     ASSERT_EQ(api::ResultCode::ok, result);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
-    restart();
+    ASSERT_TRUE(restart());
 
     result = getAccount(account1.email, account1NewPassword, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
@@ -810,7 +820,7 @@ TEST_F(Account, temporary_credentials)
         for (int j = 0; j < 2; ++j)
         {
             if (j == 1)
-                restart();
+                ASSERT_TRUE(restart());
 
             result = getAccount(
                 temporaryCredentials.login,
@@ -873,7 +883,7 @@ TEST_F(Account, temporary_credentials_expiration)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         result = getAccount(
             temporaryCredentials.login,
@@ -928,10 +938,12 @@ TEST_F(Account, created_while_sharing)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(2);
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))
+    ).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/)
@@ -969,7 +981,7 @@ TEST_F(Account, created_while_sharing)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         ASSERT_EQ(
             api::ResultCode::ok,

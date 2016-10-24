@@ -115,6 +115,12 @@ public:
     void setLastDiscoveredResources(const QnResourceList& resources);
     QSet<QString> lastDiscoveredIds() const;
     void addResourcesImmediatly(QnResourceList& resources);
+
+    static bool sameResourceWithAnotherGuidExists(
+        const QnResourcePtr& resource, 
+        std::function<bool(const QnNetworkResourcePtr& resource)> filterFunc,
+        bool manuallyAdded);
+
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:

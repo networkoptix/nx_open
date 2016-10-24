@@ -17,8 +17,9 @@ namespace cdb {
 class AuthorizationInfo;
 
 namespace ec2 {
-class ConnectionManager;
-class TransactionLog;
+
+class SyncronizationEngine;
+
 } // namespace ec2
 
 class MaintenanceManager
@@ -26,8 +27,7 @@ class MaintenanceManager
 public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
-        const ec2::ConnectionManager& connectionManager,
-        ec2::TransactionLog* const transactionLog);
+        ec2::SyncronizationEngine* const syncronizationEngine);
     ~MaintenanceManager();
 
     void getVmsConnections(
@@ -47,8 +47,7 @@ public:
 
 private:
     const QnUuid m_moduleGuid;
-    const ec2::ConnectionManager& m_connectionManager;
-    ec2::TransactionLog* const m_transactionLog;
+    ec2::SyncronizationEngine* const m_syncronizationEngine;
     nx::network::aio::Timer m_timer;
     QnCounter m_startedAsyncCallsCounter;
 

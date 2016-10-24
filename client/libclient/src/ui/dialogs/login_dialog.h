@@ -75,11 +75,7 @@ protected:
 private:
     QUrl currentUrl() const;
 
-    QnLocalConnectionData gatherSystemConnectionData(const QUrl& url,
-        const QString& name,
-        bool savePassword);
-
-    QStandardItem* newConnectionItem(const QnLocalConnectionData& connection);
+    QStandardItem* newConnectionItem(const QnConnectionData& connection);
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;

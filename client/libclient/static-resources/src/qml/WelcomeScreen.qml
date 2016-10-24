@@ -204,6 +204,7 @@ Rectangle
                         anchors.verticalCenter: parent.verticalCenter
 
                         systemId: model.systemId
+                        localId: model.localId
                         systemName: model.systemName
                         ownerDescription: model.ownerDescription
 

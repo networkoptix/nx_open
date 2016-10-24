@@ -57,7 +57,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     if (connection)
     {
         trace(lit("Connection established to %1").arg(connection->connectionInfo().ecsGuid));
-        qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
+        qnCommon->setRemoteGUID(connection->connectionInfo().serverId());
         //TODO: #GDM #3.0 in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     }
     else if (m_connected)

@@ -75,17 +75,17 @@ QnRecentLocalConnectionsModel::~QnRecentLocalConnectionsModel()
     QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
-QString QnRecentLocalConnectionsModel::systemId() const
+QUuid QnRecentLocalConnectionsModel::systemId() const
 {
     return m_systemId;
 }
 
-void QnRecentLocalConnectionsModel::setSystemId(const QString &systemId)
+void QnRecentLocalConnectionsModel::setSystemId(const QUuid& localId)
 {
-    if (m_systemId == systemId)
+    if (m_systemId == localId)
         return;
 
-    m_systemId = systemId;
+    m_systemId = localId;
     emit systemIdChanged();
 }
 

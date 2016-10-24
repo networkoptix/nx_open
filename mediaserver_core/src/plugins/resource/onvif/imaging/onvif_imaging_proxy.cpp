@@ -219,7 +219,9 @@ bool QnOnvifImagingProxy::makeSetRequest() {
     ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login, passwd, getTimeDrift());
     SetImagingSettingsResp response;
     SetImagingSettingsReq request;
-    request.ImagingSettings = m_values->ImagingSettings;
+    NX_ASSERT(m_values);
+    auto imagingSettings = *m_values->ImagingSettings;
+    request.ImagingSettings = &imagingSettings;
     request.VideoSourceToken = m_videoSrcToken;
 
     int soapRes = soapWrapper.setImagingSettings(request, response);

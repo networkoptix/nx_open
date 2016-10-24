@@ -780,9 +780,10 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this, time);
 
-    m_dataQueue.lock();
-    markIgnoreBefore(m_dataQueue, time);
-    m_dataQueue.unlock();
+    {
+        auto randomAccess = m_dataQueue.lock();
+        markIgnoreBefore(randomAccess, time);
+    }
     QnMutexLocker lock( &m_timeMutex );
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();

@@ -289,6 +289,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
     addAction(action(QnActions::SystemAdministrationAction));
+    if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))
+        addAction(screenRecordingAction);
 
     connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(QnActions::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));

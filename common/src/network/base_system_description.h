@@ -3,8 +3,8 @@
 #include <QtCore/QObject>
 
 #include <network/module_information.h>
-#include <nx/utils/uuid.h>
 
+class QnUuid;
 class QnBaseSystemDescription;
 typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 
@@ -33,6 +33,8 @@ public:
     virtual ~QnBaseSystemDescription() {}
 
     virtual QString id() const = 0;
+
+    virtual QnUuid localId() const = 0;
 
     virtual QString name() const = 0;
 

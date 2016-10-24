@@ -59,10 +59,15 @@ QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(bool allowItfWitho
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
 QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
 
-//returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time; 
+//returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time;
 QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
 
-// return true if succeded 
+/**
+ * Set filter for interface list
+ */
+void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
+
+// return true if succeded
 bool NX_NETWORK_API getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
 
 void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
@@ -88,7 +93,7 @@ bool NX_NETWORK_API isNewDiscoveryAddressBetter(
 
 static const int MAC_ADDR_LEN = 18;
 /*!
-    \param host If function succeeds \a *host contains pointer to statically-allocated buffer, 
+    \param host If function succeeds \a *host contains pointer to statically-allocated buffer,
         so it MUST NOT be freed!
     \return 0 on success, -1 in case of error. Use errno to get error code
 */

@@ -50,7 +50,7 @@ public:
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
-    QUrl getApiUrl() const;
+    virtual QUrl getApiUrl() const;
 
     SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
@@ -135,8 +135,6 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
-    void sslAllowedChanged(const QnResourcePtr& resource);
-
 private:
     SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated

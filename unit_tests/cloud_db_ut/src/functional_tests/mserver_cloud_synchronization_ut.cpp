@@ -16,8 +16,8 @@
 #include <utils/common/id.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
+#include "ec2/transaction_connection_helper.h"
 #include "email_manager_mocked.h"
-#include "transaction_transport.h"
 
 namespace nx {
 namespace cdb {
@@ -40,7 +40,7 @@ TEST_F(Ec2MserverCloudSynchronization, general)
         testSynchronizingUserFromMediaServerToCloud();
 
         if (i == 0)
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
     }
 }
 
@@ -109,14 +109,13 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserLocallyWhileOffline)
 
         if (i == 0)
         {
-            // Removing user in cloud.
-            api::SystemSharing sharingData;
-            sharingData.accountEmail = account2VmsData.email.toStdString();
-            sharingData.accessRole = api::SystemAccessRole::none;   //< Removing user.
-            sharingData.systemID = registeredSystemData().id;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharingData));
+                cdb()->removeSystemSharing(
+                    ownerAccount().email,
+                    ownerAccountPassword(),
+                    registeredSystemData().id,
+                    account2VmsData.email.toStdString()));
 
             // Waiting for user to disappear from vms.
             waitForUserToDisappearLocally(account2VmsData.id);
@@ -296,7 +295,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
             appserver2()->moduleInstance()->ecConnection()
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
             ASSERT_EQ(api::ResultCode::ok, unbindSystem());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
             ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
         }
     }
@@ -336,7 +335,7 @@ TEST_F(Ec2MserverCloudSynchronization, newTransactionTimestamp)
         {
             appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
 
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
 
             api::SystemSharing sharing;
             sharing.accountEmail = testAccount.email;
@@ -366,7 +365,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
         {
             appserver2()->moduleInstance()->ecConnection()
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
             appserver2()->moduleInstance()->ecConnection()
                 ->addRemotePeer(cdbEc2TransactionUrl());
         }
@@ -411,13 +410,16 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))
+    ).Times(1);
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))
+    ).Times(1);
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))
+    ).Times(1);
     //< One for owner account, another one - for user account, third one - password reset
 
     EMailManagerFactory::setFactory(
@@ -507,7 +509,7 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
         {
             appserver2()->moduleInstance()->ecConnection()
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
             appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
         }
 
@@ -518,15 +520,13 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
 
         waitForCloudAndVmsToSyncUsers();
 
-        // Removing user in cloud.
         ASSERT_EQ(
             api::ResultCode::ok,
-            cdb()->updateSystemSharing(
+            cdb()->removeSystemSharing(
                 ownerAccount().email,
                 ownerAccountPassword(),
                 registeredSystemData().id,
-                newAccountEmail,
-                api::SystemAccessRole::none));
+                newAccountEmail));
         waitForCloudAndVmsToSyncUsers();
 
         // Checking that user has been removed.

@@ -274,7 +274,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
         for (const auto& id: target.targets)
         {
             const auto server = qnResPool->getIncompatibleResourceById(id)
-                .dynamicCast<QnMediaServerResource>();
+                .dynamicCast<QnFakeMediaServerResource>();
             if (!server)
                 continue;
 

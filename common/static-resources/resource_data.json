@@ -596,7 +596,7 @@
             }
         },
         {
-            "keys":["Honeywell|H4D3PRV3"],
+            "keys":["Honeywell|H4D3PRV3", "Honeywell|H4D3PRV2"],
             "preferredAuthScheme": "Automatic"
         },
         {
@@ -1469,7 +1469,21 @@
 			"showUrl": true,
 			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
-		}
+		},
+        {
+            "keys":[
+                "Digital_Watchdog|DWC-PF5M1TIR"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 32,
+                "max": 8000
+            },
+            "lowStreamBitrateBounds": {
+                "min": 32,
+                "max": 8000
+            }
+        }
+
     ]
 }
 

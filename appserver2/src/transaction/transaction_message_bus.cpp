@@ -1385,19 +1385,26 @@ void QnTransactionMessageBus::doPeriodicTasks()
             ++itr)
         {
             QnTransactionTransport* transport = itr.value();
-            if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient())
+
+            if (transport->remotePeerSupportsKeepAlive() &&
+                transport->getState() >= QnTransactionTransport::Connected &&
+                transport->getState() < QnTransactionTransport::Closed &&
+                transport->isHttpKeepAliveTimeout())
             {
-                if (transport->isHttpKeepAliveTimeout())
-                {
-                    NX_LOGX(
-                        QnLog::EC2_TRAN_LOG,
-                        lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
-                            .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()),
-                        cl_logWARNING);
-                    transport->setState(QnTransactionTransport::Error);
-                }
-                else if (transport->isNeedResync())
-                    queueSyncRequest(transport);
+                NX_LOGX(
+                    QnLog::EC2_TRAN_LOG,
+                    lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
+                    .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()),
+                    cl_logWARNING);
+                transport->setState(QnTransactionTransport::Error);
+                continue;
+            }
+
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming &&
+                !transport->remotePeer().isClient() &&
+                transport->isNeedResync())
+            {
+                queueSyncRequest(transport);
             }
         }
     }
@@ -1431,7 +1438,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
             }
 
             itr.value().lastConnectedTime.restart();
-            QnTransactionTransport* transport = new QnTransactionTransport(localPeer());
+            QnTransactionTransport* transport = new QnTransactionTransport(
+                &m_connectionGuardSharedState, localPeer());
             connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction, Qt::QueuedConnection);
             connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged, Qt::QueuedConnection);
             connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::QueuedConnection);
@@ -1920,6 +1928,11 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerD
     }
     *peerDistance = minDistance;
     return result;
+}
+
+ConnectionGuardSharedState* QnTransactionMessageBus::connectionGuardSharedState()
+{
+    return &m_connectionGuardSharedState;
 }
 
 int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const

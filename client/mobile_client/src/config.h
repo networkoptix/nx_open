@@ -11,8 +11,8 @@ struct FlagConfig: public nx::utils::FlagConfig
     NX_FLAG(0, forceLiteMode, "Launch mobile_client in lite_mode, regardless of the platform.");
     NX_FLAG(0, forceNonLiteMode, "Do not launch mobile_client in lite_mode, regardless of anything.");
     NX_FLAG(0, disableFullScreen, "In lite_mode, do not start in full-screen mode.");
-    NX_FLAG(0, enableLog, "Enable mobile_client logging to temp path (DEBUG2 level).");
-    NX_FLAG(0, enableEc2TranLog, "Enable ec2_tran logging to temp path (DEBUG2 level).");
+    NX_FLAG(0, enableLog, "Enable mobile_client logging (DEBUG2 level) to temp path / Android logcat.");
+    NX_FLAG(0, enableEc2TranLog, "Enable ec2_tran logging (DEBUG2 level) to temp path / Android logcat.");
     NX_FLAG(0, execAtGlThreadOnBeforeSynchronizing, "Connect lambda execution to specified event.");
     NX_FLAG(1, execAtGlThreadOnFrameSwapped, "Connect lambda execution to specified event.");
 };

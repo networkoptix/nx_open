@@ -862,6 +862,9 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     foreach(QnVideoWallResourcePtr r, videowalls)
         resources.removeOne(r);
 
+    if (!workbench()->currentLayout()->resource())
+        menu()->trigger(QnActions::OpenNewTabAction);
+
     if (workbench()->currentLayout()->resource()->locked() &&
         !resources.empty() &&
         layouts.empty() &&
