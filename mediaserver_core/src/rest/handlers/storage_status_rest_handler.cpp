@@ -27,20 +27,19 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     if (!storage)
         storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
 
-    if (!storage) {
+    if (!storage) 
+    {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
         qint64 spaceLimit = QnFileStorageResource::isLocal(storageUrl) ?
                             nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE :
                             QnFileStorageResource::kNasStorageLimit;
 
-        if (storage)
-        {
-            storage->setUrl(storageUrl);
-            storage->setSpaceLimit(spaceLimit);
-            if (!storage->initOrUpdate())
-                return CODE_INVALID_PARAMETER;
-        }
-        else
+        if (!storage)
+            return CODE_INVALID_PARAMETER;
+
+        storage->setUrl(storageUrl);
+        storage->setSpaceLimit(spaceLimit);
+        if (!storage->initOrUpdate())
             return CODE_INVALID_PARAMETER;
     }
 
