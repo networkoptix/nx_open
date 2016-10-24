@@ -165,6 +165,7 @@ Item
             if (currentItemIndex == -1) //< In case of non-existent user
             {
                 expandedArea.savePasswordCheckbox.checked = false;  // Reset "Store password" checkbox
+                expandedArea.passwordTextField.text = "";
                 return;
             }
 
