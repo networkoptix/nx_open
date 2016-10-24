@@ -7,6 +7,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
+#include <ui/workaround/label_link_tabstop_workaround.h>
 
 #include <utils/common/html.h>
 
@@ -37,8 +38,11 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
-    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."), 
+    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."),
         urlHelper.accountManagementUrl()));
+
+    auto tabstopListener = new QnLabelFocusListener(this);
+    ui->manageAccountLabel->installEventFilter(tabstopListener);
 
     connect(ui->enabledButton, &QPushButton::toggled, this, &QnCloudUserPanelWidget::enabledChanged);
     setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
@@ -91,7 +95,7 @@ QString QnCloudUserPanelWidget::fullName() const
 }
 
 void QnCloudUserPanelWidget::setFullName(const QString& value)
-{   
+{
     ui->nameLabel->setText(value);
     ui->nameLabel->setVisible(!value.trimmed().isEmpty());
 }

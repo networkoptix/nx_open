@@ -1,8 +1,6 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
-#include <QtWidgets/private/qwidgettextcontrol_p.h>
-
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
@@ -29,6 +27,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
+#include <ui/workaround/label_link_tabstop_workaround.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -123,8 +122,14 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+
+    auto tabstopListener = new QnLabelFocusListener(this);
+
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
+    ui->createAccountLabel->installEventFilter(tabstopListener);
+
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
+    ui->forgotPasswordLabel->installEventFilter(tabstopListener);
 
     auto aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
@@ -173,19 +178,6 @@ void QnConnectToCloudDialog::accept()
     }
 
     base_type::accept();
-}
-
-bool QnConnectToCloudDialog::focusNextPrevChild(bool next)
-{
-    bool result = base_type::focusNextPrevChild(next);
-    auto w = focusWidget();
-    if (qobject_cast<QLabel*>(w))
-    {
-        if (auto child = w->findChild<QWidgetTextControl*>())
-            child->setFocusToNextOrPreviousAnchor(next);
-    }
-
-    return result;
 }
 
 QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent):

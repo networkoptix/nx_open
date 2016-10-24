@@ -20,10 +20,6 @@ public:
     ~QnConnectToCloudDialog();
 
     void accept() override;
-
-protected:
-    virtual bool focusNextPrevChild(bool next) override;
-
 private:
     QScopedPointer<Ui::ConnectToCloudDialog> ui;
     QScopedPointer<QnConnectToCloudDialogPrivate> d_ptr;
