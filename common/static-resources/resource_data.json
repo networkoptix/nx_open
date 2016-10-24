@@ -1401,7 +1401,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,4,5,3",
+			"videoLayout": "width=3;height=2;sensors=0,1,2,4,3,5",
 			"defaultAR":"4x3"
 		},
 		{
