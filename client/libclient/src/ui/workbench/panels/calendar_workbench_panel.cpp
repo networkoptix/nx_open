@@ -321,6 +321,8 @@ void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
         m_dayTimeItem->setOpacity(opacity);
         m_dayTimeMinimizeButton->setOpacity(opacity);
     }
+
+    emit geometryChanged();
 }
 
 void CalendarWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)
