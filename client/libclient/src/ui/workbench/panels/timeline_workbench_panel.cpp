@@ -321,8 +321,8 @@ void TimelineWorkbenchPanel::setCalendarPanel(CalendarWorkbenchPanel* calendar)
     if (!m_calendar)
         return;
 
-    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::visibleChanged, this, updateAutoHideHeight);
-    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::geometryChanged, this, updateAutoHideHeight);
+    connect(m_calendar.data(), &NxUi::AbstractWorkbenchPanel::visibleChanged, this, updateAutoHideHeight);
+    connect(m_calendar.data(), &NxUi::AbstractWorkbenchPanel::geometryChanged, this, updateAutoHideHeight);
 
     m_calendar->hidingProcessor->addTargetItem(item->calendarButton());
 
