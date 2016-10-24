@@ -940,18 +940,8 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     auto status =  QnConnectionDiagnosticsHelper::validateConnection(
         connectionInfo, errorCode, mainWindow());
 
-    switch (status)
-    {
-        case Qn::SuccessConnectionResult:
-        case Qn::IncompatibleProtocolConnectionResult:
-        case Qn::IncompatibleInternalConnectionResult:
-        case Qn::IncompatibleCloudHostConnectionResult:
-        case Qn::IncompatibleVersionConnectionResult:
-            storeConnectionRecord(url, connectionInfo, storeSettings);
-            break;
-        default:
-            break;
-    }
+    if (status == Qn::SuccessConnectionResult)
+        storeConnectionRecord(url, connectionInfo, storeSettings);
 
     switch (status)
     {
