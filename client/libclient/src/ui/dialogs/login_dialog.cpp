@@ -300,7 +300,9 @@ void QnLoginDialog::resetConnectionsModel()
 
     QModelIndex selectedIndex;
     const auto lastConnection = qnSettings->lastUsedConnection();
-    m_lastUsedItem = ::newConnectionItem(tr("* Last used connection *"), lastConnection.url);
+    m_lastUsedItem = (lastConnection.url.host().isEmpty()
+        ? nullptr
+        : ::newConnectionItem(tr("* Last used connection *"), lastConnection.url));
 
     if (m_lastUsedItem != NULL)
     {
@@ -322,7 +324,7 @@ void QnLoginDialog::resetSavedSessionsModel()
 {
     auto customConnections = qnSettings->customConnections();
 
-    if (customConnections.isEmpty())
+    if (!m_lastUsedItem || customConnections.isEmpty())
     {
         QUrl url;
         url.setPort(DEFAULT_APPSERVER_PORT);
