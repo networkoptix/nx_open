@@ -44,7 +44,20 @@ struct RtspServerTrackInfo
     bool openServerSocket(const QString& peerAddress);
 
     quint32 getSSRC() const {
+        QnMutexLocker lock(&m_mutex);
         return encoder ? encoder->getSSRC() : 0;
+    }
+
+    void setEncoder(const QnRtspEncoderPtr& value)
+    {
+        QnMutexLocker lock(&m_mutex);
+        encoder = value;
+    }
+
+    QnRtspEncoderPtr getEncoder() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return encoder;
     }
 
     int clientPort;
@@ -53,9 +66,11 @@ struct RtspServerTrackInfo
     qint64 firstRtpTime;
     AbstractDatagramSocket* mediaSocket;
     AbstractDatagramSocket* rtcpSocket;
-    QnRtspEncoderPtr encoder;
     MediaType mediaType;
 
+private:
+    QnRtspEncoderPtr encoder;
+    mutable QnMutex m_mutex;
     static QnMutex m_createSocketMutex;
 };
 

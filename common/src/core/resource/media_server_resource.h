@@ -135,8 +135,6 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
-    void sslAllowedChanged(const QnResourcePtr& resource);
-
 private:
     SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated

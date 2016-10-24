@@ -277,6 +277,23 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     return true;
 }
 
+bool resetSystemToStateNew()
+{
+    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Resetting system to a "new" state.
+    if (!qnGlobalSettings->synchronizeNowSync())
+        return false;
+
+    auto adminUserResource = qnResPool->getAdministrator();
+    adminUserResource->setPassword(lit("admin"));
+    adminUserResource->setEnabled(true);
+
+    ec2::ApiUserData adminUser;
+    ec2::fromResourceToApi(adminUserResource, adminUser);
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    return connection->getUserManager(Qn::kSystemAccess)->saveSync(adminUser)
+        == ec2::ErrorCode::ok;
+}
+
 // -------------- nx::ServerSetting -----------------------
 
 qint64 nx::ServerSetting::getSysIdTime()

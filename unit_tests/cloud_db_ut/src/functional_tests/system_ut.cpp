@@ -126,7 +126,7 @@ TEST_F(System, unbind)
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         }
 
-        restart();
+        ASSERT_TRUE(restart());
     }
 }
 
@@ -276,7 +276,7 @@ TEST_F(System, activation)
             ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
         }
 
-        restart();
+        ASSERT_TRUE(restart());
 
         //checking account1 system list
         {
@@ -367,7 +367,7 @@ TEST_F(System, notification_of_system_removal)
             if (i == 0)
             {
                 if (testOption == TestOption::withRestart)
-                    restart();
+                    ASSERT_TRUE(restart());
                 continue;
             }
             else if (i == 1)
@@ -405,7 +405,7 @@ TEST_F(System, rename)
         const bool restartRequired = j == 1;
 
         if (restartRequired)
-            restart();
+            ASSERT_TRUE(restart());
 
         // Checking system1 name.
         api::SystemDataEx systemData;
@@ -466,7 +466,7 @@ TEST_F(System, persistent_sequence)
 
     ASSERT_EQ(system1.systemSequence+1, system2.systemSequence);
 
-    restart();
+    ASSERT_TRUE(restart());
 
     api::SystemDataEx systemData;
     ASSERT_EQ(
@@ -578,7 +578,7 @@ TEST_F(System, sorting_order_weight_expiration)
     ASSERT_LT(usageFrequency4, usageFrequency3);
 
     // Repeating previous check but after restart.
-    restart();
+    ASSERT_TRUE(restart());
 
     systems.clear();
     ASSERT_EQ(
@@ -627,7 +627,7 @@ TEST_F(System, sorting_order_multiple_systems)
         }
         else if (i == 2)
         {
-            restart();
+            ASSERT_TRUE(restart());
         }
 
         std::vector<api::SystemDataEx> systems;
@@ -724,7 +724,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
         }
         if (needRestart)
         {
-            restart();
+            ASSERT_TRUE(restart());
         }
         nx::utils::test::ScopedTimeShift timeShift;
         if (bringNewSystemDown)
@@ -773,7 +773,7 @@ TEST_F(System, sorting_order_persistence_after_sharing_update)
         if (updateSharing)
             shareSystemEx(account1, system1, account2, api::SystemAccessRole::advancedViewer);
         if (needRestart)
-            restart();
+            ASSERT_TRUE(restart());
 
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
@@ -827,7 +827,7 @@ TEST_F(System, update)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
-            restart();
+            ASSERT_TRUE(restart());
 
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
