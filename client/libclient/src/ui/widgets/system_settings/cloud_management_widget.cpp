@@ -12,7 +12,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
-#include <ui/workaround/label_link_tabstop_workaround.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>
@@ -64,8 +63,6 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     ui->learnMoreLabel->setText(
         makeHref(tr("Learn more about %1").arg(
             QnAppInfo::cloudName()), urlHelper.aboutUrl()));
-    auto tabstopListener = new QnLabelFocusListener(this);
-    ui->learnMoreLabel->installEventFilter(tabstopListener);
 
     connect(ui->goToCloudButton,     &QPushButton::clicked, action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
     connect(ui->createAccountButton, &QPushButton::clicked, action(QnActions::OpenCloudRegisterUrl),   &QAction::trigger);

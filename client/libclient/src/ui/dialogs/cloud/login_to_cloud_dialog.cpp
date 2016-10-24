@@ -13,7 +13,6 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/input_field.h>
-#include <ui/workaround/label_link_tabstop_workaround.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -71,16 +70,9 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
 
-    auto tabstopListener = new QnLabelFocusListener(this);
-
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
-    ui->createAccountLabel->installEventFilter(tabstopListener);
-
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
-    ui->restorePasswordLabel->installEventFilter(tabstopListener);
-
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
-    ui->learnMoreLabel->installEventFilter(tabstopListener);
 
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));

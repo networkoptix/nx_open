@@ -27,7 +27,6 @@
 #include <ui/style/custom_style.h>
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
-#include <ui/workaround/label_link_tabstop_workaround.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -123,13 +122,8 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
 
-    auto tabstopListener = new QnLabelFocusListener(this);
-
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
-    ui->createAccountLabel->installEventFilter(tabstopListener);
-
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
-    ui->forgotPasswordLabel->installEventFilter(tabstopListener);
 
     auto aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
