@@ -16,7 +16,9 @@
 class QnCloudStatusWatcher;
 class QQuickView;
 class QnAppInfo;
+
 typedef QList<QUrl> UrlsList;
+Q_DECLARE_METATYPE(UrlsList)
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
 {
