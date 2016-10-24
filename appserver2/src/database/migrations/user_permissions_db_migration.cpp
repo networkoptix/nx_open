@@ -145,7 +145,8 @@ int migrateFromV25(int oldPermissions)
 int fixCustomFlag(int oldPermissions)
 {
     using boost::algorithm::any_of;
-    Qn::GlobalPermissions result = oldPermissions & ~Qn::GlobalCustomUserPermission;
+    Qn::GlobalPermissions result =
+        static_cast<Qn::GlobalPermissions>(oldPermissions) & ~Qn::GlobalCustomUserPermission;
     if (result.testFlag(Qn::GlobalAdminPermission))
         return Qn::GlobalAdminPermission;
 
