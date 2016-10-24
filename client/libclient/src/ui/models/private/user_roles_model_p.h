@@ -28,6 +28,8 @@ class QnUserRolesModelPrivate: public Connective<QObject>, public QnWorkbenchCon
 public:
     QnUserRolesModelPrivate(QnUserRolesModel* parent, QnUserRolesModel::DisplayRoleFlags flags);
 
+    int rowForUser(const QnUserResourcePtr& user) const;
+
     void setUserRoles(ec2::ApiUserGroupDataList value);
 
     RoleDescription roleByRow(int row) const;

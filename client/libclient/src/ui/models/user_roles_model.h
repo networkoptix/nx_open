@@ -5,6 +5,8 @@
 
 #include <utils/common/connective.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx_ec/data/api_fwd.h>
 
 #include <nx/utils/scoped_model_operations.h>
@@ -30,6 +32,8 @@ public:
     virtual ~QnUserRolesModel();
 
     /* Role-specific stuff: */
+
+    int rowForUser(const QnUserResourcePtr& user) const;
 
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);
 
