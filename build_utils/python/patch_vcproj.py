@@ -147,7 +147,7 @@ def ignore_link_4221(root):
     """Adding librarian additional parameter to ignore this warning."""
     #xpath = "./Project/ItemDefinitionGroup/Lib/AdditionalOptions"
     
-    print "Disabling linker 4221 error"
+    print "Suppress linker 4221 message"
     xpath = "./ms:ItemDefinitionGroup/ms:Lib"
     nodes = root.findall(xpath, namespaces_dict)
     for node in nodes:
