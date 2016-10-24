@@ -297,6 +297,10 @@ footer {
     display: none;
 }
 
+.ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 @mixin ellipsis{
   overflow: hidden;
   text-overflow: ellipsis;
@@ -304,7 +308,6 @@ footer {
   max-width: 100%;
   line-height: initial;
 }
-
 .user-name{
   @include ellipsis;
 }
