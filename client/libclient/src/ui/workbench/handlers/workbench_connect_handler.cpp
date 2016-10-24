@@ -62,6 +62,7 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 
+#include <utils/applauncher_utils.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/app_info.h>
@@ -940,8 +941,19 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     auto status =  QnConnectionDiagnosticsHelper::validateConnection(
         connectionInfo, errorCode, mainWindow());
 
-    if (status == Qn::SuccessConnectionResult)
-        storeConnectionRecord(url, connectionInfo, storeSettings);
+    switch (status)
+    {
+        case Qn::IncompatibleProtocolConnectionResult:
+            // Do not store connection if applauncher is offline
+            if (!applauncher::checkOnline(false))
+                break;
+            // Fall through
+        case Qn::SuccessConnectionResult:
+            storeConnectionRecord(url, connectionInfo, storeSettings);
+            break;
+        default:
+            break;
+    }
 
     switch (status)
     {
