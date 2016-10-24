@@ -205,7 +205,7 @@ namespace applauncher
             return true;
 
         return ((result == api::ResultType::connectError) && runWhenOffline
-            && runWhenOffline && nx::vms::client::SelfUpdater::runMinilaucher());
+            && nx::vms::client::SelfUpdater::runMinilaucher());
     }
 
 }
