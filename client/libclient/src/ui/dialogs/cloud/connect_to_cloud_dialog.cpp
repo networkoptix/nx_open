@@ -1,6 +1,8 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <QtWidgets/private/qwidgettextcontrol_p.h>
+
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
@@ -145,6 +147,12 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->lockUi(false);
     d->updateUi();
 
+    setTabOrder(ui->loginInputField, ui->passwordInputField);
+    setTabOrder(ui->passwordInputField, ui->stayLoggedInCheckBox);
+    setTabOrder(ui->stayLoggedInCheckBox, ui->forgotPasswordLabel);
+    setTabOrder(ui->forgotPasswordLabel, ui->createAccountLabel);
+    setTabOrder(ui->createAccountLabel, d->indicatorButton);
+    setTabOrder(d->indicatorButton, ui->buttonBox->button(QDialogButtonBox::Cancel));
     ui->loginInputField->setFocus();
 
     setResizeToContentsMode(Qt::Vertical);
@@ -167,7 +175,20 @@ void QnConnectToCloudDialog::accept()
     base_type::accept();
 }
 
-QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent) :
+bool QnConnectToCloudDialog::focusNextPrevChild(bool next)
+{
+    bool result = base_type::focusNextPrevChild(next);
+    auto w = focusWidget();
+    if (qobject_cast<QLabel*>(w))
+    {
+        if (auto child = w->findChild<QWidgetTextControl*>())
+            child->setFocusToNextOrPreviousAnchor(next);
+    }
+
+    return result;
+}
+
+QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent):
     QObject(parent),
     q_ptr(parent),
     linkedSuccessfully(false),
