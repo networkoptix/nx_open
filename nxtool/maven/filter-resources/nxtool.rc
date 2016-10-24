@@ -1,7 +1,7 @@
 #include <windows.h>
 #include "${project.build.directory}/app_icons.h"
 
-IDI_ICON1   ICON    DISCARDABLE     "${customization.dir}/icons/nxtool.ico"
+IDI_ICON1   ICON    DISCARDABLE     "${customization.dir}/icons/${platform}/nxtool.ico"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}

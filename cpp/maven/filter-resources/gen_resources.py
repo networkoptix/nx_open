@@ -148,7 +148,7 @@ if __name__ == '__main__':
     exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
     if "${noQmlInQrc}" == "true":
         exceptions += qml_files
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons/all'], exceptions)
     if os.path.exists('${project.build.directory}/additional-resources'):
         genqrc('build/${project.artifactId}_additional.qrc', '/', ['${project.build.directory}/additional-resources'], exceptions)
         pro_file = open('${project.artifactId}-specifics.pro', 'a')
