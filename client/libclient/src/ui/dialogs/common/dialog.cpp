@@ -29,24 +29,13 @@ void QnDialog::show(QDialog *dialog)
 
 void QnDialog::show()
 {
-    Qt::WindowFlags flags = windowFlags();
-    if (helpTopic(this) != Qn::Empty_Help)
-        flags |= Qt::WindowContextHelpButtonHint;
-    else
-        flags &= ~Qt::WindowContextHelpButtonHint;
-    setWindowFlags(flags);
-
+    fixWindowFlags();
     show(this); /// Calls static member of QnDialog
 }
 
 int QnDialog::exec()
 {
-    Qt::WindowFlags flags = windowFlags();
-    if (helpTopic(this) != Qn::Empty_Help)
-        flags |= Qt::WindowContextHelpButtonHint;
-    else
-        flags &= ~Qt::WindowContextHelpButtonHint;
-    setWindowFlags(flags);
+    fixWindowFlags();
 
     /* We cannot cancel drag via modal dialog, let parent process it. */
     if (parentWidget())
@@ -101,4 +90,14 @@ void QnDialog::afterLayout()
             setFixedHeight(preferred.height());
         }
     }
+}
+
+void QnDialog::fixWindowFlags()
+{
+    auto flags = windowFlags();
+    if (helpTopic(this) != Qn::Empty_Help)
+        flags |= Qt::WindowContextHelpButtonHint;
+    else
+        flags &= ~Qt::WindowContextHelpButtonHint;
+    setWindowFlags(flags);
 }

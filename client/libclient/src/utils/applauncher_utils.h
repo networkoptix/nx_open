@@ -25,6 +25,8 @@ namespace applauncher
     api::ResultType::Value restartClient(QnSoftwareVersion version = QnSoftwareVersion(),
                        const QByteArray &auth = QByteArray());
 
+    bool checkOnline(bool runWhenOffline = true);
+
     //!Starts installation of required version
     /*!
         \param[out] installationID Unique ID of installation is returned. This id can be used to request installation status

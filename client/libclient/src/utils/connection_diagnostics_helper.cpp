@@ -138,19 +138,17 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
     return result;
 }
 
-bool QnConnectionDiagnosticsHelper::getInstalledVersions(QList<QnSoftwareVersion>* versions)
+bool QnConnectionDiagnosticsHelper::getInstalledVersions(
+    QList<QnSoftwareVersion>* versions)
 {
     qDebug() << "checkApplaucherRunning";
 
+    if (!applauncher::checkOnline())
+        return false;
+
     /* Try to run applauncher if it is not running. */
-    auto result = applauncher::getInstalledVersions(versions);
-    if (result == applauncher::api::ResultType::connectError)
-    {
-        qDebug() << "trying to start applaucher";
-        if (!nx::vms::client::SelfUpdater::runMinilaucher())
-            return false;
-    }
-    else if (result == applauncher::api::ResultType::ok)
+    const auto result = applauncher::getInstalledVersions(versions);
+    if (result == applauncher::api::ResultType::ok)
     {
         qDebug() << "getInstalledVersions success";
         return true;

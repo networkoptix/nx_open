@@ -16,6 +16,7 @@
 class QnCloudStatusWatcher;
 class QQuickView;
 class QnAppInfo;
+
 typedef QList<QUrl> UrlsList;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
@@ -88,9 +89,9 @@ public: // Properties
     QnAppInfo* appInfo() const;
 
 public slots:
-    bool isAcceptableDrag(const UrlsList& urls);
+    bool isAcceptableDrag(const QList<QUrl>& urls);
 
-    void makeDrop(const UrlsList& urls);
+    void makeDrop(const QList<QUrl>& urls);
 
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
     void connectToLocalSystem(

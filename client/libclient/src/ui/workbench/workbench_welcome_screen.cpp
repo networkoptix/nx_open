@@ -283,12 +283,12 @@ QnAppInfo* QnWorkbenchWelcomeScreen::appInfo() const
     return m_appInfo;
 }
 
-bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
+bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
     return !extractResources(urls).isEmpty();
 }
 
-void QnWorkbenchWelcomeScreen::makeDrop(const UrlsList& urls)
+void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
 {
     const auto resources = extractResources(urls);
     if (resources.isEmpty())
