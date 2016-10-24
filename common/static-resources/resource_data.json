@@ -1414,7 +1414,7 @@
 					"channelMap": [
 						{
 							"originalChannel": 0,
-							"mappedChannels": [3]
+							"mappedChannels": [2]
 						}
 					]
 				},
@@ -1423,21 +1423,12 @@
 					"channelMap": [
 						{
 							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
 							"mappedChannels": [1]
 						}
 					]
 				},
 				{
-					"resourceChannel": 6,
+					"resourceChannel": 4,
 					"channelMap": [
 						{
 							"originalChannel": 0,
@@ -1448,7 +1439,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=4;height=1;sensors=0,1,2,3"
+			"videoLayout": "width=3;height=1;sensors=0,1,2"
 		},
 		{
 			"keys": [
