@@ -283,7 +283,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     const auto passed = std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::steady_clock::now() - beginTime);
-    std::cout << "Sever has started in: " << passed.count() << "s." << std::endl;
+    std::cout << "Sever has started in: " << passed.count() << " s." << std::endl;
 
     const int result = printStatsAndWaitForCompletion(
         &server,
