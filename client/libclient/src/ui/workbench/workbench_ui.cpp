@@ -207,6 +207,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     createTimelineWidget(settings[Qn::WorkbenchPane::Navigation]);
 
+    /* Make timeline panel aware of calendar panel. */
+    m_timeline->setCalendarPanel(m_calendar);
+
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
         Qt::TopEdge, NxUi::kShadowThickness, true);
@@ -1325,14 +1328,6 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateCalendarGeometry();
         });
 
-    /*
-     * Calendar is created before navigation slider (alot of logic relies on that).
-     * Therefore we have to bind calendar showing/hiding processors to navigation
-     * pane button "CLND" here and not in createCalendarWidget()
-     */
-    if (m_calendar)
-        m_calendar->hidingProcessor->addTargetItem(m_timeline->item->calendarButton());
-
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
@@ -1406,7 +1401,6 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             params.setArgument(Qn::BookmarkTagRole, tag);
             menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
         });
-
 }
 
 #pragma endregion Timeline methods
