@@ -55,14 +55,21 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         [this](const QnResourcePtr& resource)
         {
             disconnect(resource, nullptr, this, nullptr);
+            if (auto user = resource.dynamicCast<QnUserResource>())
+                removeUserNode(user);
         });
 
-    /* Handling only rename here, all other issues are handled by access provider. */
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         [this](const ec2::ApiUserGroupData& role)
         {
+            ensureRoleNode(role)->update();
+        });
+
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+        [this](const ec2::ApiUserGroupData& role)
+        {
             if (m_roles.contains(role.id))
-                m_roles[role.id]->update();
+                removeNode(m_roles.take(role.id));
         });
 }
 
@@ -439,9 +446,7 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
 
     if (subject.user() && !subject.user()->isEnabled())
     {
-        auto id = subject.user()->getId();
-        if (m_users.contains(id))
-            removeNode(m_users.take(id));
+        removeUserNode(subject.user());
         return;
     }
 
@@ -454,6 +459,13 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
 
     for (const auto& resource: qnResPool->getResources())
         ensureResourceNode(subject, resource);
+}
+
+void QnResourceTreeModelUserNodes::removeUserNode(const QnUserResourcePtr& user)
+{
+    auto id = user->getId();
+    if (m_users.contains(id))
+        removeNode(m_users.take(id));
 }
 
 void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& node)
