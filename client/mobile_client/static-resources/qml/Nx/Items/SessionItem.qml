@@ -59,7 +59,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: hostsModel.firstHost
+        address: LoginUtils.extractHost(hostsModel.firstHost)
         user: connectionsModel.firstUser
     }
 
