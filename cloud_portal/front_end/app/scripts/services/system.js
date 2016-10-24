@@ -302,6 +302,7 @@ angular.module('cloudApp')
             //cloudApi.share(this.id, user.email, accessRole);
 
             return this.mediaserver.saveUser(user).then(function(result){
+                user.role = role;
                 user.accessRole = accessRole;
             });
         }
