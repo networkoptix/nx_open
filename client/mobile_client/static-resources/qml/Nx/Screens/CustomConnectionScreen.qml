@@ -100,7 +100,7 @@ Page
         hideWarning()
         connectButton.forceActiveFocus()
         d.connecting = true
-        connectionManager.connectToServer(LoginUtils.makeUrl(address, login, password))
+        connectionManager.connectToServer("http://" + address, login, password)
     }
 
     function showWarning(status, info)

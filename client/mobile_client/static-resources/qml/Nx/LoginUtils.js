@@ -1,18 +1,5 @@
 .import com.networkoptix.qml 1.0 as Nx
 
-function makeUrl(address, login, password, cloud)
-{
-    var result =
-            (cloud ? "cloud" : "http") +
-            "://" +
-            encodeURIComponent(login) +
-            ":" +
-            encodeURIComponent(password) +
-            "@" +
-            address
-    return result
-}
-
 function connectionErrorText(status, info)
 {
     if (status == Nx.QnConnectionManager.UnauthorizedConnectionResult)

@@ -92,11 +92,10 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(LoginUtils.makeUrl(
+                connectionManager.connectToServer(
                     hostsModel.firstHost,
                     cloudStatusWatcher.cloudLogin(),
-                    cloudStatusWatcher.cloudPassword(),
-                    true))
+                    cloudStatusWatcher.cloudPassword())
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -104,10 +103,10 @@ Pane
         {
             if (connectionsModel.hasConnections)
             {
-                connectionManager.connectToServer(LoginUtils.makeUrl(
+                connectionManager.connectToServer(
                     informationBlock.address,
                     informationBlock.user,
-                    connectionsModel.getData("password", 0)))
+                    connectionsModel.getData("password", 0))
                 Workflow.openResourcesScreen(systemName)
             }
             else

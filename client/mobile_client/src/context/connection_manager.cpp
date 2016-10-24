@@ -19,19 +19,19 @@
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
-    const QString kCloudConnectionScheme = lit("cloud");
     const QString kLiteClientConnectionScheme = lit("liteclient");
 
     enum { kInvalidHandle = -1 };
 
-    QnConnectionManager::ConnectionType connectionTypeByScheme(const QString& scheme)
+    QnConnectionManager::ConnectionType connectionTypeForUrl(const QUrl& url)
     {
-        if (scheme == kCloudConnectionScheme)
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
             return QnConnectionManager::CloudConnection;
-        else if (scheme == kLiteClientConnectionScheme)
+        else if (url.scheme() == kLiteClientConnectionScheme)
             return QnConnectionManager::LiteClientConnection;
         else
             return QnConnectionManager::NormalConnection;
@@ -167,7 +167,7 @@ QnSoftwareVersion QnConnectionManager::connectionVersion() const
     return d->connectionVersion;
 }
 
-void QnConnectionManager::connectToServer(const QUrl &url)
+void QnConnectionManager::connectToServer(const QUrl& url)
 {
     Q_D(QnConnectionManager);
 
@@ -179,6 +179,17 @@ void QnConnectionManager::connectToServer(const QUrl &url)
         actualUrl.setPort(defaultServerPort());
     d->setUrl(actualUrl);
     d->doConnect();
+}
+
+void QnConnectionManager::connectToServer(
+    const QUrl &url,
+    const QString& userName,
+    const QString& password)
+{
+    auto urlWithAuth = url;
+    urlWithAuth.setUserName(userName);
+    urlWithAuth.setPassword(password);
+    connectToServer(urlWithAuth);
 }
 
 void QnConnectionManager::disconnectFromServer(bool force) {
@@ -411,10 +422,10 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
     this->url = url;
     emit q->currentUrlChanged();
 
-    const auto connectionType = connectionTypeByScheme(url.scheme());
-    if (this->connectionType != connectionType)
+    const auto newConnectionType = connectionTypeForUrl(url);
+    if (connectionType != newConnectionType)
     {
-        this->connectionType = connectionType;
+        connectionType = newConnectionType;
         emit q->connectionTypeChanged();
     }
 }
