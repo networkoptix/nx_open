@@ -16,8 +16,7 @@ angular.module('cloudApp')
 
         if(!$scope.registerSuccess){
             account.logoutAuthorised();
-        }
-        if($scope.activated){
+        }else if($scope.activated){
             account.redirectAuthorised();
         }
         $scope.Config = Config;

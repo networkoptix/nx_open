@@ -6,6 +6,7 @@ angular.module('cloudApp')
 
         account.requireLogin().then(function(account){
             $scope.account = account;
+            $scope.gettingSystems.run();
         });
 
         $scope.Config = Config;
@@ -47,7 +48,6 @@ angular.module('cloudApp')
             $scope.systems = sortSystems(result.data);
             delayedUpdateSystems();
         });
-        $scope.gettingSystems.run();
 
         $scope.openSystem = function(system){
             $location.path('/systems/' + system.id);
