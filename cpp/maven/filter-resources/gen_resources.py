@@ -180,11 +180,13 @@ if __name__ == '__main__':
             os.environ["path"] += os.pathsep + vc_path
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
             if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.opt'):
+                if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.bk'):
+                    os.remove('${project.build.Directory}/build/release/generated/mocinclude.bk')
                 shutil.move(r'${project.build.Directory}/build/release/generated/mocinclude.opt', r'${project.build.Directory}/build/release/generated/mocinclude.bk')
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
             if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.opt'):
                 os.remove('${project.build.Directory}/build/release/generated/mocinclude.opt')
-            if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.bk'):
+            if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.bk'):            
                 shutil.move(r'${project.build.Directory}/build/release/generated/mocinclude.bk', r'${project.build.Directory}/build/release/generated/mocinclude.opt')
         elif '${platform}' in [ 'ios', 'macosx' ]:
             os.environ["DYLD_FRAMEWORK_PATH"] = ldpath
