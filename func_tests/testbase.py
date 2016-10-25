@@ -69,7 +69,8 @@ def _reportResult(resData, resType, name):
 
 
 def _singleSuiteName(testclass, suite_name, config, args):
-    result = unittest.TextTestRunner(verbosity=2, failfast=testclass.isFailFast(suite_name)
+    result = unittest.TextTestRunner(
+            stream=sys.stdout, verbosity=2, failfast=testclass.isFailFast(suite_name)
         ).run(
             TestLoader().load(testclass, suite_name, config, *args)
         )
@@ -435,7 +436,7 @@ class FuncTestCase(unittest.TestCase):
             if tocheck:
                 time.sleep(0.5)
         if tocheck:
-            self.fail("Servers startup timed out: %s" % (', '.join(map(str, tocheck))))
+            self.fail("Servers' startup timed out: %s" % (', '.join(map(self.sl.get, tocheck))))
             #TODO: Report the last error on each unready server!
 
     def _change_system_name(self, host, newName):
@@ -917,7 +918,7 @@ class FuncTestMaster(object):
         for i, name in enumerate(self._ec2GetRequests):
             if name.startswith('.'):
                 self._ec2GetRequests[i] = getattr(self.api, name[1:])
-                print "*** DEBUG0: substituted %s with %s" % (name, self._ec2GetRequests[i])
+                #print "*** DEBUG0: substituted %s with %s" % (name, self._ec2GetRequests[i])
 
 
     # This checkResultEqual function will categorize the return value from each
