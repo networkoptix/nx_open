@@ -20,6 +20,8 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
 #include <nx/network/socket_global.h>
+#include <helpers/system_helpers.h>
+#include <helpers/system_weight_helper.h>
 
 namespace {
 
@@ -59,10 +61,6 @@ public:
     void updateConnectionState();
 
     void setUrl(const QUrl& url);
-
-    void storeConnection(const QString& systemName, const QnUuid& localId,
-            QUrl url,
-            bool storePassword);
 
     void setInitialResourcesReceived(bool received);
 
@@ -344,7 +342,10 @@ void QnConnectionManagerPrivate::doConnect()
 
             updateConnectionState();
 
-            storeConnection(connectionInfo.systemName, connectionInfo.localSystemId, url, true);
+            const auto localId = helpers::getLocalSystemId(connectionInfo);
+
+            helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url, true);
+            helpers::updateWeightData(localId);
             qnSettings->setLastUsedSystemId(connectionInfo.systemName);
             url.setPassword(QString());
             qnSettings->setLastUsedUrl(url);
@@ -428,34 +429,6 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
         connectionType = newConnectionType;
         emit q->connectionTypeChanged();
     }
-}
-
-void QnConnectionManagerPrivate::storeConnection(
-    const QString& systemName,
-    const QnUuid& localId,
-    QUrl url,
-    bool storePassword)
-{
-    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
-
-    QnEncodedString password;
-    if (storePassword)
-        password.setValue(url.password());
-    url.setPassword(QString());
-
-    const QnLocalConnectionData connectionInfo(systemName, localId, url, password);
-
-    auto connectionEqual = [connectionInfo](const QnLocalConnectionData& connection)
-    {
-        return connection.systemName == connectionInfo.systemName;
-    };
-    lastConnections.erase(
-        std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-        lastConnections.end());
-    lastConnections.prepend(connectionInfo);
-
-    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
-    qnClientCoreSettings->save();
 }
 
 void QnConnectionManagerPrivate::setInitialResourcesReceived(bool received)

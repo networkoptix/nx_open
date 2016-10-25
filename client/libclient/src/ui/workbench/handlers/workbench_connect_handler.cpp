@@ -74,7 +74,7 @@
 #include <utils/common/delayed.h>
 #include <network/module_finder.h>
 #include <network/router.h>
-#include <network/system_helpers.h>
+#include <helpers/system_helpers.h>
 #include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
@@ -165,67 +165,27 @@ void storeCustomConnection(const QnLocalConnectionData& data)
     qnSettings->setCustomConnections(customConnections);
 }
 
-void updateWeightData(const QnUuid& localId)
+void storeLocalSystemConnection(
+    const QString& systemName,
+    const QnUuid& localSystemId,
+    const QUrl& url,
+    bool storePassword,
+    bool autoLogin)
 {
-    auto weightData = qnClientCoreSettings->localSystemWeightsData();
-    const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
-        [localId](const QnWeightData& data) { return data.localId == localId; });
-
-    auto currentWeightData = (itWeightData == weightData.end()
-        ? QnWeightData({ localId, 0, QDateTime::currentMSecsSinceEpoch(), true })
-        : *itWeightData);
-
-    currentWeightData.weight = helpers::calculateSystemWeight(
-        currentWeightData.weight, currentWeightData.lastConnectedUtcMs) + 1;
-    currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
-    currentWeightData.realConnection = true;
-
-    if (itWeightData == weightData.end())
-        weightData.append(currentWeightData);
-    else
-        *itWeightData = currentWeightData;
-
-    qnClientCoreSettings->setLocalSystemWeightsData(weightData);
-}
-
-void storeLocalSystemConnection(const QString& systemName, const QnUuid& localSystemId, QUrl url,
-    bool storePassword, bool autoLogin)
-{
-    // TODO: #ynikitenkov remove outdated connection data
-
-    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     if (autoLogin)
         storePassword = true;
 
-    const auto lastUsed = QnConnectionData(systemName, url, false);
+    const auto connectionData =
+        helpers::storeLocalSystemConnection(systemName, localSystemId, url, storePassword);
 
-
-    const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
-        [localSystemId, userName = url.userName()](const QnLocalConnectionData& connection)
-        {
-            return (connection.localId == localSystemId)
-                && QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0;
-        });
-
-    recentConnections.erase(itEnd, recentConnections.end());
-
-    QnEncodedString password;
-    if (storePassword)
-        password.setValue(url.password());
-    url.setPassword(QString());
-
-    const QnLocalConnectionData connectionRecord(systemName, localSystemId, url, password);
-    recentConnections.prepend(connectionRecord);
-
-    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
-    qnClientCoreSettings->save();
-
+    const auto lastUsed = QnConnectionData(systemName, connectionData.url, false);
     qnSettings->setLastUsedConnection(lastUsed);
     qnSettings->setAutoLogin(autoLogin);
+
     if (storePassword)
-        storeCustomConnection(connectionRecord);
+        storeCustomConnection(connectionData);
     else
-        removeCustomConnection(connectionRecord);
+        removeCustomConnection(connectionData);
 
     qnSettings->save();
 }
@@ -596,7 +556,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
      * from function. It is just workaround
      */
     const auto updateWeightDataAtReturn = QnRaiiGuard::createDestructable(
-        [localId]() { updateWeightData(localId); });
+        [localId]() { helpers::updateWeightData(localId); });
 
     if (storeSettings->isConnectionToCloud)
     {

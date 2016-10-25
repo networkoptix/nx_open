@@ -1,10 +1,10 @@
-
 #include "system_helpers.h"
 
 #include <network/cloud_system_data.h>
 #include <network/module_information.h>
 #include <api/model/connection_info.h>
 #include <utils/common/id.h>
+#include <client_core/client_core_settings.h>
 
 namespace {
 
@@ -59,40 +59,42 @@ QString getTargetSystemIdImpl(
 
 } // namespace
 
-QString helpers::getTargetSystemId(const QnConnectionInfo& info)
+namespace helpers {
+
+QString getTargetSystemId(const QnConnectionInfo& info)
 {
     return ::getTargetSystemIdImpl(info.systemName, info.cloudSystemId,
         info.localSystemId, info.serverId(), info.version);
 }
 
-QString helpers::getTargetSystemId(const QnModuleInformation& info)
+QString getTargetSystemId(const QnModuleInformation& info)
 {
     return ::getTargetSystemIdImpl(info.systemName, info.cloudSystemId,
         info.localSystemId, info.id, info.version);
 }
 
-QString helpers::getTargetSystemId(const QnCloudSystem& cloudSystem)
+QString getTargetSystemId(const QnCloudSystem& cloudSystem)
 {
     return generateTargetId(cloudSystem.cloudId, cloudSystem.localId);
 }
 
-QnUuid helpers::getLocalSystemId(const QnModuleInformation& info)
+QnUuid getLocalSystemId(const QnModuleInformation& info)
 {
     return getLocalSystemIdImpl(info.systemName, info.localSystemId, info.id, info.version);
 }
 
-QnUuid helpers::getLocalSystemId(const QnConnectionInfo& info)
+QnUuid getLocalSystemId(const QnConnectionInfo& info)
 {
     return getLocalSystemIdImpl(info.systemName, info.localSystemId, info.serverId(), info.version);
 }
 
 
-QString helpers::getFactorySystemId(const QnModuleInformation& info)
+QString getFactorySystemId(const QnModuleInformation& info)
 {
     return getFactorySystemIdImpl(info.id).toString();
 }
 
-bool helpers::isNewSystem(const QnModuleInformation& info)
+bool isNewSystem(const QnModuleInformation& info)
 {
     if (info.version < kMinVersionWithLocalId)
         return false; //< No new systems until 3.0
@@ -100,7 +102,41 @@ bool helpers::isNewSystem(const QnModuleInformation& info)
     return info.localSystemId.isNull();
 }
 
-bool helpers::isNewSystem(const QnCloudSystem& info)
+bool isNewSystem(const QnCloudSystem& info)
 {
     return info.localId.isNull();
 }
+
+QnLocalConnectionData storeLocalSystemConnection(
+    const QString& systemName,
+    const QnUuid& localSystemId,
+    const QUrl& url,
+    bool storePassword)
+{
+    // TODO: #ynikitenkov remove outdated connection data
+
+    const auto password = QnEncodedString(storePassword ? url.password() : QString());
+
+    auto fixedUrl = url;
+    fixedUrl.setPassword(QString());
+
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
+        [localSystemId, userName = url.userName()](const QnLocalConnectionData& connection)
+        {
+            return (connection.localId == localSystemId)
+                && QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0;
+        });
+
+    recentConnections.erase(itEnd, recentConnections.end());
+
+    const QnLocalConnectionData connectionData(systemName, localSystemId, fixedUrl, password);
+    recentConnections.prepend(connectionData);
+
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+    qnClientCoreSettings->save();
+
+    return connectionData;
+}
+
+} // namespace helpers

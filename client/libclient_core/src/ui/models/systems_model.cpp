@@ -1,5 +1,6 @@
-
 #include "systems_model.h"
+
+#include <QtCore/QUrl>
 
 #include <utils/math/math.h>
 #include <utils/common/app_info.h>
@@ -8,7 +9,6 @@
 #include <nx/utils/disconnect_helper.h>
 #include <network/system_description.h>
 #include <network/connection_validator.h>
-#include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 

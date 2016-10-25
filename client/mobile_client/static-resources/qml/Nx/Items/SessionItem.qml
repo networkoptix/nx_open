@@ -10,6 +10,7 @@ Pane
     id: control
 
     property alias systemId: informationBlock.systemId
+    property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
     property alias online: informationBlock.online
@@ -30,7 +31,7 @@ Pane
     QnRecentLocalConnectionsModel
     {
         id: connectionsModel
-        systemId: control.systemId
+        systemId: control.localId
     }
 
     background: Rectangle
@@ -104,8 +105,8 @@ Pane
             if (connectionsModel.hasConnections)
             {
                 connectionManager.connectToServer(
-                    informationBlock.address,
-                    informationBlock.user,
+                    hostsModel.firstHost,
+                    connectionsModel.firstUser,
                     connectionsModel.getData("password", 0))
                 Workflow.openResourcesScreen(systemName)
             }
