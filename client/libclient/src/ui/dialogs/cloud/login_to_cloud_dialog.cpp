@@ -98,11 +98,6 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     d->updateUi();
     d->lockUi(false);
 
-    setTabOrder(ui->loginInputField, ui->passwordInputField);
-    setTabOrder(ui->passwordInputField, ui->stayLoggedInCheckBox);
-    setTabOrder(ui->stayLoggedInCheckBox, ui->loginButton);
-    setTabOrder(ui->loginButton, ui->restorePasswordLabel);
-    setTabOrder(ui->restorePasswordLabel, ui->createAccountLabel);
     ui->loginInputField->setFocus();
 
     ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);

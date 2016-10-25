@@ -146,12 +146,6 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->lockUi(false);
     d->updateUi();
 
-    setTabOrder(ui->loginInputField, ui->passwordInputField);
-    setTabOrder(ui->passwordInputField, ui->stayLoggedInCheckBox);
-    setTabOrder(ui->stayLoggedInCheckBox, ui->forgotPasswordLabel);
-    setTabOrder(ui->forgotPasswordLabel, ui->createAccountLabel);
-    setTabOrder(ui->createAccountLabel, d->indicatorButton);
-    setTabOrder(d->indicatorButton, ui->buttonBox->button(QDialogButtonBox::Cancel));
     ui->loginInputField->setFocus();
 
     setResizeToContentsMode(Qt::Vertical);

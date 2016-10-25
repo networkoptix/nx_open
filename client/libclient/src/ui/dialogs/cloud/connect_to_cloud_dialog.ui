@@ -81,6 +81,9 @@
           <height>10</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
        </widget>
       </item>
       <item row="4" column="0">
@@ -110,6 +113,9 @@
          </property>
          <item>
           <widget class="QLabel" name="forgotPasswordLabel">
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
            <property name="text">
             <string notr="true">_Forgot password?_</string>
            </property>
@@ -126,6 +132,9 @@
          </item>
          <item>
           <widget class="QLabel" name="createAccountLabel">
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
            <property name="text">
             <string notr="true">_Create account_</string>
            </property>
@@ -151,6 +160,9 @@
           <height>10</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
        </widget>
       </item>
       <item row="2" column="1">
@@ -175,6 +187,9 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="focusPolicy">
+      <enum>Qt::TabFocus</enum>
+     </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
@@ -190,6 +205,13 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>loginInputField</tabstop>
+  <tabstop>passwordInputField</tabstop>
+  <tabstop>stayLoggedInCheckBox</tabstop>
+  <tabstop>forgotPasswordLabel</tabstop>
+  <tabstop>createAccountLabel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
