@@ -11,8 +11,6 @@ class QnWebPage : public QWebPage
 public:
     QnWebPage(QObject* parent = 0);
 
-    virtual bool event(QEvent* ev) override;
-
 protected:
     virtual void javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID) override;
 
