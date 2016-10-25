@@ -101,7 +101,8 @@ QString getConnectionName(const QnLocalConnectionData& data)
 
 void removeCustomConnection(const QnLocalConnectionData& data)
 {
-    if (data.isStoredPassword)
+    //TODO: #ynikitenkov why this check?
+    if (!data.password.isEmpty())
         return;
 
     auto customConnections = qnSettings->customConnections();
@@ -120,7 +121,7 @@ void removeCustomConnection(const QnLocalConnectionData& data)
 
 void storeCustomConnection(const QnLocalConnectionData& data)
 {
-    if (!data.isStoredPassword)
+    if (data.password.isEmpty())
         return;
 
     auto customConnections = qnSettings->customConnections();
@@ -129,7 +130,10 @@ void storeCustomConnection(const QnLocalConnectionData& data)
         "%1 is user name, %2 is name of system");
 
     const auto connectionName = getConnectionName(data);
-    auto connection = QnConnectionData(connectionName, data.url, false);
+    QUrl urlWithPassword = data.url;
+    urlWithPassword.setPassword(data.password.value());
+
+    auto connection = QnConnectionData(connectionName, urlWithPassword, false);
 
     const auto it = std::find_if(customConnections.begin(), customConnections.end(),
         [connectionName](const QnConnectionData& value) { return (value.name == connectionName); });
@@ -194,8 +198,7 @@ void storeLocalSystemConnection(const QString& systemName, const QnUuid& localSy
         storePassword = true;
 
     const auto lastUsed = QnConnectionData(systemName, url, false);
-    if (!storePassword)
-        url.setPassword(QString());
+
 
     const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
         [localSystemId, userName = url.userName()](const QnLocalConnectionData& connection)
@@ -206,7 +209,12 @@ void storeLocalSystemConnection(const QString& systemName, const QnUuid& localSy
 
     recentConnections.erase(itEnd, recentConnections.end());
 
-    const QnLocalConnectionData connectionRecord(systemName, localSystemId, url, storePassword);
+    QnEncodedString password;
+    if (storePassword)
+        password.setValue(url.password());
+    url.setPassword(QString());
+
+    const QnLocalConnectionData connectionRecord(systemName, localSystemId, url, password);
     recentConnections.prepend(connectionRecord);
 
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);

@@ -6,6 +6,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
+#include <utils/crypt/encoded_string.h>
+
 class QSettings;
 
 struct QnLocalConnectionData
@@ -16,17 +18,17 @@ struct QnLocalConnectionData
         const QString& systemName,
         const QnUuid& localId,
         const QUrl& url,
-        bool isStoredPassword);
+        const QnEncodedString& password);
 
     QString systemName;
     QnUuid localId;
 
     QUrl url;
-    bool isStoredPassword;
+    QnEncodedString password;
 };
 
-#define QnLocalConnectionData_Fields (systemName)(localId)(url)(isStoredPassword)
-QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq)(json))
+#define QnLocalConnectionData_Fields (systemName)(localId)(url)(password)
+QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (metatype)(eq)(json))
 
 typedef QList<QnLocalConnectionData> QnLocalConnectionDataList;
 Q_DECLARE_METATYPE(QnLocalConnectionDataList)

@@ -6,23 +6,23 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData)(QnWeightData), (datastream)(eq)(json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData)(QnWeightData), (eq)(json), _Fields)
 
 QnLocalConnectionData::QnLocalConnectionData() :
     systemName(),
     localId(),
     url(),
-    isStoredPassword(false)
+    password()
 {}
 
 QnLocalConnectionData::QnLocalConnectionData(
     const QString& systemName,
     const QnUuid& localId,
     const QUrl& url,
-    bool isStoredPassword)
+    const QnEncodedString& password)
     :
     systemName(systemName),
     localId(localId),
     url(url),
-    isStoredPassword(isStoredPassword)
+    password(password)
 {}

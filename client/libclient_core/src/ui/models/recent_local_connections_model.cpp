@@ -44,9 +44,10 @@ namespace
 
             const auto itStoredPass = std::find_if(list.begin(), list.end(),
                 [userName](const QnLocalConnectionData &connection)
-            {
-                return (connection.isStoredPassword && (connection.url.userName() == userName));
-            });
+                {
+                    return !connection.password.isEmpty()
+                        && connection.url.userName() == userName;
+                });
 
             /// Stores first found connection with password (if found) or just first connection
             result.append(itStoredPass == list.end() ? connectionData : *itStoredPass);
@@ -186,9 +187,9 @@ QVariant QnRecentLocalConnectionsModel::data(const QModelIndex &index, int role)
         case UserNameRole:
             return userPasswordData.url.userName();
         case PasswordRole:
-            return userPasswordData.url.password();
+            return userPasswordData.password.value();
         case HasStoredPasswordRole:
-            return userPasswordData.isStoredPassword;
+            return !userPasswordData.password.isEmpty();
         default:
             return QVariant();
     }
