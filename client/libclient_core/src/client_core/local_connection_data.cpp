@@ -1,28 +1,21 @@
-
 #include "local_connection_data.h"
 
-#include <QtCore/QSettings>
+#include <QtCore/QUrl>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/string.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData)(QnWeightData), (datastream)(eq)(json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnLocalConnectionData)(QnWeightData), (eq)(json), _Fields)
 
-QnLocalConnectionData::QnLocalConnectionData() :
-    systemName(),
-    localId(),
-    url(),
-    isStoredPassword(false)
-{}
+QnLocalConnectionData::QnLocalConnectionData() {}
 
 QnLocalConnectionData::QnLocalConnectionData(
     const QString& systemName,
     const QnUuid& localId,
-    const QUrl& url,
-    bool isStoredPassword)
+    const QUrl& url)
     :
     systemName(systemName),
     localId(localId),
     url(url),
-    isStoredPassword(isStoredPassword)
+    password(url.password())
 {}

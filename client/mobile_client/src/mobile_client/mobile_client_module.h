@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-class QnMobileClientStartupParameters;
+struct QnMobileClientStartupParameters;
 
 class QnMobileClientModule: public QObject
 {

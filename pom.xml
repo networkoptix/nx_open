@@ -352,6 +352,14 @@
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
                                 </resource>
+                                <resource>
+                                    <directory>${customization.dir}/icons/${platform}</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                
+                                <resource>
+                                    <directory>${customization.dir}/icons/all</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                                                                                
                             </resources>
                         </configuration>
                     </execution>

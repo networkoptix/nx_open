@@ -166,6 +166,11 @@ ComboBox
                 thisComponent.currentIndex = thisComponent.find(text.trim()
                     , Qt.MatchExactly | Qt.MatchCaseSensitive);
             }
+            onActiveFocusChanged:
+            {
+                if (activeFocus)
+                    selectAll();
+            }
         }
 
         NxLabel

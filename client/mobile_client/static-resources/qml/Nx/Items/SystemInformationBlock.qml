@@ -8,6 +8,7 @@ Item
     id: systemInformationBlock
 
     property string systemId
+    property string localId
     property string systemName
     property string ownerDescription
     property bool cloud: false

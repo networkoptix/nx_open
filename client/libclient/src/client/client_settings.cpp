@@ -55,7 +55,7 @@ void writeConnectionData(QSettings *settings, const QnConnectionData &connection
 
     QString password;
     if (!url.password().isEmpty())
-        nx::utils::xorEncrypt(url.password(), kXorKey);
+        password = nx::utils::xorEncrypt(url.password(), kXorKey);
 
     url.setPassword(QString()); /* Don't store password in plain text. */
 
