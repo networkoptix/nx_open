@@ -77,6 +77,8 @@ private:
 
     QStandardItem* newConnectionItem(const QnConnectionData& connection);
 
+    QModelIndex getModelIndexForName(const QString& name);
+
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

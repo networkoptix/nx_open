@@ -568,11 +568,28 @@ void QnLoginDialog::at_saveButton_clicked()
 
     resetSavedSessionsModel();
 
-    QModelIndex idx = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
+    m_connectionsModel->rowCount();
+
+    const auto idx = getModelIndexForName(connectionData.name);
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
     ui->passwordLineEdit->setText(password);         // password is cleared on index change
     ui->autoLoginCheckBox->setChecked(autoLogin);
+}
+
+QModelIndex QnLoginDialog::getModelIndexForName(const QString& name)
+{
+    const auto savedSessionsIndex = m_savedSessionsItem->index();
+    const auto rowCount = m_connectionsModel->rowCount(savedSessionsIndex);
+    for (auto row = 0; row != rowCount; ++row)
+    {
+        const auto index = m_connectionsModel->index(row, 0, savedSessionsIndex);
+        const auto savedName = m_connectionsModel->data(index, Qt::DisplayRole);
+        if (savedName == name)
+            return index;
+    }
+
+    return QModelIndex();
 }
 
 void QnLoginDialog::at_deleteButton_clicked()
