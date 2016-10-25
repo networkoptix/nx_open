@@ -63,7 +63,7 @@ var L = {
     restartDialog:{
         serverStarting:'server is starting',
         serverRestarting:'server is restarting',
-        serverOffline: 'server is offline',
+        serverOffline: 'server is offline'
     },
     fileUpload:{
         started: 'Updating successfully started. It will take several minutes',
