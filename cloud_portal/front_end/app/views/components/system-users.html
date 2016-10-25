@@ -14,7 +14,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="user in system.users" class="hoverable">
+            <tr ng-repeat="user in system.users" class="hoverable" ng-class="{disabled:!user.isEnabled}">
                 <td class="user-name">{{user.fullName}}</td>
                 <td class="user-email">{{user.email}}</td>
                 <td class="user-role">

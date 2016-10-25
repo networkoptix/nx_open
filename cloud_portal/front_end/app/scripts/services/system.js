@@ -253,7 +253,7 @@ angular.module('cloudApp')
                             user.fullName = user.accountFullName;
                         }
                         user.canBeDeleted = !isOwner && (!isAdmin || self.isMine);
-                        user.canBeEdited = !isOwner && !isMe && (!isAdmin || self.isMine);
+                        user.canBeEdited = !isOwner && !isMe && (!isAdmin || self.isMine) && user.isEnabled;
 
                         return -Config.accessRoles.order.indexOf(user.accessRole);
                     });
