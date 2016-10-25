@@ -672,7 +672,11 @@ angular.module('webadminApp')
             },
 
             localLogin:{
-                back: 'chooseLocal',
+                back: function(){
+                    $scope.settings.localPassword = '';
+                    $scope.settings.localPasswordConfirmation = '';
+                    $scope.next('chooseLocal',true);
+                },
                 next: initOfflineSystem,
                 valid: function(){
                     return checkForm($scope.forms.localForm) &&
