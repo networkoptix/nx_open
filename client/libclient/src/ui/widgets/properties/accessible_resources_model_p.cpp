@@ -115,6 +115,9 @@ QModelIndex QnAccessibleResourcesModel::mapFromSource(const QModelIndex& sourceI
 
 QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) const
 {
+    if (role == Qn::DisabledRole && m_allChecked)
+        return false;
+
     switch (index.column())
     {
         case IndirectAccessColumn:
