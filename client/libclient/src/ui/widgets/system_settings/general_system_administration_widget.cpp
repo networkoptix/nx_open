@@ -62,6 +62,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->systemNameLabel, &QnEditableLabel::textChanging,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
+    connect(ui->systemNameLabel, &QnEditableLabel::editingFinished,
+        this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
     buttonLayout->setSpacing(0);
