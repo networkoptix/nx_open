@@ -596,6 +596,14 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
             storage->setUsedForWriting(false);
     }
 
+    NX_LOG(lit("%1 Storage new candidates:").arg(Q_FUNC_INFO), cl_logDEBUG2);
+    for (const auto& storage : storages)
+        NX_LOG(lit("%1 url: %2, totalSpace: %3, spaceLimit: %4")
+                    .arg(Q_FUNC_INFO)
+                    .arg(storage->getUrl())
+                    .arg(storage->getTotalSpace())
+                    .arg(storage->getSpaceLimit()), cl_logDEBUG2);
+
     return storages;
 }
 
@@ -636,12 +644,23 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
                 if (it != partitions.end())
                     storageType = QnLexical::serialized(it->type);
             }
-            storage->setStorageType(storageType);
+            storage->setStorageType(
+                    storageType.isEmpty() 
+                    ? QnLexical::serialized(QnPlatformMonitor::UnknownPartition)
+                    : storageType);
             modified = true;
         }
         if (modified)
             result.insert(storage->getId(), storage);
     }
+
+    NX_LOG(lit("%1 Modified storages:").arg(Q_FUNC_INFO), cl_logDEBUG2);
+    for (const auto& storage : result.values())
+        NX_LOG(lit("%1 url: %2, totalSpace: %3, spaceLimit: %4")
+                    .arg(Q_FUNC_INFO)
+                    .arg(storage->getUrl())
+                    .arg(storage->getTotalSpace())
+                    .arg(storage->getSpaceLimit()), cl_logDEBUG2);
 
     return result.values();
 }
