@@ -596,13 +596,14 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
             storage->setUsedForWriting(false);
     }
 
-    NX_LOG(lit("%1 Storage new candidates:").arg(Q_FUNC_INFO), cl_logDEBUG2);
+    QString logMessage = lit("%1 Storage new candidates:\n").arg(Q_FUNC_INFO);
     for (const auto& storage : storages)
-        NX_LOG(lit("%1 url: %2, totalSpace: %3, spaceLimit: %4")
-                    .arg(Q_FUNC_INFO)
-                    .arg(storage->getUrl())
-                    .arg(storage->getTotalSpace())
-                    .arg(storage->getSpaceLimit()), cl_logDEBUG2);
+        logMessage.append(
+            lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
+                .arg(storage->getUrl())
+                .arg(storage->getTotalSpace())
+                .arg(storage->getSpaceLimit()));
+    NX_LOG(logMessage, cl_logDEBUG1);
 
     return storages;
 }
@@ -654,13 +655,14 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
             result.insert(storage->getId(), storage);
     }
 
-    NX_LOG(lit("%1 Modified storages:").arg(Q_FUNC_INFO), cl_logDEBUG2);
+    QString logMesssage = lit("%1 Modified storages:\n").arg(Q_FUNC_INFO);
     for (const auto& storage : result.values())
-        NX_LOG(lit("%1 url: %2, totalSpace: %3, spaceLimit: %4")
-                    .arg(Q_FUNC_INFO)
-                    .arg(storage->getUrl())
-                    .arg(storage->getTotalSpace())
-                    .arg(storage->getSpaceLimit()), cl_logDEBUG2);
+        logMesssage.append(
+            lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3\n")
+                .arg(storage->getUrl())
+                .arg(storage->getTotalSpace())
+                .arg(storage->getSpaceLimit()));
+    NX_LOG(logMesssage, cl_logDEBUG1);
 
     return result.values();
 }
