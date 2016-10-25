@@ -344,7 +344,7 @@ void QnConnectionManagerPrivate::doConnect()
 
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
-            helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url, true);
+            helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url);
             helpers::updateWeightData(localId);
             qnSettings->setLastUsedSystemId(connectionInfo.systemName);
             url.setPassword(QString());

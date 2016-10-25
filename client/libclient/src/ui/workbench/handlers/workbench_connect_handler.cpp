@@ -168,17 +168,19 @@ void storeCustomConnection(const QnLocalConnectionData& data)
 void storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
-    const QUrl& url,
+    QUrl url,
     bool storePassword,
     bool autoLogin)
 {
     if (autoLogin)
         storePassword = true;
+    if (!storePassword)
+        url.setPassword(QString());
 
     const auto connectionData =
-        helpers::storeLocalSystemConnection(systemName, localSystemId, url, storePassword);
+        helpers::storeLocalSystemConnection(systemName, localSystemId, url);
 
-    const auto lastUsed = QnConnectionData(systemName, connectionData.url, false);
+    const auto lastUsed = QnConnectionData(systemName, url, false);
     qnSettings->setLastUsedConnection(lastUsed);
     qnSettings->setAutoLogin(autoLogin);
 

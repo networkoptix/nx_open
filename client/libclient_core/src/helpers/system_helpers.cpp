@@ -110,15 +110,9 @@ bool isNewSystem(const QnCloudSystem& info)
 QnLocalConnectionData storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
-    const QUrl& url,
-    bool storePassword)
+    const QUrl& url)
 {
     // TODO: #ynikitenkov remove outdated connection data
-
-    const auto password = QnEncodedString(storePassword ? url.password() : QString());
-
-    auto fixedUrl = url;
-    fixedUrl.setPassword(QString());
 
     auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
@@ -130,7 +124,7 @@ QnLocalConnectionData storeLocalSystemConnection(
 
     recentConnections.erase(itEnd, recentConnections.end());
 
-    const QnLocalConnectionData connectionData(systemName, localSystemId, fixedUrl, password);
+    const QnLocalConnectionData connectionData(systemName, localSystemId, url);
     recentConnections.prepend(connectionData);
 
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);

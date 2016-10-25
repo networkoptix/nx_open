@@ -32,7 +32,6 @@ bool isNewSystem(const QnCloudSystem& info);
 QnLocalConnectionData storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
-    const QUrl& url,
-    bool storePassword);
+    const QUrl& url);
 
 } // namespace helpers

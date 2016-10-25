@@ -17,12 +17,10 @@ struct QnLocalConnectionData
     QnLocalConnectionData(
         const QString& systemName,
         const QnUuid& localId,
-        const QUrl& url,
-        const QnEncodedString& password);
+        const QUrl& url);
 
     QString systemName;
     QnUuid localId;
-
     QUrl url;
     QnEncodedString password;
 };
