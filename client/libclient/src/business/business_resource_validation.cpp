@@ -5,6 +5,10 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <utils/email/email.h>
 
@@ -75,7 +79,6 @@ namespace
         return QnDeviceDependentStrings::getNumericName(cameras);
     }
 
-
 }
 
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -134,7 +137,9 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
     if (cameras.isEmpty())
-        return tr("Select device");
+        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select device"),
+            tr("Select camera"));
     else
         return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
 }
@@ -149,34 +154,95 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
     return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", invalid), invalid);
 }
 
-bool QnUserEmailPolicy::isResourceValid(const QnUserResourcePtr &resource) {
-    return QnEmailAddress::isValid(resource->getEmail());
+QnSendEmailActionDelegate::QnSendEmailActionDelegate(QWidget* parent):
+    QnResourceSelectionDialogDelegate(parent),
+    m_warningLabel(nullptr)
+{
 }
 
-QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool detailed, const QStringList &additional) {
+void QnSendEmailActionDelegate::init(QWidget* parent)
+{
+    m_warningLabel = new QLabel(parent);
+    setWarningStyle(m_warningLabel);
+    parent->layout()->addWidget(m_warningLabel);
+}
 
-    QnUserResourceList users = resources.filtered<QnUserResource>();
-    if (users.isEmpty() && additional.isEmpty())
+bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
+{
+    if (!m_warningLabel)
+        return true;
+
+    bool valid = isValidList(selected);
+    m_warningLabel->setVisible(!valid);
+    if (!valid)
+        m_warningLabel->setText(getText(selected));
+    return true;
+}
+
+bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
+{
+    if (auto user = qnResPool->getResourceById<QnUserResource>(resourceId))
+        return isValidUser(user);
+
+    /* We can get here either user id or role id. User should be checked additionally, role is
+     * always counted as valid (if exists). */
+    return !qnUserRolesManager->userRole(resourceId).isNull();
+}
+
+bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
+{
+    /* Return true if there are no invalid emails and there is at least one recipient. */
+    auto users = qnResPool->getResources<QnUserResource>(ids);
+
+    if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
+        return false;
+
+    auto isValidEmail = [](const QString& email) { return QnEmailAddress::isValid(email); };
+
+    const auto additionalRecipients = parseAdditional(additional);
+    if (!std::all_of(additionalRecipients.cbegin(), additionalRecipients.cend(), isValidEmail))
+        return false;
+
+    /* Using lazy calculations to avoid counting roles when not needed. */
+    return !users.empty()
+        || !additionalRecipients.empty()
+        || !qnUserRolesManager->userRoles(ids).empty();
+}
+
+QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
+    const QString& additionalList)
+{
+    auto roles = qnUserRolesManager->userRoles(ids);
+    auto users = qnResPool->getResources<QnUserResource>(ids);
+    auto additional = parseAdditional(additionalList);
+
+    if (users.isEmpty() && roles.empty() && additional.isEmpty())
         return tr("Select at least one user");
 
     QStringList receivers;
     int invalid = 0;
-    foreach (const QnUserResourcePtr &user, users) {
+    for (const auto& user: users)
+    {
         QString userMail = user->getEmail();
-        if (isResourceValid(user))
+        if (isValidUser(user))
             receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
         else
             invalid++;
     }
 
-    if (detailed && invalid > 0) {
+    for (const auto& role: roles)
+        receivers << role.name;
+
+    if (detailed && invalid > 0)
+    {
         if (users.size() == 1)
             return tr("User %1 has invalid email address").arg(users.first()->getName());
-        return tr("%n of %1 users have invalid email address", "", invalid).arg(users.size()); // TODO: #Elric #TR invalid %n placement!
+        return tr("%n of %1 users have invalid email address", "", invalid).arg(users.size());
     }
 
     invalid = 0;
-    foreach(const QString &email, additional) {
+    for (const QString &email: additional)
+    {
         if (QnEmailAddress::isValid(email))
             receivers << email;
         else
@@ -186,14 +252,40 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
     //
     if (detailed && invalid > 0)
         return (additional.size() == 1)
-                ? tr("Invalid email address %1").arg(additional.first())
-                : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
+        ? tr("Invalid email address %1").arg(additional.first())
+        : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
 
     if (detailed)
         return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
 
-    QString result = tr("%n User(s)", "", users.size());
-    if (additional.size() > 0)
-        result = tr("%1, %n additional", "", additional.size()).arg(result);
+
+    QStringList recipients;
+    if (!users.empty())
+        recipients << tr("%n Users", "", users.size());
+    if (!roles.empty())
+        recipients << tr("%n Roles", "", (int)roles.size());
+    if (!additional.empty())
+        recipients << tr("%n additional", "", additional.size());
+
+    NX_ASSERT(!recipients.empty());
+    return recipients.join(lit(", "));
+}
+
+QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional)
+{
+    QStringList result;
+    for (auto email : additional.split(L';', QString::SkipEmptyParts))
+    {
+        if (email.trimmed().isEmpty())
+            continue;
+        result << email;
+    }
+    result.removeDuplicates();
     return result;
+}
+
+bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
+{
+    const auto email = user->getEmail();
+    return !email.isEmpty() && QnEmailAddress::isValid(email);
 }

@@ -14,8 +14,10 @@ namespace nx_ms_conf
 #ifdef __arm__
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 100*1024*1024; // 100MB
 #else
-    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
+    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 10*1024*1024*1024ll; // 10gb
 #endif
+
+    static const QLatin1String DISABLE_STORAGE_DB_OPTIMIZATION("disableStorageDbOptimization");
 
 	static const QLatin1String MAX_RECORD_QUEUE_SIZE_BYTES( "maxRecordQueueSizeBytes" );
     static const int DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES = 1024*1024*20;
@@ -104,6 +106,8 @@ namespace nx_ms_conf
     static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 
     static const QLatin1String CDB_ENDPOINT( "cdbEndpoint" );
+
+    static const QLatin1String ONVIF_TIMEOUTS( "onvifTimeouts" );
 }
 
 /*!

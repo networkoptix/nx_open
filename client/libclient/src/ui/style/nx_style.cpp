@@ -33,6 +33,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -48,7 +49,7 @@ namespace
     const char* kViewportMarginsBackupId = "viewportMargins";
     const char* kContentsMarginsBackupId = "contentsMargins";
 
-    const char* kHoveredChildProperty = "_qn_hoveredChild";
+    const char* kHoveredWidgetProperty = "_qn_hoveredWidget";
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
 
@@ -163,6 +164,14 @@ namespace
         return false;
     }
 
+    bool isTextButton(const QStyleOption* option)
+    {
+        if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+            return button->features.testFlag(QStyleOptionButton::Flat);
+
+        return false;
+    }
+
     bool isSwitchButtonCheckbox(const QWidget* widget)
     {
         return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
@@ -221,12 +230,36 @@ namespace
         if (!option->state.testFlag(QStyle::State_MouseOver))
             return false;
 
+        if (!widget)
+            return true;
+
         /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
          * To overcome this problem we process hover events and track hovered children: */
-        if (widget && widget->property(kHoveredChildProperty).value<QWidget*>())
+        auto hoveredWidget = widget->property(kHoveredWidgetProperty).value<QWidget*>();
+        if (!hoveredWidget)
             return false;
 
-        return true;
+        if (hoveredWidget == widget)
+            return true;
+
+        /* Make exception for close buttons: */
+        static const QByteArray kQTabBarCloseButtonClassName = "CloseButton";
+        if (hoveredWidget->metaObject()->className() == kQTabBarCloseButtonClassName)
+            return true;
+
+        return false;
+    }
+
+    QIcon::Mode buttonIconMode(const QStyleOption& option)
+    {
+        if (!option.state.testFlag(QStyle::State_Enabled))
+            return QIcon::Disabled;
+        if (option.state.testFlag(QStyle::State_Sunken))
+            return QnIcon::Pressed;
+        if (option.state.testFlag(QStyle::State_MouseOver))
+            return QIcon::Active;
+
+        return QIcon::Normal;
     }
 
     bool isNonEditableComboBox(const QWidget* widget)
@@ -319,6 +352,19 @@ namespace
         return false;
     }
 
+    QGraphicsProxyWidget* findProxyWidget(QWidget* widget)
+    {
+        while (widget)
+        {
+            if (auto proxy = widget->graphicsProxyWidget())
+                return proxy;
+
+            widget = widget->parentWidget();
+        }
+
+        return nullptr;
+    }
+
     enum ScrollBarStyle
     {
         CommonScrollBar,
@@ -354,7 +400,8 @@ QnNxStylePrivate::QnNxStylePrivate() :
     QCommonStylePrivate(),
     palette(),
     idleAnimator(nullptr),
-    stateAnimator(nullptr)
+    stateAnimator(nullptr),
+    lastProxiedWidgetUnderMouse(nullptr)
 {
     Q_Q(QnNxStyle);
 
@@ -487,7 +534,8 @@ void QnNxStyle::drawPrimitive(
             }
 
             const bool pressed = option->state.testFlag(State_Sunken);
-            const bool hovered = option->state.testFlag(State_MouseOver);
+            const bool enabled = option->state.testFlag(State_Enabled);
+            const bool hovered = option->state.testFlag(State_MouseOver) && enabled;
 
             QRect rect = option->rect;
 
@@ -827,10 +875,21 @@ void QnNxStyle::drawPrimitive(
         case PE_IndicatorViewItemCheck:
         {
             QStyleOptionViewItem adjustedOption;
+            bool exclusive = widget && widget->property(Properties::kItemViewRadioButtons).toBool();
+
+            auto drawFunction =
+                [exclusive, painter, widget, d](const QStyleOption* option)
+                {
+                    if (exclusive)
+                        d->drawRadioButton(painter, option, widget);
+                    else
+                        d->drawCheckBox(painter, option, widget);
+                };
+
             if (viewItemHoverAdjusted(widget, option, adjustedOption))
-                d->drawCheckBox(painter, &adjustedOption, widget);
+                drawFunction(&adjustedOption);
             else
-                d->drawCheckBox(painter, option, widget);
+                drawFunction(option);
 
             return;
         }
@@ -864,10 +923,34 @@ void QnNxStyle::drawPrimitive(
         {
             bool selected = option->state.testFlag(QStyle::State_Selected);
 
+            /* Main window tabs draw icons: */
+            if (const QTabBar* tabBar = qobject_cast<const QTabBar*>(widget->parent()))
+            {
+                if (tabShape(tabBar) == TabShape::Rectangular)
+                {
+                    QIcon icon = qnSkin->icon(selected
+                        ? lit("tab_bar/tab_close_current.png")
+                        : lit("tab_bar/tab_close.png"));
+
+                    QIcon::Mode mode = buttonIconMode(*option);
+                    icon.paint(painter, option->rect, Qt::AlignCenter, mode);
+                    return;
+                }
+            }
+
+            /* Other tabs normally don't have close buttons, but if
+             * they ever do, fall back to vector drawing of the cross: */
+
             QColor color = option->palette.color(
                     selected ? QPalette::Text : QPalette::Light);
 
-            if (option->state.testFlag(State_MouseOver))
+            if (option->state.testFlag(State_Sunken))
+            {
+                QnPaletteColor background = findColor(
+                    option->palette.color(selected ? QPalette::Midlight : QPalette::Dark)).darker(1);
+                painter->fillRect(option->rect, background);
+            }
+            else if (option->state.testFlag(State_MouseOver))
             {
                 QnPaletteColor background = findColor(
                         option->palette.color(selected ? QPalette::Midlight : QPalette::Dark)).lighter(1);
@@ -895,14 +978,40 @@ void QnNxStyle::drawPrimitive(
                 {
                     switch (tabShape(tabBar))
                     {
+                        /* Main window tabs draw icons: */
+                        case TabShape::Rectangular:
+                        {
+                            QIcon icon;
+                            switch (element)
+                            {
+                                case PE_IndicatorArrowLeft:
+                                    icon = qnSkin->icon(lit("tab_bar/tab_prev.png"));
+                                    break;
+                                case PE_IndicatorArrowRight:
+                                    icon = qnSkin->icon(lit("tab_bar/tab_next.png"));
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (icon.isNull())
+                            {
+                                /* Fall back to vector drawing: */
+                                width = 1.3;
+                                break;
+                            }
+
+                            QIcon::Mode mode = buttonIconMode(*option);
+                            icon.paint(painter, option->rect.adjusted(1, 0, 0, 0), Qt::AlignCenter, mode);
+                            return;
+                        }
+
+                        /* Other tabs fall back to vector drawing of the arrows: */
                         case TabShape::Default:
                         case TabShape::Compact:
                             size = dp(14);
                             color = findColor(option->palette.light().color()).darker(2);
                             width = 1.5;
-                            break;
-                        case TabShape::Rectangular:
-                            width = 1.3;
                             break;
                         default:
                             break;
@@ -1562,6 +1671,24 @@ void QnNxStyle::drawControl(
             break;
         }
 
+        case CE_ToolButtonLabel:
+        {
+            if (auto button = qstyleoption_cast<const QStyleOptionToolButton*>(option))
+            {
+                if (button->state.testFlag(State_Enabled) && button->state.testFlag(State_Sunken))
+                {
+                    QStyleOptionToolButton optionCopy(*button);
+                    optionCopy.state &= ~State_MouseOver;
+                    optionCopy.icon = QnSkin::maximumSizePixmap(button->icon, QnIcon::Pressed,
+                        button->state.testFlag(State_On) ? QIcon::On : QIcon::Off, false);
+                    base_type::drawControl(CE_ToolButtonLabel, &optionCopy, painter, widget);
+                    return;
+                }
+            }
+
+            break;
+        }
+
         case CE_TabBarTabShape:
         {
             if (auto tab = qstyleoption_cast<const QStyleOptionTab*>(option))
@@ -1589,7 +1716,7 @@ void QnNxStyle::drawControl(
                     case TabShape::Rectangular:
                     {
                         QnPaletteColor mainColor = findColor(
-                            option->palette.color(QPalette::Mid)).lighter(1);
+                            option->palette.color(QPalette::Base)).lighter(1);
 
                         QColor color = mainColor;
 
@@ -1633,6 +1760,18 @@ void QnNxStyle::drawControl(
                 QRect textRect = tab->rect;
                 QRect focusRect = tab->rect;
 
+                int iconWithPadding = 0;
+                if (!tab->icon.isNull())
+                {
+                    QSize iconSize = QnSkin::maximumSize(tab->icon);
+                    iconWithPadding = iconSize.width() + Metrics::kStandardPadding;
+
+                    QRect iconRect = textRect;
+                    iconRect.setWidth(iconWithPadding);
+                    iconRect = aligned(iconSize, iconRect);
+                    tab->icon.paint(painter, iconRect);
+                }
+
                 if (shape == TabShape::Rectangular)
                 {
                     textFlags |= Qt::AlignLeft | Qt::AlignVCenter;
@@ -1643,12 +1782,13 @@ void QnNxStyle::drawControl(
                         color = tab->palette.light().color();
 
                     int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
-                    textRect.adjust(hspace, 0, -hspace, 0);
+                    textRect.adjust(qMax(iconWithPadding, hspace), 0, -hspace, 0);
                     focusRect.adjust(0, 2, 0, -2);
                 }
                 else
                 {
                     textFlags |= Qt::AlignCenter;
+                    textRect.setLeft(textRect.left() + iconWithPadding);
 
                     QnPaletteColor mainColor = findColor(tab->palette.light().color()).darker(2);
                     color = mainColor;
@@ -1699,17 +1839,6 @@ void QnNxStyle::drawControl(
                     tab->state.testFlag(QStyle::State_Enabled),
                     tab->text);
 
-                if (!tab->icon.isNull())
-                {
-                    QFontMetrics fm(painter->font());
-                    QRect rect = fm.boundingRect(textRect, textFlags, tab->text);
-
-                    QSize iconSize = tab->icon.actualSize(tab->iconSize);
-                    QRect iconRect = aligned(iconSize, textRect);
-                    iconRect.moveLeft(rect.right() + Metrics::kStandardPadding);
-                    tab->icon.paint(painter, iconRect);
-                }
-
                 if (tab->state.testFlag(State_HasFocus))
                 {
                     QStyleOptionFocusRect focusOption;
@@ -1725,7 +1854,16 @@ void QnNxStyle::drawControl(
         {
             if (auto header = qstyleoption_cast<const QStyleOptionHeader*>(option))
             {
-                if (header->state.testFlag(State_MouseOver))
+                bool hovered = header->state.testFlag(State_MouseOver);
+                if (auto headerWidget = qobject_cast<const QHeaderView*>(widget))
+                {
+                    /* In addition to Qt's requirement of sectionsClickable()
+                     * we demand isSortIndicatorShown() to be also true to enable hover: */
+                    if (!headerWidget->isSortIndicatorShown())
+                        hovered = false;
+                }
+
+                if (hovered)
                 {
                     QColor color = findColor(header->palette.midlight().color());
                     painter->fillRect(header->rect, color);
@@ -1755,12 +1893,14 @@ void QnNxStyle::drawControl(
         {
             if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
             {
+                bool asDropdown = widget && widget->property(Properties::kMenuAsDropdown).toBool();
                 if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
                 {
                     QnScopedPainterPenRollback penRollback(painter, menuItem->palette.color(QPalette::Midlight));
                     int y = menuItem->rect.top() + menuItem->rect.height() / 2;
-                    painter->drawLine(Metrics::kMenuItemHPadding, y,
-                                      menuItem->rect.right() - Metrics::kMenuItemHPadding, y);
+                    int padding = asDropdown ? Metrics::kStandardPadding: Metrics::kMenuItemHPadding;
+                    painter->drawLine(padding, y,
+                                      menuItem->rect.right() - padding, y);
                     break;
                 }
 
@@ -1781,7 +1921,10 @@ void QnNxStyle::drawControl(
                 if (selected)
                     painter->fillRect(menuItem->rect, backgroundColor);
 
-                int xPos = Metrics::kMenuItemTextLeftPadding;
+                int xPos = asDropdown
+                    ? Metrics::kStandardPadding
+                    : Metrics::kMenuItemTextLeftPadding;
+
                 int y = menuItem->rect.y();
 
                 int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
@@ -1816,6 +1959,7 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->checked && menuItem->checkType != QStyleOptionMenuItem::NotCheckable)
                 {
+                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawMenuCheckMark(
                             painter,
                             QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
@@ -1824,6 +1968,7 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
                 {
+                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawArrow(Right,
                               painter,
                               QRect(menuItem->rect.right() - Metrics::kMenuItemVPadding - Metrics::kArrowSize, menuItem->rect.top(),
@@ -2008,32 +2153,8 @@ void QnNxStyle::drawControl(
 
         case CE_PushButtonBevel:
         {
-            if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
-            {
-                /* Draw panel for hovered and pressed flat buttons: */
-                if (buttonOption->features.testFlag(QStyleOptionButton::Flat)
-                    && (buttonOption->state.testFlag(State_Sunken)
-                     || buttonOption->state.testFlag(State_MouseOver)))
-                {
-                    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
-                    QnScopedPainterBrushRollback brushRollback(painter);
-
-                    if (buttonOption->state.testFlag(State_Sunken))
-                        painter->setBrush(findColor(option->palette.color(QPalette::Base)).darker(1).color());
-                    else
-                        painter->setBrush(option->palette.dark());
-
-                    static const qreal kRoundingRadius = 2.0;
-                    painter->drawRoundedRect(option->rect, kRoundingRadius, kRoundingRadius);
-
-                    /* Call standard paint for frames etc.
-                     * Clear pressed state to avoid more panel painting. */
-                    QStyleOptionButton optionCopy(*buttonOption);
-                    optionCopy.state &= ~(State_On | State_Sunken);
-                    base_type::drawControl(element, &optionCopy, painter, widget);
-                    return;
-                }
-            }
+            if (isTextButton(option))
+                return;
 
             break;
         }
@@ -2042,40 +2163,103 @@ void QnNxStyle::drawControl(
         {
             if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
-                bool checkable = isCheckableButton(option);
-                bool leftAligned = checkable
-                    || widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
+                /* Support for custom foreground role for buttons: */
+                QPalette::ColorRole foregroundRole = widget
+                    ? widget->foregroundRole()
+                    : QPalette::ButtonText;
 
-                bool customForeground = widget && widget->foregroundRole() != QPalette::ButtonText;
-
-                QStyleOptionButton newOpt(*buttonOption);
-
-                if (leftAligned)
+                /* Draw text button: */
+                if (isTextButton(option))
                 {
-                    /* Calculate minimal label width: */
-                    int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
-                    if (!buttonOption->icon.isNull())
-                        minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
-                    if (!buttonOption->text.isEmpty())
-                        minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
+                    /* Foreground role override: */
+                    if (foregroundRole == QPalette::ButtonText)
+                        foregroundRole = QPalette::WindowText;
 
-                    /* Draw standard button content left-aligned: */
-                    newOpt.rect.setWidth(minLabelWidth);
+                    d->drawTextButton(painter, buttonOption, foregroundRole, widget);
+                    return;
                 }
 
-                /* Support for custom foreground role for buttons: */
-                if (customForeground)
-                    newOpt.palette.setColor(QPalette::ButtonText, newOpt.palette.color(widget->foregroundRole()));
+                int margin = pixelMetric(PM_ButtonMargin, option, widget);
+                QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
 
-                base_type::drawControl(element, &newOpt, painter, widget);
+                Qt::Alignment textHorizontalAlignment = Qt::AlignHCenter;
+
+                if (widget && widget->property(Properties::kPushButtonMargin).canConvert<int>())
+                    textHorizontalAlignment = Qt::AlignLeft;
+
+                /* Draw icon left-aligned: */
+                if (!buttonOption->icon.isNull())
+                {
+                    QIcon::Mode mode = buttonIconMode(*option);
+
+                    QIcon::State state = buttonOption->state.testFlag(State_On)
+                        ? QIcon::On : QIcon::Off;
+
+                    QRect iconRect = buttonOption->rect;
+                    iconRect.setWidth(buttonOption->iconSize.width() + margin);
+
+                    if (buttonOption->direction == Qt::RightToLeft)
+                    {
+                        iconRect.moveRight(buttonOption->rect.right());
+                        textRect.setRight(iconRect.left() - 1);
+                    }
+                    else
+                    {
+                        textRect.setLeft(option->rect.left() + iconRect.width());
+                    }
+
+                    iconRect = alignedRect(option->direction, Qt::AlignCenter,
+                        buttonOption->iconSize, iconRect);
+
+                    buttonOption->icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
+                    textHorizontalAlignment = Qt::AlignLeft;
+                }
 
                 /* Draw switch right-aligned: */
-                if (checkable)
+                if (isCheckableButton(option))
                 {
+                    QStyleOptionButton newOpt(*buttonOption);
                     newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
-                    newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
                     newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
+
+                    if (buttonOption->direction == Qt::RightToLeft)
+                    {
+                        newOpt.rect.moveLeft(option->rect.left() + Metrics::kSwitchMargin);
+                        textRect.setLeft(newOpt.rect.right() + Metrics::kSwitchMargin + 1);
+                    }
+                    else
+                    {
+                        newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                        textRect.setRight(newOpt.rect.left() - Metrics::kSwitchMargin - 1);
+                    }
+
                     drawSwitch(painter, &newOpt, widget);
+                    textHorizontalAlignment = Qt::AlignLeft;
+                }
+
+                /* Subtract menu indicator area: */
+                if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu))
+                {
+                    int indicatorSize = proxy()->pixelMetric(PM_MenuButtonIndicator, option, widget);
+                    if (buttonOption->direction == Qt::RightToLeft)
+                        textRect.setLeft(textRect.left() + indicatorSize);
+                    else
+                        textRect.setRight(textRect.right() - indicatorSize);
+                }
+
+                /* Draw text: */
+                if (!buttonOption->text.isEmpty())
+                {
+                    const int textFlags = textHorizontalAlignment
+                        | Qt::AlignVCenter
+                        | Qt::TextSingleLine
+                        | Qt::TextHideMnemonic;
+
+                    QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
+                        Qt::ElideRight, textRect.width(), textFlags);
+
+                    proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
+                        buttonOption->state.testFlag(State_Enabled), text, foregroundRole);
                 }
 
                 return;
@@ -2108,14 +2292,13 @@ QRect QnNxStyle::subControlRect(
         SubControl subControl,
         const QWidget *widget) const
 {
-    QRect rect = base_type::subControlRect(control, option, subControl, widget);
-
     switch (control)
     {
         case CC_Slider:
         {
             if (auto slider = qstyleoption_cast<const QStyleOptionSlider*>(option))
             {
+                QRect rect = base_type::subControlRect(CC_Slider, option, subControl, widget);
                 int tickSize = proxy()->pixelMetric(PM_SliderTickmarkOffset, option, widget);
 
                 switch (subControl)
@@ -2177,6 +2360,8 @@ QRect QnNxStyle::subControlRect(
                     default:
                         break;
                 }
+
+                return rect;
             }
             break;
         }
@@ -2185,6 +2370,7 @@ QRect QnNxStyle::subControlRect(
         {
             if (auto comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option))
             {
+                QRect rect;
                 switch (subControl)
                 {
                     case SC_ComboBoxArrow:
@@ -2207,8 +2393,11 @@ QRect QnNxStyle::subControlRect(
                     }
 
                     default:
+                        rect = base_type::subControlRect(CC_ComboBox, option, subControl, widget);
                         break;
                 }
+
+                return rect;
             }
             break;
         }
@@ -2364,12 +2553,7 @@ QRect QnNxStyle::subControlRect(
         {
             if (auto scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
             {
-                /* For some reason QCommonStyle returns scrollbar subcontrol rects in local coordinates.
-                 * Fix that: */
-                rect.moveTopLeft(option->rect.topLeft() + rect.topLeft());
-
-                const int w = pixelMetric(PM_ScrollBarExtent, option, widget);
-
+                QRect rect = scrollBar->rect;
                 switch (subControl)
                 {
                     case SC_ScrollBarAddLine:
@@ -2387,34 +2571,68 @@ QRect QnNxStyle::subControlRect(
                         break;
 
                     case SC_ScrollBarGroove:
-                        rect = scrollBar->rect;
                         break;
 
                     case SC_ScrollBarSlider:
-                        if (scrollBar->orientation == Qt::Vertical)
-                            rect.adjust(0, -w, 0, w);
-                        else
-                            rect.adjust(-w, 0, w, 0);
-                        break;
-
                     case SC_ScrollBarAddPage:
-                        if (scrollBar->orientation == Qt::Vertical)
-                            rect.adjust(0, w, 0, 0);
-                        else
-                            rect.adjust(w, 0, 0, 0);
-                        break;
-
                     case SC_ScrollBarSubPage:
-                        if (scrollBar->orientation == Qt::Vertical)
-                            rect.adjust(0, 0, 0, -w);
-                        else
-                            rect.adjust(0, 0, -w, 0);
-                        break;
+                    {
+                        qreal range = scrollBar->maximum - scrollBar->minimum;
+                        int maxLength = scrollBar->orientation == Qt::Vertical
+                            ? rect.height()
+                            : rect.width();
 
-                    default:
+                        int minLength = proxy()->pixelMetric(PM_ScrollBarSliderMin, scrollBar, widget);
+
+                        int sliderLength = static_cast<int>(
+                            (static_cast<qreal>(maxLength) * scrollBar->pageStep)
+                                / (range + scrollBar->pageStep) + 0.5);
+
+                        sliderLength = qBound(minLength, sliderLength, maxLength);
+
+                        int pos = sliderPositionFromValue(
+                            scrollBar->minimum,
+                            scrollBar->maximum,
+                            scrollBar->sliderPosition,
+                            maxLength - sliderLength,
+                            scrollBar->upsideDown);
+
+                        switch (subControl)
+                        {
+                            case SC_ScrollBarSlider:
+                                if (scrollBar->orientation == Qt::Vertical)
+                                    rect = QRect(rect.left(), rect.top() + pos, rect.width(), sliderLength);
+                                else
+                                    rect = QRect(rect.left() + pos, rect.top(), sliderLength, rect.height());
+                                break;
+
+                            case SC_ScrollBarAddPage:
+                                if (scrollBar->orientation == Qt::Vertical)
+                                    rect = QRect(QPoint(rect.left(), rect.top() + pos + sliderLength), rect.bottomRight());
+                                else
+                                    rect = QRect(QPoint(rect.left() + pos + sliderLength, rect.top()), rect.bottomRight());
+                                break;
+
+                            case SC_ScrollBarSubPage:
+                                if (scrollBar->orientation == Qt::Vertical)
+                                    rect = QRect(rect.left(), rect.top(), rect.width(), pos);
+                                else
+                                    rect = QRect(rect.left(), rect.top(), pos, rect.height());
+                                break;
+                        }
+
                         break;
+                    }
+
+                    case SC_ScrollBarFirst:
+                    case SC_ScrollBarLast:
+                    default:
+                        return QRect();
                 }
+
+                return visualRect(scrollBar->direction, scrollBar->rect, rect);
             }
+
             break;
         }
 
@@ -2422,7 +2640,7 @@ QRect QnNxStyle::subControlRect(
             break;
     }
 
-    return rect;
+    return base_type::subControlRect(control, option, subControl, widget);
 }
 
 QRect QnNxStyle::subElementRect(
@@ -2462,7 +2680,11 @@ QRect QnNxStyle::subElementRect(
         }
 
         case SE_PushButtonFocusRect:
-            return QnGeometry::eroded(option->rect, 1);
+        {
+            return isTextButton(option)
+                ? option->rect
+                : QnGeometry::eroded(option->rect, 1);
+        }
 
         case SE_ProgressBarGroove:
         {
@@ -2555,7 +2777,7 @@ QRect QnNxStyle::subElementRect(
             {
                 QSize size = tabBar->rightButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return aligned(size, tabBar->rect.adjusted(0, 0, -1, 0), Qt::AlignRight | Qt::AlignVCenter);
+                return aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
             }
             break;
         }
@@ -2659,10 +2881,10 @@ QRect QnNxStyle::subElementRect(
 }
 
 QSize QnNxStyle::sizeFromContents(
-        ContentsType type,
-        const QStyleOption *option,
-        const QSize &size,
-        const QWidget *widget) const
+    ContentsType type,
+    const QStyleOption* option,
+    const QSize& size,
+    const QWidget* widget) const
 {
     if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
         type = CT_PushButton;
@@ -2683,12 +2905,29 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_PushButton:
         {
-            QSize switchSize;
-            if (isCheckableButton(option))
-                switchSize = Metrics::kButtonSwitchSize + QSize(Metrics::kSwitchMargin, 0);
+            QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));
+            result.rwidth() += pixelMetric(PM_ButtonMargin, option, widget) * 2;
 
-            return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + switchSize.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
-                qMax(qMax(size.height(), switchSize.height()), Metrics::kButtonHeight));
+            if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+            {
+                if (!button->icon.isNull())
+                    result.rwidth() -= 4; // Compensate for QPushButton::sizeHint magic
+            }
+
+            if (isTextButton(option))
+                result.rwidth() += Metrics::kTextButtonIconMargin;
+            else
+                result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
+
+            if (isCheckableButton(option))
+            {
+                result.rwidth() += Metrics::kButtonSwitchSize.width() +
+                    Metrics::kStandardPadding * 2 - Metrics::kSwitchMargin;
+
+                result.rheight() = qMax(result.rheight(), Metrics::kButtonSwitchSize.height());
+            }
+
+            return result;
         }
 
         case CT_LineEdit:
@@ -2774,8 +3013,17 @@ QSize QnNxStyle::sizeFromContents(
         }
 
         case CT_MenuItem:
+        {
+            if (widget && widget->property(Properties::kMenuAsDropdown).toBool())
+            {
+                return QSize(
+                    qMax(size.width() + 2 * Metrics::kStandardPadding, Metrics::kMinimumButtonWidth),
+                    size.height() + 2 * Metrics::kMenuItemVPadding);
+            }
+
             return QSize(size.width() + dp(24) + 2 * Metrics::kMenuItemHPadding,
-                         size.height() + 2 * Metrics::kMenuItemVPadding);
+                size.height() + 2 * Metrics::kMenuItemVPadding);
+        }
 
         case CT_HeaderSection:
         {
@@ -2844,16 +3092,38 @@ QSize QnNxStyle::sizeFromContents(
 }
 
 int QnNxStyle::pixelMetric(
-        PixelMetric metric,
-        const QStyleOption *option,
-        const QWidget *widget) const
+    PixelMetric metric,
+    const QStyleOption* option,
+    const QWidget* widget) const
 {
     switch (metric)
     {
         case PM_ButtonMargin:
         {
-            int margin = widget ? widget->property(Properties::kButtonMarginProperty).toInt() : 0;
-            return margin ? margin : dp(16);
+            if (qobject_cast<const QAbstractItemView*>(widget))
+                return 0;
+
+            if (isCheckableButton(option))
+                return Metrics::kSwitchMargin * 2;
+
+            if (isTextButton(option))
+                return 0;
+
+            if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+            {
+                if (!button->icon.isNull())
+                    return Metrics::kPushButtonIconMargin * 2;
+            }
+
+            if (widget)
+            {
+                bool ok;
+                int margin = widget->property(Properties::kPushButtonMargin).toInt(&ok);
+                if (ok && margin >= 0)
+                    return margin;
+            }
+
+            return Metrics::kStandardPadding * 2;
         }
 
         case PM_ButtonShiftVertical:
@@ -2917,6 +3187,9 @@ int QnNxStyle::pixelMetric(
         case PM_LayoutVerticalSpacing:
             return (qobject_cast<const QnDialog*>(widget)) ? 0 : Metrics::kDefaultLayoutSpacing.height();
 
+        case PM_MenuButtonIndicator:
+            return 20 + Metrics::kMenuButtonIndicatorMargin;
+
         case PM_MenuVMargin:
             return dp(2);
         case PM_SubMenuOverlap:
@@ -2941,7 +3214,7 @@ int QnNxStyle::pixelMetric(
         case PM_ScrollBarExtent:
             return dp(8);
         case PM_ScrollBarSliderMin:
-            return dp(8);
+            return dp(24);
 
         case PM_SplitterWidth:
             return dp(5);
@@ -2951,7 +3224,7 @@ int QnNxStyle::pixelMetric(
             return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
         case PM_TabBarScrollButtonWidth:
-            return dp(24);
+            return 24 + 1;
 
         case PM_TabCloseIndicatorWidth:
         case PM_TabCloseIndicatorHeight:
@@ -3070,12 +3343,27 @@ void QnNxStyle::polish(QWidget *widget)
 {
     base_type::polish(widget);
 
+    /* #QTBUG 18838 */
+    /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
+    if (findProxyWidget(widget))
+        widget->installEventFilter(this);
+
     if (qobject_cast<QAbstractSpinBox*>(widget) ||
         qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
+
+        /*
+        * Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
+        *  which causes calendar dropdown button to not redraw properly
+        */
+        #if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
+        #error Check if this workaround is required in current Qt version
+        #endif
+        if (qobject_cast<QDateTimeEdit*>(widget))
+            widget->installEventFilter(this);
     }
 
     if (qobject_cast<QPushButton*>(widget) ||
@@ -3099,6 +3387,13 @@ void QnNxStyle::polish(QWidget *widget)
             widget->setFont(font);
         }
         widget->setAttribute(Qt::WA_Hover);
+
+#if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
+#error Check if this workaround is required in current Qt version
+#endif
+        /* Fix for Qt 5.6 bug: QHeaderView doesn't resize stretch sections to minimum
+         *  if quickly resized down. To overcome this problem we do it ourselves: */
+        widget->installEventFilter(this);
     }
 
     if (qobject_cast<QLineEdit*>(widget))
@@ -3297,6 +3592,8 @@ void QnNxStyle::polish(QWidget *widget)
 
 void QnNxStyle::unpolish(QWidget* widget)
 {
+    widget->removeEventFilter(this);
+
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QHeaderView*>(widget) ||
         qobject_cast<QLineEdit*>(widget) ||
@@ -3342,12 +3639,8 @@ void QnNxStyle::unpolish(QWidget* widget)
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {
         /* Remove hover events tracking: */
-        tabBar->setProperty(kHoveredChildProperty, QVariant());
-        tabBar->removeEventFilter(this);
+        tabBar->setProperty(kHoveredWidgetProperty, QVariant());
     }
-
-    if (qobject_cast<QAbstractButton*>(widget))
-        widget->removeEventFilter(this);
 
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
@@ -3393,26 +3686,98 @@ QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
 
 bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
 {
+    /* #QTBUG 18838 */
+    /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
+    if (auto widget = qobject_cast<QWidget*>(object))
+    {
+        if (auto proxy = findProxyWidget(widget))
+        {
+            Q_D(QnNxStyle);
+
+            switch (event->type())
+            {
+                case QEvent::Leave:
+                case QEvent::HoverLeave:
+                {
+                    if (d->lastProxiedWidgetUnderMouse == widget)
+                        d->lastProxiedWidgetUnderMouse = nullptr;
+
+                    break;
+                }
+
+                case QEvent::HoverMove:
+                {
+                    auto pos = static_cast<QHoverEvent*>(event)->pos();
+                    auto child = proxy->widget()->childAt(widget->mapTo(proxy->widget(), pos));
+                    if (child)
+                        widget = child;
+                    /* FALL THROUGH */
+                }
+                case QEvent::Enter:
+                case QEvent::HoverEnter:
+                {
+                    if (d->lastProxiedWidgetUnderMouse == widget)
+                        break;
+
+                    if (d->lastProxiedWidgetUnderMouse)
+                        d->lastProxiedWidgetUnderMouse->setAttribute(Qt::WA_UnderMouse, false);
+
+                    widget->setAttribute(Qt::WA_UnderMouse, true);
+                    d->lastProxiedWidgetUnderMouse = widget;
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+
     /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
      * To overcome this problem we process hover events and track hovered children: */
     if (auto tabBar = qobject_cast<QTabBar*>(object))
     {
-        QWidget* hoveredChild = nullptr;
+        QWidget* hoveredWidget = nullptr;
         switch (event->type())
         {
-            case QEvent::HoverEnter:
             case QEvent::HoverMove:
-                hoveredChild = tabBar->childAt(static_cast<QHoverEvent*>(event)->pos());
+            case QEvent::HoverEnter:
+            {
+                if (tabBar->rect().contains(static_cast<QHoverEvent*>(event)->pos()))
+                {
+                    hoveredWidget = tabBar->childAt(static_cast<QHoverEvent*>(event)->pos());
+                    if (!hoveredWidget)
+                        hoveredWidget = tabBar;
+                }
                 /* FALL THROUGH */
+            }
             case QEvent::HoverLeave:
             {
-                if (tabBar->property(kHoveredChildProperty).value<QWidget*>() != hoveredChild)
+                if (tabBar->property(kHoveredWidgetProperty).value<QWidget*>() != hoveredWidget)
                 {
-                    tabBar->setProperty(kHoveredChildProperty, QVariant::fromValue(hoveredChild));
+                    tabBar->setProperty(kHoveredWidgetProperty, QVariant::fromValue(hoveredWidget));
                     tabBar->update();
                 }
                 break;
             }
+
+            default:
+                break;
+        }
+    }
+    /* Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
+     * which causes calendar dropdown button to not redraw properly. We simply update
+     * entire control on each hover event, it's not optimal but will suffice for now: */
+    else if (auto dateTime = qobject_cast<QDateTimeEdit*>(object))
+    {
+        switch (event->type())
+        {
+            case QEvent::HoverEnter:
+            case QEvent::HoverMove:
+            case QEvent::HoverLeave:
+                dateTime->update();
+                break;
+
             default:
                 break;
         }
@@ -3425,6 +3790,37 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
         {
             event->ignore();
             return true;
+        }
+    }
+    /* Fix for Qt 5.6 bug: QHeaderView doesn't resize stretch sections to minimum
+     *  if quickly resized down.To overcome this problem we do it manually here: */
+    if (auto header = qobject_cast<QHeaderView*>(object))
+    {
+        if (event->type() == QEvent::Resize)
+        {
+            auto updateSectionSizes =
+                [header]()
+                {
+                    if (header->stretchSectionCount() > 0 && header->length() > header->width())
+                    {
+                        bool last = header->stretchLastSection();
+                        int minumumSize = header->minimumSectionSize();
+
+                        for (int i = header->count() - 1; i >= 0; --i)
+                        {
+                            if (header->isSectionHidden(i))
+                                continue;
+
+                            if (last || header->sectionResizeMode(i) == QHeaderView::Stretch)
+                            {
+                                header->resizeSection(i, minumumSize);
+                                last = false;
+                            }
+                        }
+                    }
+                };
+
+            executeDelayedParented(updateSectionSizes, 0, header);
         }
     }
 

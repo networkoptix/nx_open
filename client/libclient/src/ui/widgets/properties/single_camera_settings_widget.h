@@ -43,18 +43,6 @@ public:
     bool hasAdvancedCameraChanges() const;
     bool hasChanges() const;
 
-    /** Checks if user changed schedule controls but not applied them */
-    bool hasScheduleControlsChanges() const;
-
-    /** Clear flag that user changed schedule controls but not applied them */
-    void clearScheduleControlsChanges();
-
-    /** Checks if user changed motion controls but not applied them */
-    bool hasMotionControlsChanges() const;
-
-    /** Clear flag that  user changed motion controls but not applied them */
-    void clearMotionControlsChanges();
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
@@ -85,8 +73,6 @@ private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
-    void at_cameraScheduleWidget_gridParamsChanged();
-    void at_cameraScheduleWidget_controlsChangesApplied();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
@@ -95,8 +81,10 @@ private slots:
     void at_fisheyeSettingsChanged();
 
     void updateMotionWidgetSensitivity();
+    void updateMotionAlert();
     void updateIpAddressText();
     void updateWebPageText();
+    void updateAlertBar();
 
 private:
     void setHasDbChanges(bool hasChanges);
@@ -129,9 +117,6 @@ private:
 
     bool m_scheduleEnabledChanged;
 
-    /** Indicates that the user changed schedule controls but not applied them */
-    bool m_hasScheduleControlsChanges;
-
     /** Indicates that the user changed motion sensitivity controls but not applied them */
     bool m_hasMotionControlsChanges;
 
@@ -145,4 +130,7 @@ private:
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 
     QButtonGroup* m_sensitivityButtons;
+
+    QString m_recordingAlert;
+    QString m_motionAlert;
 };

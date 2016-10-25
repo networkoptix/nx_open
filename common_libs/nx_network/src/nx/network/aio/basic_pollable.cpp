@@ -7,7 +7,6 @@
 
 #include <nx/utils/std/future.h>
 
-
 namespace nx {
 namespace network {
 namespace aio {
@@ -23,22 +22,22 @@ void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler
     post(
         [this, completionHandler = std::move(completionHandler)]
         {
+            m_timer.pleaseStopSync();
             stopWhileInAioThread();
             completionHandler();
         });
 }
 
-void BasicPollable::pleaseStopSync()
+void BasicPollable::pleaseStopSync(bool checkForLocks)
 {
     if (m_timer.isInSelfAioThread())
     {
+        m_timer.pleaseStopSync();
         stopWhileInAioThread();
     }
     else
     {
-        nx::utils::promise<void> stoppedPromise;
-        pleaseStop([&stoppedPromise]{ stoppedPromise.set_value(); });
-        stoppedPromise.get_future().wait();
+        QnStoppableAsync::pleaseStopSync(checkForLocks);
     }
 }
 
@@ -67,6 +66,11 @@ Timer* BasicPollable::timer()
     return &m_timer;
 }
 
-}   //namespace aio
-}   //namespace network
-}   //namespace nx
+bool BasicPollable::isInSelfAioThread() const
+{
+    return m_timer.isInSelfAioThread();
+}
+
+} // namespace aio
+} // namespace network
+} // namespace nx

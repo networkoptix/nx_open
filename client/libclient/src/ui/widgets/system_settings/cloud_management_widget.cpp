@@ -7,12 +7,11 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/dialogs/link_to_cloud_dialog.h>
-#include <ui/dialogs/unlink_from_cloud_dialog.h>
+#include <ui/dialogs/cloud/connect_to_cloud_dialog.h>
+#include <ui/dialogs/cloud/disconnect_from_cloud_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
-
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>
@@ -47,7 +46,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     // TODO: #help Set help topic
 
     ui->unlinkButton->setText(tr("Disconnect System from %1").arg(QnAppInfo::cloudName()));
-    ui->goToCloudButton->setText(tr("Open %1 Portal").arg(QnAppInfo::cloudName()));
+    ui->goToCloudButton->setText(tr("Open %1 Portal", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
 
     ui->createAccountButton->setText(tr("Create %1 Account").arg(QnAppInfo::cloudName()));
     ui->linkButton->setText(tr("Connect System to %1").arg(QnAppInfo::cloudName()));
@@ -71,7 +70,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     connect(ui->linkButton, &QPushButton::clicked, this,
         [this]()
         {
-            QScopedPointer<QnLinkToCloudDialog> dialog(new QnLinkToCloudDialog(this));
+            QScopedPointer<QnConnectToCloudDialog> dialog(new QnConnectToCloudDialog(this));
             dialog->exec();
         });
 
@@ -84,7 +83,7 @@ QnCloudManagementWidget::~QnCloudManagementWidget()
 
 void QnCloudManagementWidget::loadDataToUi()
 {
-    bool linked = !qnGlobalSettings->cloudSystemID().isEmpty() &&
+    bool linked = !qnGlobalSettings->cloudSystemId().isEmpty() &&
         !qnGlobalSettings->cloudAuthKey().isEmpty();
 
     if (linked)
@@ -121,7 +120,7 @@ void QnCloudManagementWidget::unlinkFromCloud()
 
     //bool loggedAsCloud = context()->user()->isCloud();
 
-    QScopedPointer<QnUnlinkFromCloudDialog> messageBox(new QnUnlinkFromCloudDialog(this));
+    QScopedPointer<QnDisconnectFromCloudDialog> messageBox(new QnDisconnectFromCloudDialog(this));
     messageBox->exec();
 }
 

@@ -1,7 +1,5 @@
 #include "buffered_screen_grabber.h"
 
-#ifdef Q_OS_WIN
-
 namespace {
 
 #ifndef DWM_EC_DISABLECOMPOSITION
@@ -30,7 +28,8 @@ namespace {
     }
 
     static const int MAX_JITTER = 60;
-}
+
+} //namespace
 
 QnMutex QnBufferedScreenGrabber::m_instanceMutex;
 int QnBufferedScreenGrabber::m_aeroInstanceCounter;
@@ -137,5 +136,3 @@ AVRational QnBufferedScreenGrabber::getFrameRate()
     rez.den = m_frameRate;
     return rez;
 }
-
-#endif // Q_OS_WIN

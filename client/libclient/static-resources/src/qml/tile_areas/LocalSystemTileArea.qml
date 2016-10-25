@@ -6,6 +6,7 @@ Item
 {
     id: control;
 
+    property bool isOnline: false;
     property bool isExpandedTile: false;
     property real expandedOpacity: 0;
 
@@ -17,7 +18,7 @@ Item
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
     property bool isConnecting: false;
     property var hostsModel;
-    property var recentUserConnectionsModel;
+    property var recentLocalConnectionsModel;
 
     property var prevTabObject;
 
@@ -62,7 +63,7 @@ Item
 
     Connections
     {
-        target: (recentUserConnectionsModel ? recentUserConnectionsModel : null);
+        target: (recentLocalConnectionsModel ? recentLocalConnectionsModel : null);
         onConnectionDataChanged: { control.impl.updatePasswordData(index); }
     }
 
@@ -74,6 +75,8 @@ Item
         anchors.left: parent.left;
         anchors.right: parent.right;
 
+        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 0);
+
         InfoItem
         {
             id: hostChooseItem;
@@ -83,6 +86,7 @@ Item
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             comboBoxTextRole: "display";
+            comboBoxValueRole: "url";
             iconUrl: "qrc:/skin/welcome_page/server.png";                   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";
@@ -92,16 +96,20 @@ Item
 
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
+            visible: control.isOnline;
+
+            onAccepted: control.connectRequested();
+
         }
 
         InfoItem
         {
             id: userChooseItem;
 
-            model: control.recentUserConnectionsModel;
+            model: control.recentLocalConnectionsModel;
 
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections;
+            visible: control.impl.hasRecentConnections && control.isOnline;
 
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";
@@ -116,7 +124,6 @@ Item
 
             onCurrentItemIndexChanged:
             {
-                expandedArea.passwordTextField.text = ""; // Force clear password field on user change
                 control.impl.updatePasswordData(currentItemIndex);
             }
 
@@ -124,6 +131,8 @@ Item
             {
                 expandedArea.loginTextField.text = value;
             }
+
+            onAccepted: control.connectRequested();
         }
     }
 
@@ -138,7 +147,7 @@ Item
         opacity: control.expandedOpacity;
         hasRecentConnections: control.impl.hasRecentConnections;
 
-        prevTabObject: (userChooseItem ? userChooseItem : control.prevTabObject);
+        prevTabObject: (userChooseItem.visible ? userChooseItem : hostChooseItem);
         nextTabObject: control.prevTabObject;
 
         onConnectButtonClicked: { control.connectRequested(); }
@@ -146,25 +155,46 @@ Item
 
     property QtObject impl: QtObject
     {
-        readonly property bool hasRecentConnections: userChooseItem.value.length;
+        readonly property bool hasRecentConnections: (recentLocalConnectionsModel && recentLocalConnectionsModel.hasConnections);
 
         function updatePasswordData(currentItemIndex)
         {
             if (currentItemIndex !== userChooseItem.currentItemIndex)
                 return; // Do not update if it is not current item
 
-            var hasStoredPasswordValue = (control.recentUserConnectionsModel
-                && control.recentUserConnectionsModel.getData("hasStoredPassword", currentItemIndex));
+            if (currentItemIndex == -1) //< In case of non-existent user
+            {
+                expandedArea.savePasswordCheckbox.checked = false;  // Reset "Store password" checkbox
+                expandedArea.passwordTextField.text = "";
+                return;
+            }
+
+            var hasStoredPasswordValue = (control.recentLocalConnectionsModel
+                && control.recentLocalConnectionsModel.getData("hasStoredPassword", currentItemIndex));
 
             // value can be <undefined>, thus we use explicit conversion here
             var hasStoredPassword = (hasStoredPasswordValue ? true : false);
             expandedArea.savePasswordCheckbox.checked = hasStoredPassword;
 
             expandedArea.passwordTextField.text = (hasStoredPassword ?
-                recentUserConnectionsModel.getData("password", currentItemIndex) : "")
+                recentLocalConnectionsModel.getData("password", currentItemIndex) : "")
         }
     }
 
+    onIsExpandedTileChanged:
+    {
+        if (isExpandedTile)
+            return;
 
+        if (userChooseItem.currentItemIndex == -1)
+        {
+            // Clears password if it is new user.
+            // Is "save password" is checked then connection will be stored anyway
+            expandedArea.passwordTextField.text = "";
+            expandedArea.savePasswordCheckbox.checked = false;
+        }
+
+        impl.updatePasswordData(userChooseItem.currentItemIndex);
+    }
     Component.onCompleted: { impl.updatePasswordData(0); }
 }

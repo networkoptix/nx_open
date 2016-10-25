@@ -36,9 +36,9 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 {
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
 {
-    QnCommonMessageProcessor::updateResource(resource);
+    QnCommonMessageProcessor::updateResource(resource, peerId);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     if (resource.dynamicCast<QnVirtualCameraResource>())
@@ -58,8 +58,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
             ec2::fromResourceToApi(ownMediaServer, ownData);
             ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
 
-            if (ownData != newData)
+            if (ownData != newData && peerId != qnCommon->moduleGUID())
             {
+                // if remote peer send update for our server then ignore it and resend our own data
                 QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
                 return;
             }
@@ -94,6 +95,18 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     QnCommonMessageProcessor::init(connection);
 }
 
+void QnServerMessageProcessor::startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr &connection)
+{
+    NX_ASSERT(connection);
+    if (m_connection) {
+        /* Safety check in case connection will not be deleted instantly. */
+        m_connection->stopReceivingNotifications();
+        disconnectFromConnection(m_connection);
+    }
+    m_connection = connection;
+    connectToConnection(connection);
+}
+
 void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::connectToConnection(connection);
 
@@ -107,15 +120,15 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
-    connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-            this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime)
+    connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
+            this, [this](const QnUuid& systemId, qint64 sysIdTime, ec2::Timestamp tranLogTime)
                   {
                       ConfigureSystemData configSystemData;
-                      configSystemData.systemName = systemName;
+                      configSystemData.localSystemId = systemId;
                       configSystemData.sysIdTime = sysIdTime;
                       configSystemData.tranLogTime = tranLogTime;
                       configSystemData.wholeSystem = true;
-                      changeSystemName(configSystemData);
+                      changeLocalSystemId(configSystemData);
                   });
 }
 
@@ -159,7 +172,9 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(resource->getId(), Qn::Online);
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto manager = connection->getResourceManager(Qn::kSystemAccess);
+        manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, true);
     }
     else {
@@ -246,8 +261,9 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     {
         ec2::ApiMediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(apiServer.id, Qn::Online);
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
+        connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(apiServer.id, Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {

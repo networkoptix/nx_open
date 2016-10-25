@@ -4,7 +4,7 @@
 
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 namespace ec2
 {

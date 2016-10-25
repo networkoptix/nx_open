@@ -19,7 +19,12 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, api_conventions_general)
+class ApiConventions:
+    public CdbFunctionalTest
+{
+};
+
+TEST_F(ApiConventions, general)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -67,7 +72,7 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
             QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
-        ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+        ASSERT_EQ(nx_http::StatusCode::forbidden, httpClient.response()->statusLine.statusCode);
         ASSERT_EQ(nx_http::FusionRequestErrorClass::unauthorized, requestResult.errorClass);
         ASSERT_EQ(
             QnLexical::serialized(api::ResultCode::accountNotActivated),
@@ -78,11 +83,11 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
     }
 }
 
-TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
+TEST_F(ApiConventions, using_post_method)
 {
     const QByteArray testData =
         "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
-        "\"email\": \"andreyk07@gmail.com\", \"customization\": \"default\"}";
+        "\"email\": \"abrakadabra@gmail.com\", \"customization\": \"default\"}";
 
     bool success = false;
     auto accountData = QJson::deserialized<api::AccountData>(
@@ -112,7 +117,7 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
     ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
 }
 
-TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
+TEST_F(ApiConventions, json_in_unauthorized_response)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -152,7 +157,7 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
     }
 }
 
-TEST_F(CdbFunctionalTest, DISABLED_api_conventions_ok)
+TEST_F(ApiConventions, api_conventions_ok)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -194,7 +199,7 @@ TEST_F(CdbFunctionalTest, DISABLED_api_conventions_ok)
     }
 }
 
-TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
+TEST_F(ApiConventions, json_in_ok_response)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 

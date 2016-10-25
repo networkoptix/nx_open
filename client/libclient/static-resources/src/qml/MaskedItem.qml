@@ -5,6 +5,7 @@ Item
     id: thisComponent;
 
     property string value;
+    property string displayValue;
 
     property bool isMasked: isAvailable && isMaskedPrivate;
     property bool isAvailable: true;
@@ -16,12 +17,18 @@ Item
     property var area: (isMasked ? maskedAreaLoader.item : areaLoader.item);
     property var maskedArea: maskedAreaLoader.item;
 
+    signal accepted();
+
     height: area.height;
 
     MouseArea
     {
         anchors.fill: (isMasked ? maskedAreaLoader : areaLoader);
-        onClicked: { thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate; }
+        onClicked:
+        {
+            thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate;
+            area.forceActiveFocus();
+        }
         acceptedButtons: (isAvailable ? Qt.AllButtons : Qt.NoButton);
     }
 

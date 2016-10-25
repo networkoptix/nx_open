@@ -338,7 +338,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
         if (wasLoggedIn && !context()->user())
             return;
 
-        QScopedPointer<QnCustomFileDialog> dialog(new QnSessionAwareDialog<QnCustomFileDialog>(
+        QScopedPointer<QnSessionAwareFileDialog> dialog(new QnSessionAwareFileDialog(
             mainWindow(),
             tr("Export Video As..."),
             suggestion,
@@ -546,12 +546,6 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
     if (binaryExport)
     {
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
-        if (!existingLayout)
-            existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
-        if (existingLayout)
-            removeLayoutFromPool(existingLayout);
-
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
         NX_ASSERT(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
@@ -560,7 +554,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     }
     else
     {
-        QnProgressDialog *exportProgressDialog = new QnSessionAwareDialog<QnProgressDialog>(mainWindow());
+        QnProgressDialog *exportProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindow());
         exportProgressDialog->setWindowTitle(tr("Exporting Video"));
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setModal(false);
@@ -716,7 +710,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         if (resource->getParentResource() == layout)
             continue;
         hasImage |= resource->hasFlags(Qn::still_image);
-        hasLocal |= resource->hasFlags(Qn::local) || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        hasLocal |= resource->hasFlags(Qn::local);
         if (hasImage || hasLocal)
             break;
     }
@@ -744,19 +738,6 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         return false;
     }
     return true;
-}
-
-void QnWorkbenchExportHandler::removeLayoutFromPool(const QnLayoutResourcePtr &existingLayout)
-{
-    QnLayoutItemDataMap items = existingLayout->getItems();
-    for (QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
-        QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutRes = qnResPool->getResourceByDescriptor(item.resource);
-        if (layoutRes)
-            qnResPool->removeResource(layoutRes);
-    }
-    qnResPool->removeResource(existingLayout);
 }
 
 bool QnWorkbenchExportHandler::saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target, const char *slot)
@@ -805,7 +786,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         if (wasLoggedIn && !context()->user())
             return false;
 
-        QScopedPointer<QnCustomFileDialog> dialog(new QnSessionAwareDialog<QnCustomFileDialog>(
+        QScopedPointer<QnSessionAwareFileDialog> dialog(new QnSessionAwareFileDialog(
             mainWindow(),
             dialogName,
             suggestion,
@@ -877,12 +858,6 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         return false;
 
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
-
-    QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
-    if (!existingLayout)
-        existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
-    if (existingLayout)
-        removeLayoutFromPool(existingLayout);
 
     saveLayoutToLocalFile(layout, exportPeriod, fileName, mode, readOnly, true);
 
@@ -982,8 +957,9 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
 
         QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."));
     }
-    else if (tool->status() != QnClientVideoCamera::NoError)
+    else if (tool->status() != StreamRecorderError::noError)
     {
-        QnMessageBox::warning(mainWindow(), tr("Unable to export video."), QnClientVideoCamera::errorString(tool->status()));
+        QnMessageBox::warning(mainWindow(), tr("Unable to export video."),
+            QnStreamRecorder::errorString(tool->status()));
     }
 }

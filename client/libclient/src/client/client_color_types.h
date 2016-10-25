@@ -53,15 +53,6 @@ public:
     (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
     (separator)(dateBarBackgrounds)(dateBarText)(tickmarkLines)(tickmarkText)
 
-struct QnTimeScrollBarColors {
-    QnTimeScrollBarColors();
-
-    QColor indicator;
-    QColor border;
-    QColor handle;
-};
-#define QnTimeScrollBarColors_Fields (indicator)(border)(handle)
-
 
 struct QnBackgroundColors {
     QnBackgroundColors();
@@ -281,13 +272,17 @@ struct QnAuditLogColors {
 };
 #define QnAuditLogColors_Fields (httpLink)(loginAction)(unsucessLoginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)(chartColor)
 
-struct QnRecordingStatsColors {
+struct QnRecordingStatsColors
+{
     QnRecordingStatsColors();
 
-    QColor chartMainColor;
-    QColor chartForecastColor;
+    QColor chartBackground;
+    QColor chartForeground;
+    QColor foreignForeground;
+    QColor totalForeground;
 };
-#define QnRecordingStatsColors_Fields (chartMainColor)(chartForecastColor)
+#define QnRecordingStatsColors_Fields (chartBackground) \
+    (chartForeground)(foreignForeground)(totalForeground)
 
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();
@@ -349,7 +344,7 @@ struct QnPasswordStrengthColors
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
 #define QN_CLIENT_COLOR_TYPES                                                   \
-    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
+    (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
     (QnTwoWayAudioWidgetColors) \

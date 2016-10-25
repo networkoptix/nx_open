@@ -81,8 +81,26 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
 
     const auto messageProcessor = QnClientMessageProcessor::instance();
 
+    auto allowedForUser =
+        [this](const std::vector<QnUuid>& ids)
+        {
+            if (ids.empty())
+                return true;
+
+            auto user = context()->user();
+            if (!user)
+                return false;
+
+            if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
+                return true;
+
+            auto roleId = user->userGroup();
+            return !roleId.isNull()
+                && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
+        };
+
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const QnAbstractBusinessActionPtr &businessAction)
+        [this, allowedForUser](const QnAbstractBusinessActionPtr &businessAction)
         {
             if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
                 return;
@@ -92,10 +110,8 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
 
             const auto params = businessAction->getParams();
 
-            /* Skip action if it contains list of users, and we are not on the list. */
-            auto ids = businessAction->getParams().additionalResources;
-            if (!ids.empty()
-                && std::find(ids.cbegin(), ids.cend(), context()->user()->getId()) == ids.cend())
+            /* Skip action if it contains list of users and we are not on the list. */
+            if (!allowedForUser(businessAction->getParams().additionalResources))
                 return;
 
             auto targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
@@ -216,7 +232,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     QnWorkbenchLayout* workbenchAlarmLayout = QnWorkbenchLayout::instance(QnLayoutResourcePtr(alarmLayout));
     if (!workbenchAlarmLayout) {
         workbenchAlarmLayout = new QnWorkbenchLayout(alarmLayout, workbench());
-        workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("titlebar/alert.png"));
+        workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("layouts/alarm.png"));
         workbench()->addLayout(workbenchAlarmLayout);
     }
 

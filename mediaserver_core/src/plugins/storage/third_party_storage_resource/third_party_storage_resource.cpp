@@ -343,7 +343,7 @@ qint64 QnThirdPartyStorageResource::getFreeSpace()
     return freeSpace;
 }
 
-qint64 QnThirdPartyStorageResource::getTotalSpace()
+qint64 QnThirdPartyStorageResource::getTotalSpace() const
 {
     if (!m_valid)
         return 0;
@@ -355,11 +355,11 @@ qint64 QnThirdPartyStorageResource::getTotalSpace()
     return totalSpace;
 }
 
-bool QnThirdPartyStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate() 
 {
     if (!m_valid)
-       return false;
-    return m_storage->isAvailable();
+       return Qn::StorageInit_WrongPath;
+    return m_storage->isAvailable() ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
 bool QnThirdPartyStorageResource::removeFile(const QString& url)

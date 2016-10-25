@@ -1,41 +1,45 @@
-/**********************************************************
-* Sep 3, 2015
-* NetworkOptix
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef NX_CDB_SYSTEM_DATA_H
-#define NX_CDB_SYSTEM_DATA_H
-
+#include <cstdint>
+#include <chrono>
 #include <string>
 #include <vector>
 
+#include <boost/optional.hpp>
 
 namespace nx {
 namespace cdb {
 namespace api {
 
-class SubscriptionData
-{
-public:
-    std::string productID;
-    std::string systemID;
-};
-
-//!Information required to register system in cloud
+/**
+ * Information required to register system in cloud.
+ */
 class SystemRegistrationData
 {
 public:
-    //!Not unique system name
+    /** Not unique system name. */
     std::string name;
     std::string customization;
+    /** Vms-specific data. Transparently stored and returned. */
+    std::string opaque;
 };
 
-
-enum SystemStatus
+class SystemAttributesUpdate
 {
+public:
+    std::string systemID;
+    boost::optional<std::string> name;
+    boost::optional<std::string> opaque;
+};
+
+enum class SystemStatus
+{
+    // TODO: #ak remove "ss" prefix.
     ssInvalid = 0,
-    //!System has been bound but not a single request from that system has been received by cloud
+    /**
+     * System has been bound but not a single request from 
+     * that system has been received by cloud.
+     */
     ssNotActivated,
     ssActivated,
     ssDeleted
@@ -44,22 +48,27 @@ enum SystemStatus
 class SystemData
 {
 public:
-    //!Globally unique ID of system assigned by cloud
+    /** Globally unique id of system assigned by cloud. */
     std::string id;
-    //!Not unique system name
+    /** Not unique system name. */
     std::string name;
     std::string customization;
-    //!Key, system uses to authenticate requests to any cloud module
+    /** Key, system uses to authenticate requests to any cloud module. */
     std::string authKey;
     std::string ownerAccountEmail;
     SystemStatus status;
-    //!a true, if cloud connection is activated for this system
+    /** \a true, if cloud connection is activated for this system. */
     bool cloudConnectionSubscriptionStatus;
+    /** MUST be used as upper 64 bits of 128-bit transaction timestamp. */
+    std::uint64_t systemSequence;
+    /** Vms-specific data. Same as SystemRegistrationData::opaque. */
+    std::string opaque;
 
     SystemData()
     :
-        status(ssInvalid),
-        cloudConnectionSubscriptionStatus(true)
+        status(SystemStatus::ssInvalid),
+        cloudConnectionSubscriptionStatus(true),
+        systemSequence(0)
     {
     }
 
@@ -72,7 +81,9 @@ public:
             authKey == right.authKey &&
             ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
-            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus;
+            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus &&
+            systemSequence == right.systemSequence &&
+            opaque == right.opaque;
     }
 };
 
@@ -110,6 +121,8 @@ public:
     std::string groupID;
     std::string customPermissions;
     bool isEnabled;
+    //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
+    std::string vmsUserId;
 
     SystemSharing()
     :
@@ -141,17 +154,26 @@ public:
     std::vector<SystemSharing> sharing;
 };
 
-/** adds account's full name to \a SystemSharing */
+/**
+ * Expands \a SystemSharing to contain more data.
+ */
 class SystemSharingEx
 :
     public SystemSharing
 {
 public:
-    SystemSharingEx() {}
+    SystemSharingEx()
+    :
+        usageFrequency(0.0)
+    {
+    }
 
-    /** unique account id */
+    /** Globally unique account id. */
     std::string accountID;
     std::string accountFullName;
+    /** Shows how often user accesses given system in comparison to other user's systems. */
+    float usageFrequency;
+    std::chrono::system_clock::time_point lastLoginTime;
 
     bool operator==(const SystemSharingEx& rhs) const
     {
@@ -204,14 +226,25 @@ class SystemDataEx
 public:
     std::string ownerFullName;
     SystemAccessRole accessRole;
-    /** permissions, account can share current system with */
+    /** Permissions, account can share current system with. */
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
+    /**
+     * This number shows how often user, performing request, 
+     * uses this system in comparision to other systems.
+     */
+    float usageFrequency;
+    /**
+     * Time of last reported login of authenticated user to this system.
+     * \note Fact of login is reported by \a SystemManager::recordUserSessionStart()
+     */
+    std::chrono::system_clock::time_point lastLoginTime;
 
     SystemDataEx()
     :
         accessRole(SystemAccessRole::none),
-        stateOfHealth(SystemHealth::offline)
+        stateOfHealth(SystemHealth::offline),
+        usageFrequency(0)
     {
     }
 
@@ -219,7 +252,8 @@ public:
     :
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
-        stateOfHealth(SystemHealth::offline)
+        stateOfHealth(SystemHealth::offline),
+        usageFrequency(0)
     {
     }
 };
@@ -230,8 +264,16 @@ public:
     std::vector<SystemDataEx> systems;
 };
 
-}   //api
-}   //cdb
-}   //nx
+/**
+ * Information about newly started user session.
+ */
+class UserSessionDescriptor
+{
+public:
+    boost::optional<std::string> accountEmail;
+    boost::optional<std::string> systemId;
+};
 
-#endif //NX_CDB_SYSTEM_DATA_H
+} // namespace api
+} // namespace cdb
+} // namespace nx

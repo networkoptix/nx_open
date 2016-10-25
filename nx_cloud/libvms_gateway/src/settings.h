@@ -12,6 +12,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/settings.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/abstract_socket.h>
 
 
 namespace nx {
@@ -27,13 +28,6 @@ public:
     QString changeUser;
     /** if empty, default address is used */
     QString mediatorEndpoint;
-};
-
-class Logging
-{
-public:
-    QString logLevel;
-    QString logDir;
 };
 
 class Auth
@@ -65,9 +59,18 @@ public:
 class CloudConnect
 {
 public:
+    struct TcpReverseOptions
+    {
+        uint16_t port;
+        size_t poolSize;
+        boost::optional<KeepAliveOptions> keepAlive;
+    };
+
     bool replaceHostAddressWithPublicAddress;
     bool allowIpTarget;
     QString fetchPublicIpUrl;
+    QString publicIpAddress;
+    TcpReverseOptions tcpReverse;
 
     CloudConnect();
 };
@@ -87,7 +90,7 @@ public:
     bool showHelp() const;
 
     const General& general() const;
-    const Logging& logging() const;
+    const QnLogSettings& logging() const;
     const Auth& auth() const;
     const Tcp& tcp() const;
     const Http& http() const;
@@ -104,7 +107,7 @@ private:
     bool m_showHelp;
 
     General m_general;
-    Logging m_logging;
+    QnLogSettings m_logging;
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;

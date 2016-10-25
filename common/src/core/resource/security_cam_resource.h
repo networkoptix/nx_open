@@ -33,6 +33,9 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
+
+public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
@@ -41,7 +44,6 @@ public:
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     bool isIOModule() const;
-    Qn::MotionType getCameraBasedMotionType() const;
     Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
@@ -218,8 +220,8 @@ public:
     void setMinDays(int value);
     int minDays() const;
 
-    void setPreferedServerId(const QnUuid& value);
-    QnUuid preferedServerId() const;
+    void setPreferredServerId(const QnUuid& value);
+    QnUuid preferredServerId() const;
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -269,10 +271,6 @@ public:
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
-
-    bool isCameraInfoSavedToDisk(const QString &storageUrl) const;
-    void setCameraInfoSavedToDisk(const QString &storageUrl);
-    void resetCameraInfoSavedToDisk(const QString &storageUrl);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAudioTransmitterPtr getAudioTransmitter();
@@ -349,9 +347,6 @@ protected:
     virtual bool isInputPortMonitored() const;
 
 private:
-    void resetCameraInfoDiskFlags() const;
-
-private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
@@ -371,9 +366,6 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
-    void resetAllCameraInfoSavedToDisk();
-
-    mutable std::map<QString, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 
 private slots:
     void resetCachedValues();

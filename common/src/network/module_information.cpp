@@ -5,8 +5,10 @@
 #include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
-
+#include <api/model/connection_info.h>
 #include <utils/common/app_info.h>
+#include <utils/common/software_version.h>
+#include <network/cloud_system_data.h>
 
 namespace {
     /*!
@@ -16,7 +18,7 @@ namespace {
     const QString nxClientId = lit("client.exe");
     const QString nxECId = lit("Enterprise Controller");
     const QString nxMediaServerId = lit("Media Server");
-}
+} // namespace
 
 QnModuleInformation::QnModuleInformation():
     type(),

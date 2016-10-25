@@ -16,7 +16,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"
@@ -32,7 +32,7 @@
 #include "nx_ec/data/api_stored_file_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_rebuild_tran_log_data.h"
+#include "nx_ec/data/api_cleanup_db_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_routing_data.h"
@@ -45,21 +45,6 @@
 #include "nx_ec/data/api_statistics.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_lock_data.h"
-#include "core/resource/user_resource.h"
-
-#include "managers/business_event_manager.h"
-#include "managers/camera_manager.h"
-#include "managers/discovery_manager.h"
-#include "managers/layout_manager.h"
-#include "managers/license_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
 
 #include "nx/utils/type_utils.h"
 
@@ -89,6 +74,35 @@ enum class RemotePeerAccess
     Partial
 };
 
+namespace access_helpers {
+
+enum class Mode 
+{
+    read,
+    write
+};
+
+using KeyValueFilterType        =   std::pair<const QString&, QString*>;
+using FilterFunctorType         =   std::function<bool(Mode mode, const Qn::UserAccessData&, KeyValueFilterType*)>;
+using FilterFunctorListType     =   std::vector<FilterFunctorType>;
+
+namespace detail {
+std::vector<QString> getRestrictedKeysByMode(Mode mode);
+}
+
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key);
+
+void applyValueFilters(
+    Mode mode,
+    const Qn::UserAccessData& accessData,
+    KeyValueFilterType* keyValue,
+    const FilterFunctorListType& filterList,
+    bool* allowed = nullptr);
+
+} // namespace access_helpers
+
 namespace detail {
 
 struct NoneType {};
@@ -97,7 +111,7 @@ template<typename ParamType>
 using CheckSavePermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
 using FilterByReadPermissionFuncType = std::function<void(const Qn::UserAccessData& accessData, ParamType&)>;
@@ -107,6 +121,9 @@ using FilterBySavePermissionFuncType = std::function<void(const Qn::UserAccessDa
 
 template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(const Qn::UserAccessData& accessData, const ParamType&)>;
+
+template<typename ParamType>
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
@@ -176,6 +193,7 @@ struct TransactionDescriptor : TransactionDescriptorBase
     FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc;
     FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc;
     CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc;
+    GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc;
 
     template<
 		typename GetHashF,
@@ -187,7 +205,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
 		typename CheckReadPermissionFunc,
 		typename FilterBySavePermissionFunc,
 		typename FilterByReadPermissionFunc,
-		typename CheckRemoteAccessFunc
+		typename CheckRemoteAccessFunc,
+        typename GetTransactionTypeFunc
 	>
     TransactionDescriptor(ApiCommand::Value value,
         bool isPersistent,
@@ -202,7 +221,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
         CheckReadPermissionFunc&& checkReadPermissionFunc,
         FilterBySavePermissionFunc&& filterBySavePermissionFunc,
         FilterByReadPermissionFunc&& filterByReadPermissionFunc,
-        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc)
+        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc,
+        GetTransactionTypeFunc&& getTransactionTypeFunc)
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),
         getHashFunc(std::forward<GetHashF>(getHashFunc)),
@@ -214,7 +234,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
         checkReadPermissionFunc(std::forward<CheckReadPermissionFunc>(checkReadPermissionFunc)),
         filterBySavePermissionFunc(std::forward<FilterBySavePermissionFunc>(filterBySavePermissionFunc)),
         filterByReadPermissionFunc(std::forward<FilterByReadPermissionFunc>(filterByReadPermissionFunc)),
-        checkRemotePeerAccessFunc(std::forward<CheckRemoteAccessFunc>(checkRemotePeerAccessFunc))
+        checkRemotePeerAccessFunc(std::forward<CheckRemoteAccessFunc>(checkRemotePeerAccessFunc)),
+        getTransactionTypeFunc(std::forward<GetTransactionTypeFunc>(getTransactionTypeFunc))
     {
     }
 };
@@ -261,15 +282,40 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
+    static std::atomic<detail::TransactionDescriptor<Param>*> holder(nullptr);
+    if (!holder.load())
+    {
+        for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+        {
+            auto tdBase = (*it).get();
+            auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+            if (td)
+                holder = td;
+        }
+    }
+    NX_ASSERT(holder.load(), "Transaciton descriptor for the given param not found");
+    return holder;
+}
+
+/**
+* Semantics of the transactionHash() function is following:
+* if transaction A follows transaction B and overrides it,
+* their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
+* Obviously, transactionHash() is not needed for the non-persistent transaction.
+*/
+
+template<typename Param>
+static QnUuid transactionHash(const Param &param)
+{
     for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
     {
         auto tdBase = (*it).get();
         auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
         if (td)
-            return td;
+            return td->getHashFunc(param);
     }
-    NX_ASSERT(0, "Transaciton descriptor for the given param not found");
-    return nullptr;
+    NX_ASSERT(0, "Transaction descriptor for the given param not found");
+    return QnUuid();
 }
 
 } //namespace ec2

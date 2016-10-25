@@ -12,6 +12,7 @@ BaseTile
     property string ownerDescription;
 
     property string systemId;
+    property string localId;
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
     property bool isCompatibleInternal: false;
@@ -19,7 +20,11 @@ BaseTile
     property string wrongVersion;
     property string compatibleVersion;
 
-    isConnecting: ((control.systemId == context.connectingToSystem) && !isFactoryTile);
+    // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
+    readonly property bool offlineCloudConnectionsDisabled: true;
+
+    isConnecting: ((control.systemId == context.connectingToSystem)
+        && context.connectingToSystem.length && !isFactoryTile);
 
     isAvailable:
     {
@@ -29,34 +34,39 @@ BaseTile
         if (wrongVersion.length || !isCompatibleInternal)
             return false;
 
-        if (isCloudTile)
-            return control.impl.isOnline;
 
-        return true;
+        // TODO: #ynikitenkov remove condition below in 3.1
+        if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
+            return false;
+
+        return control.impl.hasHosts;
     }
 
     tileColor:
     {
-        if (isFactoryTile)
-        {
-            return (isHovered ? Style.colors.custom.systemTile.factorySystemHovered :
-                Style.colors.custom.systemTile.factorySystemBkg);
-        }
-
         if (!control.isAvailable)
             return Style.colors.custom.systemTile.disabled;
 
         if (control.isHovered)
-            return Style.colors.custom.systemTile.backgroundHovered;
+        {
+            return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
+                : Style.colors.custom.systemTile.backgroundHovered);
+        }
 
-        return Style.colors.custom.systemTile.background;
+        return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
+                : Style.colors.custom.systemTile.background);
     }
 
     indicator
     {
-        visible: ((impl.tileType !== impl.kFactorySystemTileType) &&
-            (wrongVersion.length ||
-             compatibleVersion.length || !impl.isOnline || !isCompatibleInternal));
+        visible:
+        {
+            if (control.isFactoryTile)
+                return false;    //< We don't have indicator for new systems
+
+            return (wrongVersion.length || compatibleVersion.length
+                || !impl.hasHosts || !isCompatibleInternal);
+        }
 
         text:
         {
@@ -66,7 +76,7 @@ BaseTile
                 return wrongVersion;
             if (compatibleVersion.length)
                 return compatibleVersion;
-            if (!impl.isOnline)
+            if (!impl.hasHosts)
                 return qsTr("OFFLINE");
 
             return "";
@@ -110,7 +120,7 @@ BaseTile
         {
             var cloudHost = control.impl.hostsModel.firstHost;
             console.log("Connecting to cloud system <", systemName,
-                ">, throug the host <", cloudHost, ">");
+                ">, through the host <", cloudHost, ">");
             context.connectToCloudSystem(control.systemId, cloudHost);
         }
         else // Local system tile
@@ -126,7 +136,7 @@ BaseTile
 
     menuButton
     {
-        visible: impl.hasSavedConnection;
+        visible: impl.hasSavedConnection && control.isAvailable;
 
         menu: NxPopupMenu
         {
@@ -163,10 +173,11 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
+                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.hasHosts; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
-                currentAreaItem.recentUserConnectionsModel = control.impl.recentConnectionsModel;
+                currentAreaItem.recentLocalConnectionsModel = control.impl.recentConnectionsModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
@@ -176,16 +187,19 @@ BaseTile
                 currentAreaItem.host = Qt.binding( function()
                 {
                     return (control.impl.hostsModel ?
-                        control.impl.hostsModel.firstHost : "");
+                        control.impl.hostsModel.getData("url", 0): "");
+                });
+                currentAreaItem.displayHost = Qt.binding( function()
+                {
+                    return (control.impl.hostsModel ?
+                        control.impl.hostsModel.getData("display", 0): "");
                 });
             }
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.enabled = Qt.binding( function()
-                {
-                    return control.impl.isOnline && control.isAvailable;
-                });
+                currentAreaItem.hasHosts = Qt.binding( function() { return control.impl.hasHosts; });
+                currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
     }
@@ -211,7 +225,7 @@ BaseTile
     property QtObject impl: QtObject
     {
         property var hostsModel: QnSystemHostsModel { systemId: control.systemId; }
-        property var recentConnectionsModel: QnRecentUserConnectionsModel { systemName: control.systemName; }
+        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemId: control.localId; }
 
         // TODO: add enum to c++ code, add type info to model
         readonly property int kFactorySystemTileType: 0;
@@ -228,10 +242,10 @@ BaseTile
                 return kLocalSystemTileType;
         }
 
-        readonly property bool isOnline: !control.impl.hostsModel.isEmpty
-        readonly property color standardColor: Style.colors.custom.systemTile.background
-        readonly property color hoveredColor: Style.lighterColor(standardColor)
-        readonly property color inactiveColor: Style.colors.shadow
+        readonly property bool hasHosts: !control.impl.hostsModel.isEmpty;
+        readonly property color standardColor: Style.colors.custom.systemTile.background;
+        readonly property color hoveredColor: Style.lighterColor(standardColor);
+        readonly property color inactiveColor: Style.colors.shadow;
 
         readonly property bool hasSavedConnection:
         {

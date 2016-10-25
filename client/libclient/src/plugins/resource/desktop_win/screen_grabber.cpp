@@ -1,7 +1,5 @@
 #include "screen_grabber.h"
 
-#ifdef Q_OS_WIN
-
 #include <QtGui/QScreen>
 #include <QtCore/QLibrary>
 #include <nx/utils/log/log.h>
@@ -587,7 +585,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
 #endif
         sws_scale(m_scaleContext,
             m_tmpFrame->data, m_tmpFrame->linesize,
-            0, m_ddm.Height,
+            0, height,
             pFrame->data, pFrame->linesize);
     }
     else
@@ -657,5 +655,3 @@ void QnScreenGrabber::pleaseStop()
     m_needStop = true;
     m_waitCond.wakeAll();
 }
-
-#endif // Q_OS_WIN

@@ -13,22 +13,35 @@
 namespace nx {
 namespace db {
 
-static const size_t WAITING_TASKS_COEFF = 5;
+static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 
-AsyncSqlQueryExecutor::AsyncSqlQueryExecutor( const ConnectionOptions& connectionOptions )
-:
-    m_connectionOptions( connectionOptions ),
-    m_connectionsBeingAdded( 0 )
+AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
+    const ConnectionOptions& connectionOptions)
+    :
+    m_connectionOptions(connectionOptions)
 {
-    m_dropConnectionThread = 
+    m_dropConnectionThread =
         nx::utils::thread(
             std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
+
+    using namespace std::placeholders;
+    if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
+            > std::chrono::minutes::zero())
+    {
+        m_requestQueue.enableItemStayTimeoutEvent(
+            m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection,
+            std::bind(&AsyncSqlQueryExecutor::reportQueryCancellation, this, _1));
+    }
 }
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
 {
     m_connectionsToDropQueue.push(nullptr);
     m_dropConnectionThread.join();
+
+    for (auto& dbConnection: m_dbThreadPool)
+        dbConnection->pleaseStop();
+    m_dbThreadPool.clear();
 }
 
 bool AsyncSqlQueryExecutor::init()
@@ -38,39 +51,27 @@ bool AsyncSqlQueryExecutor::init()
 
 bool AsyncSqlQueryExecutor::openOneMoreConnectionIfNeeded()
 {
-    {
-        QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
-        dropClosedConnections(&lk);
+    dropClosedConnections(&lk);
 
-        //checking whether we really need a new connection
-        const auto effectiveDBConnectionCount = m_dbThreadPool.size() + m_connectionsBeingAdded;
-        const auto queueSize = static_cast< size_t >( m_requestQueue.size() );
-        if( queueSize < effectiveDBConnectionCount * WAITING_TASKS_COEFF ||  //task number is not too high
-            effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount )    //pool size is already at maximum
-        {
-            return true;
-        }
-        ++m_connectionsBeingAdded;
-    }
+    //checking whether we really need a new connection
+    const auto effectiveDBConnectionCount = m_dbThreadPool.size();
+    const auto queueSize = static_cast< size_t >(m_requestQueue.size());
+    const auto maxDesiredQueueSize = 
+        effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
+    if (queueSize < maxDesiredQueueSize)
+        return true;    //< Task number is not too high.
+    if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
+        return true;    //< Pool size is already at maximum.
 
     //adding another connection
     auto executorThread = std::make_unique<DbRequestExecutionThread>(
         m_connectionOptions,
-        &m_requestQueue );
-    //avoiding locking mutex for connecting phase
-    if( !executorThread->open() )
-    {
-        NX_LOG( lit("Failed to initialize connection to DB"), cl_logWARNING );
-        QnMutexLocker lk( &m_mutex );
-        --m_connectionsBeingAdded;
-        return false;
-    }
+        &m_requestQueue);
     executorThread->start();
 
-    QnMutexLocker lk( &m_mutex );
-    m_dbThreadPool.push_back( std::move( executorThread ) );
-    --m_connectionsBeingAdded;
+    m_dbThreadPool.push_back(std::move(executorThread));
     return true;
 }
 
@@ -81,7 +82,7 @@ void AsyncSqlQueryExecutor::dropClosedConnections(QnMutexLockerBase* const /*lk*
         m_dbThreadPool.begin(), m_dbThreadPool.end(),
         [](const std::unique_ptr<DbRequestExecutionThread>& dbConnectionThread)
         {
-            return !dbConnectionThread->isOpen();
+            return dbConnectionThread->state() == ConnectionState::closed;
         });
     if (firstConnectionToDropIter == m_dbThreadPool.end())
         return;
@@ -112,5 +113,12 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
     }
 }
 
-}   //db
-}   //nx
+void AsyncSqlQueryExecutor::reportQueryCancellation(
+    std::unique_ptr<AbstractExecutor> expiredQuery)
+{
+    // We are in a random db request execution thread.
+    expiredQuery->reportErrorWithoutExecution(DBResult::cancelled);
+}
+
+} // namespace db
+} // namespace nx

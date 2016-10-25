@@ -8,30 +8,10 @@
 #include <nx/utils/singleton.h>
 
 #include <utils/common/credentials.h>
+#include <network/cloud_system_data.h>
 
 class QSettings;
-
-struct QnCloudSystem
-{
-    QString id;
-    QString name;
-    QString ownerAccountEmail;
-    QString ownerFullName;
-    std::string authKey;
-
-    bool operator <(const QnCloudSystem &other) const;
-    bool operator ==(const QnCloudSystem &other) const;
-
-    bool fullEqual(const QnCloudSystem& other) const;
-
-    static void writeToSettings(QSettings* settings, const QnCloudSystem& data);
-
-    static QnCloudSystem fromSettings(QSettings* settings);
-};
-
-typedef QList<QnCloudSystem> QnCloudSystemList;
-Q_DECLARE_METATYPE(QnCloudSystemList);
-
+class QnSystemDescription;
 class QnCloudStatusWatcherPrivate;
 
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
@@ -41,6 +21,7 @@ class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatch
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool stayConnected READ stayConnected WRITE setStayConnected NOTIFY stayConnectedChanged)
+    Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
 
     using base_type = QObject;
 
@@ -79,17 +60,18 @@ public:
     bool stayConnected() const;
     void setStayConnected(bool value);
 
+    void logSession(const QString& cloudSystemId);
+
     void resetCloudCredentials();
     void setCloudCredentials(const QnCredentials& credentials, bool initial = false);
 
     QnCredentials createTemporaryCredentials() const;
 
-    QString cloudEndpoint() const;
-    void setCloudEndpoint(const QString &endpoint);
-
     Status status() const;
 
     ErrorCode error() const;
+
+    bool isCloudEnabled() const;
 
     void updateSystems();
 
@@ -102,11 +84,13 @@ signals:
     void passwordChanged();
     void effectiveUserNameChanged();
     void statusChanged(Status status);
-    void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
+    void beforeCloudSystemsChanged(const QnCloudSystemList &newCloudSystems);
+    void cloudSystemsChanged(const QnCloudSystemList &currectCloudSystems);
     void recentCloudSystemsChanged();
     void currentSystemChanged(const QnCloudSystem& system);
     void errorChanged();
     void stayConnectedChanged();
+    void isCloudEnabledChanged();
 
 private:
     QScopedPointer<QnCloudStatusWatcherPrivate> d_ptr;

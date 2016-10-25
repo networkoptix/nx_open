@@ -57,6 +57,8 @@ public:
     // used for test purpose
     void setForceConnectionClose(bool value);
 
+    nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
+
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;

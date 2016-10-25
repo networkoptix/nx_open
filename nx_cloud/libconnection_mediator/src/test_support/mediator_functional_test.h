@@ -41,8 +41,8 @@ public:
     SocketAddress stunEndpoint() const;
     SocketAddress httpEndpoint() const;
 
-    std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
-    std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
+    std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
+    std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
 
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
@@ -54,6 +54,7 @@ public:
 
     std::unique_ptr<MediaServerEmulator> addRandomServer(
         const AbstractCloudDataProvider::System& system,
+        boost::optional<QnUuid> serverId = boost::none,
         bool bindEndpoint = true);
 
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(

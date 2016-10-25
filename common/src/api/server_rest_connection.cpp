@@ -21,10 +21,16 @@
 #include <http/custom_headers.h>
 #include <nx/network/http/httptypes.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/log/log.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
     static const size_t TcpConnectTimeoutMs   = 5 * 1000;
+
+    void trace(int handle, const QString& message)
+    {
+        NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
+    }
 }
 
 // --------------------------- public methods -------------------------------------------
@@ -68,25 +74,70 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
 }
 
-Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type callback
-    , QThread *targetThread)
+QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
 {
-    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
-    return executeGet(lit("/ec2/statistics/settings"), kEmptyParams.toParams(), callback, targetThread);
+    QnMediaServerResourcePtr server =
+        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    if (!server)
+        return QnMediaServerResourcePtr(); //< something wrong. No current server available
+
+    if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        return server;
+
+    // Current server doesn't have internet access. Try to find another one
+    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    {
+        if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+            return server;
+    }
+    return QnMediaServerResourcePtr(); //< no internet access found
 }
 
-Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &request
-    , PostCallback callback
-    , QThread *targetThread)
+Handle ServerConnection::getStatisticsSettingsAsync(
+    Result<QByteArray>::type callback,
+    QThread *targetThread)
+{
+    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
+    static const auto path = lit("/ec2/statistics/settings");
+
+    QnMediaServerResourcePtr server = getServerWithInternetAccess();
+    if (!server)
+        return Handle(); //< can't process request now. No internet access
+
+    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, kEmptyParams.toParams()));
+    nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    nx_http::insertOrReplaceHeader(&request.headers, header);
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
+}
+
+Handle ServerConnection::sendStatisticsAsync(
+    const QnSendStatisticsRequestData& statisticsData,
+    PostCallback callback,
+    QThread *targetThread)
 {
     static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    static const auto path = lit("/ec2/statistics/send");
 
-    const nx_http::BufferType data = QJson::serialized(request.metricsList);
+    auto server = getServerWithInternetAccess();
+    if (!server)
+        return Handle(); //< can't process request now. No internet access
+
+    const nx_http::BufferType data = QJson::serialized(statisticsData.metricsList);
     if (data.isEmpty())
         return Handle();
 
-    return executePost(lit("/ec2/statistics/send"), request.toParams()
-        , kJsonContentType, data, callback, targetThread);
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::POST,
+        prepareUrl(path, statisticsData.toParams()),
+        kJsonContentType,
+        data);
+    nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    nx_http::insertOrReplaceHeader(&request.headers, header);
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 Handle ServerConnection::detachSystemFromCloud(
@@ -114,14 +165,14 @@ Handle ServerConnection::detachSystemFromCloud(
 }
 
 Handle ServerConnection::saveCloudSystemCredentials(
-    const QString& cloudSystemID,
+    const QString& cloudSystemId,
     const QString& cloudAuthKey,
     const QString &cloudAccountName,
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
     CloudCredentialsData data;
-    data.cloudSystemID = cloudSystemID;
+    data.cloudSystemID = cloudSystemId;
     data.cloudAuthKey = cloudAuthKey;
     data.cloudAccountName = cloudAccountName;
 
@@ -196,7 +247,9 @@ template <typename ResultType>
 Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
     nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
-    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 template <typename ResultType>
@@ -208,16 +261,28 @@ Handle ServerConnection::executePost(const QString& path,
                                            QThread* targetThread)
 {
     nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
-    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 template <typename ResultType>
 void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool success, const Handle& id, const ResultType& result)
 {
     if (targetThread)
-        executeDelayed([callback, success, id, result] { callback(success, id, result); }, 0, targetThread);
+    {
+        executeDelayed(
+        [callback, success, id, result]
+        {
+            trace(id, lit("Reply"));
+            callback(success, id, result);
+        }, 0, targetThread);
+    }
     else
+    {
+        trace(id, lit("Reply"));
         callback(success, id, result);
+    }
 }
 
 template <typename ResultType>

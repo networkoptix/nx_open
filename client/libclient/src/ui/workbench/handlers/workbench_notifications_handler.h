@@ -8,7 +8,7 @@
 #include <business/events/abstract_business_event.h>
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <nx_ec/ec_api.h>
 
 #include <utils/common/connective.h>
@@ -17,7 +17,7 @@ class QnWorkbenchUserEmailWatcher;
 class QnActionParameters;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
-class QnWorkbenchNotificationsHandler : public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchNotificationsHandler : public Connective<QObject>, public QnSessionAwareDelegate
 {
     Q_OBJECT
 
@@ -28,6 +28,9 @@ public:
 
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
 signals:
     void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );

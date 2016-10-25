@@ -33,6 +33,28 @@ bool QnDbHelper::QnDbTransaction::beginTran()
     return true;
 }
 
+bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
+{
+    QSqlQuery enableWalQuery(*sqlDb);
+    enableWalQuery.prepare(lit("PRAGMA journal_mode = WAL"));
+    if( !enableWalQuery.exec() )
+    {
+        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        return false;
+    }
+
+    QSqlQuery enableFKQuery(*sqlDb);
+    enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
+    if( !enableFKQuery.exec() )
+    {
+        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+
 void QnDbHelper::QnDbTransaction::rollback()
 {
     m_database.rollback();
@@ -110,10 +132,14 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, c
     return prepareSQLQuery(&query, queryStr, details) && execSQLQuery(&query, details);
 }
 
-bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
+bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details)
+{
     if (!query->exec())
     {
-        qWarning() << details << query->lastError().text();
+        auto error = query->lastError();
+        NX_ASSERT(error.type() != QSqlError::StatementError,
+            error.text() + lit(":\n") + query->lastQuery());
+        qWarning() << details << error.text();
         return false;
     }
     return true;

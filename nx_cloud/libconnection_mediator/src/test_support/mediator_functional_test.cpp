@@ -91,13 +91,13 @@ SocketAddress MediatorFunctionalTest::httpEndpoint() const
     return SocketAddress(HostAddress::localhost, m_httpPort);
 }
 
-std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
+std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection>
+std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
     return network::SocketGlobals::mediatorConnector().systemConnection();
@@ -155,9 +155,16 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
 }
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
-    const AbstractCloudDataProvider::System& system, bool bindEndpoint)
+    const AbstractCloudDataProvider::System& system,
+    boost::optional<QnUuid> serverId,
+    bool bindEndpoint)
 {
-    return addServer(system, QnUuid::createUuid().toSimpleString().toUtf8(), bindEndpoint);
+    if (!serverId)
+        serverId = QnUuid::createUuid();
+    return addServer(
+        system,
+        serverId.get().toSimpleString().toUtf8(),
+        bindEndpoint);
 }
 
 std::vector<std::unique_ptr<MediaServerEmulator>>
@@ -168,7 +175,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
     for (size_t i = 0; i < count; ++i)
     {
-        auto server = addRandomServer(system, bindEndpoint);
+        auto server = addRandomServer(system, boost::none, bindEndpoint);
         if (!server)
             return {};
 

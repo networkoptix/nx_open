@@ -40,9 +40,12 @@ QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
     m_checked(false)
 {
     auto checkLicensesDelayed =
-        [this]()
+        [this, guard = QPointer<QnWorkbenchLicenseNotifier>(this)]()
         {
-            executeDelayed([this]{checkLicenses();}, kMessagesDelayMs);
+            if (!guard)
+                return;
+
+            executeDelayedParented([this]{ checkLicenses(); }, kMessagesDelayMs, this);
         };
 
     connect(qnLicensePool, &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
@@ -58,6 +61,9 @@ QnWorkbenchLicenseNotifier::~QnWorkbenchLicenseNotifier()
 
 void QnWorkbenchLicenseNotifier::checkLicenses()
 {
+    if (context()->closingDown())
+        return;
+
      if (m_checked)
          return;
      m_checked = true;
@@ -128,7 +134,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
         licenseWarningStates[license->key()].lastWarningTime = currentTime;
     }
 
-    if (warn)
+    if (warn && mainWindow())
     {
         QScopedPointer<QnLicenseNotificationDialog> dialog(new QnLicenseNotificationDialog(mainWindow()));
         dialog->setLicenses(licenses);

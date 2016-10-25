@@ -18,8 +18,12 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/device_dependent_strings.h>
+#include <core/resource_access/resource_access_manager.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
@@ -100,14 +104,27 @@ namespace {
             if (!idx.isValid())
                 return false;
 
-            auto passText = [this](const QnResourcePtr &resource){
-                return resource->toSearchString().contains(m_filterText, Qt::CaseInsensitive);
-            };
+            auto resourcePassText =
+                [this](const QnResourcePtr& resource)
+                {
+                    return resource->toSearchString().contains(m_filterText, Qt::CaseInsensitive);
+                };
 
-            bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), passText);
+            auto passText =
+                [this, resourcePassText](const QnUuid& id)
+                {
+                    auto resource = qnResPool->getResourceById(id);
+                    if (resource)
+                        return resourcePassText(resource);
+                    auto role = qnUserRolesManager->userRole(id);
+                    return role.name.contains(m_filterText, Qt::CaseInsensitive);
+                };
+
+
+            bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), resourcePassText);
             QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
             if (QnBusiness::requiresCameraResource(eventType)) {
-                QnResourceList eventResources = idx.data(Qn::EventResourcesRole).value<QnResourceList>();
+                auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
 
                 // rule supports any camera (assuming there is any camera that passing filter)
                 if (eventResources.isEmpty() && anyCameraPassFilter)
@@ -120,7 +137,7 @@ namespace {
 
             QnBusiness::ActionType actionType = idx.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
             if (QnBusiness::requiresCameraResource(actionType)) {
-                QnResourceList actionResources = idx.data(Qn::ActionResourcesRole).value<QnResourceList>();
+                auto actionResources = idx.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>();
                 if (any_of(actionResources, passText))
                     return true;
             }
@@ -172,6 +189,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     setHelpTopic(ui->eventLogButton, Qn::EventLog_Help);
 
     m_currentDetailsWidget = ui->detailsWidget;
+
+    //TODO: #GDM #3.0 fix icon
+    ui->advancedButton->setIcon(qnSkin->icon(lit("buttons/down.png")));
+    ui->eventLogButton->setIcon(qnSkin->icon(lit("buttons/event_log.png")));
 
     createActions();
 

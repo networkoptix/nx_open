@@ -58,7 +58,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
-#include <ui/graphics/items/resource/web_view.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -122,7 +122,7 @@ const qreal focusExpansion = 100.0;
 /** Maximal expanded size of a raised widget, relative to viewport size. */
 const qreal maxExpandedSize = 0.5;
 
-const int widgetAnimationDurationMsec = 500;
+static const int kWidgetAnimationDurationMs = 200;
 const int zoomAnimationDurationMsec = 500;
 
 /** The amount of z-space that one layer occupies. */
@@ -213,7 +213,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* We should disable all one-key shortcuts while web view is in the focus. */
     connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
     {
-        bool isWebView = scene() && dynamic_cast<QnWebView*>(scene()->focusItem());
+        bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
 
         for (auto actionId : {
             QnActions::JumpToLiveAction, //< L
@@ -625,8 +625,9 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
     animator->setRelativeMovementSpeed(8.0);
     animator->setScalingSpeed(128.0);
     animator->setRotationSpeed(270.0);
+    animator->setEasingCurve(QEasingCurve::InOutQuad);
     animator->setTimer(m_instrumentManager->animationTimer());
-    animator->setTimeLimit(widgetAnimationDurationMsec);
+    animator->setTimeLimit(kWidgetAnimationDurationMs);
     widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }

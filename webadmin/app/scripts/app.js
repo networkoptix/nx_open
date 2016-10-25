@@ -72,15 +72,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
-        .when('/webclient', {
-            templateUrl: 'views/webclient.html',
-            controller: 'WebclientCtrl',
-            reloadOnSearch: false
-        }).when('/view/', {
+        .when('/view/', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
-        }).when('/view/:cameraId', {
+        })
+        .when('/view/:cameraId', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
@@ -100,8 +97,9 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/settings'
         });
-}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location, $localStorage) {
     var original = $location.path;
+    $rootScope.storage = $localStorage;
     $location.path = function (path, reload) {
         if (reload === false) {
             var lastRoute = $route.current;

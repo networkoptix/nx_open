@@ -233,7 +233,7 @@ struct ScreenWidgetKey
 };
 
 const int identifyTimeout = 5000;
-const int identifyFontSize = 100;
+const int kIdentifyFontSize = 100;
 
 const int cacheMessagesTimeoutMs = 500;
 
@@ -999,7 +999,15 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
 
             QnVideoWallItem data = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
             if (!data.name.isEmpty())
-                QnGraphicsMessageBox::information(data.name, identifyTimeout, identifyFontSize);
+            {
+                auto messageBox = QnGraphicsMessageBox::information(data.name, identifyTimeout);
+                if (messageBox)
+                {
+                    QFont f = messageBox->font();
+                    f.setPixelSize(kIdentifyFontSize);
+                    messageBox->setFont(f);
+                }
+            }
             break;
         }
         case QnVideoWallControlMessage::RadassModeChanged:
@@ -1246,6 +1254,12 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const
 
 QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourceList &resources) const
 {
+    if (resources.size() == 1)
+    {
+        if (auto layout = resources.first().dynamicCast<QnLayoutResource>())
+            return layout;
+    }
+
     QnResourceList filtered;
     QMap<qreal, int> aspectRatios;
     qreal defaultAr = qnGlobals->defaultLayoutCellAspectRatio();
@@ -2209,7 +2223,8 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
     }
 }
 
-void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
+void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& item)
 {
     //TODO: #GDM #VW implement screen size changes handling
 
@@ -2233,7 +2248,9 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
     updateReviewLayout(videoWall, item, ItemAction::Removed);
 }
 
-void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
+void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode(
+    const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& item)
 {
     if (videoWall->getId() != m_videoWallMode.guid || item.uuid != m_videoWallMode.instanceGuid)
         return;

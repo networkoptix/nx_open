@@ -3,7 +3,9 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
@@ -36,23 +38,8 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
     addPage(SettingsPage, m_settingsPage, tr("Role Info"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
-    addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
+    addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
-
-    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &QnUserGroupsDialog::accessibleLayoutsChanged);
-
-    for (auto page : allPages())
-    {
-        /* Changes are locally stored in model. */
-        connect(page.widget, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this, page]
-        {
-            if (!page.widget->hasChanges())
-                return;
-            page.widget->applyChanges();
-            updateButtonBox();
-        });
-    }
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -73,58 +60,42 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 
-    m_model->setGroups(qnResourceAccessManager->userGroups());
+    m_model->setGroups(qnUserRolesManager->userRoles());
     ui->groupsTreeView->setModel(m_model);
 
-    connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex& current, const QModelIndex& previous)
-    {
-        Q_UNUSED(previous);
+    connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+        &QnUserGroupsDialog::at_model_currentChanged);
 
-        bool valid = current.isValid();
-        ui->groupInfoStackedWidget->setCurrentWidget(valid ? ui->groupInfoPage : ui->noGroupsPage);
-        if (!valid)
-            return;
+    connect(ui->newGroupButton, &QPushButton::clicked, this,
+        [this]
+        {
+            QStringList usedNames;
+            for (const auto& group: m_model->groups())
+                usedNames << group.name;
 
-        QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
-        if (m_model->selectedGroup() == groupId)
-            return;
+            ec2::ApiUserGroupData group;
+            group.id = QnUuid::createUuid();
+            group.name = nx::utils::generateUniqueString(usedNames, tr("New Role"), tr("New Role %1"));
+            group.permissions = Qn::NoGlobalPermissions;
 
-        m_model->selectGroup(groupId);
-        loadDataToUi();
-
-        m_camerasPage->indirectAccessChanged();
-        m_layoutsPage->indirectAccessChanged();
-    });
-
-    connect(ui->newGroupButton, &QPushButton::clicked, this, [this]
-    {
-        QStringList usedNames;
-        for (const auto& group: m_model->groups())
-            usedNames << group.name;
-
-        ec2::ApiUserGroupData group;
-        group.id = QnUuid::createUuid();
-        group.name = nx::utils::generateUniqueString(usedNames, tr("New Role"), tr("New Role %1"));
-        group.permissions = Qn::NoGlobalPermissions;
-
-        int row = m_model->addGroup(group);
-        ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row), QItemSelectionModel::ClearAndSelect);
-        updateButtonBox();
-    });
+            int row = m_model->addGroup(group);
+            ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row), QItemSelectionModel::ClearAndSelect);
+            updateButtonBox();
+        });
 
     auto modelChanged = [this]()
-    {
-        bool hasGroups = m_model->rowCount() > 0;
-        ui->groupsTreeView->setVisible(hasGroups);
-        ui->groupsListUnderline->setVisible(hasGroups);
-
-        if (hasGroups && !ui->groupsTreeView->selectionModel()->currentIndex().isValid())
         {
-            ui->groupsTreeView->selectionModel()->setCurrentIndex(
-                m_model->index(0, 0),
-                QItemSelectionModel::SelectCurrent);
-        }
-    };
+            bool hasGroups = m_model->rowCount() > 0;
+            ui->groupsTreeView->setVisible(hasGroups);
+            ui->groupsListUnderline->setVisible(hasGroups);
+
+            if (hasGroups && !ui->groupsTreeView->selectionModel()->currentIndex().isValid())
+            {
+                ui->groupsTreeView->selectionModel()->setCurrentIndex(
+                    m_model->index(0, 0),
+                    QItemSelectionModel::SelectCurrent);
+            }
+        };
 
     connect(m_model, &QAbstractItemModel::modelReset,   this, modelChanged);
     connect(m_model, &QAbstractItemModel::rowsRemoved,  this, modelChanged);
@@ -158,29 +129,21 @@ bool QnUserGroupsDialog::selectGroup(const QnUuid& groupId)
 bool QnUserGroupsDialog::hasChanges() const
 {
     /* Quick check */
-    if (qnResourceAccessManager->userGroups().size() != m_model->groups().size())
+    if (qnUserRolesManager->userRoles().size() != m_model->groups().size())
         return true;
 
     for (const auto& group : m_model->groups())
     {
-        auto existing = qnResourceAccessManager->userGroup(group.id);
+        auto existing = qnUserRolesManager->userRole(group.id);
 
         if (existing != group)
             return true;
 
-        if (qnResourceAccessManager->accessibleResources(group.id) != m_model->accessibleResources(group.id))
+        if (qnSharedResourcesManager->sharedResources(group) != m_model->accessibleResources(group))
             return true;
-
-        continue;
     }
 
-    return false;
-}
-
-void QnUserGroupsDialog::loadDataToUi()
-{
-    base_type::loadDataToUi();
-    accessibleLayoutsChanged();
+    return base_type::hasChanges();
 }
 
 void QnUserGroupsDialog::applyChanges()
@@ -191,12 +154,12 @@ void QnUserGroupsDialog::applyChanges()
     for (const auto& group : m_model->groups())
     {
         groupsLeft << group.id;
-        auto existing = qnResourceAccessManager->userGroup(group.id);
+        auto existing = qnUserRolesManager->userRole(group.id);
 
         if (existing != group)
-            qnResourcesChangesManager->saveUserGroup(group);
+            qnResourcesChangesManager->saveUserRole(group);
 
-        auto resources = m_model->accessibleResources(group.id);
+        auto resources = m_model->accessibleResources(group);
         QnLayoutResourceList layoutsToShare = qnResPool->getResources(resources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)
@@ -213,7 +176,7 @@ void QnUserGroupsDialog::applyChanges()
         qnResourcesChangesManager->saveAccessibleResources(group, resources);
     }
 
-    for (const auto& group : qnResourceAccessManager->userGroups())
+    for (const auto& group : qnUserRolesManager->userRoles())
     {
         if (groupsLeft.contains(group.id))
             continue;
@@ -229,15 +192,27 @@ void QnUserGroupsDialog::applyChanges()
                 });
         }
 
-        qnResourcesChangesManager->removeUserGroup(group.id);
+        qnResourcesChangesManager->removeUserRole(group.id);
     }
 
     updateButtonBox();
     loadDataToUi();
 }
 
-void QnUserGroupsDialog::accessibleLayoutsChanged()
+void QnUserGroupsDialog::at_model_currentChanged(const QModelIndex& current)
 {
-    m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
-    m_camerasPage->indirectAccessChanged();
+    bool valid = current.isValid();
+    ui->groupInfoStackedWidget->setCurrentWidget(valid ? ui->groupInfoPage : ui->noGroupsPage);
+    if (!valid)
+        return;
+
+    QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
+    if (m_model->selectedGroup() == groupId)
+        return;
+
+    /* Apply page changes to current group in the model. */
+    base_type::applyChanges();
+    m_model->selectGroup(groupId);
+    loadDataToUi();
 }
+

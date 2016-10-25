@@ -53,9 +53,6 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-
-        QnTransaction<ApiStoredFileData> prepareTransaction( const QString& filename, const QByteArray& data );
-        QnTransaction<ApiStoredFilePath> prepareTransaction( const QString& filename );
     };
 }
 

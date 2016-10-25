@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<TS version="2.0" language="de" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -896,32 +896,32 @@
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP Inhalt</translation>
     </message>
     <message>
         <location/>
         <source>HTTP url</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP URL</translation>
     </message>
     <message>
         <location/>
         <source>Login to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Einloggen zum Authentifizieren (optional)</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Login</translation>
     </message>
     <message>
         <location/>
         <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort zum Authentifizieren (optional)</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort</translation>
     </message>
 </context>
 <context>
@@ -937,27 +937,27 @@
     <message>
         <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
         <source>Export Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Rapid Review exportieren</translation>
     </message>
     <message>
         <location/>
         <source>Initial Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Ursprüngliche Videolänge</translation>
     </message>
     <message>
         <location/>
         <source>Exported Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportierte Videolänge</translation>
     </message>
     <message>
         <location/>
         <source>Rapid Review speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Rapid Review Geschwindigkeit</translation>
     </message>
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Frame Intervall</translation>
     </message>
 </context>
 <context>
@@ -1681,7 +1681,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Soundausgabe</translation>
     </message>
 </context>
 <context>
@@ -2463,7 +2463,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprachausgabe</translation>
     </message>
 </context>
 <context>

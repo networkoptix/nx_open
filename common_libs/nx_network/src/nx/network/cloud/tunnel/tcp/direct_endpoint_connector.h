@@ -7,9 +7,9 @@
 
 #include <list>
 
-#include "nx/network/system_socket.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/system_socket.h>
 #include "../abstract_tunnel_connector.h"
-
 
 namespace nx {
 namespace network {
@@ -39,21 +39,33 @@ public:
         ConnectCompletionHandler handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
+    /** Disables verification for test purposes */
+    static void setVerificationRequirement(bool value);
+
 private:
     struct ConnectionContext
     {
         SocketAddress endpoint;
-        std::unique_ptr<TCPSocket> connection;
+        nx_http::AsyncHttpClientPtr httpClient;
     };
 
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
     std::list<ConnectionContext> m_connections;
+    static bool s_needVerification;
 
-    void onConnected(
-        SystemError::ErrorCode sysErrorCode,
+    void onHttpRequestDone(
+        nx_http::AsyncHttpClientPtr httpClient,
         std::list<ConnectionContext>::iterator socketIter);
+
+    void reportErrorOnEndpointVerificationFailure(
+        nx::hpm::api::NatTraversalResultCode resultCode,
+        SystemError::ErrorCode sysErrorCode);
+    bool verifyHostResponse(nx_http::AsyncHttpClientPtr httpClient);
+    void reportSuccessfulVerificationResult(
+        SocketAddress endpoint,
+        std::unique_ptr<AbstractStreamSocket> streamSocket);
 };
 
 } // namespace tcp

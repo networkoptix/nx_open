@@ -20,11 +20,11 @@ IncomingTunnelConnection::IncomingTunnelConnection(
     {
         m_controlConnection.reset();
         NX_LOGX(lm("Control connection error (%1), closing tunnel...")
-            .arg(SystemError::toString(code)), cl_logWARNING);
+            .arg(SystemError::toString(code)), cl_logDEBUG1);
 
         m_state = code;
         if (m_serverSocket)
-            m_serverSocket->pleaseStopSync(); // we are in IO thread
+            m_serverSocket->pleaseStopSync(false); // we are in IO thread
 
         if (m_acceptHandler)
         {

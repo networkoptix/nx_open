@@ -37,12 +37,12 @@ public:
         MRS_COLOR,
         RECORD_ALWAYS_COLOR,
 
-        OPACITY_CHANGE_PERIOD,
-
         SELECTION_OPACITY_DELTA,
         SELECTION_BORDER_DELTA,
 
         ERROR_TEXT_COLOR,
+        WARNING_TEXT_COLOR,
+        SUCCESS_TEXT_COLOR,
 
         /** Size of a single unit of workbench grid, in scene coordinates.
          * This basically is the width of a single video item in scene coordinates. */
@@ -124,10 +124,11 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   motionMaskColor,                MOTION_MASK_COLOR,                      QColor(180, 180, 180, 96))
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
 
-        QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(int,      buttonAnimationPeriod,          BUTTON_ANIMATION_PERIOD,                1)
 
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
+        QN_DECLARE_R_PROPERTY(QColor,   warningTextColor,               WARNING_TEXT_COLOR,                     QColor(255, 255, 64))
+        QN_DECLARE_R_PROPERTY(QColor,   successTextColor,               SUCCESS_TEXT_COLOR,                     QColor(64, 255, 64))
 
         QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0) /**< Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
         QN_DECLARE_R_PROPERTY(QSizeF,   viewportLowerSizeBound,         VIEWPORT_LOWER_SIZE_BOUND,              QSizeF(500.0, 500.0))

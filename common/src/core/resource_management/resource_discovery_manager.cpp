@@ -83,6 +83,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::autoDiscoveryChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -327,7 +328,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
 
-    if (camera->preferedServerId() == ownGuid)
+    if (camera->preferredServerId() == ownGuid)
         return true;
     else if (mServer->getStatus() == Qn::Online)
         return false;
@@ -512,6 +513,49 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
+bool QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+    const QnResourcePtr& resource, 
+    std::function<bool(const QnNetworkResourcePtr& resource)> filterFunc,
+    bool manuallyAdded)
+{
+    QnSecurityCamResourcePtr netRes = resource.dynamicCast<QnSecurityCamResource>();
+    if (!netRes)
+        return false;
+
+    QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+    existResList = existResList.filtered(filterFunc);
+
+    for(const QnNetworkResourcePtr& existRes: existResList)
+    {
+        QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
+        if (!existCam)
+            continue;
+
+        bool newIsRtsp = (netRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
+        bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
+        if (newIsRtsp && !existIsRtsp)
+            continue; // allow to stack RTSP and non RTSP cameras with same IP:port
+
+        bool resourceWasAddedAnotherWay = manuallyAdded && !existCam->isManuallyAdded() ||
+                                          !manuallyAdded && existCam->isManuallyAdded();
+
+        if (resourceWasAddedAnotherWay)
+        {
+           return true; // block manual and auto add in same time
+        }
+        else if (existRes->getTypeId() != netRes->getTypeId())
+        {
+            // allow several manual cameras on the same IP if cameras have different ports
+            QUrl url1(existRes->getUrl());
+            QUrl url2(netRes->getUrl());
+            if (url1.port() == url2.port())
+                return true; // camera found by different drivers on the same port
+        }
+    }
+
+    return false;
+}
+
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
     QnMutexLocker lock( &m_discoveryMutex );
@@ -677,7 +721,9 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
 {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
-    DiscoveryMode discoveryMode = DiscoveryMode::fullyEnabled;
+    DiscoveryMode discoveryMode = qnGlobalSettings->isAutoDiscoveryEnabled() ?
+        DiscoveryMode::fullyEnabled :
+        DiscoveryMode::partiallyEnabled;
     if( searcher->isLocal() ||                  // local resources should always be found
         searcher->isVirtualResource() )         // virtual resources should always be found
     {
@@ -709,7 +755,8 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
     searcher->setDiscoveryMode( discoveryMode );
 }
 
-void QnResourceDiscoveryManager::updateSearchersUsage() {
+void QnResourceDiscoveryManager::updateSearchersUsage()
+{
     ResourceSearcherList searchers;
     {
         QnMutexLocker locker( &m_searchersListMutex );

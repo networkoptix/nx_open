@@ -8,20 +8,16 @@
 
 #include <memory>
 
+#include <nx/network/connection_server/message_dispatcher.h>
+#include <nx/utils/std/cpp14.h>
+
 #include "abstract_http_request_handler.h"
 #include "http_server_connection.h"
-#include <nx/network/connection_server/message_dispatcher.h>
-#include "nx/utils/std/cpp14.h"
 
 
 namespace nx_http
 {
     //TODO #ak this class MUST search processor by max string prefix
-
-    typedef std::function<void(
-            nx_http::Message&&,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> )
-        > HttpRequestCompletionFunc;
 
     static const nx_http::StringType kAnyMethod;
     static const QString kAnyPath;
@@ -47,10 +43,10 @@ namespace nx_http
         bool registerRequestProcessor(
             const QString& path, const nx_http::StringType& method = kAnyMethod)
         {
-            return registerRequestProcessor(
-                path, method,
-                []()->std::unique_ptr<AbstractHttpRequestHandler>{
-                    return std::make_unique<RequestHandlerType>(); } ).second;
+            return registerRequestProcessor<RequestHandlerType>(
+                path,
+                []() {return std::make_unique<RequestHandlerType>();},
+                method);
         }
 
         template<typename RequestHandlerType>
@@ -97,9 +93,12 @@ namespace nx_http
                     if (maker != methodFactory->second.end())
                         requestProcessor = maker->second();
 
-                    const auto anyMaker = methodFactory->second.find(kAnyPath);
-                    if (anyMaker != methodFactory->second.end())
-                        requestProcessor = anyMaker->second();
+                    if (!requestProcessor)
+                    {
+                        const auto anyMaker = methodFactory->second.find(kAnyPath);
+                        if (anyMaker != methodFactory->second.end())
+                            requestProcessor = anyMaker->second();
+                    }
                 }
             }
 
@@ -111,6 +110,13 @@ namespace nx_http
                     auto maker = methodFactory->second.find(path);
                     if (maker != methodFactory->second.end())
                         requestProcessor = maker->second();
+
+                    if (!requestProcessor)
+                    {
+                        auto maker = methodFactory->second.find(kAnyPath);
+                        if (maker != methodFactory->second.end())
+                            requestProcessor = maker->second();
+                    }
                 }
             }
 
@@ -127,10 +133,14 @@ namespace nx_http
             return requestProcessorPtr->processRequest(
                 conn, std::move(message), std::move(authInfo),
                 [completionFunc, requestProcessorPtr](
-                    nx_http::Message&& responseMsg,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody) mutable
+                    nx_http::Message responseMsg,
+                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+                    ConnectionEvents connectionEvents) mutable
                 {
-                    completionFunc(std::move(responseMsg), std::move(responseMsgBody));
+                    completionFunc(
+                        std::move(responseMsg),
+                        std::move(responseMsgBody),
+                        std::move(connectionEvents));
                     delete requestProcessorPtr;
                 });
         }

@@ -1,5 +1,6 @@
-
 #include "socket_common.h"
+
+#include <cstring>
 
 #include "socket_global.h"
 
@@ -37,14 +38,23 @@ bool HostAddress::isResolved() const
 
 bool HostAddress::isLocal() const
 {
-    const auto& string = toString();
+    if (const auto& ip = ipV4())
+    {
+        const auto addr = ntohl(ip->s_addr);
+        return (addr == 0x7F000001) // 127.0.0.1
+            || (addr >= 0x0A000000 && addr <= 0x0AFFFFFF) // 10.*.*.*
+            || (addr >= 0xAC100000 && addr <= 0xAC1FFFFF) // 172.16.*.* - 172.31.*.*
+            || (addr >= 0xC0A80000 && addr <= 0xC0A8FFFF); // 192.168.0.0
+    }
 
-    // TODO: add some more IPv4
-    return string == QLatin1String("127.0.0.1") // localhost
-        || string.startsWith(QLatin1String("10.")) // IPv4 private
-        || string.startsWith(QLatin1String("192.168")) // IPv4 private
-        || string.startsWith(QLatin1String("fd00::")) // IPv6 private
-        || string.startsWith(QLatin1String("fe80::")); // IPv6 link-local
+    if (const auto& ip = ipV6())
+    {
+        return (std::memcmp(&*ip, &in6addr_loopback, sizeof(*ip)) == 0) // ::1
+            || (ip->s6_addr[0] == 0xFD && ip->s6_addr[1] == 0x00) // FD00:*
+            || (ip->s6_addr[0] == 0xFE && ip->s6_addr[1] == 0x80); // FE00:*
+    }
+
+    return false; // not even IP address
 }
 
 bool HostAddress::operator==( const HostAddress& rhs ) const
@@ -75,45 +85,23 @@ bool HostAddress::operator<( const HostAddress& rhs ) const
 }
 
 static const QString kIpVersionConvertPart = QLatin1String("::ffff:");
+static const QByteArray kIpVersionMapPrefix = QByteArray::fromHex("00000000000000000000FFFF");
 
 const QString& HostAddress::toString() const
 {
     if (m_string)
         return *m_string;
 
-    if (m_ipV4)
-    {
-        m_string = ipToString(*m_ipV4);
-        Q_ASSERT(m_string);
-        return *m_string;
-    }
-
-    Q_ASSERT(m_ipV6);
-    auto string = ipToString(*m_ipV6);
-    Q_ASSERT(string);
-
     // TODO: Remove this hack when IPv6 is properly supported!
-    //  Try to map it on IPv4 as v4 format is preferable
-    if (*string == QLatin1String("::"))
-    {
-        *string = QLatin1String("0.0.0.0");
-    }
-    else if (*string == QLatin1String("::1"))
-    {
-        *string = QLatin1String("127.0.0.1");
-    }
-    else if (string->startsWith(kIpVersionConvertPart))
-    {
-        const auto part = string->mid(kIpVersionConvertPart.length());
-        m_ipV4 = ipV4from(part);
-        if (m_ipV4)
-        {
-            m_string = part;
-            return *m_string;
-        }
-    }
+    //  Try to map it from IPv4 as v4 format is preferable
+    if (!m_ipV4)
+        m_ipV4 = ipV4from(*m_ipV6);
 
-    m_string = string;
+    if (m_ipV4)
+        m_string = ipToString(*m_ipV4);
+    else
+        m_string = ipToString(*m_ipV6);
+
     return *m_string;
 }
 
@@ -127,27 +115,12 @@ const boost::optional<in_addr>& HostAddress::ipV4() const
         m_ipV4 = ipV4from(*m_string);
         if (m_ipV4)
             return m_ipV4;
-    }
-    else
-    {
-        Q_ASSERT(m_ipV6);
-        toString(); // Converts from IPv6
+
+        m_ipV6 = ipV6from(*m_string);
     }
 
-    Q_ASSERT(m_string);
-    m_ipV4 = ipV4from(*m_string);
-    if (!m_ipV4)
-    {
-        // Try to map it on IPv4 if HostAddress was created by IPv4 string
-        if (*m_string == QLatin1String("::"))
-            m_ipV4 = ipV4from(QLatin1String("0.0.0.0"));
-
-        else if (*m_string == QLatin1String("::1"))
-            m_ipV4 = ipV4from(QLatin1String("127.0.0.1"));
-
-        else if (m_string->startsWith(kIpVersionConvertPart))
-            m_ipV4 = ipV4from(m_string->mid(kIpVersionConvertPart.length()));
-    }
+    if (m_ipV6)
+        m_ipV4 = ipV4from(*m_ipV6);
 
     return m_ipV4;
 }
@@ -157,29 +130,16 @@ const boost::optional<in6_addr>& HostAddress::ipV6() const
     if (m_ipV6)
         return m_ipV6;
 
-    if (m_string)
+    if (m_string && !m_ipV4)
+        m_ipV4 = ipV4from(*m_string);
+
+    if (m_ipV4)
     {
-        m_ipV6 = ipV6from(*m_string);
-        if (m_ipV6)
-            return m_ipV6;
-    }
-    else
-    {
-        Q_ASSERT(m_ipV4);
-        m_string = ipToString(*m_ipV4);
+        m_ipV6 = ipV6from(*m_ipV4);
+        return m_ipV6;
     }
 
-    Q_ASSERT(m_string);
-
-    // TODO: Remove this hack when IPv6 is properly supported!
-    //  Try to map it from IPv4 as v4 format is preferable
-    if (*m_string == QLatin1String("0.0.0.0"))
-        m_ipV6 = ipV6from(QLatin1String("::"));
-    else if (*m_string == QLatin1String("127.0.0.1"))
-        m_ipV6 = ipV6from(QLatin1String("::1"));
-    else
-        m_ipV6 = ipV6from(kIpVersionConvertPart + *m_string);
-
+    m_ipV6 = ipV6from(*m_string);
     return m_ipV6;
 }
 
@@ -219,6 +179,45 @@ boost::optional<in6_addr> HostAddress::ipV6from(const QString& ip)
         return v6;
 
     return boost::none;
+}
+
+boost::optional<in_addr> HostAddress::ipV4from(const in6_addr& v6)
+{
+    in_addr v4;
+
+    // TODO: Remove this hack when IPv6 is properly supported!
+    //  Try to map it from IPv4 as v4 format is preferable
+    if (std::memcmp(&v6, &in6addr_any, sizeof(v6)) == 0)
+    {
+        v4.s_addr = htonl(INADDR_ANY);
+        return v4;
+    }
+    if (std::memcmp(&v6, &in6addr_loopback, sizeof(v6)) == 0)
+    {
+        v4.s_addr = htonl(INADDR_LOOPBACK);
+        return v4;
+    }
+
+    if (std::memcmp(kIpVersionMapPrefix.data(), &v6.s6_addr[0], kIpVersionMapPrefix.size()) != 0)
+        return boost::none;
+
+    std::memcpy(&v4, &v6.s6_addr[kIpVersionMapPrefix.size()], sizeof(v4));
+    return v4;
+}
+
+in6_addr HostAddress::ipV6from(const in_addr& v4)
+{
+    // TODO: Remove this hack when IPv6 is properly supported!
+    //  Try to map it from IPv4 as v4 format is preferable
+    if (v4.s_addr == htonl(INADDR_ANY))
+        return in6addr_any;
+    if (v4.s_addr == htonl(INADDR_LOOPBACK))
+        return in6addr_loopback;
+
+    in6_addr v6;
+    std::memcpy(&v6.s6_addr[0], kIpVersionMapPrefix.data(), kIpVersionMapPrefix.size());
+    std::memcpy(&v6.s6_addr[kIpVersionMapPrefix.size()], &v4, sizeof(v4));
+    return v6;
 }
 
 SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):

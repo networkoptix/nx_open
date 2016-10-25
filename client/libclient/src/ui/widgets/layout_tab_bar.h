@@ -29,6 +29,8 @@ signals:
 
 protected:
     virtual QSize minimumSizeHint() const override;
+    virtual QSize tabSizeHint(int index) const override;
+    virtual QSize minimumTabSizeHint(int index) const override;
 
     virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
@@ -43,7 +45,6 @@ protected:
     QString layoutText(QnWorkbenchLayout *layout) const;
     QIcon layoutIcon(QnWorkbenchLayout *layout) const;
 
-    void updateCurrentLayout();
     void updateTabText(QnWorkbenchLayout *layout);
     void updateTabIcon(QnWorkbenchLayout *layout);
 
@@ -60,6 +61,7 @@ private slots:
 private:
     void checkInvariants() const;
     void submitCurrentLayout();
+    void fixGeometry();
 
 private:
     /** Whether changes to tab bar should be written back into the workbench. */

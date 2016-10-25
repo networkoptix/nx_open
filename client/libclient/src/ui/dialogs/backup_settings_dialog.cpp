@@ -1,6 +1,7 @@
 #include "backup_settings_dialog.h"
 #include "ui_backup_settings_dialog.h"
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
@@ -28,49 +29,59 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
     ui->comboBoxBackupType->addItem(tr("Realtime"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"), Qn::Backup_Manual);
 
-    ui->backupResourcesButton->setProperty(
-        style::Properties::kButtonMarginProperty, style::Metrics::kStandardPadding);
-
-    updateCamerasButton();
-
-    connect(ui->comboBoxBackupType, QnComboboxCurrentIndexChanged, this, [this]()
-    {
-        m_schedule.backupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->currentData().toInt());
-        switch (m_schedule.backupType)
+    auto updatePage = [this]
         {
-            case Qn::Backup_Manual   : ui->stackedWidget->setCurrentWidget(ui->onDemandPage);   break;
-            case Qn::Backup_Schedule : ui->stackedWidget->setCurrentWidget(ui->bySchedulePage); break;
-            case Qn::Backup_RealTime : ui->stackedWidget->setCurrentWidget(ui->realtimePage);   break;
-        }
-    });
+            m_schedule.backupType = static_cast<Qn::BackupType>(
+                ui->comboBoxBackupType->currentData().toInt());
+            switch (m_schedule.backupType)
+            {
+                case Qn::Backup_Manual:
+                    ui->stackedWidget->setCurrentWidget(ui->onDemandPage);
+                    break;
+                case Qn::Backup_Schedule:
+                    ui->stackedWidget->setCurrentWidget(ui->bySchedulePage);
+                    break;
+                case Qn::Backup_RealTime:
+                    ui->stackedWidget->setCurrentWidget(ui->realtimePage);
+                    break;
+            }
+        };
 
-    connect(ui->pushButtonSchedule, &QPushButton::clicked, this, [this]()
-    {
-        auto scheduleDialog = new QnBackupScheduleDialog(this);
-        scheduleDialog->setReadOnly(isReadOnly());
-        scheduleDialog->updateFromSettings(m_schedule);
-        if (scheduleDialog->exec() != QDialog::Accepted || isReadOnly())
-            return;
+    connect(ui->comboBoxBackupType, QnComboboxCurrentIndexChanged, this, updatePage);
+    updatePage();
 
-        scheduleDialog->submitToSettings(m_schedule);
-    });
+    connect(ui->pushButtonSchedule, &QPushButton::clicked, this,
+        [this]()
+        {
+            auto scheduleDialog = new QnBackupScheduleDialog(this);
+            scheduleDialog->setReadOnly(isReadOnly());
+            scheduleDialog->updateFromSettings(m_schedule);
+            if (scheduleDialog->exec() != QDialog::Accepted || isReadOnly())
+                return;
 
-    connect(ui->backupResourcesButton, &QPushButton::clicked, this, [this]()
-    {
-        //TODO: #vkutin #GDM #common In read-only mode display a different dialog
-        // to view only selected cameras
+            scheduleDialog->submitToSettings(m_schedule);
+        });
 
-        QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(this));
-        dialog->setSelectedResources(m_camerasToBackup);
-        dialog->setBackupNewCameras(m_backupNewCameras);
+    connect(ui->backupResourcesButton, &QPushButton::clicked, this,
+        [this]()
+        {
+            //TODO: #vkutin #GDM #common In read-only mode display a different dialog
+            // to view only selected cameras
 
-        if (dialog->exec() != QDialog::Accepted || isReadOnly())
-            return;
+            QSet<QnUuid> ids;
+            for (auto camera: m_camerasToBackup)
+                ids << camera->getId();
 
-        m_camerasToBackup = dialog->selectedResources().filtered<QnVirtualCameraResource>();
-        m_backupNewCameras = dialog->backupNewCameras();
-        updateCamerasButton();
-    });
+            QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(this));
+            dialog->setSelectedResources(ids);
+            dialog->setBackupNewCameras(m_backupNewCameras);
+
+            if (dialog->exec() != QDialog::Accepted || isReadOnly())
+                return;
+
+            setCamerasToBackup(qnResPool->getResources(dialog->selectedResources())
+                .filtered<QnVirtualCameraResource>());
+        });
 
     ui->qualityComboBox->addItem(tr("Low-Res Streams", "Cameras Backup"),
         QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_LowQuality));
@@ -127,42 +138,7 @@ const QnVirtualCameraResourceList& QnBackupSettingsDialog::camerasToBackup() con
 void QnBackupSettingsDialog::setCamerasToBackup(const QnVirtualCameraResourceList& cameras)
 {
     m_camerasToBackup = cameras;
-    updateCamerasButton();
-}
-
-void QnBackupSettingsDialog::updateCamerasButton()
-{
-    switch (m_camerasToBackup.size())
-    {
-        case 0:
-        {
-            ui->backupResourcesButton->setIcon(QIcon());
-            ui->backupResourcesButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("Select devices..."),
-                tr("Select cameras...")));
-            break;
-        }
-
-        case 1:
-        {
-            QIcon icon = qnResIconCache->icon(m_camerasToBackup[0]);
-            ui->backupResourcesButton->setIcon(qnSkin->maximumSizePixmap(icon, QIcon::Selected));
-            ui->backupResourcesButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("1 Device..."),
-                tr("1 Camera...")));
-            break;
-        }
-
-        default:
-        {
-            QIcon icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
-            ui->backupResourcesButton->setIcon(qnSkin->maximumSizePixmap(icon, QIcon::Selected));
-            ui->backupResourcesButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("%n Devices...", "", m_camerasToBackup.size()),
-                tr("%n Cameras...", "", m_camerasToBackup.size())));
-            break;
-        }
-    }
+    ui->backupResourcesButton->selectDevices(cameras);
 }
 
 bool QnBackupSettingsDialog::backupNewCameras() const

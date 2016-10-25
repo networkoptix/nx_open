@@ -9,10 +9,14 @@
 #include <ui/style/generic_palette.h>
 
 #include <nx/utils/raii_guard.h>
+
 #include <utils/common/connective.h>
 #include <utils/common/credentials.h>
 
 class QnCloudStatusWatcher;
+class QQuickView;
+class QnAppInfo;
+
 typedef QList<QUrl> UrlsList;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
@@ -22,18 +26,20 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
 
     Q_PROPERTY(bool isVisible READ isVisible WRITE setVisible NOTIFY visibleChanged)
 
-    Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged);
+    Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
-    Q_PROPERTY(bool isOfflineConnection READ isOfflineConnection NOTIFY isOfflineConnectionChanged)
+    Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
 
-    Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
+    Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged)
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
-    Q_PROPERTY(QString softwareVersion READ softwareVersion CONSTANT)
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
+    Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged);
+
+    Q_PROPERTY(QnAppInfo* appInfo READ appInfo CONSTANT);
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
 
@@ -50,7 +56,7 @@ public: // Properties
 
     bool isLoggedInToCloud() const;
 
-    bool isOfflineConnection() const;
+    bool isCloudEnabled() const;
 
     QSize pageSize() const;
 
@@ -62,20 +68,30 @@ public: // Properties
 
     QString connectingToSystem() const;
 
+    void openConnectingTile();
+
+    void handleDisconnectedFromSystem();
+
+    void handleConnectingToSystem();
+
     void setConnectingToSystem(const QString& value);
 
     bool globalPreloaderVisible() const;
 
     void setGlobalPreloaderVisible(bool value);
 
-    QString softwareVersion() const;
-
     QString minSupportedVersion() const;
 
-public slots:
-    bool isAcceptableDrag(const UrlsList& urls);
+    void setMessage(const QString& message);
 
-    void makeDrop(const UrlsList& urls);
+    QString message() const;
+
+    QnAppInfo* appInfo() const;
+
+public slots:
+    bool isAcceptableDrag(const QList<QUrl>& urls);
+
+    void makeDrop(const QList<QUrl>& urls);
 
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
     void connectToLocalSystem(
@@ -100,6 +116,9 @@ public slots:
 
     void createAccount();
 
+    void forceActiveFocus();
+
+
 public slots:
     QColor getPaletteColor(const QString& group, int index);
 
@@ -116,7 +135,7 @@ signals:
 
     void isLoggedInToCloudChanged();
 
-    void isOfflineConnectionChanged();
+    void isCloudEnabledChanged();
 
     void pageSizeChanged();
 
@@ -127,6 +146,10 @@ signals:
     void resetAutoLogin();
 
     void globalPreloaderVisibleChanged();
+
+    void messageChanged();
+
+    void openTile(const QString& systemId);
 
 private:
     void connectToSystemInternal(
@@ -140,8 +163,6 @@ private:
 private:
     void showScreen();
 
-    void enableScreen();
-
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;
 
@@ -154,6 +175,9 @@ private:
     bool m_visible;
     QString m_connectingSystemName;
     const QnGenericPalette m_palette;
+    QQuickView* m_quickView;
     const WidgetPtr m_widget;
     QSize m_pageSize;
+    QString m_message;
+    QnAppInfo* m_appInfo;
 };

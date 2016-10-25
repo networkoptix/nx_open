@@ -6,6 +6,7 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
+#include <VersionHelpers.h>
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
 
@@ -550,16 +551,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
         throw HardwareIdError(os.str());
     }
 
-    OSVERSIONINFOEX osvi;
-    ZeroMemory(&osvi, sizeof(osvi));
-    osvi.dwOSVersionInfoSize = sizeof(osvi);
-
-    bool vistaOrLater = false;
-
-    if (GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osvi)))
-    {
-        vistaOrLater = osvi.dwMajorVersion >= 6;
-    }
+    bool vistaOrLater = IsWindowsVistaOrGreater();
 
     // Find disabled NICs
     std::vector<_bstr_t> paths;

@@ -52,7 +52,7 @@ void processHttpResponse(
     OutputData outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
     if (!success)
     {
-        handler(SystemError::noError, response, OutputData());
+        handler(SystemError::invalidData, response, OutputData());
         return;
     }
 
@@ -83,7 +83,7 @@ public:
     //!Implementation of QnStoppableAsync::pleaseStopAsync
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
-        m_httpClient->terminate();
+        m_httpClient->pleaseStopSync();
         handler();
     }
 
@@ -113,7 +113,8 @@ private:
 //!HTTP client that uses \a fusion to serialize/deserialize input/output data
 /*!
     If output data is expected, then only GET request can be used.
-    Input data in this case is serialized to the url by calling \a serializeToUrlQuery(InputData, QUrlQuery*)
+    Input data in this case is serialized to the url by calling \a serializeToUrlQuery(InputData, QUrlQuery*).
+    \note Reports \a SystemError::invalidData on failure to parse response
 */
 template<typename InputData, typename OutputData>
 class FusionDataHttpClient

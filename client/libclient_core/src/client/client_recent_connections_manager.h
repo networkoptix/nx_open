@@ -4,10 +4,10 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
+#include <client_core/local_connection_data.h>
 
-#include <client_core/user_recent_connection_data.h>
-
-class QnRecentUserConnectionsModel;
+class QnRecentLocalConnectionsModel;
 
 class QnClientRecentConnectionsManager: public QObject, public Singleton<QnClientRecentConnectionsManager>
 {
@@ -18,18 +18,18 @@ public:
     QnClientRecentConnectionsManager();
     virtual ~QnClientRecentConnectionsManager();
 
-    void addModel(QnRecentUserConnectionsModel* model);
-    void removeModel(QnRecentUserConnectionsModel* model);
+    void addModel(QnRecentLocalConnectionsModel* model);
+    void removeModel(QnRecentLocalConnectionsModel* model);
 
 private:
-    void updateModelBinding(QnRecentUserConnectionsModel* model);
+    void updateModelBinding(QnRecentLocalConnectionsModel* model);
     void updateModelsData();
 
 private:
-    using QnRecentUserConnectionsModelPtr = QPointer<QnRecentUserConnectionsModel>;
-    using DataCache = QHash<QString, QnUserRecentConnectionDataList>;
+    using QnrecentLocalConnectionsModelPtr = QPointer<QnRecentLocalConnectionsModel>;
+    using DataCache = QHash<QnUuid, QnLocalConnectionDataList>;
 
-    QList<QnRecentUserConnectionsModelPtr> m_models;
+    QList<QnrecentLocalConnectionsModelPtr> m_models;
     DataCache m_dataCache;
     bool m_updating;
 };

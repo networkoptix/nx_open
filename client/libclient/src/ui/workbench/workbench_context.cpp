@@ -21,6 +21,7 @@
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
+#include <ui/workbench/workbench_welcome_screen.h>
 
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
@@ -240,7 +241,6 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
             }
             case SystemUri::ClientCommand::ConnectToSystem:
             {
-                SystemUri::Auth auth = startupParams.customUri.authenticator();
                 QString systemId = startupParams.customUri.systemId();
                 bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
@@ -250,6 +250,13 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
 
                 if (systemIsCloud)
                     qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
+
+                const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+                const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+
+                // Force to show preloader in case of connection caused by link
+                resourceModeAction->setChecked(false); //< Shows welcome screen
+                welcomeScreen->setGlobalPreloaderVisible(true);
 
                 menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, systemUrl));
                 break;

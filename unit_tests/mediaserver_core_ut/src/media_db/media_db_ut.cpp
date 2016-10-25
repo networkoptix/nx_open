@@ -818,6 +818,10 @@ TEST(MediaDbTest, StorageDB)
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
+#ifdef Q_OS_LINUX
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+#endif
+
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
         statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
@@ -833,7 +837,7 @@ TEST(MediaDbTest, StorageDB)
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource);
     storage->setUrl(workDirPath);
-    result = storage->initOrUpdate();
+    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
 
     QnStorageDb sdb(storage, 1);
@@ -913,8 +917,8 @@ TEST(MediaDbTest, StorageDB)
          catalogIt != dbChunkCatalogs.cend();
          ++catalogIt)
     {
-        for (auto chunkIt = (*catalogIt)->getChunks().cbegin();
-             chunkIt != (*catalogIt)->getChunks().cend();
+        for (auto chunkIt = (*catalogIt)->getChunksUnsafe().cbegin();
+             chunkIt != (*catalogIt)->getChunksUnsafe().cend();
              ++chunkIt)
         {
             TestChunkManager::TestChunkCont::iterator tcmIt = 
@@ -1022,7 +1026,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
         {
             QSqlQuery query(*sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
-            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunks().at(j);
+            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunksUnsafe().at(j);
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
             query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
@@ -1039,7 +1043,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource);
     storage->setUrl(workDirPath);
-    result = storage->initOrUpdate();
+    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
 
     auto connectionName = sqlDb->connectionName();
@@ -1057,7 +1061,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
         {
             sdb->addRecord(referenceCatalogs[i]->cameraUniqueId(),
                            referenceCatalogs[i]->getCatalog(),
-                           referenceCatalogs[i]->getChunks().at(j));
+                           referenceCatalogs[i]->getChunksUnsafe().at(j));
         }
     }
 
@@ -1071,7 +1075,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
                                      { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() && 
                                               c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
-        ASSERT_TRUE((*mergedIt)->getChunks() == referenceCatalogs[i]->getChunks());
+        ASSERT_TRUE((*mergedIt)->getChunksUnsafe() == referenceCatalogs[i]->getChunksUnsafe());
     }
 }
 

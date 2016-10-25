@@ -36,9 +36,6 @@ protected:
     virtual void setReadOnlyInternal() override;
 
 private:
-    void updateCamerasButton();
-
-private:
     QScopedPointer<Ui::BackupSettingsDialog> ui;
     QnServerBackupSchedule m_schedule;
     QnVirtualCameraResourceList m_camerasToBackup;

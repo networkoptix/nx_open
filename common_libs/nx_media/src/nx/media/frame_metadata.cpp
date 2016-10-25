@@ -15,7 +15,8 @@ FrameMetadata::FrameMetadata():
     flags(QnAbstractMediaData::MediaFlags_None),
     noDelay(false),
     frameNum(kNotInitialized),
-    sar(1.0)
+    sar(1.0),
+    videoChannel(0)
 {
 }
 
@@ -23,6 +24,7 @@ FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
     FrameMetadata()
 {
     flags = frame->flags;
+    videoChannel = frame->channelNumber;
 }
 
 void FrameMetadata::serialize(const QVideoFramePtr& frame) const

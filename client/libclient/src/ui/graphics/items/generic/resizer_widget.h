@@ -11,6 +11,9 @@ public:
 
     void setEnabled(bool enabled);
 
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
 private:
     Qt::Orientation m_orientation;
 };

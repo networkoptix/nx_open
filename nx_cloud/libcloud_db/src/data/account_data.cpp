@@ -50,6 +50,10 @@ bool AccountUpdateData::getAsVariant(int /*resID*/, QVariant* const /*value*/) c
 }
 
 
+AccountUpdateDataWithEmail::AccountUpdateDataWithEmail()
+{
+}
+
 AccountUpdateDataWithEmail::AccountUpdateDataWithEmail(AccountUpdateData&& rhs)
 :
     AccountUpdateData(std::move(rhs))

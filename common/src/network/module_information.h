@@ -8,7 +8,6 @@
 #include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-
 struct QnModuleInformation
 {
     QString type;
@@ -29,6 +28,7 @@ struct QnModuleInformation
     QString cloudSystemId;
     QString cloudPortalUrl;
     QString cloudHost;
+    QnUuid localSystemId;
 
     QnModuleInformation();
 
@@ -38,6 +38,7 @@ struct QnModuleInformation
     static QString nxMediaServerId();
     static QString nxECId();
     static QString nxClientId();
+
 };
 
 struct QnModuleInformationWithAddresses : QnModuleInformation
@@ -51,7 +52,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation
 
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation) \
     (systemName)(name)(port)(id)(sslAllowed)(protoVersion)(runtimeId) \
-    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(cloudHost)(brand)
+    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(cloudHost)(brand)(localSystemId)
 
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 

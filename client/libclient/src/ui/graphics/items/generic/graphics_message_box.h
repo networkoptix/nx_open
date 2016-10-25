@@ -10,17 +10,21 @@
 #include <ui/animation/animated.h>
 #include <ui/customization/customized.h>
 
+#include <nx/utils/singleton.h>
+
 class GraphicsLabel;
 
-// TODO: #Elric rename, not standard item => no "graphics" prefix?
-
-class QnGraphicsMessageBoxItem: public GraphicsWidget {
+class QnGraphicsMessageBoxHolder:
+    public GraphicsWidget,
+    public Singleton<QnGraphicsMessageBoxHolder>
+{
     Q_OBJECT
-    typedef GraphicsWidget base_type;
+
+    using base_type = GraphicsWidget;
 
 public:
-    explicit QnGraphicsMessageBoxItem(QGraphicsItem *parent = NULL);
-    virtual ~QnGraphicsMessageBoxItem();
+    explicit QnGraphicsMessageBoxHolder(QGraphicsItem *parent = NULL);
+    virtual ~QnGraphicsMessageBoxHolder();
     virtual QRectF boundingRect() const override;
 
     void addItem(QGraphicsLayoutItem* item);
@@ -34,15 +38,17 @@ private:
 };
 
 
-class QnGraphicsMessageBox : public Customized<Animated<QnFramedWidget>> {
+class QnGraphicsMessageBox: public Customized<Animated<QnFramedWidget>>
+{
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(QnGraphicsMessageBoxColors colors READ colors WRITE setColors)
 
-    typedef Customized<Animated<QnFramedWidget>> base_type;
+    using base_type = Customized<Animated<QnFramedWidget>>;
 
 public:
-    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0, int fontSize = 0);
+    explicit QnGraphicsMessageBox(QGraphicsItem *parent = nullptr,
+        const QString &text = QString(), int timeoutMsec = 0);
     ~QnGraphicsMessageBox();
 
     QString text() const;
@@ -53,17 +59,17 @@ public:
 
     int timeout() const;
 
-    static QnGraphicsMessageBox* information(const QString &text, int timeoutMsec = 0, int fontSize = 0);
-    static QnGraphicsMessageBox* informationTicking(const QString &text, int timeoutMsec = 0, int fontSize = 0);
+    static QnGraphicsMessageBox* information(const QString &text, int timeoutMsec = 0);
 
-public slots:
+public:
+    void showAnimated();
+    void hideAnimated();
     void hideImmideately();
 
 signals:
     void finished();
-    void tick(int time);
 
-private slots:
+private:
     void at_animationIn_finished();
 
 private:

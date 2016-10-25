@@ -30,7 +30,10 @@ FocusScope
     onActiveFocusChanged:
     {
         if (activeFocus)
+        {
             textField.forceActiveFocus();
+            textField.selectAll();
+        }
     }
 
     height: Math.max(leftControlLoader.height, textField.height, rightControlLoader.height);

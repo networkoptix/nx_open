@@ -4,6 +4,7 @@
 #include <map>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -26,7 +27,9 @@ class Ec2DirectConnectionFactory:
     public QnJoinable
 {
 public:
-    Ec2DirectConnectionFactory(Qn::PeerType peerType);
+    Ec2DirectConnectionFactory(
+        Qn::PeerType peerType,
+        nx::utils::TimerManager* const timerManager);
     virtual ~Ec2DirectConnectionFactory();
 
     virtual void pleaseStop() override;
@@ -72,6 +75,8 @@ private:
     int establishConnectionToRemoteServer(
         const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo);
 
+    void tryConnectToOldEC(const QUrl& ecUrl, impl::ConnectHandlerPtr handler, int reqId);
+
     template<class Handler>
     void connectToOldEC(const QUrl& ecURL, Handler completionFunc);
 
@@ -105,7 +110,7 @@ private:
 
     int testDirectConnection(const QUrl& addr, impl::TestConnectionHandlerPtr handler);
     int testRemoteConnection(const QUrl& addr, impl::TestConnectionHandlerPtr handler);
-    ErrorCode getSettings(nullptr_t, ApiResourceParamDataList* const outData);
+    ErrorCode getSettings(nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData&);
 
     template<class InputDataType>
     void regUpdate(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,
@@ -123,7 +128,7 @@ private:
     void regFunctor(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*)> handler,
+        std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler,
         Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
 
     template<class InputType, class OutputType>

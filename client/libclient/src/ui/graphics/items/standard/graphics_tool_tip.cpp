@@ -140,6 +140,8 @@ void GraphicsToolTipLabel::hideTip()
 
 void GraphicsToolTipLabel::hideTipImmediately()
 {
+    if (qFuzzyEquals(opacity(), 0.0))
+        return;
     opacityAnimator(this, 6.0)->animateTo(0.0);
 }
 

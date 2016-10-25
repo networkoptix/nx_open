@@ -48,9 +48,11 @@ void EventConnection::setProxyCredentials(const std::string& login, const std::s
     m_auth.proxyPassword = QString::fromStdString(password);
 }
 
-void EventConnection::setProxyVia(const SocketAddress& proxyEndpoint)
+void EventConnection::setProxyVia(
+    const std::string& proxyHost,
+    std::uint16_t proxyPort)
 {
-    m_auth.proxyEndpoint = proxyEndpoint;
+    m_auth.proxyEndpoint = SocketAddress(proxyHost.c_str(), proxyPort);
 }
 
 EventConnection::~EventConnection()

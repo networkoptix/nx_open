@@ -10,6 +10,7 @@ Pane
     id: control
 
     property alias systemId: informationBlock.systemId
+    property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
     property alias online: informationBlock.online
@@ -27,10 +28,10 @@ Pane
         id: hostsModel
         systemId: control.systemId
     }
-    QnRecentUserConnectionsModel
+    QnRecentLocalConnectionsModel
     {
         id: connectionsModel
-        systemName: control.systemName
+        systemId: control.localId
     }
 
     background: Rectangle
@@ -59,7 +60,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: hostsModel.firstHost
+        address: LoginUtils.extractHost(hostsModel.firstHost)
         user: connectionsModel.firstUser
     }
 
@@ -92,11 +93,10 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(LoginUtils.makeUrl(
+                connectionManager.connectToServer(
                     hostsModel.firstHost,
                     cloudStatusWatcher.cloudLogin(),
-                    cloudStatusWatcher.cloudPassword(),
-                    true))
+                    cloudStatusWatcher.cloudPassword())
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -104,10 +104,10 @@ Pane
         {
             if (connectionsModel.hasConnections)
             {
-                connectionManager.connectToServer(LoginUtils.makeUrl(
-                    informationBlock.address,
-                    informationBlock.user,
-                    connectionsModel.getData("password", 0)))
+                connectionManager.connectToServer(
+                    hostsModel.firstHost,
+                    connectionsModel.firstUser,
+                    connectionsModel.getData("password", 0))
                 Workflow.openResourcesScreen(systemName)
             }
             else

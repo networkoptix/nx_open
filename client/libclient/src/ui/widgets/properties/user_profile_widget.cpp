@@ -7,10 +7,9 @@
 #include <client_core/client_core_settings.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
-#include <core/resource/user_resource.h>
+#include <core/resource_management/user_roles_manager.h>
 
-#include <helpers/cloud_url_helper.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
@@ -24,7 +23,7 @@
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/email/email.h>
-#include <utils/common/html.h>
+
 #include <utils/common/url.h>
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
@@ -45,13 +44,6 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
-
-    using nx::vms::utils::SystemUri;
-    QnCloudUrlHelper urlHelper(
-        SystemUri::ReferralSource::DesktopClient,
-        SystemUri::ReferralContext::SettingsDialog);
-
-    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."), urlHelper.accountManagementUrl()));
 
     connect(ui->nameInputField, &QnInputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
@@ -86,6 +78,23 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         ui->permissionsSpacerLabel,
         ui->emailInputField
     });
+
+    //TODO: #GDM move this to style helper or stacked widget subclass
+    auto stackedWidgetCurrentChanged =
+        [this](int index)
+        {
+            auto stackedWidget = static_cast<QStackedWidget*>(sender());
+            for (int i = 0; i < stackedWidget->count(); ++i)
+            {
+                auto policy = i == index ? QSizePolicy::Maximum : QSizePolicy::Ignored;
+                stackedWidget->widget(i)->setSizePolicy(QSizePolicy::Expanding, policy);
+                stackedWidget->widget(i)->adjustSize();
+            }
+
+            stackedWidget->adjustSize();
+        };
+
+    connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, stackedWidgetCurrentChanged);
 }
 
 QnUserProfileWidget::~QnUserProfileWidget()
@@ -122,12 +131,22 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->nameInputField->setText(m_model->user()->fullName());
-    ui->groupInputField->setText(qnResourceAccessManager->userRoleName(m_model->user()));
+    ui->groupInputField->setText(qnUserRolesManager->userRoleName(m_model->user()));
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
 
-    ui->manageAccountLabel->setVisible(m_model->mode() == QnUserSettingsModel::OwnProfile
-        && m_model->user()->isCloud());
+    ui->stackedWidget->setCurrentWidget(m_model->user()->isCloud()
+        ? ui->cloudUserPage
+        : ui->localUserPage
+    );
+    ui->cloudPanelWidget->setEnabled(m_model->user()->isEnabled());
+    ui->cloudPanelWidget->setEmail(m_model->user()->getEmail());
+    ui->cloudPanelWidget->setFullName(m_model->user()->fullName());
+
+    auto options = m_model->mode() == QnUserSettingsModel::OwnProfile
+        ? QnCloudUserPanelWidget::ShowManageLinkOption
+        : QnCloudUserPanelWidget::NoOptions;
+    ui->cloudPanelWidget->setOptions(options);
 }
 
 void QnUserProfileWidget::updatePermissionsLabel(const QString& text)
@@ -158,15 +177,15 @@ void QnUserProfileWidget::applyChanges()
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
-            auto connections = qnClientCoreSettings->recentUserConnections();
+            auto connections = qnClientCoreSettings->recentLocalConnections();
             if (!connections.isEmpty() &&
-                !connections.first().url.password().isEmpty() &&
+                !connections.first().password.isEmpty() &&
                 qnUrlEqual(connections.first().url, url))
             {
                 auto current = connections.takeFirst();
-                current.url = url;
+                current.password.setValue(m_newPassword);
                 connections.prepend(current);
-                qnClientCoreSettings->setRecentUserConnections(connections);
+                qnClientCoreSettings->setRecentLocalConnections(connections);
             }
 
             auto lastUsed = qnSettings->lastUsedConnection();

@@ -421,6 +421,81 @@ int QnFfmpegHelper::audioSampleSize(AVCodecContext* ctx)
     return ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt);
 }
 
+AVSampleFormat QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(const QnAudioFormat& format)
+{
+    auto qtSampleType = format.sampleType();
+    auto sampleSizeInBits = format.sampleSize();
+
+    if (qtSampleType == QnAudioFormat::SignedInt)
+    {
+        if (sampleSizeInBits == 16)
+            return AV_SAMPLE_FMT_S16;
+        if (sampleSizeInBits == 32)
+            return AV_SAMPLE_FMT_S32;
+    }
+
+    if (qtSampleType == QnAudioFormat::UnSignedInt)
+    {
+        if (sampleSizeInBits == 8)
+            return AV_SAMPLE_FMT_U8;
+    }
+
+    if (qtSampleType == QnAudioFormat::Float)
+    {
+        if (sampleSizeInBits == 32)
+            return AV_SAMPLE_FMT_FLT;
+        if (sampleSizeInBits == 64)
+            return AV_SAMPLE_FMT_DBL;
+    }
+
+    return AV_SAMPLE_FMT_NONE;
+}
+
+AVCodecID QnFfmpegHelper::fromQtAudioFormatToFfmpegPcmCodec(const QnAudioFormat& format)
+{
+    auto qtCodec = format.codec().toLower();
+    auto qtEndianness = format.byteOrder();
+
+    if (qtCodec == lit("audio/pcm") || qtCodec == lit("pcm"))
+    {
+        auto sampleFormat = fromQtAudioFormatToFfmpegSampleType(format);
+
+        switch (sampleFormat)
+        {
+            case AV_SAMPLE_FMT_S16:
+            {
+                if (qtEndianness == QnAudioFormat::BigEndian)
+                    return AV_CODEC_ID_PCM_S16BE;
+                return AV_CODEC_ID_PCM_S16LE;
+            }
+            case AV_SAMPLE_FMT_S32:
+            {
+                if (qtEndianness == QnAudioFormat::BigEndian)
+                    return AV_CODEC_ID_PCM_S32BE;
+                return AV_CODEC_ID_PCM_S32LE;
+            }
+            case AV_SAMPLE_FMT_U8:
+            {
+                return AV_CODEC_ID_PCM_U8;
+            }
+            case AV_SAMPLE_FMT_FLT:
+            {
+                if (qtEndianness == QnAudioFormat::BigEndian)
+                    return AV_CODEC_ID_PCM_F32BE;
+                return AV_CODEC_ID_PCM_F32LE;
+            }
+            case AV_SAMPLE_FMT_DBL:
+            {
+                if (qtEndianness == QnAudioFormat::BigEndian)
+                    return AV_CODEC_ID_PCM_F64BE;
+                return AV_CODEC_ID_PCM_F64LE;
+            }
+        }
+    }
+
+    return  AV_CODEC_ID_NONE;
+}
+
 QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
     m_swr(swr_alloc())
 {

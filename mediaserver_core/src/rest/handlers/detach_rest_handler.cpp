@@ -19,12 +19,6 @@
 #include <utils/common/app_info.h>
 #include <api/model/detach_from_cloud_reply.h>
 
-namespace {
-
-static const QString kDefaultAdminPassword = "admin";
-
-} // namespace
-
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     CloudConnectionManager* const cloudConnectionManager)
     :
@@ -84,7 +78,7 @@ int QnDetachFromCloudRestHandler::execute(
 
     // Second, updating data in cloud.
     api::ResultCode cdbResultCode = api::ResultCode::ok;
-    auto systemId = qnGlobalSettings->cloudSystemID();
+    auto systemId = qnGlobalSettings->cloudSystemId();
     auto authKey = qnGlobalSettings->cloudAuthKey();
     auto cloudConnection = m_cloudConnectionManager->getCloudConnection(systemId, authKey);
     std::tie(cdbResultCode) = makeSyncCall<api::ResultCode>(

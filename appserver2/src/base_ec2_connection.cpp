@@ -328,13 +328,10 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
 {
     const int reqID = generateRequestID();
 
-    QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::restoreDatabase);
-    tran.isLocal = true;
-    tran.params = data;
-
     using namespace std::placeholders;
     m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
-        tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1));
+        ApiCommand::restoreDatabase, data,
+        std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1));
 
     return reqID;
 }
@@ -369,14 +366,16 @@ void BaseEc2Connection<QueryProcessorType>::sendRuntimeData(const ApiRuntimeData
 }
 
 template<class QueryProcessorType>
-qint64 BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const
+Timestamp BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const
 {
-    return transactionLog ? transactionLog->getTransactionLogTime() : -1;
+    NX_ASSERT(transactionLog);
+    return transactionLog ? transactionLog->getTransactionLogTime() : Timestamp();
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(qint64 value)
+void BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(Timestamp value)
 {
+    NX_ASSERT(transactionLog);
     if (transactionLog)
         transactionLog->setTransactionLogTime(value);
 }

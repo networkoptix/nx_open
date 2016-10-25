@@ -32,9 +32,10 @@
 
 #include <utils/common/joinable.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
-#include <nx/network/time/multiple_internet_time_fetcher.h>
 
 #include "database/db_manager.h"
 #include "ec2_thread_pool.h"
@@ -93,8 +94,8 @@ namespace ec2
             ApiMiscData(USED_TIME_PRIORITY_KEY_PARAM_NAME,
                 QByteArray::number(syncTimeKey.toUInt64())));
 
-        deltaTran.isLocal = true;
-        priorityTran.isLocal = true;
+        deltaTran.transactionType = TransactionType::Local;
+        priorityTran.transactionType = TransactionType::Local;
 
         transactionLog->fillPersistentInfo(deltaTran);
         transactionLog->fillPersistentInfo(priorityTran);
@@ -262,7 +263,8 @@ namespace ec2
     static const size_t MILLIS_PER_SEC = 1000;
     static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
-    static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
+    // Requesting same server twice to greatly reduce chance of receiving corrupted time value
+    static const char* RFC868_SERVERS[] = { "instance1.rfc868server.com", "instance1.rfc868server.com"/*, "time1.ucla.edu"*/ };
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;
@@ -308,7 +310,9 @@ namespace ec2
     static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SEC,
         "Check INTERNET_SYNC_TIME_PERIOD_SEC and MAX_INTERNET_SYNC_TIME_PERIOD_SEC" );
 
-    TimeSynchronizationManager::TimeSynchronizationManager( Qn::PeerType peerType )
+    TimeSynchronizationManager::TimeSynchronizationManager(
+        Qn::PeerType peerType,
+        nx::utils::TimerManager* const timerManager)
     :
         m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
         m_broadcastSysTimeTaskID( 0 ),
@@ -317,6 +321,7 @@ namespace ec2
         m_checkSystemTimeTaskID( 0 ),
         m_terminated( false ),
         m_peerType( peerType ),
+        m_timerManager(timerManager),
         m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
         m_timeSynchronized( false ),
         m_internetSynchronizationFailureCount( 0 )
@@ -352,21 +357,20 @@ namespace ec2
         }
 
         if( broadcastSysTimeTaskID )
-            nx::utils::TimerManager::instance()->joinAndDeleteTimer( broadcastSysTimeTaskID );
+            m_timerManager->joinAndDeleteTimer( broadcastSysTimeTaskID );
 
         if( manualTimerServerSelectionCheckTaskID )
-            nx::utils::TimerManager::instance()->joinAndDeleteTimer( manualTimerServerSelectionCheckTaskID );
+            m_timerManager->joinAndDeleteTimer( manualTimerServerSelectionCheckTaskID );
 
         if( internetSynchronizationTaskID )
-            nx::utils::TimerManager::instance()->joinAndDeleteTimer( internetSynchronizationTaskID );
+            m_timerManager->joinAndDeleteTimer( internetSynchronizationTaskID );
 
         if( checkSystemTimeTaskID )
-            nx::utils::TimerManager::instance()->joinAndDeleteTimer( checkSystemTimeTaskID );
+            m_timerManager->joinAndDeleteTimer( checkSystemTimeTaskID );
 
         if( m_timeSynchronizer )
         {
-            m_timeSynchronizer->pleaseStop();
-            m_timeSynchronizer->join();
+            m_timeSynchronizer->pleaseStopSync();
             m_timeSynchronizer.reset();
         }
     }
@@ -409,23 +413,17 @@ namespace ec2
             using namespace std::placeholders;
             if( m_peerType == Qn::PT_Server )
             {
-                m_broadcastSysTimeTaskID = nx::utils::TimerManager::instance()->addTimer(
+                m_broadcastSysTimeTaskID = m_timerManager->addTimer(
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     std::chrono::milliseconds::zero());
-                std::unique_ptr<MultipleInternetTimeFetcher> multiFetcher( new MultipleInternetTimeFetcher() );
-
-                for(const char* timeServer: RFC868_SERVERS)
-                    multiFetcher->addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher>(
-                        new TimeProtocolClient(QLatin1String(timeServer))));
-                m_timeSynchronizer = std::move( multiFetcher );
                 addInternetTimeSynchronizationTask();
 
-                m_checkSystemTimeTaskID = nx::utils::TimerManager::instance()->addTimer(
+                m_checkSystemTimeTaskID = m_timerManager->addTimer(
                     std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
                     std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
             }
             else
-                m_manualTimerServerSelectionCheckTaskID = nx::utils::TimerManager::instance()->addTimer(
+                m_manualTimerServerSelectionCheckTaskID = m_timerManager->addTimer(
                     std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
                     std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
         }
@@ -466,7 +464,12 @@ namespace ec2
         return result;
     }
 
-    void TimeSynchronizationManager::primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran )
+    void TimeSynchronizationManager::onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran)
+    {
+        primaryTimeServerChanged(tran.params.id);
+    }
+
+    void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serverId)
     {
         quint64 localTimePriorityBak = 0;
         quint64 newLocalTimePriority = 0;
@@ -476,9 +479,9 @@ namespace ec2
             localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
             NX_LOGX( lit("Received primary time server change transaction. new peer %1, local peer %2").
-                arg( tran.params.id.toString() ).arg( qnCommon->moduleGUID().toString() ), cl_logDEBUG1 );
+                arg(serverId.id.toString() ).arg( qnCommon->moduleGUID().toString() ), cl_logDEBUG1 );
 
-            if( tran.params.id == qnCommon->moduleGUID() )
+            if(serverId.id == qnCommon->moduleGUID() )
             {
                 //local peer is selected by user as primary time server
                 const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
@@ -594,7 +597,7 @@ namespace ec2
         if (!m_terminated)
         {
             if (m_broadcastSysTimeTaskID)
-                nx::utils::TimerManager::instance()->modifyTimerDelay(
+                m_timerManager->modifyTimerDelay(
                     m_broadcastSysTimeTaskID, std::chrono::milliseconds::zero());
         }
     }
@@ -740,9 +743,12 @@ namespace ec2
         syncTimeWithAllKnownServers(lock);
     }
 
-    void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransport* transport )
+    void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransportBase* transport )
     {
         using namespace std::placeholders;
+
+        if (transport->remotePeer().peerType != Qn::PT_Server)
+            return;
 
         if( transport->isIncoming() )
         {
@@ -790,9 +796,11 @@ namespace ec2
             return; //already exists
         PeerContext& ctx = iterResultPair.first->second;
         //adding periodic task
-        ctx.syncTimerID = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
-            std::chrono::milliseconds::zero());    //performing initial synchronization immediately
+        ctx.syncTimerID = nx::utils::TimerManager::TimerGuard(
+            m_timerManager,
+            m_timerManager->addTimer(
+                std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
+                std::chrono::milliseconds::zero()));    //performing initial synchronization immediately
     }
 
     void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& peerID )
@@ -824,9 +832,12 @@ namespace ec2
 
         if (!QnGlobalSettings::instance()->isTimeSynchronizationEnabled())
         {
-            peerIter->second.syncTimerID = nx::utils::TimerManager::instance()->addTimer(
-                std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
-                std::chrono::milliseconds(TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC));
+            peerIter->second.syncTimerID = 
+                nx::utils::TimerManager::TimerGuard(
+                    m_timerManager,
+                    m_timerManager->addTimer(
+                        std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
+                        std::chrono::milliseconds(TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC)));
             return;
         }
 
@@ -923,9 +934,12 @@ namespace ec2
         //scheduling next synchronization
         if( m_terminated )
             return;
-        peerIter->second.syncTimerID = nx::utils::TimerManager::instance()->addTimer(
-            std::bind( &TimeSynchronizationManager::synchronizeWithPeer, this, peerID ),
-            std::chrono::milliseconds(TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC));
+        peerIter->second.syncTimerID = 
+            nx::utils::TimerManager::TimerGuard(
+                m_timerManager,
+                m_timerManager->addTimer(
+                    std::bind( &TimeSynchronizationManager::synchronizeWithPeer, this, peerID ),
+                    std::chrono::milliseconds(TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC)));
     }
 
     void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
@@ -936,7 +950,7 @@ namespace ec2
                 return;
 
             using namespace std::placeholders;
-            m_broadcastSysTimeTaskID = nx::utils::TimerManager::instance()->addTimer(
+            m_broadcastSysTimeTaskID = m_timerManager->addTimer(
                 std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                 std::chrono::milliseconds(LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS));
         }
@@ -968,7 +982,7 @@ namespace ec2
             return;
 
         using namespace std::placeholders;
-        m_manualTimerServerSelectionCheckTaskID = nx::utils::TimerManager::instance()->addTimer(
+        m_manualTimerServerSelectionCheckTaskID = m_timerManager->addTimer(
             std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
             std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
 
@@ -1012,10 +1026,22 @@ namespace ec2
 
         //synchronizing with some internet server
         using namespace std::placeholders;
+        if (m_timeSynchronizer)
+        {
+            m_timeSynchronizer->pleaseStopSync(false);
+            m_timeSynchronizer.reset();
+        }
+
+        auto multiFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
+        for (const char* timeServer : RFC868_SERVERS)
+            multiFetcher->addTimeFetcher(
+                std::make_unique<nx::network::TimeProtocolClient>(
+                    QLatin1String(timeServer)));
+        m_timeSynchronizer = std::move(multiFetcher);
         m_timeSynchronizer->getTimeAsync(
             std::bind(
                 &TimeSynchronizationManager::onTimeFetchingDone,
-                this, _1, _2 ) );
+                this, _1, _2));
     }
 
     void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
@@ -1096,7 +1122,7 @@ namespace ec2
             return;
 
         using namespace std::placeholders;
-        m_internetSynchronizationTaskID = nx::utils::TimerManager::instance()->addTimer(
+        m_internetSynchronizationTaskID = m_timerManager->addTimer(
             std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
             std::chrono::milliseconds(m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC));
         NX_LOGX( lit( "Added internet time sync task %1, delay %2" ).
@@ -1231,14 +1257,14 @@ namespace ec2
     {
         for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
         {
-            nx::utils::TimerManager::instance()->modifyTimerDelay(
+            m_timerManager->modifyTimerDelay(
                 peerCtx.second.syncTimerID.get(),
                 std::chrono::milliseconds::zero());
         }
     }
 
     void TimeSynchronizationManager::onBeforeSendingTransaction(
-        QnTransactionTransport* /*transport*/,
+        QnTransactionTransportBase* /*transport*/,
         nx_http::HttpHeaders* const headers)
     {
         headers->emplace(
@@ -1247,7 +1273,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::onTransactionReceived(
-        QnTransactionTransport* /*transport*/,
+        QnTransactionTransportBase* /*transport*/,
         const nx_http::HttpHeaders& headers)
     {
         for (auto header : headers)
@@ -1310,7 +1336,7 @@ namespace ec2
         QnMutexLocker lk(&m_mutex);
         if (m_terminated)
             return;
-        m_checkSystemTimeTaskID = nx::utils::TimerManager::instance()->addTimer(
+        m_checkSystemTimeTaskID = m_timerManager->addTimer(
             std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
             std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
     }
@@ -1324,7 +1350,7 @@ namespace ec2
                     ec2::ApiMiscData(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                         QByteArray::number(m_localTimePriorityKey.toUInt64())));
 
-                localTimeTran.isLocal = true;
+                localTimeTran.transactionType = TransactionType::Local;
                 transactionLog->fillPersistentInfo(localTimeTran);
                 detail::QnDbManager::instance()->executeTransaction(localTimeTran, QByteArray());
             }));

@@ -27,20 +27,15 @@ protected:
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
-    virtual void updateResource(const QnResourcePtr &resource) override;
+    virtual void updateResource(const QnResourcePtr &resource, const QnUuid& peerId) override;
     virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData) override;
 
     virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
     virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
-
-private slots:
-    void at_systemNameChangeRequested(const QString &systemName);
-
 private:
     QnClientConnectionStatus m_status;
     bool m_connected;
     bool m_holdConnection;
-    bool m_waitingForPeerReconnect;
 };
 
 #define qnClientMessageProcessor static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())

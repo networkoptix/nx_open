@@ -83,13 +83,11 @@ private:
     QElapsedTimer m_monotonicClock;
     //!set<pair<username, nonce>, auth_data>
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
-    nx::utils::SubscriptionId m_systemAccessListUpdatedSubscriptionId;
 
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
-        const nx_http::StringType& userName,
-        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
+        const nx_http::StringType& userName) const;
     void fetchAuthorizationFromCloud(
         QnMutexLockerBase* const lk,
         const nx_http::StringType& userid,
@@ -102,10 +100,6 @@ private:
         nx_http::HttpHeaders* const responseHeaders,
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader) const;
-    void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
-    QnUserResourcePtr createCloudUser(
-        const QString& userName,
-        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
 
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);

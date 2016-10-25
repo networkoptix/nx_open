@@ -1,7 +1,7 @@
 import os, sys, subprocess, shutil
 from os.path import dirname, join, exists, isfile
 
-bin_source_dir = '${libdir}/${arch}/bin/${build.configuration}'
+bin_source_dir = '${libdir}/bin/${build.configuration}'
 server_msi_folder = 'bin/msi'
 client_msi_folder = 'bin/msi'
 nxtool_msi_folder = 'bin/msi'
@@ -68,7 +68,7 @@ def get_light_command(folder, msi, suffix):
     command = ['light']
     command.append('-cultures:${installer.language}')
     command.append('-cc')
-    command.append('${libdir}/${arch}/bin/${build.configuration}/cab')
+    command.append('${libdir}/bin/${build.configuration}/cab')
     command.append('-reusecab')
     command.append('-loc')
     command.append('CustomStrings_${installer.language}.wxl')

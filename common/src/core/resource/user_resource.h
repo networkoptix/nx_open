@@ -20,6 +20,8 @@ class QnUserResource : public QnResource
     typedef QnResource base_type;
 
 public:
+    static const QnUuid kAdminGuid;
+
     QnUserResource(QnUserType userType);
     QnUserResource(const QnUserResource& right);
 
@@ -54,8 +56,17 @@ public:
     Qn::GlobalPermissions getRawPermissions() const;
     void setRawPermissions(Qn::GlobalPermissions permissions);
 
+    /**
+     * Owner user has maxumum permissions. Could be local or cloud user
+     */
     bool isOwner() const;
     void setOwner(bool isOwner);
+
+    /**
+     * Predefined local owner.
+     * 'isOwner=true' for 'admin' user and can't be reset. Could be disabled for login. Can't be removed.
+     */
+    bool isBuiltInAdmin() const;
 
     QnUuid userGroup() const;
     void setUserGroup(const QnUuid& group);
@@ -84,16 +95,17 @@ public:
      */
     void fillId();
 signals:
+    void permissionsChanged(const QnUserResourcePtr& user);
+    void userGroupChanged(const QnUserResourcePtr& user);
+    void enabledChanged(const QnUserResourcePtr& user);
+
     void hashChanged(const QnResourcePtr& user);
     void passwordChanged(const QnResourcePtr& user);
     void digestChanged(const QnResourcePtr& user);
     void cryptSha512HashChanged(const QnResourcePtr& user);
-    void permissionsChanged(const QnResourcePtr& user);
-    void userGroupChanged(const QnResourcePtr& user);
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
 	void realmChanged(const QnResourcePtr& user);
-    void enabledChanged(const QnResourcePtr& user);
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;

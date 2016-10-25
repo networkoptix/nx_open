@@ -34,22 +34,6 @@ QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
     return;
 }
 
-void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &version)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_currentVersion = version;
-    }
-}
-
-QnSoftwareVersion QnAppServerConnectionFactory::currentVersion()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_currentVersion;
-    }
-
-    return QnSoftwareVersion();
-}
-
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {

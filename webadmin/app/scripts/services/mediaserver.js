@@ -133,9 +133,9 @@ angular.module('webadminApp')
                 $localStorage.$reset();
                 return $http.post(proxy + '/web/api/cookieLogout');
             },
-            digest:function(login,password,realm,nonce,post){
+            digest:function(login,password,realm,nonce,method){
                 var digest = md5(login + ':' + realm + ':' + password);
-                var method = md5(post?'POST:':'GET:');
+                var method = md5((method||'GET') + ':');
                 var authDigest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
@@ -156,11 +156,15 @@ angular.module('webadminApp')
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
-                        }).then(function(){
+                        }).then(function(data){
+                            if(data.data.error != "0"){
+                                return $q.reject(data.data);
+                            }
                             $localStorage.login = login;
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+                            return data.data.reply;
                         });
                     });
                 }
@@ -247,8 +251,7 @@ angular.module('webadminApp')
                 });
             },
             systemCloudInfo:function(){
-                var deferred = $q.defer();
-                this.getSystemSettings().then(function(data){
+                return this.getSystemSettings().then(function(data){
 
                     var allSettings = data.data;
                     var cloudId = _.find(allSettings, function (setting) {
@@ -257,8 +260,7 @@ angular.module('webadminApp')
                     var cloudSystemID = cloudId ? cloudId.value : '';
 
                     if (cloudSystemID.trim() === '' || cloudSystemID === '{00000000-0000-0000-0000-000000000000}') {
-                        deferred.reject(null);
-                        return;
+                        return $q.reject(null);
                     }
 
                     var cloudAccount = _.find(allSettings, function (setting) {
@@ -266,12 +268,11 @@ angular.module('webadminApp')
                     });
                     cloudAccount = cloudAccount ? cloudAccount.value : '';
 
-                    deferred.resolve({
+                    return{
                         cloudSystemID:cloudSystemID,
                         cloudAccountName: cloudAccount
-                    });
+                    };
                 });
-                return deferred.promise;
             },
             disconnectFromCloud:function(ownerLogin,ownerPassword){
                 var params = ownerPassword ? {
@@ -305,17 +306,8 @@ angular.module('webadminApp')
 
 
             changeSystemName:function(systemName){
-                return wrapPost(proxy + '/web/api/configure', {
-                    wholeSystem: true,
+                return this.systemSettings({
                     systemName: systemName
-                });
-            },
-
-            changeSystem:function(systemName,login,password){
-                return wrapPost(proxy + '/web/api/configure', {
-                    systemName: systemName,
-                    login: login,
-                    password: password
                 });
             },
 
@@ -334,8 +326,8 @@ angular.module('webadminApp')
                     // 2. calculate digest
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
-                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
-                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'POST');
 
                     // 3. pass it to merge request
                     if(url.indexOf('http')!=0){
@@ -354,8 +346,8 @@ angular.module('webadminApp')
                 return self.getNonce(remoteLogin, url).then(function(data) {
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
-                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
-                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'POST');
 
                     if (url.indexOf('http') != 0) {
                         url = 'http://' + url;

@@ -14,9 +14,10 @@ namespace Qn
         // Single-occurrence nodes
         RootNode,               /**< Root node for the tree (current system node). */
         CurrentSystemNode,      /**< Root node, displaying current system name. */
+        CurrentUserNode,        /**< Root node, displaying current user. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
         ServersNode,            /**< Root node for servers for admin user. */
-        UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
+        UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
@@ -30,13 +31,13 @@ namespace Qn
         RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
         AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
         AllLayoutsAccessNode,   /**< Node that represents 'All Shared Layouts' placeholder, displayed under admins. */
-        AccessibleResourcesNode,/**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
-        AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
+        SharedResourcesNode,    /**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
+        SharedLayoutsNode,      /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
 
         // Repeating nodes
         RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        AccessibleResourceNode, /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
+        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
@@ -198,13 +199,9 @@ namespace Qn
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
-        ForceRemoveOldConnectionRole,               /**< Role for flag that shows if we have to remove or clean
-                                                         previous connection to specified system using selected user. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
-                                                         Used in QnActions::ConnectAction. */
-        CompletionWatcherRole,                      /**< Role for guard that calls specified handler after action was processed.
                                                          Used in QnActions::ConnectAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction. */
@@ -231,9 +228,9 @@ namespace Qn
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
-        EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
+        EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
         ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
-        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
+        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
@@ -243,7 +240,6 @@ namespace Qn
 
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
 
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */

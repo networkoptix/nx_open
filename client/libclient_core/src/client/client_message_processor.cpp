@@ -33,30 +33,8 @@ QnClientMessageProcessor::QnClientMessageProcessor()
 
     m_status(),
     m_connected(false),
-    m_holdConnection(false),
-    m_waitingForPeerReconnect(false)
+    m_holdConnection(false)
 {
-    /*
-     * On changing ec2 settings qnTransactionMessageBus reconnects all peers, therefore
-     * disconnecting us from server. After that 'Reconnect' dialog appears and reconnects us.
-     * This leads to unnecessary connectionClosed/connectionOpened sequence and closing
-     * all state-dependent dialogs and notifications.
-     * This workaround depends on fact that qnTransactionMessageBus works in own thread and
-     * connects to ec2ConnectionSettingsChanged via queued connection.
-     */
-    connect(qnGlobalSettings, &QnGlobalSettings::ec2ConnectionSettingsChanged, this, [this]()
-    {
-        //TODO: #gdm #3.0 improve dependency logic
-        if (!m_connected)
-            return;
-
-        if (m_waitingForPeerReconnect)
-            return;
-
-        m_waitingForPeerReconnect = true;
-    });
-
-
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection)
@@ -79,8 +57,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     if (connection)
     {
         trace(lit("Connection established to %1").arg(connection->connectionInfo().ecsGuid));
-        qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
-        //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
+        qnCommon->setRemoteGUID(connection->connectionInfo().serverId());
+        //TODO: #GDM #3.0 in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     }
     else if (m_connected)
     { // double init by null is allowed
@@ -118,8 +96,6 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     base_type::connectToConnection(connection);
-    connect(connection->getMiscNotificationManager(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-        this, &QnClientMessageProcessor::at_systemNameChangeRequested);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -133,7 +109,7 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
 {
     NX_ASSERT(resource);
     /*
@@ -161,7 +137,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     resource->addFlags(Qn::remote);
     resource->removeFlags(Qn::local);
 
-    QnCommonMessageProcessor::updateResource(resource);
+    QnCommonMessageProcessor::updateResource(resource, peerId);
     if (!ownResource)
     {
         qnResPool->addResource(resource);
@@ -181,8 +157,11 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
 {
     base_type::handleRemotePeerFound(data);
 
-    /* Avoiding double connectionOpened() if reconnecting while client was on breakpoint */
-    if (m_connected && !m_waitingForPeerReconnect)
+    /*
+     * Avoiding multiple connectionOpened() if client was on breakpoint or
+     * if ec connection settings were changed.
+     */
+    if (m_connected)
         return;
 
     if (qnCommon->remoteGUID().isNull())
@@ -197,11 +176,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     trace(lit("peer found, state -> Connected"));
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
-
-    if (m_waitingForPeerReconnect)
-        m_waitingForPeerReconnect = false;
-    else
-        emit connectionOpened();
+    emit connectionOpened();
 }
 
 void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data)
@@ -222,29 +197,20 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         that were not sent as TransactionMessageBus was stopped. Peer id is the same if we are
         connecting to the same server we are already connected to (and just disconnected).
     */
-    if (m_status.state() == QnConnectionState::Connecting)
+    if (!m_connected)
         return;
 
     trace(lit("peer lost, state -> Reconnecting"));
     m_status.setState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
+    if (auto server = qnCommon->currentServer())
         server->setStatus(Qn::Offline);
 
     m_connected = false;
 
-    if (!m_holdConnection && !m_waitingForPeerReconnect)
+    if (!m_holdConnection)
         emit connectionClosed();
-}
-
-void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName)
-{
-    if (qnCommon->localSystemName() == systemName)
-        return;
-
-    qnCommon->setLocalSystemName(systemName);
 }
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)

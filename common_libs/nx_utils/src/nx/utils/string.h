@@ -1,13 +1,14 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <nx/utils/literal.h>
+#include "literal.h"
+#include "qnbytearrayref.h"
 
 namespace nx {
 namespace utils {
@@ -135,10 +136,31 @@ K, M, G suffix are supported.
 @return On failure returns 0 and (if not null) sets \a *ok to \a false
 */
 NX_UTILS_API uint64_t stringToBytes(const QString& str, bool* isOk = nullptr);
+NX_UTILS_API uint64_t stringToBytes(const QString& str, uint64_t defaultValue);
+NX_UTILS_API uint64_t stringToBytesConst(const char* str);
+
+NX_UTILS_API std::vector<QnByteArrayConstRef> splitQuotedString(
+    const QnByteArrayConstRef& src, char separator=',');
+
+/**
+ * Parses string like "name1=value1,name2=value2,...".
+ */
+NX_UTILS_API QMap<QByteArray, QByteArray> parseNameValuePairs(
+    const QnByteArrayConstRef& serializedData,
+    char separator = ',');
+NX_UTILS_API void parseNameValuePairs(
+    const QnByteArrayConstRef& serializedData,
+    char separator,
+    QMap<QByteArray, QByteArray>* const params);
+
+/**
+ * Serializes dictionary of (name, value) pairs into string like "name1=value1,name2=value2,...".
+ */
+NX_UTILS_API QByteArray serializeNameValuePairs(
+    const QMap<QByteArray, QByteArray>& params);
+NX_UTILS_API void serializeNameValuePairs(
+    const QMap<QByteArray, QByteArray>& params,
+    QByteArray* const dstBuffer);
 
 } // namespace utils
 } // namespace nx
-
-
-
-

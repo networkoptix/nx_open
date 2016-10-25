@@ -33,12 +33,12 @@ void SystemManager::bindSystem(
 }
 
 void SystemManager::unbindSystem(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
         kSystemUnbindPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         completionHandler);
 }
@@ -53,12 +53,12 @@ void SystemManager::getSystems(
 }
 
 void SystemManager::getSystem(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     executeRequest(
         kSystemGetPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
@@ -74,17 +74,6 @@ void SystemManager::shareSystem(
         completionHandler);
 }
 
-void SystemManager::setSystemUserList(
-    api::SystemSharingList sharings,
-    std::function<void(api::ResultCode)> completionHandler)
-{
-    executeRequest(
-        kSystemSetSystemUserListPath,
-        std::move(sharings),
-        completionHandler,
-        completionHandler);
-}
-
 void SystemManager::getCloudUsersOfSystem(
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
@@ -95,39 +84,64 @@ void SystemManager::getCloudUsersOfSystem(
 }
 
 void SystemManager::getCloudUsersOfSystem(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
     executeRequest(
         kSystemGetCloudUsersPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
 void SystemManager::getAccessRoleList(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
 {
     executeRequest(
         kSystemGetAccessRoleListPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemAccessRoleList()));
 }
 
-void SystemManager::updateSystemName(
-    const std::string& systemID,
+void SystemManager::update(
+    const api::SystemAttributesUpdate& updatedData,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest(
+        kSystemUpdatePath,
+        updatedData,
+        completionHandler,
+        completionHandler);
+}
+
+void SystemManager::rename(
+    const std::string& systemId,
     const std::string& systemName,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    api::SystemNameUpdate data;
-    data.id = systemID;
+    api::SystemAttributesUpdate data;
+    data.systemID = systemId;
     data.name = systemName;
 
     executeRequest(
-        kSystemUpdateSystemNamePath,
+        kSystemRenamePath,
         std::move(data),
+        completionHandler,
+        completionHandler);
+}
+
+void SystemManager::recordUserSessionStart(
+    const std::string& systemId,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    api::UserSessionDescriptor userSessionDescriptor;
+    userSessionDescriptor.systemId = systemId;
+
+    executeRequest(
+        kSystemRecordUserSessionStartPath,
+        std::move(userSessionDescriptor),
         completionHandler,
         completionHandler);
 }

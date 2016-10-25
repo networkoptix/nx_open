@@ -43,11 +43,13 @@ EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_
         [&endpointPromise, this](
             nx_http::StatusCode::Value resCode,
             SocketAddress endpoint)
-    {
-        endpointPromise.set_value(resCode);
-        m_notificationModuleEndpoint = std::move(endpoint);
-    });
-    if (endpointFuture.get() != nx_http::StatusCode::ok)
+        {
+            endpointPromise.set_value(resCode);
+            m_notificationModuleEndpoint = std::move(endpoint);
+        });
+    const auto result = endpointFuture.get();
+    endPointFetcher.pleaseStopSync();
+    if (result != nx_http::StatusCode::ok)
         throw std::runtime_error("Failed to find out notification module address");
 }
 
@@ -58,7 +60,7 @@ EMailManager::~EMailManager()
 }
 
 void EMailManager::sendAsync(
-    QByteArray serializedNotification,
+    const AbstractNotification& notification,
     std::function<void(bool)> completionHandler)
 {
     auto asyncOperationLocker = m_startedAsyncCallsCounter.getScopedIncrement();
@@ -85,21 +87,24 @@ void EMailManager::sendAsync(
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         httpClient.get(),
-        [this, asyncOperationLocker, completionHandler](nx_http::AsyncHttpClientPtr client) {
-        onSendNotificationRequestDone(
-            std::move(asyncOperationLocker),
-            std::move(client),
-            std::move(completionHandler));
-    },
+        [this, asyncOperationLocker, completionHandler](
+            nx_http::AsyncHttpClientPtr client)
+        {
+            onSendNotificationRequestDone(
+                std::move(asyncOperationLocker),
+                std::move(client),
+                std::move(completionHandler));
+        },
         Qt::DirectConnection);
     {
         QnMutexLocker lk(&m_mutex);
         m_ongoingRequests.insert(httpClient);
     }
+
     httpClient->doPost(
         url,
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        std::move(serializedNotification));
+        notification.serializeToJson());
 }
 
 void EMailManager::onSendNotificationRequestDone(

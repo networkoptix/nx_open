@@ -780,9 +780,10 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this, time);
 
-    m_dataQueue.lock();
-    markIgnoreBefore(m_dataQueue, time);
-    m_dataQueue.unlock();
+    {
+        auto randomAccess = m_dataQueue.lock();
+        markIgnoreBefore(randomAccess, time);
+    }
     QnMutexLocker lock( &m_timeMutex );
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();
@@ -1055,7 +1056,8 @@ void QnCamDisplay::processNewSpeed(float speed)
         m_eofSignalSended = false;
     }
 
-    if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0))
+    // Speed sign was previously changed. Need unblock blocked resources
+    if (m_executingChangeSpeed)
     {
         //m_dataQueue.clear();
         clearVideoQueue();
@@ -1199,7 +1201,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (speedIsNegative != dataIsNegative)
         return true; // skip data
 
-    if (m_prevSpeed != speed)
+    if (m_prevSpeed != speed || m_executingChangeSpeed)
     {
         processNewSpeed(speed);
         m_prevSpeed = speed;

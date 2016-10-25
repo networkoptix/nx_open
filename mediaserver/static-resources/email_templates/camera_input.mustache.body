@@ -1,0 +1,24 @@
+<h1>Input signal{{#source}} on <b>{{source}}</b>{{/source}}</h1>
+
+<table class="description">
+    <thead>
+        <tr>
+            <th>Input Port</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#aggregated}}
+        <tr>
+            <td>{{inputPort}}</td>
+            <td>{{{timestamp}}}</td>
+        </tr>
+    {{/aggregated}}
+    </tbody>
+</table>
+
+{{#screenshot}}
+    <div class="description">
+        <img alt="Screenshot" src="{{screenshot}}"/>
+    </div>
+{{/screenshot}}

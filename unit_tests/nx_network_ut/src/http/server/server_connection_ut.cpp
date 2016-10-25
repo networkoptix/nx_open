@@ -55,17 +55,13 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::HttpRequestProcessedHandler completionHandler )
     {
         m_timer.start(
             std::chrono::seconds(5),
             [completionHandler = std::move(completionHandler)]
             {
-                completionHandler(
-                    nx_http::StatusCode::ok,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource>());
+                completionHandler(nx_http::StatusCode::ok);
             });
     }
 
@@ -121,16 +117,15 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::HttpRequestProcessedHandler completionHandler )
     {
         response->headers.emplace(
             "Seq",
             nx_http::getHeaderValue( request.headers, "Seq" ) );
         completionHandler(
-            nx_http::StatusCode::ok,
-            std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla"));
+            nx_http::RequestResult(
+                nx_http::StatusCode::ok,
+                std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla")));
     }
 };
 
@@ -250,4 +245,28 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
     ASSERT_EQ(sizeof(testData) - 1, sock.send(testData, sizeof(testData)-1));
 }
 
+TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
+{
+    const std::chrono::milliseconds kTimeout = std::chrono::seconds(1);
+    const nx::String kQuery(
+        "GET / HTTP/1.1\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "\r\n");
+
+    m_testHttpServer->server().setConnectionInactivityTimeout(kTimeout);
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
+
+    nx::network::TCPSocket sock(false, AF_INET);
+    ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
+    ASSERT_EQ(sock.send(kQuery.data(), kQuery.size()), kQuery.size());
+
+    nx::Buffer buffer(1024, Qt::Uninitialized);
+    ASSERT_GT(sock.recv(buffer.data(), buffer.size(), 0), 0);
+
+    const auto start = std::chrono::steady_clock::now();
+    ASSERT_EQ(sock.recv(buffer.data(), buffer.size(), 0), 0);
+    ASSERT_LT(std::chrono::steady_clock::now() - start, kTimeout * 2);
 }
+
+} // namespace nx_http

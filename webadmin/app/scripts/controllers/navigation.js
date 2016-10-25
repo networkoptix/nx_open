@@ -37,7 +37,4 @@ angular.module('webadminApp')
                 window.location.reload();
             });
         };
-
-        $scope.webclientEnabled = Config.webclientEnabled;
-
     });

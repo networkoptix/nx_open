@@ -5,10 +5,11 @@
 #include <utils/common/request_param.h>
 #include <nx/fusion/model_functions_fwd.h>
 //#include <nx/fusion/fusion/fusion_fwd.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 #include <utils/common/optional.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
+#include <nx_ec/transaction_timestamp.h>
 #include <api/model/password_data.h>
 
 // TODO: #Elric this belongs together with server_settings
@@ -23,6 +24,7 @@ bool backupDatabase();
 
 namespace nx
 {
+    // Config based system name
     class SystemName
     {
     public:
@@ -34,6 +36,7 @@ namespace nx
 
         void resetToDefault();
         bool isDefault() const;
+        void clear();
 
         bool saveToConfig();
         void loadFromConfig();
@@ -75,25 +78,26 @@ struct ConfigureSystemData : public PasswordData
         PasswordData(),
         wholeSystem(false),
         sysIdTime(0),
-        tranLogTime(0),
         port(0)
     {
     }
 
     ConfigureSystemData(const QnRequestParams& params) :
         PasswordData(params),
-        systemName(params.value(lit("systemName"))),
+        localSystemId(params.value(lit("localSystemId"))),
         wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
         sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
-        tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
+        //tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
         port(params.value(lit("port")).toInt())
     {
+        tranLogTime.sequence = params.value(lit("tranLogTimeSequence")).toULongLong();
+        tranLogTime.ticks = params.value(lit("tranLogTimeTicks")).toULongLong();
     }
 
-    QString systemName;
+    QnUuid localSystemId;
     bool wholeSystem;
     qint64 sysIdTime;
-    qint64 tranLogTime;
+    ec2::Timestamp tranLogTime;
     int port;
     ec2::ApiMediaServerData foreignServer;
     ec2::ApiUserData foreignUser;
@@ -101,14 +105,19 @@ struct ConfigureSystemData : public PasswordData
 };
 
 /*
-* @param systemName - new system name
+* @param localSystemId - new local system id
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeSystemName(const ConfigureSystemData& data);
+bool changeLocalSystemId(const ConfigureSystemData& data);
+
+/**
+ * @return false if failed to save some data.
+ */
+bool resetSystemToStateNew();
 
 
-#define ConfigureSystemData_Fields PasswordData_Fields (systemName)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUser)(foreignSettings)
+#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUser)(foreignSettings)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (ConfigureSystemData),

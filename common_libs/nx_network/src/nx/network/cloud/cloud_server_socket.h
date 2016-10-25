@@ -30,7 +30,7 @@ public:
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 
     CloudServerSocket(
-        std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+        std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
         nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
             = nx::network::RetryPolicy(),
         std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
@@ -74,6 +74,7 @@ public:
         nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
 
     hpm::api::ResultCode registerOnMediatorSync();
+    void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
     /** test only */
     void moveToListeningState();
@@ -98,7 +99,7 @@ protected:
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);
     void onMediatorConnectionRestored();
 
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
     const std::vector<AcceptorMaker> m_acceptorMakers;
     int m_acceptQueueLen;
@@ -111,6 +112,7 @@ protected:
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;
+    hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default
 };
 
 } // namespace cloud

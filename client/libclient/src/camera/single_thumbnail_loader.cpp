@@ -66,6 +66,16 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
 
 }
 
+QnThumbnailRequestData QnSingleThumbnailLoader::requestData() const
+{
+    return m_request;
+}
+
+void QnSingleThumbnailLoader::setRequestData(const QnThumbnailRequestData& data)
+{
+    m_request = data;
+}
+
 QImage QnSingleThumbnailLoader::image() const {
     return m_image;
 }

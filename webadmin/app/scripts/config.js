@@ -18,13 +18,11 @@ var Config = {
         clientSetupContext: '?from=client&context=setup',
         webadminContext: '?from=webadmin&context=settings',
 
-        portalUrl: 'http://cloud-demo.hdw.mx',
         apiUrl: '/api',
         portalRegisterUrl: '/register',
         portalSystemUrl: '/systems/{systemId}'
     },
 
-    webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
@@ -47,25 +45,8 @@ var Config = {
         maxLength: 255,
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
         requiredMessage: L.passwordRequirements.requiredMessage,
-        strongPasswordCheck: function(password){
-
-            var classes = [
-                '[0-9]+',
-                '[a-z]+',
-                '[A-Z]+',
-                '[\\W_]+'
-            ];
-
-            var classesCount = 0;
-
-            for (var i = 0; i < classes.length; i++) {
-                var classRegex = classes[i];
-                if(new RegExp(classRegex).test(password)){
-                    classesCount ++;
-                }
-            }
-            return classesCount >= 3;
-        },
+        minClassesCount: 2,
+        strongClassesCount: 3,
         weakMessage: L.passwordRequirements.weakMessage,
         strongMessage: L.passwordRequirements.strongMessage,
         commonMessage: L.passwordRequirements.commonMessage
@@ -83,17 +64,17 @@ var Config = {
         emailSignature: {label: 'Email signature', type: 'text'},
         emailSupportEmail: {label: 'Support Email', type: 'text'},
         ldapAdminDn: {label: 'LDAP admin DN', type: 'text'},
-        ldapAdminPassword: {label: 'LDAP admin password', type: 'text'},
+        ldapAdminPassword: {label: 'LDAP admin password', type: 'password'},
         ldapSearchBase: {label: 'LDAP search base', type: 'text'},
         ldapSearchFilter: {label: 'LDAP search filter', type: 'text'},
         ldapUri: {label: 'LDAP URI', type: 'text'},
-        serverAutoDiscoveryEnabled: {label: 'Enable device auto discovery', type: 'checkbox', setupWizard: true},
+        autoDiscoveryEnabled: {label: 'Enable device auto discovery', type: 'checkbox', setupWizard: true},
         smtpConnectionType: {label: 'SMTP connection type', type: 'text'},
         smtpHost: {label: 'SMTP host', type: 'text'},
         smtpPort: {label: 'SMTP port', type: 'number'},
         smtpSimple: {label: 'SMTP simple', type: 'checkbox'},
         smtpTimeout: {label: 'SMTP timeout', type: 'number'},
-        smptPassword: {label: 'SMTP password', type: 'text'},
+        smptPassword: {label: 'SMTP password', type: 'password'},
         smtpUser: {label: 'SMTP user', type: 'text'},
         updateNotificationsEnabled: {label: 'Update notifications enabled', type: 'checkbox'},
         arecontRtspEnabled: {label: 'Arecont RTSP Enabled', type: 'checkbox'},
@@ -106,11 +87,12 @@ var Config = {
         backupQualities: {label: 'Backup qualities', type: 'text'},
         serverDiscoveryPingTimeoutSec: {label: 'Server discovery timeout', type: 'number'},
 
-
         cloudAccountName: {label: 'Cloud owner account', type: 'static'},
+        cloudHost: {label: 'Cloud host', type: 'static'},
         cloudAuthKey: {label: 'Cloud auth key', type: 'static'},
-        cloudPortalUrl: {label: 'Cloud portal url', type: 'text'},
-        cloudSystemID: {label: 'Cloud portal url', type: 'static'},
+        cloudSystemID: {label: 'Cloud system id', type: 'static'},
+
+        systemName: {label: 'System name', type: 'text'},
 
         newSystem: {label: 'Server is "New"', type: 'static'},
         proxyConnectTimeoutSec: {label: 'Proxy connection timeout (seconds)', type: 'number'},

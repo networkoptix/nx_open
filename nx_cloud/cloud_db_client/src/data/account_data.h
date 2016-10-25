@@ -27,13 +27,13 @@ namespace api {
 ////////////////////////////////////////////////////////////
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((AccountStatus), (lexical))
-
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountData* const accountData);
 void serializeToUrlQuery(const AccountData&, QUrlQuery* const urlQuery);
 
-#define AccountData_Fields (id)(email)(passwordHa1)(fullName)(customization)(statusCode)
+#define AccountData_Fields \
+    (id)(email)(passwordHa1)(passwordHa1Sha256)\
+    (fullName)(customization)(statusCode)
 
 
 ////////////////////////////////////////////////////////////
@@ -99,5 +99,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 }   //api
 }   //cdb
 }   //nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::AccountStatus), (lexical))
 
 #endif  //NX_CDB_CL_ACCOUNT_DATA_H

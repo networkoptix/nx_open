@@ -228,7 +228,7 @@ void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, cons
 
 void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst)
 {
-    dst->cameraID = src.cameraID;
+    dst->cameraId = src.cameraId;
     dst->name = src.cameraName;
     dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
@@ -244,7 +244,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     for (const ApiScheduleTaskData& srcTask: src.scheduleTasks)
     {
         tasks.push_back(QnScheduleTask());
-        fromApiToResource(srcTask, tasks.back(), src.cameraID);
+        fromApiToResource(srcTask, tasks.back(), src.cameraId);
     }
     dst->scheduleTasks = tasks;
 
@@ -255,14 +255,14 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     dst->dewarpingParams = QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams);
     dst->minDays = src.minArchiveDays;
     dst->maxDays = src.maxArchiveDays;
-    dst->preferedServerId = src.preferedServerId;
+    dst->preferredServerId = src.preferredServerId;
     dst->failoverPriority = src.failoverPriority;
     dst->backupQualities = src.backupType;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
 {
-    dst.cameraID = src->cameraID;
+    dst.cameraId = src->cameraId;
     dst.cameraName = src->name;
     dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
@@ -285,7 +285,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;
     dst.maxArchiveDays = src->maxDays;
-    dst.preferedServerId = src->preferedServerId;
+    dst.preferredServerId = src->preferredServerId;
     dst.failoverPriority = src->failoverPriority;
     dst.backupType = src->backupQualities;
 }
@@ -580,7 +580,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& 
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.authKey = src->getAuthKey();
-    dst.systemName = src->getSystemName();
 }
 
 void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst)
@@ -595,7 +594,6 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setAuthKey(src.authKey);
-    dst->setSystemName(src.systemName);
 }
 
 template<class List>
@@ -626,7 +624,7 @@ void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResou
 ////////////////////////////////////////////////////////////
 void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst)
 {
-    dst.serverID = src->serverID;
+    dst.serverId = src->serverId;
     dst.serverName = src->name;
     dst.maxCameras = src->maxCameras;
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
@@ -639,7 +637,7 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
 {
-    dst->serverID = src.serverID;
+    dst->serverId = src.serverId;
     dst->name = src.serverName;
     dst->maxCameras = src.maxCameras;
     dst->isRedundancyEnabled = src.allowAutoRedundancy;

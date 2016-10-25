@@ -11,7 +11,7 @@ namespace ec2
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiVideowallData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveVideowall);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
@@ -43,7 +43,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, videowalls);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowalls, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowalls, QnUuid(), queryDoneHandler);
         return reqID;
     }
 
@@ -51,11 +51,13 @@ namespace ec2
     int QnVideowallManager<T>::save(const ec2::ApiVideowallData& videowall, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiVideowallData> tran(ApiCommand::saveVideowall, videowall);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveVideowall,
+            videowall,
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
         return reqID;
     }
 
@@ -63,11 +65,12 @@ namespace ec2
     int QnVideowallManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiIdData> tran(ApiCommand::removeVideowall, id);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeVideowall, ApiIdData(id),
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
         return reqID;
     }
 
@@ -75,11 +78,12 @@ namespace ec2
     int QnVideowallManager<T>::sendControlMessage(const ec2::ApiVideowallControlMessageData& message, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiVideowallControlMessageData> tran(ApiCommand::videowallControl, message);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::videowallControl, message,
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
         return reqID;
     }
 

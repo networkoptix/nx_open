@@ -3,7 +3,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
-#define STRICT_STATE_CONTROL
+//#define STRICT_STATE_CONTROL
 #define DEBUG_CLIENT_CONNECTION_STATUS
 #ifdef DEBUG_CLIENT_CONNECTION_STATUS
 #define TRACE(...) qDebug() << "QnClientConnectionStatus: " << __VA_ARGS__;
@@ -66,8 +66,16 @@ void QnClientConnectionStatus::setState(QnConnectionState state)
     if (!m_allowedTransactions.values(m_state).contains(state))
         warn(lit("Invalid state transaction %1 -> %2").arg(stateToString[m_state]).arg(stateToString[state]));
 
+    if (m_state == state)
+        return;
+
     m_state = state;
     emit stateChanged(state);
+}
+
+bool QnClientConnectionStatus::operator!=(QnConnectionState state) const
+{
+    return m_state != state;
 }
 
 QnClientConnectionStatus& QnClientConnectionStatus::operator=(QnConnectionState state)

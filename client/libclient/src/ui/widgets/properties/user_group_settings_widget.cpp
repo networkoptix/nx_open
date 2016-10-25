@@ -23,10 +23,7 @@ public:
         q_ptr(parent),
         model(model),
         usersModel(new QStandardItemModel(this)),
-        replacementRoles(new QnUserRolesModel(this,
-            true,  /* standardRoles */
-            false, /* userRoles (will be filled later) */
-            false  /* customRole */))
+        replacementRoles(new QnUserRolesModel(this, QnUserRolesModel::StandardRoleFlag))
     {
         for (const auto& user : qnResPool->getResources<QnUserResource>())
             connectUserSignals(user);
@@ -51,7 +48,7 @@ public:
                 if (!user)
                     return;
 
-                disconnectUserSignals(user);
+                disconnect(user, nullptr, this, nullptr);
 
                 if (user->userGroup() == this->model->selectedGroup())
                     userMaybeRemoved(user);
@@ -69,19 +66,13 @@ public:
             });
 
         connect(user, &QnUserResource::userGroupChanged, this,
-            [this](const QnResourcePtr& resource)
+            [this](const QnUserResourcePtr& user)
             {
-                auto user = resource.staticCast<QnUserResource>();
                 if (user->userGroup() == model->selectedGroup())
                     userAddedOrUpdated(user);
                 else
                     userMaybeRemoved(user);
             });
-    }
-
-    void disconnectUserSignals(const QnUserResourcePtr& user)
-    {
-        user->disconnect(this);
     }
 
     void resetUsers()
@@ -126,8 +117,16 @@ public:
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                 q->window());
 
-            replacementRoles->setUserRoles(model->groups());
-            replacementRoles->removeUserRole(model->selectedGroup());
+            auto roles = model->groups();
+            auto selectedRole = std::find_if(roles.begin(), roles.end(),
+                [selectedId = model->selectedGroup()](const ec2::ApiUserGroupData& role)
+                {
+                    return role.id == selectedId;
+                });
+            if (selectedRole != roles.end())
+                roles.erase(selectedRole);
+
+            replacementRoles->setUserRoles(roles);
 
             messageBox.setInformativeText(tr("All users that had this role will be assigned the following role:"));
 
@@ -245,8 +244,31 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
     ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
     ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
 
-    connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnUserGroupSettingsWidget::applyChanges);
-    connect(ui->deleteGroupButton, &QPushButton::clicked, d, &QnUserGroupSettingsWidgetPrivate::deleteCurrentGroup);
+    ui->nameInputField->setValidator([this](const QString& text)
+        {
+            auto name = text.trimmed().toLower();
+            if (name.isEmpty())
+                return Qn::ValidationResult(tr("Role name cannot be empty."));
+
+            auto model = d_ptr->model;
+            for (const auto& role: model->groups())
+            {
+                if (role.id == model->selectedGroup())
+                    continue;
+
+                if (role.name.trimmed().toLower() != name)
+                    continue;
+
+                return Qn::ValidationResult(tr("Role with same name already exists."));
+            }
+
+            return Qn::kValidResult;
+        });
+
+    connect(ui->nameInputField, &QnInputField::textChanged, this,
+        &QnUserGroupSettingsWidget::applyChanges);
+    connect(ui->deleteGroupButton, &QPushButton::clicked, d,
+        &QnUserGroupSettingsWidgetPrivate::deleteCurrentGroup);
 }
 
 QnUserGroupSettingsWidget::~QnUserGroupSettingsWidget()
@@ -262,16 +284,20 @@ void QnUserGroupSettingsWidget::loadDataToUi()
 {
     Q_D(QnUserGroupSettingsWidget);
 
-    QSignalBlocker blocker(ui->nameLineEdit);
-    ui->nameLineEdit->setText(d->model->groupName());
+    QSignalBlocker blocker(ui->nameInputField);
+    ui->nameInputField->setText(d->model->groupName());
 
     d->resetUsers();
 }
 
 void QnUserGroupSettingsWidget::applyChanges()
 {
+    ui->nameInputField->validate();
+    if (!ui->nameInputField->isValid())
+        return;
+
     Q_D(QnUserGroupSettingsWidget);
 
-    d->model->setGroupName(ui->nameLineEdit->text());
+    d->model->setGroupName(ui->nameInputField->text());
     emit hasChangesChanged();
 }

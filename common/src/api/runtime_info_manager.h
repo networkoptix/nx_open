@@ -62,7 +62,7 @@ signals:
 private:
     virtual Qn::Notifier storedItemAdded(const QnPeerRuntimeInfo &item) override;
     virtual Qn::Notifier storedItemRemoved(const QnPeerRuntimeInfo &item) override;
-    virtual Qn::Notifier storedItemChanged(const QnPeerRuntimeInfo &item) override;
+    virtual Qn::Notifier storedItemChanged(const QnPeerRuntimeInfo& item) override;
 private:
     /** Mutex that is to be used when accessing items. */
     mutable QnMutex m_mutex;

@@ -5,6 +5,8 @@
 
 #include <utils/common/connective.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx_ec/data/api_fwd.h>
 
 #include <nx/utils/scoped_model_operations.h>
@@ -17,21 +19,23 @@ class QnUserRolesModel : public ScopedModelOperations<Connective<QAbstractItemMo
     using base_type = ScopedModelOperations<Connective<QAbstractItemModel>>;
 
 public:
-    explicit QnUserRolesModel(QObject* parent = nullptr, bool standardRoles = true, bool userRoles = true, bool customRole = true);
+    enum DisplayRoleFlag
+    {
+        StandardRoleFlag = 0x00,    /*< Model will use standard roles. */
+        UserRoleFlag     = 0x01,    /*< Model will use custom user roles (and listen to changes).*/
+        CustomRoleFlag   = 0x02,    /*< Model will display 'Custom...' standard role. */
+        AllRoleFlags     = StandardRoleFlag | UserRoleFlag | CustomRoleFlag
+    };
+    Q_DECLARE_FLAGS(DisplayRoleFlags, DisplayRoleFlag)
+
+    explicit QnUserRolesModel(QObject* parent = nullptr, DisplayRoleFlags flags = AllRoleFlags);
     virtual ~QnUserRolesModel();
 
     /* Role-specific stuff: */
 
-    void setStandardRoles(bool enabled = true);
- //   void setStandardRoles(const QList<Qn::GlobalPermissions>& standardRoles);
+    int rowForUser(const QnUserResourcePtr& user) const;
 
-    void setUserRoles(bool enabled = true);
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);
-
-    bool updateUserRole(const ec2::ApiUserGroupData& role);
-    bool removeUserRole(const QnUuid& id);
-
-    void setCustomRole(bool enabled);
 
     /* QAbstractItemModel implementation: */
 
@@ -45,5 +49,5 @@ public:
 
 private:
     QScopedPointer<QnUserRolesModelPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnUserRolesModel);
+    Q_DECLARE_PRIVATE(QnUserRolesModel)
 };

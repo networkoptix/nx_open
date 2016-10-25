@@ -12,8 +12,6 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/ui/timeline.h>
-#include <ui/workbench/ui/resource_tree.h>
 
 #include <client/client_globals.h>
 
@@ -39,9 +37,17 @@ class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
 class QnFramedWidget;
-class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 struct QnPaneSettings;
+
+namespace NxUi {
+
+class ResourceTreeWorkbenchPanel;
+class NotificationsWorkbenchPanel;
+class TimelineWorkbenchPanel;
+class CalendarWorkbenchPanel;
+
+}
 
 class QnWorkbenchUi:
     public Disconnective<QObject>,
@@ -73,7 +79,7 @@ public:
         NoPanel = 0x0,
         TreePanel = 0x1,
         TitlePanel = 0x2,
-        SliderPanel = 0x4,
+        TimelinePanel = 0x4,
         NotificationsPanel = 0x8
     };
     Q_DECLARE_FLAGS(Panels, Panel)
@@ -100,9 +106,9 @@ public:
     bool isTreePinned() const;
 
     /** Whether navigation slider is opened. */
-    bool isSliderOpened() const;
+    bool isTimelineOpened() const;
 
-    bool isSliderPinned() const;
+    bool isTimelinePinned() const;
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
@@ -120,31 +126,26 @@ public:
     bool isCalendarOpened() const;
 
     bool isTreeVisible() const;
-    bool isSliderVisible() const;
+    bool isTimelineVisible() const;
     bool isTitleVisible() const;
     bool isNotificationsVisible() const;
     bool isCalendarVisible() const;
 
 public slots:
-    void setProxyUpdatesEnabled(bool updatesEnabled);
-    void enableProxyUpdates();
-    void disableProxyUpdates();
-
     void setTitleUsed(bool titleUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
-    void setSliderVisible(bool visible = true, bool animate = true);
+    void setTimelineVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
-    void setCalendarVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
-    void setSliderOpened(bool opened = true, bool animate = true);
+    void setTimelineOpened(bool opened = true, bool animate = true);
     void setTitleOpened(bool opened = true, bool animate = true);
     void setNotificationsOpened(bool opened = true, bool animate = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
-    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
 
 protected:
     virtual void tick(int deltaMSecs) override;
@@ -153,29 +154,16 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
-    Q_SLOT void updateTreeResizerGeometry();
+
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
-    void updateDayTimeWidgetGeometry();
-    Q_SLOT void updateSliderResizerGeometry();
-    void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
-    QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry);
     void updateActivityInstrumentState();
 
-    void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setSliderOpacity(qreal opacity, bool animate);
-    void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setCalendarOpacity(qreal opacity, bool animate);
-    void setSliderZoomButtonsOpacity(qreal opacity, bool animate);
-
-    bool isThumbnailsVisible() const;
-    void setThumbnailsVisible(bool visible);
+    void setTitleOpacity(qreal opacity, bool animate);
 
     bool isHovered() const;
 
@@ -186,7 +174,7 @@ private:
     void createTitleWidget(const QnPaneSettings& settings);
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
-    void createSliderWidget(const QnPaneSettings& settings);
+    void createTimelineWidget(const QnPaneSettings& settings);
 
 #ifdef _DEBUG
     void createDebugWidget();
@@ -195,7 +183,7 @@ private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true);
 
-    void initGraphicsMessageBox();
+    void initGraphicsMessageBoxHolder();
 
     /** Make sure animation is allowed, set animate to false otherwise. */
     void ensureAnimationAllowed(bool &animate);
@@ -205,27 +193,14 @@ private:
     void updateCursor();
 
 private slots:
-    void updateTreeOpacity(bool animate = true);
-    void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
-    void updateNotificationsOpacity(bool animate = true);
-    void updateCalendarOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
-    void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
-    void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
-    void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
-    void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
-    void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
-    void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
-
-    void setSliderShowButtonUsed(bool used);
-    void setTreeShowButtonUsed(bool used);
-    void setNotificationsShowButtonUsed(bool used);
-    void setCalendarShowButtonUsed(bool used);
+    void updateTitleOpacityAnimated();
+    void updateCalendarVisibilityAnimated();
+    void updateControlsVisibilityAnimated();
 
     void at_freespaceAction_triggered();
     void at_activityStopped();
@@ -235,149 +210,75 @@ private slots:
 
     void at_controlsWidget_geometryChanged();
 
-    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
-    void at_sliderItem_geometryChanged();
-    void at_sliderResizerWidget_geometryChanged();
-
-    void at_treeWidget_activated(const QnResourcePtr &resource);
-    void at_treeItem_paintGeometryChanged();
-    void at_treeResizerWidget_geometryChanged();
-    void at_treeShowingProcessor_hoverEntered();
-    void at_pinTreeAction_toggled(bool checked);
-    void at_pinNotificationsAction_toggled(bool checked);
-
     void at_titleItem_geometryChanged();
-
-    void at_notificationsShowingProcessor_hoverEntered();
-    void at_notificationsItem_geometryChanged();
-
-    void at_calendarShowingProcessor_hoverEntered();
-    void at_calendarItem_paintGeometryChanged();
-    void at_dayTimeItem_paintGeometryChanged();
-
-    void at_calendarWidget_dateClicked(const QDate &date);
 
 private:
     /* Global state. */
 
     /** Instrument manager for the scene. */
-    InstrumentManager *m_instrumentManager;
+    QPointer<InstrumentManager> m_instrumentManager;
 
     /** Fps counting instrument. */
-    FpsCountingInstrument *m_fpsCountingInstrument;
+    QPointer<FpsCountingInstrument> m_fpsCountingInstrument;
 
     /** Activity listener instrument. */
-    ActivityListenerInstrument *m_controlsActivityInstrument;
+    QPointer<ActivityListenerInstrument> m_controlsActivityInstrument;
 
     /** Current flags. */
     Flags m_flags;
 
     /** Widgets by role. */
-    std::array<QnResourceWidget*, Qn::ItemRoleCount> m_widgetByRole;
+    std::array<QPointer<QnResourceWidget>, Qn::ItemRoleCount> m_widgetByRole;
 
     /** Widget that ui controls are placed on. */
-    QGraphicsWidget *m_controlsWidget;
+    QPointer<QGraphicsWidget> m_controlsWidget;
 
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
-
-    bool m_treeVisible;
 
     bool m_titleUsed;
 
     bool m_titleVisible;
 
-    bool m_notificationsVisible;
-
-    bool m_calendarVisible;
-
-    bool m_dayTimeOpened;
-
     bool m_ignoreClickEvent;
 
     bool m_inactive;
 
-    QnProxyLabel *m_fpsItem;
-    QnDebugProxyLabel* m_debugOverlayLabel;
+    QPointer<QnProxyLabel> m_fpsItem;
+    QPointer<QnDebugProxyLabel> m_debugOverlayLabel;
 
     /* In freespace mode? */
     bool m_inFreespace;
 
     Panels m_unzoomedOpenedPanels;
 
-    /* Slider-related state. */
+    /* Timeline-related state. */
 
-    /** Navigation item. */
-    QnWorkbenchUiTimeline m_timeline;
+    /** Timeline. */
+    QPointer<NxUi::TimelineWorkbenchPanel> m_timeline;
 
     /* Resources tree. */
-    QnWorkbenchUiResourceTree m_tree;
+    QPointer<NxUi::ResourceTreeWorkbenchPanel> m_tree;
 
     /* Title-related state. */
 
     /** Title bar widget. */
-    QGraphicsProxyWidget *m_titleItem;
+    QPointer<QGraphicsProxyWidget> m_titleItem;
 
-    QnImageButtonWidget *m_titleShowButton;
+    QPointer<QnImageButtonWidget> m_titleShowButton;
 
-    AnimatorGroup *m_titleOpacityAnimatorGroup;
+    QPointer<AnimatorGroup> m_titleOpacityAnimatorGroup;
 
     /** Animator for title's position. */
-    VariantAnimator *m_titleYAnimator;
+    QPointer<VariantAnimator> m_titleYAnimator;
 
-    HoverFocusProcessor *m_titleOpacityProcessor;
+    QPointer<HoverFocusProcessor> m_titleOpacityProcessor;
 
     /* Notifications window-related state. */
-
-    QnFramedWidget *m_notificationsBackgroundItem;
-
-    QnNotificationsCollectionWidget *m_notificationsItem;
-
-    QnImageButtonWidget *m_notificationsPinButton;
-
-    QnImageButtonWidget *m_notificationsShowButton;
-
-    HoverFocusProcessor *m_notificationsOpacityProcessor;
-
-    HoverFocusProcessor *m_notificationsHidingProcessor;
-
-    HoverFocusProcessor *m_notificationsShowingProcessor;
-
-    VariantAnimator *m_notificationsXAnimator;
-
-    AnimatorGroup *m_notificationsOpacityAnimatorGroup;
-
+    QPointer<NxUi::NotificationsWorkbenchPanel> m_notifications;
 
     /* Calendar window-related state. */
-
-    QnMaskedProxyWidget *m_calendarItem;
-
-    QnImageButtonWidget *m_calendarPinButton;
-
-    QnImageButtonWidget *m_dayTimeMinimizeButton;
-
-    VariantAnimator *m_calendarSizeAnimator;
-
-    AnimatorGroup *m_calendarOpacityAnimatorGroup;
-
-    HoverFocusProcessor *m_calendarOpacityProcessor;
-
-    HoverFocusProcessor *m_calendarHidingProcessor;
-
-    HoverFocusProcessor *m_calendarShowingProcessor;
-
-    bool m_inCalendarGeometryUpdate;
-
-    bool m_inDayTimeGeometryUpdate;
-
-    QnMaskedProxyWidget *m_dayTimeItem;
-
-    QnDayTimeWidget *m_dayTimeWidget;
-
-    VariantAnimator *m_dayTimeSizeAnimator;
-
-    QPoint m_calendarPinOffset;
-    QPoint m_dayTimeOffset;
+    QPointer<NxUi::CalendarWorkbenchPanel> m_calendar;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

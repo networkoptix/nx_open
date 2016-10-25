@@ -41,6 +41,16 @@ public:
         return m_mediator;
     }
 
+    std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket()
+    {
+        auto serverSocket = std::make_unique<CloudServerSocket>(
+            SocketGlobals::mediatorConnector().systemConnection());
+
+        serverSocket->setSupportedConnectionMethods(hpm::api::ConnectionMethod::udpHolePunching);
+        NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
+        return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));
+    }
+
 protected:
     nx::hpm::AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_server;
@@ -55,7 +65,7 @@ private:
 
         //registering server in mediator
         m_system = mediator().addRandomSystem();
-        m_server = mediator().addRandomServer(m_system, false);
+        m_server = mediator().addRandomServer(m_system, boost::none, false);
         ASSERT_NE(nullptr, m_server);
 
         SocketGlobals::mediatorConnector().setSystemCredentials(
@@ -71,15 +81,7 @@ private:
 TEST_F(UdpHolePunching, simpleSync)
 {
     test::socketSimpleSync(
-        []{
-            auto serverSocket = std::make_unique<CloudServerSocket>(
-                SocketGlobals::mediatorConnector().systemConnection());
-
-            NX_CRITICAL(serverSocket->registerOnMediatorSync()
-                == hpm::api::ResultCode::ok);
-
-            return serverSocket;
-        },
+        [&](){ return cloudServerSocket(); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
         SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
@@ -88,15 +90,7 @@ TEST_F(UdpHolePunching, simpleSync)
 TEST_F(UdpHolePunching, simpleAsync)
 {
     test::socketSimpleAsync(
-        []{
-            auto serverSocket = std::make_unique<CloudServerSocket>(
-                SocketGlobals::mediatorConnector().systemConnection());
-
-            NX_CRITICAL(serverSocket->registerOnMediatorSync()
-                == hpm::api::ResultCode::ok);
-
-            return serverSocket;
-        },
+        [&](){ return cloudServerSocket(); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
         SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
@@ -113,11 +107,7 @@ TEST_F(UdpHolePunching, loadTest)
         bytesToSendThroughConnection,
         test::TestTransmissionMode::spam);
 
-    auto serverSocket = std::make_unique<CloudServerSocket>(
-        SocketGlobals::mediatorConnector().systemConnection());
-
-    ASSERT_EQ(serverSocket->registerOnMediatorSync(), hpm::api::ResultCode::ok);
-    server.setServerSocket(std::move(serverSocket));
+    server.setServerSocket(cloudServerSocket());
     ASSERT_TRUE(server.start());
 
     test::ConnectionsGenerator connectionsGenerator(

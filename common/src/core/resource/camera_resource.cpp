@@ -13,6 +13,7 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
+#include <utils/crypt/symmetrical.h>
 
 namespace {
 
@@ -455,7 +456,10 @@ void QnVirtualCameraResource::saveParamsAsync()
 
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
-    if (getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME).isNull())
+    auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(
+        getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
+
+    if (decodedCredentials.isEmpty() || decodedCredentials == lit(":"))
     {
         setDefaultAuth(login, password);
         saveParams();

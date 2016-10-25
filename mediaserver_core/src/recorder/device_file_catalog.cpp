@@ -104,6 +104,22 @@ DeviceFileCatalog::DeviceFileCatalog(
 {
 }
 
+std::unordered_map<int, qint64> DeviceFileCatalog::calcSpaceByStorage() const
+{
+    std::unordered_map<int, qint64> result;
+    QnMutexLocker lock(&m_mutex);
+
+    for (auto catalogIt = m_chunks.cbegin(); catalogIt != m_chunks.cend(); ++catalogIt)
+    {
+        std::unordered_map<int, qint64>::iterator resultIt;
+        bool emplaceResult = false;
+
+        std::tie(resultIt, emplaceResult) = result.emplace(catalogIt->storageIndex, 0);
+        resultIt->second += catalogIt->getFileSize();
+    }
+    return result;
+}
+
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
@@ -398,45 +414,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
     return chunk;
 }
 
-void DeviceFileCatalog::setLastSyncTime(int64_t time)
-{
-    qnServerDb->setLastBackupTime(
-        m_storagePool,
-        guidFromArbitraryData(m_cameraUniqueId),
-        m_catalog,
-        time
-    );
-
-    QnMutexLocker lk(&m_mutex);
-    m_lastSyncTime = time;
-}
-
-int64_t DeviceFileCatalog::getLastSyncTimeFromDBNoLock() const
-{
-    int64_t ret = qnServerDb->getLastBackupTime(
-        m_storagePool,
-        guidFromArbitraryData(m_cameraUniqueId),
-        m_catalog
-    );
-    return ret;
-}
-
-int64_t DeviceFileCatalog::getLastSyncTime() const
-{
-    QnMutexLocker lk(&m_mutex);
-    if (m_lastSyncTime == 0)
-    {   // need to unlock here to fetch data from DB.
-        lk.unlock();
-        int64_t dbLastSyncTime = getLastSyncTimeFromDBNoLock();
-        // locking again
-        lk.relock();
-        m_lastSyncTime = dbLastSyncTime;
-        if (m_lastSyncTime == 0)
-            m_lastSyncTime = 1;
-    }
-    return m_lastSyncTime;
-}
-
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
     if (m_storagePool == QnServer::StoragePool::Normal)
@@ -701,6 +678,17 @@ qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
+}
+
+qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
+{
+    QnMutexLocker lock( &m_mutex );
+    for (auto itr = m_chunks.rbegin(); itr != m_chunks.rend(); ++itr)
+    {
+        if (itr->storageIndex == storageIndex)
+            return itr->startTimeMs;
+    }
+    return 0;
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)

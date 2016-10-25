@@ -14,6 +14,7 @@
 #include "nx/fusion/serialization/csv.h"
 #include "nx/fusion/serialization/ubjson.h"
 #include "common/common_module.h"
+#include <nx_ec/transaction_timestamp.h>
 
 namespace ec2
 {
@@ -30,7 +31,8 @@ APPLY(1, tranSyncRequest, ApiSyncRequestData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2, tranSyncResponse, QnTranStateResponse, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
@@ -40,7 +42,8 @@ APPLY(2, tranSyncResponse, QnTranStateResponse, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(3, lockRequest, ApiLockData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
@@ -50,7 +53,8 @@ APPLY(3, lockRequest, ApiLockData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(4, lockResponse, ApiLockData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
@@ -60,7 +64,8 @@ APPLY(4, lockResponse, ApiLockData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(5, unlockRequest, ApiLockData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
@@ -70,7 +75,8 @@ APPLY(5, unlockRequest, ApiLockData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(6, peerAliveInfo, ApiPeerAliveData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
@@ -80,7 +86,8 @@ APPLY(6, peerAliveInfo, ApiPeerAliveData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
@@ -90,7 +97,8 @@ APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(100, testConnection, ApiLoginData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -100,7 +108,8 @@ APPLY(100, testConnection, ApiLoginData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(101, connect, ApiLoginData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -110,7 +119,8 @@ APPLY(101, connect, ApiLoginData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(102, openReverseConnection, ApiReverseConnectionData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
@@ -124,7 +134,8 @@ APPLY(102, openReverseConnection, ApiReverseConnectionData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(201, removeResource, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -134,7 +145,8 @@ APPLY(201, removeResource, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        true,  /* persistent*/ \
                        false, /* system*/ \
@@ -144,7 +156,8 @@ APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(),                     \
+                       SetStatusTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_status by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -154,7 +167,8 @@ APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(),                     \
+                       RegularTransactionType()) /* local transaction type is set manually in  server query processor via removeResourceStatusHelper call*/ \
 APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -164,7 +178,8 @@ APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceParamAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceParamAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceParamAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -174,7 +189,8 @@ APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceParamAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceParamAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceParamAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(205, getResourceTypes, ApiResourceTypeDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -184,7 +200,8 @@ APPLY(205, getResourceTypes, ApiResourceTypeDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(206, getFullInfo, ApiFullInfoData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -199,7 +216,8 @@ APPLY(206, getFullInfo, ApiFullInfoData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -209,7 +227,8 @@ APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        ReadResourceParamAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceParamAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceParamAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       SetResourceParamTransactionType()) /* regular transaction type */ \
 APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -219,7 +238,8 @@ APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        ReadResourceParamAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -229,7 +249,8 @@ APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceParamAccess>(true), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(211, getStatusList, ApiResourceStatusDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -239,7 +260,8 @@ APPLY(211, getStatusList, ApiResourceStatusDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(212, removeResources, ApiIdDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -249,7 +271,8 @@ APPLY(212, removeResources, ApiIdDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(true), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(300, getCameras, ApiCameraDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -259,7 +282,8 @@ APPLY(300, getCameras, ApiCameraDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(301, saveCamera, ApiCameraData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -269,7 +293,8 @@ APPLY(301, saveCamera, ApiCameraData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(302, saveCameras, ApiCameraDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -282,7 +307,8 @@ APPLY(302, saveCameras, ApiCameraDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(303, removeCamera, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -292,7 +318,8 @@ APPLY(303, removeCamera, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(304, getCameraHistoryItems, ApiServerFootageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -302,7 +329,8 @@ APPLY(304, getCameraHistoryItems, ApiServerFootageDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyFootageDataAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadFootageDataAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadFootageDataAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadFootageDataAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(305, addCameraHistoryItem, ApiServerFootageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -312,7 +340,8 @@ APPLY(305, addCameraHistoryItem, ApiServerFootageData, \
                        ReadFootageDataAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadFootageDataAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadFootageDataAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(309, removeCameraHistoryItem, ApiServerFootageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -322,7 +351,8 @@ APPLY(309, removeCameraHistoryItem, ApiServerFootageData, \
                        ReadFootageDataAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(310, saveCameraUserAttributes, ApiCameraAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -332,7 +362,8 @@ APPLY(310, saveCameraUserAttributes, ApiCameraAttributesData, \
                        ReadCameraAttributesAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadCameraAttributesAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadCameraAttributesAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -342,8 +373,9 @@ APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        ModifyCameraAttributesListAccess(), /* Filter save func */ \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
+                       ReadListAccessOut<ReadCameraAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(312, getCameraUserAttributesList, ApiCameraAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -352,7 +384,8 @@ APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        ModifyCameraAttributesListAccess(), /* Filter save func */ \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadCameraAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(313, getCamerasEx, ApiCameraDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -362,7 +395,8 @@ APPLY(313, getCamerasEx, ApiCameraDataExList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(314, removeCameraUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -372,7 +406,8 @@ APPLY(314, removeCameraUserAttributes, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -382,17 +417,19 @@ APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(401, saveMediaServer, ApiMediaServerData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       [](const Qn::UserAccessData& accessData, const ApiMediaServerData&) { return accessData == Qn::kSystemAccess; }, /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(402, removeMediaServer, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -402,8 +439,9 @@ APPLY(402, removeMediaServer, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(403, saveServerUserAttributes, ApiMediaServerUserAttributesData, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(403, saveMediaServerUserAttributes, ApiMediaServerUserAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiMediaServerUserAttributesDataHelper, /* getHash*/ \
@@ -412,8 +450,9 @@ APPLY(403, saveServerUserAttributes, ApiMediaServerUserAttributesData, \
                        ReadServerAttributesAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadServerAttributesAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(404, saveServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+                       ReadServerAttributesAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(404, saveMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -422,8 +461,9 @@ APPLY(404, saveServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyServerAttributesAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadServerAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
+                       ReadListAccessOut<ReadServerAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(405, getMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -432,7 +472,8 @@ APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyServerAttributesAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadServerAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadServerAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(406, removeServerUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -442,7 +483,8 @@ APPLY(406, removeServerUserAttributes, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(407, saveStorage, ApiStorageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -452,7 +494,8 @@ APPLY(407, saveStorage, ApiStorageData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(408, saveStorages, ApiStorageDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -462,7 +505,8 @@ APPLY(408, saveStorages, ApiStorageDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(409, removeStorage, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -472,7 +516,8 @@ APPLY(409, removeStorage, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(410, removeStorages, ApiIdDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -482,7 +527,8 @@ APPLY(410, removeStorages, ApiIdDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(true), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -492,7 +538,8 @@ APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(412, getStorages, ApiStorageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -502,7 +549,8 @@ APPLY(412, getStorages, ApiStorageDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(500, getUsers, ApiUserDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -512,7 +560,8 @@ APPLY(500, getUsers, ApiUserDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(501, saveUser, ApiUserData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -522,7 +571,8 @@ APPLY(501, saveUser, ApiUserData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       SaveUserTransactionType()) /* regular transaction type */ \
 APPLY(502, removeUser, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -532,7 +582,8 @@ APPLY(502, removeUser, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RemoveUserTransactionType()) /* regular transaction type */ \
 APPLY(503, getAccessRights, ApiAccessRightsDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -542,7 +593,8 @@ APPLY(503, getAccessRights, ApiAccessRightsDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(504, setAccessRights, ApiAccessRightsData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -552,7 +604,8 @@ APPLY(504, setAccessRights, ApiAccessRightsData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(),                     \
+                       RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_rights by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -562,7 +615,8 @@ APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_righ
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(),                     \
+                       RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        false, \
                        false, \
@@ -572,7 +626,8 @@ APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(506, saveUserGroup, ApiUserGroupData, \
                        true, \
                        false, \
@@ -582,7 +637,8 @@ APPLY(506, saveUserGroup, ApiUserGroupData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(507, removeUserGroup, ApiIdData, \
                        true, \
                        false, \
@@ -592,7 +648,8 @@ APPLY(507, removeUserGroup, ApiIdData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -602,7 +659,8 @@ APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(600, getLayouts, ApiLayoutDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -612,7 +670,8 @@ APPLY(600, getLayouts, ApiLayoutDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(601, saveLayout, ApiLayoutData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -622,7 +681,8 @@ APPLY(601, saveLayout, ApiLayoutData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(602, saveLayouts, ApiLayoutDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -632,7 +692,8 @@ APPLY(602, saveLayouts, ApiLayoutDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(603, removeLayout, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -642,7 +703,8 @@ APPLY(603, removeLayout, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(700, getVideowalls, ApiVideowallDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -652,7 +714,8 @@ APPLY(700, getVideowalls, ApiVideowallDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(701, saveVideowall, ApiVideowallData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -662,7 +725,8 @@ APPLY(701, saveVideowall, ApiVideowallData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(702, removeVideowall, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -672,7 +736,8 @@ APPLY(702, removeVideowall, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        false, /* persistent*/\
                        false, /* system*/ \
@@ -682,8 +747,9 @@ APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(800, getEventRules, ApiBusinessRuleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -692,8 +758,9 @@ APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(801, saveBusinessRule, ApiBusinessRuleData, \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(801, saveEventRule, ApiBusinessRuleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -702,8 +769,9 @@ APPLY(801, saveBusinessRule, ApiBusinessRuleData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(802, removeBusinessRule, ApiIdData, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(802, removeEventRule, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -712,8 +780,9 @@ APPLY(802, removeBusinessRule, ApiIdData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(803, resetBusinessRules, ApiResetBusinessRuleData, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(803, resetEventRules, ApiResetBusinessRuleData, \
                        true, \
                        false, \
                        [] (const ApiResetBusinessRuleData&) { return QnTransactionLog::makeHash("reset_brule", ADD_HASH_DATA); }, \
@@ -722,8 +791,9 @@ APPLY(803, resetBusinessRules, ApiResetBusinessRuleData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(804, broadcastBusinessAction, ApiBusinessActionData, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(804, broadcastAction, ApiBusinessActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -732,8 +802,9 @@ APPLY(804, broadcastBusinessAction, ApiBusinessActionData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(805, execBusinessAction, ApiBusinessActionData, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(805, execAction, ApiBusinessActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -742,7 +813,8 @@ APPLY(805, execBusinessAction, ApiBusinessActionData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        true, \
                        false, \
@@ -756,7 +828,8 @@ APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(901, getStoredFile, ApiStoredFileData, \
                        false, \
                        false, \
@@ -766,7 +839,8 @@ APPLY(901, getStoredFile, ApiStoredFileData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(902, addStoredFile, ApiStoredFileData, \
                        true, \
                        false, \
@@ -776,7 +850,8 @@ APPLY(902, addStoredFile, ApiStoredFileData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(903, updateStoredFile, ApiStoredFileData, \
                        true, \
                        false, \
@@ -786,7 +861,8 @@ APPLY(903, updateStoredFile, ApiStoredFileData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(900, listDirectory, ApiStoredDirContents, \
                        false, \
                        false, \
@@ -796,7 +872,8 @@ APPLY(900, listDirectory, ApiStoredDirContents, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(905, getStoredFiles, ApiStoredFileDataList, \
                        false, \
                        false, \
@@ -806,7 +883,8 @@ APPLY(905, getStoredFiles, ApiStoredFileDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1000, getLicenses, ApiLicenseDataList, \
                        false, \
                        false, \
@@ -816,7 +894,8 @@ APPLY(1000, getLicenses, ApiLicenseDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1001, addLicense, ApiLicenseData, \
                        true, \
                        false, \
@@ -826,7 +905,8 @@ APPLY(1001, addLicense, ApiLicenseData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1002, addLicenses, ApiLicenseDataList, \
                        true, \
                        false, \
@@ -836,7 +916,8 @@ APPLY(1002, addLicenses, ApiLicenseDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1003, removeLicense, ApiLicenseData, \
                        true, \
                        false, \
@@ -846,7 +927,8 @@ APPLY(1003, removeLicense, ApiLicenseData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        false, \
                        true, \
@@ -856,7 +938,8 @@ APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
                        false, \
                        true, \
@@ -866,7 +949,8 @@ APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1202, installUpdate, ApiUpdateInstallData, \
                        false, \
                        true, \
@@ -876,7 +960,8 @@ APPLY(1202, installUpdate, ApiUpdateInstallData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
                        false, \
                        false, \
@@ -886,7 +971,8 @@ APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* local transaction type */ \
 APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
                        false, \
                        false, \
@@ -896,7 +982,8 @@ APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
                        false, \
                        false, \
@@ -906,7 +993,8 @@ APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
                        true, \
                        false, \
@@ -916,7 +1004,8 @@ APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
                        true, \
                        false, \
@@ -926,7 +1015,8 @@ APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
                        true, \
                        false, \
@@ -936,7 +1026,8 @@ APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1500, getWebPages, ApiWebPageDataList, \
                        false, \
                        false, \
@@ -946,7 +1037,8 @@ APPLY(1500, getWebPages, ApiWebPageDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1501, saveWebPage, ApiWebPageData, \
                        true, \
                        false, \
@@ -956,7 +1048,8 @@ APPLY(1501, saveWebPage, ApiWebPageData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1502, removeWebPage, ApiIdData, \
                        true, \
                        false, \
@@ -966,7 +1059,8 @@ APPLY(1502, removeWebPage, ApiIdData, \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2001, forcePrimaryTimeServer, ApiIdData, \
                        false, \
                        false, \
@@ -976,7 +1070,8 @@ APPLY(2001, forcePrimaryTimeServer, ApiIdData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
                        false, \
                        true, \
@@ -986,7 +1081,8 @@ APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2003, getCurrentTime, ApiTimeData, \
                        false, \
                        false, \
@@ -996,18 +1092,20 @@ APPLY(2003, getCurrentTime, ApiTimeData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2004, changeSystemName, ApiSystemNameData, \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(2004, changeSystemId, ApiSystemIdData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiSystemNameData> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<ApiSystemIdData> &tran, const NotificationParams &notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
                        false, \
                        false, \
@@ -1017,7 +1115,8 @@ APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
                        true, \
                        false, \
@@ -1027,7 +1126,8 @@ APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* local transaction type */ \
 APPLY(2007, getSettings, ApiResourceParamDataList, \
                        false, \
                        false, \
@@ -1036,9 +1136,10 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>(),  \
+                       RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1047,8 +1148,9 @@ APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(4001, getClientInfos, ApiClientInfoDataList, \
+                       AllowForAllAccessOut(),      \
+                       LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(4001, getClientInfoList, ApiClientInfoDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1057,7 +1159,8 @@ APPLY(4001, getClientInfos, ApiClientInfoDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(4002, saveClientInfo, ApiClientInfoData, \
                        true, \
                        false, \
@@ -1067,7 +1170,8 @@ APPLY(4002, saveClientInfo, ApiClientInfoData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        false, \
                        false, \
@@ -1077,7 +1181,8 @@ APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
                        false, \
                        false, \
@@ -1087,7 +1192,8 @@ APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
                        false, \
                        true, \
@@ -1101,7 +1207,8 @@ APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
                        false, \
                        false, \
@@ -1114,7 +1221,8 @@ APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* local transaction type */ \
 APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        true, \
                        false, \
@@ -1127,7 +1235,8 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        false, \
                        false, \
@@ -1137,7 +1246,8 @@ APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(9010, dumpDatabaseToFile, ApiDatabaseDumpToFileData, \
                        false, \
                        false, \
@@ -1147,7 +1257,8 @@ APPLY(9010, dumpDatabaseToFile, ApiDatabaseDumpToFileData, \
                        AdminOnlyAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        false, \
                        false, \
@@ -1157,8 +1268,8 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
-
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 
@@ -1185,23 +1296,73 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
 
         /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
-
     }
+
+    namespace TransactionType
+    {
+        enum Value
+        {
+            Unknown = -1,
+            Regular = 0,
+            Local = 1, //< do not propagate transactions to other server peers or cloud
+            Cloud = 2,  //< sync transaction to cloud
+        };
+        QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
+    }
+
+    struct HistoryAttributes
+    {
+        /** Id of user or entity who created transaction. */
+        QnUuid author;
+    };
+
+    #define HistoryAttributes_Fields (author)
+    QN_FUSION_DECLARE_FUNCTIONS(HistoryAttributes, (json)(ubjson)(xml)(csv_record))
 
     class QnAbstractTransaction
     {
     public:
-        QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
-        QnAbstractTransaction(ApiCommand::Value value): command(value), isLocal(false) { peerID = qnCommon->moduleGUID(); }
+        typedef Timestamp TimestampType;
+
+        /**
+         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
+         */
+        QnAbstractTransaction():
+            command(ApiCommand::NotDefined),
+            peerID(qnCommon->moduleGUID()),
+            transactionType(TransactionType::Regular)
+        {
+        }
+        /**
+         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
+         */
+        QnAbstractTransaction(ApiCommand::Value value):
+            command(value),
+            peerID(qnCommon->moduleGUID()),
+            transactionType(TransactionType::Regular)
+        {
+        }
+        QnAbstractTransaction(QnUuid _peerID):
+            command(ApiCommand::NotDefined),
+            peerID(std::move(_peerID)),
+            transactionType(TransactionType::Regular)
+        {
+        }
+        QnAbstractTransaction(ApiCommand::Value value, QnUuid _peerID):
+            command(value),
+            peerID(std::move(_peerID)),
+            transactionType(TransactionType::Regular)
+        {
+        }
 
         struct PersistentInfo
         {
-            PersistentInfo(): sequence(0), timestamp(0) {}
+            PersistentInfo(): sequence(0), timestamp(Timestamp::fromInteger(0)) {}
             bool isNull() const { return dbID.isNull(); }
 
             QnUuid dbID;
             qint32 sequence;
-            qint64 timestamp;
+            Timestamp timestamp;
 
 #ifndef QN_NO_QT
             friend uint qHash(const ec2::QnAbstractTransaction::PersistentInfo &id) {
@@ -1215,27 +1376,54 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         };
 
         ApiCommand::Value command;
+        /** Id of peer that generated transaction. */
         QnUuid peerID;
         PersistentInfo persistentInfo;
 
-        bool isLocal; /* do not propagate transactions to other server peers*/
+        TransactionType::Value transactionType;
+        HistoryAttributes historyAttributes;
 
         QString toString() const;
+        bool isLocal() const { return transactionType == TransactionType::Local; }
+        bool isCloud() const { return transactionType == TransactionType::Cloud; }
     };
 
 
     typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
 #define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
-#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(isLocal)
+#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(transactionType)(historyAttributes)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction
     {
     public:
         QnTransaction(): QnAbstractTransaction() {}
-        QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
-        QnTransaction(ApiCommand::Value command, const T& params = T()): QnAbstractTransaction(command), params(params) {}
+        QnTransaction(QnUuid _peerID):
+            QnAbstractTransaction(std::move(_peerID))
+        {
+        }
+        QnTransaction(const QnAbstractTransaction& abstractTran):
+            QnAbstractTransaction(abstractTran)
+        {
+        }
+        QnTransaction(
+            ApiCommand::Value command,
+            const T& params = T())
+            :
+            QnAbstractTransaction(command),
+            params(params)
+        {
+        }
+        QnTransaction(
+            ApiCommand::Value command,
+            QnUuid _peerID,
+            const T& params = T())
+            :
+            QnAbstractTransaction(command, std::move(_peerID)),
+            params(params)
+        {
+        }
 
         template<typename U>
         QnTransaction(const QnTransaction<U>&)
@@ -1300,19 +1488,33 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
             QnUbjson::deserialize(stream, &transaction->params);
     }
 
+    struct ApiTranLogFilter
+    {
+        bool cloudOnly;
+
+        ApiTranLogFilter(): cloudOnly(false) {}
+    };
+
     struct ApiTransactionData: public ApiData
     {
         QnUuid tranGuid;
         QnAbstractTransaction tran;
+
+        ApiTransactionData() {}
+        ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
+
+        ApiTransactionData(const ApiTransactionData&) = default;
+        ApiTransactionData& operator=(const ApiTransactionData&) = default;
+        ApiTransactionData(ApiTransactionData&&) = default;
+        ApiTransactionData& operator=(ApiTransactionData&&) = default;
     };
 #define ApiTransactionData_Fields (tranGuid)(tran)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
-
     int generateRequestID();
 } /* namespace ec2*/
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value)(ec2::TransactionType::Value), (metatype)(numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

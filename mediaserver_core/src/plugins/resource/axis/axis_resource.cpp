@@ -122,6 +122,11 @@ QnPlAxisResource::~QnPlAxisResource()
 {
     m_audioTransmitter.reset();
     stopInputPortMonitoringAsync();
+
+    QnMutexLocker lock(&m_inputPortMutex);
+    while (!m_stoppingHttpClients.empty())
+        m_stopInputMonitoringWaitCondition.wait(lock.mutex());
+
 }
 
 void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
@@ -264,23 +269,23 @@ void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
 
     nx_http::AsyncHttpClientPtr httpClient;
     httpClient.swap(value);
+    m_stoppingHttpClients.insert(httpClient);
 
     lk.unlock();
-    httpClient->terminate();
-    httpClient.reset();
-    lk.relock();
+
+    httpClient->pleaseStop([httpClient, this]()
+        {
+            QnMutexLocker lock(&m_inputPortMutex);
+            m_stoppingHttpClients.erase(httpClient);
+            m_stopInputMonitoringWaitCondition.wakeAll();
+        });
+
 }
 
 bool QnPlAxisResource::isInputPortMonitored() const
 {
     QnMutexLocker lk( &m_inputPortMutex );
     return m_ioHttpMonitor[0].httpClient.get() != nullptr;
-}
-
-bool QnPlAxisResource::isInitialized() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
 }
 
 void QnPlAxisResource::clear()
@@ -429,7 +434,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=").append(isAudioEnabled() ? "yes" : "no"));
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
@@ -518,6 +523,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
                 }
             }
         }
+
+        if (!isIOModule() && m_resolutionList.isEmpty())
+            return CameraDiagnostics::CameraInvalidParams("Failed to read resolution list");
     }
 
     if (hasVideo(0))
@@ -1184,8 +1192,14 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
             break;
         }
     }
+
     if (!found)
+    {
         m_ioStates.push_back(newValue);
+        if (!isActive)
+            return;
+    }
+
     for (const auto& port: m_ioPorts)
     {
         if (port.id == portId) {

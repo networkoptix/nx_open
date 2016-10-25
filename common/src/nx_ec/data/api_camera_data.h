@@ -1,27 +1,38 @@
-#ifndef __API_CAMERA_DATA_H_
-#define __API_CAMERA_DATA_H_
+#pragma once
 
 #include "api_globals.h"
-#include "api_data.h"
 #include "api_resource_data.h"
+#include <utils/common/id.h>
 
-namespace ec2
+namespace ec2 {
+
+struct ApiCameraData: ApiResourceData
 {
-    struct ApiCameraData: ApiResourceData
-    {
-        ApiCameraData(): manuallyAdded(false), statusFlags(0) {}
+    ApiCameraData(): manuallyAdded(false), statusFlags(0) {}
 
-        QnLatin1Array       mac;
-        QString             physicalId;
-        bool                manuallyAdded;
-        QString             model;
-        QString             groupId;
-        QString             groupName;
-        Qn::CameraStatusFlags   statusFlags;
-        QString             vendor;
-    };
-#define ApiCameraData_Fields ApiResourceData_Fields (mac)(physicalId)(manuallyAdded)(model)(groupId)(groupName)(statusFlags)(vendor)
+    /**
+     * See fillId() in ApiIdData
+     */
+    void fillId()
+    {
+        // ATTENTION: This logic is similar to the one in
+        // QnSecurityCamResource::makeCameraIdFromUniqueId().
+        if (!physicalId.isEmpty())
+            id = guidFromArbitraryData(physicalId.toUtf8());
+        else
+            id = QnUuid();
+    }
+
+    QnLatin1Array mac;
+    QString physicalId;
+    bool manuallyAdded;
+    QString model;
+    QString groupId;
+    QString groupName;
+    Qn::CameraStatusFlags statusFlags;
+    QString vendor;
+};
+#define ApiCameraData_Fields ApiResourceData_Fields \
+    (mac)(physicalId)(manuallyAdded)(model)(groupId)(groupName)(statusFlags)(vendor)
 
 } // namespace ec2
-
-#endif // __API_CAMERA_DATA_H_

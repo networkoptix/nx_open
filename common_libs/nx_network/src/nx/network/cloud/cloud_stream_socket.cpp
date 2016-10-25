@@ -144,8 +144,14 @@ bool CloudStreamSocket::connect(
             SystemError::setLastErrorCode(SystemError::interrupted);
             return false;
         }
-        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
-        NX_ASSERT(oldPromisePtr == nullptr);
+
+        SocketResultPrimisePtr expected = nullptr;
+        if (!m_sendPromisePtr.compare_exchange_strong(expected, &promise))
+        {
+            NX_ASSERT(false);
+            SystemError::setLastErrorCode(SystemError::already);
+            return false;
+        }
     }
 
     connectAsync(
@@ -332,6 +338,8 @@ aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
 
 void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    if (m_socketDelegate)
+        m_socketDelegate->bindToAioThread(aioThread);
     m_aioThreadBinder->bindToAioThread(aioThread);
     m_socketAttributes.aioThread = aioThread;
 }
@@ -430,9 +438,14 @@ bool CloudStreamSocket::startAsyncConnect(
                     auto operationLock = sharedOperationGuard->lock();
                     if (!operationLock)
                         return; //operation has been cancelled
+
+                    if (errorCode == SystemError::noError)
+                        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
+                    else
+                        NX_ASSERT(!cloudConnection);
+
                     dispatch(
-                        [this, errorCode, 
-                            cloudConnection = std::move(cloudConnection)]() mutable
+                        [this, errorCode, cloudConnection = std::move(cloudConnection)]() mutable
                         {
                             onCloudConnectDone(
                                 errorCode,

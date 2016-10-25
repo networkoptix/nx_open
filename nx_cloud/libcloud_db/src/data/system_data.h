@@ -22,42 +22,44 @@
 
 namespace nx {
 namespace cdb {
-namespace data {
 
-class SubscriptionData
-:
-    public api::SubscriptionData
-{
-public:
-};
+namespace api {
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (SystemSharingEx),
+    (sql_record));
+
+} // namespace api
+
+namespace data {
 
 //!Information required to register system in cloud
 class SystemRegistrationData
-:
+    :
     public api::SystemRegistrationData,
     public stree::AbstractResourceReader
 {
 public:
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
-    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
 class SystemRegistrationDataWithAccount
-:
+    :
     public SystemRegistrationData
 {
 public:
     std::string accountEmail;
 
     SystemRegistrationDataWithAccount(SystemRegistrationData&& right)
-    :
+        :
         SystemRegistrationData(std::move(right))
     {
     }
 };
 
 class SystemData
-:
+    :
     public api::SystemData,
     public stree::AbstractResourceReader
 {
@@ -68,31 +70,33 @@ public:
     SystemData();
 
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
-    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
 #define SystemData_FieldsEx SystemData_Fields (expirationTimeUtc)
 
 
 class SystemDataList
-:
+    :
     public api::SystemDataList
 {
 public:
 };
 
 class SystemSharing
-:
+    :
     public api::SystemSharing,
     public stree::AbstractResourceReader
 {
 public:
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
-    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
+#define SystemSharing_FieldsEx SystemSharing_Fields (vmsUserId)
+
 class SystemSharingList
-:
+    :
     public stree::AbstractResourceReader
 {
 public:
@@ -105,7 +109,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 
 //!for requests passing just system id
 class SystemID
-:
+    :
     public api::SystemID,
     public stree::AbstractResourceReader
 {
@@ -114,9 +118,9 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class SystemNameUpdate
-:
-    public api::SystemNameUpdate,
+class SystemAttributesUpdate
+    :
+    public api::SystemAttributesUpdate,
     public stree::AbstractResourceReader
 {
 public:
@@ -124,8 +128,16 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
+class UserSessionDescriptor
+    :
+    public api::UserSessionDescriptor,
+    public stree::AbstractResourceReader
+{
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

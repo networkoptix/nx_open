@@ -16,13 +16,7 @@ class QnNewSystemServerFlagWatcher: public QObject
     typedef QObject base_type;
 public:
     QnNewSystemServerFlagWatcher(QObject* parent = nullptr);
-    virtual ~QnNewSystemServerFlagWatcher();
-
+    virtual ~QnNewSystemServerFlagWatcher() {}
 private:
     void update();
-
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
-
-private:
-    QnMediaServerResourcePtr m_server;
 };

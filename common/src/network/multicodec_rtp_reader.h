@@ -24,9 +24,12 @@ namespace RtpTransport
     typedef QString Value;
 
     //!Server selects best suitable transport
-    static QLatin1String _auto( "AUTO" );
-    static QLatin1String udp( "UDP" );
-    static QLatin1String tcp( "TCP" );
+
+    static const QLatin1String _auto( "AUTO" );
+    static const QLatin1String udp( "UDP" );
+    static const QLatin1String tcp( "TCP" );
+
+    Value fromString(const QString& str);
 };
 
 class QnRtpStreamParser;
@@ -73,6 +76,7 @@ public:
     void setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme);
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
+    void setRtpTransport(const RtpTransport::Value& value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
@@ -129,8 +133,8 @@ private:
     QElapsedTimer m_dataTimer;
     bool m_rtpStarted;
     nx_http::header::AuthScheme::Value m_prefferedAuthScheme;
-
     QString m_currentStreamUrl;
+    QString m_rtpTransport;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

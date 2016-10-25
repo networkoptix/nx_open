@@ -18,19 +18,15 @@ namespace api {
 
 enum class NatTraversalResultCode
 {
-    ok,
+    ok = 0,
     noResponseFromMediator,
     mediatorReportedError,
     targetPeerHasNoUdpAddress,
     noSynFromTargetPeer,
     udtConnectFailed,
-    tcpConnectFailed
+    tcpConnectFailed,
+    endpointVerificationFailure
 };
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NatTraversalResultCode)
-//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorDetail), (lexical))
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-void NX_NETWORK_API serialize(const NatTraversalResultCode&, QString*);
 
 class NX_NETWORK_API ConnectionResultRequest
 :
@@ -53,5 +49,8 @@ public:
 }   //api
 }   //hpm
 }   //nx
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)
+void NX_NETWORK_API serialize(const nx::hpm::api::NatTraversalResultCode&, QString*);
 
 #endif  //NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H

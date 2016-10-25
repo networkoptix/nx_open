@@ -28,16 +28,6 @@ namespace
     const QLatin1String kDataDir("general/dataDir");
     const QLatin1String kDefaultDataDir("");
 
-    //log settings
-    const QLatin1String kLogLevel("log/logLevel");
-#ifdef _DEBUG
-    const QLatin1String kDefaultLogLevel("DEBUG");
-#else
-    const QLatin1String kDefaultLogLevel("INFO");
-#endif
-    const QLatin1String kLogDir("log/logDir");
-    const QLatin1String kDefaultLogDir("");
-
     //CloudDB settings
     const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
     const QLatin1String kDefaultRunWithCloud("true");
@@ -77,6 +67,19 @@ namespace
     const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
     constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
         nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
+
+    namespace tcp_reverse_retry_policy {
+    const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
+    const QLatin1String kInitialDelay("cloudConnect/tcpReverseRetryPolicy/initialDelay");
+    const QLatin1String kDelayMultiplier("cloudConnect/tcpReverseRetryPolicy/delayMultiplier");
+    const QLatin1String kMaxDelay("cloudConnect/tcpReverseRetryPolicy/maxDelay");
+    } // namespace tcp_reverse_retry_policy
+
+    namespace tcp_reverse_http_timeouts {
+    const QLatin1String kSend("cloudConnect/tcpReverseHttpTimeouts/send");
+    const QLatin1String kRead("cloudConnect/tcpReverseHttpTimeouts/read");
+    const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
+    } // namespace tcp_reverse_http_timeouts
 }
 
 
@@ -86,17 +89,8 @@ namespace conf {
 
 Settings::Settings()
 :
-#ifdef _WIN32
-    m_settings(
-        QSettings::SystemScope,
-        QnAppInfo::organizationName(),
-        QnLibConnectionMediatorAppInfo::applicationName()),
-#else
-    m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
-                QSettings::IniFormat ),
-#endif
-    m_showHelp( false )
+    m_settings(QnLibConnectionMediatorAppInfo::applicationName(), kModuleName),
+    m_showHelp(false)
 {
     fillSupportedCmdParameters();
 }
@@ -131,7 +125,7 @@ const api::ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const Logging& Settings::logging() const
+const QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }
@@ -167,8 +161,7 @@ void Settings::loadConfiguration()
         kDefaultDataDir).toString();
 
     //log
-    m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
-    m_logging.logDir = m_settings.value(kLogDir, kDefaultLogDir).toString();
+    m_logging.load(m_settings);
 
     m_cloudDB.runWithCloud = m_settings.value(kRunWithCloud, kDefaultRunWithCloud).toBool();
     m_cloudDB.endpoint = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
@@ -199,6 +192,33 @@ void Settings::loadConfiguration()
         kUdpTunnelKeepAliveRetries,
         kDefaultUdpTunnelKeepAliveRetries).toInt();
 
+    m_connectionParameters.tcpReverseRetryPolicy.setMaxRetryCount(m_settings.value(
+        tcp_reverse_retry_policy::kMaxCount,
+        network::RetryPolicy::kDefaultMaxRetryCount).toInt());
+    m_connectionParameters.tcpReverseRetryPolicy.setInitialDelay(
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_retry_policy::kInitialDelay).toString(),
+        network::RetryPolicy::kDefaultInitialDelay));
+    m_connectionParameters.tcpReverseRetryPolicy.setDelayMultiplier(m_settings.value(
+        tcp_reverse_retry_policy::kDelayMultiplier,
+        network::RetryPolicy::kDefaultDelayMultiplier).toInt());
+    m_connectionParameters.tcpReverseRetryPolicy.setMaxDelay(
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_retry_policy::kMaxDelay).toString(),
+        network::RetryPolicy::kDefaultMaxDelay));
+
+    m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_http_timeouts::kSend).toString(),
+        nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+    m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_http_timeouts::kRead).toString(),
+        nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+    m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_http_timeouts::kBody).toString(),
+        nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -211,9 +231,6 @@ void Settings::loadConfiguration()
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
     }
-
-    if (m_logging.logDir.isEmpty())
-        m_logging.logDir = m_general.dataDir + lit("/log/");
 }
 
 void Settings::readEndpointList(

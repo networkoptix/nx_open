@@ -3,10 +3,8 @@ call "%${VCVars}%\..\..\VC\vcvarsall.bat"
 set CONFIG=%1
 echo config = %CONFIG%
 
-set ARCH=x86
-
 set AXHDW=%~dp0
-set bebin_path=${root.dir}\build_environment\target\%ARCH%\bin
+set bebin_path=${root.dir}\build_environment\target\bin
 set PATH=%bebin_path%\%CONFIG%;%PATH%
 set IDC=${qt.dir}\bin\idc.exe
 

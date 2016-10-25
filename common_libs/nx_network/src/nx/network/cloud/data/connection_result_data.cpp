@@ -1,29 +1,12 @@
-/**********************************************************
-* Dec 23, 2015
-* akolesnikov
-***********************************************************/
-
 #include "connection_result_data.h"
 
 #include <nx/fusion/model_functions.h>
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
 using namespace stun::cc;
-
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(NatTraversalResultCode,
-    (NatTraversalResultCode::ok, "ok")
-    (NatTraversalResultCode::noResponseFromMediator, "noResponseFromMediator")
-    (NatTraversalResultCode::mediatorReportedError, "mediatorReportedError")
-    (NatTraversalResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
-    (NatTraversalResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
-    (NatTraversalResultCode::udtConnectFailed, "udtConnectFailed")
-    )
-
 
 ConnectionResultRequest::ConnectionResultRequest()
 :
@@ -56,3 +39,14 @@ bool ConnectionResultRequest::parseAttributes(const nx::stun::Message& message)
 }   //api
 }   //hpm
 }   //nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, NatTraversalResultCode,
+    (nx::hpm::api::NatTraversalResultCode::ok, "ok")
+    (nx::hpm::api::NatTraversalResultCode::noResponseFromMediator, "noResponseFromMediator")
+    (nx::hpm::api::NatTraversalResultCode::mediatorReportedError, "mediatorReportedError")
+    (nx::hpm::api::NatTraversalResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
+    (nx::hpm::api::NatTraversalResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
+    (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "udtConnectFailed")
+    (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "tcpConnectFailed")
+    (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "endpointVerificationFailure")
+)

@@ -12,10 +12,10 @@
 
 RepeatingBufferSender::RepeatingBufferSender(
     const nx_http::StringType& mimeType,
-    nx::Buffer buffer )
+    nx::Buffer buffer)
 :
-    m_mimeType( mimeType ),
-    m_buffer( std::move( buffer ) )
+    m_mimeType(mimeType),
+    m_buffer(std::move(buffer))
 {
 }
 
@@ -24,11 +24,10 @@ void RepeatingBufferSender::processRequest(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request /*request*/,
     nx_http::Response* const /*response*/,
-    std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+    nx_http::HttpRequestProcessedHandler completionHandler)
 {
     completionHandler(
-        nx_http::StatusCode::ok,
-        std::make_unique<RepeatingBufferMsgBodySource>( m_mimeType, m_buffer ) );
+        nx_http::RequestResult(
+            nx_http::StatusCode::ok,
+            std::make_unique<RepeatingBufferMsgBodySource>(m_mimeType, m_buffer)));
 }

@@ -189,15 +189,15 @@ class FlexibleQueryHttpHandler:
 public:
     FlexibleQueryHttpHandler(
         ApiCommand::Value cmdCode,
-        std::function<ErrorCode(InputData, OutputData*)> queryHandler)
+        std::function<ErrorCode(InputData, OutputData*, const Qn::UserAccessData&)> queryHandler)
         :
         base_type(cmdCode),
         m_queryHandler(
             [queryHandler](
-                InputData input, OutputData* output, nx_http::Response* response) -> ErrorCode
+                InputData input, OutputData* output, const Qn::UserAccessData& accessData, nx_http::Response* response) -> ErrorCode
             {
                 QN_UNUSED(response);
-                return queryHandler(std::move(input), output);
+                return queryHandler(std::move(input), output, accessData);
             })
     {
     }
@@ -206,9 +206,12 @@ public:
         ApiCommand::Value cmdCode,
         std::function<ErrorCode(InputData, OutputData*, nx_http::Response*)> queryHandler)
         :
-        base_type(cmdCode),
-        m_queryHandler(std::move(queryHandler))
+        base_type(cmdCode)
     {
+        m_queryHandler = [queryHandler](InputData input, OutputData* output, const Qn::UserAccessData&, nx_http::Response* response)
+        {
+            return queryHandler(input, output, response);
+        };
     }
 
     template<class HandlerType>
@@ -224,13 +227,14 @@ public:
                 const ErrorCode errorCode = m_queryHandler(
                     inputData,
                     &output,
+                    connection->accessRights(),
                     connection->response());
                 handler(errorCode, output);
             });
     }
 
 private:
-    std::function<ErrorCode(InputData, OutputData*, nx_http::Response*)> m_queryHandler;
+    std::function<ErrorCode(InputData, OutputData*, const Qn::UserAccessData& accessData, nx_http::Response*)> m_queryHandler;
 };
 
 } // namespace ec2

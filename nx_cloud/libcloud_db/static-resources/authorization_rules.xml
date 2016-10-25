@@ -21,9 +21,15 @@
                     <set resName="user.ha1" resValue="111111111111111"/>
                 </sequence> -->
             </condition>
-
+            
             <condition resName="request.path">
                 <set value="/cdb/account/reset_password" resName="authenticated" resValue="true"/>
+                <condition value="/cdb/maintenance/get_vms_connections" resName="secureSource">
+                    <set value="true" resName="authenticated" resValue="true"/>
+                </condition>
+                <condition value="/cdb/maintenance/get_transaction_log" resName="secureSource">
+                    <set value="true" resName="authenticated" resValue="true"/>
+                </condition>
             </condition>
         </sequence>
 
@@ -133,8 +139,18 @@
                                 </condition>
                             </sequence>
                         </condition>
+                        <condition resName="data.accountRightsOnSystem">
+                            <!-- owner sharing cannot be modified by anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
+                        <condition resName="systemAccessRole">
+                            <!-- "owner" role cannot be assigned to anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
                         <condition resName="auth.selfAccountAccessRequested">
                             <sequence value="true">
+                                <!-- It is forbidden to change own access role (even downgrade). Only remove -->
+                                <set resName="authorized" resValue="false"/>
                                 <condition resName="systemAccessRole">
                                     <sequence value="none">  <!-- sharing removal... -->
                                         <!-- any account can remove non-owner sharing to itself -->
@@ -146,14 +162,6 @@
                                     </sequence>
                                 </condition>
                             </sequence>
-                        </condition>
-                        <condition resName="data.accountRightsOnSystem">
-                            <!-- owner sharing cannot be modified by anyone -->
-                            <set value="owner" resName="authorized" resValue="false"/>
-                        </condition>
-                        <condition resName="systemAccessRole">
-                            <!-- "owner" role cannot be assigned to anyone -->
-                            <set value="owner" resName="authorized" resValue="false"/>
                         </condition>
                     </sequence>
                     <sequence value="/cdb/system/bind">
@@ -169,7 +177,7 @@
                             <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                         <condition resName="auth.selfSystemAccessRequested">
-                            <set value="owner" resName="authorized" resValue="true"/>
+                            <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <sequence value="/cdb/auth/get_authentication">
@@ -193,16 +201,37 @@
                     <condition value="/cdb/event/subscribe" resName="auth.systemID" matchType="presence">
                         <set value="false" resName="authorized" resValue="false"/>
                     </condition>
-                    <!-- only system can update self system name -->
-                    <sequence value="/cdb/system/update_system_name">
+                    <!-- only system owner can rename the system -->
+                    <sequence value="/cdb/system/rename">
                         <set resName="authorized" resValue="false"/>
-                        <condition value="/cdb/system/update_system_name" resName="auth.selfSystemAccessRequested">
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/system/update">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                        <condition resName="auth.selfSystemAccessRequested">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">
                         <set value="false" resName="authorized" resValue="false"/>
                     </condition>
+                    <sequence value="/cdb/maintenance/get_vms_connections">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/maintenance/get_transaction_log">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
                 </condition>
             </condition>
         </sequence>     <!-- authorization -->

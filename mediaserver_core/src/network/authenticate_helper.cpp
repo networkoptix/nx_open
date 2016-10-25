@@ -3,6 +3,7 @@
 
 #include <QtCore/QCryptographicHash>
 
+#include <utils/crypt/symmetrical.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
@@ -30,6 +31,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/string.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -368,6 +370,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
 
     //adding active period
     nx::utils::TimerManager::TimerGuard timerGuard(
+        nx::utils::TimerManager::instance(),
         nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnAuthHelper::authenticationExpired, this, authKey, std::placeholders::_1),
             std::chrono::milliseconds(std::min(periodMillis, MAX_AUTHENTICATION_KEY_LIFE_TIME_MS))));
@@ -628,7 +631,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     nx_http::Response tmpHeaders;
 
     QMap<nx_http::BufferType, nx_http::BufferType> params;
-    nx_http::header::parseDigestAuthParams(authData, &params, ';');
+    nx::utils::parseNameValuePairs(authData, ';', &params);
 
     Qn::AuthResult authResult = Qn::Auth_Forbidden;
     if (params.contains(Qn::URL_QUERY_AUTH_KEY_NAME))
@@ -718,12 +721,7 @@ void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
 
 QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
 {
-    static const QByteArray mask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312"); // generated from guid
-    static const int maskSize = mask.size();
-    QByteArray result = data;
-    for (int i = 0; i < result.size(); ++i)
-        result.data()[i] ^= mask.data()[i % maskSize];
-    return result;
+    return nx::utils::encodeSimple(data);
 }
 
 Qn::AuthResult QnAuthHelper::authenticateByUrl(

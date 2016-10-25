@@ -3,6 +3,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
+#include <utils/math/math.h>
 
 #include <ui/actions/actions.h>
 #include <ui/common/geometry.h>
@@ -20,7 +21,7 @@ namespace {
 
 const int kTitleBarHeight = 24;
 const int kVLineWidth = 1;
-const QSize kControlButtonSize(40 - kVLineWidth, kTitleBarHeight);
+const QSize kControlButtonSize(36, kTitleBarHeight);
 const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
 
 QFrame* newVLine()
@@ -102,10 +103,12 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
                     d->mainMenuButton->rect().bottomLeft()));
+
+            d->mainMenuButton->setDown(false);
     });
 
-
     d->tabBar = new QnLayoutTabBar(this);
+    d->tabBar->setFocusPolicy(Qt::NoFocus);
     d->tabBar->setFixedHeight(kTitleBarHeight);
     connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested, d,
         &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
@@ -152,6 +155,8 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
                     d->currentLayoutsButton->rect().bottomLeft()));
+
+            d->currentLayoutsButton->setDown(false);
         });
 
     layout->addWidget(d->newTabButton);
@@ -161,25 +166,25 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newVLine());
     layout->addWidget(d->cloudPanel);
     layout->addWidget(newVLine());
+#ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
     layout->addWidget(newActionButton(
         QnActions::OpenLoginDialogAction,
         Qn::Login_Help,
         kControlButtonSize));
-    layout->addWidget(newVLine());
+#else
+    layout->addSpacing(8);
+#endif
     layout->addWidget(newActionButton(
         QnActions::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
         kControlButtonSize));
-    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
         QnActions::MinimizeAction,
         kControlButtonSize));
-    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
         QnActions::EffectiveMaximizeAction,
         Qn::MainWindow_Fullscreen_Help,
         kControlButtonSize));
-    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
         QnActions::ExitAction,
         kControlButtonSize));
@@ -301,12 +306,13 @@ QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
     int helpTopicId,
     const QSize& fixedSize)
 {
-    auto button = new QnToolButton();
+    auto button = new QnToolButton(this);
 
     button->setDefaultAction(action(actionId));
     button->setFocusPolicy(Qt::NoFocus);
     button->adjustIconSize();
     button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
+    button->setAutoRaise(true);
 
     if (helpTopicId != Qn::Empty_Help)
         setHelpTopic(button, helpTopicId);

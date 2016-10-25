@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource_management/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 #include <nx_ec/data/api_fwd.h>
@@ -61,8 +61,8 @@ public:
     /** Save accessible resources for the given user */
     void saveAccessibleResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& accessibleResources);
 
-    void saveUserGroup(const ec2::ApiUserGroupData& userGroup);
-    void removeUserGroup(const QnUuid& groupId);
+    void saveUserRole(const ec2::ApiUserGroupData& role);
+    void removeUserRole(const QnUuid& id);
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);

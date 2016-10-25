@@ -44,6 +44,10 @@ public:
     QnLog();
     ~QnLog();
 
+    /**
+     * @param baseName Can be "-" which directs all logs to qWarning(). This is useful e.g. on
+     *     Android, where QDebug logs to logcat.
+     */
     bool create(const QString &baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel);
 
     void setLogLevel(QnLogLevel logLevel);
@@ -91,7 +95,7 @@ public:
         bool init( int logID, const QString& logLevelStr );
 
     private:
-        mutable QnMutex m_mutex;
+        mutable std::mutex m_mutex;
         std::map< int, std::unique_ptr< QnLog > > m_logs;
     };
 

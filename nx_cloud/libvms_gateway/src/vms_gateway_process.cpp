@@ -117,7 +117,9 @@ int VmsGatewayProcess::exec()
             return 0;
         }
 
-        initializeLogging(settings);
+        initializeQnLog(
+            settings.logging(), settings.general().dataDir,
+            QnLibVmsGatewayAppInfo::applicationDisplayName());
 
         //enabling nat traversal
         if (!settings.general().mediatorEndpoint.isEmpty())
@@ -128,15 +130,24 @@ int VmsGatewayProcess::exec()
         std::unique_ptr<QnPublicIPDiscovery> publicAddressFetcher;
         if (settings.cloudConnect().replaceHostAddressWithPublicAddress)
         {
-            publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
-                QStringList() << settings.cloudConnect().fetchPublicIpUrl);
-            QObject::connect(
-                publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
-                publicAddressFetcher.get(), [this](const QHostAddress& publicAddress) {
-                    publicAddressFetched(publicAddress);
-                },
-                Qt::DirectConnection);
-            publicAddressFetcher->update();
+            if (!settings.cloudConnect().publicIpAddress.isEmpty())
+            {
+                publicAddressFetched(settings, settings.cloudConnect().publicIpAddress);
+            }
+            else
+            {
+                publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
+                    QStringList() << settings.cloudConnect().fetchPublicIpUrl);
+
+                QObject::connect(
+                    publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
+                    [this, &settings](const QHostAddress& publicAddress)
+                    {
+                        publicAddressFetched(settings, publicAddress.toString());
+                    });
+
+                publicAddressFetcher->update();
+            }
         }
 
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
@@ -260,26 +271,6 @@ bool VmsGatewayProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 }
 #endif
 
-void VmsGatewayProcess::initializeLogging(const conf::Settings& settings)
-{
-    //logging
-    if (settings.logging().logLevel != QString::fromLatin1("none"))
-    {
-        const QString& logDir = settings.logging().logDir;
-
-        QDir().mkpath(logDir);
-        const QString& logFileName = logDir + lit("/log_file");
-        if (cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
-            QnLog::initLog(settings.logging().logLevel);
-        else
-            std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
-        NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-    }
-}
-
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
@@ -304,15 +295,33 @@ void VmsGatewayProcess::registerApiHandlers(
     }
 }
 
-void VmsGatewayProcess::publicAddressFetched(const QHostAddress& publicAddress)
+void VmsGatewayProcess::publicAddressFetched(
+    const conf::Settings& settings,
+    const QString& publicAddress)
 {
-    const QString publicAddressStr = publicAddress.toString();
-
     NX_LOGX(lm("Retrieved public address %1. This address will be used for cloud connect")
-        .arg(publicAddressStr), cl_logINFO);
+        .arg(publicAddress), cl_logINFO);
 
     nx::network::SocketGlobals::cloudConnectSettings()
-        .replaceOriginatingHostAddress(publicAddressStr);
+        .replaceOriginatingHostAddress(publicAddress);
+
+    const auto& rcSettings = settings.cloudConnect().tcpReverse;
+    if (rcSettings.poolSize != 0)
+    {
+        auto& pool = nx::network::SocketGlobals::tcpReversePool();
+        pool.setPoolSize(rcSettings.poolSize);
+        pool.setKeepAliveOptions(rcSettings.keepAlive);
+        if (pool.start(publicAddress, rcSettings.port))
+        {
+            NX_LOG(lm("TCP reverse pool has started with port=%1, poolSize=%2, keepAlive=%3")
+                .args(pool.port(), rcSettings.poolSize, rcSettings.keepAlive), cl_logALWAYS);
+        }
+        else
+        {
+            NX_LOGX(lm("Could not start TCP reverse pool on port %1").args(rcSettings.port),
+                cl_logERROR);
+        }
+    }
 }
 
 }   //namespace cloud

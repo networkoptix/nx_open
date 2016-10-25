@@ -100,12 +100,12 @@ Page
         hideWarning()
         connectButton.forceActiveFocus()
         d.connecting = true
-        connectionManager.connectToServer(LoginUtils.makeUrl(address, login, password))
+        connectionManager.connectToServer("http://" + address, login, password)
     }
 
     function showWarning(status, info)
     {
-        if (status == QnConnectionManager.Unauthorized)
+        if (status == QnConnectionManager.UnauthorizedConnectionResult)
         {
             credentialsEditor.displayUserCredentialsError = true
         }
@@ -115,7 +115,7 @@ Page
             credentialsEditor.displayAddressError = true
         }
 
-        if (status == QnConnectionManager.IncompatibleVersion)
+        if (status == QnConnectionManager.IncompatibleVersionConnectionResult)
             Workflow.openOldClientDownloadSuggestion()
     }
 

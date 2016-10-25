@@ -373,7 +373,7 @@ int CEPoll::wait(
 
     int total = 0;
 
-    int64_t entertime = CTimer::getTime();
+    uint64_t entertime = CTimer::getTime();
     while (true)
     {
         {
@@ -438,9 +438,9 @@ int CEPoll::wait(
         if (total > 0)
             return total;
 
-        if ((msTimeOut >= 0) && (int64_t(CTimer::getTime() - entertime) >= msTimeOut * 1000LL))
-            //throw CUDTException(6, 3, 0);
-            return 0; //on timeout epoll_wait MUST return 0!
+        auto now = CTimer::getTime();
+        if (msTimeOut >= 0 && now - entertime >= (uint64_t) msTimeOut * 1000)
+            return 0;
 
         CTimer::waitForEvent();
     }

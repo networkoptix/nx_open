@@ -29,7 +29,17 @@ namespace ec2
 
         static QnTransactionLog* instance();
 
-        ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
+        /**
+         * Return transactions from the log
+         * @param state return transactions with sequence bigger then state
+         * @param output result
+         * @param onlyCloudData if false returns all transactions otherwise filter
+         *        result and keep only cloud related transactions.
+         */
+        ErrorCode getTransactionsAfter(
+            const QnTranState& state,
+            bool onlyCloudData,
+            QList<QByteArray>& result);
         QnTranState getTransactionsState();
 
         bool contains(const QnTranState& state) const;
@@ -57,34 +67,13 @@ namespace ec2
             return ErrorCode::ok;
         }
 
-        qint64 getTimeStamp();
+        Timestamp getTimeStamp();
         bool init();
         bool clear();
 
         int getLatestSequence(const QnTranStateKey& key) const;
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
-
-         /**
-         *  Semantics of the transactionHash() function is following:
-         *  if transaction A follows transaction B and overrides it,
-         *  their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
-         *  Obviously, transactionHash() is not needed for the non-persistent transaction.
-         */
-
-        template<typename Param>
-        QnUuid transactionHash(const Param &param)
-        {
-            for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
-            {
-                auto tdBase = (*it).get();
-                auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
-                if (td)
-                    return td->getHashFunc(param);
-            }
-            NX_ASSERT(0, "Transaciton descriptor for the given param not found");
-            return QnUuid();
-        }
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
         void fillPersistentInfo(QnAbstractTransaction& tran);
@@ -93,8 +82,8 @@ namespace ec2
         void commit();
         void rollback();
 
-        qint64 getTransactionLogTime() const;
-        void setTransactionLogTime(qint64 value);
+        Timestamp getTransactionLogTime() const;
+        void setTransactionLogTime(Timestamp value);
         ErrorCode saveToDB(
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
@@ -112,10 +101,10 @@ namespace ec2
     private:
         struct UpdateHistoryData
         {
-            UpdateHistoryData(): timestamp(0) {}
-            UpdateHistoryData(const QnTranStateKey& updatedBy, const qint64& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
+            UpdateHistoryData(const QnTranStateKey& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
             QnTranStateKey updatedBy;
-            qint64 timestamp;
+            Timestamp timestamp;
         };
         struct CommitData
         {
@@ -132,8 +121,8 @@ namespace ec2
 
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_baseTime;
-        qint64 m_lastTimestamp;
+        quint64 m_baseTime;
+        Timestamp m_lastTimestamp;
         CommitData m_commitData;
     };
 };

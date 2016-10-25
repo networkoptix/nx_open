@@ -18,41 +18,48 @@ class QnNxStylePrivate : public QCommonStylePrivate, public QnGeometry
 public:
     QnNxStylePrivate();
 
-    QnPaletteColor findColor(const QColor &color) const;
+    QnPaletteColor findColor(const QColor& color) const;
     QnPaletteColor mainColor(QnNxStyle::Colors::Palette palette) const;
 
-    QColor checkBoxColor(const QStyleOption *option, bool radio = false) const;
+    QColor checkBoxColor(const QStyleOption* option, bool radio = false) const;
 
     void drawSwitch(
-            QPainter *painter,
-            const QStyleOption *option,
-            const QWidget *widget = nullptr) const;
+            QPainter* painter,
+            const QStyleOption* option,
+            const QWidget* widget = nullptr) const;
 
     void drawCheckBox(
-            QPainter *painter,
-            const QStyleOption *option,
-            const QWidget *widget = nullptr) const;
+            QPainter* painter,
+            const QStyleOption* option,
+            const QWidget* widget = nullptr) const;
 
     void drawRadioButton(
-            QPainter *painter,
-            const QStyleOption *option,
-            const QWidget *widget = nullptr) const;
+            QPainter* painter,
+            const QStyleOption* option,
+            const QWidget* widget = nullptr) const;
 
     void drawSortIndicator(
-            QPainter *painter,
-            const QStyleOption *option,
-            const QWidget *widget = nullptr) const;
+            QPainter* painter,
+            const QStyleOption* option,
+            const QWidget* widget = nullptr) const;
 
     void drawCross(
             QPainter* painter,
             const QRect& rect,
             const QColor& color) const;
 
+    void drawTextButton(
+            QPainter* painter,
+            const QStyleOptionButton* option,
+            QPalette::ColorRole foregroundRole,
+            const QWidget* widget = nullptr) const;
+
     /* Insert horizontal separator line into QInputDialog above its button box. */
     bool polishInputDialog(QInputDialog* inputDialog) const;
 
 public:
     QnGenericPalette palette;
-    QnNoptixStyleAnimator *idleAnimator;
-    QnNoptixStyleAnimator *stateAnimator;
+    QnNoptixStyleAnimator* idleAnimator;
+    QnNoptixStyleAnimator* stateAnimator;
+    QPointer<QWidget> lastProxiedWidgetUnderMouse;
 };

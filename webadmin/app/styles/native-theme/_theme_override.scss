@@ -67,11 +67,28 @@ button, select{
   &:active,
   &.active,
   &.disabled,
-  &[disabled] {
+  &[disabled],
+  &.readonly,
+  &[readonly]{
     outline: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
+  }
+}
+
+
+button, select, .form-control{
+  &.disabled,
+  &[disabled],
+  &.readonly,
+  &[readonly] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border-color: $input-border;
+    box-shadow: none;
   }
 }
 
@@ -225,4 +242,13 @@ input[type="radio"], input[type="checkbox"] {
 .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
    margin-left: -22px;
 
+}
+.dropdown-menu {
+  padding: 2px 0;
+  border:none;
+  @include box-shadow(0 10px 20px transparentize($dark4,0.5));
+  &> li > a {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 }

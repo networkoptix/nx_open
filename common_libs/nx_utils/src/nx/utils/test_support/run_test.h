@@ -7,6 +7,7 @@
 #endif
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/flag_config.h>
 #include <nx/utils/test_support/test_options.h>
 
 namespace nx {
@@ -16,6 +17,8 @@ inline int runTest(
     int argc, const char* argv[],
     std::function<void(const ArgumentParser& args)> extraInit = nullptr)
 {
+    nx::utils::FlagConfig::setOutputAllowed(false);
+
     #ifdef USE_GMOCK
         ::testing::InitGoogleMock(&argc, (char**)argv);
     #else

@@ -193,22 +193,36 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    //TODO: #vkutin replace with SearchLineEdit
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+        QLineEdit::LeadingPosition);
     ui->filterLineEdit->setClearButtonEnabled(true);
     ui->filter->setVisible(false);
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
-    ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
-    ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 0)));
+    ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
+    ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
+        QVariant::fromValue(QnIndents(0, 0)));
 
-    connect(ui->resourcesTreeView, SIGNAL(enterPressed(QModelIndex)), this, SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->resourcesTreeView, SIGNAL(spacePressed(QModelIndex)), this, SLOT(at_treeView_spacePressed(QModelIndex)));
-    connect(ui->resourcesTreeView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(at_treeView_doubleClicked(QModelIndex)));
-    connect(ui->resourcesTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(at_treeView_clicked(QModelIndex)));
+    auto activate = [this](const QModelIndex& index)
+        {
+            if (auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+                emit activated(resource);
+        };
 
-    connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
-    connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(updateFilter()));
+    connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this, activate);
+    connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this, activate);
+
+    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
+        &QnResourceTreeWidget::at_treeView_spacePressed);
+    connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
+        &QnResourceTreeWidget::at_treeView_clicked);
+
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
+        &QnResourceTreeWidget::updateFilter);
+    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
+        &QnResourceTreeWidget::updateFilter);
 
     ui->resourcesTreeView->installEventFilter(this);
 }
@@ -520,13 +534,6 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event)
     base_type::mousePressEvent(event);
 }
 
-void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index)
-{
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource)
-        emit activated(resource);
-}
-
 void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index)
 {
     if (!m_checkboxesVisible)
@@ -537,18 +544,6 @@ void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index)
     bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
     int inverted = checked ? Qt::Unchecked : Qt::Checked;
     m_resourceProxyModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
-}
-
-
-void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index)
-{
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-
-    // TODO: #Elric. This is totally evil. This check belongs to the slot that handles activation.
-    if (resource &&
-        !(resource->flags() & Qn::layout) &&    /* Layouts cannot be activated by double clicking. */
-        !(resource->flags() & Qn::server))      /* Bug #1009: Servers should not be activated by double clicking. */
-        emit activated(resource);
 }
 
 void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index)

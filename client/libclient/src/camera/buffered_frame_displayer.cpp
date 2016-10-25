@@ -4,7 +4,8 @@
 #include "video_stream_display.h"
 #include "abstract_renderer.h"
 
-QnBufferedFrameDisplayer::QnBufferedFrameDisplayer(): 
+QnBufferedFrameDisplayer::QnBufferedFrameDisplayer():
+    base_type(),
     m_queue(11)
 {
     m_currentTime = AV_NOPTS_VALUE;
@@ -29,46 +30,54 @@ void QnBufferedFrameDisplayer::waitForFramesDisplayed()
         msleep(1);
 }
 
-qint64 QnBufferedFrameDisplayer::bufferedDuration() {
-    QnMutexLocker lock( &m_sync );
-    if (m_queue.size() == 0)
+qint64 QnBufferedFrameDisplayer::bufferedDuration()
+{
+    QnMutexLocker lock(&m_sync);
+    auto randomAccess = m_queue.lock();
+    if (randomAccess.size() == 0)
         return 0;
     else
-        return m_lastQueuedTime - m_queue.front()->pkt_dts;
+        return m_lastQueuedTime - randomAccess.front()->pkt_dts;
 }
 
-bool QnBufferedFrameDisplayer::addFrame(const QSharedPointer<CLVideoDecoderOutput>& outFrame) 
+bool QnBufferedFrameDisplayer::addFrame(const QSharedPointer<CLVideoDecoderOutput>& outFrame)
 {
     bool wasWaiting = false;
     bool needWait;
-    do {
-        m_sync.lock();
-        m_lastQueuedTime = outFrame->pkt_dts;
-        needWait = !needToStop() && (m_queue.size() == m_queue.maxSize() 
-                    || (m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME));
-        m_sync.unlock();
-        if (needWait) {
+    do
+    {
+        {
+            QnMutexLocker lock(&m_sync);
+            m_lastQueuedTime = outFrame->pkt_dts;
+            auto randomAccess = m_queue.lock();
+            needWait = !needToStop() && (randomAccess.size() == m_queue.maxSize() ||
+                (randomAccess.size() > 0 && outFrame->pkt_dts - randomAccess.front()->pkt_dts >= MAX_QUEUE_TIME));
+        }
+        if (needWait)
+        {
             wasWaiting = true;
-        msleep(1);
+            msleep(1);
         }
     } while (needWait);
     m_queue.push(outFrame);
     return wasWaiting;
 }
 
-void QnBufferedFrameDisplayer::setCurrentTime(qint64 time) {
+void QnBufferedFrameDisplayer::setCurrentTime(qint64 time)
+{
     QnMutexLocker lock( &m_sync );
     m_currentTime = time;
     m_timer.restart();
 }
 
-void QnBufferedFrameDisplayer::clear() {
-    QnMutexLocker processFrameLock( &m_processFrameMutex );
+void QnBufferedFrameDisplayer::clear()
+{
+    QnMutexLocker lock(&m_sync);
     m_queue.clear();
     m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
 }
 
-qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() const 
+qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() const
 {
     QnMutexLocker lock( &m_sync );
     return m_lastDisplayedTime;
@@ -80,17 +89,25 @@ void QnBufferedFrameDisplayer::overrideTimestampOfNextFrameToRender(qint64 value
     m_lastDisplayedTime = value;
 }
 
-void QnBufferedFrameDisplayer::run() 
+void QnBufferedFrameDisplayer::pleaseStop()
+{
+    base_type::pleaseStop();
+    m_queue.setTerminated(true);
+}
+
+void QnBufferedFrameDisplayer::run()
 {
     QSharedPointer<CLVideoDecoderOutput> frame;
     while (!needToStop())
     {
-        m_processFrameMutex.lock();
-        if (m_queue.size() > 0)
         {
-            frame = m_queue.front();
-
-            if (m_expectedTime == AV_NOPTS_VALUE) {
+            auto randomAccess = m_queue.lock();
+            frame = randomAccess.size() > 0 ? randomAccess.front() : QSharedPointer<CLVideoDecoderOutput>();
+        }
+        if (frame)
+        {
+            if (m_expectedTime == AV_NOPTS_VALUE)
+            {
                 m_alignedTimer.restart();
                 m_expectedTime = frame->pkt_dts;
             }
@@ -98,7 +115,7 @@ void QnBufferedFrameDisplayer::run()
             QnMutexLocker syncLock( &m_sync );
             qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
             qint64 currentTime = m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
-                
+
             //cl_log.log("djitter:", qAbs(expectedTime - currentTime), cl_logALWAYS);
             // align to grid
             if (qAbs(expectedTime - currentTime) < 60000) {
@@ -126,7 +143,7 @@ void QnBufferedFrameDisplayer::run()
             /*
             else if (sleepTime < -15000)
             {
-                if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0) 
+                if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0)
                 {
                     cl_log.log("Late picture skipped at ", frame->pkt_dts/1000000.0, cl_logWARNING);
                     syncLock.relock();
@@ -153,15 +170,12 @@ void QnBufferedFrameDisplayer::run()
             syncLock.relock();
             m_queue.pop(frame);
             syncLock.unlock();
-            m_processFrameMutex.unlock();
             //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
         }
         else {
-            m_processFrameMutex.unlock();
             msleep(1);
         }
     }
 
-    QnMutexLocker processFrameLock( &m_processFrameMutex );
     m_queue.clear();
 }

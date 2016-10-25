@@ -6,10 +6,10 @@ BusyIndicator
 {
     id: control
 
-    property color color: ColorTheme.base13
+    property color color: ColorTheme.contrast16
 
-    implicitWidth: 60
-    implicitHeight: 60
+    implicitWidth: 72
+    implicitHeight: 72
 
     contentItem: null
 
@@ -33,7 +33,7 @@ BusyIndicator
             border.color: control.color
             color: "transparent"
 
-            width: (index + 1) * 20 - border.width / 2
+            width: control.implicitWidth / 3 * (index + 1) - border.width / 2
             height: width
 
             SequentialAnimation

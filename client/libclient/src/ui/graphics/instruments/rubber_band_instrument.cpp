@@ -7,13 +7,11 @@
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsItem>
-#include <QtWidgets/QStyleHintReturnMask>
-#include <QtWidgets/QStyleOptionRubberBand>
-#include <QtWidgets/QRubberBand>
 #include <QtWidgets/QWidget>
 #include <QtGui/QCursor>
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/math/color_transformations.h>
 
 namespace {
     struct ItemIsMouseInteractive: public std::unary_function<QGraphicsItem *, bool> {
@@ -22,7 +20,7 @@ namespace {
         }
     };
 
-} // anonymous namespace 
+} // anonymous namespace
 
 /**
  * Item that implements a rubber band. The downside of implementing rubber band
@@ -31,12 +29,13 @@ namespace {
  */
 class RubberBandItem: public QGraphicsObject {
 public:
-    RubberBandItem(): 
+    RubberBandItem():
         QGraphicsObject(NULL),
         m_viewport(NULL),
         m_cacheDirty(true)
     {
         setAcceptedMouseButtons(0);
+
 
         /* Don't disable this item here or it will swallow mouse wheel events. */
     }
@@ -61,32 +60,20 @@ public:
         if (m_rubberBandRect.isEmpty())
             return;
 
-        QStyleOptionRubberBand rubberBandOption;
-        rubberBandOption.initFrom(widget);
-        rubberBandOption.rect = m_rubberBandRect;
-        rubberBandOption.shape = QRubberBand::Rectangle;
-
-        QRegion oldClipRegion;
-        QStyleHintReturnMask mask;
-        if (widget->style()->styleHint(QStyle::SH_RubberBand_Mask, &rubberBandOption, widget, &mask)) {
-            /* Painter clipping for masked rubber bands. */
-            oldClipRegion = painter->clipRegion();
-            painter->setClipRegion(mask.region, Qt::IntersectClip);
-        }
+        QPalette palette = widget->palette();
+        QColor highlight = palette.color(QPalette::Active, QPalette::Highlight);
 
         QnScopedPainterTransformRollback transformRollback(painter, QTransform());
-        widget->style()->drawControl(QStyle::CE_RubberBand, &rubberBandOption, painter, widget);
-
-        /* Restore painter state. */
-        if (!oldClipRegion.isEmpty())
-            painter->setClipRegion(oldClipRegion);
+        QnScopedPainterPenRollback penRollback(painter, QPen(highlight, 0.5));
+        QnScopedPainterBrushRollback brushRollback(painter, toTransparent(highlight, 0.2));
+        painter->drawRect(m_rubberBandRect);
     }
 
     /**
      * Sets this item's viewport. This item will be drawn only on the given
      * viewport. This item won't access the given viewport in any way, so it is
      * safe to delete the viewport without notifying the item.
-     * 
+     *
      * \param viewport                  Viewport to draw this item on.
      */
     void setViewport(QWidget *viewport) {
@@ -102,7 +89,7 @@ public:
     }
 
     /**
-     * \param sceneToViewport           Scene-to-viewport transformation for the viewport 
+     * \param sceneToViewport           Scene-to-viewport transformation for the viewport
      *                                  that this item will be drawn on.
      */
     void setViewportTransform(const QTransform &sceneToViewport) {
@@ -185,10 +172,10 @@ private:
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
     base_type(
-        makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), 
-        makeSet(QEvent::FocusOut), 
-        makeSet(), 
-        makeSet(), 
+        makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint),
+        makeSet(QEvent::FocusOut),
+        makeSet(),
+        makeSet(),
         parent
     ),
     m_rubberBandZValue(std::numeric_limits<qreal>::max())
@@ -200,7 +187,7 @@ RubberBandInstrument::~RubberBandInstrument() {
 
 void RubberBandInstrument::setRubberBandZValue(qreal rubberBandZValue) {
     m_rubberBandZValue = rubberBandZValue;
-    
+
     if(rubberBand() != NULL)
         rubberBand()->setZValue(m_rubberBandZValue);
 }
@@ -226,7 +213,7 @@ void RubberBandInstrument::installedNotify() {
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
 
-    if (scene() != NULL) 
+    if (scene() != NULL)
         disconnect(scene(), NULL, this, NULL);
 
     if(rubberBand() != NULL)
@@ -236,7 +223,7 @@ void RubberBandInstrument::aboutToBeUninstalledNotify() {
 bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false;
-    
+
     QGraphicsView *view = this->view(viewport);
     if (!view->isInteractive())
         return false;
@@ -247,18 +234,18 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     /* Check if there is a focusable item under cursor. */
     QGraphicsItem *focusableItem = item(view, event->pos(), ItemIsMouseInteractive());
     if (focusableItem != NULL)
-        return false; 
+        return false;
 
     /* Ok to go. */
     if (!(event->modifiers() & Qt::ShiftModifier))
         scene()->clearSelection();
-    
+
     /* Scene may clear selection after a mouse click. We don't allow it. */
     m_originallySelected = toSet(scene()->selectedItems());
     m_protectSelection = !m_originallySelected.empty();
 
     dragProcessor()->mousePressEvent(viewport, event);
-        
+
     event->accept();
     return false;
 }
@@ -294,7 +281,7 @@ void RubberBandInstrument::at_scene_selectionChanged() {
         return;
 
     m_inSelectionChanged = true;
-    
+
     foreach(QGraphicsItem *item, m_originallySelected)
         item->setSelected(true);
 

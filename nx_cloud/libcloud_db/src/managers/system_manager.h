@@ -1,14 +1,8 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef cloud_db_system_manager_h
-#define cloud_db_system_manager_h
-
-#define BOOST_BIND_NO_PLACEHOLDERS
-
+#include <array>
 #include <atomic>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <stdexcept>
@@ -16,33 +10,51 @@
 #include <vector>
 
 #include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
+#include <nx_ec/data/api_data.h>
+#include <nx_ec/data/api_user_data.h>
 #include <utils/common/counter.h>
+#include <utils/common/subscription.h>
 #include <utils/db/async_sql_query_executor.h>
+#include <utils/db/filter.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
+#include "data/account_data.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
 #include "data_view.h"
+#include "ec2/transaction_log.h"
 #include "managers_types.h"
 
 
 namespace nx {
 namespace cdb {
 
-namespace conf
-{
-    class Settings;
-}
+namespace conf {
+
+class Settings;
+
+}   // namespace conf
+
+class AbstractEmailManager;
 class AccountManager;
-class EventManager;
+class SystemHealthInfoProvider;
+
+namespace ec2 {
+
+class SyncronizationEngine;
+
+}   // namespace ec2 
+
+class InviteUserNotification;
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -54,6 +66,12 @@ class SystemManager
     public AbstractAuthenticationDataProvider
 {
 public:
+    enum class NotificationCommand
+    {
+        sendNotification,
+        doNotSendNotification,
+    };
+
     /*!
         Fills internal cache
         \throw std::runtime_error In case of failure to pre-fill data cache
@@ -61,9 +79,11 @@ public:
     SystemManager(
         const conf::Settings& settings,
         nx::utils::TimerManager* const timerManager,
-        const AccountManager& accountManager,
-        const EventManager& eventManager,
-        nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
+        AccountManager* const accountManager,
+        const SystemHealthInfoProvider& systemHealthInfoProvider,
+        nx::db::AsyncSqlQueryExecutor* const dbManager,
+        AbstractEmailManager* const emailManager,
+        ec2::SyncronizationEngine* const ec2SyncronizationEngine) throw(std::runtime_error);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -97,10 +117,6 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler);
-    void setSystemUserList(
-        const AuthorizationInfo& authzInfo,
-        data::SystemSharingList sharings,
-        std::function<void(api::ResultCode)> completionHandler);
     //!Provides list of cloud accounts who have access to this system
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
@@ -112,23 +128,15 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
-    void updateSystemName(
+    void updateSystem(
         const AuthorizationInfo& authzInfo,
-        data::SystemNameUpdate data,
+        data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
-
-    //void addSubscription(
-    //    const AuthorizationInfo& authzInfo,
-    //    const std::string& systemID,
-    //    const std::string& productID,
-    //    std::function<void(api::ResultCode)> completionHandler);
-    ///*!
-    //    \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
-    //*/
-    //void getActiveSubscriptions(
-    //    const AuthorizationInfo& authzInfo,
-    //    const std::string& systemID,
-    //    std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
+    
+    void recordUserSessionStart(
+        const AuthorizationInfo& authzInfo,
+        data::UserSessionDescriptor userSessionDescriptor,
+        std::function<void(api::ResultCode)> completionHandler);
 
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
@@ -146,8 +154,16 @@ public:
     DataView<data::SystemData> createView(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter);
+
+    nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
+    const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
         
 private:
+    static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
+        const api::SystemSharing& data);
+    static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
+        const api::SystemSharing& data);
+
     typedef boost::multi_index::multi_index_container<
         data::SystemData,
         boost::multi_index::indexed_by<
@@ -166,7 +182,7 @@ private:
     constexpr static const int kSystemByExpirationTimeIndex = 1;
 
     typedef boost::multi_index::multi_index_container<
-        api::SystemSharing,
+        api::SystemSharingEx,
         boost::multi_index::indexed_by<
             boost::multi_index::ordered_unique<
                 boost::multi_index::identity<api::SystemSharing>>,
@@ -175,19 +191,45 @@ private:
                 api::SystemSharing, std::string, &api::SystemSharing::accountEmail>>,
             //indexing by system
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
-                api::SystemSharing, std::string, &api::SystemSharing::systemID>>
+                api::SystemSharing, std::string, &api::SystemSharing::systemID>>,
+            //indexing by pair<systemId, vmsUserId>
+            boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
+                const api::SystemSharing&,
+                std::pair<std::string, std::string>,
+                &SystemManager::extractSystemIdAndVmsUserId>>,
+            //indexing by pair<systemId, accountEmail>
+            boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
+                const api::SystemSharing&,
+                std::pair<std::string, std::string>,
+                &SystemManager::extractSystemIdAndAccountEmail>>
         >
     > AccountSystemAccessRoleDict;
+
+    struct InsertNewSystemToDbResult
+    {
+        data::SystemData systemData;
+        data::SystemSharing ownerSharing;
+    };
+
+    struct SaveUserSessionResult
+    {
+        float usageFrequency;
+        std::chrono::system_clock::time_point lastloginTime;
+    };
 
     constexpr static const int kSharingUniqueIndex = 0;
     constexpr static const int kSharingByAccountEmail = 1;
     constexpr static const int kSharingBySystemId = 2;
+    constexpr static const int kSharingBySystemIdAndVmsUserIdIndex = 3;
+    constexpr static const int kSharingBySystemIdAndAccountEmailIndex = 4;
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
-    const AccountManager& m_accountManager;
-    const EventManager& m_eventManager;
+    AccountManager* const m_accountManager;
+    const SystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    AbstractEmailManager* const m_emailManager;
+    ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
     //!map<id, system>
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
@@ -195,101 +237,254 @@ private:
     QnCounter m_startedAsyncCallsCounter;
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
+    nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
 
     nx::db::DBResult insertSystemToDB(
-        QSqlDatabase* const connection,
+        nx::db::QueryContext* const queryContext,
         const data::SystemRegistrationDataWithAccount& newSystem,
-        data::SystemData* const systemData);
+        InsertNewSystemToDbResult* const result);
+    nx::db::DBResult insertNewSystemDataToDb(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemRegistrationDataWithAccount& newSystem,
+        InsertNewSystemToDbResult* const result);
+    nx::db::DBResult insertOwnerSharingToDb(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::SystemRegistrationDataWithAccount& newSystem,
+        nx::cdb::data::SystemSharing* const ownerSharing);
     void systemAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
-        data::SystemData systemData,
+        InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
-    //nx::db::DBResult insertSystemSharingToDB(
-    //    QSqlDatabase* const connection,
-    //    const data::SystemSharing& systemSharing);
-    void systemSharingAdded(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::DBResult dbResult,
-        data::SystemSharing sytemSharing,
-        std::function<void(api::ResultCode)> completionHandler);
-
     nx::db::DBResult markSystemAsDeleted(
-        QSqlDatabase* const connection,
+        nx::db::QueryContext* const queryContext,
         const std::string& systemId);
     void systemMarkedAsDeleted(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
+    void markSystemAsDeletedInCache(const std::string& systemId);
 
     nx::db::DBResult deleteSystemFromDB(
-        QSqlDatabase* const connection,
+        nx::db::QueryContext* const queryContext,
         const data::SystemID& systemID);
     void systemDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
-    nx::db::DBResult updateSharingInDB(
-        QSqlDatabase* const connection,
-        const data::SystemSharing& sharing);
-    void sharingUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::DBResult dbResult,
-        data::SystemSharing sharing,
-        std::function<void(api::ResultCode)> completionHandler);
+    //---------------------------------------------------------------------------------------------
+    // system sharing methods. TODO: #ak: move to a separate class
 
-    nx::db::DBResult updateUserListInDB(
-        QSqlDatabase* const connection,
-        const std::string& systemId,
-        const data::SystemSharingList& sharingList);
-    void userListUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::DBResult dbResult,
-        const std::string& systemId,
-        data::SystemSharingList sharingList,
-        std::function<void(api::ResultCode)> completionHandler);
+    /**
+     * @param inviteeAccount Filled with attributes of account sharing.accountEmail
+     */
+    nx::db::DBResult shareSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const data::SystemSharing& sharing,
+        NotificationCommand notificationCommand,
+        data::AccountData* const inviteeAccount);
 
-    nx::db::DBResult updateSystemNameInDB(
-        QSqlDatabase* const connection,
-        const data::SystemNameUpdate& data);
+    nx::db::DBResult insertOrReplaceSharing(
+        nx::db::QueryContext* const queryContext,
+        api::SystemSharingEx sharing);
+
+    template<typename Notification>
+    nx::db::DBResult fillSystemSharedNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const std::string& systemId,
+        const std::string& inviteeEmail,
+        Notification* const notification);
+
+    nx::db::DBResult scheduleSystemHasBeenSharedNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const api::SystemSharing& sharing);
+
+    nx::db::DBResult fetchSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        const std::string& systemId,
+        api::SystemSharingEx* const sharing);
+
+    nx::db::DBResult fetchUserSharings(
+        nx::db::QueryContext* const queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<api::SystemSharingEx>* const sharings);
+
+    nx::db::DBResult fetchSharing(
+        nx::db::QueryContext* const queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        api::SystemSharingEx* const sharing);
+
+    /**
+     * Fetch existing account or create a new one sending corresponding notification.
+     */
+    nx::db::DBResult fetchAccountToShareWith(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const data::SystemSharing& sharing,
+        data::AccountData* const inviteeAccount,
+        bool* const isNewAccount);
+    nx::db::DBResult inviteNewUserToSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId);
+    nx::db::DBResult scheduleInvintationNotificationDelivery(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId);
+    nx::db::DBResult prepareInviteNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId,
+        InviteUserNotification* const notification);
+    /**
+     * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
+     */
+    nx::db::DBResult calculateUsageFrequencyForANewSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId,
+        const std::string& systemId,
+        float* const newSystemInitialUsageFrequency);
+    nx::db::DBResult updateSharingInDbAndGenerateTransaction(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const data::SystemSharing& sharing,
+        NotificationCommand notificationCommand);
+    void updateSharingInCache(data::SystemSharing sharing);
+    void updateSharingInCache(
+        api::SystemSharingEx sharing,
+        bool updateExFields = true);
+
+    nx::db::DBResult updateSystem(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult renameSystem(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult execSystemNameUpdate(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult execSystemOpaqueUpdate(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
+    void updateSystemAttributesInCache(
+        data::SystemAttributesUpdate data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemNameUpdate data,
+        data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult activateSystem(
-        QSqlDatabase* const connection,
+        nx::db::QueryContext* const queryContext,
         const std::string& systemId);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
-    /** returns sharing permissions depending on current access role */
+    nx::db::DBResult saveUserSessionStart(
+        nx::db::QueryContext* queryContext,
+        const data::UserSessionDescriptor& userSessionDescriptor,
+        SaveUserSessionResult* const result);
+    nx::db::DBResult updateUserLoginStatistics(
+        nx::db::QueryContext* queryContext,
+        const std::string& accountId,
+        const std::string& systemId,
+        std::chrono::system_clock::time_point lastloginTime,
+        float usageFrequency);
+    void updateSystemUsageStatisticsCache(
+        const data::UserSessionDescriptor& userSessionDescriptor,
+        const SaveUserSessionResult& usageStatistics);
+
+    /**
+     * @return Sharing permissions depending on current access role.
+     */
     api::SystemAccessRoleList getSharingPermissions(
         api::SystemAccessRole accessRole) const;
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);
+    template<typename Func> nx::db::DBResult doBlockingDbQuery(Func func);
+    nx::db::DBResult fetchSystems(
+        nx::db::QueryContext* queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<data::SystemData>* const systems);
+    nx::db::DBResult fetchSystemById(
+        nx::db::QueryContext* queryContext,
+        const std::string& systemId,
+        data::SystemData* const system);
     nx::db::DBResult fetchSystemToAccountBinder(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* queryContext,
         int* const /*dummy*/);
 
     void dropExpiredSystems(uint64_t timerId);
-    nx::db::DBResult deleteExpiredSystemsFromDb(QSqlDatabase* connection);
+    nx::db::DBResult deleteExpiredSystemsFromDb(nx::db::QueryContext* queryContext);
     void expiredSystemsDeletedFromDb(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
+
+    /** Processes saveUser transaction received from mediaserver */
+    nx::db::DBResult processEc2SaveUser(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        ::ec2::QnTransaction<::ec2::ApiUserData> data,
+        data::SystemSharing* const systemSharingData);
+    void onEc2SaveUserDone(
+        nx::db::QueryContext* /*queryContext*/,
+        nx::db::DBResult dbResult,
+        data::SystemSharing sharing);
+
+    nx::db::DBResult processEc2RemoveUser(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        ::ec2::QnTransaction<::ec2::ApiIdData> data,
+        data::SystemSharing* const systemSharingData);
+    void onEc2RemoveUserDone(
+        nx::db::QueryContext* /*queryContext*/,
+        nx::db::DBResult dbResult,
+        data::SystemSharing sharing);
+
+    nx::db::DBResult processSetResourceParam(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
+        data::SystemAttributesUpdate* const systemNameUpdate);
+    void onEc2SetResourceParamDone(
+        nx::db::QueryContext* /*queryContext*/,
+        nx::db::DBResult dbResult,
+        data::SystemAttributesUpdate systemNameUpdate);
+
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::AccountData& inviteeAccount);
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* queryContext,
+        const std::string& systemId,
+        const nx::db::InnerJoinFilterFields& filter = nx::db::InnerJoinFilterFields());
+    static float calculateSystemUsageFrequency(
+        std::chrono::system_clock::time_point lastLoginTime,
+        float currentUsageFrequency);
 };
 
 }   //cdb
 }   //nx
-
-#endif

@@ -35,9 +35,12 @@ QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr
 
 QnDesktopAudioOnlyDataProvider::~QnDesktopAudioOnlyDataProvider()
 {
+    directDisconnectAll();
+    stop();
+
     if (m_encoderBuffer)
         av_free(m_encoderBuffer);
-    stop();
+
     av_frame_free(&m_inputFrame);
 }
 
@@ -82,12 +85,11 @@ void QnDesktopAudioOnlyDataProvider::startInputs()
     auto primaryIODevice =
         m_audioSourcesInfo.at(0)->ioDevice;
 
-    connect(
+    Qn::directConnect(
         primaryIODevice,
         &QIODevice::readyRead,
         this,
-        &QnDesktopAudioOnlyDataProvider::processData,
-        Qt::DirectConnection);
+        &QnDesktopAudioOnlyDataProvider::processData);
 }
 
 void QnDesktopAudioOnlyDataProvider::run()
@@ -113,6 +115,7 @@ void QnDesktopAudioOnlyDataProvider::run()
 
     exec();
 
+    directDisconnectAll();
     m_audioSourcesInfo.clear();
 }
 
@@ -160,8 +163,8 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
 
     encoderCtx->codec_id = audioCodec->id;
     encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    encoderCtx->sample_fmt =
-        QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(
+    encoderCtx->sample_fmt = 
+        QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(
             fromQtAudioFormat(format));
 
     encoderCtx->channels = m_audioSourcesInfo.size() > 1 ?
@@ -194,8 +197,14 @@ bool QnDesktopAudioOnlyDataProvider::initInputDevices()
 
     if (primaryAudioDevice.isNull())
     {
-        m_lastErrorStr = tr("Primary audio device isn't selected.");
-        return false;
+        if (secondaryAudioDevice.isNull())
+        {
+            m_lastErrorStr = tr("Primary audio device isn't selected.");
+            return false;
+        }
+
+        primaryAudioDevice = secondaryAudioDevice;
+        secondaryAudioDevice = QnAudioDeviceInfo();
     }
 
     AudioSourceInfoPtr sourceInfo(new AudioSourceInfo());

@@ -179,10 +179,11 @@ static QDialogButtonBox::StandardButton execMessageBox(
                 icon,
                 helpTopicId,
                 title,
-                text,
+                title,
                 buttons,
                 parent);
 
+    msgBox.setInformativeText(text);
     msgBox.setDefaultButton(defaultButton);
 
     return static_cast<QDialogButtonBox::StandardButton>(msgBox.exec());
@@ -420,7 +421,7 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
     auto standardPixmap =
         [this](QStyle::StandardPixmap pixmapId) -> QPixmap
         {
-            return qnSkin->maximumSizePixmap(style()->standardIcon(pixmapId));
+            return QnSkin::maximumSizePixmap(style()->standardIcon(pixmapId));
         };
 
     QPixmap pixmap;
@@ -730,17 +731,6 @@ QDialogButtonBox::StandardButton QnMessageBox::critical(
 int QnMessageBox::exec()
 {
     Q_D(QnMessageBox);
-
-    Qt::WindowFlags flags = windowFlags();
-    if (helpTopic(this) != Qn::Empty_Help)
-        flags |= Qt::WindowContextHelpButtonHint;
-    else
-        flags &= ~Qt::WindowContextHelpButtonHint;
-    setWindowFlags(flags);
-
-    /* We cannot cancel drag via modal dialog, let parent process it. */
-    if (parentWidget())
-        cancelDrag(parentWidget());
 
     adjustSize();
 

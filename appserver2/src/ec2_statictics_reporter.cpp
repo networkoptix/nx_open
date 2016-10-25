@@ -3,7 +3,7 @@
 #include <QtCore/QCollator>
 
 #include <api/global_settings.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
@@ -62,15 +62,20 @@ namespace ec2
             return ErrorCode::ioError;
 
         ErrorCode res;
+        // TODO: Get rid of these macros.
         #define dbManager_queryOrReturn(ApiType, name) \
             ApiType name; \
             if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
                 return res;
+        #define dbManager_queryOrReturn_uuid(ApiType, name) \
+            ApiType name; \
+            if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), name)) != ErrorCode::ok) \
+                return res;
 
-        dbManager_queryOrReturn(ApiMediaServerDataExList, mediaservers);
+        dbManager_queryOrReturn_uuid(ApiMediaServerDataExList, mediaservers);
         for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
 
-        dbManager_queryOrReturn(ApiCameraDataExList, cameras);
+        dbManager_queryOrReturn_uuid(ApiCameraDataExList, cameras);
         for (ApiCameraDataEx& cam : cameras)
             if (cam.typeId != m_desktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
@@ -87,25 +92,26 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
+        dbManager_queryOrReturn_uuid(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->layouts)) != ErrorCode::ok)
             return res;
 
-        dbManager_queryOrReturn(ApiUserDataList, users);
+        dbManager_queryOrReturn_uuid(ApiUserDataList, users);
         for (auto& u : users) outData->users.push_back(std::move(u));
 
         #undef dbManager_queryOrReturn
+        #undef dbManager_queryOrReturn_uuid
 
-        outData->systemId = getOrCreateSystemId();
+        outData->systemId = qnGlobalSettings->localSystemId();
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = getOrCreateSystemId();
+        outData->systemId = qnGlobalSettings->localSystemId();
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }
@@ -151,7 +157,7 @@ namespace ec2
             nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
 
         if (auto client = m_httpClient)
-            client->terminate();
+            client->pleaseStopSync();
 
         {
             QnMutexLocker lk(&m_mutex);
@@ -263,33 +269,12 @@ namespace ec2
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
         NX_LOGX(lm("Sending statistics asynchronously to %1")
-               .arg(url.toString()), cl_logDEBUG1);
+               .arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
 
         if (reportApi)
             *reportApi = url.toString();
 
         return ErrorCode::ok;
-    }
-
-    QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
-    {
-        const auto systemName = qnCommon->localSystemName();
-        const auto systemNameForId = qnGlobalSettings->systemNameForId();
-        const auto systemId = qnGlobalSettings->systemId();
-        qDebug() << "system id" << systemId.toString();
-
-        if (systemNameForId == systemName // system name was not changed
-            && !systemId.isNull())       // and systemId is already generated
-        {
-            return QnUuid(systemId);
-        }
-
-        const auto newId = QnUuid::createUuid();
-        qnGlobalSettings->setSystemId(newId);
-        qnGlobalSettings->setSystemNameForId(systemName);
-        qnGlobalSettings->synchronizeNow();
-
-        return newId;
     }
 
     void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)

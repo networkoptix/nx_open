@@ -57,16 +57,14 @@ void MediatorConnector::enable( bool waitComplete )
         m_future->wait();
 }
 
-std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
+std::unique_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
 {
-    return std::shared_ptr<MediatorClientTcpConnection>(
-                new MediatorClientTcpConnection( m_stunClient ) );
+    return std::make_unique<MediatorClientTcpConnection>(m_stunClient);
 }
 
-std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
+std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
 {
-    return std::shared_ptr<MediatorServerTcpConnection>(
-                new MediatorServerTcpConnection( m_stunClient, this ) );
+    return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarning )
@@ -151,7 +149,7 @@ void MediatorConnector::fetchEndpoint()
         if( status != nx_http::StatusCode::ok )
         {
             NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
-                     .arg( status ), cl_logERROR );
+                     .arg( status ), cl_logDEBUG1 );
 
             if (!isReady(*m_future))
                 m_promise->set_value( false );
@@ -166,7 +164,7 @@ void MediatorConnector::fetchEndpoint()
         else
         {
             NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg( address.toString() ), cl_logALWAYS );
+                     .arg( address.toString() ), cl_logDEBUG1 );
 
             {
                 QnMutexLocker lk(&m_mutex);

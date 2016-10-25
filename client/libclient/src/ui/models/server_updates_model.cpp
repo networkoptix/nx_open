@@ -10,6 +10,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <api/global_settings.h>
 
 
 QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
@@ -174,11 +175,11 @@ void QnServerUpdatesModel::resetResourses() {
     for (const QnMediaServerResourcePtr &server: allServers)
         m_items.append(new Item(server));
 
-    const QString systemName = qnCommon->localSystemName();
+    const auto localSystemId = qnGlobalSettings->localSystemId();
     for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources())
     {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || server->getSystemName() != systemName)
+        if (!server || server->getModuleInformation().localSystemId != localSystemId)
             continue;
 
         // Adds newly added to system server which is not authorized
@@ -200,8 +201,11 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    if (server->getSystemName() != qnCommon->localSystemName())
+    if (server->hasFlags(Qn::fake_server)
+        && server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
+    {
         return;
+    }
 
     int row = m_items.size();
     beginInsertRows(QModelIndex(), row, row);
@@ -230,7 +234,8 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
 
     QModelIndex idx = index(server);
     bool exists = idx.isValid();
-    bool isOurServer = (server->getSystemName() == qnCommon->localSystemName());
+    bool isOurServer = !server->hasFlags(Qn::fake_server)
+        || (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemId());
 
     if (exists == isOurServer) {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));

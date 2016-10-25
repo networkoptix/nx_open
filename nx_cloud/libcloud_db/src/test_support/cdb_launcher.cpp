@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include <cdb/account_manager.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -42,14 +43,13 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
-    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-log/level"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-syncroLog/level"); addArg("DEBUG2");
 
     addArg("-db/driverName");
-    if (!sConnectionOptions.driverName.isEmpty())
-        addArg(sConnectionOptions.driverName.toLatin1().constData());
-    else
-        addArg("QSQLITE");
+    addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
+        sConnectionOptions.driverType).toLatin1().constData());
 
     if (!sConnectionOptions.hostName.isEmpty())
     {
@@ -135,6 +135,15 @@ nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()
     return m_connectionFactory.get();
 }
 
+std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
+    const std::string& login,
+    const std::string& password)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(login, password);
+    return connection;
+}
+
 api::ModuleInfo CdbLauncher::moduleInfo() const
 {
     return m_moduleInfo;
@@ -151,11 +160,7 @@ api::ResultCode CdbLauncher::addAccount(
     api::AccountConfirmationCode* const activationCode)
 {
     if (accountData->email.empty())
-    {
-        std::ostringstream ss;
-        ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
-        accountData->email = ss.str();
-    }
+        accountData->email = generateRandomEmailAddress();
 
     if (password->empty())
     {
@@ -171,9 +176,14 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->passwordHa1.empty())
         accountData->passwordHa1 = nx_http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
-            //accountData->email.c_str(),
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
+    if (accountData->passwordHa1Sha256.empty())
+        accountData->passwordHa1Sha256 = nx_http::calcHa1(
+            QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
+            moduleInfo().realm.c_str(),
+            password->c_str(),
+            "SHA-256").constData();
     if (accountData->customization.empty())
         accountData->customization = QnAppInfo::customizationName().toStdString();
 
@@ -181,13 +191,21 @@ api::ResultCode CdbLauncher::addAccount(
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
-        std::bind(
-            &nx::cdb::api::AccountManager::registerNewAccount,
-            connection->accountManager(),
-            *accountData,
-            std::placeholders::_1));
+    std::tie(result, *activationCode) = 
+        makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
+            std::bind(
+                &nx::cdb::api::AccountManager::registerNewAccount,
+                connection->accountManager(),
+                *accountData,
+                std::placeholders::_1));
     return result;
+}
+
+std::string CdbLauncher::generateRandomEmailAddress() const
+{
+    std::ostringstream ss;
+    ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
+    return ss.str();
 }
 
 api::ResultCode CdbLauncher::activateAccount(
@@ -344,6 +362,15 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     const std::string& password,
     api::SystemData* const systemData)
 {
+    return bindRandomNotActivatedSystem(email, password, std::string(), systemData);
+}
+
+api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& opaque,
+    api::SystemData* const systemData)
+{
     auto connection = connectionFactory()->createConnection();
     connection->setCredentials(email, password);
 
@@ -351,6 +378,7 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     std::ostringstream ss;
     ss << "test_sys_" << nx::utils::random::number();
     sysRegData.name = ss.str();
+    sysRegData.opaque = opaque;
 
     api::ResultCode resCode = api::ResultCode::ok;
 
@@ -370,7 +398,16 @@ api::ResultCode CdbLauncher::bindRandomSystem(
     const std::string& password,
     api::SystemData* const systemData)
 {
-    auto resCode = bindRandomNotActivatedSystem(email, password, systemData);
+    return bindRandomSystem(email, password, std::string(), systemData);
+}
+
+api::ResultCode CdbLauncher::bindRandomSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& opaque,
+    api::SystemData* const systemData)
+{
+    auto resCode = bindRandomNotActivatedSystem(email, password, opaque, systemData);
     if (resCode != api::ResultCode::ok)
         return resCode;
 
@@ -452,6 +489,24 @@ api::ResultCode CdbLauncher::getSystem(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    api::SystemDataEx* const system)
+{
+    std::vector<api::SystemDataEx> systems;
+    const auto res = getSystem(email, password, systemID, &systems);
+    if (res != api::ResultCode::ok)
+        return res;
+
+    if (systems.size() != 1)
+        return api::ResultCode::unknownError;
+
+    *system = systems[0];
+    return api::ResultCode::ok;
+}
+
 api::ResultCode CdbLauncher::shareSystem(
     const std::string& email,
     const std::string& password,
@@ -516,6 +571,20 @@ api::ResultCode CdbLauncher::updateSystemSharing(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::removeSystemSharing(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    const std::string& accountEmail)
+{
+    return updateSystemSharing(
+        email,
+        password,
+        systemID,
+        accountEmail,
+        api::SystemAccessRole::none);
+}
+
 api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& email,
     const std::string& password,
@@ -565,7 +634,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
     return resCode;
 }
 
-api::ResultCode CdbLauncher::updateSystemName(
+api::ResultCode CdbLauncher::renameSystem(
     const std::string& login,
     const std::string& password,
     const std::string& systemID,
@@ -578,10 +647,28 @@ api::ResultCode CdbLauncher::updateSystemName(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::updateSystemName,
+                &nx::cdb::api::SystemManager::rename,
                 connection->systemManager(),
                 systemID,
                 newSystemName,
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::updateSystem(
+    const api::SystemData& system,
+    const api::SystemAttributesUpdate& updatedData)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(system.id, system.authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::update,
+                connection->systemManager(),
+                updatedData,
                 std::placeholders::_1));
     return resCode;
 }
@@ -675,24 +762,6 @@ api::ResultCode CdbLauncher::ping(
     return resCode;
 }
 
-api::ResultCode CdbLauncher::setSystemUserList(
-    const std::string& systemID,
-    const std::string& authKey,
-    api::SystemSharingList sharings)
-{
-    auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
-
-    api::ResultCode resCode = api::ResultCode::ok;
-    std::tie(resCode) = makeSyncCall<nx::cdb::api::ResultCode>(
-        std::bind(
-            &nx::cdb::api::SystemManager::setSystemUserList,
-            connection->systemManager(),
-            std::move(sharings),
-            std::placeholders::_1));
-    return resCode;
-}
-
 const api::SystemSharingEx& CdbLauncher::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
@@ -736,6 +805,63 @@ api::ResultCode CdbLauncher::fetchSystemData(
         }
     }
     return api::ResultCode::notFound;
+}
+
+api::ResultCode CdbLauncher::recordUserSessionStart(
+    const AccountWithPassword& account,
+    const std::string& systemId)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(account.data.email, account.password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<nx::cdb::api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::recordUserSessionStart,
+                connection->systemManager(),
+                systemId,
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::getVmsConnections(
+    api::VmsConnectionDataList* const vmsConnections)
+{
+    auto connection = connectionFactory()->createConnection();
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *vmsConnections) =
+        makeSyncCall<nx::cdb::api::ResultCode, api::VmsConnectionDataList>(
+            std::bind(
+                &nx::cdb::api::MaintenanceManager::getConnectionsFromVms,
+                connection->maintenanceManager(),
+                std::placeholders::_1));
+    return resCode;
+}
+
+bool CdbLauncher::isStartedWithExternalDb() const
+{
+    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    return !connectionOptions.dbName.isEmpty();
+}
+
+bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
+{
+    //starting with old db
+    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    if (!connectionOptions.dbName.isEmpty())
+        return false; //test is started with external DB: ignoring
+
+    if (!QDir().mkpath(testDataDir()))
+        return false;
+    const QString dbPath = QDir::cleanPath(testDataDir() + "/cdb_ut.sqlite");
+    QDir().remove(dbPath);
+    if (!QFile::copy(dbDumpPath, dbPath))
+        return false;
+    return QFile(dbPath).setPermissions(
+        QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+        QFileDevice::ReadUser | QFileDevice::WriteUser);
 }
 
 void CdbLauncher::setTemporaryDirectoryPath(const QString& path)

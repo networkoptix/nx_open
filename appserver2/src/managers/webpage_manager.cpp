@@ -11,7 +11,7 @@ namespace ec2
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveWebPage);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiIdData> &tran)
@@ -34,7 +34,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, webpages);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, QnUuid(), queryDoneHandler);
         return reqID;
     }
 
@@ -42,11 +42,12 @@ namespace ec2
     int QnWebPageManager<QueryProcessorType>::save( const ec2::ApiWebPageData& webpage, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiWebPageData> tran(ApiCommand::saveWebPage, webpage);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveWebPage, webpage,
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
         return reqID;
     }
 
@@ -54,11 +55,12 @@ namespace ec2
     int QnWebPageManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiIdData> tran(ApiCommand::removeWebPage, id);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeWebPage, ApiIdData(id),
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
         return reqID;
     }
 

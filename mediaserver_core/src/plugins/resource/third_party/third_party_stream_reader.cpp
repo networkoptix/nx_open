@@ -269,10 +269,12 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             rtspStreamReader->setRole(role);
             rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
 			m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
         else if( mediaUrl.scheme().toLower() == lit("http") )
         {
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset(new MJPEGStreamReader(
                 m_resource,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
@@ -456,6 +458,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
 {
+    // public function can be called from other thread
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader
         ? m_audioLayout.staticCast<const QnResourceAudioLayout>()    //TODO/IMPL
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getAudioLayout() : QnConstResourceAudioLayoutPtr());
@@ -667,6 +671,8 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
 
 QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const
 {
+    // public function can be called from other thread
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_builtinStreamReader ? m_builtinStreamReader->getVideoLayout() : QnConstResourceVideoLayoutPtr();
 }
 

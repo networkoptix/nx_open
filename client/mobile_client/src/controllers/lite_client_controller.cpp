@@ -98,7 +98,8 @@ void QnLiteClientController::setServerId(const QString& serverId)
         const auto it = std::find_if(items.begin(), items.end(),
             [d](const QnPeerRuntimeInfo& info)
             {
-                return info.data.peer.peerType == Qn::PT_LiteClient
+                // Assuming a Mobile Client with proper videowallInstanceGuid is a Lite Client.
+                return info.data.peer.peerType == Qn::PT_MobileClient
                     && info.data.videoWallInstanceGuid == d->serverId;
             });
         d->setClientState(it != items.end() ? State::Started : State::Stopped);
@@ -280,7 +281,9 @@ void QnLiteClientControllerPrivate::at_runtimeInfoAdded(const QnPeerRuntimeInfo&
     if (serverId.isNull())
         return;
 
-    if (data.data.peer.peerType != Qn::PT_LiteClient)
+    // Assuming a Mobile Client with proper videowallInstanceGuid is a Lite Client.
+
+    if (data.data.peer.peerType != Qn::PT_MobileClient)
         return;
 
     if (data.data.videoWallInstanceGuid != serverId)
@@ -295,7 +298,7 @@ void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInf
     if (serverId.isNull())
         return;
 
-    if (data.data.peer.peerType != Qn::PT_LiteClient)
+    if (data.data.peer.peerType != Qn::PT_MobileClient)
         return;
 
     if (data.data.videoWallInstanceGuid != serverId)

@@ -19,7 +19,6 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <common/common_globals.h>
-#include "resource_command_processor.h"
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
@@ -93,6 +92,8 @@ public:
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;
+
+    void flushProperties();
 
     // flags like network media and so on
     virtual Qn::ResourceFlags flags() const;

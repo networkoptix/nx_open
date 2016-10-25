@@ -18,12 +18,11 @@
 #include <network/module_finder.h>
 #include <network/multicast_module_finder.h>
 #include <network/router.h>
+#include <cloud/cloud_connection.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 #include <finders/systems_finder.h>
-#include <finders/cloud_systems_finder.h>
-#include <finders/direct_systems_finder.h>
 #include <client/client_recent_connections_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
@@ -32,8 +31,12 @@
 #include "mobile_client_settings.h"
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
+#include "mobile_client_startup_parameters.h"
 
-QnMobileClientModule::QnMobileClientModule(QObject *parent) :
+QnMobileClientModule::QnMobileClientModule(
+    const QnMobileClientStartupParameters& startupParameters,
+    QObject* parent)
+    :
     QObject(parent)
 {
     Q_INIT_RESOURCE(mobile_client);
@@ -79,11 +82,23 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
     connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
+    common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.peerType = Qn::PT_MobileClient;
+    runtimeData.peer.dataFormat = Qn::JsonFormat;
+    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.customization = QnAppInfo::customizationName();
+    if (!startupParameters.videowallInstanceGuid.isNull())
+        runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
     auto moduleFinder = new QnModuleFinder(true);
     common->store<QnModuleFinder>(moduleFinder);
@@ -92,26 +107,27 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
 
     common->store<QnRouter>(new QnRouter(moduleFinder));
 
-    QnSystemsFinder* systemsFinder(new QnSystemsFinder());
-    systemsFinder->addSystemsFinder(new QnDirectSystemsFinder(systemsFinder), false);
-    systemsFinder->addSystemsFinder(new QnCloudSystemsFinder(systemsFinder), true);
-    common->store<QnSystemsFinder>(systemsFinder);
+    common->store<QnSystemsFinder>(new QnSystemsFinder());
 
-    connect(qApp, &QGuiApplication::applicationStateChanged, this, [moduleFinder](Qt::ApplicationState state) {
-        switch (state) {
-        case Qt::ApplicationActive:
-            moduleFinder->start();
-            break;
-        case Qt::ApplicationSuspended:
-            moduleFinder->pleaseStop();
-            break;
-        default:
-            break;
-        }
-    });
+    connect(qApp, &QGuiApplication::applicationStateChanged, this,
+        [moduleFinder](Qt::ApplicationState state)
+        {
+            switch (state)
+            {
+                case Qt::ApplicationActive:
+                    moduleFinder->start();
+                    break;
+                case Qt::ApplicationSuspended:
+                    moduleFinder->pleaseStop();
+                    break;
+                default:
+                    break;
+            }
+        });
 }
 
-QnMobileClientModule::~QnMobileClientModule() {
-    disconnect(qApp, nullptr, this, nullptr);
+QnMobileClientModule::~QnMobileClientModule()
+{
+    qApp->disconnect(this);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 }

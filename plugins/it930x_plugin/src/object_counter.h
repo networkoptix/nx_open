@@ -24,8 +24,8 @@ public:
         : m_needStop(false),
           m_startPoint(std::chrono::system_clock::now())
     {
-        std::cout << "[LOGGER] Starting..." << std::endl;
-        std::cout << "[LOGGER] Using " << (fname.empty() ? "stdout" : fname.c_str()) << " as log sink" << std::endl;
+//        std::cout << "[LOGGER] Starting..." << std::endl;
+//        std::cout << "[LOGGER] Using " << (fname.empty() ? "stdout" : fname.c_str()) << " as log sink" << std::endl;
         if (fname.empty())
             m_ostream = std::shared_ptr<std::ostream>(&std::cout, [] (std::ostream *) {});
         else
@@ -33,7 +33,7 @@ public:
             m_ostream = std::shared_ptr<std::ostream>(new std::ofstream(fname));
             if (!*m_ostream)
             {
-                std::cout << "[LOGGER] Log file open failed. Logging to stdout" << std::endl;
+                //std::cout << "[It930x LOGGER] Log file open failed. Logging to stdout" << std::endl;
                 m_ostream.reset();
                 m_ostream = std::shared_ptr<std::ostream>(&std::cout, [] (std::ostream *) {});
             }

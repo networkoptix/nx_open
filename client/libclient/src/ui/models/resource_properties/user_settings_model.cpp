@@ -1,8 +1,8 @@
 #include "user_settings_model.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
-#include <core/resource_management/resource_access_filter.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -48,28 +48,33 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
     m_user = value;
 
     auto calculateMode = [this]
-    {
-        if (!m_user)
-            return Invalid;
+        {
+            if (!m_user)
+                return Invalid;
 
-        if (m_user == context()->user())
-            return OwnProfile;
+            if (m_user == context()->user())
+                return OwnProfile;
 
-        if (m_user->flags().testFlag(Qn::local))
-            return NewUser;
+            if (m_user->flags().testFlag(Qn::local))
+                return NewUser;
 
-        if (!accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
-            return OtherProfile;
+            if (!accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+                return OtherProfile;
 
-        return OtherSettings;
-    };
+            return OtherSettings;
+        };
 
     m_mode = calculateMode();
-    m_accessibleResources = m_user
-        ? qnResourceAccessManager->accessibleResources(m_user->getId())
-        : QSet<QnUuid>();
 
+    updatePermissions();
     emit userChanged(m_user);
+}
+
+void QnUserSettingsModel::updatePermissions()
+{
+    m_accessibleResources = m_user
+        ? qnSharedResourcesManager->sharedResources(m_user)
+        : QSet<QnUuid>();
 }
 
 Qn::GlobalPermissions QnUserSettingsModel::rawPermissions() const
@@ -104,20 +109,7 @@ void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
     m_accessibleResources = value;
 }
 
-void QnUserSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)
+QnResourceAccessSubject QnUserSettingsModel::subject() const
 {
-    m_accessibleLayoutsPreview = value;
-}
-
-QnIndirectAccessProviders QnUserSettingsModel::accessibleLayouts() const
-{
-    if (!m_user)
-        return QnIndirectAccessProviders();
-
-    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(m_user);
-
-    for (auto layoutPreview : m_accessibleLayoutsPreview)
-        layouts.insert(layoutPreview, QSet<QnResourcePtr>());
-
-    return layouts;
+    return m_user;
 }

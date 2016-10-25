@@ -21,6 +21,7 @@
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 
+#include "connection_guard_shared_state.h"
 
 class QTimer;
 class QnRuntimeTransactionLog;
@@ -145,6 +146,8 @@ public:
     */
     QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
+    ConnectionGuardSharedState* connectionGuardSharedState();
+
 signals:
     void peerLost(ApiPeerAliveData data);
     //!Emitted when a new peer has joined cluster or became online
@@ -195,7 +198,7 @@ private:
         }
 
         // some dst is not accessible directly, send broadcast (to all connected peers except of just sent)
-        if (!toSendRest.isEmpty() && !tran.isLocal)
+        if (!toSendRest.isEmpty() && !tran.isLocal())
         {
             for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
             {
@@ -242,6 +245,7 @@ private:
 
     void addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance);
     void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
+    bool readApiFullInfoData(QnTransactionTransport* transport, ApiFullInfoData* data);
     bool sendInitialData(QnTransactionTransport* transport);
     void printTranState(const QnTranState& tranState);
     template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
@@ -261,14 +265,14 @@ private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
         Qn::SerializationFormat tranFormat,
-        const QByteArray &serializedTran,
+        QByteArray serializedTran,
         const QnTransactionTransportHeader &transportHeader);
     void doPeriodicTasks();
     bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
     void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
     void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     void emitRemotePeerUnauthorized(const QnUuid& id);
-    void onEc2ConnectionSettingsChanged();
+    void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
     /** Info about us. */
@@ -312,6 +316,8 @@ private:
 
     QMap<QnUuid, DelayedAliveData> m_delayedAliveTran;
     QElapsedTimer m_relativeTimer;
+
+    ConnectionGuardSharedState m_connectionGuardSharedState;
 };
 
 } //namespace ec2

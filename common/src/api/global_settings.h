@@ -4,6 +4,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <nx_ec/data/api_fwd.h>
 
@@ -24,6 +25,58 @@ template<class T>
 class QnResourcePropertyAdaptor;
 class QSettings;
 
+namespace nx {
+namespace settings_names {
+
+const QString kNameDisabledVendors(lit("disabledVendors"));
+const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
+const QString kNameHost(lit("smtpHost"));
+const QString kNamePort(lit("smtpPort"));
+const QString kNameUser(lit("smtpUser"));
+const QString kNamePassword(lit("smptPassword"));
+const QString kNameConnectionType(lit("smtpConnectionType"));
+const QString kNameSimple(lit("smtpSimple"));
+const QString kNameTimeout(lit("smtpTimeout"));
+const QString kNameFrom(lit("emailFrom"));
+const QString kNameSignature(lit("emailSignature"));
+const QString kNameSupportEmail(lit("emailSupportEmail"));
+const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
+const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
+const QString kNameBackupQualities(lit("backupQualities"));
+const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
+const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
+const QString kCloudHostName(lit("cloudHost"));
+
+const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
+const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
+const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"));
+const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
+const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
+const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
+const QString kNameLocalSystemId(lit("localSystemId"));
+const QString kNameSystemName(lit("systemName"));
+const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
+const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
+
+
+const QString ldapUri(lit("ldapUri"));
+const QString ldapAdminDn(lit("ldapAdminDn"));
+const QString ldapAdminPassword(lit("ldapAdminPassword"));
+const QString ldapSearchBase(lit("ldapSearchBase"));
+const QString ldapSearchFilter(lit("ldapSearchFilter"));
+
+const QString kNameCloudAccountName(lit("cloudAccountName"));
+const QString kNameCloudSystemId(lit("cloudSystemID")); //< todo: rename it to cloudSystemId
+const QString kNameCloudAuthKey(lit("cloudAuthKey"));
+const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
+const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
+const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
+
+} // namespace settings_names
+} // namespace nx
+
 class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -31,6 +84,8 @@ class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSet
 public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
+
+    void initialize();
 
     /** Check if global settings are ready to use. */
     bool isInitialized() const;
@@ -49,8 +104,8 @@ public:
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
 
-    bool isServerAutoDiscoveryEnabled() const;
-    void setServerAutoDiscoveryEnabled(bool enabled);
+    bool isAutoDiscoveryEnabled() const;
+    void setAutoDiscoveryEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
@@ -88,17 +143,12 @@ public:
     QString statisticsReportUpdateDelay() const;
     void setStatisticsReportUpdateDelay(const QString& value);
 
-    static const QString kNameUpnpPortMappingEnabled;
     bool isUpnpPortMappingEnabled() const;
     void setUpnpPortMappingEnabled(bool value);
 
-    /** System id for the statistics server */
-    QnUuid systemId() const;
-    void setSystemId(const QnUuid &value);
-
-    /** System name, bound to the current system id */
-    QString systemNameForId() const;
-    void setSystemNameForId(const QString &value);
+    /** local systemId. Media servers connect if this value equal */
+    QnUuid localSystemId() const;
+    void setLocalSystemId(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;
 
@@ -123,26 +173,23 @@ public:
 
     // -- Cloud settings
 
-    static const QString kNameCloudAccountName;
     QString cloudAccountName() const;
     void setCloudAccountName(const QString& value);
 
-    static const QString kNameCloudSystemID;
-    QString cloudSystemID() const;
-    void setCloudSystemID(const QString& value);
+    QString cloudSystemId() const;
+    void setCloudSystemId(const QString& value);
 
-    static const QString kNameCloudAuthKey;
     QString cloudAuthKey() const;
     void setCloudAuthKey(const QString& value);
+
+    QString systemName() const;
+    void setSystemName(const QString& value);
 
     void resetCloudParams();
 
     // -- Misc settings
 
-    /** System is not set, it has default admin password and not linked to the cloud. */
-    bool isNewSystem() const;
-    void setNewSystem(bool value);
-
+    bool isNewSystem() const { return localSystemId().isNull(); }
     /** Media server put cloud host here from QnAppInfo::defaultCloudHost */
     QString cloudHost() const;
     void setCloudHost(const QString& value);
@@ -166,18 +213,19 @@ public:
 signals:
     void initialized();
 
+    void systemNameChanged();
+    void localSystemIdChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
-    void serverAutoDiscoveryChanged();
+    void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
     void updateNotificationsChanged();
     void upnpPortMappingEnabledChanged();
-    void ec2ConnectionSettingsChanged();
+    void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
-    void newSystemChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -196,7 +244,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
@@ -210,8 +258,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor;
     QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
-    QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_localSystemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
     QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor;
 
@@ -245,12 +292,12 @@ private:
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
-    QnResourcePropertyAdaptor<QString>* m_cloudSystemIDAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
 
     // misc adaptors
+    QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;

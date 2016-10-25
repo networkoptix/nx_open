@@ -26,7 +26,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -532,7 +531,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::WhatsThisAction).
         flags(Qn::NoTarget).
         text(tr("Help")).
-        icon(qnSkin->icon("titlebar/whats_this.png"));
+        icon(qnSkin->icon("titlebar/window_question.png"));
 
     factory(QnActions::CameraDiagnosticsAction).
         mode(QnActionTypes::DesktopMode).
@@ -558,7 +557,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Alarm/Event Rules..."));
+        text(tr("Event Rules..."));
 
     factory(QnActions::OpenFailoverPriorityAction).
         mode(QnActionTypes::DesktopMode).
@@ -632,7 +631,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         shortcut(lit("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
-        icon(qnSkin->icon("main_menu/main_menu.png"));
+        icon(qnSkin->icon("titlebar/main_menu.png"));
 
     factory(QnActions::OpenLoginDialogAction).
         flags(Qn::Main | Qn::GlobalHotkey).
@@ -805,7 +804,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+Shift+S")).
         shortcut(lit("Ctrl+Alt+S"), QnActionBuilder::Windows, true).
         autoRepeat(false).
-        condition(new QnSaveLayoutAsActionCondition(true, this));
+        condition(new QnConjunctionActionCondition(
+            new QnLoggedInCondition(this),
+            new QnSaveLayoutAsActionCondition(true, this),
+            this));
 
     factory(QnActions::ShareLayoutAction).
         mode(QnActionTypes::DesktopMode).
@@ -837,7 +839,14 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    if (QnScreenRecorder::isSupported())
+    const bool screenRecordingSupported =
+#if defined(Q_OS_WIN)
+        true;
+#else
+        false;
+#endif
+
+    if (screenRecordingSupported && qnRuntime->isDesktopMode())
     {
         factory(QnActions::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).
@@ -866,20 +875,20 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
+        icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
 
 
     factory(QnActions::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
-        icon(qnSkin->icon("titlebar/minimize.png"));
+        icon(qnSkin->icon("titlebar/window_minimize.png"));
 
     factory(QnActions::MaximizeAction).
         flags(Qn::NoTarget).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
+        icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
 
 
     factory(QnActions::FullscreenMaximizeHotkeyAction).
@@ -905,11 +914,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         text(lit("Show Beta Version Warning Message"));
-
-    factory(QnActions::HiDpiSupportMessageAction).
-        flags(Qn::NoTarget).
-        mode(QnActionTypes::DesktopMode).
-        text(lit("Show HiDpi Support Warning Message"));
 
     factory(QnActions::AllowStatisticsReportMessageAction).
         flags(Qn::NoTarget).
@@ -969,7 +973,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to Cloud..."));
+        text(tr("Login to %1...").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
@@ -977,7 +981,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
-        text(tr("Go to %1...").arg(QnAppInfo::cloudName()));
+        text(tr("Open %1 Portal...", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
@@ -995,7 +999,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Alarm/Event Rules...")).
+        text(tr("Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
         shortcut(lit("Ctrl+E")).
         autoRepeat(false);
@@ -1050,7 +1054,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/exit.png"));
+        icon(qnSkin->icon("titlebar/window_close.png"));
 
     factory(QnActions::DelayedForcedExitAction).
         flags(Qn::NoTarget);
@@ -1070,10 +1074,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, this));
 
     /* Resource actions. */
-    factory(QnActions::OpenInLayoutAction).
-        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
-        text(tr("Open in Layout"));
+    factory(QnActions::OpenInLayoutAction)
+        .flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget)
+        .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
+        .text(tr("Open in Layout"))
+        .condition(new QnOpenInLayoutActionCondition(this));
 
     factory(QnActions::OpenInCurrentLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1087,10 +1092,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Tab")).
         conditionalText(tr("Monitor in New Tab"), hasFlags(Qn::server), Qn::All).
-        condition(new QnConjunctionActionCondition(
-            new QnOpenInNewEntityActionCondition(this),
-            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
-            this));
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(QnActions::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
@@ -1105,7 +1107,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnOpenInNewEntityActionCondition(this),
             new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
-            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
             this));
 
     factory(QnActions::OpenSingleLayoutAction).
@@ -1478,7 +1479,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false).
-        condition(new QnTreeNodeTypeCondition(Qn::SharedLayoutNode, this));
+        condition(new QnStopSharingActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -1504,11 +1505,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
+    //TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(QnActions::DeleteFromDiskAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Delete from Disk")).
         autoRepeat(false).
-        condition(hasFlags(Qn::url | Qn::local | Qn::media));
+        condition(hasFlags(Qn::local_media));
 
     factory(QnActions::SetAsBackgroundAction).
         flags(Qn::Scene | Qn::SingleTarget).
@@ -1988,16 +1990,15 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Hide Tree")).
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
-    factory(QnActions::ToggleSliderAction).
+    factory(QnActions::ToggleTimelineAction).
         flags(Qn::NoTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
 
     factory(QnActions::ToggleNotificationsAction).
-        flags(Qn::NoTarget);
-    //text(tr("Show Notifications")).         // TODO: #ynikitenkov: uncomment in 2.6
-    //toggledText(tr("Hide Notifications"));  // TODO: #ynikitenkov: uncomment in 2.6
-    action(QnActions::ToggleNotificationsAction)->setCheckable(true);   // TODO: remove in 2.6
+        flags(Qn::NoTarget).
+        text(tr("Show Notifications")).
+        toggledText(tr("Hide Notifications"));
 
     factory(QnActions::PinNotificationsAction).
         flags(Qn::Notifications | Qn::NoTarget).

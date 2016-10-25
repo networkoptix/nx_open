@@ -1,6 +1,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <set>
+
 #include "openssl/evp.h"
 
 #include "soap_wrapper.h"
@@ -23,6 +25,7 @@
 #include "core/resource/resource.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include "media_server/settings.h"
 
 namespace {
 
@@ -109,6 +112,88 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
+const int kSoapDefaultSendTimeoutSeconds = 10;
+const int kSoapDefaultRecvTimeoutSeconds = 10;
+const int kSoapDefaultConnectTimeoutSeconds = 5;
+const int kSoapDefaultAcceptTimeoutSeconds = 5;
+
+
+struct SoapTimeouts
+{
+    SoapTimeouts(): 
+        sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
+        recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
+        connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
+        acceptTimeoutSeconds(kSoapDefaultAcceptTimeoutSeconds)
+    {};
+
+    SoapTimeouts(const QString& serialized):
+        SoapTimeouts()
+    {
+        if (serialized.isEmpty())
+            return;
+
+        const int kTimeoutsCount = 4;
+
+        bool success = false;
+        auto timeouts = serialized.split(';');
+        auto paramsNum = timeouts.size();
+
+        std::vector<std::chrono::seconds*> fieldsToSet =
+        {
+            &sendTimeoutSeconds,
+            &recvTimeoutSeconds,
+            &connectTimeoutSeconds,
+            &acceptTimeoutSeconds
+        };
+
+        if (paramsNum == 1)
+        {
+            auto timeout = timeouts[0].toInt(&success);
+
+            if (!success)
+                return;
+
+            for (auto i = 0; i < kTimeoutsCount; ++i)
+                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
+        }
+        else if (paramsNum == 4)
+        {
+            for (auto i = 0; i < kTimeoutsCount; ++i)
+            {
+                auto timeout = timeouts[i].toInt(&success);
+
+                if (!success)
+                    continue;
+
+                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
+            }
+        }
+    }
+
+    QString serialize()
+    { 
+        return lit("%1;%2;%3;%4")
+            .arg(sendTimeoutSeconds.count())
+            .arg(recvTimeoutSeconds.count())
+            .arg(connectTimeoutSeconds.count())
+            .arg(acceptTimeoutSeconds.count());
+    };
+
+    std::chrono::seconds sendTimeoutSeconds;
+    std::chrono::seconds recvTimeoutSeconds;
+    std::chrono::seconds connectTimeoutSeconds;
+    std::chrono::seconds acceptTimeoutSeconds;
+};
+
+SoapTimeouts getSoapTimeouts()
+{
+    auto serializedTimeouts = MSSettings::roSettings()
+        ->value( nx_ms_conf::ONVIF_TIMEOUTS, QString()).toString();
+
+    return SoapTimeouts(serializedTimeouts);
+}
+
 /*
 int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
 { 
@@ -122,15 +207,8 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
 } // anonymous namespace
 
 
-
-const int SOAP_RECEIVE_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
-const int SOAP_CONNECT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
-const int SOAP_ACCEPT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
-//static const int DIGEST_TIMEOUT_SEC = 60;
-
 
 
 SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
@@ -194,10 +272,13 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
         m_soapProxy = new T();
     else
         m_soapProxy = new T( SOAP_IO_KEEPALIVE, SOAP_IO_KEEPALIVE );
-    m_soapProxy->soap->send_timeout = SOAP_SEND_TIMEOUT;
-    m_soapProxy->soap->recv_timeout = SOAP_RECEIVE_TIMEOUT;
-    m_soapProxy->soap->connect_timeout = SOAP_CONNECT_TIMEOUT;
-    m_soapProxy->soap->accept_timeout = SOAP_ACCEPT_TIMEOUT;
+
+    auto timeouts = getSoapTimeouts();
+
+    m_soapProxy->soap->send_timeout = timeouts.sendTimeoutSeconds.count();
+    m_soapProxy->soap->recv_timeout = timeouts.recvTimeoutSeconds.count();
+    m_soapProxy->soap->connect_timeout = timeouts.connectTimeoutSeconds.count();
+    m_soapProxy->soap->accept_timeout = timeouts.acceptTimeoutSeconds.count();
 
     soap_register_plugin(m_soapProxy->soap, soap_wsse);
 
@@ -338,37 +419,38 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
     return result;
 }
 
-QSet<QAuthenticator> DeviceSoapWrapper::getPossibleCredentials(
+std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
     const QString& manufacturer, 
     const QString& model) const
 {
-    QSet<QAuthenticator> result;
-
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
     auto credentials = resData.value<QList<QnCredentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    for (const auto& credsEntry: credentials)
-        result.insert(credsEntry.toAuthenticator());
-
-    return result;
+    return credentials.toStdList();
 }
 
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
-    auto possibleCredentials = getPossibleCredentials(manufacturer, model);
-
     calcTimeDrift();
 
-    auto passwords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
+    std::list<QnCredentials> possibleCredentials;
+    const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
+    auto& oldPasswords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
 
-    for (const auto& creds: passwords)
+    std::set<QnCredentials> oldCredentialsSet;
+
+    for (const auto& creds: oldPasswords)
     {
-        QAuthenticator auth;
-        auth.setUser(creds.first);
-        auth.setPassword(creds.second);
+        QnCredentials auth(QLatin1String(creds.first), QLatin1String(creds.second));
+        oldCredentialsSet.insert(auth);
+        possibleCredentials.push_back(auth);
+    }
 
-        possibleCredentials.insert(auth);
+    for (const auto& creds: credentialsFromResourceData)
+    {
+        if (!oldCredentialsSet.count(creds))
+            possibleCredentials.push_back(creds);
     }
 
     for (const auto& auth: possibleCredentials)
@@ -376,8 +458,8 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
         if (QnResource::isStopping())
             return false;
 
-        setLogin(auth.user());
-        setPassword(auth.password());
+        setLogin(auth.user);
+        setPassword(auth.password);
 
         NetIfacesReq request;
         NetIfacesResp response;
@@ -387,8 +469,18 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
             return soapRes == SOAP_OK;
     }
 
-    setLogin(QString());
-    setPassword(QString());
+    if (!possibleCredentials.empty())
+    {
+        auto first = possibleCredentials.cbegin();
+        setLogin(first->user);
+        setPassword(first->password);
+    }
+    else
+    {
+        setLogin(QString());
+        setPassword(QString());
+    }
+
     return false;
 }
 

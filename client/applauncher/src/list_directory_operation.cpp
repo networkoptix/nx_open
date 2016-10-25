@@ -185,7 +185,7 @@ namespace detail
     {
         if( m_httpClient )
         {
-            m_httpClient->terminate();
+            m_httpClient->pleaseStopSync();
             m_httpClient.reset();
         }
     }
@@ -193,7 +193,7 @@ namespace detail
     void ListDirectoryOperation::pleaseStop()
     {
         if( m_httpClient )
-            m_httpClient->terminate();
+            m_httpClient->pleaseStopSync();
     }
 
     bool ListDirectoryOperation::startAsync()
@@ -221,7 +221,7 @@ namespace detail
         {
             setResult( ResultCode::downloadFailure );
             setErrorText( httpClient->response()->statusLine.reasonPhrase );
-            m_httpClient->terminate();
+            m_httpClient->pleaseStopSync();
             m_httpClient.reset();
             m_handler->operationDone( shared_from_this() );
             return;
@@ -238,14 +238,14 @@ namespace detail
             const nx_http::Response *response = httpClient->response();
             if (response)
                 setErrorText(response->statusLine.reasonPhrase);
-            m_httpClient->terminate();
+            m_httpClient->pleaseStopSync();
             m_httpClient.reset();
             m_handler->operationDone( shared_from_this() );
             return;
         }
 
         nx_http::BufferType contentsXml = httpClient->fetchMessageBodyBuffer();
-        m_httpClient->terminate();
+        m_httpClient->pleaseStopSync();
         m_httpClient.reset();
 
         ContentsXmlSaxHandler xmlHandler( &m_entries );
@@ -265,7 +265,7 @@ namespace detail
         QXmlInputSource input( &xmlFile );
         if( !reader.parse( &input ) )
         {
-            NX_LOG( QString::fromLatin1( "Failed to parse contents.xml from remote folder %1. %2" ).arg(m_downloadUrl.toString()).arg(xmlHandler.errorString()), cl_logERROR );
+            NX_LOG( QString::fromLatin1( "Failed to parse contents.xml from remote folder %1. %2" ).arg(m_downloadUrl.toString(QUrl::RemovePassword)).arg(xmlHandler.errorString()), cl_logERROR );
             setResult( ResultCode::downloadFailure );
             m_handler->operationDone( shared_from_this() );
             return;

@@ -58,6 +58,7 @@ private:
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
+    mutable QnMutex m_streamReaderMutex;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;

@@ -12,16 +12,18 @@
 
 #include <cloud_db_client/src/data/types.h>
 
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/utils/time.h>
 
+#include <common/common_globals.h> //for Qn::SerializationFormat
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -31,8 +33,6 @@
 #include "stree/http_request_attr_reader.h"
 #include "stree/socket_attr_reader.h"
 #include "stree/stree_manager.h"
-
-#include <common/common_globals.h> //for Qn::SerializationFormat
 
 namespace nx {
 namespace cdb {
@@ -124,7 +124,8 @@ void AuthenticationManager::authenticate(
     const auto authSearchInputData = stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
-        inputRes);
+        inputRes,
+        authTraversalResult);
     m_stree.search(
         StreeOperation::authentication,
         authSearchInputData,
@@ -245,7 +246,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
 
 nx::Buffer AuthenticationManager::generateNonce()
 {
-    const size_t nonce = m_dist(m_rd) | ::time(NULL);
+    const size_t nonce = m_dist(m_rd) | nx::utils::timeSinceEpoch().count();
     return nx::Buffer::number((qulonglong)nonce);
 }
 

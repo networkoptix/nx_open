@@ -222,16 +222,18 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     QnResourceList result;
 
     QnActiResourcePtr actiRes(new QnActiResource);
-    actiRes->setUrl(url.toString());
+    QUrl urlCopy(url);
+    urlCopy.setScheme("http");
+    actiRes->setUrl(urlCopy.toString());
     actiRes->setDefaultAuth(auth);
 
     auto devUrl = lit("http://%1:%2")
-        .arg(url.host())
-        .arg(url.port(nx_http::DEFAULT_HTTP_PORT));
+        .arg(urlCopy.host())
+        .arg(urlCopy.port(nx_http::DEFAULT_HTTP_PORT));
 
     auto deviceXmlUrl =
         lit("http://%1:%2/%3")
-            .arg(url.host())
+            .arg(urlCopy.host())
             .arg(kActiDeviceXmlPort)
             .arg(kActiDeviceXmlPath);
 

@@ -25,7 +25,7 @@ static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
 
 int QnBusinessEventLogRestHandler::executeGet(
     const QString& /*path*/, const QnRequestParamList& params, QByteArray& result,
-    QByteArray& contentType, const QnRestConnectionProcessor* owner)
+    QByteArray& contentType, const QnRestConnectionProcessor* /*owner*/)
 {
     QnTimePeriod period(-1, -1);
     QnSecurityCamResourceList resList;

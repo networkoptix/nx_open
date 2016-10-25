@@ -60,7 +60,13 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
     const auto offset = (backwardSearch ? QPoint(targetGeometry.width(), 0) : QPoint());
     const auto factor = appropriate->devicePixelRatio();
     const auto targetTopLeft = targetGeometry.topLeft();
-    return targetTopLeft + offset + pixelPointOnScreen / factor;
+
+    const auto result = targetTopLeft + offset + pixelPointOnScreen / factor;;
+    if (appropriate->geometry().contains(result))
+        return result;
+
+    // Looking for next screen
+    return screenRelatedToGlobal(result, appropriate);
 }
 
 QScreen* getScreen(const QPoint& scaled)
@@ -236,14 +242,14 @@ class ContextMenuEventCorrector : public QObject
     class ProxyContextMenuEvent : public QContextMenuEvent
     {
     public:
-        ProxyContextMenuEvent(const QPoint& pos, const QPoint& globalPos)
-            :QContextMenuEvent(QContextMenuEvent::Mouse,   //< Always set mouse to prevent coordinates transforming
+        ProxyContextMenuEvent(const QPoint& pos, const QPoint& globalPos):
+            QContextMenuEvent(QContextMenuEvent::Mouse,   //< Always set mouse to prevent coordinates transforming
                 pos, globalPos)
         {}
     };
 
 public:
-    bool eventFilter(QObject*watched, QEvent* event)
+    bool eventFilter(QObject* watched, QEvent* event)
     {
         if (event->type() != QEvent::ContextMenu)
             return QObject::eventFilter(watched, event);
@@ -264,34 +270,45 @@ public:
     }
 };
 
-}   // unnamed namespace
+static bool initializedWorkarounds = false;
+static bool isWindowsEnvironment =
+    #if defined(Q_OS_WIN)
+    true;
+    #else
+    false;
+    #endif
+
+}   // namespace
 
 QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
 {
-#if defined(Q_OS_WIN)
-    if (!knownCorrectors.contains(menu))
-        installMenuMouseEventCorrector(menu);
+    if (isWindowsEnvironment)
+    {
+        if (!knownCorrectors.contains(menu))
+            installMenuMouseEventCorrector(menu);
 
-    const auto corrector = knownCorrectors.value(menu);
-    corrector->setTargetPosition(globalPoint);
-#endif
+        const auto corrector = knownCorrectors.value(menu);
+        corrector->setTargetPosition(globalPoint);
+    }
+
     return menu->exec(globalPoint);
 }
 
 QPoint QnHiDpiWorkarounds::safeMapToGlobal(QWidget* widget, const QPoint& offset)
 {
-#if defined(Q_OS_WIN)
-    return getPoint(widget, offset);
-#else
+    if (isWindowsEnvironment)
+        return getPoint(widget, offset);
+
     return widget->mapToGlobal(offset);
-#endif
 }
 
 void QnHiDpiWorkarounds::init()
 {
-#if defined(Q_OS_WIN)
+    if (!isWindowsEnvironment || initializedWorkarounds)
+        return;
+
+    initializedWorkarounds = true;
     qApp->installEventFilter(new ContextMenuEventCorrector());
     qApp->installEventFilter(new TopLevelWidgetsPositionCorrector());
-#endif
 }
 

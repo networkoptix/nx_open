@@ -40,7 +40,7 @@ QUrl QnCloudUrlHelper::createAccountUrl() const
 
 QUrl QnCloudUrlHelper::restorePasswordUrl() const
 {
-    return makeUrl(lit("/restore_password"));
+    return makeUrl(lit("/restore_password"), false);
 }
 
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const

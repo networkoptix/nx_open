@@ -260,13 +260,13 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
 QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate, bool showTime)
 {
     if (showDate && showTime)
-        return dateTime.toString(Qt::SystemLocaleShortDate);
+        return dateTime.toString(Qt::DefaultLocaleShortDate);
 
     if (showDate)
-        return dateTime.date().toString(Qt::SystemLocaleShortDate);
+        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
 
     if (showTime)
-        return dateTime.time().toString(Qt::SystemLocaleShortDate);
+        return dateTime.time().toString(Qt::DefaultLocaleShortDate);
 
     return QString();
 }

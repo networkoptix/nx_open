@@ -100,15 +100,11 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_bookmarksModeButton = newActionButton(QnActions::BookmarksModeAction);
     m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
-    m_bookmarksModeButton->setPreferredSize(34, 24);
+    m_bookmarksModeButton->setPreferredSize(52, 24);
 
     m_calendarButton = newActionButton(QnActions::ToggleCalendarAction);
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
-    m_calendarButton->setPreferredSize(34, 24);
-
-    m_thumbnailsButton = newActionButton(QnActions::ToggleThumbnailsAction);
-    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
-    m_thumbnailsButton->setPreferredSize(34, 24);
+    m_calendarButton->setPreferredSize(52, 24);
 
     /* Create clock label. */
     QnClockLabel* clockLabel = new QnClockLabel(this);
@@ -147,19 +143,18 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_separators->setFrameColor(palette().color(QPalette::Midlight));
     m_separators->setFrameWidth(1.0);
 
-    auto updateTimelineMode =
-        [this, timelinePlaceholder]()
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
+        [this, timelinePlaceholder](bool isRelevant)
         {
-            bool isTimeline = isTimelineRelevant();
-            m_timeSlider->setVisible(isTimeline);
-            m_timeScrollBar->setVisible(isTimeline);
-            timelinePlaceholder->setVisible(!isTimeline);
-            m_separators->setFrameColor(palette().color(isTimeline ? QPalette::Shadow : QPalette::Midlight));
-            m_separators->setFrameWidth(isTimeline ? 2.0 : 1.0);
-        };
-
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,      this, updateTimelineMode);
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,   this, updateTimelineMode);
+            bool reset = m_timeSlider->isVisible() != isRelevant;
+            m_timeSlider->setVisible(isRelevant);
+            m_timeScrollBar->setVisible(isRelevant);
+            timelinePlaceholder->setVisible(!isRelevant);
+            m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));
+            m_separators->setFrameWidth(isRelevant ? 2.0 : 1.0);
+            if (reset)
+                m_timeSlider->invalidateWindow();
+        });
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
@@ -201,7 +196,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     rightLayoutBottom->setSpacing(2);
     rightLayoutBottom->addItem(m_bookmarksModeButton);
     rightLayoutBottom->addItem(m_calendarButton);
-    rightLayoutBottom->addItem(m_thumbnailsButton);
 
     QGraphicsLinearLayout* rightLayout = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -320,7 +314,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
-    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_bookmarksModeButton, Qn::Bookmarks_Usage_Help);
 
     /* Run handlers */

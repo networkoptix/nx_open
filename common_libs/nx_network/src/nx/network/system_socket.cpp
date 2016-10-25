@@ -755,8 +755,12 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
 
         bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags & ~MSG_DONTWAIT);
 
-        if (!setNonBlockingMode(&value))
+        // Save error code as changing mode will drop it.
+        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+        if (!setNonBlockingMode(value))
             return -1;
+
+        SystemError::setLastErrorCode(sysErrorCodeBak);
     }
     else
     {

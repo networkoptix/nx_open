@@ -35,9 +35,9 @@ namespace ec2
 
     QString QnAbstractTransaction::toString() const
     {
-        return lit("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
+        return lm("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
             .arg(ApiCommand::toString(command))
-            .arg(persistentInfo.timestamp)
+            .str(persistentInfo.timestamp)
             .arg(peerID.toString())
             .arg(persistentInfo.dbID.toString())
             .arg(persistentInfo.sequence);
@@ -50,7 +50,7 @@ namespace ec2
         (optional, false))
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-        (QnAbstractTransaction)(ApiTransactionData),
+        (HistoryAttributes)(QnAbstractTransaction)(ApiTransactionData),
         (json)(ubjson)(xml)(csv_record),
         _Fields,
         (optional, false))

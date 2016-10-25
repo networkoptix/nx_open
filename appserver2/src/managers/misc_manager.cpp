@@ -6,9 +6,9 @@
 
 namespace ec2 {
 
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction)
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemIdData> &transaction)
 {
-    emit systemNameChangeRequested(transaction.params.systemName,
+    emit systemIdChangeRequested(transaction.params.systemId,
                                    transaction.params.sysIdTime,
                                    transaction.params.tranLogTime);
 }
@@ -25,17 +25,23 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::changeSystemName(
-        const QString &systemName,
+int QnMiscManager<QueryProcessorType>::changeSystemId(
+        const QnUuid& systemId,
         qint64 sysIdTime,
-        qint64 tranLogTime,
+        Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(systemName, sysIdTime, tranLogTime);
+
+
+    ApiSystemIdData params;
+    params.systemId = systemId;
+    params.sysIdTime = sysIdTime;
+    params.tranLogTime = tranLogTime;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::changeSystemId, params,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -43,19 +49,6 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(
     );
 
     return reqId;
-}
-
-template<class QueryProcessorType>
-QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(
-        const QString &systemName,
-        qint64 sysIdTime,
-        qint64 tranLogTime) const
-{
-    QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName);
-    transaction.params.systemName = systemName;
-    transaction.params.sysIdTime = sysIdTime;
-    transaction.params.tranLogTime = tranLogTime;
-    return transaction;
 }
 
 template<class QueryProcessorType>
@@ -65,13 +58,13 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    QnTransaction<ApiLicenseOverflowData> transaction(ApiCommand::markLicenseOverflow);
-    transaction.params.value = value;
-    transaction.params.time = time;
-    transaction.isLocal = true;
+    ApiLicenseOverflowData params;
+    params.value = value;
+    params.time = time;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::markLicenseOverflow, params,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -82,20 +75,24 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::rebuildTransactionLog(
+int QnMiscManager<QueryProcessorType>::cleanupDatabase(
+    bool cleanupDbObjects,
+    bool cleanupTransactionLog,
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    QnTransaction<ApiRebuildTransactionLogData> transaction(ApiCommand::rebuildTransactionLog);
-    transaction.isLocal = true;
+    ApiCleanupDatabaseData data;
+    data.cleanupDbObjects = cleanupDbObjects;
+    data.cleanupTransactionLog = cleanupTransactionLog;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::cleanupDatabase,
+	    data,
         [handler, reqId](ErrorCode errorCode)
-    {
-        handler->done(reqId, errorCode);
-    }
-    );
+        {
+            handler->done(reqId, errorCode);
+        });
 
     return reqId;
 }

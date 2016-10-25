@@ -22,7 +22,7 @@ HttpClient::HttpClient()
 HttpClient::~HttpClient()
 {
     pleaseStop();
-    m_asyncHttpClient->terminate();
+    m_asyncHttpClient->pleaseStopSync(false);
 }
 
 void HttpClient::pleaseStop()
@@ -35,7 +35,9 @@ void HttpClient::pleaseStop()
 bool HttpClient::doGet(const QUrl& url)
 {
     using namespace std::placeholders;
-    return doRequest(std::bind(&nx_http::AsyncHttpClient::doGet, _1, url));
+    return doRequest(std::bind(
+        static_cast<void(AsyncHttpClient::*)(const QUrl&)>(
+            &nx_http::AsyncHttpClient::doGet), _1, url));
 }
 
 bool HttpClient::doPost(
@@ -45,8 +47,14 @@ bool HttpClient::doPost(
 {
     using namespace std::placeholders;
 
+    typedef void(AsyncHttpClient::*FuncType)(
+        const QUrl& /*url*/,
+        const nx_http::StringType& /*contentType*/,
+        nx_http::StringType /*messageBody*/,
+        bool /*includeContentLength*/);
+
     return doRequest(std::bind(
-        &nx_http::AsyncHttpClient::doPost,
+        static_cast<FuncType>(&nx_http::AsyncHttpClient::doPost),
         _1,
         url,
         contentType,
@@ -196,7 +204,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         //have to re-establish connection if previous message has not been read up to the end
         if (m_asyncHttpClient)
         {
-            m_asyncHttpClient->terminate();
+            m_asyncHttpClient->pleaseStopSync();
             m_asyncHttpClient.reset();
         }
         instanciateHttpClient();

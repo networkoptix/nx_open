@@ -66,7 +66,11 @@ angular.module('webadminApp')
                     errorToShow = L.join.configError;
                     break;
                 case 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':
+                case 'BOTH_SYSTEM_BOUND_TO_CLOUD':
                     errorToShow = L.join.cloudError;
+                    break;
+                case 'DIFFERENT_CLOUD_HOST':
+                    errorToShow = L.join.cloudHostConflict;
                     break;
                 case 'STARTER_LICENSE_ERROR':
                     errorToShow = L.join.licenceError;
@@ -83,7 +87,7 @@ angular.module('webadminApp')
             }*/
 
             mediaserver.pingSystem($scope.settings.url, $scope.settings.login, $scope.settings.password).then(function(r){
-                if(r.data.error!=='0'){
+                if(r.data && r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
                         dialogs.alert(L.join.connectionFailed + errorToShow);
@@ -92,6 +96,12 @@ angular.module('webadminApp')
                 }
                 $scope.systems.systemFound = true;
                 $scope.systems.joinSystemName = r.data.reply.systemName;
+            },function(){
+                var errorToShow = L.join.unknownError;
+                if(r.data && r.data.error!=='0') {
+                    errorToShow = errorHandler(r.data.errorString);
+                }
+                dialogs.alert(L.join.connectionFailed + errorToShow);
             });
         };
 

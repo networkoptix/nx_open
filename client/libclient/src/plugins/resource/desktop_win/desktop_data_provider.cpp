@@ -1,5 +1,5 @@
 #include "desktop_data_provider.h"
-#if defined(Q_OS_WIN)
+
 #include <intrin.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -30,8 +30,8 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
-namespace {
 
+namespace {
 
     struct FffmpegLog
     {
@@ -52,7 +52,7 @@ namespace {
         }
     };
 
-}
+} // namespace
 
 QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
     m_owner(owner),
@@ -60,7 +60,6 @@ QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider*
     m_speexPreprocess(0),
     m_terminated(false)
 {
-
 }
 
 QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
@@ -462,7 +461,7 @@ bool QnDesktopDataProvider::init()
         m_audioCodecCtx = avcodec_alloc_context3(audioCodec);
         m_audioCodecCtx->codec_id = audioCodec->id;
         m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-        m_audioCodecCtx->sample_fmt = QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
+        m_audioCodecCtx->sample_fmt = QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(m_audioInfo[0]->m_audioFormat);
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channelCount();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.sampleRate();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
@@ -472,8 +471,8 @@ bool QnDesktopDataProvider::init()
 
         const auto audioContext = new QnAvCodecMediaContext(m_audioCodecCtx);
         m_audioContext = QnConstMediaContextPtr(audioContext);
-
-        if (avcodec_open2(m_audioCodecCtx, audioCodec, nullptr) < 0)
+        const auto res = avcodec_open2(m_audioCodecCtx, audioCodec, nullptr);
+        if (res < 0)
         {
             m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;
@@ -576,7 +575,8 @@ void QnDesktopDataProvider::putAudioData()
     EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
     while (ai && ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
     {
-        QnWritableCompressedAudioDataPtr audioData = std::static_pointer_cast<QnWritableCompressedAudioData>(ai->m_audioQueue.front());
+        QnWritableCompressedAudioDataPtr audioData;
+        ai->m_audioQueue.pop(audioData);
 
         qint64 audioPts = audioData->timestamp - m_audioFrameDuration;
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
@@ -595,9 +595,6 @@ void QnDesktopDataProvider::putAudioData()
 
 
         m_audioFramesCount++;
-
-        QnWritableCompressedAudioDataPtr mediaData;
-        ai->m_audioQueue.pop(mediaData);
 
         // todo: add audio resample here
 
@@ -884,5 +881,3 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
     }
 }
 */
-
-#endif // Q_OS_WIN

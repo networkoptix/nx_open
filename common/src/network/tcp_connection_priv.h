@@ -9,7 +9,7 @@
 #include "utils/common/byte_array.h"
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/httpstreamreader.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 
 static const int TCP_READ_BUFFER_SIZE = 65536;

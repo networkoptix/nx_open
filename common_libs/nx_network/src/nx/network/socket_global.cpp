@@ -3,16 +3,18 @@
 
 #include <nx/utils/std/future.h>
 
+const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 
 namespace nx {
 namespace network {
 
-SocketGlobals::SocketGlobals()
-    : m_log( QnLog::logs() )
-    , m_mediatorConnector(new hpm::api::MediatorConnector)
-    , m_addressResolver(m_mediatorConnector->clientConnection())
-    , m_addressPublisher(m_mediatorConnector->systemConnection())
+SocketGlobals::SocketGlobals():
+    m_log(QnLog::logs()),
+    m_mediatorConnector(new hpm::api::MediatorConnector),
+    m_addressPublisher(m_mediatorConnector->systemConnection()),
+    m_tcpReversePool(m_mediatorConnector->clientConnection())
 {
+    m_addressResolver.reset(new cloud::AddressResolver(m_mediatorConnector->clientConnection()));
 }
 
 SocketGlobals::~SocketGlobals()
@@ -23,10 +25,12 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        m_addressResolver.pleaseStop( barrier.fork() );
-        m_addressPublisher.pleaseStop( barrier.fork() );
-        m_mediatorConnector->pleaseStop( barrier.fork() );
-        m_outgoingTunnelPool.pleaseStop( barrier.fork() );
+        m_debugConfigurationTimer.pleaseStop(barrier.fork());
+        m_addressResolver->pleaseStop(barrier.fork());
+        m_addressPublisher.pleaseStop(barrier.fork());
+        m_mediatorConnector->pleaseStop(barrier.fork());
+        m_outgoingTunnelPool.pleaseStop(barrier.fork());
+        m_tcpReversePool.pleaseStop(barrier.fork());
     }
 
     promise.get_future().wait();
@@ -46,6 +50,9 @@ void SocketGlobals::init()
     {
         s_isInitialized = true; // allow creating Pollable(s) in constructor
         s_instance = new SocketGlobals;
+
+        lock.unlock();
+        s_instance->setDebugConfigurationTimer();
     }
 }
 
@@ -55,9 +62,11 @@ void SocketGlobals::deinit()
     if (--s_counter == 0) // last out
     {
         delete s_instance;
+        s_instance = nullptr;
         s_isInitialized = false; // allow creating Pollable(s) in destructor
     }
 }
+
 void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
@@ -82,6 +91,17 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
     QnMutexLocker lock(&s_instance->m_mutex);
     if (s_instance->m_customInits.emplace(init, deinit).second)
         init();
+}
+
+void SocketGlobals::setDebugConfigurationTimer()
+{
+    m_debugConfigurationTimer.start(
+        kReloadDebugConfigurationInterval,
+        [this]()
+        {
+            m_debugConfiguration.reload(utils::FlagConfig::OutputType::silent);
+            setDebugConfigurationTimer();
+        });
 }
 
 QnMutex SocketGlobals::s_mutex;

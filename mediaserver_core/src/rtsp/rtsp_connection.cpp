@@ -20,7 +20,7 @@ extern "C"
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_media_layout.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/httptypes.h>
@@ -145,7 +145,6 @@ public:
         wasDualStreaming(false),
         wasCameraControlDisabled(false),
         tcpMode(true),
-        transcodedVideoSize(640, 480),
         peerHasAccess(true)
     {
     }
@@ -214,7 +213,28 @@ public:
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
     QByteArray clientGuid;
-    enum AVCodecID codecId;
+
+    struct TranscodeParams
+    {
+        TranscodeParams(): resolution(640, 480), codecId(AV_CODEC_ID_NONE) {}
+
+        bool isNull() const
+        {
+            bool isFilled = resolution.height() > 0 && codecId != AV_CODEC_ID_NONE;
+            return !isFilled;
+        }
+        bool operator==(const TranscodeParams& other) const
+        {
+            return resolution == other.resolution &&
+                codecId == other.codecId;
+        }
+
+        QSize resolution;
+        enum AVCodecID codecId;
+    };
+    TranscodeParams transcodeParams;
+    TranscodeParams prevTranscodeParams;
+
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
@@ -227,7 +247,6 @@ public:
     bool wasDualStreaming;
     bool wasCameraControlDisabled;
     bool tcpMode;
-    QSize transcodedVideoSize;
     bool peerHasAccess;
 };
 
@@ -240,7 +259,6 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 {
     Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
-    d->codecId = AV_CODEC_ID_NONE;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -315,9 +333,9 @@ void QnRtspConnectionProcessor::parseRequest()
     {
         AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
         if (format)
-            d->codecId = format->video_codec;
+            d->transcodeParams.codecId = format->video_codec;
         else
-            d->codecId = AV_CODEC_ID_NONE;
+            d->transcodeParams.codecId = AV_CODEC_ID_NONE;
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
@@ -343,9 +361,9 @@ void QnRtspConnectionProcessor::parseRequest()
                 videoSize = QSize(0,480);
             }
         }
-        d->transcodedVideoSize = videoSize;
-        if (d->codecId == AV_CODEC_ID_NONE)
-            d->codecId = DEFAULT_VIDEO_CODEC;
+        d->transcodeParams.resolution = videoSize;
+        if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
+            d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
     }
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
@@ -601,7 +619,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     Q_D(QnRtspConnectionProcessor);
     AVCodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
-        dstCodec = d->codecId;
+        dstCodec = d->transcodeParams.codecId;
     else
         dstCodec = media && media->compressionType == AV_CODEC_ID_AAC ? AV_CODEC_ID_AAC : AV_CODEC_ID_MP2; // keep aac without transcoding for audio
         //dstCodec = media && media->compressionType == AV_CODEC_ID_AAC ? AV_CODEC_ID_AAC : AV_CODEC_ID_VORBIS; // keep aac without transcoding for audio
@@ -775,7 +793,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media)
             {
-                encoder = createEncoderByMediaData(media, d->transcodedVideoSize, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
+                encoder = createEncoderByMediaData(media, d->transcodeParams.resolution, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
                 if (encoder)
                     encoder->setMediaData(media);
                 else
@@ -793,7 +811,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             return CODE_NOT_FOUND;
 
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
-        trackInfo->encoder = encoder;
+        trackInfo->setEncoder(encoder);
         d->trackInfo.insert(i, trackInfo);
         //d->encoders.insert(i, encoder);
 
@@ -1122,9 +1140,24 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
     Q_D(const QnRtspConnectionProcessor);
 
     QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
-    if (isVideo && !d->transcodedVideoSize.isEmpty() && d->codecId != AV_CODEC_ID_NONE)
-        result->setDstResolution(d->transcodedVideoSize, d->codecId);
+    if (isVideo && !d->transcodeParams.isNull())
+        result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
+}
+
+void QnRtspConnectionProcessor::updatePredefinedTracks()
+{
+    Q_D(QnRtspConnectionProcessor);
+    const bool isParamsEqual = d->transcodeParams == d->prevTranscodeParams;
+    if (!isParamsEqual || d->startTime > 0)
+    {
+        // update encode resolution if position changed or other transcoding params
+        for (const auto& track : d->trackInfo)
+        {
+            if (track->mediaType == RtspServerTrackInfo::MediaType::Video)
+                track->setEncoder(QnRtspEncoderPtr(createRtspFfmpegEncoder(true)));
+        }
+    }
 }
 
 void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
@@ -1135,14 +1168,15 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     for (; trackNum < videoLayout->channelCount(); ++trackNum)
     {
         RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
-        vTrack->encoder = QnRtspEncoderPtr(createRtspFfmpegEncoder(true));
+        vTrack->setEncoder(QnRtspEncoderPtr(createRtspFfmpegEncoder(true)));
         vTrack->clientPort = trackNum*2;
         vTrack->clientRtcpPort = trackNum*2 + 1;
+        vTrack->mediaType = RtspServerTrackInfo::MediaType::Video;
         d->trackInfo.insert(trackNum, vTrack);
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
-    aTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+    aTrack->setEncoder(QnRtspEncoderPtr(new QnRtspFfmpegEncoder()));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
     d->trackInfo.insert(trackNum, aTrack);
@@ -1188,7 +1222,12 @@ int QnRtspConnectionProcessor::composePlay()
                 d->response.headers.insert( std::make_pair(nx_http::StringType("x-video-layout"), layoutStr.toLatin1()) );
         }
     }
+    else if (d->useProprietaryFormat)
+    {
+        updatePredefinedTracks();
+    }
 
+    d->prevTranscodeParams = d->transcodeParams;
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
 
@@ -1594,8 +1633,8 @@ void QnRtspConnectionProcessor::resetTrackTiming()
         RtspServerTrackInfoPtr track = itr.value();
         track->sequence = 0;
         track->firstRtpTime = -1;
-        if (track->encoder)
-            track->encoder->init();
+        if (auto encoder = track->getEncoder())
+            encoder->init();
     }
 }
 

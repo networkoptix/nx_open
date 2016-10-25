@@ -16,15 +16,15 @@
 
 namespace CameraDiagnostics
 {
-    DiagnoseTool::DiagnoseTool( const QnUuid& cameraID, QObject *parent )
+    DiagnoseTool::DiagnoseTool( const QnUuid& cameraId, QObject *parent )
     :
         QObject(parent),
-        m_cameraID( cameraID ),
+        m_cameraId( cameraId ),
         m_state( sInit ),
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraID );
+        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraId );
         if( !m_camera )
             return;
 
@@ -73,10 +73,10 @@ namespace CameraDiagnostics
         return m_errorMessage;
     }
 
-    void DiagnoseTool::onGetServerSystemNameResponse( int status, QString serverSystemName, int /*handle*/ )
+    void DiagnoseTool::onGetServerSystemIdResponse( int status, QString serverSystemId, int /*handle*/ )
     {
         const ec2::AbstractECConnectionPtr& ecConnection = QnAppServerConnectionFactory::getConnection2();
-        if( (status != 0) || !ecConnection || (serverSystemName != ecConnection->connectionInfo().systemName) )
+        if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().localSystemId.toString()) )
         {
             m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
 
@@ -94,7 +94,7 @@ namespace CameraDiagnostics
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
         if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
-                m_cameraID,
+                m_cameraId,
                 static_cast<Step::Value>(m_step+1),
                 this,
                 SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
@@ -156,7 +156,7 @@ namespace CameraDiagnostics
         emit diagnosticsStepStarted( m_step );
 
         if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
-                m_cameraID,
+                m_cameraId,
                 m_step,
                 this,
                 SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
@@ -175,9 +175,9 @@ namespace CameraDiagnostics
         emit diagnosticsStepStarted( m_step );
 
         if( !m_server || !m_server->apiConnection() ||
-            m_server->apiConnection()->getSystemNameAsync(
+            m_server->apiConnection()->getSystemIdAsync(
                 this,
-                SLOT(onGetServerSystemNameResponse(int, QString, int)) ) == -1 )
+                SLOT(onGetServerSystemIdResponse(int, QString, int)) ) == -1 )
         {
             m_errorMessage = tr("No connection to Server %1.").arg(m_serverHostAddress);
             m_result = false;

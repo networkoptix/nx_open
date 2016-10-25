@@ -1,5 +1,6 @@
 #include "player_data_consumer.h"
 
+#include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/debug_utils.h>
 
@@ -20,15 +21,19 @@ static const int kMaxMediaQueueLen = 90;
 // Max queue length for decoded video which is awaiting to be rendered.
 static const int kMaxDecodedVideoQueueSize = 2;
 
+QSize qMax(const QSize& size1, const QSize& size2)
+{
+    return size1.height() > size2.height() ? size1 : size2;
+}
+
 } // namespace
 
 PlayerDataConsumer::PlayerDataConsumer(
     const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
-:
+    :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_awaitJumpCounter(0),
     m_buffering(0),
-    m_hurryUpToFrame(0),
     m_noDelayState(NoDelayState::Disabled),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE)
@@ -50,8 +55,8 @@ void PlayerDataConsumer::pleaseStop()
 {
     base_type::pleaseStop();
     QnMutexLocker lock(&m_decoderMutex);
-    if (m_videoDecoder)
-        m_videoDecoder->pleaseStop();
+    for (auto& videoDecoder: m_videoDecoders)
+        videoDecoder->pleaseStop();
     if (m_audioDecoder)
         m_audioDecoder->pleaseStop();
     m_queueWaitCond.wakeAll();
@@ -80,18 +85,17 @@ qint64 PlayerDataConsumer::queueVideoDurationUsec() const
 {
     qint64 minTime = std::numeric_limits<qint64>::max();
     qint64 maxTime = 0;
-    m_dataQueue.lock();
-    for (int i = 0; i < m_dataQueue.size(); ++i)
+    auto unsafeQueue = m_dataQueue.lock();
+    for (int i = 0; i < unsafeQueue.size(); ++i)
     {
         auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(
-            m_dataQueue.atUnsafe(i));
+            unsafeQueue.at(i));
         if (video)
         {
             minTime = std::min(minTime, video->timestamp);
             maxTime = std::max(maxTime, video->timestamp);
         }
     }
-    m_dataQueue.unlock();
     return std::max(0ll, maxTime - minTime);
 }
 
@@ -102,17 +106,6 @@ const AudioOutput* PlayerDataConsumer::audioOutput() const
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
-    {
-        QnMutexLocker lock(&m_decoderMutex);
-        if (!m_videoDecoder)
-        {
-            m_videoDecoder.reset(new SeamlessVideoDecoder());
-            m_videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
-        }
-        if (!m_audioDecoder)
-            m_audioDecoder.reset(new SeamlessAudioDecoder());
-    }
-
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
@@ -161,6 +154,33 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
+    quint32 videoChannel = videoFrame->channelNumber;
+    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
+    if (archiveReader)
+    {
+        auto resource = archiveReader->getResource();
+        if (resource)
+        {
+            if (auto camera = resource.dynamicCast<QnMediaResource>())
+            {
+                auto videoLayout = camera->getVideoLayout();
+                if (videoLayout)
+                    m_awaitingFramesMask.setChannelCount(videoLayout->channelCount());
+            }
+        }
+    }
+
+    {
+        QnMutexLocker lock(&m_decoderMutex);
+        while (m_videoDecoders.size() <= videoChannel)
+        {
+            auto videoDecoder = new SeamlessVideoDecoder();
+            videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
+            m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
+        }
+    }
+    SeamlessVideoDecoder* videoDecoder = m_videoDecoders[videoChannel].get();
+
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
         return true; //< Frame is processed.
@@ -182,12 +202,13 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     }
     if (displayImmediately)
     {
-        m_hurryUpToFrame = m_videoDecoder->currentFrameNumber();
+        m_hurryUpToFrame.videoChannel = videoChannel;
+        m_hurryUpToFrame.frameNumber = videoDecoder->currentFrameNumber();
         emit hurryUp(); //< Hint to a player to avoid waiting for the currently displaying frame.
     }
 
     QVideoFramePtr decodedFrame;
-    if (!m_videoDecoder->decode(data, &decodedFrame))
+    if (!videoDecoder->decode(data, &decodedFrame))
     {
         qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
         // False result means we want to repeat this frame later, thus, returning true.
@@ -224,11 +245,26 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
     lock.unlock();
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
-    if (metadata.frameNum <= m_hurryUpToFrame)
+
+    /**
+     * m_hurryUpToFrame hold frame number from which player should display data without delay.
+     * Additionally, for panoramic cameras frames should be processed without delay unless
+     * it got at least 1 frame for each channel
+     */
+    if ((metadata.videoChannel != m_hurryUpToFrame.videoChannel &&
+        m_awaitingFramesMask.hasChannel(m_hurryUpToFrame.videoChannel)) ||
+        metadata.frameNum < m_hurryUpToFrame.frameNumber)
     {
         metadata.noDelay = true;
-        metadata.serialize(result);
     }
+    else
+    {
+        if (!m_awaitingFramesMask.isEmpty())
+            metadata.noDelay = true; //< include noDelay to the first displayed frame
+        m_awaitingFramesMask.removeChannel(metadata.videoChannel);
+    }
+    if (metadata.noDelay)
+        metadata.serialize(result);
 
     m_queueWaitCond.wakeAll();
 
@@ -239,6 +275,12 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 
 bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 {
+    {
+        QnMutexLocker lock(&m_decoderMutex);
+        if (!m_audioDecoder)
+            m_audioDecoder.reset(new SeamlessAudioDecoder());
+    }
+
     AudioFramePtr decodedFrame;
     if (!m_audioDecoder->decode(data, &decodedFrame))
     {
@@ -266,6 +308,7 @@ void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
     // We supposed to decode/display them at maximum speed unless the last jump command is
     // processed.
     m_noDelayState = NoDelayState::Activated;
+    m_awaitingFramesMask.setMask();
     m_lastDisplayedTimeUs = m_lastFrameTimeUs = timeUsec; //< force position to the new place
 }
 
@@ -298,24 +341,28 @@ void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/)
 void PlayerDataConsumer::endOfRun()
 {
     QnMutexLocker lock(&m_decoderMutex);
-    m_videoDecoder.reset();
+    m_videoDecoders.clear();
     m_audioDecoder.reset();
 }
 
 QSize PlayerDataConsumer::currentResolution() const
 {
-    if (m_videoDecoder)
-        return m_videoDecoder->currentResolution();
-    else
-        return QSize();
+    QSize result;
+    for (const auto& decoder: m_videoDecoders)
+        result = qMax(result, decoder->currentResolution());
+
+    return result;
 }
 
 AVCodecID PlayerDataConsumer::currentCodec() const
 {
-    if (m_videoDecoder)
-        return m_videoDecoder->currentCodec();
-    else
-        return AV_CODEC_ID_NONE;
+    for (const auto& videoDecoder: m_videoDecoders)
+    {
+        auto result = videoDecoder->currentCodec();
+        if (result != AV_CODEC_ID_NONE)
+            return result;
+    }
+    return AV_CODEC_ID_NONE;
 }
 
 void PlayerDataConsumer::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)

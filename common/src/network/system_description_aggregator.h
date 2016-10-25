@@ -10,20 +10,23 @@ class QnSystemDescriptionAggregator : public QnBaseSystemDescription
     typedef QnBaseSystemDescription base_type;
 
 public:
-    QnSystemDescriptionAggregator(const QnSystemDescriptionPtr &systemDescription);
+    QnSystemDescriptionAggregator(int priority,
+        const QnSystemDescriptionPtr &systemDescription);
 
-    virtual ~QnSystemDescriptionAggregator();
+    virtual ~QnSystemDescriptionAggregator() = default;
 
     bool isAggregator() const;
 
     bool containsSystem(const QString& systemId) const;
 
-    void mergeSystem(const QnSystemDescriptionPtr& system);
+    void mergeSystem(int priority, const QnSystemDescriptionPtr& system);
 
-    void removeSystem(const QString& id, bool isCloud);
+    void removeSystem(int priority);
 
 public: // overrides
     QString id() const override;
+
+    QnUuid localId() const override;
 
     QString name() const override;
 
@@ -33,22 +36,31 @@ public: // overrides
 
     bool isCloudSystem() const override;
 
+    bool isNewSystem() const override;
+
     ServersList servers() const override;
 
     bool containsServer(const QnUuid& serverId) const override;
 
     QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid& serverId) const override;
+    QUrl getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
 private:
-    void emitChangesSignals(bool wasCloudSystem, const ServersList& oldServers);
+    void emitHeadChanged();
+
+    void onSystemNameChanged(const QnSystemDescriptionPtr& system);
+
+    ServersList gatherServers() const;
+
+    void updateServers();
+
+    void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
 
 private:
-    QnSystemDescriptionPtr m_cloudSystem;
-    QnSystemDescriptionPtr m_localSystem;
-
+    typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;
+    SystemsMap m_systems;
     ServersList m_servers;
 };

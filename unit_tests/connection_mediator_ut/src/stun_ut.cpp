@@ -4,11 +4,13 @@
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
-#include <nx/utils/test_support/sync_queue.h>
+#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
-#include <nx/network/stun/message_dispatcher.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/test_support/sync_queue.h>
+
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
 #include <mediaserver_api.h>
@@ -26,7 +28,7 @@ class StunCustomTest : public testing::Test
 protected:
     StunCustomTest()
         : mediaserverApi(&cloudData, &stunMessageDispatcher)
-        , listeningPeerRegistrator(&cloudData, &stunMessageDispatcher, &listeningPeerPool)
+        , listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool)
         , server(
             &stunMessageDispatcher,
             false,
@@ -43,6 +45,7 @@ protected:
     MessageDispatcher stunMessageDispatcher;
     CloudDataProviderMock cloudData;
     MediaserverApiMock mediaserverApi;
+    conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;
     MultiAddressServer<SocketServer> server;
@@ -50,6 +53,7 @@ protected:
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
 static const auto SERVER_ID = QnUuid::createUuid().toSimpleString().toUtf8();
+static const auto SERVER_ID2 = QnUuid::createUuid().toSimpleString().toUtf8();
 static const auto AUTH_KEY = QnUuid::createUuid().toSimpleString().toUtf8();
 
 static const SocketAddress GOOD_ADDRESS( lit( "hello.world:123" ) );
@@ -185,6 +189,119 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_NE( err, nullptr );
         ASSERT_EQ( err->getCode(), stun::cc::error::notFound );
     }
+}
+
+typedef std::unique_ptr<utils::TestSyncMultiQueue<String, SocketAddress>> IndicatinonQueue;
+
+IndicatinonQueue listenForClientBind(
+    AsyncClient* client, const String& serverId, const conf::Settings& settings)
+{
+    auto queue = std::make_unique<utils::TestSyncMultiQueue<String, SocketAddress>>();
+    client->setIndicationHandler(
+        stun::cc::indications::connectionRequested,
+        [queue = queue.get(), &settings](stun::Message message)
+        {
+            api::ConnectionRequestedEvent event;
+            EXPECT_TRUE(event.parseAttributes(message));
+            EXPECT_EQ(event.tcpReverseEndpointList.size(), 1);
+            EXPECT_EQ(event.params, settings.connectionParameters());
+            EXPECT_EQ(event.isPersistent, true);
+            queue->push(
+                std::move(event.originatingPeerID),
+                std::move(event.tcpReverseEndpointList.front()));
+        });
+
+    api::ListenRequest request;
+    request.systemId = SYSTEM_ID;
+    request.serverId = serverId;
+
+    nx::stun::Message message(stun::Header(stun::MessageClass::request, request.kMethod));
+    request.serialize(&message);
+    message.insertIntegrity(SYSTEM_ID, AUTH_KEY);
+
+    nx::utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
+    client->sendRequest(std::move(message), waiter.pusher());
+
+    std::pair<SystemError::ErrorCode, Message> result = waiter.pop();
+    EXPECT_EQ(result.first, SystemError::noError);
+    EXPECT_EQ(result.second.header.messageClass, MessageClass::successResponse);
+    return queue;
+}
+
+void expectIndicationForEach(
+    std::vector<IndicatinonQueue::element_type*> msIndicationsList,
+    const String& peerId, const SocketAddress& address, bool exactlyOne = true)
+{
+    for (auto& msIndications: msIndicationsList)
+        ASSERT_EQ(msIndications->pop(), std::make_pair(peerId, address));
+
+    if (exactlyOne)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        for (auto& msIndications: msIndicationsList)
+            ASSERT_TRUE(msIndications->isEmpty());
+    }
+}
+
+void bindClientSync(AsyncClient* client, const String& id, const SocketAddress& address)
+{
+    api::ClientBindRequest request;
+    request.originatingPeerID = id;
+    request.tcpReverseEndpoints.push_back(address);
+
+    nx::stun::Message message(stun::Header(stun::MessageClass::request, request.kMethod));
+    request.serialize(&message);
+
+    nx::utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
+    client->sendRequest(std::move(message), waiter.pusher());
+
+    const auto result = waiter.pop();
+    ASSERT_EQ(result.first, SystemError::noError);
+    ASSERT_EQ(result.second.header.messageClass, MessageClass::successResponse);
+}
+
+TEST_F(StunCustomTest, ClientBind)
+{
+    typedef std::chrono::seconds s;
+    auto& params = const_cast<api::ConnectionParameters&>(settings.connectionParameters());
+    params.tcpReverseRetryPolicy = nx::network::RetryPolicy(3, s(1), 2, s(7));
+    params.tcpReverseHttpTimeouts = nx_http::AsyncHttpClient::Timeouts(s(1), s(2), s(3));
+    cloudData.expect_getSystem(SYSTEM_ID, AUTH_KEY, 3);
+
+    AsyncClient msClient;
+    msClient.connect(address);
+    const auto msIndications = listenForClientBind(&msClient, SERVER_ID, settings);
+
+    auto bindClient = std::make_unique<AsyncClient>();
+    bindClient->connect(address);
+    bindClientSync(bindClient.get(), "VmsGateway", GOOD_ADDRESS);
+
+    AsyncClient msClient2;
+    msClient2.connect(address);
+    const auto msIndications2 = listenForClientBind(&msClient2, SERVER_ID2, settings);
+
+    // Both servers get just one indication:
+    expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway", GOOD_ADDRESS);
+
+    bindClientSync(bindClient.get(), "VmsGateway", BAD_ADDRESS);
+    expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway", BAD_ADDRESS);
+
+    auto bindClient2 = std::make_unique<AsyncClient>();;
+    bindClient2->connect(address);
+    bindClientSync(bindClient2.get(), "VmsGateway2", GOOD_ADDRESS);
+
+    // Both servers get just one indication:
+    expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway2", GOOD_ADDRESS);
+
+    // Disconnect one gateway:
+    bindClient2.reset();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    // The next server gets only one indication:
+    AsyncClient msClient3;
+    msClient3.connect(address);
+    const auto msIndications3 = listenForClientBind(&msClient3, SERVER_ID, settings);
+    expectIndicationForEach({msIndications3.get()}, "VmsGateway", BAD_ADDRESS);
 }
 
 } // namespace test

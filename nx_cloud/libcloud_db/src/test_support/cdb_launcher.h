@@ -22,6 +22,12 @@
 namespace nx {
 namespace cdb {
 
+struct AccountWithPassword
+{
+    api::AccountData data;
+    std::string password;
+};
+
 class CdbLauncher
 :
     public utils::test::ModuleLauncher<CloudDBProcessPublic>
@@ -36,6 +42,9 @@ public:
     SocketAddress endpoint() const;
 
     nx::cdb::api::ConnectionFactory* connectionFactory();
+    std::unique_ptr<nx::cdb::api::Connection> connection(
+        const std::string& login,
+        const std::string& password);
     api::ModuleInfo moduleInfo() const;
 
     QString testDataDir() const;
@@ -44,6 +53,7 @@ public:
         api::AccountData* const accountData,
         std::string* const password,
         api::AccountConfirmationCode* const activationCode);
+    std::string generateRandomEmailAddress() const;
     api::ResultCode activateAccount(
         const api::AccountConfirmationCode& activationCode,
         std::string* const accountEmail);
@@ -74,9 +84,19 @@ public:
         const std::string& email,
         const std::string& password,
         api::SystemData* const systemData);
+    api::ResultCode bindRandomNotActivatedSystem(
+        const std::string& email,
+        const std::string& password,
+        const std::string& opaque,
+        api::SystemData* const systemData);
     api::ResultCode bindRandomSystem(
         const std::string& email,
         const std::string& password,
+        api::SystemData* const systemData);
+    api::ResultCode bindRandomSystem(
+        const std::string& email,
+        const std::string& password,
+        const std::string& opaque,
         api::SystemData* const systemData);
     api::ResultCode unbindSystem(
         const std::string& login,
@@ -91,6 +111,11 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::vector<api::SystemDataEx>* const systems);
+    api::ResultCode getSystem(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemID,
+        api::SystemDataEx* const system);
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,
@@ -107,6 +132,11 @@ public:
         const std::string& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole newAccessRole);
+    api::ResultCode removeSystemSharing(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemID,
+        const std::string& accountEmail);
     api::ResultCode getSystemSharings(
         const std::string& email,
         const std::string& password,
@@ -121,11 +151,14 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::set<api::SystemAccessRole>* const accessRoles);
-    api::ResultCode updateSystemName(
+    api::ResultCode renameSystem(
         const std::string& login,
         const std::string& password,
         const std::string& systemID,
         const std::string& newSystemName);
+    api::ResultCode updateSystem(
+        const api::SystemData& system,
+        const api::SystemAttributesUpdate& updatedData);
 
     //calls on system's regard
     api::ResultCode getCdbNonce(
@@ -141,10 +174,6 @@ public:
     api::ResultCode ping(
         const std::string& systemID,
         const std::string& authKey);
-    api::ResultCode setSystemUserList(
-        const std::string& systemID,
-        const std::string& authKey,
-        api::SystemSharingList sharings);
 
     /** finds sharing of \a systemID to account \a accountEmail.
         \return reference to an element of \a sharings
@@ -162,6 +191,16 @@ public:
         const std::string& accountPassword,
         const std::string& systemId,
         api::SystemDataEx* const systemData);
+
+    api::ResultCode recordUserSessionStart(
+        const AccountWithPassword& account,
+        const std::string& systemId);
+
+    api::ResultCode getVmsConnections(
+        api::VmsConnectionDataList* const vmsConnections);
+
+    bool isStartedWithExternalDb() const;
+    bool placePreparedDB(const QString& dbDumpPath);
 
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath();
@@ -196,13 +235,13 @@ public:
     }
 
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override
     {
         if (!m_target)
             return;
         m_target->sendAsync(
-            std::move(serializedNotification),
+            notification,
             std::move(completionHandler));
     }
 

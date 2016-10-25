@@ -20,6 +20,7 @@ MaskedComboBox
 
     isEditableComboBox: true;
 
+    activeFocusOnTab: true;
     onActiveFocusChanged:
     {
         if (!activeFocus || !isAvailable)
@@ -64,7 +65,7 @@ MaskedComboBox
                 {
                     target: textItem;
                     property: "text";
-                    value: control.value;
+                    value: control.displayValue;
                 }
             }
 

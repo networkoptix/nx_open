@@ -42,6 +42,7 @@ namespace nx_http
         {
             m_forceConnectionClose = value;
         }
+
     protected:
         virtual std::shared_ptr<HttpServerConnection> createConnection(
             std::unique_ptr<AbstractStreamSocket> _socket) override

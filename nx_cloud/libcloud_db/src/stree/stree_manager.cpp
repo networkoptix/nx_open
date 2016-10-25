@@ -12,13 +12,6 @@
 namespace nx {
 namespace cdb {
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(StreeOperation,
-    (StreeOperation::authentication, "authentication")
-    (StreeOperation::authorization, "authorization")
-    (StreeOperation::getTemporaryCredentialsParameters, "getTemporaryCredentialsParameters")
-)
-
-
 StreeManager::StreeManager(
     const stree::ResourceNameSet& resourceNameSet,
     const QString& xmlFilePath) throw(std::runtime_error)
@@ -41,3 +34,9 @@ void StreeManager::search(
 
 }   //cdb
 }   //nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, StreeOperation,
+    (nx::cdb::StreeOperation::authentication, "authentication")
+    (nx::cdb::StreeOperation::authorization, "authorization")
+    (nx::cdb::StreeOperation::getTemporaryCredentialsParameters, "getTemporaryCredentialsParameters")
+)

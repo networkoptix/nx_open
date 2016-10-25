@@ -19,45 +19,62 @@ namespace
             | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField)
             | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudIdField));
 
-        if (result.testFlag(QnServerField::FlagsField))
-        {
-            const auto isNewSystem = [](const QnModuleInformation& info)
-                { return info.serverFlags.testFlag(Qn::SF_NewSystem); };
-
-            if (isNewSystem(before) != isNewSystem(after))
-                result |= QnServerField::IsFactoryFlag;
-        }
-
         return result;
     }
 #undef EXTRACT_CHANGE_FLAG
 }
 
+QnSystemDescription::PointerType QnSystemDescription::createFactorySystem(const QString& systemId)
+{
+    return PointerType(new QnSystemDescription(systemId));
+}
+
 QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
     const QString& systemId,
+    const QnUuid &localId,
     const QString& systemName)
 {
-    return PointerType(new QnSystemDescription(systemId, systemName));
+    return PointerType(new QnSystemDescription(systemId, localId, systemName));
 }
 
 QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
     const QString& systemId,
+    const QnUuid &localId,
     const QString& systemName,
     const QString& ownerAccountEmail,
     const QString& ownerFullName)
 {
     return PointerType(
-        new QnSystemDescription(systemId, systemName
-            , ownerAccountEmail, ownerFullName));
+        new QnSystemDescription(systemId, localId, systemName,
+            ownerAccountEmail, ownerFullName));
 }
 
-QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName)
-    :
+QnSystemDescription::QnSystemDescription(const QString& systemId) :
     m_id(systemId),
-    m_systemName(systemName),
+    m_localId(systemId),
     m_ownerAccountEmail(),
     m_ownerFullName(),
     m_isCloudSystem(false),
+    m_isNewSystem(true),
+    m_systemName(tr("New system")),
+    m_serverTimestamps(),
+    m_servers(),
+    m_prioritized(),
+    m_hosts()
+{}
+
+
+QnSystemDescription::QnSystemDescription(const QString& systemId,
+    const QnUuid &localId,
+    const QString& systemName)
+    :
+    m_id(systemId),
+    m_localId(localId),
+    m_ownerAccountEmail(),
+    m_ownerFullName(),
+    m_isCloudSystem(false),
+    m_isNewSystem(false),
+    m_systemName(extractSystemName(systemName)),
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
@@ -66,15 +83,18 @@ QnSystemDescription::QnSystemDescription(const QString& systemId, const QString&
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
+    const QnUuid &localId,
     const QString& systemName,
     const QString& cloudOwnerAccountEmail,
     const QString& ownerFullName)
     :
     m_id(systemId),
-    m_systemName(systemName),
+    m_localId(localId),
     m_ownerAccountEmail(cloudOwnerAccountEmail),
     m_ownerFullName(ownerFullName),
     m_isCloudSystem(true),
+    m_isNewSystem(false),
+    m_systemName(extractSystemName(systemName)),
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
@@ -84,9 +104,19 @@ QnSystemDescription::QnSystemDescription(
 QnSystemDescription::~QnSystemDescription()
 {}
 
+QString QnSystemDescription::extractSystemName(const QString& systemName)
+{
+    return (systemName.isEmpty() ? tr("<Unnamed system>") : systemName);
+}
+
 QString QnSystemDescription::id() const
 {
     return m_id;
+}
+
+QnUuid QnSystemDescription::localId() const
+{
+    return m_localId;
 }
 
 QString QnSystemDescription::name() const
@@ -107,6 +137,11 @@ QString QnSystemDescription::ownerFullName() const
 bool QnSystemDescription::isCloudSystem() const
 {
     return m_isCloudSystem;
+}
+
+bool QnSystemDescription::isNewSystem() const
+{
+    return m_isNewSystem;
 }
 
 QnSystemDescription::ServersList QnSystemDescription::servers() const
@@ -194,7 +229,16 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
         emit serverRemoved(serverId);
 }
 
-void QnSystemDescription::setServerHost(const QnUuid& serverId, const QString& host)
+void QnSystemDescription::setName(const QString& value)
+{
+    if (m_systemName == value)
+        return;
+
+    m_systemName = value;
+    emit systemNameChanged();
+}
+
+void QnSystemDescription::setServerHost(const QnUuid& serverId, const QUrl& host)
 {
     const bool containsServer = m_servers.contains(serverId);
 
@@ -215,7 +259,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const QString& h
     emit serverChanged(serverId, QnServerField::HostField);
 }
 
-QString QnSystemDescription::getServerHost(const QnUuid& serverId) const
+QUrl QnSystemDescription::getServerHost(const QnUuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
         "System does not contain specified server");

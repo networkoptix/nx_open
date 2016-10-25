@@ -29,14 +29,19 @@ public:
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
-    virtual void updateResource(const QnResourcePtr &resource);
-    virtual void updateResource(const ec2::ApiUserData& user);
-    virtual void updateResource(const ec2::ApiLayoutData& layout);
-    virtual void updateResource(const ec2::ApiVideowallData& videowall);
-    virtual void updateResource(const ec2::ApiWebPageData& webpage);
-    virtual void updateResource(const ec2::ApiCameraData& camera);
-    virtual void updateResource(const ec2::ApiMediaServerData& server);
-    virtual void updateResource(const ec2::ApiStorageData& storage);
+    /**
+     * @param resource resource to update
+     * @param peerId peer what modified resource.
+     */
+    virtual void updateResource(const QnResourcePtr &resource, const QnUuid& peerId);
+
+    virtual void updateResource(const ec2::ApiUserData& user, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiLayoutData& layout, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiVideowallData& videowall, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiWebPageData& webpage, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiCameraData& camera, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiStorageData& storage, const QnUuid& peerId);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
@@ -119,17 +124,19 @@ private slots:
     void on_userGroupRemoved(const QnUuid& groupId);
 
     void on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& userAttributes);
-    void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
+    void on_cameraUserAttributesRemoved(const QnUuid& cameraId);
     void on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory);
 
     void on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& userAttributes);
-    void on_mediaServerUserAttributesRemoved(const QnUuid& serverID);
+    void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
     void on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules);
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
     void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
+private:
+    template <class Datatype> void updateResources(const std::vector<Datatype>& resList, QHash<QnUuid, QnResourcePtr>& remoteResources);
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnUuid, QnBusinessEventRulePtr> m_rules;

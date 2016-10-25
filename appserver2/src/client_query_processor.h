@@ -57,7 +57,7 @@ namespace ec2
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
                 lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
-                httpClient->terminate();
+                httpClient->pleaseStopSync();
                 //it is garanteed that no http event handler is running currently and no handler will be called
                 lk.relock();
                 m_runningHttpRequests.erase( m_runningHttpRequests.begin() );
@@ -68,8 +68,8 @@ namespace ec2
         /*!
             \param handler Functor ( ErrorCode )
         */
-        template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& tran, HandlerType handler )
+        template<class InputData, class HandlerType>
+            void processUpdateAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
@@ -83,20 +83,14 @@ namespace ec2
             }
             httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
 
-            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
+            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
 
-            QByteArray tranBuffer;
+            QByteArray serializedData;
             Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
             if( format == Qn::JsonFormat )
-                tranBuffer = QJson::serialized(tran.params);
-            //else if( format == Qn::BnsFormat )
-            //    tranBuffer = QnBinary::serialized(tran);
+                serializedData = QJson::serialized(input);
             else if( format == Qn::UbjsonFormat )
-                tranBuffer = QnUbjson::serialized(tran);
-            //else if( format == Qn::CsvFormat )
-            //    tranBuffer = QnCsv::serialized(tran);
-            //else if( format == Qn::XmlFormat )
-            //    tranBuffer = QnXml::serialized(tran, lit("reply"));
+                serializedData = QnUbjson::serialized(input);
             else
             {
                 NX_ASSERT(false);
@@ -108,7 +102,7 @@ namespace ec2
             httpClient->doPost(
                 requestUrl,
                 Qn::serializationFormatToHttpContentType(format),
-                std::move(tranBuffer));
+                std::move(serializedData));
             auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
@@ -161,7 +155,7 @@ namespace ec2
                 auto it = m_runningHttpRequests.find( httpClient );
                 NX_ASSERT( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
-                httpClient->terminate();
+                httpClient->pleaseStopSync();
                 m_runningHttpRequests.erase( it );
             }
 
@@ -185,8 +179,10 @@ namespace ec2
                     QString authResultStr = nx_http::getHeaderValue(httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
                     if (!authResultStr.isEmpty()) {
                         Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
-                        if (authResult == Qn::Auth_ConnectError)
-                            return handler( ErrorCode::temporary_unauthorized, OutputData() );
+                        if (authResult == Qn::Auth_LDAPConnectError)
+                            return handler( ErrorCode::ldap_temporary_unauthorized, OutputData() );
+                        else if (authResult == Qn::Auth_CloudConnectError)
+                            return handler( ErrorCode::cloud_temporary_unauthorized, OutputData() );
                     }
                     return handler( ErrorCode::unauthorized, OutputData() );
                 }

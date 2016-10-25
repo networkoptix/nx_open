@@ -84,14 +84,14 @@ private:
     QnWaitCondition m_cond;
 #endif
 
-    void initializeLogging(const conf::Settings& settings);
-
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         nx_http::MessageDispatcher* const msgDispatcher);
 
-    void publicAddressFetched(const QHostAddress& publicAddress);
+    void publicAddressFetched(
+        const conf::Settings& settings,
+        const QString& publicAddress);
 };
 
 }   //namespace cloud

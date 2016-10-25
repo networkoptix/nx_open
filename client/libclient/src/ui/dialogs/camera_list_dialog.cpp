@@ -40,7 +40,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 
     ui->camerasView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->camerasView->setModel(m_resourceSearch);
-    connect(ui->filterEdit,     &QLineEdit::textChanged,                        this,   &QnCameraListDialog::updateCriterion);
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
     connect(ui->camerasView,    &QTableView::customContextMenuRequested,        this,   &QnCameraListDialog::at_camerasView_customContextMenuRequested);
     connect(ui->camerasView,    &QTableView::doubleClicked,                     this,   &QnCameraListDialog::at_camerasView_doubleClicked);
 
@@ -124,10 +124,12 @@ void QnCameraListDialog::updateWindowTitle() {
 
     const QString title = lit("%1 - %2").arg(titleServerPart).arg(titleCamerasPart);
     setWindowTitle(title);
+
+    ui->camerasView->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }
 
 void QnCameraListDialog::updateCriterion() {
-    QString text = ui->filterEdit->text();
+    QString text = ui->filterLineEdit->text();
 
     QString searchString = text.isEmpty()
         ? lit("*")
@@ -135,6 +137,8 @@ void QnCameraListDialog::updateCriterion() {
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
     m_resourceSearch->addCriterion(QnResourceCriterion(Qn::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
+
+
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {

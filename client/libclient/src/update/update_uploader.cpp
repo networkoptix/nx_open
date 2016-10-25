@@ -11,6 +11,7 @@
 #include "core/resource/media_server_resource.h"
 #include "utils/update/update_utils.h"
 #include <nx/utils/log/log.h>
+#include <core/resource/fake_media_server.h>
 
 namespace {
     const int chunkSize = 1024 * 1024;
@@ -98,10 +99,13 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
         if (!server)
             return false;
 
-        if (QnMediaServerResource::isFakeServer(server)) {
+        if (server.dynamicCast<QnFakeMediaServerResource>())
+        {
             m_restPeers.insert(peerId);
             m_restTargets.append(server);
-        } else {
+        }
+        else
+        {
             m_peers.insert(peerId);
         }
 
@@ -226,6 +230,7 @@ void QnUpdateUploader::at_restReply_finished(int status, const QnUploadUpdateRep
 
         switch (status) {
         case QNetworkReply::AuthenticationRequiredError:
+        case QNetworkReply::ContentAccessDenied:
             errorCode = AuthenticationError;
             break;
         case QNetworkReply::TimeoutError:

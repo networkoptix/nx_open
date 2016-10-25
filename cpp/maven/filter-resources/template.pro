@@ -74,11 +74,7 @@ else {
   }
 }
 
-win* {
-  OUTPUT_PATH = ${libdir}/${arch}
-} else {
-  OUTPUT_PATH = ${libdir}
-}
+OUTPUT_PATH = ${libdir}
 
 isEmpty(BUILDLIB) {
   DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
@@ -194,7 +190,7 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${customization.dir}/icons/hdw_logo.ico
+  ICON = ${customization.dir}/icons/favicon.ico
   LIBS += ${windows.oslibs}
   DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
@@ -242,9 +238,6 @@ unix: {
 linux*:!android {
   !arm {
     LIBS += ${linux.oslibs}
-    QMAKE_CXXFLAGS += ${compiler.arguments}
-    QMAKE_CFLAGS += ${compiler.arguments}
-    QMAKE_LFLAGS += ${compiler.arguments}
     !clang: {
         QMAKE_CXXFLAGS += -msse2
     } else {
@@ -268,7 +261,8 @@ linux*:!android {
 ## MAC OS
 macx {
   QMAKE_INFO_PLIST = Info.plist
-  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
+  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.8 -stdlib=libc++
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
   QMAKE_CFLAGS += -msse4.1
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
   LIBS += ${mac.oslibs}

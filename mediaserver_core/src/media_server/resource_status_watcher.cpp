@@ -34,10 +34,13 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
         return;
 
     m_setStatusInProgress.insert(resource->getId());
-    if (resource.dynamicCast<QnMediaServerResource>())
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocal(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
-    else
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto manager = connection->getResourceManager(Qn::kSystemAccess);
+    manager->setResourceStatus(
+        resource->getId(),
+        resource->getStatus(),
+        this,
+        &QnResourceStatusWatcher::requestFinished2);
 }
 
 void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnUuid& id)

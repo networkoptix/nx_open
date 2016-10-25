@@ -11,6 +11,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
+#include <utils/common/guard.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
@@ -78,14 +79,16 @@ void syncSocketServerMainFunc(
             nx::utils::promise<
                 std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
             > acceptedPromise;
+            ASSERT_TRUE(server->setNonBlockingMode(true));
             server->acceptAsync(
                 [&server, &acceptedPromise](
                     SystemError::ErrorCode errorCode,
                     AbstractStreamSocket* socket)
                 {
                     server->post(
-                        [&acceptedPromise, errorCode, socket]()
+                        [&server, &acceptedPromise, errorCode, socket]()
                         {
+                            ASSERT_TRUE(server->setNonBlockingMode(false));
                             acceptedPromise.set_value(
                                 std::make_pair(
                                     errorCode,
@@ -188,11 +191,11 @@ void socketSimpleSync(
     nx::utils::thread clientThread(
         [endpointToConnectTo, &testMessage, clientCount, &clientMaker]()
         {
-            for (int i = clientCount; i > 0; --i)
+            for (size_t i = 0; i != clientCount; ++i)
             {
                 auto client = clientMaker();
                 EXPECT_TRUE(client->connect(
-                    endpointToConnectTo, kTestTimeout.count()))
+                    endpointToConnectTo, kTestTimeout.count())) << i << ": "
                         << SystemError::getLastOSErrorText().toStdString();
 
                 ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
@@ -312,6 +315,13 @@ void socketSimpleAsync(
     nx::utils::TestSyncQueue< SystemError::ErrorCode > clientResults;
 
     auto server = serverMaker();
+
+    const auto serverGuard = makeScopedGuard(
+        [&server, &stopSocket]()
+        {
+            stopSocket(std::move(server));
+        });
+
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(5000));
@@ -418,6 +428,13 @@ void socketSimpleAsync(
     for (int i = clientCount; i > 0; --i)
     {
         auto testClient = clientMaker();
+
+        const auto testClientGuard = makeScopedGuard(
+            [&testClient, &stopSocket]()
+            {
+                stopSocket(std::move(testClient));
+            });
+
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
         ASSERT_TRUE(testClient->setSendTimeout(3000));
         ASSERT_TRUE(testClient->setRecvTimeout(3000));
@@ -514,19 +531,15 @@ void socketSimpleAsync(
         ASSERT_EQ(serverResults.pop(), SystemError::noError) << i; // accept
         ASSERT_EQ(clientResults.pop(), SystemError::noError) << i; // send
         ASSERT_EQ(serverResults.pop(), SystemError::noError) << i; // recv
-
-        stopSocket(std::move(testClient));
     }
-
-    stopSocket(std::move(server));
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-    void socketMultiConnect(
-        const ServerSocketMaker& serverMaker,
-        const ClientSocketMaker& clientMaker,
-        SocketAddress endpoint = kAnyPrivateAddress,
-        int clientCount = kClientCount)
+void socketMultiConnect(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    SocketAddress endpoint = kAnyPrivateAddress,
+    int clientCount = kClientCount)
 {
     static const std::chrono::milliseconds timeout(1500);
 
@@ -595,6 +608,29 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
     server->pleaseStopSync();
     for (auto& socket : connectedSockets)
         socket->pleaseStopSync();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketErrorHandling(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker)
+{
+    auto client = clientMaker();
+    auto server = serverMaker();
+
+    SystemError::setLastErrorCode(SystemError::noError);
+    ASSERT_TRUE(client->bind(SocketAddress::anyAddress));
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
+
+    SystemError::setLastErrorCode(SystemError::noError);
+    ASSERT_FALSE(server->bind(client->getLocalAddress()));
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::addrInUse);
+
+    // Sounds wierd but linux ::listen sometimes returns true...
+    //
+    // SystemError::setLastErrorCode(SystemError::noError);
+    // ASSERT_FALSE(server->listen(10));
+    // ASSERT_NE(SystemError::getLastOSErrorCode(), SystemError::noError);
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>

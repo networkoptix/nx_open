@@ -67,7 +67,7 @@ angular.module('webadminApp')
                     $scope.settings.remoteAddresses = _.filter($scope.settings.remoteAddresses,function(addr){
                         return addr.indexOf('-')==-1;
                     });
-                    $scope.settings.remoteAddressesDisplay = $scope.settings.remoteAddresses.join('\n');
+                    $scope.settings.remoteAddressesDisplay = $scope.settings.remoteAddresses.join('<br>');
 
                     mediaserver.resolveNewSystemAndUser().then(function(user){
                         if(user === null){
@@ -77,15 +77,14 @@ angular.module('webadminApp')
                             isAdmin: user.isAdmin,
                             name: user.name
                         };
+                        pingServers();
                     },function(error){
                         if(error.status !== 401 && error.status !== 403) {
                             alert(L.navigaion.cannotGetUser);
                         }
+                        pingServers();
                     });
-
-                    pingServers();
                 });
-
             }
         };
     }]);

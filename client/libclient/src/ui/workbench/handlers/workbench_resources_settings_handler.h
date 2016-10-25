@@ -1,17 +1,20 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnCameraSettingsDialog;
 class QnServerSettingsDialog;
 class QnUserSettingsDialog;
 
-class QnWorkbenchResourcesSettingsHandler: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchResourcesSettingsHandler: public QObject, public QnWorkbenchContextAware
+{
     Q_OBJECT
-    typedef QObject base_type;
 
+    using base_type = QObject;
 public:
-    QnWorkbenchResourcesSettingsHandler(QObject *parent = nullptr);
+    QnWorkbenchResourcesSettingsHandler(QObject* parent = nullptr);
     virtual ~QnWorkbenchResourcesSettingsHandler();
 
 private:
@@ -20,6 +23,11 @@ private:
     void at_newUserAction_triggered();
     void at_userSettingsAction_triggered();
     void at_userGroupsAction_triggered();
+    void at_layoutSettingsAction_triggered();
+    void at_currentLayoutSettingsAction_triggered();
+
+private:
+    void openLayoutSettingsDialog(const QnLayoutResourcePtr& layout);
 
 private:
     QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;

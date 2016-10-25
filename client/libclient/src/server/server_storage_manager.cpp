@@ -15,6 +15,7 @@
 #include <core/resource/client_storage_resource.h>
 
 #include <utils/common/delayed.h>
+#include <core/resource/fake_media_server.h>
 
 namespace {
     /** Delay between requests when the rebuild is running. */
@@ -23,10 +24,14 @@ namespace {
     /** Delay between requests when the backup is running. */
     const int updateBackupStatusDelayMs = 500;
 
-    void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo) {
+    void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo)
+    {
         storage->setFreeSpace(spaceInfo.freeSpace);
         storage->setTotalSpace(spaceInfo.totalSpace);
         storage->setWritable(spaceInfo.isWritable);
+        storage->setSpaceLimit(spaceInfo.reservedSpace);
+        storage->setStatus(spaceInfo.isOnline ? Qn::Online : Qn::Offline);
+
     }
 }
 
@@ -107,7 +112,7 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         }
 
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || QnMediaServerResource::isFakeServer(server))
+        if (!server || server.dynamicCast<QnFakeMediaServerResource>())
             return;
 
         m_serverInfo.insert(server, ServerInfo());
@@ -128,7 +133,7 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         }
 
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || QnMediaServerResource::isFakeServer(server))
+        if (!server || server.dynamicCast<QnFakeMediaServerResource>())
             return;
 
         m_serverInfo.remove(server);

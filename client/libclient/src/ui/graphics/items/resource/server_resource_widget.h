@@ -47,7 +47,8 @@ public:
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter* painter, int channel,
+        const QRectF& channelRect, const QRectF& paintRect) override;
 
     virtual QString calculateTitleText() const override;
     virtual int calculateButtonsVisibility() const override;
@@ -74,9 +75,6 @@ private:
         NetworkButtonBar,
         ButtonBarCount
     };
-
-    /** Background painting function. */
-    void drawBackground(const QRectF &rect, QPainter *painter);
 
     void addOverlays();
 

@@ -131,7 +131,7 @@ AsyncClient::~AsyncClient()
     }
 
     for (const auto& client: httpClients)
-        client->terminate();
+        client->pleaseStopSync();
 }
 
 bool AsyncClient::Message::isOk() const
@@ -199,7 +199,8 @@ void AsyncClient::doUpnp( const QUrl& url, const Message& message,
         }
 
         NX_LOGX( lit( "Could not parse message from %1" )
-                 .arg( url.toString() ), cl_logERROR );
+                .arg( url.toString(QUrl::RemovePassword) ),
+            cl_logERROR );
 
         callback( Message() );
     };
@@ -382,9 +383,9 @@ void AsyncClient::getAllMappings(
     } );
 }
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( AsyncClient::Protocol,
-    ( AsyncClient::Protocol::TCP, "tcp" )
-    ( AsyncClient::Protocol::UDP, "udp" )
-)
-
 } // namespace nx_upnp
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( nx_upnp::AsyncClient, Protocol,
+    ( nx_upnp::AsyncClient::Protocol::TCP, "tcp" )
+    ( nx_upnp::AsyncClient::Protocol::UDP, "udp" )
+)

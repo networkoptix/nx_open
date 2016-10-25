@@ -19,19 +19,21 @@
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
+#include <nx/network/socket_global.h>
+#include <helpers/system_helpers.h>
+#include <helpers/system_weight_helper.h>
 
 namespace {
 
-    const QString kCloudConnectionScheme = lit("cloud");
     const QString kLiteClientConnectionScheme = lit("liteclient");
 
     enum { kInvalidHandle = -1 };
 
-    QnConnectionManager::ConnectionType connectionTypeByScheme(const QString& scheme)
+    QnConnectionManager::ConnectionType connectionTypeForUrl(const QUrl& url)
     {
-        if (scheme == kCloudConnectionScheme)
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
             return QnConnectionManager::CloudConnection;
-        else if (scheme == kLiteClientConnectionScheme)
+        else if (url.scheme() == kLiteClientConnectionScheme)
             return QnConnectionManager::LiteClientConnection;
         else
             return QnConnectionManager::NormalConnection;
@@ -60,11 +62,6 @@ public:
 
     void setUrl(const QUrl& url);
 
-    void storeConnection(
-            const QString& systemName,
-            const QUrl& url,
-            bool storePassword);
-
     void setInitialResourcesReceived(bool received);
 
 public:
@@ -84,7 +81,11 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
 {
     Q_D(QnConnectionManager);
 
-    connect(qnCommon, &QnCommonModule::systemNameChanged, this, &QnConnectionManager::systemNameChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
+        [this]()
+        {
+            emit systemNameChanged(qnGlobalSettings->systemName());
+        });
 
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived,
         d, [d](){ d->setInitialResourcesReceived(true); });
@@ -103,7 +104,7 @@ QnConnectionManager::~QnConnectionManager() {
 }
 
 QString QnConnectionManager::systemName() const {
-    return qnCommon->localSystemName();
+    return qnGlobalSettings->systemName();
 }
 
 QnConnectionManager::State QnConnectionManager::connectionState() const
@@ -164,7 +165,7 @@ QnSoftwareVersion QnConnectionManager::connectionVersion() const
     return d->connectionVersion;
 }
 
-void QnConnectionManager::connectToServer(const QUrl &url)
+void QnConnectionManager::connectToServer(const QUrl& url)
 {
     Q_D(QnConnectionManager);
 
@@ -176,6 +177,17 @@ void QnConnectionManager::connectToServer(const QUrl &url)
         actualUrl.setPort(defaultServerPort());
     d->setUrl(actualUrl);
     d->doConnect();
+}
+
+void QnConnectionManager::connectToServer(
+    const QUrl &url,
+    const QString& userName,
+    const QString& password)
+{
+    auto urlWithAuth = url;
+    urlWithAuth.setUserName(userName);
+    urlWithAuth.setPassword(password);
+    connectToServer(urlWithAuth);
 }
 
 void QnConnectionManager::disconnectFromServer(bool force) {
@@ -195,7 +207,6 @@ void QnConnectionManager::disconnectFromServer(bool force) {
     d->doDisconnect(force);
 
     d->setUrl(QUrl());
-    QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
@@ -252,11 +263,11 @@ void QnConnectionManagerPrivate::resume() {
 
 void QnConnectionManagerPrivate::doConnect()
 {
-    if (!url.isValid())
+    if (!url.isValid() || url.host().isEmpty())
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
-        emit q->connectionFailed(Qn::ConnectionResult::NetworkError, QVariant());
+        emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
         return;
     }
 
@@ -290,12 +301,12 @@ void QnConnectionManagerPrivate::doConnect()
             auto status = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
             QVariant infoParameter;
 
-            if (status == Qn::ConnectionResult::IncompatibleVersion)
+            if (status == Qn::IncompatibleVersionConnectionResult)
                 infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
 
             Q_Q(QnConnectionManager);
 
-            if (status != Qn::ConnectionResult::Success)
+            if (status != Qn::SuccessConnectionResult)
             {
                 updateConnectionState();
                 emit q->connectionFailed(status, infoParameter);
@@ -306,7 +317,6 @@ void QnConnectionManagerPrivate::doConnect()
 
             QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-            QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
             QnMobileClientMessageProcessor::instance()->init(ec2Connection);
 
@@ -325,7 +335,6 @@ void QnConnectionManagerPrivate::doConnect()
                 QnSyncTime::instance(),
                 static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
-            qnCommon->setLocalSystemName(connectionInfo.systemName);
             qnCommon->instance<QnUserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
                     ? url.userName()
@@ -333,10 +342,14 @@ void QnConnectionManagerPrivate::doConnect()
 
             updateConnectionState();
 
-            storeConnection(connectionInfo.systemName, url, true);
-            qnSettings->setLastUsedSystemId(connectionInfo.systemName);
-            url.setPassword(QString());
-            qnSettings->setLastUsedUrl(url);
+            const auto localId = helpers::getLocalSystemId(connectionInfo);
+
+            const auto connectionData =
+                helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url);
+            helpers::updateWeightData(localId);
+
+            qnSettings->setLastUsedConnection(connectionData);
+            qnSettings->save();
 
             connectionVersion = connectionInfo.version;
             emit q->connectionVersionChanged();
@@ -411,33 +424,12 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
     this->url = url;
     emit q->currentUrlChanged();
 
-    const auto connectionType = connectionTypeByScheme(url.scheme());
-    if (this->connectionType != connectionType)
+    const auto newConnectionType = connectionTypeForUrl(url);
+    if (connectionType != newConnectionType)
     {
-        this->connectionType = connectionType;
+        connectionType = newConnectionType;
         emit q->connectionTypeChanged();
     }
-}
-
-void QnConnectionManagerPrivate::storeConnection(
-        const QString& systemName,
-        const QUrl& url,
-        bool storePassword)
-{
-    auto lastConnections = qnClientCoreSettings->recentUserConnections();
-
-    const QnUserRecentConnectionData connectionInfo(QString(), systemName, url, storePassword);
-
-    auto connectionEqual = [connectionInfo](const QnUserRecentConnectionData& connection)
-    {
-        return connection.systemName == connectionInfo.systemName;
-    };
-    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-                          lastConnections.end());
-    lastConnections.prepend(connectionInfo);
-
-    qnClientCoreSettings->setRecentUserConnections(lastConnections);
-    qnClientCoreSettings->save();
 }
 
 void QnConnectionManagerPrivate::setInitialResourcesReceived(bool received)

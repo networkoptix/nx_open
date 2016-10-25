@@ -49,9 +49,6 @@ CloudConnectionManager::CloudConnectionManager()
 CloudConnectionManager::~CloudConnectionManager()
 {
     directDisconnectAll();
-
-    if (m_eventConnection)
-        stopMonitoringCloudEvents();
 }
 
 void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
@@ -63,11 +60,11 @@ boost::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
     QnMutexLocker lk(&m_mutex);
-    if (m_cloudSystemID.isEmpty() || m_cloudAuthKey.isEmpty())
+    if (m_cloudSystemId.isEmpty() || m_cloudAuthKey.isEmpty())
         return boost::none;
 
     nx::hpm::api::SystemCredentials cloudCredentials;
-    cloudCredentials.systemId = m_cloudSystemID.toUtf8();
+    cloudCredentials.systemId = m_cloudSystemId.toUtf8();
     cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
     cloudCredentials.key = m_cloudAuthKey.toUtf8();
     return cloudCredentials;
@@ -80,7 +77,7 @@ bool CloudConnectionManager::boundToCloud() const
 }
 
 std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection(
-    const QString& cloudSystemID,
+    const QString& cloudSystemId,
     const QString& cloudAuthKey) const
 {
     QString proxyLogin;
@@ -94,9 +91,9 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     }
 
     auto result = m_cdbConnectionFactory->createConnection();
-    result->setCredentials(cloudSystemID.toStdString(), cloudAuthKey.toStdString());
+    result->setCredentials(cloudSystemId.toStdString(), cloudAuthKey.toStdString());
     result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
-    result->setProxyVia(m_proxyAddress);
+    result->setProxyVia(m_proxyAddress.address.toString().toStdString(), m_proxyAddress.port);
     return result;
 }
 
@@ -106,7 +103,7 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     if (!boundToCloud(&lk))
         return nullptr;
     return getCloudConnection(
-        m_cloudSystemID,
+        m_cloudSystemId,
         m_cloudAuthKey);
 }
 
@@ -134,24 +131,19 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
-void CloudConnectionManager::subscribeToSystemAccessListUpdatedEvent(
-    nx::utils::MoveOnlyFunc<void(nx::cdb::api::SystemAccessListModifiedEvent)> handler,
-    nx::utils::SubscriptionId* const subscriptionId)
-{
-    m_systemAccessListUpdatedEventSubscription.subscribe(
-        std::move(handler),
-        subscriptionId);
-}
-
-void CloudConnectionManager::unsubscribeFromSystemAccessListUpdatedEvent(
-    nx::utils::SubscriptionId subscriptionId)
-{
-    m_systemAccessListUpdatedEventSubscription.removeSubscription(subscriptionId);
-}
-
 bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
 {
     qnGlobalSettings->resetCloudParams();
+    auto adminUser = qnResPool->getAdministrator();
+    if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
+    {
+        if (!resetSystemToStateNew())
+        {
+            NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
+            return false;
+        }
+    }
+
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
@@ -178,7 +170,6 @@ bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
         }
     }
 
-    qnCommon->updateModuleInformation();
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
@@ -186,122 +177,26 @@ bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
 
 bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 {
-    return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
-}
-
-void CloudConnectionManager::monitorForCloudEvents()
-{
-    QString proxyLogin;
-    QString proxyPassword;
-
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (server)
-    {
-        proxyLogin = server->getId().toString();
-        proxyPassword = server->getAuthKey();
-    }
-
-    m_eventConnection = m_cdbConnectionFactory->createEventConnection();
-    m_eventConnection->setCredentials(m_cloudSystemID.toStdString(), m_cloudAuthKey.toStdString());
-    m_eventConnection->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
-    m_eventConnection->setProxyVia(m_proxyAddress);
-
-    m_eventConnectionRetryTimer = std::make_unique<nx::network::RetryTimer>(
-        nx::network::RetryPolicy(
-            nx::network::RetryPolicy::kInfiniteRetries,
-            std::chrono::seconds(1),
-            nx::network::RetryPolicy::kDefaultDelayMultiplier,
-            kMaxEventConnectionStartRetryPeriod));
-    m_eventConnectionRetryTimer->post(
-        std::bind(&CloudConnectionManager::startEventConnection, this));
-}
-
-void CloudConnectionManager::stopMonitoringCloudEvents()
-{
-    if (!m_eventConnection)
-        return;
-
-    m_eventConnectionRetryTimer->pleaseStopSync();
-
-    //closing event connection
-    decltype(m_eventConnection) eventConnection;
-    {
-        QnMutexLocker lk(&m_mutex);
-        NX_ASSERT(m_eventConnection);
-        eventConnection = std::move(m_eventConnection);
-        m_eventConnection = nullptr;
-    }
-
-    eventConnection.reset();
-    m_eventConnectionRetryTimer.reset();
-}
-
-void CloudConnectionManager::onSystemAccessListUpdated(
-    nx::cdb::api::SystemAccessListModifiedEvent event)
-{
-    m_systemAccessListUpdatedEventSubscription.notify(std::move(event));
-}
-
-void CloudConnectionManager::startEventConnection()
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!m_eventConnection)
-            return;
-    }
-
-    using namespace std::placeholders;
-    nx::cdb::api::SystemEventHandlers systemEventHandlers;
-    systemEventHandlers.onSystemAccessListUpdated =
-        std::bind(&CloudConnectionManager::onSystemAccessListUpdated, this, _1);
-    m_eventConnection->start(
-        std::move(systemEventHandlers),
-        std::bind(&CloudConnectionManager::onEventConnectionEstablished, this, _1));
-}
-
-void CloudConnectionManager::onEventConnectionEstablished(
-    nx::cdb::api::ResultCode resultCode)
-{
-    if (resultCode == nx::cdb::api::ResultCode::ok)
-    {
-        NX_LOGX(lm("Successfully opened event connection to the cloud"), cl_logDEBUG2);
-        return;
-    }
-
-    NX_LOGX(lm("Error opening event connection to the cloud: %1")
-        .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
-
-    if (!m_eventConnectionRetryTimer->scheduleNextTry(
-            std::bind(&CloudConnectionManager::startEventConnection, this)))
-    {
-        NX_ASSERT(false);
-    }
+    return !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
 }
 
 void CloudConnectionManager::cloudSettingsChanged()
 {
-    const auto cloudSystemId = qnGlobalSettings->cloudSystemID();
+    const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
     const auto cloudAuthKey = qnGlobalSettings->cloudAuthKey();
 
     QnMutexLocker lk(&m_mutex);
-    if (cloudSystemId == m_cloudSystemID &&
+    if (cloudSystemId == m_cloudSystemId &&
         cloudAuthKey == m_cloudAuthKey)
     {
         return;
     }
 
-    m_cloudSystemID = cloudSystemId;
+    m_cloudSystemId = cloudSystemId;
     m_cloudAuthKey = cloudAuthKey;
-    const bool boundToCloud = !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
+    const bool boundToCloud = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
 
     lk.unlock();
-
-    QnModuleInformation info = qnCommon->moduleInformation();
-    if (info.cloudSystemId != cloudSystemId)
-    {
-        info.cloudSystemId = cloudSystemId;
-        qnCommon->setModuleInformation(info);
-    }
 
     if (boundToCloud)
     {
@@ -313,14 +208,12 @@ void CloudConnectionManager::cloudSettingsChanged()
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(std::move(credentials));
 
-        monitorForCloudEvents();
         MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
-        stopMonitoringCloudEvents();
         MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
     }
 

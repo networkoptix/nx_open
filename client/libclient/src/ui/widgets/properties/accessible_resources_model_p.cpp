@@ -4,6 +4,7 @@
 
 #include <client/client_globals.h>
 
+#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/utils/string.h>
@@ -11,9 +12,11 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/common/html.h>
+
 namespace {
 
-    const int kMaxResourcesInTooltip = 10;
+static const int kMaxResourcesInTooltip = 10;
 
 } // anonymous namespace
 
@@ -21,28 +24,32 @@ namespace {
 QnAccessibleResourcesModel::QnAccessibleResourcesModel(QObject* parent) :
     base_type(parent),
     m_allChecked(false),
-    m_indirectlyAccessibleDirty(true)
+    m_subject()
 {
+    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+        [this](const QnResourceAccessSubject& subject)
+        {
+            if (subject == m_subject)
+                accessChanged();
+        });
+
 }
 
 QnAccessibleResourcesModel::~QnAccessibleResourcesModel()
 {
 }
 
-QnAccessibleResourcesModel::IndirectAccessFunction QnAccessibleResourcesModel::indirectAccessFunction() const
+QnResourceAccessSubject QnAccessibleResourcesModel::subject() const
 {
-    return m_indirectAccessFunction;
+    return m_subject;
 }
 
-void QnAccessibleResourcesModel::setIndirectAccessFunction(IndirectAccessFunction function)
+void QnAccessibleResourcesModel::setSubject(const QnResourceAccessSubject& subject)
 {
-    m_indirectAccessFunction = function;
-
-    indirectAccessChanged();
-
-    emit dataChanged(
-        index(0, IndirectAccessColumn),
-        index(rowCount() - 1, IndirectAccessColumn));
+    if (m_subject == subject)
+        return;
+    m_subject = subject;
+    accessChanged();
 }
 
 int QnAccessibleResourcesModel::columnCount(const QModelIndex& parent) const
@@ -106,81 +113,41 @@ QModelIndex QnAccessibleResourcesModel::mapFromSource(const QModelIndex& sourceI
     }
 }
 
-QnAccessibleResourcesModel::IndirectAccessInfo QnAccessibleResourcesModel::indirectAccessInfo(const QnResourcePtr& resource) const
-{
-    if (m_indirectlyAccessibleDirty)
-    {
-        m_indirectlyAccessibleResources.clear();
-        if (m_indirectAccessFunction)
-            m_indirectlyAccessibleResources = m_indirectAccessFunction();
-
-        m_indirectlyAccessibleDirty = false;
-    }
-
-    if (m_indirectlyAccessibleResources.empty())
-        return IndirectAccessInfo();
-
-    auto info = m_indirectAccessInfoCache.find(resource);
-    if (info != m_indirectAccessInfoCache.end())
-        return info.value();
-
-    auto providers = m_indirectlyAccessibleResources[resource->getId()];
-    std::set<QString, decltype(&nx::utils::naturalStringLess)> names(&nx::utils::naturalStringLess);
-    QIcon icon;
-
-    for (auto provider : providers)
-    {
-        /* Get first normal icon: */
-        if (icon.isNull())
-            icon = qnResIconCache->icon(provider);
-
-        /* Sort all names: */
-        names.insert(provider->getName());
-    }
-
-    int count = 0;
-    QString tooltip;
-
-    /* Show only first kMaxResourcesInTooltip names from the sorted list: */
-    for (const auto& name : names)
-    {
-        if (++count > kMaxResourcesInTooltip)
-            break;
-
-        tooltip += lit("<br>&nbsp;&nbsp;&nbsp;%1").arg(name);
-    }
-
-    if (!tooltip.isEmpty())
-    {
-        QString suffix;
-        if (count > kMaxResourcesInTooltip)
-            suffix = lit("<br>&nbsp;&nbsp;&nbsp;%1").arg(tr("...and %n more", "", count - kMaxResourcesInTooltip));
-
-        tooltip = lit("<div style='white-space: pre'>%1<b>%2</b>%3</div>").
-            arg(tr("Access granted by:")).
-            arg(tooltip).
-            arg(suffix);
-    }
-
-    info = m_indirectAccessInfoCache.insert(resource, IndirectAccessInfo(icon, tooltip));
-    return info.value();
-}
-
 QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) const
 {
+    if (role == Qn::DisabledRole && m_allChecked)
+        return false;
+
     switch (index.column())
     {
         case IndirectAccessColumn:
         {
+            auto resource = index.sibling(index.row(), NameColumn).
+                data(Qn::ResourceRole).value<QnResourcePtr>();
+
+            /* Providers calculation is a bit long so using it only when needed. */
+            QnResourceList providers;
+            auto source = (role == Qt::ToolTipRole)
+                ? qnResourceAccessProvider->accessibleVia(m_subject, resource, &providers)
+                : qnResourceAccessProvider->accessibleVia(m_subject, resource);
+
             switch (role)
             {
                 case Qt::DecorationRole:
-                    return indirectAccessInfo(index.sibling(index.row(), NameColumn).
-                        data(Qn::ResourceRole).value<QnResourcePtr>()).first;
+                {
+                    switch (source)
+                    {
+                        case QnAbstractResourceAccessProvider::Source::layout:
+                            return qnResIconCache->icon(QnResourceIconCache::Layout);
+                        case QnAbstractResourceAccessProvider::Source::videowall:
+                            return qnResIconCache->icon(QnResourceIconCache::VideoWall);
+                        default:
+                            return QVariant();
+                    }
+                }
 
                 case Qt::ToolTipRole:
-                    return indirectAccessInfo(index.sibling(index.row(), NameColumn).
-                        data(Qn::ResourceRole).value<QnResourcePtr>()).second;
+                    return getTooltip(providers);
 
                 case Qn::DisabledRole:
                     return index.sibling(index.row(), NameColumn).data(role);
@@ -231,11 +198,32 @@ void QnAccessibleResourcesModel::setAllChecked(bool value)
         { Qt::CheckStateRole });
 }
 
-void QnAccessibleResourcesModel::indirectAccessChanged()
+QString QnAccessibleResourcesModel::getTooltip(const QnResourceList& providers) const
 {
-    m_indirectAccessInfoCache.clear();
-    m_indirectlyAccessibleDirty = true;
+    if (providers.empty())
+        return QString();
 
+    static const QString kSpacer = lit("<br>&nbsp;&nbsp;&nbsp;");
+
+    QStringList lines;
+    lines << tr("Access granted by:");
+
+    const auto maxTooltipLines = std::min(kMaxResourcesInTooltip, providers.size());
+    std::for_each(providers.begin(), providers.begin() + maxTooltipLines,
+        [&lines](const QnResourcePtr& provider)
+        {
+            lines << htmlBold(provider->getName());
+        });
+
+    const auto more = providers.size() - kMaxResourcesInTooltip;
+    if (more > 0)
+        lines << tr("...and %n more", "", more);
+
+    return lit("<div style='white-space: pre'>%1</div>").arg(lines.join(kSpacer));
+}
+
+void QnAccessibleResourcesModel::accessChanged()
+{
     emit dataChanged(index(0, IndirectAccessColumn), index(rowCount() - 1, IndirectAccessColumn));
 }
 

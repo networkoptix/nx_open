@@ -31,8 +31,7 @@
 #include <nx/fusion/model_functions.h>
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
-#include "cloud/cloud_system_name_updater.h"
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
 #include <nx/utils/log/assert.h>
@@ -189,21 +188,23 @@ bool backupDatabase() {
     return true;
 }
 
-void resetTransactionTransportConnections()
+void dropConnectionsToRemotePeers()
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
 
     qnTransactionBus->dropConnections();
+}
 
+void resumeConnectionsToRemotePeers()
+{
     if (QnServerConnector::instance())
         QnServerConnector::instance()->start();
 }
 
-bool changeSystemName(const ConfigureSystemData& data)
+bool changeLocalSystemId(const ConfigureSystemData& data)
 {
-    nx::SystemName systemName(data.systemName);
-    if (qnCommon->localSystemName() == systemName.value())
+    if (qnGlobalSettings->localSystemId() == data.localSystemId)
         return true;
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
@@ -213,14 +214,7 @@ bool changeSystemName(const ConfigureSystemData& data)
     }
 
     if (!data.wholeSystem)
-        resetTransactionTransportConnections();
-
-    const auto systemNameBak = qnCommon->localSystemName();
-    if (!systemName.saveToConfig())
-    {
-        NX_LOG("Failed to save new system name to config", cl_logWARNING);
-        return false;
-    }
+        dropConnectionsToRemotePeers();
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
 
@@ -229,10 +223,8 @@ bool changeSystemName(const ConfigureSystemData& data)
     {
         if (connection->getUserManager(Qn::kSystemAccess)->saveSync(data.foreignUser) != ec2::ErrorCode::ok)
         {
-            systemName = nx::SystemName(systemNameBak);
-            if (!systemName.saveToConfig())
-                NX_LOG("Failed to to revert state after error while configuring system", cl_logWARNING);
-
+            if (!data.wholeSystem)
+                resumeConnectionsToRemotePeers();
             return false;
         }
     }
@@ -251,16 +243,12 @@ bool changeSystemName(const ConfigureSystemData& data)
         }
     }
 
-    qnCommon->setLocalSystemName(data.systemName);
-
-    server->setSystemName(data.systemName);
     qnCommon->setSystemIdentityTime(data.sysIdTime, qnCommon->moduleGUID());
 
-    if (systemName.isDefault())
+    if (data.localSystemId.isNull())
         qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setNewSystem(systemName.isDefault());
-    if (qnGlobalSettings->synchronizeNowSync())
-        qnCommon->updateModuleInformation();
+    qnGlobalSettings->setLocalSystemId(data.localSystemId);
+    qnGlobalSettings->synchronizeNowSync();
 
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
 
@@ -283,9 +271,27 @@ bool changeSystemName(const ConfigureSystemData& data)
         }
     }
 
-    CloudSystemNameUpdater::instance()->update();
+    if (!data.wholeSystem)
+        resumeConnectionsToRemotePeers();
 
     return true;
+}
+
+bool resetSystemToStateNew()
+{
+    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Resetting system to a "new" state.
+    if (!qnGlobalSettings->synchronizeNowSync())
+        return false;
+
+    auto adminUserResource = qnResPool->getAdministrator();
+    adminUserResource->setPassword(lit("admin"));
+    adminUserResource->setEnabled(true);
+
+    ec2::ApiUserData adminUser;
+    ec2::fromResourceToApi(adminUserResource, adminUser);
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    return connection->getUserManager(Qn::kSystemAccess)->saveSync(adminUser)
+        == ec2::ErrorCode::ok;
 }
 
 // -------------- nx::ServerSetting -----------------------
@@ -398,4 +404,10 @@ void nx::SystemName::resetToDefault()
 bool nx::SystemName::isDefault() const
 {
     return m_value.startsWith(AUTO_GEN_SYSTEM_NAME);
+}
+
+void nx::SystemName::clear()
+{
+    m_value.clear();
+    m_prevValue.clear();
 }

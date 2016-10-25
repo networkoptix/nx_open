@@ -355,13 +355,13 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const QnRtspStatistic& sta
             if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
             {
                 if (camTimeChanged) {
-                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logDEBUG1);
                 }
                 else if (localTimeChanged) {
-                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logDEBUG1);
                 }
                 else {
-                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logDEBUG1);
                 }
                 m_lastWarnTime = currentUsecTime;
             }
@@ -725,7 +725,9 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if( result )
     {
-        NX_LOG( lit("Sucessfully opened RTSP stream %1").arg(m_url.toString()), cl_logALWAYS );
+        NX_LOG(lit("Sucessfully opened RTSP stream %1")
+                .arg(m_url.toString(QUrl::RemovePassword)),
+            cl_logALWAYS);
     }
 
     return result;
@@ -1837,7 +1839,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
     }
 #endif
 
-    int bytesRead = m_tcpSock->recv( buf, bufSize, readSome ? 0 : MSG_WAITALL );
+    int bytesRead = m_tcpSock->recv( buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL );
     return bytesRead < 0 ? 0 : bytesRead;
 #else
     const size_t bufSizeBak = bufSize;

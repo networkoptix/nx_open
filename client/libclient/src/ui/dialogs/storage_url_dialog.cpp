@@ -10,19 +10,23 @@
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags)
-    : base_type(parent, windowFlags)
-    , ui(new Ui::StorageUrlDialog())
-    , m_server(server)
-    , m_protocols()
-    , m_descriptions()
-    , m_urlByProtocol()
-    , m_lastProtocol()
-    , m_storage()
-    , m_currentServerStorages()
+QnStorageUrlDialog::QnStorageUrlDialog(
+        const QnMediaServerResourcePtr& server,
+        QWidget* parent,
+        Qt::WindowFlags windowFlags) :
+
+    base_type(parent, windowFlags),
+    ui(new Ui::StorageUrlDialog()),
+    m_server(server),
+    m_protocols(),
+    m_descriptions(),
+    m_urlByProtocol(),
+    m_lastProtocol(),
+    m_storage(),
+    m_currentServerStorages()
 {
     ui->setupUi(this);
-
+    ui->urlEdit->setFocus();
     connect(ui->protocolComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_protocolComboBox_currentIndexChanged()));
 }
 
@@ -147,7 +151,19 @@ void QnStorageUrlDialog::accept()
     unsetCursor();
 
     m_storage = QnStorageModelInfo(result.reply().value<QnStorageStatusReply>().storage);
-    if(result.status() != 0 || !m_storage.isWritable || !m_storage.isExternal) {
+    Qn::StorageInitResult initStatus = result.reply().value<QnStorageStatusReply>().status;
+
+    if (result.status() == 0 && initStatus == Qn::StorageInit_WrongAuth)
+    {
+        QnMessageBox::warning(this, tr("Invalid Storage"), tr("Invalid external storage credentials."));
+        return;
+    }
+
+    if (!(result.status() == 0
+            && initStatus == Qn::StorageInit_Ok
+            && m_storage.isWritable
+            && m_storage.isExternal))
+    {
         QnMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
         return;
     }

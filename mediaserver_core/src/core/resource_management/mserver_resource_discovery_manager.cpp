@@ -20,6 +20,7 @@
 #include <core/resource_management/resource_properties.h>
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
+#include "plugins/resource/desktop_camera/desktop_camera_resource.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 #include "media_server/settings.h"
@@ -113,8 +114,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         const QnUuid ownGuid = qnCommon->moduleGUID();
         std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid] (const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
         {
-            bool leftOwnServer = leftCam->preferedServerId() == ownGuid;
-            bool rightOwnServer = rightCam->preferedServerId() == ownGuid;
+            bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
+            bool rightOwnServer = rightCam->preferredServerId() == ownGuid;
             if (leftOwnServer != rightOwnServer)
                 return leftOwnServer > rightOwnServer;
 
@@ -148,6 +149,16 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     {
         if (needToStop())
             return false;
+
+        if (QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+                *it, 
+                [](const QnNetworkResourcePtr& res) { return true; },
+                false))
+        {
+            it = resources.erase(it);
+            continue;
+        }
+
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes) {
@@ -190,7 +201,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (existCamRes)
         {
             QnUuid newTypeId = newNetRes->getTypeId();
-            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId(); 
+            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
                 if (isForeign || updateTypeId)

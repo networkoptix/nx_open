@@ -16,6 +16,11 @@ CheckBox
 
     opacity: (enabled ? 1.0 : 0.3);
 
+    signal accepted();
+
+    Keys.onEnterPressed: { thisComponent.accepted(); }
+    Keys.onReturnPressed: { thisComponent.accepted(); }
+
     MouseArea
     {
         id: hoverArea;

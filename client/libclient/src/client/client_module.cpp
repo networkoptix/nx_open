@@ -27,6 +27,8 @@
 
 #include <client_core/client_core_settings.h>
 
+#include <cloud/cloud_connection.h>
+
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -39,9 +41,6 @@
 #include <decoders/video/abstract_video_decoder.h>
 
 #include <finders/systems_finder.h>
-#include <finders/direct_systems_finder.h>
-#include <finders/cloud_systems_finder.h>
-
 #include <network/module_finder.h>
 #include <network/router.h>
 
@@ -215,8 +214,14 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     QnDesktopResourceSearcher* desktopSearcher(new QnDesktopResourceSearcher(window));
+    desktopSearcher->setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher);
     qnCommon->store<QnDesktopResourceSearcher>(desktopSearcher);
+}
+
+void QnClientModule::startLocalSearchers()
+{
+    QnResourceDiscoveryManager::instance()->start();
 }
 
 void QnClientModule::initMetaInfo()
@@ -288,6 +293,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
     /* Just to feel safe */
+    common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
@@ -447,7 +453,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
 
-    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(clientPeerType));
+    NX_ASSERT(nx::utils::TimerManager::instance());
+    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory(clientPeerType, nx::utils::TimerManager::instance()));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.data());
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory.take());
 
@@ -470,14 +478,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 
-    QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
-    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
-    QScopedPointer<QnCloudSystemsFinder> cloudSystemsFinder(new QnCloudSystemsFinder());
-    systemsFinder->addSystemsFinder(directSystemsFinder.data(), false);
-    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), true);
-    qnCommon->store<QnSystemsFinder>(systemsFinder.take());
-    qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
-    qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
+    qnCommon->store<QnSystemsFinder>(new QnSystemsFinder());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);
@@ -513,7 +514,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
+        QApplication::setWindowIcon(qnSkin->icon("logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
@@ -557,7 +558,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);

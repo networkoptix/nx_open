@@ -10,7 +10,6 @@
 #include <context/context_settings.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
-#include <ui/models/recent_user_connections_model.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
@@ -134,61 +133,37 @@ QString QnContext::initialTest() const
 
 void QnContext::removeSavedConnection(const QString& systemName)
 {
-    auto lastConnections = qnClientCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
 
-    auto connectionEqual = [systemName](const QnUserRecentConnectionData& connection)
+    auto connectionEqual = [systemName](const QnLocalConnectionData& connection)
     {
         return connection.systemName == systemName;
     };
     lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
                           lastConnections.end());
 
-    qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
     qnClientCoreSettings->save();
-}
-
-void QnContext::setLastUsedConnection(const QString& systemId, const QUrl& url)
-{
-    qnSettings->setLastUsedSystemId(systemId);
-    QUrl clearedUrl = url;
-    clearedUrl.setPassword(QString());
-    qnSettings->setLastUsedUrl(clearedUrl);
 }
 
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedSystemId(QString());
-    qnSettings->setLastUsedUrl(QUrl());
+    qnSettings->setLastUsedConnection(QnLocalConnectionData());
 }
 
-QString QnContext::getLastUsedSystemId() const
+QString QnContext::getLastUsedSystemName() const
 {
-    return qnSettings->lastUsedSystemId();
+    return qnSettings->lastUsedConnection().systemName;
 }
 
-QString QnContext::getLastUsedUrl() const
+QUrl QnContext::getLastUsedUrl() const
 {
-    QUrl url = qnSettings->lastUsedUrl();
+    return qnSettings->lastUsedConnection().urlWithPassword();
+}
 
-    if (!url.isValid() || url.userName().isEmpty())
-        return QString();
-
-    if (url.password().isEmpty())
-    {
-        QnRecentUserConnectionsModel connectionsModel;
-        connectionsModel.setSystemName(getLastUsedSystemId());
-        if (!connectionsModel.hasConnections())
-            return QString();
-
-        const auto firstIndex = connectionsModel.index(0);
-        QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
-        if (password.isEmpty())
-            return QString();
-
-        url.setPassword(password);
-    }
-
-    return url.toString();
+QUrl QnContext::getInitialUrl() const
+{
+    return qnSettings->startupParameters().url;
 }
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)

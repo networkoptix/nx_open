@@ -75,6 +75,7 @@ Page
             width: sessionsList.width
             systemName: model.systemName
             systemId: model.systemId
+            localId: model.localId
             cloudSystem: model.isCloudSystem
             ownerDescription: cloudSystem ? model.ownerDescription : ""
             online: model.isOnline
@@ -130,7 +131,7 @@ Page
                 : qsTr("Connect to Another System")
 
             anchors.centerIn: parent
-            width: getDeviceIsPhone() ? parent.width - 16 : implicitWidth
+            width: parent.width - 16
 
             onClicked: Workflow.openNewSessionScreen()
         }

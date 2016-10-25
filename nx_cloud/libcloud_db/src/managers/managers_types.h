@@ -22,7 +22,7 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode fromDbResultCode( nx::db::DBResult );
+api::ResultCode dbResultToApiResult( nx::db::DBResult );
 
 enum class EntityType
 {
@@ -31,12 +31,12 @@ enum class EntityType
     account,
     system,
     subscription,
-    product
+    product,
+    maintenance,
     //...
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EntityType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((EntityType), (lexical))
 
 enum class DataActionType
 {
@@ -47,9 +47,11 @@ enum class DataActionType
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DataActionType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((DataActionType), (lexical))
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::EntityType), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::DataActionType), (lexical))
 
 #endif  //CLOUD_DB_MANAGERS_TYPES_H

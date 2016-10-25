@@ -3,8 +3,8 @@
 #include <QtCore/QObject>
 
 #include <network/module_information.h>
-#include <nx/utils/uuid.h>
 
+class QnUuid;
 class QnBaseSystemDescription;
 typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 
@@ -15,8 +15,7 @@ enum class QnServerField
     SystemNameField = 0x02,
     HostField = 0x04,
     FlagsField = 0x08,
-    IsFactoryFlag = 0x10,
-    CloudIdField = 0x20
+    CloudIdField = 0x10
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -35,6 +34,8 @@ public:
 
     virtual QString id() const = 0;
 
+    virtual QnUuid localId() const = 0;
+
     virtual QString name() const = 0;
 
     virtual QString ownerAccountEmail() const = 0;
@@ -43,6 +44,8 @@ public:
 
     virtual bool isCloudSystem() const = 0;
 
+    virtual bool isNewSystem() const = 0;
+
     typedef QList<QnModuleInformation> ServersList;
     virtual ServersList servers() const = 0;
 
@@ -50,7 +53,8 @@ public:
 
     virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
-    virtual QString getServerHost(const QnUuid& serverId) const = 0;
+    // TODO: #ynikitenkov Rename host "field" to appropriate
+    virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
 
@@ -60,6 +64,8 @@ signals:
     void isCloudSystemChanged();
 
     void ownerChanged();
+
+    void systemNameChanged();
 
     void serverAdded(const QnUuid& serverId);
 

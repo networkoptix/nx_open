@@ -33,15 +33,6 @@ namespace
 
     const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
 
-    //log settings
-    const QLatin1String kLogLevel( "log/logLevel" );
-#ifdef _DEBUG
-    const QLatin1String kDefaultLogLevel( "DEBUG" );
-#else
-    const QLatin1String kDefaultLogLevel( "ERROR" );
-#endif
-    const QLatin1String kLogDir( "log/logDir" );
-
     //auth
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
@@ -64,7 +55,7 @@ namespace
     const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
 
     const QLatin1String kHttpSslSupport("http/sslSupport");
-    const QLatin1String kDefaultHttpSslSupport("false");
+    const QLatin1String kDefaultHttpSslSupport("true");
 
     const QLatin1String kHttpSslCertPath("http/sslCertPath");
     const QLatin1String kDefaultHttpSslCertPath("");
@@ -78,6 +69,20 @@ namespace
 
     const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
     const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
+
+    const QLatin1String kPublicIpAddress("cloudConnect/publicIpAddress");
+    const QLatin1String kDefaultPublicIpAddress("");
+
+    namespace tcp_reverse {
+    const QLatin1String kPort("cloudConnect/tcpReversePort");
+    const uint32_t kDefaultPort(0);
+
+    const QLatin1String kPoolSize("cloudConnect/tcpReversePoolSize");
+    const size_t kDefaultPoolSize(1);
+
+    const QLatin1String kKeepAlive("cloudConnect/tcpReverseKeepAlive");
+    const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
+    } // namespace tcp_reverse
 }
 
 
@@ -105,17 +110,8 @@ CloudConnect::CloudConnect()
 
 Settings::Settings()
 :
-#ifdef _WIN32
-    m_settings(
-        QSettings::SystemScope,
-        QnAppInfo::organizationName(),
-        QnLibVmsGatewayAppInfo::applicationName()),
-#else
-    m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
-                QSettings::IniFormat ),
-#endif
-    m_showHelp( false )
+    m_settings(QnLibVmsGatewayAppInfo::applicationName(), kModuleName),
+    m_showHelp(false)
 {
     fillSupportedCmdParameters();
 }
@@ -130,7 +126,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const Logging& Settings::logging() const
+const QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }
@@ -211,10 +207,7 @@ void Settings::loadConfiguration()
     m_general.mediatorEndpoint = m_settings.value(kGeneralMediatorEndpoint).toString();
 
     //log
-    m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
-    m_logging.logDir = m_settings.value(
-        kLogDir,
-        m_general.dataDir + lit("/log/")).toString();
+    m_logging.load(m_settings);
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
@@ -262,6 +255,17 @@ void Settings::loadConfiguration()
         m_settings.value(
             kFetchPublicIpUrl,
             kDefaultFetchPublicIpUrl).toString();
+    m_cloudConnect.publicIpAddress =
+        m_settings.value(
+            kPublicIpAddress,
+            kDefaultPublicIpAddress).toString();
+    m_cloudConnect.tcpReverse.port =
+        (uint16_t)m_settings.value(tcp_reverse::kPort, tcp_reverse::kDefaultPort).toInt();
+    m_cloudConnect.tcpReverse.poolSize =
+        (size_t)m_settings.value(tcp_reverse::kPoolSize, (int)tcp_reverse::kDefaultPoolSize).toInt();
+    m_cloudConnect.tcpReverse.keepAlive =
+        KeepAliveOptions::fromString(m_settings.value(
+            tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
 }
 
 }   //namespace conf

@@ -38,10 +38,10 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
 
 
     connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
-        [this]()
+        [this](qreal value)
         {
             static const auto kPixelLineWidth = 1;
-            m_lineWidth = kPixelLineWidth * m_scaleWatcher.scale();
+            m_lineWidth = kPixelLineWidth * value;
         });
 
     /* Don't disable this item here. When disabled, it starts accepting wheel events

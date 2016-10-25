@@ -118,9 +118,9 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     m_filter.orderBy = QnSearchBookmarksModel::defaultSortOrder();
 
     connect(&m_cameraNamesWatcher, &utils::QnCameraNamesWatcher::cameraNameChanged, this
-        , [this](const QString &cameraUuid)
+        , [this](/*const QString &cameraUuid*/)
     {
-        Q_UNUSED(cameraUuid);
+//        Q_UNUSED(cameraUuid);
 
         const auto topIndex = m_owner->index(0);
         const auto bottomIndex = m_owner->index(m_bookmarks.size() - 1);
@@ -248,7 +248,7 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     case kStartTime:
         return context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(bookmark.startTimeMs);
     case kLength:
-        enum { kNoApproximation = 0};   /// Don't use approximation, because bookmark could have short lifetime
+        enum { kNoApproximation = -1};   /// Don't use approximation, because bookmark could have short lifetime
         return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(kNoApproximation);
     case kTags:
         return QnCameraBookmark::tagsToString(bookmark.tags);

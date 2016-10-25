@@ -2,7 +2,7 @@
 
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
-#include <client_core/user_recent_connection_data.h>
+#include <client_core/local_connection_data.h>
 #include <watchers/cloud_status_watcher.h>
 
 class QSettings;
@@ -17,7 +17,8 @@ class QnClientCoreSettings :
 public:
     enum PropertyIdentifier
     {
-        RecentUserConnections,
+        RecentLocalConnections,
+        LocalSystemWeightsData,
         CdbEndpoint,
         CloudLogin,
         CloudPassword,
@@ -45,9 +46,12 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionDataList,
-            recentUserConnections, setRecentUserConnections,
-            RecentUserConnections, QnUserRecentConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(QnLocalConnectionDataList,
+            recentLocalConnections, setRecentLocalConnections,
+            RecentLocalConnections, QnLocalConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(QnWeightDataList,
+            localSystemWeightsData, setLocalSystemWeightsData,
+            LocalSystemWeightsData, QnWeightDataList())
         QN_DECLARE_RW_PROPERTY(QString,
             cdbEndpoint, setCdbEndpoint,
             CdbEndpoint, QString())

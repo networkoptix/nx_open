@@ -1,4 +1,6 @@
 #include  <base_ec2_connection.h>
+#include <transaction/transaction.h>
+
 #include "server_query_processor.h"
 
 namespace ec2
@@ -13,20 +15,27 @@ void detail::ServerQueryProcessor::setAuditData(
     m_authSession = authSession;
 }
 
-ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
+ErrorCode detail::ServerQueryProcessor::removeHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    const AbstractECConnectionPtr& connection,
-    std::list<std::function<void()>>* const transactionsToSend)
+    std::list<std::function<void()>>* const transactionsToSend,
+    TransactionType::Value transactionType)
 {
-    QnTransaction<ApiIdData> removeObjAttrTran(command, ApiIdData(id));
-    ErrorCode errorCode = processUpdateSync(removeObjAttrTran, transactionsToSend, 0);
+    QnTransaction<ApiIdData> removeTran = createTransaction(command, ApiIdData(id));
+    removeTran.transactionType = transactionType;
+    ErrorCode errorCode = processUpdateSync(removeTran, transactionsToSend, 0);
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
-    triggerNotification(connection, removeObjAttrTran);
-
     return ErrorCode::ok;
+}
+
+ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
+    const QnUuid& id,
+    ApiCommand::Value command,
+    std::list<std::function<void()>>* const transactionsToSend)
+{
+    return removeHelper(id, command, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
@@ -39,7 +48,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
     ErrorCode errorCode = processMultiUpdateSync(
         ApiCommand::removeResourceParam,
-        tran.isLocal,
+        tran.transactionType,
         resourceParams,
         transactionsToSend);
 
@@ -48,9 +57,10 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
     for (const auto& param : resourceParams)
     {
-        QnTransaction<ApiResourceParamWithRefData> removeParamTran(
-            ApiCommand::Value::removeResourceParam,
-            param);
+        QnTransaction<ApiResourceParamWithRefData> removeParamTran = 
+            createTransaction(
+                ApiCommand::Value::removeResourceParam,
+                param);
         triggerNotification(connection, removeParamTran);
     }
 
@@ -59,30 +69,21 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
-    QnTransaction<ApiIdData> removeObjAccessRightsTran(ApiCommand::removeAccessRights, ApiIdData(id));
-    ErrorCode errorCode = processUpdateSync(removeObjAccessRightsTran, transactionsToSend, 0);
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    return ErrorCode::ok;
+    return removeHelper(id, ApiCommand::removeAccessRights, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend,
-    bool isLocal)
+    TransactionType::Value transactionType)
 {
-    QnTransaction<ApiIdData> removeResourceStatusTran(ApiCommand::removeResourceStatus, ApiIdData(id));
-    removeResourceStatusTran.isLocal = isLocal;
-    ErrorCode errorCode = processUpdateSync(removeResourceStatusTran, transactionsToSend, 0);
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    return ErrorCode::ok;
+    return removeHelper(
+        id,
+        ApiCommand::removeResourceStatus,
+        transactionsToSend,
+        transactionType);
 }
 
 } //namespace ec2

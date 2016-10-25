@@ -2,6 +2,7 @@
 
 #include "api/global_settings.h"
 #include <nx/utils/log/log.h>
+#include <utils/crypt/symmetrical.h>
 #include <iostream>
 #include <sstream>
 
@@ -374,14 +375,14 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
     // The servresp will contain the digest-challange after the first call.
     berval *servresp = NULL;
     LDAP_RESULT res;
-    
+
     ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
     if (res != LDAP_SASL_BIND_IN_PROGRESS) {
         m_lastErrorCode = res;
-        return Qn::Auth_ConnectError;
+        return Qn::Auth_LDAPConnectError;
     }
-    
+
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
     for (QByteArray line : smartSplit(initialResponse, ',')) {
@@ -463,7 +464,7 @@ QString LdapSession::getRealm()
         m_lastErrorCode = res;
         return result;
     }
-    
+
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
     for (QByteArray line : smartSplit(initialResponse, ',')) {
@@ -556,7 +557,7 @@ Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const
     if (!session.connect())
     {
         NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
-        return Qn::Auth_ConnectError;
+        return Qn::Auth_LDAPConnectError;
     }
 
     auto authResult = session.authenticateWithDigest(login, digest);
@@ -578,14 +579,14 @@ Qn::AuthResult  QnLdapManager::realm(QString* realm) const
         if (!session.connect())
         {
             NX_LOG( QString::fromLatin1("QnLdapManager::realm: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
-            return Qn::Auth_ConnectError;
+            return Qn::Auth_LDAPConnectError;
         }
 
         QString realm = session.getRealm();
         if (realm.isEmpty())
         {
             NX_LOG( QString::fromLatin1("QnLdapManager::realm: realm(): %1").arg(session.lastErrorString()), cl_logWARNING );
-            return Qn::Auth_ConnectError;
+            return Qn::Auth_LDAPConnectError;
         }
 
         m_realmCache.insert(uriString, realm);

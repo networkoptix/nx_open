@@ -1,16 +1,64 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <utils/common/sync_call.h>
 #include <nx/utils/random.h>
+#include <nx_ec/ec_api.h>
 
+#include <utils/common/sync_call.h>
+
+#include "ec2/cloud_vms_synchro_test_helper.h"
 #include "test_setup.h"
 
 namespace nx {
 namespace cdb {
 
+#if 1
+
 class HealthMonitoring
-:
+    :
+    public Ec2MserverCloudSynchronization
+{
+};
+
+TEST_F(HealthMonitoring, general)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+
+    for (int i = 0; i < 2; ++i)
+    {
+        api::SystemDataEx systemData;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->fetchSystemData(
+                ownerAccount().email, ownerAccountPassword(),
+                registeredSystemData().id, &systemData));
+        ASSERT_EQ(api::SystemHealth::offline, systemData.stateOfHealth);
+
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+        waitForCloudAndVmsToSyncUsers();
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->fetchSystemData(
+                ownerAccount().email, ownerAccountPassword(),
+                registeredSystemData().id, &systemData));
+        ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
+
+        if (i == 0)
+        {
+            appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+            ASSERT_TRUE(cdb()->restart());
+        }
+    }
+}
+
+
+#else
+class HealthMonitoring
+    :
     public CdbFunctionalTest
 {
 };
@@ -179,6 +227,7 @@ TEST_F(HealthMonitoring, badCredentials)
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::forbidden, result);
 }
+#endif
 
 }   //namespace cdb
 }   //namespace nx

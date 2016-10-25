@@ -12,6 +12,7 @@
 #include <rest/server/json_rest_result.h>
 #include <utils/common/safe_direct_connection.h>
 #include <api/http_client_pool.h>
+#include <core/resource/resource_fwd.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -70,7 +71,7 @@ namespace rest
          * Save the credentials returned by cloud to the database.
          */
         Handle saveCloudSystemCredentials(
-            const QString &cloudSystemID,
+            const QString &cloudSystemId,
             const QString &cloudAuthKey,
             const QString &cloudAccountName,
             Result<QnRestResult>::type callback,
@@ -127,6 +128,8 @@ namespace rest
 
         typedef std::function<void (Handle, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
         Handle sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+
+        QnMediaServerResourcePtr getServerWithInternetAccess() const;
     private:
         QnUuid m_serverId;
         QMap<Handle, HttpCompletionFunc> m_runningRequests;

@@ -13,6 +13,7 @@
 #include <core/resource/videowall_resource.h>
 
 #include <ui/style/skin.h>
+#include <api/global_settings.h>
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -40,8 +41,10 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(CurrentSystem,           loadIcon(lit("tree/system.png")));
     m_cache.insert(Server,                  loadIcon(lit("tree/server.png")));
     m_cache.insert(Servers,                 loadIcon(lit("tree/servers.png")));
+    m_cache.insert(HealthMonitor,           loadIcon(lit("tree/health_monitor.png")));
     m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
     m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
+    m_cache.insert(VideoWallLayout,         loadIcon(lit("tree/layout_videowall.png")));
     m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
     m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
     m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
@@ -206,7 +209,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             case Qn::Incompatible:
                 if (auto server = resource.dynamicCast<QnMediaServerResource>())
                 {
-                    if (server->getSystemName() != qnCommon->localSystemName())
+                    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
                     {
                         status = Online;
                         break;

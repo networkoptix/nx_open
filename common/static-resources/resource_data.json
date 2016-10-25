@@ -276,6 +276,12 @@
         },
         {
             "keys": [
+                "ACTI|ACM3411", "ACTI|ACM3401"
+            ],
+            "desiredTransport":"UDP"
+        },
+        {
+            "keys": [
                 "Camera"
             ],
             "forceONVIF": false
@@ -325,7 +331,13 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32", "ACTi Corporation|V32",
-                "BOSCH|VIP-X1600-XFM4"
+                "BOSCH|VIP-X1600-XFM4",
+                "Axis|AXISM7014*",
+                "Axis|AXISM7016*",
+                "Axis|AXISQ7404*",
+                "Axis|M7014*",
+                "Axis|M7016*",
+                "Axis|Q7404*"
             ],
             "analogEncoder": true
         },
@@ -584,6 +596,10 @@
             }
         },
         {
+            "keys":["Honeywell|H4D3PRV3", "Honeywell|H4D3PRV2"],
+            "preferredAuthScheme": "Automatic"
+        },
+        {
             "keys": [
                 "DW|DWC-MPTZ20X|unknown_beta",
                 "Win4NET Co., Ltd.|Clebo-PD20",
@@ -818,7 +834,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XVRDPTZF"
+                "VISTA|VK2-1080XVRDPTZF", "VISTA|VK2-HD20-SM"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -899,7 +915,7 @@
         },            
         {
             "keys": [
-                "VISTA|VK2-1080XIRPTZF"
+                "VISTA|VK2-HD30IR-PM", "VISTA|VK2-1080XIRPTZF", "VISTA|NFX-22053H3", "HITRON|NFX-22053H3", "VISTA|VK2-HD30LRIR-PM"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -1301,7 +1317,8 @@
                 "PelcoOptera|IMM12027",
                 "PelcoOptera|IMM12036"
             ],
-            "doNotConfigureCamera": false 
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true
         },
 		{
 			"keys": [
@@ -1452,7 +1469,21 @@
 			"showUrl": true,
 			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
-		}
+		},
+        {
+            "keys":[
+                "Digital_Watchdog|DWC-PF5M1TIR"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 32,
+                "max": 8000
+            },
+            "lowStreamBitrateBounds": {
+                "min": 32,
+                "max": 8000
+            }
+        }
+
     ]
 }
 

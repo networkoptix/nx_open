@@ -20,7 +20,7 @@ public:
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     virtual int getCapabilities() const override;
-    virtual bool initOrUpdate() const override {return true;}
+    virtual Qn::StorageInitResult initOrUpdate() override {return Qn::StorageInit_Ok;}
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& /*dirName*/) override
     {return QnAbstractStorageResource::FileInfoList();}
     qint64 getFileSize(const QString& /*url*/) const override {return 0;}
@@ -30,7 +30,7 @@ public:
     virtual bool isFileExists(const QString& /*url*/) override {return true;}
     virtual bool isDirExists(const QString& /*url*/) override {return true;}
     virtual qint64 getFreeSpace() override {return 999999999;}
-    virtual qint64 getTotalSpace() override {return 9999999999;}
+    virtual qint64 getTotalSpace() const override {return 9999999999;}
 
 private:
     mutable QnMutex m_mutex;

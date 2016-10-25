@@ -23,8 +23,7 @@
 
 #include <nx/network/buffer.h>
 #include <nx/utils/log/assert.h>
-
-#include "qnbytearrayref.h"
+#include <nx/utils/qnbytearrayref.h>
 
 
 /*!
@@ -243,6 +242,7 @@ namespace nx_http
             notAllowed = 405,
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
+            unsupportedMediaType = 415,
             rangeNotSatisfiable = 416,
             invalidParameter = 451,
 
@@ -253,8 +253,10 @@ namespace nx_http
 
         NX_NETWORK_API StringType toString(Value);
         NX_NETWORK_API StringType toString(int);
-        NX_NETWORK_API bool isSuccessCode(Value);
-        NX_NETWORK_API bool isSuccessCode(int);
+        /** Returns \a true if \a  statusCode is 2xx */
+        NX_NETWORK_API bool isSuccessCode(Value statusCode);
+        /** Returns \a true if \a  statusCode is 2xx */
+        NX_NETWORK_API bool isSuccessCode(int statusCode);
 
         NX_NETWORK_API bool isMessageBodyAllowed(int statusCode);
     };
@@ -438,13 +440,6 @@ namespace nx_http
         /** common header name constants */
         extern NX_NETWORK_API const StringType kContentType;
         extern NX_NETWORK_API const StringType kUserAgent;
-
-
-        //!Parses string "name1=val1; name2=val2; ...". ; separator can be specified
-        void NX_NETWORK_API parseDigestAuthParams(
-            const ConstBufferRefType& authenticateParamsStr,
-            QMap<BufferType, BufferType>* const params,
-            char sep = ',' );
 
         //!Http authentication scheme enumeration
         namespace AuthScheme

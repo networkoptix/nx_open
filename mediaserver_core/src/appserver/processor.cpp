@@ -25,6 +25,8 @@
 #include "utils/license_usage_helper.h"
 #include <media_server/settings.h>
 #include <api/global_settings.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
 
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
@@ -52,10 +54,9 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        auto secResource = camera.dynamicCast<QnSecurityCamResource>();
-
         QString urlStr = camera->getUrl();
-        if (secResource && !secResource->getGroupId().isEmpty())
+        const QnResourceData resourceData = qnCommon->dataPool()->data(camera);
+        if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 
         if (camera->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(urlStr))
@@ -73,7 +74,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
-    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
+    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
@@ -138,7 +139,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     ec2::ApiCameraAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return;
-    userAttrsData.preferedServerId = qnCommon->moduleGUID();
+    userAttrsData.preferredServerId = qnCommon->moduleGUID();
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
@@ -151,10 +152,10 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     // remote peer access rights are being checked, the resource should already reside in the
     // Resource Pool so ResourceAccessManager could check access rights for the pair
     // (remotePeerUserId, resourceId).
+
     QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
         qnResPool->removeResource(existCamRes);
-    QnCommonMessageProcessor::instance()->updateResource(apiCameraData);
 
     ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
         ->getCameraManager(Qn::kSystemAccess)
@@ -163,18 +164,12 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     {
         NX_LOG(
             QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1")
-                .arg(ec2::toString(errorCode)),
+            .arg(ec2::toString(errorCode)),
             cl_logWARNING
         );
-        // Here, if the transaction has failed, we have to restore Resource Pool
-        // initial (before cameraResource processing began) state.
-        qnResPool->removeResource(qnResPool->getResourceById(apiCameraData.id));
-        if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
-            QnCommonMessageProcessor::instance()->updateResource(existCamRes);
-        return errorCode;
     }
 
-    return ec2::ErrorCode::ok;
+    return errorCode;
 }
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
@@ -194,6 +189,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     if (addAndPropagateCamResource(apiCamera) == ec2::ErrorCode::ok)
     {   // finally, when transaction is successful we can save params
         // for our new resource.
+        cameraResource->flushProperties();
         propertyDictionary->saveParams(cameraResource->getId());
     }
 
@@ -206,7 +202,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
             if (!helper.isValid())
                 userAttrCopy->scheduleDisabled = true;
         }
-        userAttrCopy->cameraID = cameraResource->getId();
+        userAttrCopy->cameraId = cameraResource->getId();
 
         ec2::ApiCameraAttributesDataList attrsList;
         fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
@@ -219,10 +215,10 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         QSet<QByteArray> modifiedFields;
         {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraID );
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraId );
             (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
-        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraID);
+        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraId);
         if( res )   //it is OK if resource is missing
             res->emitModificationSignals( modifiedFields );
     }

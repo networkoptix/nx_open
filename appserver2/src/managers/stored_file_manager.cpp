@@ -31,10 +31,14 @@ namespace ec2
     int QnStoredFileManager<QueryProcessorType>::addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( filename, data );
+        ApiStoredFileData params;
+        params.path = filename;
+        params.data = data;
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::addStoredFile, params,
+            std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }
@@ -43,10 +47,11 @@ namespace ec2
     int QnStoredFileManager<QueryProcessorType>::deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( filename );
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeStoredFile, ApiStoredFilePath(filename),
+            std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }
@@ -64,23 +69,6 @@ namespace ec2
         m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, ApiStoredFilePath(folderName), queryDoneHandler );
         return reqID;
     }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiStoredFileData> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename, const QByteArray& data )
-    {
-        QnTransaction<ApiStoredFileData> tran(ApiCommand::addStoredFile);
-        tran.params.path = filename;
-        tran.params.data = data;
-        return tran;
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiStoredFilePath> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename )
-    {
-        QnTransaction<ApiStoredFilePath> tran(ApiCommand::removeStoredFile, filename);
-        return tran;
-    }
-
 
     template class QnStoredFileManager<ServerQueryProcessorAccess>;
     template class QnStoredFileManager<FixedUrlClientQueryProcessor>;

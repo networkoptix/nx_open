@@ -4,6 +4,7 @@
 #ifdef ENABLE_AXIS
 
 #include <QtCore/QMap>
+#include <set>
 #include <nx/utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
@@ -44,8 +45,6 @@ public:
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
-    bool isInitialized() const;
 
     AxisResolution getMaxResolution() const;
     AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
@@ -89,7 +88,6 @@ protected:
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
-
 private:
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
@@ -114,7 +112,7 @@ private:
     QnIOStateDataList m_ioStates;
     mutable QnMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
-    
+
     struct IOMonitor {
         nx_http::AsyncHttpClientPtr httpClient;
         std::shared_ptr<nx_http::MultipartContentParser> contentParser;
@@ -123,12 +121,15 @@ private:
     IOMonitor m_ioHttpMonitor[2];
     nx_http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
-    
+
 
     nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
     QnAudioTransmitterPtr m_audioTransmitter;
+
+    std::set<nx_http::AsyncHttpClientPtr> m_stoppingHttpClients;
+    QnWaitCondition m_stopInputMonitoringWaitCondition;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

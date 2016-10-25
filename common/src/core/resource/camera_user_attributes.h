@@ -25,7 +25,7 @@
 class QnCameraUserAttributes
 {
 public:
-    QnUuid cameraID;
+    QnUuid cameraId;
     Qn::MotionType motionType;
     QList<QnMotionRegion> motionRegions;
     bool scheduleDisabled;
@@ -36,7 +36,7 @@ public:
     Qn::SecondStreamQuality secondaryQuality;
     int minDays;
     int maxDays;
-    QnUuid preferedServerId;
+    QnUuid preferredServerId;
     //!User-given name of camera (can be different from resource name). This is name shown to the user
     QString name;
     QString groupName;

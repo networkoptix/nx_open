@@ -71,6 +71,7 @@
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
+        <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
         <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
@@ -86,10 +87,10 @@
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
 
         <client.name>${company.name} ${product.name} Client</client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+        <client.display.name>${display.product.name} Client</client.display.name>
 
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
-        <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
+        <mobile_client.display.name>${display.product.name} Mobile Client</mobile_client.display.name>
 
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
@@ -134,7 +135,7 @@
         <beta>true</beta>
         <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-cloud_${cloud.group}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile/>
@@ -143,27 +144,18 @@
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
-        <!-- compile.option2. See profile angle  -->
-        <angle>false</angle>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1/>
-        <compile.option2/>
-        <compile.option3/>
-        <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
-        <!-- Used for cross-compilation to add -m32 on Linux to compile x86 on x64 -->
-        <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
-        <qt.debug/>
         <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
+        <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>         
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.1</qt.version>
@@ -204,10 +196,11 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
+        <cloud.group>internal</cloud.group>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
-        <toolchain.version>none</toolchain.version>
+        <toolchain.version>none</toolchain.version>       
 
         <additional.defines/>
         <customization.defines/>
@@ -359,6 +352,14 @@
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
                                 </resource>
+                                <resource>
+                                    <directory>${customization.dir}/icons/${platform}</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                
+                                <resource>
+                                    <directory>${customization.dir}/icons/all</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                                                                                
                             </resources>
                         </configuration>
                     </execution>
@@ -468,9 +469,6 @@
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
-            <properties>
-                <additional.compiler>${compiler}</additional.compiler>
-            </properties>
         </profile>
         <profile>
             <id>desktop</id>
@@ -505,14 +503,11 @@
             </activation>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
-                <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv_2.6.bat</buildenv.script>
                 <platform>windows</platform>
                 <box>none</box>
-                <compiler>msvc2015u1</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
@@ -524,17 +519,13 @@
                 <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
                 <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
                 <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
-
-                <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
-                <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
-
+                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
-                <launcher.version.dir>${libdir}/${arch}/bin/${build.configuration}</launcher.version.dir>
             </properties>
 
         </profile>
@@ -636,18 +627,15 @@
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>/usr/bin</init.python.dir>
-                <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
                 <common.platform>unix</common.platform>
-                <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
                 <festival.version>2.1</festival.version>
-                <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
             </properties>
         </profile>
         <profile>
@@ -675,7 +663,6 @@
                 </os>
             </activation>
             <properties>
-                <additional.compiler>clang</additional.compiler>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -763,7 +750,6 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
             <build>
@@ -786,7 +772,6 @@
             </activation>
             <properties>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <compiler>2011.09</compiler>
                 <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
@@ -816,7 +801,6 @@
             </activation>
             <properties>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
@@ -846,10 +830,10 @@
             </activation>
             <properties>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
+                <festival.version>2.1x-SNAPSHOT</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -879,7 +863,6 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
@@ -919,7 +902,6 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
@@ -952,7 +934,6 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
@@ -1024,7 +1005,6 @@
                 </property>
             </activation>
             <properties>
-                <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
                 <target.arch>i386</target.arch>
@@ -1039,24 +1019,9 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
+                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-cloud_${cloud.group}</finalName>
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
-            </properties>
-        </profile>
-        <profile>
-            <id>angle</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>angle</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <compile.option2>-angle</compile.option2>
             </properties>
         </profile>
 
@@ -1070,9 +1035,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <properties>
-                <compile.options/>
-            </properties>
             <modules>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
@@ -1109,22 +1071,6 @@
             </properties>
         </profile>
         <profile>
-            <id>mobile-android-desktop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>android-desktop</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
-                </file>
-            </activation>
-            <properties>
-                <additional.compiler>${compiler}</additional.compiler>
-            </properties>
-        </profile>
-        <profile>
             <id>mobile-ios</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -1147,12 +1093,9 @@
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec/>
                 <libdir>${root.dir}/build_environment/target</libdir>
-                <compiler>clang</compiler>
-                <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
-                <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>
         </profile>
@@ -1194,10 +1137,6 @@
             <id>unit-tests-build-only</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
                 <property>
                     <name>utb</name>
                     <value>true</value>
@@ -1207,5 +1146,38 @@
                 <module>unit_tests</module>
             </modules>
         </profile>
+        <profile>
+            <id>get-cloud-url</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>cloud.group</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <version>1.0-alpha-2</version>
+                        <executions>
+                            <execution>
+                                <id>get-cloud-url-property</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>read-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <files>
+                                        <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
+                                    </files>
+                                    <quiet>true</quiet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>             
+                </plugins>
+            </build> 
+        </profile>  
     </profiles>
 </project>

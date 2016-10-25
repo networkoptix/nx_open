@@ -7,6 +7,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QShowEvent>
 
+#include <client/client_color_types.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
@@ -14,27 +15,25 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/actions.h>
 #include <ui/common/widget_anchor.h>
-#include <ui/utils/table_export_helper.h>
+#include <ui/customization/customized.h>
+#include <ui/delegates/recording_stats_item_delegate.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/delegates/resource_item_delegate.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/models/recording_stats_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
-
+#include <ui/utils/table_export_helper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/models/recording_stats_model.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/actions.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/math/color_transformations.h>
 #include <utils/common/synctime.h>
 #include <set>
 
@@ -45,6 +44,9 @@ namespace {
     const qint64 kBytesInGB = 1024ll * 1024 * 1024;
     const qint64 kBytesInTB = 1024ll * kBytesInGB;
     const qint64 kFinalStepSeconds = 1000000000ll * 10;
+
+    const int kTableRowHeight = 24;
+    const int kMinimumColumnWidth = 110;
 
     //TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
     const std::array<qint64, 5> kExtraDataBase =
@@ -58,70 +60,10 @@ namespace {
 
     const int kTicksPerInterval = 100;
 
-    class QnRecordingStatsItemDelegate: public QStyledItemDelegate
-    {
-        typedef QStyledItemDelegate base_type;
-
-    public:
-        explicit QnRecordingStatsItemDelegate(QObject* parent = nullptr):
-            base_type(parent)
-        {
-        }
-
-        virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
-        {
-            NX_ASSERT(index.isValid());
-
-            QStyleOptionViewItem opt = option;
-            initStyleOption(&opt, index);
-
-            const QWidget* widget = option.widget;
-            QStyle* style = widget ? widget->style() : QApplication::style();
-
-            if (index.column() != QnRecordingStatsModel::CameraNameColumn)
-            {
-                QString label = opt.text;
-
-                opt.text = QString();
-                style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-
-                // draw chart manually
-                QnScopedPainterTransformRollback rollback(painter);
-                QnScopedPainterBrushRollback rollback2(painter);
-
-                QPoint shift = opt.rect.topLeft();
-                painter->translate(shift);
-                opt.rect.translate(-shift);
-
-                //qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
-                //qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
-                qreal chartData = index.data(Qn::RecordingStatChartDataRole).toReal();
-                QColor chartColor;
-                QVariant colorData =  index.data(Qn::RecordingStatChartColorDataRole);
-                if (colorData.isValid() && colorData.canConvert<QColor>())
-                    chartColor = qvariant_cast<QColor>(colorData);
-
-                opt.rect.adjust(2, 1, -2, -1);
-
-                painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * chartData, opt.rect.height()), chartColor);
-
-                QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &opt, opt.widget);
-
-                painter->setFont(opt.font);
-                painter->setPen(opt.palette.color(QPalette::ButtonText));
-                painter->drawText(textRect, Qt::AlignRight | Qt::AlignVCenter, label);
-
-            }
-            else
-            {
-                style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-            }
-        }
-    };
-
     class CustomHorizontalHeader: public QHeaderView
     {
         Q_DECLARE_TR_FUNCTIONS(CustomHorizontalHeader)
+        using base_type = QHeaderView;
 
     private:
         QComboBox* m_comboBox;
@@ -137,7 +79,8 @@ namespace {
         }
 
     public:
-        CustomHorizontalHeader(QWidget* parent = nullptr) : QHeaderView(Qt::Horizontal, parent)
+        CustomHorizontalHeader(QWidget* parent = nullptr) :
+            base_type(Qt::Horizontal, parent)
         {
             m_comboBox = new QComboBox(this);
             m_comboBox->addItem(tr("5 minutes"), 5 * 60);
@@ -168,9 +111,17 @@ namespace {
         {
             return m_comboBox->itemData(m_comboBox->currentIndex()).toInt();
         }
-    };
 
-    const int kMinimumSectionSize = 200;
+    protected:
+        virtual QSize sectionSizeFromContents(int logicalIndex) const override
+        {
+            QSize size = base_type::sectionSizeFromContents(logicalIndex);
+            if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
+                size.rwidth() += m_comboBox->minimumSizeHint().width();
+
+            return size;
+        }
+    };
 }
 
 QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
@@ -195,7 +146,9 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     setWarningStyle(ui->warningLabel);
 
     auto refreshButton = new QPushButton(ui->tabWidget);
+    refreshButton->setFlat(true);
     refreshButton->setText(tr("Refresh"));
+    refreshButton->setIcon(qnSkin->icon(lit("buttons/refresh.png")));
     refreshButton->resize(refreshButton->sizeHint());
 
     auto anchor = new QnWidgetAnchor(refreshButton);
@@ -245,20 +198,17 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     sortModel->setSourceModel(model);
     table->setModel(sortModel);
     table->setItemDelegate(new QnRecordingStatsItemDelegate(this));
-    table->setItemDelegateForColumn(QnRecordingStatsModel::CameraNameColumn,
-        new QnResourceItemDelegate(this));
 
-    CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
-    table->setHorizontalHeader(headers);
+    table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
 
-    headers->setSectionsClickable(true);
-    headers->setSectionResizeMode(QHeaderView::Fixed);
-    headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
-    headers->setMinimumSectionSize(kMinimumSectionSize);
-    headers->setSortIndicatorShown(true);
+    CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
+    table->setHorizontalHeader(header);
 
-    for (int i = QnRecordingStatsModel::BytesColumn; i < QnRecordingStatsModel::ColumnCount; ++i)
-        table->setColumnWidth(i, kMinimumSectionSize);
+    header->setSectionsClickable(true);
+    header->setMinimumSectionSize(kMinimumColumnWidth);
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
+    header->setSortIndicatorShown(true);
 
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
@@ -280,12 +230,13 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
         ? ui->forecastTable
         : ui->statsTable;
 
-    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, [this, otherTable](int index)
-    {
-        static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->comboBox()->setCurrentIndex(index);
-        if (otherTable == ui->forecastTable)
-            updateData();
-    });
+    connect(header->comboBox(), QnComboboxCurrentIndexChanged, this,
+        [this, otherTable](int index)
+        {
+            static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->comboBox()->setCurrentIndex(index);
+            if (otherTable == ui->forecastTable)
+                updateData();
+        });
 }
 
 QnMediaServerResourcePtr QnStorageAnalyticsWidget::server() const

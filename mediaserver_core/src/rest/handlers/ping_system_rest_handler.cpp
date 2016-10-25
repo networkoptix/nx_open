@@ -23,7 +23,7 @@ int QnPingSystemRestHandler::executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
-        const QnRestConnectionProcessor* owner)
+        const QnRestConnectionProcessor* /*owner*/)
 {
     Q_UNUSED(path)
 
@@ -78,7 +78,7 @@ int QnPingSystemRestHandler::executeGet(
     result.setReply(moduleInformation);
 
     auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
-    if (connectionResult != Qn::ConnectionResult::Success)
+    if (connectionResult != Qn::SuccessConnectionResult)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;

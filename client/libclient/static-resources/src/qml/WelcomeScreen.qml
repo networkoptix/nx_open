@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import NetworkOptix.Qml 1.0;
+import com.networkoptix.qml 1.0;
 
 import "."
 
@@ -20,32 +21,28 @@ Rectangle
         anchors.fill: parent;
         visible: context.visibleControls && !context.globalPreloaderVisible;
 
-        CloudPanel
+        Image
         {
-            id: cloudPanel;
+            id: statusImage;
 
-            y: ((gridHolder.y - height) / 2);
+            width: 120;
+            height: 120;
+            y: ((searchEdit.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            userName: context.cloudUserName;
-            loggedIn: context.isLoggedInToCloud;
-
-
-            onLoginToCloud: context.loginToCloud();
-            onCreateAccount: context.createAccount();
-
-            onManageAccount: context.manageCloudAccount();
-            onLogout: context.logoutFromCloud();
+            source: "qrc:/skin/welcome_page/logo.png"
         }
 
         NxSearchEdit
         {
-            visible: (pageSwitcher.pagesCount > 1);
-            visualParent: screenHolder;
+            id: searchEdit;
 
-            anchors.bottom: gridHolder.top;
-            anchors.bottomMargin: 8;
-            anchors.horizontalCenter: parent.horizontalCenter;
+            visible: grid.totalItemsCount > grid.itemsPerPage
+            visualParent: screenHolder
+
+            anchors.bottom: gridHolder.top
+            anchors.bottomMargin: 8
+            anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
         }
@@ -85,9 +82,11 @@ Rectangle
                         return 4;
                 }
 
-                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
-                readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
-                readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount)
+                readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
+                readonly property int itemsPerPage: colsCount * rowsCount
+                readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
+                readonly property int totalItemsCount: model.sourceRowsCount;
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -110,7 +109,7 @@ Rectangle
 
                     ScriptAction
                     {
-                        script: { grid.setPositionTo(switchPageAnimation.pageIndex); }
+                        script: { grid.setPositionTo(switchPageAnimation.pageIndex, GridView.Beginning); }
                     }
 
                     NumberAnimation
@@ -137,24 +136,56 @@ Rectangle
 
                 property QtObject watcher: SingleActiveItemSelector
                 {
+                    id: itemSelector;
                     variableName: "isExpanded";
                     deactivateFunc: function(item) { item.toggle(); };
                 }
 
-
                 Connections
                 {
-                    target: context;
-                    onIsVisibleChanged:
+                    id: openTileHandler;
+
+                    property variant items: [];
+
+                    function addItem(item)
                     {
-                        if (!context.isVisible)
-                            grid.watcher.resetCurrentItem();
+                        if (items.indexOf(item) == -1)
+                            items.push(item);
+                    }
+
+                    function removeItem(item)
+                    {
+                        var index = items.indexOf(item);
+                        if (index > -1)
+                            items.splice(index, 1); // Removes element
+                    }
+
+                    target: context;
+
+                    onOpenTile:
+                    {
+                        var foundItem = null;
+                        var count = openTileHandler.items.length;
+                        for (var i = 0; i != count; ++i)
+                        {
+                            var item = openTileHandler.items[i];
+                            if (item.systemId == systemId)
+                            {
+                                foundItem = item;
+                                break;
+                            }
+                        }
+
+                        if (foundItem && !foundItem.isCloudTile && !foundItem.isFactoryTile
+                            && !foundItem.isExpanded && foundItem.isAvailable)
+                        {
+                            foundItem.toggle();
+                        }
                     }
                 }
 
-                model: QnQmlSortFilterProxyModel
+                model: QnFilteringSystemsModel
                 {
-                    model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
                 }
@@ -173,6 +204,7 @@ Rectangle
                         anchors.verticalCenter: parent.verticalCenter
 
                         systemId: model.systemId
+                        localId: model.localId
                         systemName: model.systemName
                         ownerDescription: model.ownerDescription
 
@@ -183,7 +215,16 @@ Rectangle
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
 
-                        Component.onCompleted: { grid.watcher.addItem(this); }
+                        Component.onCompleted:
+                        {
+                            grid.watcher.addItem(this);
+                            openTileHandler.addItem(this);
+                        }
+
+                        Component.onDestruction:
+                        {
+                            openTileHandler.removeItem(this);
+                        }
                     }
                 }
 
@@ -204,6 +245,14 @@ Rectangle
                     var tilesPerPage = grid.colsCount * grid.rowsCount;
                     var firstItemIndex = index * tilesPerPage;
                     grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
+                }
+
+                footer: Item    //< Represents empty bottom space workaround for model with odd lines
+                {
+                    visible: ((grid.colsCount % 2) == 1)
+                        && ((pageSwitcher.page + 1) == pageSwitcher.pagesCount);
+                    height: grid.cellHeight;
+                    width: grid.width;
                 }
             }
 
@@ -232,7 +281,29 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: foundServersCount == 0;
+            visible: (grid.model.sourceRowsCount == 0);
+        }
+
+        Item
+        {
+            height: 208;
+            width: parent.width;
+            anchors.top: searchEdit.bottom;
+            anchors.topMargin: 16;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+
+            visible: (grid.count == 0) && !emptyTilePreloader.visible;
+
+            NxLabel
+            {
+                anchors.centerIn: parent;
+                font: Style.fonts.notFoundMessages.caption;
+                color: Style.colors.windowText;
+
+                text: qsTr("Nothing found");
+            }
+
         }
 
         NxButton
@@ -241,20 +312,22 @@ Rectangle
             anchors.bottomMargin: 64;   // Magic const by design
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            text: qsTr("Connect to another system");
+            text: grid.totalItemsCount > 0
+                ? qsTr("Connect to another system")
+                : qsTr("Connect to system")
 
             onClicked: context.connectToAnotherSystem();
         }
 
         NxBanner
         {
-            visible: context.isOfflineConnection;
+            visible: !context.isCloudEnabled;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no Internet access. Some cloud features could be unavailable.");
+            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(context.appInfo.cloudName());
         }
     }
 
@@ -304,14 +377,62 @@ Rectangle
         }
     }
 
+    Rectangle
+    {
+        id: messageHolder;
+        anchors.centerIn: parent;
+        visible: (context.message.length);
+        opacity: (visible ? 1.0 : 0.0);
+
+        radius: 2;
+        color: Style.colorWithAlpha(
+            Style.darkerColor(Style.colors.brand, 2), 0.8);
+        width: messageLabel.implicitWidth;
+        height: messageLabel.implicitHeight;
+
+        Behavior on opacity
+        {
+            PropertyAnimation
+            {
+                target: messageHolder;
+                property: "opacity";
+                duration: 200;
+            }
+        }
+
+        NxLabel
+        {
+            id: messageLabel;
+            anchors.centerIn: parent;
+            font: Style.fonts.screenRecording;
+            standardColor: Style.colors.brandContrast;
+            leftPadding: 24;
+            rightPadding: leftPadding;
+            topPadding: 10;
+            bottomPadding: topPadding;
+            text: context.message;
+        }
+    }
+
     NxLabel
     {
         x: 8;
-        anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 8;
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
 
-        text: context.softwareVersion;
-        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        text: context.appInfo.applicationVersion()
+        standardColor: Style.darkerColor(Style.colors.windowText, 1)
+
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
+
+    Connections
+    {
+        target: context;
+        onIsVisibleChanged:
+        {
+            grid.watcher.resetCurrentItem();
+            pageSwitcher.setPage(0);
+        }
     }
 }

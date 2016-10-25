@@ -11,12 +11,16 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/from_this_to_shared.h>
+#include <utils/common/connective.h>
 
-class QnResourceTreeModelNode: public QObject, public QnWorkbenchContextAware, public QnFromThisToShared<QnResourceTreeModelNode>
+class QnResourceTreeModelNode:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware,
+    public QnFromThisToShared<QnResourceTreeModelNode>
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    using base_type = Connective<QObject>;
 public:
     enum State
     {
@@ -48,15 +52,22 @@ public:
 
     ~QnResourceTreeModelNode();
 
-    void setResource(const QnResourcePtr &resource);
+    virtual void setResource(const QnResourcePtr &resource);
+    virtual void setParent(const QnResourceTreeModelNodePtr& parent);
+    virtual void updateRecursive();
+
+    /** Setup node. Called when its shared pointer is ready. */
+    virtual void initialize();
+
+    /** Cleanup node to make sure it can be destroyed safely. */
+    virtual void deinitialize();
 
     void update();
-
-    void updateRecursive() ;
 
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
+    QnUuid uuid() const;
 
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
@@ -64,8 +75,6 @@ public:
     QnResourceTreeModelNodePtr child(int index) ;
 
     QnResourceTreeModelNodePtr parent() const ;
-
-    void setParent(const QnResourceTreeModelNodePtr& parent) ;
 
     QModelIndex createIndex(int row, int col);
     QModelIndex createIndex(int col);
@@ -81,14 +90,22 @@ public:
     void setModified(bool modified) ;
 
 protected:
-    void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
-    void addChildInternal(const QnResourceTreeModelNodePtr& child);
+    bool isInitialized() const;
+
+    QnResourceTreeModel* model() const;
+
+    virtual void handlePermissionsChanged(const QnResourcePtr& resource);
+    virtual QIcon calculateIcon() const;
+
+    virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
+    virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
+    void setName(const QString& name);
 private:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 
-    const QnUuid &uuid() const;
+
     bool isValid() const;
     State state() const;
     void setState(State state);
@@ -104,6 +121,7 @@ private:
     friend class QnResourceTreeModel;
 
     /* Node state. */
+    bool m_initialized;
 
     /** Model that this node belongs to. */
     QPointer<QnResourceTreeModel> const m_model;
@@ -164,4 +182,5 @@ private:
     } m_editable;
 };
 
-
+QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node);
+QDebug operator<<(QDebug dbg, const QnResourceTreeModelNodePtr& node);

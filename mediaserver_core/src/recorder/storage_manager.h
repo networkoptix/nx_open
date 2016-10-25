@@ -71,7 +71,7 @@ public:
 			  usageCoeff(0.0)
 		{}
 	};
-	typedef std::unordered_map<int, StorageSpaceInfo> StorageSpaceInfoMap;
+    typedef std::unordered_map<int, StorageSpaceInfo> StorageSpaceInfoMap;
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
@@ -121,13 +121,12 @@ public:
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(
-        QnAbstractMediaStreamDataProvider                   *provider,
-        std::function<bool(const QnStorageResourcePtr &)>   pred =
+        QnAbstractMediaStreamDataProvider *provider,
+        std::function<bool(const QnStorageResourcePtr &)> pred =
             [](const QnStorageResourcePtr &storage) {
                 return !storage->hasFlags(Qn::storage_fastscan) ||
                         storage->getFreeSpace() > storage->getSpaceLimit();
-            }
-    );
+            });
 
     QnStorageResourceList getStorages() const;
 
@@ -191,7 +190,6 @@ public slots:
 private:
     friend class TestStorageThread;
 
-    void resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage);
     void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnSecurityCamResourceList &cameras,
@@ -309,6 +307,9 @@ private:
     bool m_isRenameDisabled;
 	mutable QnMutex m_occupiedSpaceInfoMutex;
 	StorageSpaceInfoMap m_occupiedSpaceInfo;
+
+    QMap<QString, QByteArray> m_storageUrlToCameraInfo;
+    QElapsedTimer m_cameraInfoWriteTimer;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

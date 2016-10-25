@@ -6,7 +6,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
         <fileSet>
-            <directory>${libdir}/${arch}/bin/release</directory>
+            <directory>${libdir}/bin/release</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
                 <include>audio/**</include>
@@ -14,6 +14,7 @@
                 <include>imageformats/*.dll</include>
                 <include>platforms/*.dll</include>
                 <include>qml/**</include>
+                <include>vox/**</include>
                 <include>av*.dll</include>
                 <include>${applauncher.binary.name}</include>                
                 <include>${client.binary.name}</include>

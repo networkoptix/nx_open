@@ -19,10 +19,11 @@ TEST(TimerManager, singleShot)
 {
     const std::chrono::seconds delay(1);
 
+    nx::utils::promise<void> triggeredPromise;
+
     TimerManager timerManager;
     timerManager.start();
 
-    nx::utils::promise<void> triggeredPromise;
     timerManager.addTimer(
         [&triggeredPromise](TimerId) { triggeredPromise.set_value(); },
         delay);
@@ -30,8 +31,6 @@ TEST(TimerManager, singleShot)
     ASSERT_EQ(
         std::future_status::ready,
         triggeredPromise.get_future().wait_for(delay*2));
-
-    timerManager.stop();
 }
 
 TEST(TimerManager, nonStopTimer)

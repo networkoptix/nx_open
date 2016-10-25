@@ -15,11 +15,13 @@ namespace nx {
 namespace hpm {
 
 PeerRegistrator::PeerRegistrator(
+    const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool)
 :
     RequestProcessor(cloudData),
+    m_settings(settings),
     m_listeningPeerPool(listeningPeerPool)
 {
     using namespace std::placeholders;
@@ -49,7 +51,7 @@ PeerRegistrator::PeerRegistrator(
                     this,
                     std::move(connection),
                     std::move(message));
-            });
+            }) &&
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::resolvePeer,
@@ -60,7 +62,18 @@ PeerRegistrator::PeerRegistrator(
                     this,
                     std::move(connection),
                     std::move(message));
-            });
+            }) &&
+
+        dispatcher->registerRequestProcessor(
+            stun::cc::methods::clientBind,
+            [this](const ConnectionStrongRef& connection, stun::Message message)
+            {
+                processRequestWithNoOutput(
+                    &PeerRegistrator::clientBind,
+                    this,
+                    std::move(connection),
+                    std::move(message));
+            }) ;
 
     // TODO: NX_LOG
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
@@ -135,21 +148,28 @@ void PeerRegistrator::listen(
         return;
     }
 
-    auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
-        connection,
-        MediaserverData(
-            requestData.systemId,
-            requestData.serverId));
+    std::vector<nx::stun::Message> clientBindIndications;
+    {
+        QnMutexLocker lk(&m_mutex);
+        for (const auto& client: m_boundClients)
+            clientBindIndications.push_back(makeIndication(client.first, client.second));
 
-    peerDataLocker.value().isListening = true;
-    peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
+        auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
+            connection,
+            MediaserverData(requestData.systemId, requestData.serverId));
 
-    NX_LOGX(lit("Peer %1.%2 started to listen")
-        .arg(QString::fromUtf8(requestData.serverId))
-        .arg(QString::fromUtf8(requestData.systemId)),
-        cl_logDEBUG1);
+        peerDataLocker.value().isListening = true;
+        peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
+
+        NX_LOGX(lit("Peer %1.%2 started to listen")
+            .arg(QString::fromUtf8(requestData.serverId))
+            .arg(QString::fromUtf8(requestData.systemId)),
+            cl_logDEBUG1);
+    }
 
     completionHandler(api::ResultCode::ok);
+    for (auto& indication: clientBindIndications)
+        connection->sendMessage(std::move(indication));
 }
 
 void PeerRegistrator::resolveDomain(
@@ -217,6 +237,76 @@ void PeerRegistrator::resolvePeer(
         .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
 
     completionHandler(api::ResultCode::ok, std::move(responseData));
+}
+
+void PeerRegistrator::clientBind(
+    const ConnectionStrongRef& connection,
+    api::ClientBindRequest requestData,
+    stun::Message /*requestMessage*/,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    const auto reject = [&](api::ResultCode code)
+    {
+        NX_LOGX(lm("Reject client bind (requested from %1): %2")
+            .strs(connection->getSourceAddress(), code), cl_logDEBUG2);
+
+        completionHandler(code);
+    };
+
+    // Only local peers are alowed while auth is not avaliable for clients:
+    if (!connection->getSourceAddress().address.isLocal())
+        return reject(api::ResultCode::notAuthorized);
+
+    if (requestData.tcpReverseEndpoints.empty())
+        return reject(api::ResultCode::badRequest);
+
+    auto peerId = std::move(requestData.originatingPeerID);
+    nx::stun::Message indication;
+    std::vector<ConnectionWeakRef> listeningPeerConnections;
+    {
+        QnMutexLocker lk(&m_mutex);
+        ClientBindInfo& info = m_boundClients[peerId];
+        info.connection = connection;
+        info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
+
+        NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
+            .str(peerId).container(info.tcpReverseEndpoints)
+            .str(connection->getSourceAddress()), cl_logDEBUG1);
+
+        indication = makeIndication(peerId, info);
+        listeningPeerConnections = m_listeningPeerPool->getAllConnections();
+    }
+
+    connection->addOnConnectionCloseHandler(
+        [this, peerId, connection]()
+        {
+            QnMutexLocker lk(&m_mutex);
+            const auto it = m_boundClients.find(peerId);
+            if (it == m_boundClients.end() || it->second.connection.lock() != connection)
+                return;
+
+            NX_LOGX(lm("Client %1 has disconnected").str(peerId), cl_logDEBUG1);
+            m_boundClients.erase(it);
+        });
+
+    completionHandler(api::ResultCode::ok);
+    for (const auto& connectionRef: listeningPeerConnections)
+        if (const auto connection = connectionRef.lock())
+            connection->sendMessage(indication);
+}
+
+nx::stun::Message PeerRegistrator::makeIndication(const String& id, const ClientBindInfo& info) const
+{
+    api::ConnectionRequestedEvent event;
+    event.originatingPeerID = id;
+    event.tcpReverseEndpointList = info.tcpReverseEndpoints;
+    event.connectionMethods = api::ConnectionMethod::reverseConnect; // TODO: Support others?
+    event.params = m_settings.connectionParameters();
+    event.isPersistent = true;
+
+    nx::stun::Message indication(stun::Header(stun::MessageClass::indication, event.kMethod));
+    event.serialize(&indication);
+    return indication;
 }
 
 } // namespace hpm

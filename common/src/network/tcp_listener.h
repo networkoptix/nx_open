@@ -38,6 +38,7 @@ public:
     void waitForPortUpdated();
 
     int getPort() const;
+    SocketAddress getLocalEndpoint() const;
 
     /** Remove ownership from connection.*/
     void removeOwnership(QnLongRunnable* processor);
@@ -45,6 +46,8 @@ public:
     void addOwnership(QnLongRunnable* processor);
 
     bool isSslEnabled() const;
+
+    SystemError::ErrorCode lastError() const;
 
     static void setDefaultPage(const QByteArray& path);
     static QByteArray defaultPage();
@@ -72,6 +75,8 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress);
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
+
+    void setLastError(SystemError::ErrorCode error);
 
 private:
     void removeDisconnectedConnections();

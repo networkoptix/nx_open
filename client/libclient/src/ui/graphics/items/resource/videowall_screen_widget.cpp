@@ -72,8 +72,7 @@ Qn::RenderStatus QnVideowallScreenWidget::paintChannelBackground(QPainter *paint
         return Qn::NothingRendered;
 
     updateLayout();
-    painter->fillRect(paintRect, palette().color(QPalette::Window));
-    return Qn::NewFrameRendered;
+    return base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
 }
 
 int QnVideowallScreenWidget::calculateButtonsVisibility() const {
@@ -201,15 +200,19 @@ void QnVideowallScreenWidget::at_thumbnailReady(const QnUuid &resourceId, const 
     update();
 }
 
-void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& item,
+    const QnVideoWallItem& oldItem)
+{
     Q_UNUSED(videoWall)
 
     int idx = qnIndexOf(m_items, [&item](const QnVideoWallItem &i) {return item.uuid == i.uuid; });
     if (idx < 0)
         return; // item on another widget
 
-    QnVideoWallItem oldItem = m_items[idx];
-    if (oldItem.screenSnaps.screens() != item.screenSnaps.screens()) {
+    NX_ASSERT(oldItem == m_items[idx]);
+    if (oldItem.screenSnaps.screens() != item.screenSnaps.screens())
+    {
          // if there are more than one item on the widget, this one will be updated from outside
         if (m_items.size() == 1)
             updateItems();

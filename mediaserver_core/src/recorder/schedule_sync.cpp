@@ -49,8 +49,8 @@ DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
 {
     DeviceFileCatalog::Chunk resultChunk;
     DeviceFileCatalog::Chunk prevResultChunk;
-    resultChunk.startTimeMs = resultChunk.durationMs 
-                            = prevResultChunk.startTimeMs 
+    resultChunk.startTimeMs = resultChunk.durationMs
+                            = prevResultChunk.startTimeMs
                             = prevResultChunk.durationMs = 0;
 
     while (auto chunkVector = getOldestChunk(resultChunk.startTimeMs)) {
@@ -58,17 +58,17 @@ DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
         prevResultChunk = resultChunk;
         resultChunk = chunkKey.chunk;
 
-        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultChunk.startTimeMs), 
+        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultChunk.startTimeMs),
                cl_logDEBUG2);
 
         auto toCatalog = qnBackupStorageMan->getFileCatalog(
-            chunkKey.cameraID,
+            chunkKey.cameraId,
             chunkKey.catalog
         );
         if (!toCatalog)
             continue;
 
-        if (toCatalog->getLastSyncTime() < resultChunk.startTimeMs) {
+        if (toCatalog->lastChunkStartTime() < resultChunk.startTimeMs) {
             resultChunk = prevResultChunk;
             break;
         }
@@ -99,8 +99,8 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
     auto chunk = fromCatalog->chunkAt(nextFileIndex);
     if (syncData)
     {
-        syncData->currentIndex = syncData->startIndex 
-                               = nextFileIndex == -1 ? (int)fromCatalog->size() : 
+        syncData->currentIndex = syncData->startIndex
+                               = nextFileIndex == -1 ? (int)fromCatalog->size() :
                                                             nextFileIndex;
         syncData->totalChunks = (int)fromCatalog->size() - syncData->startIndex;
     }
@@ -110,14 +110,14 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
 }
 
 
-boost::optional<QnScheduleSync::ChunkKeyVector> 
+boost::optional<QnScheduleSync::ChunkKeyVector>
 QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
 {
     ChunkKeyVector ret;
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true)) 
-    {       
+    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true))
+    {
         Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
         ChunkKey tmp;
@@ -156,7 +156,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
             }
         }
     }
-    
+
     if (ret.empty())
         return boost::none;
 
@@ -166,39 +166,39 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
 QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 {
     auto fromCatalog = qnNormalStorageMan->getFileCatalog(
-        chunkKey.cameraID,
+        chunkKey.cameraId,
         chunkKey.catalog
     );
     if (!fromCatalog)
         return CopyError::GetCatalogError;
 
     auto toCatalog = qnBackupStorageMan->getFileCatalog(
-        chunkKey.cameraID,
+        chunkKey.cameraId,
         chunkKey.catalog
     );
     if (!toCatalog)
         return CopyError::GetCatalogError;
 
-    if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
+    if (toCatalog->lastChunkStartTime() < chunkKey.chunk.startTimeMs) {
         {   // update sync data
             QnMutexLocker lk(&m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
             NX_ASSERT(syncDataIt != m_syncData.cend());
             auto catalogSize = fromCatalog->size();
             int curFileIndex = fromCatalog->findFileIndex(
-                chunkKey.chunk.startTimeMs, 
+                chunkKey.chunk.startTimeMs,
                 DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
             );
             syncDataIt->second.currentIndex = curFileIndex;
             syncDataIt->second.totalChunks = (int) catalogSize - syncDataIt->second.startIndex;
         }
 
-        QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);            
+        QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);
         auto fromStorage = QnStorageManager::getStorageByUrl(
-            fromFileFullName, 
+            fromFileFullName,
             QnServer::StoragePool::Normal
         );
-        
+
         if (!fromStorage)
             return CopyError::FromStorageError;
 
@@ -209,10 +209,10 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             )
         );
 
-        if (!fromFile) 
-        {   // This means that source storage is not available or 
+        if (!fromFile)
+        {   // This means that source storage is not available or
             // source file's been removed by external force.
-            if (fromStorage->initOrUpdate())
+            if (fromStorage->initOrUpdate() == Qn::StorageInit_Ok)
             {   // File's gone. Log this and skip this file.
                 NX_LOG(
                     lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
@@ -279,7 +279,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             NX_ASSERT(bitrate > 0);
             qint64 fileSize = fromFile->size();
             const qint64 timeToWrite = (fileSize / bitrate) * 1000;
-                            
+
             const qint64 CHUNK_SIZE = 4096;
             const qint64 chunksInFile = fileSize / CHUNK_SIZE;
             const qint64 timeOnChunk = timeToWrite / chunksInFile;
@@ -351,9 +351,9 @@ void QnScheduleSync::addSyncDataKey(
         return;
 
     ChunkKey tmp = getOldestChunk(
-        cameraId, 
-        quality, 
-        catalog->getLastSyncTime(), 
+        cameraId,
+        quality,
+        catalog->lastChunkStartTime(),
         &syncData
     );
     m_syncData.emplace(tmp, syncData);
@@ -361,10 +361,10 @@ void QnScheduleSync::addSyncDataKey(
 
 void QnScheduleSync::initSyncData()
 {
-    for (const QnVirtualCameraResourcePtr &camera : 
-         qnResPool->getAllCameras(QnResourcePtr(), true)) 
-    {       
-        Qn::CameraBackupQualities cameraBackupQualities = 
+    for (const QnVirtualCameraResourcePtr &camera :
+         qnResPool->getAllCameras(QnResourcePtr(), true))
+    {
+        Qn::CameraBackupQualities cameraBackupQualities =
             camera->getActualBackupQualities();
 
         if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
@@ -400,7 +400,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         }
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
-            m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(), 
+            m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(),
                                       m_syncEndTimePoint);
             NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint),
                    cl_logDEBUG2);
@@ -433,7 +433,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         if (needStop) {
             if (needMoveOnCode == SyncCode::OutOfTime) {
                 return QnBusiness::BackupEndOfPeriod;
-            } else if (needMoveOnCode == SyncCode::WrongBackupType || 
+            } else if (needMoveOnCode == SyncCode::WrongBackupType ||
                        needMoveOnCode == SyncCode::Interrupted) {
                 return QnBusiness::BackupCancelled;
             }
@@ -444,17 +444,17 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     return QnBusiness::BackupDone;
 }
 
-void QnScheduleSync::stop() 
-{ 
+void QnScheduleSync::stop()
+{
     m_backupSyncOn  = false;
     m_forced        = false;
     m_syncing       = false;
     m_interrupted   = true;
-   
+
     wait();
 }
 
-int QnScheduleSync::state() const 
+int QnScheduleSync::state() const
 {
     int result = 0;
     result |= m_backupSyncOn ? Started : Idle;
@@ -479,7 +479,7 @@ int QnScheduleSync::forceStart()
         return Idle;
     if (m_forced)
         return Forced;
-    
+
     m_forced = true;
     m_interrupted = false;
     return Ok;
@@ -501,7 +501,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
         {
             return ac + p.second.totalChunks;
         }
-    ); 
+    );
     int processedChunks = std::accumulate(
         m_syncData.cbegin(),
         m_syncData.cend(),
@@ -510,8 +510,8 @@ QnBackupStatusData QnScheduleSync::getStatus() const
         {
             return ac + p.second.currentIndex - p.second.startIndex;
         }
-    ); 
-    ret.progress = (double) processedChunks / 
+    );
+    ret.progress = (double) processedChunks /
                     (double) (totalChunks == 0 ? 1 : totalChunks);
     return ret;
 }
@@ -534,7 +534,7 @@ void QnScheduleSync::renewSchedule()
 
 void QnScheduleSync::run()
 {
-    static const auto 
+    static const auto
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
     m_backupSyncOn = true;
 
@@ -563,13 +563,13 @@ void QnScheduleSync::run()
             if (m_schedule.backupDaysOfTheWeek == ec2::backup::Never)
                 return SyncCode::WrongBackupType;
 
-            QDateTime now = qnSyncTime->currentDateTime();                        
+            QDateTime now = qnSyncTime->currentDateTime();
             const Qt::DayOfWeek today = static_cast<Qt::DayOfWeek>(now.date().dayOfWeek());
 
-            ec2::backup::DaysOfWeek allowedDays = 
+            ec2::backup::DaysOfWeek allowedDays =
                 static_cast<ec2::backup::DaysOfWeek>(m_schedule.backupDaysOfTheWeek);
-                    
-            if (m_curDow == ec2::backup::Never || ec2::backup::fromQtDOW(today) != m_curDow) { 
+
+            if (m_curDow == ec2::backup::Never || ec2::backup::fromQtDOW(today) != m_curDow) {
                 m_curDow = ec2::backup::fromQtDOW(today);
                 m_interrupted = false; // new day - new life
             }
@@ -577,17 +577,17 @@ void QnScheduleSync::run()
             if (m_interrupted)
                 return SyncCode::Interrupted;
 
-            if (allowedDays.testFlag(ec2::backup::fromQtDOW(today))) 
+            if (allowedDays.testFlag(ec2::backup::fromQtDOW(today)))
             {
                 const auto curTime = now.time();
-                if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec* 1000 && 
+                if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec* 1000 &&
                     m_schedule.backupDurationSec == -1) // sync without end time
                 {
                     return SyncCode::Ok;
                 }
 
                 if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000 &&
-                    curTime.msecsSinceStartOfDay() < m_schedule.backupStartSec * 1000 + 
+                    curTime.msecsSinceStartOfDay() < m_schedule.backupStartSec * 1000 +
                                                         m_schedule.backupDurationSec * 1000) // 'normal' schedule sync
                 {
                     return SyncCode::Ok;
@@ -602,13 +602,13 @@ void QnScheduleSync::run()
             if (m_forced)
                 m_failReported = false;
 
-            while (true) 
+            while (true)
             {
                 bool hasRebuildingStorages = qnNormalStorageMan->hasRebuildingStorages();
-                if (hasRebuildingStorages) 
+                if (hasRebuildingStorages)
                 {
                     NX_LOG(
-                        lit("[Backup] Can't start because some of the source storages are being rebuilded."), 
+                        lit("[Backup] Can't start because some of the source storages are being rebuilded."),
                         cl_logDEBUG1
                     );
                 }
@@ -630,27 +630,27 @@ void QnScheduleSync::run()
             m_forced = false;
             m_syncing = false;
 
-            bool backupFailed = result != QnBusiness::BackupDone && 
-                                result != QnBusiness::BackupCancelled && 
-                                result != QnBusiness::BackupEndOfPeriod;  
+            bool backupFailed = result != QnBusiness::BackupDone &&
+                                result != QnBusiness::BackupCancelled &&
+                                result != QnBusiness::BackupEndOfPeriod;
 
             if (backupFailed && !m_failReported) {
                 emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = true;
             } else if (!backupFailed) {
                 emit backupFinished(syncEndTimePointLocal, result);
-                m_failReported = false; 
+                m_failReported = false;
             }
         }
     }
 }
 
 bool operator < (
-    const QnScheduleSync::ChunkKey &key1, 
+    const QnScheduleSync::ChunkKey &key1,
     const QnScheduleSync::ChunkKey &key2
 )
 {
-    return key1.cameraID < key2.cameraID ?
-           true : key1.cameraID > key2.cameraID ?
+    return key1.cameraId < key2.cameraId ?
+           true : key1.cameraId > key2.cameraId ?
                   false : key1.catalog < key2.catalog;
 }

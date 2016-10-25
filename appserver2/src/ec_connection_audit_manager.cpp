@@ -24,7 +24,7 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
         for (const auto& value: params)
-            auditRecord.resources.push_back(value.cameraID);
+            auditRecord.resources.push_back(value.cameraId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -32,7 +32,7 @@ namespace ec2
     {
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
-        auditRecord.resources.push_back(params.cameraID);
+        auditRecord.resources.push_back(params.cameraId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -40,7 +40,7 @@ namespace ec2
     {
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-        auditRecord.resources.push_back(params.serverID);
+        auditRecord.resources.push_back(params.serverId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -49,7 +49,7 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         for (const auto& value: params)
-            auditRecord.resources.push_back(value.serverID);
+            auditRecord.resources.push_back(value.serverId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -132,7 +132,7 @@ namespace ec2
                 }
                 break;
             }
-            case ApiCommand::removeBusinessRule:
+            case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
                 auto msgProc = QnCommonMessageProcessor::instance();

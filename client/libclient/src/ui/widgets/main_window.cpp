@@ -51,11 +51,11 @@
 #include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
 #include <ui/workbench/handlers/workbench_cloud_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
+#include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
-#include <ui/workbench/watchers/workbench_system_name_watcher.h>
 #include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/watchers/workbench_server_port_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
@@ -82,7 +82,6 @@
 #include <ui/style/globals.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -237,7 +236,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
-    context->instance<QnWorkbenchSystemNameWatcher>();
     context->instance<QnWorkbenchServerAddressWatcher>();
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
@@ -246,6 +244,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
+    context->instance<QnWorkbenchScreenRecordingHandler>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -290,6 +289,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
     addAction(action(QnActions::SystemAdministrationAction));
+    if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))
+        addAction(screenRecordingAction);
 
     connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(QnActions::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
@@ -329,9 +330,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #else
     setOptions(TitleBarDraggable);
 #endif
-
-    /* Open single tab. */
-    action(QnActions::OpenNewTabAction)->trigger();
 
 #ifdef Q_OS_MACX
     //initialize system-wide menu
@@ -675,6 +673,13 @@ void QnMainWindow::updateDwmState() {
 // -------------------------------------------------------------------------- //
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
+
+    if ((event->type() == QEvent::WindowActivate) && isWelcomeScreenVisible())
+    {
+        // Welcome screen looses focus after window deactivation. We restore it here.
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->forceActiveFocus();
+    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);

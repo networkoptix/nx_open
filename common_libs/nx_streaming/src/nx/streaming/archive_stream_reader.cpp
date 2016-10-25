@@ -606,7 +606,7 @@ begin_label:
     }
 
 
-    if (videoData) // in case of video packet
+    if (videoData || m_eof) // in case of video packet or EOF
     {
         if (reverseMode && !delegateForNegativeSpeed)
         {
@@ -617,22 +617,24 @@ begin_label:
 
 
             FrameTypeExtractor::FrameType frameType = FrameTypeExtractor::UnknownFrameType;
-            if (videoData->context)
+            bool isKeyFrame = false;
+            if (videoData)
             {
-                if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
+                if (videoData->context)
                 {
-                    delete m_frameTypeExtractor;
-                    m_frameTypeExtractor = new FrameTypeExtractor(videoData->context);
+                    if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
+                    {
+                        delete m_frameTypeExtractor;
+                        m_frameTypeExtractor = new FrameTypeExtractor(videoData->context);
+                    }
                 }
 
-                frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), static_cast<int>(videoData->dataSize()));
-            }
-            bool isKeyFrame;
+                frameType = m_frameTypeExtractor->getFrameType((const quint8*)videoData->data(), static_cast<int>(videoData->dataSize()));
 
-            if (frameType != FrameTypeExtractor::UnknownFrameType)
-                isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
-            else {
-                isKeyFrame =  m_currentData->flags  & AV_PKT_FLAG_KEY;
+                if (frameType != FrameTypeExtractor::UnknownFrameType)
+                    isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
+                else
+                    isKeyFrame = m_currentData->flags  & AV_PKT_FLAG_KEY;
             }
 
             if (m_eof || (m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime))
@@ -650,7 +652,7 @@ begin_label:
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
-                    internalJumpTo(qnSyncTime->currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP);
+                    internalJumpTo(qnSyncTime->currentMSecsSinceEpoch() * 1000 - BACKWARD_SEEK_STEP);
                     m_afterBOFCounter = 0;
                     goto begin_label;
                 }
@@ -663,20 +665,23 @@ begin_label:
             }
 
             // multisensor cameras support
-            int ch = videoData->channelNumber;
-            if (ch > 0 && !m_rewSecondaryStarted[ch])
+            if (videoData)
             {
-                if (isKeyFrame) {
-                    videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-                    m_rewSecondaryStarted[ch] = true;
+                int ch = videoData->channelNumber;
+                if (ch > 0 && !m_rewSecondaryStarted[ch])
+                {
+                    if (isKeyFrame) {
+                        videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+                        m_rewSecondaryStarted[ch] = true;
+                    }
+                    else
+                        goto begin_label; // skip
                 }
-                else
-                    goto begin_label; // skip
             }
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
-                if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime)
+                if (videoData && m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime)
                 {
                     m_bottomIFrameTime = m_currentTime;
                     videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
@@ -691,10 +696,10 @@ begin_label:
                         {
                             if (m_delegate->endTime() != DATETIME_NOW) {
                                 m_topIFrameTime = m_delegate->endTime();
-                                seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
+                                m_bottomIFrameTime = seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
                             }
                             else {
-                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
                                 seekTime = m_topIFrameTime - LIVE_SEEK_OFFSET;
                             }
                         }
@@ -707,12 +712,12 @@ begin_label:
                     {
                         // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
                         // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
-                        qint64 ct = m_currentTime != DATETIME_NOW ? m_currentTime-BACKWARD_SEEK_STEP : m_currentTime;
+                        qint64 ct = m_currentTime != DATETIME_NOW ? m_currentTime - BACKWARD_SEEK_STEP : m_currentTime;
                         seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : ct);
                         if (seekTime != DATETIME_NOW)
                             seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
                         else
-                            seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                            seekTime = qnSyncTime->currentMSecsSinceEpoch() * 1000 - BACKWARD_SEEK_STEP;
                     }
 
                     if (m_currentTime != seekTime) {
@@ -738,9 +743,11 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-        }
+        } // negative speed
+    } // videoData || eof
 
-
+    if (videoData) // in case of video packet
+    {
         if (m_skipFramesToTime)
         {
             if (!m_nextData)

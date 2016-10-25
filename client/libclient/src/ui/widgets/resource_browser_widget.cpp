@@ -233,8 +233,23 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
     connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(forceUpdateFilter()));
 
-    connect(ui->resourceTreeWidget, SIGNAL(activated(const QnResourcePtr&)), this, SIGNAL(activated(const QnResourcePtr&)));
-    connect(ui->searchTreeWidget, SIGNAL(activated(const QnResourcePtr&)), this, SIGNAL(activated(const QnResourcePtr&)));
+    auto dropResource =
+        [this](const QnResourcePtr& resource)
+        {
+            // handle resources that should not be dropped on the scene
+            if (!resource
+                || resource->hasFlags(Qn::user)
+                || resource->hasFlags(Qn::server)
+                )
+            {
+                return;
+            }
+
+            menu()->trigger(QnActions::DropResourcesAction, resource);
+        };
+
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
+    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SIGNAL(selectionChanged()));
@@ -441,8 +456,9 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const
             break;
             case Qn::ResourceNode:
             case Qn::SharedLayoutNode:
-            case Qn::AccessibleResourceNode:
+            case Qn::SharedResourceNode:
             case Qn::EdgeNode:
+            case Qn::CurrentUserNode:
             {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if (resource && !result.contains(resource))
@@ -626,8 +642,8 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
         case Qn::LayoutsNode:
             user = context()->user();
             break;
-        case Qn::AccessibleResourcesNode:
-        case Qn::AccessibleLayoutsNode:
+        case Qn::SharedResourcesNode:
+        case Qn::SharedLayoutsNode:
             user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
             roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
             break;

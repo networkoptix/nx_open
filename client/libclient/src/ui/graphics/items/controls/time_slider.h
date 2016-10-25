@@ -130,6 +130,8 @@ public:
 
     virtual ~QnTimeSlider();
 
+    void invalidateWindow();
+
     int lineCount() const;
     void setLineCount(int lineCount);
 
@@ -208,6 +210,9 @@ public:
 
     const QnTimeSliderColors& colors() const;
     void setColors(const QnTimeSliderColors& colors);
+
+    bool isTooltipVisible() const;
+    void setTooltipVisible(bool visible);
 
     void setLastMinuteIndicatorVisible(int line, bool visible);
     bool isLastMinuteIndicatorVisible(int line) const;
@@ -365,7 +370,7 @@ private:
     int findTopLevelStepIndex() const;
 
     void updatePixmapCache();
-    void updateToolTipVisibility();
+    void updateToolTipVisibilityInternal(bool animated);
     void updateToolTipText();
     void updateSteps();
     void updateTickmarkTextSteps();
@@ -457,6 +462,7 @@ private:
     QRectF m_thumbnailsPaintRect;
     qint64 m_lastHoverThumbnail;
     bool m_thumbnailsVisible;
+    bool m_tooltipVisible;
 
     qreal m_rulerHeight;
 

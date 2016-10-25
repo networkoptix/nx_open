@@ -30,9 +30,13 @@ protected:
     virtual void doStart() override;
 
 private:
-    bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
+    bool isUpdateNeed(
+        const QnSoftwareVersion& version,
+        const QnSoftwareVersion& updateVersion) const;
 
-    void checkUpdateCoverage();
+    void checkUpdate();
+    bool checkCloudHost();
+    QnCheckForUpdateResult::Value checkUpdateCoverage();
 
     void checkBuildOnline();
     void checkOnlineUpdates();
@@ -70,6 +74,7 @@ private:
     bool m_clientRequiresInstaller;
 
     QUrl m_releaseNotesUrl;
+    QString m_cloudHost;
 
     QSet<QnAsyncHttpClientReply*> m_runningRequests;
 };

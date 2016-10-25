@@ -34,6 +34,9 @@ public:
         ec2::ErrorCode errorCode);
 
 private:
+    static bool getInstalledVersions(QList<QnSoftwareVersion>* versions);
+    static Qn::ConnectionResult showApplauncherError(QWidget* parentWidget, const QString& details);
+
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,
         QWidget* parentWidget);
@@ -45,5 +48,7 @@ private:
         UnableConnect
     };
 
-    static QString strings(ErrorStrings id);
+    static QString getErrorString(ErrorStrings id);
+    static QString getErrorDescription(
+        Qn::ConnectionResult result, const QnConnectionInfo& connectionInfo);
 };

@@ -6,8 +6,6 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <crash_reporter.h>
 
-#include <client/client_connection_status.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
@@ -21,6 +19,28 @@ class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchC
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
+    /** Logical state - what user should see. */
+    enum class LogicalState
+    {
+        disconnected,           /*< Client is disconnected. Initial state. */
+        testing,                /*< Testing connection to some system. */
+        connecting,             /*< Trying to connect to some system. */
+        reconnecting,           /*< Reconnecting to the current system. */
+        connecting_to_target,   /*< Connecting to the predefined server (New Window, Link). */
+        installing_updates,     /*< Installing updates to the server. */
+        connected               /*< Connected and ready to work. */
+    };
+
+    /** Internal state. What is under the hood. */
+    enum class PhysicalState
+    {
+        disconnected,           /*< Disconnected. */
+        testing,                /*< Know the server url, waiting for QnConnectionInfo. */
+        waiting_peer,           /*< Connection established, waiting for peerFound. */
+        waiting_resources,      /*< Peer found, waiting for resources. */
+        connected               /*< Connected and ready to work. */
+    };
+
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
 
@@ -29,21 +49,18 @@ public:
 
     struct ConnectionSettings
     {
+        bool isConnectionToCloud;
         bool storePassword;
         bool autoLogin;
-        bool forceRemoveOldConnection;
-        QnRaiiGuardPtr completionWatcher;
 
         static ConnectionSettingsPtr create(
+            bool isConnectionToCloud,
             bool storePassword,
-            bool autoLogin,
-            bool forceRemoveOldConnection,
-            const QnRaiiGuardPtr& completionWatcher);
+            bool autoLogin);
     };
 
 private:
     void showLoginDialog();
-    void showWelcomeScreen();
 
     bool tryToRestoreConnection();
 
@@ -51,19 +68,26 @@ private:
     void clearConnection();
 
     /// @brief Connects to server and stores successful connection data
-    /// according to specified settings. If no settings are specified no
-    /// connection data will be stored.
-    void connectToServer(
-        const QUrl &url,
-        const ConnectionSettingsPtr &storeSettings);
+    /// according to specified settings.
+    void testConnectionToServer(
+        const QUrl& url,
+        const ConnectionSettingsPtr& storeSettings);
 
-    bool disconnectFromServer(bool force);
+    void connectToServer(const QUrl& url);
+
+    bool disconnectFromServer(bool force, bool isErrorReason = false);
+
+    void handleTestConnectionReply(
+        int handle,
+        const QUrl& url,
+        ec2::ErrorCode errorCode,
+        const QnConnectionInfo& connectionInfo,
+        const ConnectionSettingsPtr& storeSettings);
 
     void handleConnectReply(
         int handle,
         ec2::ErrorCode errorCode,
-        ec2::AbstractECConnectionPtr connection,
-        const ConnectionSettingsPtr &storeSettings);
+        ec2::AbstractECConnectionPtr connection);
 
     void processReconnectingReply(
         Qn::ConnectionResult status,
@@ -73,6 +97,7 @@ private:
         ec2::AbstractECConnectionPtr connection);
 
     void storeConnectionRecord(
+        const QUrl& url,
         const QnConnectionInfo& info,
         const ConnectionSettingsPtr& storeSettings);
 
@@ -80,9 +105,18 @@ private:
 
     void stopReconnecting();
 
+    void setState(LogicalState logicalValue, PhysicalState physicalValue);
+    void setLogicalState(LogicalState value);
+    void setPhysicalState(PhysicalState value);
+    void handleStateChanged(LogicalState logicalValue, PhysicalState physicalValue);
+
+signals:
+    void stateChanged(LogicalState logicalValue, PhysicalState physicalValue);
+
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();
+    void at_messageProcessor_initialResourcesReceived();
 
     void at_connectAction_triggered();
     void at_reconnectAction_triggered();
@@ -90,7 +124,8 @@ private:
 
 private:
     int m_connectingHandle;
-    QnClientConnectionStatus m_state;
+    LogicalState m_logicalState;
+    PhysicalState m_physicalState;
 
     /** Flag that we should handle new connection. */
     bool m_warnMessagesDisplayed;

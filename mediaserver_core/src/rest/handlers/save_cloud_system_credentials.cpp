@@ -5,12 +5,16 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
 #include <utils/common/sync_call.h>
+
+#include <nx_ec/data/api_cloud_system_data.h>
 #include <nx/fusion/model_functions.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
@@ -44,6 +48,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     const QnRestConnectionProcessor* owner)
 {
     using namespace nx::cdb;
+    using namespace nx::settings_names;
 
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
@@ -56,7 +61,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudSystemID));
+            QnJsonRestResult::MissingParameter, kNameCloudSystemId));
         return nx_http::StatusCode::ok;
     }
 
@@ -64,7 +69,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudAuthKey"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAuthKey));
+            QnJsonRestResult::MissingParameter, kNameCloudAuthKey));
         return nx_http::StatusCode::ok;
     }
 
@@ -72,11 +77,11 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudAccountName"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAccountName));
+            QnJsonRestResult::MissingParameter, kNameCloudAccountName));
         return nx_http::StatusCode::ok;
     }
 
-    const QString cloudSystemId = qnGlobalSettings->cloudSystemID();
+    const QString cloudSystemId = qnGlobalSettings->cloudSystemId();
     if (!cloudSystemId.isEmpty() &&
         !qnGlobalSettings->cloudAuthKey().isEmpty())
     {
@@ -98,8 +103,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         return nx_http::StatusCode::internalServerError;
     }
 
-
-    qnGlobalSettings->setCloudSystemID(data.cloudSystemID);
+    qnGlobalSettings->setCloudSystemId(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
     qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
     if (!qnGlobalSettings->synchronizeNowSync())
@@ -117,18 +121,23 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //crash can result in unsynchronized unrecoverable state: there
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
-    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
-        (std::function<void(api::ResultCode, api::NonceData)>);
+
+    ec2::ApiCloudSystemData opaque;
+    opaque.localSystemId = qnGlobalSettings->localSystemId();
+
+    api::SystemAttributesUpdate systemAttributesUpdate;
+    systemAttributesUpdate.systemID = data.cloudSystemID.toStdString();
+    systemAttributesUpdate.opaque = QJson::serialized(opaque).toStdString();
 
     auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);
     api::ResultCode cdbResultCode = api::ResultCode::ok;
-    api::NonceData nonceData;
-    std::tie(cdbResultCode, nonceData) =
-        makeSyncCall<api::ResultCode, api::NonceData>(
+    std::tie(cdbResultCode) =
+        makeSyncCall<api::ResultCode>(
             std::bind(
-                static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
-                cloudConnection->authProvider(),
+                &api::SystemManager::update,
+                cloudConnection->systemManager(),
+                std::move(systemAttributesUpdate),
                 std::placeholders::_1));
 
     if (cdbResultCode != api::ResultCode::ok)

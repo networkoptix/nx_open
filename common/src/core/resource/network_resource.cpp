@@ -15,6 +15,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
+#include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
 
@@ -96,14 +97,20 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-                lit("%1:%2").arg(auth.user()).arg(auth.password()));
+    setProperty(
+        Qn::CAMERA_CREDENTIALS_PARAM_NAME, 
+        nx::utils::encodeHexStringFromStringAES128CBC(
+            lit("%1:%2").arg(auth.user()) 
+                        .arg(auth.password())));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
-    setProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-                lit("%1:%2").arg(auth.user()).arg(auth.password()));
+    setProperty(
+        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
+        nx::utils::encodeHexStringFromStringAES128CBC(
+            lit("%1:%2").arg(auth.user()) 
+                        .arg(auth.password()))); 
 }
 
 QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
@@ -113,6 +120,9 @@ QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, cons
     QString value = getResourceProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
     if (value.isNull())
         value = getResourceProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+
+    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
+
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if (credentialsList.size() >= 1)
@@ -127,6 +137,8 @@ QAuthenticator QnNetworkResource::getAuth() const
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;

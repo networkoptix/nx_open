@@ -21,10 +21,11 @@ const char* kSystemBindPath = "/cdb/system/bind";
 const char* kSystemUnbindPath = "/cdb/system/unbind";
 const char* kSystemGetPath = "/cdb/system/get";
 const char* kSystemSharePath = "/cdb/system/share";
-const char* kSystemSetSystemUserListPath = "/cdb/system/set_system_user_list";
 const char* kSystemGetCloudUsersPath = "/cdb/system/get_cloud_users";
 const char* kSystemGetAccessRoleListPath = "/cdb/system/get_access_role_list";
-const char* kSystemUpdateSystemNamePath = "/cdb/system/update_system_name";
+const char* kSystemRenamePath = "/cdb/system/rename";
+const char* kSystemUpdatePath = "/cdb/system/update";
+const char* kSystemRecordUserSessionStartPath = "/cdb/system/record_user_session_start";
 
 const char* kAuthGetNoncePath = "/cdb/auth/get_nonce";
 const char* kAuthGetAuthenticationPath = "/cdb/auth/get_authentication";
@@ -32,6 +33,12 @@ const char* kAuthGetAuthenticationPath = "/cdb/auth/get_authentication";
 const char* kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
 
 const char* kPingPath = "/cdb/ping";
+
+const char* kEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
+const char* kPushEc2TransactionPath = "/ec2/forward_events/";
+
+const char* kMaintenanceGetVmsConnections = "/cdb/maintenance/get_vms_connections";
+const char* kMaintenanceGetTransactionLog = "/cdb/maintenance/get_transaction_log";
 
 }   //cdb
 }   //nx

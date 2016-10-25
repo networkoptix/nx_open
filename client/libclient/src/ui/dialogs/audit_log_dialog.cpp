@@ -89,6 +89,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     setTabShape(ui->mainTabWidget->tabBar(), style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), style::TabShape::Compact);
 
+    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::updateTabWidgetSize);
+
     /* Setup details label and its aligning by detailsTabWidget: */
     QnSingleEventSignalizer* resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
@@ -111,17 +113,17 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     setupSessionsGrid();
     setupCamerasGrid();
     setupDetailsGrid();
+    reset();
 
     at_updateCheckboxes();
 
     connect(m_sessionModel, &QnAuditLogModel::colorsChanged,    this, &QnAuditLogDialog::at_updateCheckboxes);
     connect(ui->selectAllCheckBox, &QCheckBox::stateChanged,    this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
 
-    QDate dt = QDateTime::currentDateTime().date();
-    ui->dateEditFrom->setDate(dt);
-    ui->dateEditTo->setDate(dt);
+    connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
     ui->loadingProgressBar->hide();
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
@@ -129,15 +131,15 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     connect(m_clipboardAction,  &QAction::triggered,            this, &QnAuditLogDialog::at_clipboardAction_triggered);
     connect(m_exportAction,     &QAction::triggered,            this, &QnAuditLogDialog::at_exportAction_triggered);
 
-    connect(ui->dateEditFrom,   &QDateEdit::dateChanged,        this, &QnAuditLogDialog::updateData);
-    connect(ui->dateEditTo,     &QDateEdit::dateChanged,        this, &QnAuditLogDialog::updateData);
     connect(ui->refreshButton,  &QAbstractButton::clicked,      this, &QnAuditLogDialog::updateData);
-    connect(ui->filterLineEdit, &QLineEdit::textChanged,        this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->clearFilterButton, &QPushButton::clicked, this,
+        &QnAuditLogDialog::reset);
 
-    ui->mainGridLayout->activate();
+    enum { kUpdateFilterDelayMs = 200 };
+    ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    ui->filterLineEdit->setPlaceholderText(tr("Search"));
-    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    connect(ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
@@ -202,9 +204,6 @@ void QnAuditLogDialog::setupCamerasGrid()
     ui->gridCameras->setModel(m_camerasModel);
 
     setupGridCommon(ui->gridCameras, true);
-
-    ui->gridCameras->horizontalHeader()->setSectionResizeMode(columns.indexOf(QnAuditLogModel::CameraNameColumn), QHeaderView::Stretch);
-    ui->gridCameras->horizontalHeader()->setSectionResizeMode(columns.indexOf(QnAuditLogModel::UserActivityColumn), QHeaderView::Stretch);
 }
 
 void QnAuditLogDialog::setupDetailsGrid()
@@ -515,6 +514,8 @@ void QnAuditLogDialog::at_updateDetailModel()
 
     ui->gridDetails->setUpdatesEnabled(true);
     ui->gridDetails->update();
+
+    updateTabWidgetSize();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()
@@ -727,6 +728,21 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
         showNormal();
 }
 
+void QnAuditLogDialog::reset()
+{
+    disableUpdateData();
+    ui->filterLineEdit->clear();
+    auto now = QDateTime::currentMSecsSinceEpoch();
+    ui->dateRangeWidget->setRange(now, now);
+    enableUpdateData();
+}
+
+void QnAuditLogDialog::updateTabWidgetSize()
+{
+    auto widget = ui->mainTabWidget->currentWidget();
+    ui->mainTabWidget->setFixedWidth(widget->sizeHint().width());
+}
+
 void QnAuditLogDialog::updateData()
 {
     if (m_updateDisabled)
@@ -736,8 +752,8 @@ void QnAuditLogDialog::updateData()
     }
     m_updateDisabled = true;
 
-    query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(),
-          ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch());
+    query(ui->dateRangeWidget->startTimeMs(),
+          ui->dateRangeWidget->endTimeMs());
 
     // update UI
 
@@ -754,9 +770,6 @@ void QnAuditLogDialog::updateData()
         requestFinished(); // just clear grid
         ui->stackedWidget->setCurrentWidget(ui->warnPage);
     }
-
-    ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date().addMonths(1)); // 1 month forward should cover all local timezones diffs.
 
     m_updateDisabled = false;
     m_dirty = false;
@@ -869,15 +882,6 @@ void QnAuditLogDialog::requestFinished()
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     */
     ui->loadingProgressBar->hide();
-}
-
-void QnAuditLogDialog::setDateRange(const QDate& from, const QDate& to)
-{
-    ui->dateEditFrom->setDateRange(QDate(2000,1,1), to);
-    ui->dateEditTo->setDateRange(from, QDateTime::currentDateTime().date());
-
-    ui->dateEditTo->setDate(to);
-    ui->dateEditFrom->setDate(from);
 }
 
 void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)

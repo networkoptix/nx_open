@@ -40,6 +40,9 @@ namespace style
         static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
         static const int kDefaultIconSize;              /**< Default size of UI icon */
         static const int kToolTipHeight;                /**< Height of a single line tooltip */
+        static const int kMenuButtonIndicatorMargin;    /**< Margin between menu button text and dropdown indicator */
+        static const int kTextButtonIconMargin;         /**< Margin between text button icon and text */
+        static const int kPushButtonIconMargin;         /**< Margin around push button icon */
     };
 
     class Hints
@@ -61,8 +64,10 @@ namespace style
         static const char* kSuppressHoverPropery;   /**< Name of a property to suppress hovering of itemview items (bool). */
         static const char* kSideIndentation;        /**< Name of a property to hold overridden leftmost and rightmost itemview item margins (QnIndentation). */
         static const char* kCheckBoxAsButton;       /**< Name of a property to change checkbox appearance to switch button (bool). */
-        static const char* kButtonMarginProperty;   /**< Name of a property to hold a custom push button margin (int). Buttons with this property are left-aligned. */
+        static const char* kMenuAsDropdown;         /**< Name of a property to change menu appearance to dropdown (bool). */
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
+        static const char* kItemViewRadioButtons;   /**< Name of a property to change item view checkboxes to radio buttons (bool). */
+        static const char* kPushButtonMargin;       /**< Name of a property to hold custom push button margin (int). Buttons with custom margin are left-aligned. */
     };
 
     /** Flags of additional slider features */

@@ -48,8 +48,7 @@
 
 namespace
 {
-    static const int kColumnSpacing = 8;
-    static const int kMinColWidth = 60;
+    static const int kMinimumColumnWidth = 80;
 
     class StoragesSortModel : public QSortFilterProxyModel
     {
@@ -96,6 +95,9 @@ namespace
                 result.rwidth() += style::Metrics::kArrowSize + style::Metrics::kStandardPadding;
             }
 
+            if (index.column() != QnStorageListModel::CheckBoxColumn)
+                result.setWidth(qMax(result.width(), kMinimumColumnWidth));
+
             return result;
         }
 
@@ -113,7 +115,9 @@ namespace
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
 
-            if (index.column() == QnStorageListModel::StoragePoolColumn && !editableColumn)
+            auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
+
+            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
                 opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
 
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
@@ -228,22 +232,20 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->backupTimeLabel->setForegroundRole(QPalette::Light);
     ui->backupScheduleLabel->setForegroundRole(QPalette::Light);
+    ui->realtimeBackupStatusLabel->setForegroundRole(QPalette::Light);
 
     ui->cannotStartBackupLabel->setVisible(false);
     ui->backupStartButton->setVisible(false);
 
     ui->realtimeBackupControlButton->hide(); /* Unused in the current version. */
-
     ui->estimatedTimeLabel->hide(); /* Unused in the current version. */
-
-    setWarningStyle(ui->cannotStartBackupLabel);
-    setWarningStyle(ui->realtimeBackupWarningLabel);
 
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
 
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
+    m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
     m_storagePoolMenu->addAction(tr("Main"))->setData(false);
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
@@ -251,28 +253,12 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_StoragesBackup_Help);
 
     auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
+    hoverTracker->setAutomaticMouseCursor(true);
+
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
     ui->storageView->setItemDelegateForColumn(QnStorageListModel::CheckBoxColumn,
         new QnSwitchItemDelegate(this));
-
-    /* Cursor changes with hover: */
-    connect(hoverTracker, &QnItemViewHoverTracker::itemEnter, this,
-        [this](const QModelIndex& index)
-        {
-            bool ok;
-            auto shape = static_cast<Qt::CursorShape>(index.data(Qn::ItemMouseCursorRole).toInt(&ok));
-            if (ok)
-                ui->storageView->setCursor(shape);
-            else
-                ui->storageView->unsetCursor();
-        });
-
-    connect(hoverTracker, &QnItemViewHoverTracker::itemLeave, this,
-        [this]()
-        {
-            ui->storageView->unsetCursor();
-        });
 
     StoragesSortModel* sortModel = new StoragesSortModel(this);
     sortModel->setSourceModel(m_model.data());
@@ -487,9 +473,11 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     /* Check if somebody have added this storage right now */
     if (item.id.isNull())
     {
+        // New storages has tested and ready to add
         item.id = QnStorageResource::fillID(m_server->getId(), item.url);
         item.isBackup = !addToMain;
         item.isUsed = true;
+        item.isOnline = true;
     }
 
     m_model->addStorage(item);  // Adds or updates storage model data
@@ -696,16 +684,6 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
-    /* Make sure scheduled backup will stop in no backup storages left after 'Apply' button. */
-    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo& info)
-    {
-        return info.isBackup;
-    });
-    if (!backupStoragesExist)
-    {
-        m_backupSchedule.backupType = Qn::Backup_Manual;
-    }
-
     if (m_backupSchedule != m_server->getBackupSchedule())
     {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr& server)
@@ -796,7 +774,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (m_model->storages().empty())
+    if (m_model->storages().size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
 
     const auto isCorrectStorage = [](const QnStorageModelInfo& storage)
@@ -805,7 +783,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     };
 
     if (!any_of(m_model->storages(), isCorrectStorage))
-        return error(tr("Change \"Main\" to \"Backup\" for some of the storages above to enable backup."));
+        return error(tr("Change \"Main\" to \"Backup\" for some of the storage above to enable backup."));
 
     if (hasChanges())
         return error(tr("Apply changes to start backup."));
@@ -880,7 +858,9 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
     const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
-    return lit("%1 %2").arg(backupDateTime.date().toString()).arg(backupDateTime.time().toString(Qt::SystemLocaleLongDate));
+    return lit("%1 %2").arg(
+        backupDateTime.date().toString(Qt::DefaultLocaleLongDate)).arg(
+        backupDateTime.time().toString(Qt::DefaultLocaleShortDate));
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
@@ -1050,7 +1030,7 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
     bool canStartRebuild =
             m_server
         &&  reply.state == Qn::RebuildState_None
-        &&  !hasChanges()
+        &&  !hasStoragesChanges(m_model->storages())
         &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo& info) {
                 return info.isWritable
                     && info.isBackup != isMainPool

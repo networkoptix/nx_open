@@ -1,119 +1,106 @@
 #include "user_list_model.h"
 
+#include <core/resource_access/global_permissions_manager.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include <utils/common/app_info.h>
+
 #include <nx/utils/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject>
 {
-    Q_DECLARE_TR_FUNCTIONS(QnUserListModelPrivate);
+    Q_DECLARE_TR_FUNCTIONS(QnUserListModelPrivate)
 
     typedef Connective<QObject> base_type;
 
 public:
     QnUserListModel* model;
 
-    QnUserResourceList userList;
+    QnUserResourceList users;
     QSet<QnUserResourcePtr> checkedUsers;
+    QHash<QnUserResourcePtr, bool> enableChangedUsers;
 
     QnUserListModelPrivate(QnUserListModel* parent) :
         base_type(parent),
         model(parent)
     {
-        userList = qnResPool->getResources<QnUserResource>();
+        connect(qnResPool, &QnResourcePool::resourceAdded, this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (auto user = resource.dynamicCast<QnUserResource>())
+                    addUser(user);
+            });
 
-        connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
+        connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (auto user = resource.dynamicCast<QnUserResource>())
+                    removeUser(user);
+            });
 
-        connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
+        connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
             [this](const ec2::ApiUserGroupData& group)
             {
-                auto isUserAffected = [&group](const QnUserResourcePtr& user)
+                for (auto user : users)
                 {
-                    return user->userGroup() == group.id;
-                };
+                    if (user->userGroup() != group.id)
+                        continue;
+                    handleUserChanged(user);
+                }
+            });
 
-                auto begin = std::find_if(userList.begin(), userList.end(), isUserAffected);
-                if (begin == userList.end())
-                    return;
-
-                auto end = std::find_if(userList.rbegin(), QnUserResourceList::reverse_iterator(begin), isUserAffected).base();
-
-                QModelIndex first = model->index(begin - userList.begin(), QnUserListModel::UserRoleColumn);
-                QModelIndex last = first.sibling(first.row() + (end - begin) - 1, QnUserListModel::UserRoleColumn);
-
-                emit model->dataChanged(first, last, { Qt::DisplayRole });
-        });
-
-        for (const QnUserResourcePtr& user: userList)
-            at_resourcePool_resourceAdded(user);
+        connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this,
+            [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
+            {
+                if (subject.user())
+                    handleUserChanged(subject.user());
+            });
     }
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
     void at_resourcePool_resourceChanged(const QnResourcePtr& resource);
 
-    int userIndex(const QnUuid& id) const;
+    void handleUserChanged(const QnUserResourcePtr& user);
+
     QnUserResourcePtr user(const QModelIndex& index) const;
     QString permissionsString(const QnUserResourcePtr& user) const;
     bool isUnique(const QnUserResourcePtr& user) const;
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr& user = QnUserResourcePtr());
+
+    void resetUsers(const QnUserResourceList& value);
+    void addUser(const QnUserResourcePtr& user);
+    void removeUser(const QnUserResourcePtr& user);
+
+private:
+    void addUserInternal(const QnUserResourcePtr& user);
+    void removeUserInternal(const QnUserResourcePtr& user);
+
 };
-
-
-void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
-{
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (!user)
-        return;
-
-    connect(user, &QnUserResource::nameChanged,        this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::fullNameChanged,    this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::permissionsChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::enabledChanged,     this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-
-    if (userIndex(user->getId()) != -1)
-        return;
-
-    int row = userList.size();
-    model->beginInsertRows(QModelIndex(), row, row);
-    userList.append(user);
-    model->endInsertRows();
-}
-
-void QnUserListModelPrivate::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
-{
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (!user)
-        return;
-
-    disconnect(user, nullptr, this, nullptr);
-
-    int row = userIndex(user->getId());
-    if (row == -1)
-        return;
-
-    model->beginRemoveRows(QModelIndex(), row, row);
-    userList.removeAt(row);
-    checkedUsers.remove(user);
-    model->endRemoveRows();
-}
 
 void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
 {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if (!user)
         return;
+    handleUserChanged(user);
+}
 
-    int row = userIndex(user->getId());
+void QnUserListModelPrivate::handleUserChanged(const QnUserResourcePtr& user)
+{
+    int row = users.indexOf(user);
     if (row == -1)
         return;
 
@@ -121,25 +108,12 @@ void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr
     emit model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount - 1));
 }
 
-int QnUserListModelPrivate::userIndex(const QnUuid& id) const
-{
-    auto it = std::find_if(userList.begin(), userList.end(), [&id](const QnUserResourcePtr& user)
-    {
-        return user->getId() == id;
-    });
-
-    if (it == userList.end())
-        return -1;
-
-    return std::distance(userList.begin(), it);
-}
-
 QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex& index) const
 {
-    if (index.row() >= userList.size())
+    if (!index.isValid() || index.row() >= users.size())
         return QnUserResourcePtr();
 
-    return userList[index.row()];
+    return users[index.row()];
 }
 
 //TODO: #vkutin #common Move this function to more suitable place. Rewrite it if needed.
@@ -147,7 +121,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
 {
     QStringList permissionStrings;
 
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
+    Qn::GlobalPermissions permissions = qnGlobalPermissionsManager->globalPermissions(user);
 
     if (user->isOwner())
         return tr("Owner");
@@ -181,12 +155,12 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
 bool QnUserListModelPrivate::isUnique(const QnUserResourcePtr& user) const
 {
     QString userName = user->getName();
-    for (const QnUserResourcePtr &user1 : userList)
+    for (const QnUserResourcePtr& other : users)
     {
-        if (user1 == user)
+        if (other == user)
             continue;
 
-        if (user1->getName().compare(userName, Qt::CaseInsensitive) == 0)
+        if (other->getName().compare(userName, Qt::CaseInsensitive) == 0)
             return false;
     }
     return true;
@@ -197,7 +171,7 @@ Qt::CheckState QnUserListModelPrivate::checkState() const
     if (checkedUsers.isEmpty())
         return Qt::Unchecked;
 
-    if (checkedUsers.size() == userList.size())
+    if (checkedUsers.size() == users.size())
         return Qt::Checked;
 
     return Qt::PartiallyChecked;
@@ -208,7 +182,7 @@ void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserRes
     if (!user)
     {
         if (state == Qt::Checked)
-            checkedUsers = userList.toSet();
+            checkedUsers = users.toSet();
         else if (state == Qt::Unchecked)
             checkedUsers.clear();
     }
@@ -221,7 +195,65 @@ void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserRes
     }
 }
 
-QnUserListModel::QnUserListModel(QObject* parent) :
+void QnUserListModelPrivate::resetUsers(const QnUserResourceList& value)
+{
+    model->beginResetModel();
+    for (const auto& user: users)
+        removeUserInternal(user);
+    users = value;
+    for (const auto& user: users)
+        addUserInternal(user);
+    model->endResetModel();
+}
+
+void QnUserListModelPrivate::addUser(const QnUserResourcePtr& user)
+{
+    if (users.contains(user))
+        return;
+
+    int row = users.size();
+    model->beginInsertRows(QModelIndex(), row, row);
+    users.append(user);
+    model->endInsertRows();
+
+    addUserInternal(user);
+}
+
+void QnUserListModelPrivate::removeUser(const QnUserResourcePtr& user)
+{
+    int row = users.indexOf(user);
+    if (row >= 0)
+    {
+        model->beginRemoveRows(QModelIndex(), row, row);
+        users.removeAt(row);
+        model->endRemoveRows();
+    }
+
+    removeUserInternal(user);
+}
+
+void QnUserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
+{
+    connect(user, &QnUserResource::nameChanged, this,
+        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::fullNameChanged, this,
+        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::enabledChanged, this,
+        [this](const QnUserResourcePtr &user)
+        {
+            enableChangedUsers.remove(user);
+            handleUserChanged(user);
+        });
+}
+
+void QnUserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
+{
+    disconnect(user, nullptr, this, nullptr);
+    checkedUsers.remove(user);
+    enableChangedUsers.remove(user);
+}
+
+QnUserListModel::QnUserListModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     d(new QnUserListModelPrivate(this))
@@ -235,7 +267,7 @@ QnUserListModel::~QnUserListModel()
 int QnUserListModel::rowCount(const QModelIndex& parent) const
 {
     if (!parent.isValid())
-        return d->userList.size();
+        return d->users.size();
 
     return 0;
 }
@@ -253,7 +285,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    QnUserResourcePtr user = d->userList[index.row()];
+    QnUserResourcePtr user = d->users[index.row()];
 
     switch (role)
     {
@@ -263,7 +295,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 case LoginColumn        : return user->getName();
                 case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return qnResourceAccessManager->userRoleName(user);
+                case UserRoleColumn     : return qnUserRolesManager->userRoleName(user);
                 default                 : break;
 
             } // switch (column)
@@ -358,7 +390,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
                 return d->checkedUsers.contains(user) ? Qt::Checked : Qt::Unchecked;
 
             if (index.column() == EnabledColumn)
-                return user->isEnabled() ? Qt::Checked : Qt::Unchecked;
+                return isUserEnabled(user) ? Qt::Checked : Qt::Unchecked;
 
             break;
         }
@@ -426,14 +458,52 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
     d->setCheckState(state, user);
     if (!user)
     {
-        emit dataChanged(index(0, CheckBoxColumn), index(d->userList.size() - 1, ColumnCount - 1), roles);
+        emit dataChanged(index(0, CheckBoxColumn), index(d->users.size() - 1, ColumnCount - 1), roles);
     }
     else
     {
-        auto row = d->userIndex(user->getId());
+        auto row = d->users.indexOf(user);
         if (row >= 0)
             emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
     }
+}
+
+bool QnUserListModel::isUserEnabled(const QnUserResourcePtr& user) const
+{
+    if (!d->enableChangedUsers.contains(user))
+        return user->isEnabled();
+
+    return d->enableChangedUsers[user];
+}
+
+void QnUserListModel::setUserEnabled(const QnUserResourcePtr& user, bool enabled)
+{
+    NX_ASSERT(user->resourcePool());
+    if (!user->resourcePool())
+        return;
+
+    d->enableChangedUsers[user] = enabled;
+    d->handleUserChanged(user);
+}
+
+QnUserResourceList QnUserListModel::users() const
+{
+    return d->users;
+}
+
+void QnUserListModel::resetUsers(const QnUserResourceList& value)
+{
+    d->resetUsers(value);
+}
+
+void QnUserListModel::addUser(const QnUserResourcePtr& user)
+{
+    d->addUser(user);
+}
+
+void QnUserListModel::removeUser(const QnUserResourcePtr& user)
+{
+    d->removeUser(user);
 }
 
 bool QnUserListModel::isInteractiveColumn(int column)

@@ -10,7 +10,7 @@ namespace ec2
     class QnMiscNotificationManager : public AbstractMiscNotificationManager
     {
     public:
-        void triggerNotification(const QnTransaction<ApiSystemNameData> &transaction);
+        void triggerNotification(const QnTransaction<ApiSystemIdData> &transaction);
     };
 
     typedef std::shared_ptr<QnMiscNotificationManager> QnMiscNotificationManagerPtr;
@@ -24,16 +24,14 @@ namespace ec2
 
         virtual ~QnMiscManager();
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
-        virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) override;
+        virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) override;
 
     protected:
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) override;
+        virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-
-        QnTransaction<ApiSystemNameData> prepareTransaction(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) const;
     };
 
 } // namespace ec2

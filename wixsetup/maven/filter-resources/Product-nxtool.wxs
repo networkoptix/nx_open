@@ -42,8 +42,8 @@
         <WixVariable Id="WixUIDialogBmp" Value="nxtool\logo_493x312.bmp" />
 
         <!-- Logo -->
-        <Icon Id="icon_menu.exe" SourceFile="${root.dir}/customization/${customization}/icons/nxtool.ico"/>
-        <Icon Id="icon_desktop.exe" SourceFile="${root.dir}/customization/${customization}/icons/nxtool.ico"/>
+        <Icon Id="icon_menu.exe" SourceFile="nxtool.ico"/>
+        <Icon Id="icon_desktop.exe" SourceFile="nxtool.ico"/>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />

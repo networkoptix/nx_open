@@ -22,10 +22,11 @@ extern const char* kSystemBindPath;
 extern const char* kSystemUnbindPath;
 extern const char* kSystemGetPath;
 extern const char* kSystemSharePath;
-extern const char* kSystemSetSystemUserListPath;
 extern const char* kSystemGetCloudUsersPath;
 extern const char* kSystemGetAccessRoleListPath;
-extern const char* kSystemUpdateSystemNamePath;
+extern const char* kSystemRenamePath;
+extern const char* kSystemUpdatePath;
+extern const char* kSystemRecordUserSessionStartPath;
 
 extern const char* kAuthGetNoncePath;
 extern const char* kAuthGetAuthenticationPath;
@@ -33,6 +34,13 @@ extern const char* kAuthGetAuthenticationPath;
 extern const char* kSubscribeToSystemEventsPath;
 
 extern const char* kPingPath;
+
+extern const char* kEstablishEc2TransactionConnectionPath;
+extern const char* kPushEc2TransactionPath;
+
+/** Maintenance. */
+extern const char* kMaintenanceGetVmsConnections;
+extern const char* kMaintenanceGetTransactionLog;
 
 }   //cdb
 }   //nx

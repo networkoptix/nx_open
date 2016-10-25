@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 28, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "auth_provider.h"
 
 #include <chrono>
@@ -11,16 +6,17 @@
 
 #include <cdb/cloud_nonce.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/random.h>
+#include <nx/utils/time.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/util.h>
 
 #include "access_control/authentication_manager.h"
 #include "account_manager.h"
-#include "system_manager.h"
-#include "stree/cdb_ns.h"
+#include "temporary_account_password_manager.h"
 #include "settings.h"
-
+#include "stree/cdb_ns.h"
+#include "system_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -28,11 +24,13 @@ namespace cdb {
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
     const AccountManager& accountManager,
-    const SystemManager& systemManager)
+    const SystemManager& systemManager,
+    const TemporaryAccountPasswordManager& temporaryAccountCredentialsManager)
 :
     m_settings(settings),
     m_accountManager(accountManager),
-    m_systemManager(systemManager)
+    m_systemManager(systemManager),
+    m_temporaryAccountCredentialsManager(temporaryAccountCredentialsManager)
 {
 }
 
@@ -41,22 +39,22 @@ void AuthenticationProvider::getCdbNonce(
     const data::DataFilter& filter,
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    std::string systemID;
+    std::string systemId;
     std::string accountEmail;
-    if (!authzInfo.get(attr::authSystemID, &systemID))
+    if (!authzInfo.get(attr::authSystemID, &systemId))
     {
         if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
             return completionHandler(api::ResultCode::forbidden, api::NonceData());
-        if (!filter.get(attr::systemID, &systemID))
+        if (!filter.get(attr::systemID, &systemId))
             return completionHandler(api::ResultCode::badRequest, api::NonceData());
         const auto accessRole = m_systemManager.getAccountRightsForSystem(
-            accountEmail, systemID);
+            accountEmail, systemId);
         if (accessRole == api::SystemAccessRole::none)
             return completionHandler(api::ResultCode::forbidden, api::NonceData());
     }
 
     api::NonceData result;
-    result.nonce = api::generateCloudNonceBase(systemID);
+    result.nonce = api::generateCloudNonceBase(systemId);
     if (!accountEmail.empty())  //this is a request from portal. Generating real nonce
         result.nonce = api::generateNonce(result.nonce);
     result.validPeriod = m_settings.auth().nonceValidityPeriod;
@@ -69,58 +67,109 @@ void AuthenticationProvider::getAuthenticationResponse(
     const data::AuthRequest& authRequest,
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
-    //{random_3_bytes}base64({ timestamp }MD5(systemID:timestamp:secret_key))
-
-    std::string systemID;
-    if (!authzInfo.get(attr::authSystemID, &systemID))
+    std::string systemId;
+    if (!authzInfo.get(attr::authSystemID, &systemId))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
     if (authRequest.realm != AuthenticationManager::realm())
         return completionHandler(api::ResultCode::unknownRealm, api::AuthResponse());
 
-    //checking that nonce is valid and corresponds to the systemID
-    uint32_t timestamp = 0;
-    std::string nonceHash;
-    if (!api::parseCloudNonceBase(authRequest.nonce, &timestamp, &nonceHash))
+    if (!validateNonce(authRequest.nonce, systemId))
         return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
 
-    if (std::chrono::seconds(timestamp) + m_settings.auth().nonceValidityPeriod <
-        std::chrono::system_clock::now().time_since_epoch())
+    auto accountWithEffectivePassword = getAccountByLogin(authRequest.username);
+    if (!accountWithEffectivePassword)
+        return completionHandler(api::ResultCode::badUsername, api::AuthResponse());
+
+    // TODO: #ak: We should have used authorization rule tree here
+    if (accountWithEffectivePassword->account.statusCode != api::AccountStatus::activated)
+        return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
+    auto systemSharingData =
+        m_systemManager.getSystemSharingData(
+            accountWithEffectivePassword->account.email,
+            systemId);
+    if (!systemSharingData)
+        return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
+
+    api::AuthResponse response = 
+        prepareResponse(
+            std::move(authRequest.nonce),
+            std::move(*systemSharingData),
+            std::move(accountWithEffectivePassword->passwordHa1));
+
+    completionHandler(api::ResultCode::ok, std::move(response));
+}
+
+boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
+    AuthenticationProvider::getAccountByLogin(const std::string& login) const
+{
+    std::string passwordHa1;
+    auto account =
+        m_accountManager.findAccountByUserName(login.c_str());
+    if (account)
     {
-        return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
+        passwordHa1 = account->passwordHa1;
+    }
+    else
+    {
+        // Trying temporary credentials.
+        const auto temporaryCredentials =
+            m_temporaryAccountCredentialsManager.getCredentialsByLogin(login);
+        if (temporaryCredentials)
+        {
+            account = m_accountManager.findAccountByUserName(
+                temporaryCredentials->accountEmail);
+            passwordHa1 = temporaryCredentials->passwordHa1;
+        }
     }
 
-    const auto calculatedNonceHash = api::calcNonceHash(systemID, timestamp);
-    if (nonceHash != calculatedNonceHash)
-        return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
-
-    //checking that username corresponds to account user and requested system is shared with that user
-    //TODO #ak we should use stree here
-    const auto account = 
-        m_accountManager.findAccountByUserName(authRequest.username.c_str());
     if (!account)
-        return completionHandler(api::ResultCode::badUsername, api::AuthResponse());
-    if (account->statusCode != api::AccountStatus::activated)
-        return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
+        return boost::none;
+    return AccountWithEffectivePassword{
+        std::move(*account),
+        std::move(passwordHa1)};
+}
 
-    auto systemSharingData = 
-        m_systemManager.getSystemSharingData(account->email, systemID);
-    if (!static_cast<bool>(systemSharingData))
-        return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
+bool AuthenticationProvider::validateNonce(
+    const std::string& nonce,
+    const std::string& systemId) const
+{
+    uint32_t timestamp = 0;
+    std::string nonceHash;
+    if (!api::parseCloudNonceBase(nonce, &timestamp, &nonceHash))
+        return false;
 
+    if (std::chrono::seconds(timestamp) + m_settings.auth().nonceValidityPeriod <
+        nx::utils::timeSinceEpoch())
+    {
+        return false;
+    }
+
+    const auto calculatedNonceHash = api::calcNonceHash(systemId, timestamp);
+    if (nonceHash != calculatedNonceHash)
+        return false;
+
+    return true;
+}
+
+api::AuthResponse AuthenticationProvider::prepareResponse(
+    std::string nonce,
+    api::SystemSharingEx systemSharing,
+    const std::string& passwordHa1) const
+{
     api::AuthResponse response;
-    response.nonce = authRequest.nonce;
-    response.authenticatedAccountData = std::move(*systemSharingData);
+    response.nonce = std::move(nonce);
+    response.authenticatedAccountData = std::move(systemSharing);
     response.accessRole = response.authenticatedAccountData.accessRole;
     const auto intermediateResponse = nx_http::calcIntermediateResponse(
-        account->passwordHa1.c_str(),
-        authRequest.nonce.c_str());
+        passwordHa1.c_str(),
+        response.nonce.c_str());
     response.intermediateResponse.assign(
         intermediateResponse.constData(),
         intermediateResponse.size());
     response.validPeriod = m_settings.auth().intermediateResponseValidityPeriod;
 
-    completionHandler(api::ResultCode::ok, std::move(response));
+    return response;
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

@@ -25,9 +25,7 @@ TEST_F(Statistics, listening_peer_list)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
-
+    const auto client = clientConnection();
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
 
@@ -41,7 +39,6 @@ TEST_F(Statistics, listening_peer_list)
     ASSERT_NE(listeningPeers.systems.end(), systemIter);
     ASSERT_EQ(1, systemIter->second.peers.size());
     ASSERT_EQ(server1->serverId(), systemIter->second.peers[0].id);
-
     client->pleaseStopSync();
 }
 

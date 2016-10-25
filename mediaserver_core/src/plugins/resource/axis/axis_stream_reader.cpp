@@ -143,6 +143,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             }
 
             QList<QByteArray> lines = body.split('\n');
+            bool profileFound = false;
             for (int i = 0; i < lines.size(); ++i)
             {
                 if (lines[i].endsWith(QByteArray("Name=") + profileName))
@@ -150,7 +151,20 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                     action = "update"; // profile already exists, so update instead of add
                     QList<QByteArray> params = lines[i].split('.');
                     if (params.size() >= 2)
-                        profileNumber = params[params.size() - 2];
+                    {
+                        QByteArray token = params[params.size()-2];
+                        if (!profileFound)
+                        {
+                            action = "update"; // profile already exists, so update instead of add
+                            profileNumber = token;
+                        }
+                        else
+                        {
+                            profilesToRemove.insert( token );
+                        }
+                        profileFound = true;
+                    }
+
                 }
                 else if (lines[i].endsWith(QByteArray("Name=") + oldProfileName))
                 {

@@ -30,16 +30,17 @@
 #include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 #include <common/common_module.h>
+#include <api/global_settings.h>
 
 namespace {
+    const QString kUrlScheme = lit("rtsp");
     const QString protoVersionPropertyName = lit("protoVersion");
     const QString safeModePropertyName = lit("ecDbReadOnly");
-    const QString kUrlScheme = lit("rtsp");
+}
 
-    QString apiUrlScheme(bool sslAllowed)
-    {
-        return sslAllowed ? lit("https") : lit("http");
-    }
+QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
+{
+    return sslAllowed ? lit("https") : lit("http");
 }
 
 QnMediaServerResource::QnMediaServerResource():
@@ -52,9 +53,6 @@ QnMediaServerResource::QnMediaServerResource():
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
-
-    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
-    QnResource::setName(tr("Server"));
 
     m_statusTimer.restart();
 
@@ -151,8 +149,12 @@ void QnMediaServerResource::setName( const QString& name )
 
 void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
 {
-    QnMutexLocker lock( &m_mutex );
-    m_netAddrList = netAddrList;
+    {
+        QnMutexLocker lock( &m_mutex );
+        if (m_netAddrList == netAddrList)
+            return;
+        m_netAddrList = netAddrList;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
@@ -324,7 +326,6 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
-    emit sslAllowedChanged(toSharedPointer(this));
 }
 
 SocketAddress QnMediaServerResource::getPrimaryAddress() const
@@ -386,22 +387,26 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 {
     /* Calculate primary address before the url is changed. */
     const SocketAddress oldPrimaryAddress = getPrimaryAddress();
+    const auto oldApiUrl = getUrl();
 
     base_type::updateInternal(other, notifiers);
+    if (getUrl() != oldApiUrl)
+        notifiers << [r = toSharedPointer(this)]{ emit r->apiUrlChanged(r); };
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
     if (localOther)
     {
         if (m_version != localOther->m_version)
-        {
-            m_version = localOther->m_version;
             notifiers << [r = toSharedPointer(this)]{ emit r->versionChanged(r); };
-        }
+        if (m_serverFlags != localOther->m_serverFlags)
+            notifiers << [r = toSharedPointer(this)]{ emit r->serverFlagsChanged(r); };
+        if (m_netAddrList != localOther->m_netAddrList)
+            notifiers << [r = toSharedPointer(this)]{ emit r->auxUrlsChanged(r); };
 
+        m_version = localOther->m_version;
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
         m_systemInfo = localOther->m_systemInfo;
-        m_systemName = localOther->m_systemName;
         m_authKey = localOther->m_authKey;
 
     }
@@ -489,32 +494,19 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 
     m_systemInfo = systemInfo;
 }
+QnModuleInformation QnMediaServerResource::getModuleInformation() const
+{
+    if (getId() == qnCommon->moduleGUID())
+        return qnCommon->moduleInformation();
 
-QString QnMediaServerResource::getSystemName() const {
-    QnMutexLocker lock( &m_mutex );
+    // build module information for other server
 
-    return m_systemName;
-}
-
-void QnMediaServerResource::setSystemName(const QString &systemName) {
-    {
-        QnMutexLocker lock( &m_mutex );
-
-        if (m_systemName == systemName)
-            return;
-
-        m_systemName = systemName;
-    }
-    emit systemNameChanged(toSharedPointer(this));
-}
-
-QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
-    moduleInformation.brand = QnAppInfo::productName();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
+    moduleInformation.sslAllowed = m_sslAllowed;
     moduleInformation.name = getName();
+    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
@@ -524,47 +516,16 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
             getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
     }
 
-    QnMutexLocker lock( &m_mutex );
-
-    moduleInformation.version = m_version;
-    moduleInformation.systemInformation = m_systemInfo;
-    moduleInformation.systemName = m_systemName;
-    moduleInformation.sslAllowed = m_sslAllowed;
-    moduleInformation.port = getPort();
+    moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
+    moduleInformation.systemName = qnGlobalSettings->systemName();
     moduleInformation.id = getId();
+    moduleInformation.port = getPort();
+    moduleInformation.version = getVersion();
+    moduleInformation.systemInformation = getSystemInfo();
     moduleInformation.serverFlags = getServerFlags();
+    moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
 
-    if (const auto credentials = nx::network::SocketGlobals::mediatorConnector().getSystemCredentials())
-        moduleInformation.cloudSystemId = QString::fromUtf8(credentials->systemId);
     return moduleInformation;
-}
-
-void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
-    NX_ASSERT(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
-
-    QList<SocketAddress> addressList;
-    for (const QString &address: moduleInformation.remoteAddresses)
-        addressList.append(SocketAddress(address));
-    setNetAddrList(addressList);
-
-    if (!addressList.isEmpty()) {
-        const SocketAddress address(addressList.first().toString(), moduleInformation.port);
-        const auto url = address.toUrl(apiUrlScheme(moduleInformation.sslAllowed)).toString();
-        setUrl(url);
-    }
-    if (!moduleInformation.name.isEmpty())
-        setName(moduleInformation.name);
-    setVersion(moduleInformation.version);
-    setSystemInfo(moduleInformation.systemInformation);
-    setSystemName(moduleInformation.systemName);
-    setSslAllowed(moduleInformation.sslAllowed);
-    setProperty(protoVersionPropertyName, QString::number(moduleInformation.protoVersion));
-    setProperty(safeModePropertyName, QnLexical::serialized(moduleInformation.ecDbReadOnly));
-
-    if (moduleInformation.ecDbReadOnly)
-        addFlags(Qn::read_only);
-    else
-        removeFlags(Qn::read_only);
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
@@ -579,27 +540,6 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     return false;
 }
 
-QnUuid QnMediaServerResource::getOriginalGuid() const {
-    QnMutexLocker lock(&m_mutex);
-    return m_originalGuid;
-}
-
-void QnMediaServerResource::setOriginalGuid(const QnUuid &guid)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_originalGuid = guid;
-    NX_ASSERT(m_originalGuid.isNull() ||
-        getStatus() == Qn::Incompatible || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined,
-        Q_FUNC_INFO,
-        "Incompatible servers should not take any status but incompatible or unauthorized");
-}
-
-bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return !server->getOriginalGuid().isNull();
-    return false;
-}
-
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     if (getStatus() != newStatus)
@@ -607,9 +547,6 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
-            NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
-                       Q_FUNC_INFO,
-                       "Incompatible servers should not take any status but incompatible or unauthorized");
         }
 
         QnResource::setStatus(newStatus, silenceMode);

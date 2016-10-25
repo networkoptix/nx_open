@@ -1,24 +1,17 @@
-#ifndef QN_DESKTOP_RESOURCE_H
-#define QN_DESKTOP_RESOURCE_H
-
-#include <QtCore/QtGlobal>
+#pragma once
 
 #include <core/resource/resource.h>
 #include <nx/streaming/abstract_archive_resource.h>
-#include <plugins/resource/desktop_win/desktop_data_provider_wrapper.h>
 #include <core/resource/resource_fwd.h>
+#include <plugins/resource/desktop_camera/desktop_data_provider_wrapper.h>
 #include <plugins/resource/desktop_camera/desktop_camera_connection.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
-
-#if defined(Q_OS_WIN)
 
 class QnDesktopDataProvider;
 class QGLWidget;
 
-class QnWinDesktopResource:
-    public QnDesktopResource
+class QnWinDesktopResource: public QnDesktopResource
 {
-    Q_OBJECT;
 public:
     QnWinDesktopResource(QGLWidget* mainWindow = 0);
     virtual ~QnWinDesktopResource();
@@ -28,6 +21,7 @@ public:
 
 protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(Qn::ConnectionRole role) override;
+
 private:
     void createSharedDataProvider();
 
@@ -39,7 +33,3 @@ private:
     QnMutex m_dpMutex;
     QMap<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
-
-#endif
-
-#endif // QN_DESKTOP_RESOURCE_H

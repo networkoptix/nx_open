@@ -29,12 +29,58 @@
 #include "resizing_instrument.h"
 #include "selection_item.h"
 
-namespace
-{
+namespace {
+
     const qreal kZoomWindowMinSize = 0.1;
     const qreal kZoomWindowMaxSize = 0.9;
     const qreal kZoomLineWidth = 1;
-} // anonymous namespace
+
+    const auto isZoomAllowed = [](QGraphicsItem* item)
+        {
+            auto widget = dynamic_cast<QnMediaResourceWidget*>(item);
+            return widget && widget->options().testFlag(QnMediaResourceWidget::ControlZoomWindow);
+        };
+
+    QGraphicsSceneMouseEvent* constructSceneMouseEvent(
+        const QMouseEvent* event,
+        QGraphicsItem* item,
+        QGraphicsView* view,
+        QWidget* viewport)
+    {
+        auto type = QEvent::None;
+
+        switch (event->type())
+        {
+            case QEvent::MouseButtonPress:
+                type = QEvent::GraphicsSceneMousePress;
+                break;
+            case QEvent::MouseButtonRelease:
+                type = QEvent::GraphicsSceneMouseRelease;
+                break;
+            case QEvent::MouseButtonDblClick:
+                type = QEvent::GraphicsSceneMouseDoubleClick;
+                break;
+            case QEvent::MouseMove:
+                type = QEvent::GraphicsSceneMouseMove;
+                break;
+            default:
+                return nullptr;
+        }
+
+        auto mouseEvent = new QGraphicsSceneMouseEvent(type);
+        mouseEvent->setWidget(viewport);
+        mouseEvent->setScenePos(view->mapToScene(event->pos()));
+        mouseEvent->setPos(item->mapFromScene(mouseEvent->scenePos()));
+        mouseEvent->setScreenPos(event->globalPos());
+        mouseEvent->setButtons(event->buttons());
+        mouseEvent->setButton(event->button());
+        mouseEvent->setModifiers(event->modifiers());
+        mouseEvent->setSource(event->source());
+        mouseEvent->setFlags(event->flags());
+        return mouseEvent;
+    }
+
+} // namespace
 
 class ZoomOverlayWidget;
 
@@ -328,29 +374,40 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowF
 // -------------------------------------------------------------------------- //
 ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     base_type(
-        makeSet(QEvent::MouseButtonPress),
+        makeSet(QEvent::MouseButtonPress, QEvent::MouseMove),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease),
+        makeSet(
+            QEvent::GraphicsSceneMousePress,
+            QEvent::GraphicsSceneMouseRelease,
+            QEvent::GraphicsSceneMouseMove),
         parent
     ),
     QnWorkbenchContextAware(parent),
-    m_scaleWatcher()
+    m_zoomWindowStartedEmitted(false),
+    m_resizingInstrument(nullptr),
+    m_selectionItem(nullptr),
+    m_viewport(nullptr),
+    m_target(nullptr),
+    m_windowTarget(nullptr),
+    m_storedWindowWidget(nullptr)
 {
+    dragProcessor()->setStartDragTime(0);
+
     /* Sensible default. */
     m_colors
-        << qnNxStyle->mainColor(QnNxStyle::Colors::kYellow)
-        << qnNxStyle->mainColor(QnNxStyle::Colors::kGreen).lighter(2)
-        << qnNxStyle->mainColor(QnNxStyle::Colors::kRed).lighter(2);
+        << qnGlobals->warningTextColor()
+        << qnGlobals->successTextColor()
+        << qnGlobals->errorTextColor();
 
     connect(display(), &QnWorkbenchDisplay::zoomLinkAdded,              this, &ZoomWindowInstrument::at_display_zoomLinkAdded);
     connect(display(), &QnWorkbenchDisplay::zoomLinkAboutToBeRemoved,   this, &ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved);
     connect(display(), &QnWorkbenchDisplay::widgetChanged,              this, &ZoomWindowInstrument::at_display_widgetChanged);
 
     connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
-        [this]()
+        [this](qreal value)
         {
-            const auto penWidth = kZoomLineWidth * m_scaleWatcher.scale();
+            const auto penWidth = kZoomLineWidth * value;
             const auto pen = QPen(m_zoomWindowColor, penWidth, Qt::SolidLine,
                 Qt::SquareCap, Qt::MiterJoin);
             if (selectionItem())
@@ -474,6 +531,12 @@ void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
     disconnect(widget, NULL, this, NULL);
 
     m_dataByWidget.remove(widget);
+
+    if (m_target == widget)
+    {
+        m_target->unsetCursor();
+        m_target = nullptr;
+    }
 }
 
 void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget)
@@ -628,26 +691,56 @@ void ZoomWindowInstrument::unregisteredNotify(QGraphicsItem *item) {
         unregisterWidget(widget);
 }
 
-bool ZoomWindowInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
+bool ZoomWindowInstrument::mousePressEvent(QWidget* viewport, QMouseEvent* /*event*/)
+{
     m_viewport = viewport;
-
     return false;
 }
 
-bool ZoomWindowInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    if(event->button() != Qt::LeftButton)
+bool ZoomWindowInstrument::mousePressEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event)
+{
+    if (event->button() != Qt::LeftButton)
         return false;
 
-    QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
-    if(!(target->options() & QnResourceWidget::ControlZoomWindow))
-        return false;
+    const auto target = checked_cast<QnMediaResourceWidget*>(item);
 
-    if(!target->rect().contains(event->pos()))
-        return false; /* Ignore clicks on widget frame. */
+    if (m_target && m_target != target)
+    {
+        m_target->unsetCursor();
+        m_target = nullptr;
+    }
+
+    if (!target || !target->options().testFlag(QnMediaResourceWidget::ControlZoomWindow))
+        return false;
 
     m_target = target;
+    m_target->setCursor(Qt::CrossCursor);
 
-    dragProcessor()->mousePressEvent(target, event);
+    return base_type::mousePressEvent(item, event);
+}
+
+bool ZoomWindowInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
+{
+    auto view = this->view(viewport);
+    auto target = static_cast<QnMediaResourceWidget*>(
+        this->item(view, event->pos(), isZoomAllowed));
+
+    if (!event->buttons().testFlag(Qt::LeftButton))
+    {
+        if (m_target && m_target != target)
+        {
+            m_target->unsetCursor();
+            m_target = nullptr;
+        }
+    }
+
+    if (!target)
+        return false;
+
+    if (!m_target)
+        m_target = target;
+
+    m_target->setCursor(Qt::CrossCursor);
 
     event->accept();
     return false;

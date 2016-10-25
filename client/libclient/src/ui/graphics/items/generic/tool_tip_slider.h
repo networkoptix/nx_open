@@ -39,6 +39,9 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    void hideToolTip();
+    void showToolTip();
+
 protected:
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -51,9 +54,6 @@ protected:
     virtual bool showOwnTooltip(const QPointF &pos) override;
 
 private:
-    void hideToolTip();
-    void showToolTip();
-
     void updateToolTipVisibility();
     Q_SLOT void updateToolTipPosition();
     void updateToolTipOpacity();

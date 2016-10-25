@@ -12,6 +12,14 @@ const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
 const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
 const QString QnResourceTypePool::kUserTypeId(lit("User"));
 
+const QnUuid QnResourceTypePool::kUserTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kUserTypeId));
+const QnUuid QnResourceTypePool::kServerTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kServerTypeId));
+const QnUuid QnResourceTypePool::kStorageTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kStorageTypeId));
+const QnUuid QnResourceTypePool::kLayoutTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -233,7 +241,6 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
             }
         }
     }
-
 
     return result;
 }

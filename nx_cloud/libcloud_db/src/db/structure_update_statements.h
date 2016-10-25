@@ -1,16 +1,8 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
-#define NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
-
+#pragma once
 
 namespace nx {
 namespace cdb {
 namespace db {
-
 
 static const char kCreateDbVersion13[] =
 "                                                                               \
@@ -19,7 +11,7 @@ CREATE TABLE account_status(                                                    
     description         TEXT                                                    \
 );                                                                              \
                                                                                 \
-INSERT INTO account_status VALUES(1,'awaiting email confirmation');             \
+INSERT INTO account_status VALUES(1, 'awaiting email confirmation');            \
 INSERT INTO account_status VALUES(2, 'activated');                              \
 INSERT INTO account_status VALUES(3, 'blocked');                                \
                                                                                 \
@@ -28,7 +20,7 @@ CREATE TABLE system_status(                                                     
     description         TEXT                                                    \
 );                                                                              \
                                                                                 \
-INSERT INTO system_status VALUES(1,'not activated');                            \
+INSERT INTO system_status VALUES(1, 'not activated');                           \
 INSERT INTO system_status VALUES(2, 'activated');                               \
 INSERT INTO system_status VALUES(3, 'deleted');                                 \
                                                                                 \
@@ -37,7 +29,7 @@ CREATE TABLE access_role(                                                       
     description         TEXT NOT NULL                                           \
 );                                                                              \
                                                                                 \
-INSERT INTO access_role VALUES(1,'liveViewer');                                 \
+INSERT INTO access_role VALUES(1, 'liveViewer');                                \
 INSERT INTO access_role VALUES(2, 'viewer');                                    \
 INSERT INTO access_role VALUES(3, 'advancedViewer');                            \
 INSERT INTO access_role VALUES(4, 'localAdmin');                                \
@@ -410,47 +402,248 @@ DROP TABLE account_old;                                                         
 
 //#CLOUD-185
 static const char kTemporaryAccountCredentials[] =
-"                                                                                               \
-ALTER TABLE account_password ADD COLUMN login VARCHAR(255);                                     \
-UPDATE account_password SET login=(select email from account where id=account_password.account_id);     \
-UPDATE account_password SET access_rights='+/cdb/account/update';                               \
-";                                                                                              
+R"sql(
+ALTER TABLE account_password ADD COLUMN login VARCHAR(255);
+UPDATE account_password SET login=(select email from account where id=account_password.account_id);
+UPDATE account_password SET access_rights='+/cdb/account/update';
+)sql";
 
 
 //#CLOUD-186
 static const char kTemporaryAccountCredentialsProlongationPeriod[] =
-"                                                                                               \
-ALTER TABLE account_password ADD COLUMN prolongation_period_sec INTEGER DEFAULT 0;              \
-";                                                                                              
+R"sql(
+ALTER TABLE account_password ADD COLUMN prolongation_period_sec INTEGER DEFAULT 0;
+)sql";
 
 
 //#VMS-3018
 static const char kAddCustomAndDisabledAccessRoles[] =
-"                                                                           \
-INSERT INTO access_role(id, description) VALUES(8, 'disabled');             \
-INSERT INTO access_role(id, description) VALUES(9, 'custom');               \
-UPDATE system_to_account SET access_role_id=access_role_id+2;               \
-UPDATE access_role SET description='disabled' WHERE id=1;                   \
-UPDATE access_role SET description='custom' WHERE id=2;                     \
-UPDATE access_role SET description='liveViewer' WHERE id=3;                 \
-UPDATE access_role SET description='viewer' WHERE id=4;                     \
-UPDATE access_role SET description='advancedViewer' WHERE id=5;             \
-UPDATE access_role SET description='localAdmin' WHERE id=6;                 \
-UPDATE access_role SET description='cloudAdmin' WHERE id=7;                 \
-UPDATE access_role SET description='maintenance' WHERE id=8;                \
-UPDATE access_role SET description='owner' WHERE id=9;                      \
-";
+R"sql(
+INSERT INTO access_role(id, description) VALUES(8, 'disabled');
+INSERT INTO access_role(id, description) VALUES(9, 'custom');
+UPDATE system_to_account SET access_role_id=access_role_id+2;
+UPDATE access_role SET description='disabled' WHERE id=1;
+UPDATE access_role SET description='custom' WHERE id=2;
+UPDATE access_role SET description='liveViewer' WHERE id=3;
+UPDATE access_role SET description='viewer' WHERE id=4;
+UPDATE access_role SET description='advancedViewer' WHERE id=5;
+UPDATE access_role SET description='localAdmin' WHERE id=6;
+UPDATE access_role SET description='cloudAdmin' WHERE id=7;
+UPDATE access_role SET description='maintenance' WHERE id=8;
+UPDATE access_role SET description='owner' WHERE id=9;
+)sql";
 
 //#CLOUD-468. Adding more fields to system_to_account
 static const char kAddMoreFieldsToSystemSharing[] =
-"                                                                           \
-ALTER TABLE system_to_account ADD COLUMN group_id VARCHAR(64) NULL;         \
-ALTER TABLE system_to_account ADD COLUMN custom_permissions VARCHAR(1024) NULL;   \
-ALTER TABLE system_to_account ADD COLUMN is_enabled INTEGER NULL;            \
-";
+R"sql(
+ALTER TABLE system_to_account ADD COLUMN group_id VARCHAR(64) NULL;
+ALTER TABLE system_to_account ADD COLUMN custom_permissions VARCHAR(1024) NULL;
+ALTER TABLE system_to_account ADD COLUMN is_enabled INTEGER NULL;
+)sql";
 
-}   //db
-}   //cdb
-}   //nx
+//#CLOUD-486. Implementing saveUser vms transaction
+static const char kAddVmsUserIdToSystemSharing[] =
+R"sql(
+ALTER TABLE system_to_account ADD COLUMN vms_user_id VARCHAR(64) NULL;
+)sql";
 
-#endif  //NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
+//#CLOUD-485. Adding system transaction log
+static const char kAddSystemTransactionLog[] =
+R"sql(
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    INTEGER NOT NULL,
+    timestamp   INTEGER NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX idx_transaction_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_time
+    ON transaction_log(system_id, timestamp);
+)sql";
+
+/**
+ * #CLOUD-485. Changing timestamp field type to BIGINT so that it can store UTC milliseconds
+ * @warning This script does not update transaction log, but clears it!
+ */
+static const char kChangeTransactionLogTimestampTypeToBigInt[] =
+R"sql(
+DROP TABLE transaction_log;
+
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    BIGINT NOT NULL,
+    timestamp   BIGINT NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX idx_transaction_log_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_log_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_log_time
+    ON transaction_log(system_id, timestamp);
+)sql";
+
+/**
+ * #CLOUD-540. Cloud peer transaction sequence MUST be global
+ */
+static const char kAddPeerSequence[] =
+R"sql(
+
+CREATE TABLE cloud_db_transaction_sequence (
+    max_sequence BIGINT NOT NULL
+);
+
+INSERT INTO cloud_db_transaction_sequence(max_sequence) VALUES(1000);
+
+)sql";
+
+/**
+ * #CLOUD-545. Adding persistent system sequence for transaction timestamp
+ */
+static const char kAddSystemSequence[] =
+R"sql(
+
+ALTER TABLE system_to_account RENAME TO system_to_account_old;
+ALTER TABLE system RENAME TO system_old;
+
+CREATE TABLE system(
+    seq                         %bigint_primary_key_auto_increment%,
+    id                          VARCHAR(64) NOT NULL UNIQUE,
+    name                        VARCHAR(1024) NOT NULL,
+    auth_key                    VARCHAR(255) NOT NULL,
+    owner_account_id            VARCHAR(64) NOT NULL,
+    status_code                 INTEGER NOT NULL,
+    customization               VARCHAR(255),
+    expiration_utc_timestamp    INTEGER DEFAULT 0,
+    FOREIGN KEY(owner_account_id) REFERENCES account(id) ON DELETE CASCADE,
+    FOREIGN KEY(status_code) REFERENCES system_status(code)
+);
+
+CREATE TABLE system_to_account(
+    account_id                  VARCHAR(64) NOT NULL,
+    system_id                   VARCHAR(64) NOT NULL,
+    access_role_id              INTEGER NOT NULL,
+    group_id                    VARCHAR(64) NULL,
+    custom_permissions          VARCHAR(1024) NULL,
+    is_enabled                  INTEGER NULL,
+    vms_user_id                 VARCHAR(64) NULL,
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE,
+    FOREIGN KEY(access_role_id) REFERENCES access_role(id)
+);
+
+INSERT INTO system(
+    id, name, auth_key, owner_account_id, status_code, customization, expiration_utc_timestamp)
+SELECT
+    id, name, auth_key, owner_account_id, status_code, customization, expiration_utc_timestamp
+FROM system_old;
+
+INSERT INTO system_to_account(account_id, system_id, access_role_id, group_id, custom_permissions, is_enabled, vms_user_id)
+                       SELECT account_id, system_id, access_role_id, group_id, custom_permissions, is_enabled, vms_user_id
+                       FROM system_to_account_old;
+
+DELETE FROM system_to_account_old;
+DELETE FROM system_old;
+
+DROP TABLE system_to_account_old;
+
+DROP TABLE transaction_log;
+
+DROP TABLE system_old;
+
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    BIGINT NOT NULL,
+    timestamp   BIGINT NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX idx_transaction_log_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_log_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_log_time
+    ON transaction_log(system_id, timestamp);
+
+)sql";
+
+/**
+ * #CLOUD-546. Making transaction timestamp 128-bit.
+ */
+static const char kMakeTransactionTimestamp128Bit[] =
+R"sql(
+
+ALTER TABLE transaction_log ADD COLUMN timestamp_hi BIGINT NOT NULL DEFAULT 0;
+
+CREATE TABLE transaction_source_settings (
+    system_id       VARCHAR(64) NOT NULL,
+    timestamp_hi    BIGINT NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+)sql";
+
+/**
+ * #CLOUD-441. Adding system ordering.
+ * For usage_frequency calculation see https://networkoptix.atlassian.net/wiki/display/PM/Systems+List.
+ */
+static const char kAddSystemUsageFrequency[] =
+R"sql(
+
+ALTER TABLE system_to_account ADD COLUMN last_login_time_utc BIGINT;
+ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
+
+)sql";
+
+/**
+ * #CLOUD-588. If user has ignored invitation email 
+ * he can still register cloud account in a regular way.
+ */
+static const char kAddInviteHasBeenSentAccountStatus[] =
+R"sql(
+
+INSERT INTO account_status(code, description) 
+    VALUES(4, 'invite message has been sent');
+
+)sql";
+
+/**
+ * #CLOUD-604. Adding sha256-based HA1.
+ */
+static const char kAddHa1CalculatedUsingSha256[] =
+R"sql(
+
+ALTER TABLE account ADD COLUMN password_ha1_sha256 VARCHAR(255) NULL;
+
+)sql";
+
+/**
+ * #CLOUD-616. Adding opaque VMS data.
+ */
+static const char kAddVmsOpaqueData[] =
+R"sql(
+
+ALTER TABLE system ADD COLUMN opaque VARCHAR(1024) NULL;
+
+)sql";
+
+} // namespace db
+} // namespace cdb
+} // namespace nx

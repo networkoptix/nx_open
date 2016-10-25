@@ -551,7 +551,7 @@ bool UdtStreamSocket::setRendezvous(bool val)
 
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis )
+    unsigned int /*timeoutMillis*/ )
 {
     //TODO #ak use timeoutMillis
 
@@ -603,8 +603,11 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
         sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags & ~MSG_DONTWAIT);
 
-        if (!setNonBlockingMode(&value))
+        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+        if (!setNonBlockingMode(value))
             return -1;
+        // Restoring system error code.
+        SystemError::setLastErrorCode(sysErrorCodeBak);
     }
     else
     {

@@ -25,14 +25,14 @@ struct QnFooterData: public QnCamRecordingStatsData {
     QnFooterData() : QnCamRecordingStatsData(), bitrateSum(0) {}
 
     qint64 bitrateSum;
+    QnCamRecordingStatsData maxValues;
 };
 
 class QnRecordingStatsModel : public Customized<QAbstractListModel>
 {
     Q_OBJECT
-    Q_PROPERTY(QnRecordingStatsColors colors READ colors WRITE setColors)
-
     typedef Customized<QAbstractListModel> base_type;
+
 public:
 
     enum Columns {
@@ -56,11 +56,11 @@ public:
     void setModelData(const QnRecordingStatsReply& data);
     QnRecordingStatsReply modelData() const;
 
-    QnRecordingStatsColors colors() const;
-    void setColors(const QnRecordingStatsColors &colors);
     void setHeaderTextBlocked(bool value);
+
 signals:
     void colorsChanged();
+
 private:
 
     QString displayData(const QModelIndex &index) const;

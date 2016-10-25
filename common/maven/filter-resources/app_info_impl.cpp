@@ -49,8 +49,16 @@ QString QnAppInfo::applicationPlatformModification()
 }
 
 QString QnAppInfo::applicationCompiler()
- {
-    return QStringLiteral("${additional.compiler}");
+{
+    #if defined(__clang__)
+        return QStringLiteral("clang");
+    #elif defined(__GNUC__)
+        return QStringLiteral("gcc");
+    #elif defined(_MSC_VER)
+        return QStringLiteral("msvc");
+    #else
+        return QStringLiteral();
+    #endif
 }
 
 QString QnAppInfo::engineVersion()
@@ -174,7 +182,7 @@ QString QnAppInfo::updateGeneratorUrl()
 }
 
 //Filling string constant with zeros to be able to change this constant in already-built binary
-static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloud.host}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloudHost}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_cloud_host_name");
 
 QString QnAppInfo::defaultCloudHost()
@@ -194,7 +202,7 @@ QString QnAppInfo::defaultCloudModulesXmlUrl()
 
 QString QnAppInfo::cloudName()
 {
-    return QStringLiteral("${cloud.name}");
+    return QStringLiteral("${cloudName}");
 }
 
 int QnAppInfo::freeLicenseCount()

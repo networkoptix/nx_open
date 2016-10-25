@@ -21,14 +21,14 @@ const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource()
 {
-    connect(
+    Qn::directConnect(
         this, &QnResource::propertyChanged,
-        this, &QnAdamResource::at_propertyChanged,
-        Qt::DirectConnection );
+        this, &QnAdamResource::at_propertyChanged);
 }
 
 QnAdamResource::~QnAdamResource()
 {
+    directDisconnectAll();
     stopInputPortMonitoringAsync();
     if (m_ioManager)
         m_ioManager->terminate();
@@ -92,6 +92,8 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
     QN_UNUSED(completionHandler);
+    if (!m_ioManager)
+        return false;
 
     auto callback = [this](QString portId, nx_io_managment::IOPortState inputState)
     {
@@ -114,8 +116,8 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
-            QnBusiness::EventReason::NoReason,
-            QnNetworkIssueBusinessEvent::encodePacketLossSequence(0, 2));
+            QnBusiness::EventReason::NetworkNoResponseFromDevice,
+            QString());
 
         if (isFatal)
             setStatus(Qn::Offline);

@@ -20,19 +20,43 @@
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
 
-namespace {
-    QVector<int> textRoles = QVector<int>()
-        << Qt::DisplayRole
-        << Qt::StatusTipRole
-        << Qt::WhatsThisRole
-        << Qt::AccessibleTextRole
-        << Qt::AccessibleDescriptionRole
-        << Qt::ToolTipRole;
+#include <algorithm>
 
-    QVector<int> checkboxRoles = QVector<int>()
-        << Qt::DisplayRole
-        << Qt::CheckStateRole;
-}
+namespace {
+    template<class T>
+    QVector<T> sortedVector(const QVector<T>& unsorted)
+    {
+        auto sorted = unsorted;
+        std::sort(sorted.begin(), sorted.end());
+        return sorted;
+    }
+
+    QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
+        { 3, 5, 10, 30, 60, 180, 300, 600 });
+
+    QVector<int> kTextRoles = {
+        Qt::DisplayRole,
+        Qt::StatusTipRole,
+        Qt::WhatsThisRole,
+        Qt::AccessibleTextRole,
+        Qt::AccessibleDescriptionRole,
+        Qt::ToolTipRole };
+
+    QVector<int> kCheckboxRoles = {
+        Qt::DisplayRole,
+        Qt::CheckStateRole };
+
+    QVector<int> kForegroundRole = {
+        Qt::ForegroundRole };
+
+    QString serverName(const QnResourcePtr& server)
+    {
+        return server
+            ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
+            : QnTimeServerSelectionModel::tr("Server");
+    }
+
+} // namespace
 
 #ifdef _DEBUG
     //#define QN_TIME_SERVER_SELECTION_MODEL_DEBUG
@@ -44,7 +68,7 @@ namespace {
 #define PRINT_DEBUG(MSG)
 #endif
 
-QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL*/):
+QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_sameTimezone(false),
@@ -53,95 +77,124 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
     auto processor = QnCommonMessageProcessor::instance();
 
     /* Handle peer time updates. */
-    connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this, [this](const QnUuid &peerId, qint64 syncTime, qint64 peerTime) {
-        /* Store received value to use it later. */
-        qint64 offset = peerTime - syncTime;
-        m_serverOffsetCache[peerId] = offset;
-        PRINT_DEBUG("get time for peer " + peerId.toByteArray());
+    connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this,
+        [this](const QnUuid& peerId, qint64 syncTime, qint64 peerTime)
+        {
+            /* Store received value to use it later. */
+            qint64 offset = peerTime - syncTime;
+            m_serverOffsetCache[peerId] = offset;
+            PRINT_DEBUG("get time for peer " + peerId.toByteArray());
 
-        /* Check if the server is already online. */
-        int idx = qnIndexOf(m_items, [peerId](const Item &item) {return item.peerId == peerId; });
-        if (idx < 0)
-            return;
+            /* Check if the server is already online. */
+            int idx = qnIndexOf(m_items,
+                [peerId](const Item& item)
+                {
+                    return item.peerId == peerId;
+                });
 
-        m_items[idx].offset = offset;
-        m_items[idx].ready = true;
-        PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
-        emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), textRoles);
-    });
+            if (idx < 0)
+                return;
 
-    connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this, [this](qint64 syncTime) {
-        /* Requesting initial time. */
-        resetData(syncTime);
-    });
+            m_items[idx].offset = offset;
+            m_items[idx].ready = true;
+            PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
+            emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
+        });
+
+    connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this,
+        [this](qint64 syncTime)
+        {
+            /* Requesting initial time. */
+            resetData(syncTime);
+        });
 
     /* Handle adding new online server peers. */
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, [this](const QnPeerRuntimeInfo &info) {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            return;
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+        [this](const QnPeerRuntimeInfo& info)
+        {
+            if (info.data.peer.peerType != Qn::PT_Server)
+                return;
 
-        beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-        addItem(info);
-        updateFirstItemCheckbox();
-        endInsertRows();
-    });
+            ScopedInsertRows insertRows(this, QModelIndex(), m_items.size(), m_items.size());
+            addItem(info);
+            updateFirstItemCheckbox();
+        });
 
     /* Handle changing server peers priority (selection). */
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            return;
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+        [this](const QnPeerRuntimeInfo& info)
+        {
+            if (info.data.peer.peerType != Qn::PT_Server)
+                return;
 
-        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is changed");
-        if (isSelected(info.data.serverTimePriority))
-            setSelectedServer(info.uuid);
-        else if (info.uuid == m_selectedServer)
-            setSelectedServer(QnUuid());
-    });
+            PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is changed");
+            if (isSelected(info.data.serverTimePriority))
+                setSelectedServer(info.uuid);
+            else if (info.uuid == m_selectedServer)
+                setSelectedServer(QnUuid());
+        });
 
     /* Handle removing online server peers. */
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoRemoved,  this,  [this](const QnPeerRuntimeInfo &info) {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            return;
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+        [this](const QnPeerRuntimeInfo& info)
+        {
+            if (info.data.peer.peerType != Qn::PT_Server)
+                return;
 
-        int idx = qnIndexOf(m_items, [info](const Item &item){return item.peerId == info.uuid; });
-        if (idx < 0)
-            return;
+            int idx = qnIndexOf(m_items,
+                [info](const Item& item)
+                {
+                    return item.peerId == info.uuid;
+                });
 
-        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is removed");
-        beginRemoveRows(QModelIndex(), idx, idx);
-        m_items.removeAt(idx);
-        updateFirstItemCheckbox();
-        endRemoveRows();
+            if (idx < 0)
+                return;
 
-        if (m_selectedServer == info.uuid)
-            setSelectedServer(QnUuid());
-    });
+            PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is removed");
+            {
+                ScopedRemoveRows removeRows(this, QModelIndex(), idx, idx);
+                m_items.removeAt(idx);
+                updateFirstItemCheckbox();
+            }
+
+            if (m_selectedServer == info.uuid)
+                setSelectedServer(QnUuid());
+        });
 
     /* Handle adding new servers (to display name correctly). */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource){
-        if (!resource.dynamicCast<QnMediaServerResource>())
-            return;
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (!resource.dynamicCast<QnMediaServerResource>())
+                return;
 
-        QnUuid id = resource->getId();
-        int idx = qnIndexOf(m_items, [id](const Item &item){return item.peerId == id; });
-        if (idx < 0)
-            return;
+            QnUuid id = resource->getId();
+            int idx = qnIndexOf(m_items,
+                [id](const Item& item)
+                {
+                    return item.peerId == id;
+                });
 
-        m_sameTimezoneValid = false;
-        updateColumn(Columns::TimeColumn);
-        updateColumn(Columns::OffsetColumn);
+            if (idx < 0)
+                return;
 
-        emit dataChanged(
-            this->index(idx, Columns::NameColumn),
-            this->index(idx, Columns::NameColumn),
-            textRoles);
-    });
+            m_sameTimezoneValid = false;
+            updateColumn(Columns::TimeColumn);
+            updateColumn(Columns::OffsetColumn);
 
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, [this]{
-        m_sameTimezoneValid = false;
-        updateColumn(Columns::TimeColumn);
-        updateColumn(Columns::OffsetColumn);
-    });
+            emit dataChanged(
+                this->index(idx, Columns::NameColumn),
+                this->index(idx, Columns::NameColumn),
+                kTextRoles);
+        });
+
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
+        [this]
+        {
+            m_sameTimezoneValid = false;
+            updateColumn(Columns::TimeColumn);
+            updateColumn(Columns::OffsetColumn);
+        });
 
     /* Requesting initial time. */
     resetData(qnSyncTime->currentMSecsSinceEpoch());
@@ -156,39 +209,49 @@ void QnTimeServerSelectionModel::updateFirstItemCheckbox()
     dataChanged(firstServerIndex, firstServerIndex);  // Updates enable state of first server checkbox
 }
 
-int QnTimeServerSelectionModel::columnCount(const QModelIndex &parent) const {
+int QnTimeServerSelectionModel::columnCount(const QModelIndex& parent) const
+{
     if (parent.isValid())
         return 0;
 
     return Columns::ColumnCount;
 }
 
-int QnTimeServerSelectionModel::rowCount(const QModelIndex &parent) const {
+int QnTimeServerSelectionModel::rowCount(const QModelIndex& parent) const
+{
     if(parent.isValid())
         return 0;
 
     return m_items.size();
 }
 
-QVariant QnTimeServerSelectionModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        switch (section) {
-        case Columns::CheckboxColumn:
-            return QString();
-        case Columns::NameColumn:
-            return tr("Server");
-        case Columns::TimeColumn:
-            return tr("Server Time");
-        case Columns::OffsetColumn:
-            return tr("Offset");
-        default:
-            break;
+QVariant QnTimeServerSelectionModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+        switch (section)
+        {
+            case Columns::CheckboxColumn:
+                return QString();
+            case Columns::NameColumn:
+                return tr("Server");
+            case Columns::DateColumn:
+                return tr("Date");
+            case Columns::ZoneColumn:
+                return tr("Timezone");
+            case Columns::TimeColumn:
+                return tr("Time");
+            case Columns::OffsetColumn:
+                return tr("Offset");
+            default:
+                break;
         }
     }
     return QVariant();
 }
 
-QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) const {
+QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) const
+{
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
@@ -201,56 +264,108 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
-    QString title = server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl) : tr("Server");
+    QString title = serverName(server);
 
-    switch (role) {
-      case Qt::DisplayRole:
-      case Qt::StatusTipRole:
-      case Qt::WhatsThisRole:
-      case Qt::AccessibleTextRole:
-      case Qt::AccessibleDescriptionRole:
-      case Qt::ToolTipRole:
-          if (column == Columns::NameColumn)
-              return title;
-          if (column == Columns::TimeColumn) {
-              if (!item.ready)
-                  return tr("Synchronizing...");
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        case Qt::StatusTipRole:
+        case Qt::AccessibleTextRole:
+        case Qt::ToolTipRole:
+        {
+            switch (column)
+            {
+                case Columns::NameColumn:
+                    return title;
 
-              qint64 mSecsSinceEpoch = currentTime + item.offset;
-              if (sameTimezone()) {
-                  QDateTime time;
-                  time.setTimeSpec(Qt::LocalTime);
-                  time.setMSecsSinceEpoch(mSecsSinceEpoch);
-                  return time.toString(lit("yyyy-MM-dd HH:mm:ss"));
-              } else {
-                  QDateTime time = context()->instance<QnWorkbenchServerTimeWatcher>()->serverTime(server, mSecsSinceEpoch);
-                  return time.toString(lit("yyyy-MM-dd HH:mm:ss t"));
-              }
-          }
-          if (column == Columns::OffsetColumn) {
-              if (!item.ready)
-                  return QString();
-              return formattedOffset(item.offset);
-          }
-          break;
-      case Qt::DecorationRole:
-          if (column == Columns::NameColumn){
-              if (QnMediaServerResource::isHiddenServer(server))
-                  return qnResIconCache->icon(QnResourceIconCache::Camera);
-              return qnResIconCache->icon(QnResourceIconCache::Server);
-          }
-          break;
-      case Qt::CheckStateRole:
-          if (column == Columns::CheckboxColumn)
-              return item.peerId == m_selectedServer ? Qt::Checked : Qt::Unchecked;
-          break;
-      case Qn::PriorityRole:
-          return item.priority;
+                case Columns::DateColumn:
+                case Columns::ZoneColumn:
+                case Columns::TimeColumn:
+                {
+                    if (!item.ready)
+                        return QString();
+
+                    QDateTime dateTime;
+                    auto sinceEpochMs = currentTime + item.offset;
+
+                    if (sameTimezone())
+                    {
+                        dateTime.setTimeSpec(Qt::LocalTime);
+                        dateTime.setMSecsSinceEpoch(sinceEpochMs);
+                    }
+                    else
+                    {
+                        dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->
+                            serverTime(server, sinceEpochMs);
+                    }
+
+                    auto offsetFromUtc = dateTime.offsetFromUtc();
+                    dateTime.setTimeSpec(Qt::OffsetFromUTC);
+                    dateTime.setOffsetFromUtc(offsetFromUtc);
+
+                    switch (column)
+                    {
+                        case Columns::DateColumn:
+                            return dateTime.toString(lit("dd/MM/yyyy"));
+                        case Columns::ZoneColumn:
+                            return dateTime.timeZoneAbbreviation();
+                        case Columns::TimeColumn:
+                            return dateTime.toString(lit("HH:mm:ss"));
+                    }
+                }
+
+                case Columns::OffsetColumn:
+                {
+                    return item.ready
+                        ? formattedOffset(item.offset)
+                        : QString();
+                }
+
+                default:
+                    break;
+            }
+
+            break;
+        }
+
+        case Qt::DecorationRole:
+            if (column == Columns::NameColumn)
+            {
+                if (QnMediaServerResource::isHiddenServer(server))
+                    return qnResIconCache->icon(QnResourceIconCache::Camera);
+                return qnResIconCache->icon(QnResourceIconCache::Server);
+            }
+            break;
+
+        case Qt::CheckStateRole:
+            if (column == Columns::CheckboxColumn)
+            {
+                return item.peerId == m_selectedServer || m_items.size() == 1
+                    ? Qt::Checked
+                    : Qt::Unchecked;
+            }
+            break;
+
+        case Qn::ResourceRole:
+            return QVariant::fromValue<QnResourcePtr>(server);
+
+        case Qn::PriorityRole:
+            return item.priority;
+
+        case Qt::ForegroundRole:
+            if (column == Columns::OffsetColumn)
+                return offsetForeground(item.offset);
+            break;
+
+        default:
+            break;
     }
+
     return QVariant();
 }
 
-bool QnTimeServerSelectionModel::setData(const QModelIndex &index, const QVariant &value, int role /* = Qt::EditRole*/) {
+bool QnTimeServerSelectionModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return 0;
 
@@ -270,7 +385,8 @@ bool QnTimeServerSelectionModel::setData(const QModelIndex &index, const QVarian
     return true;
 }
 
-Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex &index) const  {
+Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex& index) const
+{
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return 0;
 
@@ -284,34 +400,40 @@ Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex &index) const 
     {
         static const Qt::ItemFlags kBaseCheckboxFlags =
             (Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-        const Qt::ItemFlag anotherFlags = (m_items.size() == 1 ? Qt::NoItemFlags : Qt::ItemIsEnabled);
+
+        const Qt::ItemFlag anotherFlags = Qt::ItemIsEnabled;// (m_items.size() == 1 ? Qt::NoItemFlags : Qt::ItemIsEnabled);
         return kBaseCheckboxFlags | anotherFlags;
     }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-void QnTimeServerSelectionModel::updateTime() {
+void QnTimeServerSelectionModel::updateTime()
+{
     updateColumn(Columns::TimeColumn);
 }
 
-void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info) {
+void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo& info)
+{
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
 #ifdef _DEBUG
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(info.uuid);
-    QString title = server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl)  : tr("Server");
+    QString title = serverName(server);
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
 #endif // DEBUG
 
     Item item;
     item.peerId = info.uuid;
     item.priority = info.data.serverTimePriority;
-    if (isSelected(item.priority)) {
+    if (isSelected(item.priority))
+    {
         PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is SELECTED");
         m_selectedServer = item.peerId;
     }
+
     item.ready = m_serverOffsetCache.contains(item.peerId);
-    if (item.ready) {
+    if (item.ready)
+    {
         item.offset = m_serverOffsetCache[item.peerId];
         PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is ready");
     }
@@ -320,19 +442,23 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info) {
     m_sameTimezoneValid = false;
 }
 
-QnUuid QnTimeServerSelectionModel::selectedServer() const {
+QnUuid QnTimeServerSelectionModel::selectedServer() const
+{
     return m_selectedServer;
 }
 
-void QnTimeServerSelectionModel::setSelectedServer(const QnUuid &serverId) {
+void QnTimeServerSelectionModel::setSelectedServer(const QnUuid& serverId)
+{
     if (m_selectedServer == serverId)
         return;
 
     PRINT_DEBUG("model: set selected peer to " + serverId.toByteArray());
 
-    if (!serverId.isNull()) {
-        int idx = qnIndexOf(m_items, [serverId](const Item &item){return item.peerId == serverId; });
-        if (idx < 0) {
+    if (!serverId.isNull())
+    {
+        int idx = qnIndexOf(m_items, [serverId](const Item& item){return item.peerId == serverId; });
+        if (idx < 0)
+        {
             PRINT_DEBUG("model: selected peer " + serverId.toByteArray() + " NOT FOUND");
             return;
         }
@@ -342,64 +468,125 @@ void QnTimeServerSelectionModel::setSelectedServer(const QnUuid &serverId) {
     updateColumn(Columns::CheckboxColumn);
 }
 
-void QnTimeServerSelectionModel::updateColumn(Columns column) {
+void QnTimeServerSelectionModel::updateColumn(Columns column)
+{
     if (m_items.isEmpty())
         return;
 
-    QVector<int> roles = column == Columns::CheckboxColumn
-        ? checkboxRoles
-        : textRoles;
+    const auto& roles = column == Columns::CheckboxColumn
+        ? kCheckboxRoles
+        : kTextRoles;
 
     emit dataChanged(index(0, column), index(m_items.size() - 1, column), roles);
 }
 
-bool QnTimeServerSelectionModel::isSelected(quint64 priority) {
+bool QnTimeServerSelectionModel::isSelected(quint64 priority)
+{
     return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
 }
 
-QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec)
+QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
     static const int kDoNotSuppress = -1;
-    static const int kMinimalOffsetMs = 1000;
+    static const QString kSeparator(L' ');
 
-    if (offsetMSec < kMinimalOffsetMs)
-        return QString();
+    static const QString sSuffix = tr("s", "Suffix for displaying seconds of server time offset");
+    static const QString mSuffix = tr("m", "Suffix for displaying minutes of server time offset");
+    static const QString hSuffix = tr("h", "Suffix for displaying hours of server time offset");
 
-    return QTimeSpan(qAbs(offsetMSec)).toApproximateString(kDoNotSuppress, kFormat);
+    auto unitStringsConverter =
+        [&](Qt::TimeSpanUnit unit, int num)
+        {
+            QString suffix;
+            switch (unit)
+            {
+                case::Qt::Seconds:
+                    suffix = sSuffix;
+                    break;
+                case::Qt::Minutes:
+                    suffix = mSuffix;
+                    break;
+                case::Qt::Hours:
+                    suffix = hSuffix;
+                    break;
+                default:
+                    break;
+            }
+
+            return QString::number(num) + suffix;
+        };
+
+    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat, unitStringsConverter,
+        kSeparator);
 }
 
-bool QnTimeServerSelectionModel::sameTimezone() const {
-    if (!m_sameTimezoneValid) {
-        m_sameTimezone = calculateSameTimezone();
-        m_sameTimezoneValid = true;
-    }
+QVariant QnTimeServerSelectionModel::offsetForeground(qint64 offsetMs) const
+{
+    if (m_colors.empty())
+        return QVariant();
+
+    unsigned int offsetSeconds = static_cast<unsigned int>(qMin<qint64>(
+        qAbs(offsetMs) / 1000, std::numeric_limits<unsigned int>::max()));
+
+    int index = std::upper_bound(kOffsetThresholdSeconds.begin(), kOffsetThresholdSeconds.end(), offsetSeconds)
+        - kOffsetThresholdSeconds.begin();
+
+    return QVariant::fromValue(QBrush(m_colors[qBound(0, index, m_colors.size() - 1)]));
+}
+
+const QVector<QColor>& QnTimeServerSelectionModel::colors() const
+{
+    return m_colors;
+}
+
+void QnTimeServerSelectionModel::setColors(const QVector<QColor>& colors)
+{
+    if (colors == m_colors)
+        return;
+
+    m_colors = colors;
+
+    if (!m_items.isEmpty())
+        emit dataChanged(index(0, OffsetColumn), index(m_items.size() - 1, OffsetColumn), kForegroundRole);
+}
+
+bool QnTimeServerSelectionModel::sameTimezone() const
+{
+    if (m_sameTimezoneValid)
+        return m_sameTimezone;
+
+    m_sameTimezone = calculateSameTimezone();
+    m_sameTimezoneValid = true;
     return m_sameTimezone;
 }
 
-bool QnTimeServerSelectionModel::calculateSameTimezone() const {
+bool QnTimeServerSelectionModel::calculateSameTimezone() const
+{
     auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
     qint64 localOffset = nx_tz::getLocalTimeZoneOffset(); /* In minutes. */
     qint64 commonOffset = localOffset == -1
         ? Qn::InvalidUtcOffset
         : localOffset*60;
 
-    foreach (const Item &item, m_items) {
+    for (const auto& item : m_items)
+    {
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
         if (!server || server->getStatus() != Qn::Online)
             continue;
 
-        qint64 offset = watcher->utcOffset(server); /* In milliseconds. */
-        if (offset == Qn::InvalidUtcOffset)
+        auto offsetMs = watcher->utcOffset(server);
+        if (offsetMs == Qn::InvalidUtcOffset)
             continue;
-        offset /= 1000;
+
+        auto offset = offsetMs / 1000;
 
         if (commonOffset == Qn::InvalidUtcOffset)
             commonOffset = offset;
-        else
-            if (commonOffset != offset)
-                return false;
+        else if (commonOffset != offset)
+            return false;
     }
+
     return true;
 }
 
@@ -408,18 +595,17 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
     if (auto connection = QnAppServerConnectionFactory::getConnection2())
     {
         auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
-        foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
+        for (const auto& info : timeManager->getPeerTimeInfoList())
             m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
     }
 
     /* Fill table with current data. */
-    beginResetModel();
+    ScopedReset modelReset(this);
     m_items.clear();
-    foreach(const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems())
+    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
     {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
         addItem(runtimeInfo);
     }
-    endResetModel();
 }

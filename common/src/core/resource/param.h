@@ -9,6 +9,7 @@ namespace Qn
     //dynamic parameters of resource
 
     static const QString POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME = lit("possibleDefaultCredentials");
+    static const QString PREFERRED_AUTH_SCHEME_PARAM_NAME = lit("preferredAuthScheme");
     static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
     static const QString DTS_PARAM_NAME = lit("dts");
     static const QString ANALOG_PARAM_NAME = lit("analog");
@@ -21,6 +22,7 @@ namespace Qn
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
+    static const QString DESIRED_TRANSPORT_PARAM_NAME = lit("desiredTransport");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver
@@ -79,7 +81,7 @@ namespace Qn
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
-    static const QString PHISICAL_MEMORY = lit("phisicalMemory");
+    static const QString PHYSICAL_MEMORY = lit("physicalMemory");
     static const QString BETA = lit("beta");
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
@@ -92,4 +94,7 @@ namespace Qn
 
     // Storage
     static const QString SPACE = lit("space");
+
+    // User
+    static const QString USER_FULL_NAME = lit("fullUserName");
 }

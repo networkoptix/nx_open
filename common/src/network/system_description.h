@@ -9,17 +9,24 @@
 
 class QnSystemDescription : public QnBaseSystemDescription
 {
+    Q_OBJECT
+
     typedef QnBaseSystemDescription base_type;
 
 public:
     typedef QSharedPointer<QnSystemDescription> PointerType;
+
+    static PointerType createFactorySystem(const QString& systemId);
+
     static PointerType createLocalSystem(
         const QString &systemId,
+        const QnUuid &localSystemId,
         const QString &systemName);
 
     static PointerType createCloudSystem(
-        const QString &systemId, 
-        const QString &systemName, 
+        const QString &systemId,
+        const QnUuid& localSystemId,
+        const QString &systemName,
         const QString &ownerAccountEmail,
         const QString &ownerFullName);
 
@@ -27,6 +34,8 @@ public:
 
 public: // overrides
     QString id() const override;
+
+    QnUuid localId() const override;
 
     QString name() const override;
 
@@ -36,13 +45,15 @@ public: // overrides
 
     bool isCloudSystem() const override;
 
+    bool isNewSystem() const override;
+
     ServersList servers() const override;
 
     bool containsServer(const QnUuid& serverId) const override;
 
     QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid& serverId) const override;
+    QUrl getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
@@ -54,28 +65,42 @@ public:
 
     void removeServer(const QnUuid& serverId);
 
-    void setServerHost(const QnUuid& serverId, const QString& host);
+    void setServerHost(const QnUuid& serverId, const QUrl& host);
+
+    void setName(const QString& value);
 
 private:
-    QnSystemDescription(const QString& systemId, const QString& systemName);
+    // Ctor for factory (new) system
+    QnSystemDescription(const QString& systemId);
 
+    // Ctor for local system
+    QnSystemDescription(const QString& systemId,
+        const QnUuid &localSystemId,
+        const QString& systemName);
+
+    // Ctor for cloud system
     QnSystemDescription(
         const QString& systemId,
+        const QnUuid &localSystemId,
         const QString& systemName,
         const QString& cloudOwnerAccountEmail,
         const QString& ownerFullName);
 
+    static QString extractSystemName(const QString& systemName);
+
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
-    typedef QHash<QnUuid, QString> HostsHash;
+    typedef QHash<QnUuid, QUrl> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QString m_id;
-    const QString m_systemName;
+    const QnUuid m_localId;
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     const bool m_isCloudSystem;
+    const bool m_isNewSystem;
+    QString m_systemName;
     ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;

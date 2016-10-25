@@ -1,9 +1,39 @@
 #include "nx_style_p.h"
+#include "skin.h"
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
 
 using namespace style;
+
+namespace {
+
+void paintLabelIcon(
+    QRect* labelRect,
+    QPainter* painter,
+    const QIcon& icon,
+    Qt::LayoutDirection direction,
+    Qt::Alignment alignment,
+    int padding,
+    QIcon::Mode mode = QIcon::Normal,
+    QIcon::State state = QIcon::Off)
+{
+    QSize iconSize = QnSkin::maximumSize(icon, mode, state);
+    QRect iconRect = QStyle::alignedRect(
+        direction,
+        alignment,
+        iconSize,
+        *labelRect);
+
+    icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
+
+    if (labelRect->left() == iconRect.left())
+        labelRect->setLeft(iconRect.right() + padding + 1);
+    else
+        labelRect->setRight(iconRect.left() - padding - 1);
+}
+
+} // namespace
 
 QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const
 {
@@ -323,6 +353,72 @@ void QnNxStylePrivate::drawCross(
 
     painter->drawLine(crossRect.topLeft(), crossRect.bottomRight());
     painter->drawLine(crossRect.topRight(), crossRect.bottomLeft());
+}
+
+void QnNxStylePrivate::drawTextButton(
+    QPainter* painter,
+    const QStyleOptionButton* option,
+    QPalette::ColorRole foregroundRole,
+    const QWidget* widget) const
+{
+    Q_UNUSED(widget);
+
+    bool enabled = option->state.testFlag(QStyle::State_Enabled);
+    bool hovered = option->state.testFlag(QStyle::State_MouseOver);
+    bool pressed = option->state.testFlag(QStyle::State_Sunken);
+
+    QBrush brush = option->palette.brush(foregroundRole);
+    QIcon::Mode iconMode = enabled ? QIcon::Normal : QIcon::Disabled;
+
+    if (hovered && enabled && !pressed)
+    {
+        QnPaletteColor color = findColor(option->palette.color(foregroundRole));
+        brush.setColor(color.lighter(2));
+        iconMode = QIcon::Active;
+    }
+
+    QRect textRect(option->rect);
+
+    if (!option->icon.isNull())
+    {
+        paintLabelIcon(
+            &textRect,
+            painter,
+            option->icon,
+            option->direction,
+            Qt::AlignLeft | Qt::AlignVCenter,
+            Metrics::kTextButtonIconMargin,
+            iconMode);
+    }
+
+    if (option->features.testFlag(QStyleOptionButton::HasMenu))
+    {
+        QIcon icon = pressed
+            ? qnSkin->icon(lit("buttons/collapse.png"))
+            : qnSkin->icon(lit("buttons/expand.png"));
+
+        paintLabelIcon(
+            &textRect,
+            painter,
+            icon,
+            option->direction,
+            Qt::AlignRight | Qt::AlignVCenter,
+            Metrics::kMenuButtonIndicatorMargin,
+            iconMode);
+    }
+
+    static const int kTextFlags = Qt::TextSingleLine
+                                | Qt::TextHideMnemonic
+                                | Qt::AlignLeft
+                                | Qt::AlignVCenter;
+
+    QString text = option->fontMetrics.elidedText(
+        option->text,
+        Qt::ElideRight,
+        textRect.width());
+
+    QnScopedPainterPenRollback penRollback(painter, QPen(brush.color()));
+    painter->drawText(textRect, kTextFlags, text);
 }
 
 /* Insert horizontal separator line into QInputDialog above its button box: */

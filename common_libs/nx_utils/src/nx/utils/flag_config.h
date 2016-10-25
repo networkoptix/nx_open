@@ -23,7 +23,7 @@ namespace utils {
  *         // or:
  *         MyModuleConf(const char* s): nx::utils::FlagConfig(s) { reload(); } //< Initial reload.
  *
- *         NX_FLAG(0, myFlag "Here 0 stands for 'false' as the default value.");
+ *         NX_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
  *         NX_INT_PARAM(7, myInt, "Here 7 is the default value.");
  *         NX_STRING_PARAM("Default value", myStr, "Description.");
  *     };
@@ -53,8 +53,10 @@ public:
     /** Called by NX_STRING_PARAM() macro; @return defaultValue. */
     const char* regStringParam(const char** pValue, const char* defaultValue, const char* paramName, const char* descr);
 
+    enum class OutputType { verbose, silent };
+
     /** Reload values from file(s), logging the values to std::cerr. */
-    void reload();
+    void reload(OutputType outputType = OutputType::verbose);
 
     /** Allows to avoid reloading on next call to reload(), which will only restore this flag. */
     void skipNextReload();
@@ -64,9 +66,14 @@ public:
 
     const char* moduleName() const;
 
+    /** Configures if std out and error output is allowed */
+    static void setOutputAllowed(bool isAllowed);
+
 private:
     class Impl;
     Impl* const d;
+
+    static bool s_isOutputAllowed; //< TODO: atomic?
 };
 
 #define NX_FLAG(DEFAULT, NAME, DESCR) bool NAME = regFlagParam(&NAME, (DEFAULT), #NAME, (DESCR))

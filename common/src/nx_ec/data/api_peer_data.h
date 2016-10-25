@@ -6,7 +6,7 @@
 
 namespace ec2 {
 
-struct ApiPeerData: ApiData
+struct ApiPeerData: ApiIdData
 {
     ApiPeerData():
         dataFormat(Qn::UbjsonFormat)
@@ -18,7 +18,7 @@ struct ApiPeerData: ApiData
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
         :
-        id(id),
+        ApiIdData(id),
         instanceId(instanceId),
         peerType(peerType),
         dataFormat(dataFormat)
@@ -34,7 +34,7 @@ struct ApiPeerData: ApiData
 
     static bool isClient(Qn::PeerType peerType)
     {
-        return peerType != Qn::PT_Server;
+            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer;
     }
 
     bool isClient() const
@@ -54,11 +54,10 @@ struct ApiPeerData: ApiData
 
     bool isMobileClient() const
     {
-        return peerType == Qn::PT_MobileClient || peerType == Qn::PT_LiteClient;
+        return
+            peerType == Qn::PT_OldMobileClient ||
+            peerType == Qn::PT_MobileClient;
     }
-
-    /** Unique ID of the peer. */
-    QnUuid id;
 
     /** Unique running instance ID of the peer. */
     QnUuid instanceId;
@@ -71,6 +70,6 @@ struct ApiPeerData: ApiData
 };
 typedef QSet<QnUuid> QnPeerSet;
 
-#define ApiPeerData_Fields (id)(instanceId)(peerType)(dataFormat)
+#define ApiPeerData_Fields ApiIdData_Fields (instanceId)(peerType)(dataFormat)
 
 } // namespace ec2

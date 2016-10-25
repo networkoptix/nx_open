@@ -248,13 +248,13 @@ bool QnRecordingManager::startOrStopRecording(
 
     bool someRecordingIsPresent = false;
 
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
+
     if (needRecordCamera && res->getStatus() != Qn::Offline)
     {
         if (!cameraRes->isInitialized())
             return false; // wait for initialization
-
-        QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
-        QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
 
         someRecordingIsPresent = true;
 
@@ -305,7 +305,10 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             recorderHiRes->pleaseStop();
             camera->notInUse(recorderHiRes);
+            if (providerHi)
+                providerHi->setFps(cameraRes->getMaxFps());
         }
+
         if (needStopLow) {
             recorderLowRes->pleaseStop();
             camera->notInUse(recorderLowRes);
@@ -314,10 +317,11 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
         }
+
         if (!res->hasFlags(Qn::foreigner)) {
             if(!needStopHi && !needStopLow && res->getStatus() == Qn::Recording)
                 res->setStatus(Qn::Online); // may be recording thread was not runned, so reset status to online
-        }
+        }   
     }
 
     //doing anyway to stop internal cache, etc...
@@ -403,6 +407,13 @@ void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &re
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
+    Q_ASSERT(!qnCameraPool->getVideoCamera(resource));
+    if (qnCameraPool->getVideoCamera(resource))
+        NX_LOG(lit("%1: VideoCamera for this resource %2 already exists")
+                .arg(Q_FUNC_INFO)
+                .arg(resource->getUrl()),
+               cl_logWARNING);
+    qnCameraPool->addVideoCamera(resource);
     if (camera)
     {
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);

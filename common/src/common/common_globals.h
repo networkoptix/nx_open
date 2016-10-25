@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef BOOST_BIND_NO_PLACEHOLDERS
 #define BOOST_BIND_NO_PLACEHOLDERS
+#endif // BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
 #include <limits>
 
@@ -22,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-    ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+    ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
@@ -261,7 +263,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
     //TODO: #GDM split to server-only and client-only flags as they are always local
-    enum ResourceFlag {
+    enum ResourceFlag
+    {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
         streamprovider              = 0x4,
@@ -284,23 +287,42 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         motion                      = 0x10000,      /**< Resource has motion */
         sync                        = 0x20000,      /**< Resource can be used in sync playback mode. */
+
+        /* Server-only flag. */
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+
+        /* Server-only flag. */
         no_last_gop                 = 0x80000,      /**< Do not use last GOP for this when stream is opened */
 
-        deprecated                  = 0x100000,     /**< Resource absent in Server but still used in memory for some reason */
+        /* Client-only flag */
+        fake                        = 0x100000,     /**< Fake server (belonging to other system). */
+
         videowall                   = 0x200000,     /**< Videowall resource */
         desktop_camera              = 0x400000,     /**< Desktop Camera resource */
-        parent_change               = 0x800000,     /**< Camera discovery internal purpose */
 
-        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
+        /* Server-only flag. */
+        parent_change               = 0x800000,     /**< Camera discovery internal purpose. Server-only flag. */
+
+        /* Client-only flag. */
+        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status. */
+
+        /* Server-only flag. */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
+
         io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
 
-        local_media = local | media,
+        /* Client-only flag. */
+        exported                    = 0x20000000,   /**< Exported media file. */
+
+
+        local_media = local | media | url,
+        exported_media = local_media | exported,
+
         local_layout = local | layout,
+        exported_layout = local_layout | url | exported,
 
         local_server = local | server,
         remote_server = remote | server,
@@ -314,6 +336,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
+        fake_server = remote_server | fake,
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -523,8 +546,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
-        PT_MobileClient = 3,
-        PT_LiteClient = 4,
+        PT_OldMobileClient = 3,
+        PT_MobileClient = 4,
+        PT_CloudServer = 5,
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -620,7 +644,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_WrongPassword, // invalid password
         Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
         Auth_PasswordExpired, // Password is expired
-        Auth_ConnectError   // can't connect to the external system to authenticate
+        Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
+        Auth_CloudConnectError   // can't connect to the Cloud to authenticate
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
 
@@ -679,6 +704,15 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
     Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
+
+    enum StorageInitResult
+    {
+        StorageInit_Ok,
+        StorageInit_CreateFailed,
+        StorageInit_WrongPath,
+        StorageInit_WrongAuth,
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageInitResult)
 
     /**
      * Flags describing the actions permitted for the user to do with the
@@ -762,6 +796,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAccessAllMediaPermission          = 0x01000000,   /**< Has access to all media resources (cameras and web pages). */
 
 
+        GlobalCustomUserPermission              = 0x10000000,   /**< Flag that just mark new user as 'custom'. */
+
         /* Shortcuts. */
 
         /* Live viewer has access to all cameras and global layouts by default. */
@@ -803,15 +839,17 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LiveViewer,
     };
 
-    enum class ConnectionResult
+    enum ConnectionResult
     {
-        Success,                    /*< Connection available. */
-        NetworkError,               /*< Connection could not be established. */
-        Unauthorized,               /*< Invalid login/password. */
-        TemporaryUnauthorized,      /*< LDAP server is not accessible. */
-        IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
-        IncompatibleVersion,        /*< Server version is too low. */
-        IncompatibleProtocol        /*< Ec2 protocol versions differs.*/
+        SuccessConnectionResult,                    /*< Connection available. */
+        NetworkErrorConnectionResult,               /*< Connection could not be established. */
+        UnauthorizedConnectionResult,               /*< Invalid login/password. */
+        LdapTemporaryUnauthorizedConnectionResult,  /*< LDAP server is not accessible. */
+        CloudTemporaryUnauthorizedConnectionResult, /*< CLOUD server is not accessible. */
+        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
+        IncompatibleVersionConnectionResult,        /*< Server version is too low. */
+        IncompatibleProtocolConnectionResult        /*< Ec2 protocol versions differs.*/
     };
 
     /**
@@ -839,7 +877,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
+        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)

@@ -1,0 +1,1 @@
+ALTER TABLE transaction_log ADD COLUMN "tran_type" int DEFAULT 0;

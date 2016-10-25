@@ -60,7 +60,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
         BackupFailedChunkError,
         BackupEndOfPeriod,
         BackupDone,
-        BackupCancelled
+        BackupCancelled,
+
+        NetworkNoResponseFromDevice
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 

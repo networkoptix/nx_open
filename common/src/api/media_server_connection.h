@@ -205,7 +205,7 @@ public:
      * @param slot Slot MUST have signature (int, QString, int).
      * @return Request handle. -1 In case of failure to start async request.
      */
-    int getSystemNameAsync(QObject* target, const char* slot);
+    int getSystemIdAsync(QObject* target, const char* slot);
 
     /**
      * Request the server to run the camera diagnostics step following previousStep.
@@ -266,6 +266,21 @@ protected:
     virtual QnAbstractReplyProcessor* newReplyProcessor(int object) override;
     virtual bool isReady() const override;
 
+    int sendAsyncGetRequestLogged(
+        int object,
+        const QnRequestParamList& params,
+        const char* replyTypeName,
+        QObject* target,
+        const char* slot);
+
+    int sendAsyncPostRequestLogged(
+        int object,
+        nx_http::HttpHeaders headers,
+        const QnRequestParamList& params,
+        const QByteArray& data,
+        const char* replyTypeName,
+        QObject* target,
+        const char* slot);
 private:
     QString m_proxyAddr;
     int m_proxyPort;

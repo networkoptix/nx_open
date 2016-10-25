@@ -26,6 +26,7 @@ struct FrameMetadata
     bool noDelay; /**< Display frame immediately with no delay. */
     int frameNum; /**< Frame number in range [0..INT_MAX]. */
     double sar; /**< square(pixel) aspect ratio */
+    int videoChannel; /**< For multi-sensor cameras */
 };
 
 } // namespace media

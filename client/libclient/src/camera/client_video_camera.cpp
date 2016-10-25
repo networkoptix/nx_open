@@ -26,7 +26,7 @@ public:
     QnTimeLapseRecorder(const QnResourcePtr& resource, qint64 timeStepUsec):
         QnStreamRecorder(resource),
         m_currentRelativeTimeUsec(0),
-        m_currentAbsoluteTimeUsec(AV_NOPTS_VALUE),
+        m_currentAbsoluteTimeUsec(std::numeric_limits<qint64>::min()),
         m_timeStepUsec(timeStepUsec)
     {
 
@@ -45,7 +45,7 @@ protected:
         // we can use non const object if only 1 consumer
         Q_ASSERT(nonConstMd->dataProvider->processorsCount() <= 1);
 
-        if (m_currentAbsoluteTimeUsec == AV_NOPTS_VALUE)
+        if (m_currentAbsoluteTimeUsec < md->timestamp)
             m_currentAbsoluteTimeUsec = md->timestamp;
         else
             m_currentAbsoluteTimeUsec += m_timeStepUsec;
@@ -68,20 +68,6 @@ private:
     qint64 m_currentAbsoluteTimeUsec;
     qint64 m_timeStepUsec;
 };
-
-
-QString QnClientVideoCamera::errorString(int errCode) {
-    switch (errCode) {
-    case NoError:
-        return QString();
-    case InvalidResourceType:
-        return tr("Invalid resource type for data export.");
-    default:
-        break;
-    }
-
-    return QnStreamRecorder::errorString(errCode);
-}
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     base_type(nullptr),
@@ -193,7 +179,7 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
 												  const  QString& fileName, const QString& format,
                                             QnStorageResourcePtr storage,
-                                            QnStreamRecorder::Role role,
+                                            StreamRecorderRole role,
                                             qint64 serverTimeZoneMs,
                                             qint64 timelapseFrameStepMs,
                                             QnImageFilterHelper transcodeParams)
@@ -221,17 +207,14 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             if (!archiveReader)
             {
                 delete tmpReader;
-                emit exportFinished(
-                    QnStreamRecorder::ErrorStruct(
-                    InvalidResourceType,
-                    QnStorageResourcePtr()
-                    ),
-                    fileName
-                    );
+
+                const auto errorStruct = StreamRecorderErrorStruct(
+                    StreamRecorderError::invalidResourceType, QnStorageResourcePtr());
+                emit exportFinished(errorStruct, fileName);
                 return;
             }
             archiveReader->setCycleMode(false);
-            if (role == QnStreamRecorder::Role_FileExport)
+            if (role == StreamRecorderRole::fileExport)
                 archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
             QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());

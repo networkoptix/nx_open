@@ -34,7 +34,7 @@ public:
 private:
     QnVirtualCameraResourceList availableCameras() const;
 
-    QnVirtualCameraResourcePtr availableCameraByUniqueId(const QString &uniqueId) const;
+    QnVirtualCameraResourcePtr availableCameraById(const QnUuid &cameraId) const;
 
     void resetToAllAvailableCameras();
 
@@ -51,6 +51,8 @@ private:
     bool currentUserHasAllCameras();
 
     void applyModelChanges();
+
+    void reset();
 
 private:
     typedef QScopedPointer<Ui::BookmarksLog> UiImpl;

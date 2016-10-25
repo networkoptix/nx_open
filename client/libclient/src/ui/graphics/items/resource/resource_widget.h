@@ -39,21 +39,28 @@ class QnScrollableOverlayWidget;
 class QnButtonsOverlay;
 class GraphicsLabel;
 
-class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget:
+    public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
+    public QnWorkbenchContextAware,
+    public ConstrainedResizable,
+    public HelpTopicQueryable,
+    protected QnGeometry
+{
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
+    using base_type = Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>;
 
 public:
-    enum Option {
+    enum Option
+    {
         DisplayActivity             = 0x00001,   /**< Whether the paused overlay icon should be displayed. */
         DisplaySelection            = 0x00002,   /**< Whether selected / not selected state should be displayed. */
         DisplayMotion               = 0x00004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        //DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */ supressed by InfoOverlaysForbidden
+
         DisplayMotionSensitivity    = 0x00010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x00020,   /**< Whether PTZ crosshair is to be displayed. */
         DisplayInfo                 = 0x00040,   /**< Whether info panel is to be displayed. */
@@ -63,13 +70,14 @@ public:
         ControlZoomWindow           = 0x00200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
         WindowRotationForbidden     = 0x01000,
-        SyncPlayForbidden           = 0x02000,   /**< Whether SyncPlay is forbidden for this widget. */
-        InfoOverlaysForbidden       = 0x04000,
+        WindowResizingForbidden     = 0x02000,
+        SyncPlayForbidden           = 0x04000,   /**< Whether SyncPlay is forbidden for this widget. */
+        InfoOverlaysForbidden       = 0x08000,
 
-        FullScreenMode              = 0x08000,
-        ActivityPresence            = 0x10000,
+        FullScreenMode              = 0x10000,
+        ActivityPresence            = 0x20000,
 
-        AlwaysShowName              = 0x20000
+        AlwaysShowName              = 0x40000
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -113,16 +121,12 @@ public:
     /**
      * \returns                         Frame opacity of this widget.
      */
-    qreal frameOpacity() const {
-        return m_frameOpacity;
-    }
+    qreal frameOpacity() const;
 
     /**
      * \param frameOpacity              New frame opacity for this widget.
      */
-    void setFrameOpacity(qreal frameOpacity) {
-        m_frameOpacity = frameOpacity;
-    }
+    void setFrameOpacity(qreal frameOpacity);
 
     QColor frameDistinctionColor() const;
     void setFrameDistinctionColor(const QColor &frameColor);
@@ -132,18 +136,14 @@ public:
      *                                  Negative value will be returned if this
      *                                  widget does not have aspect ratio.
      */
-    float aspectRatio() const {
-        return m_aspectRatio;
-    }
+    float aspectRatio() const;
 
     void setAspectRatio(float aspectRatio);
 
     /**
      * \returns                         Whether this widget has an aspect ratio.
      */
-    bool hasAspectRatio() const {
-        return m_aspectRatio > 0.0;
-    }
+    bool hasAspectRatio() const;
 
     /**
      * \returns                         Aspect ratio of this widget taking its rotation into account.
@@ -191,9 +191,7 @@ public:
      * \param option                    Affected option.
      * \param value                     New value for the affected option.
      */
-    void setOption(Option option, bool value = true) {
-        setOptions(value ? m_options | option : m_options & ~option);
-    }
+    void setOption(Option option, bool value = true);
 
     /**
      * \param options                   New options for this widget.
@@ -258,17 +256,16 @@ signals:
     void displayInfoChanged();
 
 protected:
-    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
-    virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter* painter, int channel,
+        const QRectF& channelRect, const QRectF& paintRect);
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
 
     void paintSelection(QPainter *painter, const QRectF &rect);
@@ -298,9 +295,6 @@ protected:
     void updatePositionText();
 
     void updateInfoText();
-
-    virtual QCursor calculateCursor() const;
-    Q_SLOT void updateCursor();
 
     QnStatusOverlayController *statusOverlayController() const;
 

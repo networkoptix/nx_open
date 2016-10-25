@@ -6,7 +6,9 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -109,7 +111,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     QList<QnCameraUserAttributes> backup;
     for(const QnCameraUserAttributesPtr& cameraAttrs: pool->getAttributesList(idList))
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs->cameraID );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs->cameraId );
         backup << *(*userAttributesLock);
     }
 
@@ -142,10 +144,10 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
         for( const QnCameraUserAttributes& cameraAttrs: backup ) {
             QSet<QByteArray> modifiedFields;
             {
-                QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs.cameraID );
+                QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs.cameraId );
                 (*userAttributesLock)->assign( cameraAttrs, &modifiedFields );
             }
-            if( const QnResourcePtr& res = qnResPool->getResourceById(cameraAttrs.cameraID) )   //it is OK if resource is missing
+            if( const QnResourcePtr& res = qnResPool->getResourceById(cameraAttrs.cameraId) )   //it is OK if resource is missing
                 res->emitModificationSignals( modifiedFields );
         }
 
@@ -231,7 +233,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
     QList<QnMediaServerUserAttributes> backup;
     for(const QnMediaServerUserAttributesPtr& serverAttrs: pool->getAttributesList(idList)) {
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs->serverID );
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs->serverId );
         backup << *(*userAttributesLock);
     }
 
@@ -265,11 +267,11 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
         for( const QnMediaServerUserAttributes& serverAttrs: backup ) {
             QSet<QByteArray> modifiedFields;
             {
-                QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs.serverID );
+                QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs.serverId);
                 (*userAttributesLock)->assign( serverAttrs, &modifiedFields );
             }
             if (!modifiedFields.isEmpty()) {
-                if( const QnResourcePtr& res = qnResPool->getResourceById(serverAttrs.serverID) )   //it is OK if resource is missing
+                if( const QnResourcePtr& res = qnResPool->getResourceById(serverAttrs.serverId) )   //it is OK if resource is missing
                     res->emitModificationSignals( modifiedFields );
                 somethingWasChanged = true;
             }
@@ -344,20 +346,19 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     if (!connection)
         return;
 
-    auto key = subject.sharedResourcesKey();
     auto sessionGuid = qnCommon->runningInstanceGUID();
-    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(key);
-    if (accessibleResourcesBackup == accessibleResources)
+    auto backup = qnSharedResourcesManager->sharedResources(subject);
+    if (backup == accessibleResources)
         return;
 
-    qnResourceAccessManager->setAccessibleResources(key, accessibleResources);
+    qnSharedResourcesManager->setSharedResources(subject, accessibleResources);
 
     ec2::ApiAccessRightsData accessRights;
-    accessRights.userId = key;
+    accessRights.userId = subject.effectiveId();
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
-        [this, key, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
+        [this, subject, sessionGuid, backup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -369,11 +370,11 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->setAccessibleResources(key, accessibleResourcesBackup);
+        qnSharedResourcesManager->setSharedResources(subject, backup);
     });
 }
 
-void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userGroup)
+void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserGroupData& role)
 {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
@@ -381,11 +382,11 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    auto backup = qnResourceAccessManager->userGroup(userGroup.id);
-    qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
+    auto backup = qnUserRolesManager->userRole(role.id);
+    qnUserRolesManager->addOrUpdateUserRole(role);
 
-    connection->getUserManager(Qn::kSystemAccess)->saveUserGroup(userGroup, this,
-        [backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+    connection->getUserManager(Qn::kSystemAccess)->saveUserGroup(role, this,
+        [backup, role, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -398,13 +399,13 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
             return;
 
         if (backup.id.isNull())
-            qnResourceAccessManager->removeUserGroup(userGroup.id);  /*< New group was not added */
+            qnUserRolesManager->removeUserRole(role.id);  /*< New group was not added */
         else
-            qnResourceAccessManager->addOrUpdateUserGroup(backup);
+            qnUserRolesManager->addOrUpdateUserRole(backup);
     });
 }
 
-void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
+void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
 {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
@@ -412,10 +413,10 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    auto backup = qnResourceAccessManager->userGroup(groupId);
-    qnResourceAccessManager->removeUserGroup(groupId);
+    auto backup = qnUserRolesManager->userRole(id);
+    qnUserRolesManager->removeUserRole(id);
 
-    connection->getUserManager(Qn::kSystemAccess)->removeUserGroup(groupId, this,
+    connection->getUserManager(Qn::kSystemAccess)->removeUserGroup(id, this,
         [backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
@@ -428,7 +429,7 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->addOrUpdateUserGroup(backup);
+        qnUserRolesManager->addOrUpdateUserRole(backup);
     });
 }
 

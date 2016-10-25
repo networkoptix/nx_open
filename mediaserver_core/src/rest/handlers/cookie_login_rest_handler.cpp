@@ -22,8 +22,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCookieData, (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCookieData), (json), _Fields)
 
 int QnCookieLoginRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
+    const QString &/*path*/,
+    const QnRequestParams &/*params*/,
     const QByteArray &body,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)

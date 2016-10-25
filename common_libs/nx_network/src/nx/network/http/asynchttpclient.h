@@ -93,7 +93,12 @@ namespace nx_http
             std::chrono::milliseconds responseReadTimeout;
             std::chrono::milliseconds messageBodyReadTimeout;
 
-            Timeouts();
+            Timeouts(
+                std::chrono::milliseconds send = kDefaultSendTimeout,
+                std::chrono::milliseconds recv = kDefaultResponseReadTimeout,
+                std::chrono::milliseconds msgBody = kDefaultMessageBodyReadTimeout);
+
+            bool operator==(const Timeouts& rhs) const;
         };
 
         static const int UNLIMITED_RECONNECT_TRIES = -1;
@@ -104,10 +109,8 @@ namespace nx_http
         /*!
         \note No signal is emitted after this call
         */
-        virtual void terminate();
-
         virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-        virtual void pleaseStopSync() override;
+        virtual void pleaseStopSync(bool checkForLocks = true) override;
 
         virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
         virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -126,6 +129,21 @@ namespace nx_http
         To get error description use SystemError::getLastOSErrorCode()
         */
         void doGet(const QUrl& url);
+        /**
+         * This overload is same as:
+         * \code{.cpp}
+         * QObject::connect(
+         *     httpClient.get(), &nx_http::AsyncHttpClient::done,
+         *     [completionHandler](AsyncHttpClientPtr httpClient)
+         *     {
+         *         completionHandler(httpClient);
+         *     });
+         * httpClient->doGet();
+         * \endcode
+         */
+        void doGet(
+            const QUrl& url,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         //!Start POST request to \a url
         /*!
@@ -138,13 +156,27 @@ namespace nx_http
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody,
             bool includeContentLength = true);
+        void doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            nx_http::StringType messageBody,
+            bool includeContentLength,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         void doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody);
+        void doPut(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            nx_http::StringType messageBody,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         void doOptions(const QUrl& url);
+        void doOptions(
+            const QUrl& url,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         const nx_http::Request& request() const;
 
@@ -294,17 +326,27 @@ namespace nx_http
 
         AsyncHttpClient();
 
-        void asyncConnectDone(AbstractSocket* sock, SystemError::ErrorCode errorCode);
-        void asyncSendDone(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten);
-        void onSomeBytesReadAsync(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead);
+        void asyncConnectDone(SystemError::ErrorCode errorCode);
+        void asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWritten);
+        void onSomeBytesReadAsync(SystemError::ErrorCode errorCode, size_t bytesRead);
 
         void resetDataBeforeNewRequest();
         void initiateHttpMessageDelivery(const QUrl& url);
         void initiateTcpConnection();
-        /*!
-        \return Number of bytes, read from socket. -1 in case of read error
-        */
-        size_t readAndParseHttp(size_t bytesRead);
+        /**
+         * @return Bytes parsed or -1 in case of error.
+         */
+        size_t parseReceivedBytes(size_t bytesRead);
+        void processReceivedBytes(
+            std::shared_ptr<AsyncHttpClient> sharedThis,
+            std::size_t bytesParsed);
+        void processResponseHeadersBytes(
+            std::shared_ptr<AsyncHttpClient> sharedThis,
+            bool* const continueReceiving);
+        void processResponseMessageBodyBytes(
+            std::shared_ptr<AsyncHttpClient> sharedThis,
+            std::size_t bytesRead,
+            bool* const continueReceiving);
         void composeRequest(const nx_http::StringType& httpMethod);
         void serializeRequest();
         /*!
@@ -319,6 +361,12 @@ namespace nx_http
             const nx_http::Response& response,
             Request* const request);
         void stopWhileInAioThread();
+
+        template<typename ... Args>
+        void doHttpOperation(
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler,
+            void(AsyncHttpClient::*func)(Args...),
+            Args... args);
 
         AsyncHttpClient(const AsyncHttpClient&);
         AsyncHttpClient& operator=(const AsyncHttpClient&);
@@ -390,9 +438,9 @@ namespace nx_http
 
         void reset()
         {
-            //MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete
+            // MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete.
             if (m_obj.use_count() == 1)
-                m_obj->terminate();
+                m_obj->pleaseStopSync(false);   //< pleaseStopSync should have already been called explicitly.
             m_obj.reset();
         }
 

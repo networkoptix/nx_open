@@ -86,7 +86,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     m_frameColorAnimator = new VariantAnimator(this);
     m_frameColorAnimator->setTargetObject(this);
     m_frameColorAnimator->setAccessor(new QnVideowallItemWidgetHoverProgressAccessor());
-    m_frameColorAnimator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
+    m_frameColorAnimator->setTimeLimit(200); //TODO: #GDM check value
     registerAnimation(m_frameColorAnimator);
 
     m_hoverProcessor = new HoverFocusProcessor(this);
@@ -98,7 +98,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 
     /* Status overlay. */
     const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay);
+    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay, this);
 
     connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this, overlay, controller = m_statusOverlayController]()
@@ -425,7 +425,9 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     QnHiDpiWorkarounds::showMenu(popupMenu.data(), QCursor::pos());
 }
 
-void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& item)
+{
     Q_UNUSED(videoWall)
     if (item.uuid != m_itemUuid)
         return;

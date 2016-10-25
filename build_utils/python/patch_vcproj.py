@@ -38,7 +38,7 @@ def add_prebuild_events(root):
     """
     <Target Name="BeforeClean">
         <Message Text="Cleaning moc generated files"/>
-        <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
+        <Exec Command="del \$\(ProjectDir\)..\\\${arch}\\build\\$\(Configuration\)\\generated\\moc_*.* /F /Q" />
     </Target>    
     <ItemDefinitionGroup>
         <Link>
@@ -52,9 +52,9 @@ def add_prebuild_events(root):
     print "Adding custom header with pre-build steps"
        
     target = Element('Target', {'Name': 'BeforeClean'})
-    root.insert(0, target)   
+    root.append(target)   
     target.append(Element('Message', {'Text': 'Cleaning moc generated files'}))
-    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\$(Platform)\\build\\{0}\\generated\\moc_*.* /F /Q'.format(arch)}))
+    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\{0}\\build\\$(Configuration)\\generated\\moc_*.* /F /Q'.format(arch)}))
     indent(target, 1)
     
     group = Element('ItemDefinitionGroup')
@@ -142,6 +142,25 @@ def add_qt_path(root):
     env.text= 'PATH={0}\\bin$(LocalDebuggerEnvironment)'.format(qt_path)
     target.append(env)
     indent(target, 1)
+    
+def ignore_link_4221(root):
+    """Adding librarian additional parameter to ignore this warning."""
+    #xpath = "./Project/ItemDefinitionGroup/Lib/AdditionalOptions"
+    
+    print "Suppress linker 4221 message"
+    xpath = "./ms:ItemDefinitionGroup/ms:Lib"
+    nodes = root.findall(xpath, namespaces_dict)
+    for node in nodes:
+        existing = node.findall("./ms:AdditionalOptions", namespaces_dict)
+        if existing:
+            for e in existing:
+                e.text = '/ignore:4221 ' + e.text
+        else:  
+            target = Element('AdditionalOptions')
+            target.text = '/ignore:4221 %(AdditionalOptions)'
+            node.append(target)
+        indent(node, 2)
+       
             
 def patch_project(project):
     print "Patching {0}...".format(project)
@@ -155,7 +174,8 @@ def patch_project(project):
     fix_mocables(root)
     add_prebuild_events(root)
     add_qt_path(root)
-    #enable_fastlink(root)
+    enable_fastlink(root)
+    ignore_link_4221(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():

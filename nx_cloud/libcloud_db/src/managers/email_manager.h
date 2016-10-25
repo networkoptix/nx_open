@@ -22,29 +22,24 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/counter.h>
 
+#include "notification.h"
 #include "settings.h"
 
 
 namespace nx {
 namespace cdb {
 
+namespace conf {
+class Settings;
+}   // namespace conf
+
 class AbstractEmailManager
 {
 public:
     virtual ~AbstractEmailManager() {}
 
-    template<class NotificationType>
-    void sendAsync(
-        NotificationType notification,
-        std::function<void(bool)> completionHandler)
-    {
-        sendAsync(
-            QJson::serialized(notification),
-            std::move(completionHandler));
-    }
-
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) = 0;
 };
 
@@ -59,13 +54,13 @@ public:
 
 protected:
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override;
 
 private:
     struct SendEmailTask
     {
-        ec2::ApiEmailData email;
+        ::ec2::ApiEmailData email;
         std::function<void( bool )> completionHandler;
     };
     

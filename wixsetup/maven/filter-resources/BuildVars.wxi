@@ -1,5 +1,5 @@
 <Include>
-    <?define cloudHost = "${cloud.host}"?>
+    <?define cloudHost = "${cloudHost}"?>
 
     <?define arch = "${arch}"?>
     <?define vmax = "${vmax}"?>
@@ -59,9 +59,9 @@
     <?define archSuffix = "x86_x64" ?>
     <?endif?>
 
-    <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
-    <?define NxtoolSourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
-    <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>
+    <?define SourceDir="${libdir}/bin/${build.configuration}"?>
+    <?define NxtoolSourceDir="${libdir}/bin/${build.configuration}"?>
+    <?define PluginsDir="${libdir}/bin/${build.configuration}/plugins"?>
     <?define QtDir="${qt.dir}/bin"?>
     <?define QtPluginsDir="${qt.dir}/plugins"?>
 

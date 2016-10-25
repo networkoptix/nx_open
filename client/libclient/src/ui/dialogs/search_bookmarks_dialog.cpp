@@ -5,12 +5,14 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnSearchBookmarksDialog::QnSearchBookmarksDialog(const QString &filterText
-    , qint64 utcStartTimeMs
-    , qint64 utcFinishTimeMs
-    , QWidget *parent)
-    : base_type(parent)
-    , d_ptr(new QnSearchBookmarksDialogPrivate(filterText, utcStartTimeMs, utcFinishTimeMs, this))
+QnSearchBookmarksDialog::QnSearchBookmarksDialog(
+    const QString& filterText,
+    qint64 utcStartTimeMs,
+    qint64 utcFinishTimeMs,
+    QWidget* parent)
+    :
+    base_type(parent),
+    d_ptr(new QnSearchBookmarksDialogPrivate(filterText, utcStartTimeMs, utcFinishTimeMs, this))
 {
     setHelpTopic(this, Qn::Bookmarks_Search_Help);
 }
@@ -19,16 +21,15 @@ QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
 {
 }
 
-void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs
-    , qint64 utcFinishTimeMs
-    , const QString &filterText)
+void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs, qint64 utcFinishTimeMs,
+    const QString &filterText)
 {
     Q_D(QnSearchBookmarksDialog);
     d->setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
 }
 
 
-void QnSearchBookmarksDialog::resizeEvent(QResizeEvent *event)
+void QnSearchBookmarksDialog::resizeEvent(QResizeEvent* event)
 {
     base_type::resizeEvent(event);
 
@@ -36,7 +37,7 @@ void QnSearchBookmarksDialog::resizeEvent(QResizeEvent *event)
     d->updateHeadersWidth();
 }
 
-void QnSearchBookmarksDialog::showEvent(QShowEvent *event)
+void QnSearchBookmarksDialog::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
 

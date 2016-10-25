@@ -78,7 +78,6 @@ private:
 
     FlirAlarmMonitoringState m_currentAlarmMonitoringState;
 
-    std::shared_ptr<SimpleEIPClient> m_eipClient;
     std::shared_ptr<EIPAsyncClient> m_eipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_outputEipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_alarmsEipAsyncClient;
@@ -93,7 +92,7 @@ private:
     QByteArray encodeGetParamData(const QnCameraAdvancedParameter& param) const;
     QByteArray encodeSetParamData(const QnCameraAdvancedParameter& param, const QString& data) const;
 
-    bool commitParam(const QnCameraAdvancedParameter& param);
+    bool commitParam(const QnCameraAdvancedParameter& param, SimpleEIPClient* eipClient);
 
     QString parseAsciiEIPResponse(const MessageRouterResponse& response) const;
     quint32 parseInt32EIPResponse(const MessageRouterResponse& response) const;
@@ -105,7 +104,7 @@ private:
     bool isPassthroughParam(const QnCameraAdvancedParameter& param) const;
     CIPPath parseParamCIPPath(const QnCameraAdvancedParameter& param) const;
 
-    bool handleButtonParam(const QnCameraAdvancedParameter& param);
+    bool handleButtonParam(const QnCameraAdvancedParameter& param, SimpleEIPClient* eipClient);
 
     void fetchAndSetAdvancedParameters();
     QString getAdvancedParametersTemplate() const;

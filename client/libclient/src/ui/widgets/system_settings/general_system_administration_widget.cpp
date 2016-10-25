@@ -22,18 +22,21 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <api/global_settings.h>
 
-#ifdef SYSTEM_NAME_EDITING_ENABLED
+#include <nx/utils/string.h>
+
 #include <utils/common/event_processors.h>
-#endif
 
 namespace {
 
-const int kSystemNameFontSizePixels = 24;
-const int kSystemNameFontWeight = QFont::DemiBold;
+static const int kSystemNameFontSizePixels = 24;
+static const int kSystemNameFontWeight = QFont::DemiBold;
+static const int kMaxSystemNameLabelWidth = 1000;
+static const int kMaxSystemNameLength = 64;
 
-const int kPreferencesButtonSize = 104;
-const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
+static const int kPreferencesButtonSize = 104;
+static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
 
 } // unnamed namespace
 
@@ -48,38 +51,48 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     font.setPixelSize(kSystemNameFontSizePixels);
     font.setWeight(kSystemNameFontWeight);
     ui->systemNameLabel->setFont(font);
-    ui->systemNameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
-    ui->systemNameLabel->setForegroundRole(QPalette::Text);
-    ui->systemNameEdit->setFont(font);
-    ui->systemNameEdit->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->systemNameLabel->setButtonIcon(qnSkin->icon("system_settings/edit.png"));
+    ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
+    ui->systemNameLabel->setValidator(
+        [this](QString& text) -> bool
+        {
+            text = text.trimmed().left(kMaxSystemNameLength);
+            return !text.isEmpty();
+        });
+
+    connect(ui->systemNameLabel, &QnEditableLabel::textChanging,
+        this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
+    connect(ui->systemNameLabel, &QnEditableLabel::editingFinished,
+        this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
     buttonLayout->setSpacing(0);
 
-    auto paintButtonFunction = [this](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
-    {
-        auto button = static_cast<const QPushButton*>(widget);
-        QRect rect = button->rect();
-
-        if (option->state.testFlag(QStyle::State_Enabled))
+    auto paintButtonFunction =
+        [this](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
         {
-            if (button->isDown())
-                painter->fillRect(button->rect(), option->palette.base());
-            else if (option->state.testFlag(QStyle::State_MouseOver))
-                painter->fillRect(button->rect(), option->palette.dark());
-        }
+            auto button = static_cast<const QPushButton*>(widget);
+            QRect rect = button->rect();
 
-        rect = rect.marginsRemoved(kPreferencesButtonMargins);
-        QRect iconRect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignHCenter | Qt::AlignTop,
-            QnSkin::maximumSize(button->icon()), rect);
+            if (option->state.testFlag(QStyle::State_Enabled))
+            {
+                if (button->isDown())
+                    painter->fillRect(button->rect(), option->palette.base());
+                else if (option->state.testFlag(QStyle::State_MouseOver))
+                    painter->fillRect(button->rect(), option->palette.dark());
+            }
 
-        button->icon().paint(painter, iconRect);
-        rect.setTop(iconRect.bottom() + 1);
+            rect = rect.marginsRemoved(kPreferencesButtonMargins);
+            QRect iconRect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignHCenter | Qt::AlignTop,
+                QnSkin::maximumSize(button->icon()), rect);
 
-        painter->drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, button->text());
+            button->icon().paint(painter, iconRect);
+            rect.setTop(iconRect.bottom() + 1);
 
-        return true;
-    };
+            painter->drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, button->text());
+
+            return true;
+        };
 
     for (auto& button : m_buttons)
     {
@@ -126,68 +139,33 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
-
-#ifdef SYSTEM_NAME_EDITING_ENABLED
-    auto editSystemName = [this]()
-    {
-        ui->systemNameEdit->setText(ui->systemNameLabel->text());
-        ui->systemNameStackedWidget->setCurrentWidget(ui->editPage);
-        ui->systemNameEdit->setFocus();
-    };
-
-    auto clickSignalizer = new QnSingleEventSignalizer(this);
-    clickSignalizer->setEventType(QEvent::MouseButtonPress);
-    ui->systemNameLabel->installEventFilter(clickSignalizer);
-    connect(clickSignalizer, &QnSingleEventSignalizer::activated, this,
-        [editSystemName](QObject* sender, QEvent* event)
-        {
-            Q_UNUSED(sender);
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
-                editSystemName();
-        });
-
-    connect(ui->systemNameEditButton, &QToolButton::clicked, this, editSystemName);
-    ui->systemNameEditButton->setVisible(true);
-    ui->systemNameEditButton->setIcon(qnSkin->icon("system_settings/edit.png"));
-    ui->systemNameEditButton->setFixedSize(QnSkin::maximumSize(ui->systemNameEditButton->icon()));
-    ui->systemNameLabel->setCursor(Qt::IBeamCursor);
-
-#else // SYSTEM_NAME_EDITING_ENABLED
-    ui->systemNameEditButton->setVisible(false);
-#endif
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
+    ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
-
-    ui->systemNameLabel->setText(qnCommon->localSystemName());
-    ui->systemNameStackedWidget->setCurrentWidget(ui->labelPage);
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
-
-#ifdef SYSTEM_NAME_EDITING_ENABLED
-    NX_ASSERT(false, "System name editing is not implemented!");
-#endif
+    ui->systemNameLabel->setEditing(false);
+    qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-#ifdef SYSTEM_NAME_EDITING_ENABLED
-    if (!ui->systemNameEdit->isHidden() && ui->systemNameEdit->text().trimmed() != qnCommon->localSystemName())
+    if (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
         return true;
-#endif
 
     return ui->systemSettingsWidget->hasChanges();
 }
 
 void QnGeneralSystemAdministrationWidget::retranslateUi()
 {
-    m_buttons[kBusinessRulesButton]->setText(tr("Alarm/Event Rules"));
+    m_buttons[kBusinessRulesButton]->setText(tr("Event Rules"));
     m_buttons[kEventLogButton     ]->setText(tr("Event Log"));
     m_buttons[kAuditLogButton     ]->setText(tr("Audit Trail"));
     m_buttons[kHealthMonitorButton]->setText(tr("Health Monitoring"));
@@ -206,7 +184,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     };
 
     m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(QnActions::BusinessEventsAction,
-        tr("Open Alarm/Event Rules Management")));
+        tr("Open Event Rules Management")));
 
     m_buttons[kEventLogButton]->setToolTip(shortcutString(QnActions::OpenBusinessLogAction,
         tr("Open Event Log")));
