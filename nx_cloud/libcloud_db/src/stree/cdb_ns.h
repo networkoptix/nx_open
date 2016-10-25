@@ -38,11 +38,11 @@ enum Value
     authAccountRightsOnSystem,
     authAccountEmail,
     authSystemId,
-    /** Operation data contains accountId equal to the one been authenticated */
+    /** Operation data contains accountId equal to the one being authenticated. */
     authSelfAccountAccessRequested,
-    /** Operation data contains systemId equal to the one been authenticated */
+    /** Operation data contains systemId equal to the one being authenticated. */
     authSelfSystemAccessRequested,
-    /** request has been authenticated by code sent to account email */
+    /** Request has been authenticated by code sent to account email. */
     authenticatedByEmailCode,
     resultCode,
 
