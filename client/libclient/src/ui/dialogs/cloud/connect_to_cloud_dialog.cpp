@@ -145,9 +145,6 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
 
     d->lockUi(false);
     d->updateUi();
-
-    ui->loginInputField->setFocus();
-
     setResizeToContentsMode(Qt::Vertical);
 }
 
@@ -166,6 +163,15 @@ void QnConnectToCloudDialog::accept()
     }
 
     base_type::accept();
+}
+
+void QnConnectToCloudDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    if (ui->loginInputField->text().isEmpty())
+        ui->loginInputField->setFocus();
+    else
+        ui->passwordInputField->setFocus();
 }
 
 QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent):

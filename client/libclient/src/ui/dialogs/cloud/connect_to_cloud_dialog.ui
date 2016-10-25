@@ -82,7 +82,7 @@
          </size>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
        </widget>
       </item>
@@ -161,7 +161,7 @@
          </size>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
        </widget>
       </item>

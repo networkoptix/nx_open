@@ -98,8 +98,6 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     d->updateUi();
     d->lockUi(false);
 
-    ui->loginInputField->setFocus();
-
     ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 
     setResizeToContentsMode(Qt::Vertical);
@@ -112,6 +110,15 @@ QnLoginToCloudDialog::~QnLoginToCloudDialog()
 void QnLoginToCloudDialog::setLogin(const QString& login)
 {
     ui->loginInputField->setText(login);
+}
+
+void QnLoginToCloudDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    if (ui->loginInputField->text().isEmpty())
+        ui->loginInputField->setFocus();
+    else
+        ui->passwordInputField->setFocus();
 }
 
 void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)

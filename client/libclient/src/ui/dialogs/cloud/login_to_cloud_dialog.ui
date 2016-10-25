@@ -150,7 +150,7 @@
       <item row="0" column="0" colspan="3">
        <widget class="QnInputField" name="loginInputField" native="true">
         <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
        </widget>
       </item>
@@ -216,7 +216,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QnInputField" name="passwordInputField" native="true">
         <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
        </widget>
       </item>
