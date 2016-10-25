@@ -13,8 +13,9 @@ class CLVideoDecoderOutput;
 
 class QnBufferedFrameDisplayer: public QnLongRunnable
 {
-    Q_OBJECT;
+    Q_OBJECT
 
+    using base_type = QnLongRunnable;
 public:
     QnBufferedFrameDisplayer();
 
@@ -36,6 +37,7 @@ public:
 
     void overrideTimestampOfNextFrameToRender(qint64 value);
 
+    virtual void pleaseStop() override;
 protected:
     virtual void run() override;
 
