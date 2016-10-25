@@ -3,6 +3,9 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCommandLineParser>
 
+QnMobileClientStartupParameters::QnMobileClientStartupParameters()
+{}
+
 QnMobileClientStartupParameters::QnMobileClientStartupParameters(
     const QCoreApplication& application)
 {

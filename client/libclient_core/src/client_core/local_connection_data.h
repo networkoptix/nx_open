@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <QtCore/QUrl>
@@ -19,6 +18,8 @@ struct QnLocalConnectionData
         const QnUuid& localId,
         const QUrl& url);
 
+    QUrl urlWithPassword() const;
+
     QString systemName;
     QnUuid localId;
     QUrl url;
@@ -26,7 +27,7 @@ struct QnLocalConnectionData
 };
 
 #define QnLocalConnectionData_Fields (systemName)(localId)(url)(password)
-QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (metatype)(eq)(json))
+QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq)(json))
 
 typedef QList<QnLocalConnectionData> QnLocalConnectionDataList;
 Q_DECLARE_METATYPE(QnLocalConnectionDataList)

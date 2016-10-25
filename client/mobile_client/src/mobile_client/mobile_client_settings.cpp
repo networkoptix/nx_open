@@ -64,22 +64,23 @@ QVariant QnMobileClientSettings::readValueFromSettings(
 }
 
 void QnMobileClientSettings::writeValueToSettings(
-        QSettings* settings,
-        int id,
-        const QVariant& value) const
+    QSettings* settings,
+    int id,
+    const QVariant& value) const
 {
     switch (id)
     {
-    /* Temporary options. Not to be written. */
-    case BasePath:
-    case LiteMode:
-    case TestMode:
-    case InitialTest:
-        break;
+        /* Temporary options. Not to be written. */
+        case BasePath:
+        case LiteMode:
+        case TestMode:
+        case InitialTest:
+        case StartupParameters:
+            break;
 
-    default:
-        base_type::writeValueToSettings(settings, id, value);
-        break;
+        default:
+            base_type::writeValueToSettings(settings, id, value);
+            break;
     }
 }
 

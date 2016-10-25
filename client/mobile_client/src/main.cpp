@@ -223,14 +223,7 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (startupParameters.url.isValid())
-    {
         NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
-        qnSettings->setLastUsedUrl(startupParameters.url);
-    }
-    else
-    {
-        NX_LOG(lit("--url not set"), cl_logDEBUG1);
-    }
 
     if (startupParameters.testMode)
     {
@@ -261,6 +254,7 @@ int main(int argc, char *argv[])
     QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);
 
+    qnSettings->setStartupParameters(startupParams);
     processStartupParams(startupParams);
 
     migrateSettings();
