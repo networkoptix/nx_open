@@ -254,9 +254,23 @@ void QnOrderedSystemsModel::updateFinalWeights()
 
     m_finalWeights = newWeights;
 
+    softInvalidate();
     updateMaxRealWeight();
+}
 
-    invalidate();
+void QnOrderedSystemsModel::softInvalidate()
+{
+    const auto source = sourceModel();
+    if (!source)
+        return;
+
+    // Forces resort without tiles removal
+
+    const auto sourceRowCount = source->rowCount();
+    const auto start = source->index(0, 0);
+    const auto end = source->index(sourceRowCount - 1, 0);
+
+    emit source->dataChanged(start, end);
 }
 
 void QnOrderedSystemsModel::updateMaxRealWeight()

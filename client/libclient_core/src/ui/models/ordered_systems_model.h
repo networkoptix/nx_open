@@ -39,6 +39,8 @@ private:
         const IdWeightDataHash& data,
         qreal& weight) const;
 
+    void softInvalidate();
+
 private:
 
     QTimer* const m_updateTimer;
