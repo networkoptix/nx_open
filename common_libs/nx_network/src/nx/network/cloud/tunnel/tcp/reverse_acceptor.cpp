@@ -119,7 +119,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     stree::ResourceContainer,
     nx_http::Request request,
     nx_http::Response* const response,
-    nx_http::HttpRequestProcessedHandler handler)
+    nx_http::RequestProcessedHandler handler)
 {
     auto connectionIt = request.headers.find(kConnection);
     if (connectionIt == request.headers.end() || connectionIt->second != kUpgrade)

@@ -27,7 +27,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler) override;
+        nx_http::RequestProcessedHandler completionHandler) override;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
@@ -39,7 +39,7 @@ private:
 
     std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
     nx_http::Request m_request;
-    nx_http::HttpRequestProcessedHandler m_requestCompletionHandler;
+    nx_http::RequestProcessedHandler m_requestCompletionHandler;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
 
     struct TargetWithOptions
