@@ -648,8 +648,7 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     return resultData;
 }
 
-nx::utils::Subscription<std::string>&
-    SystemManager::systemMarkedAsDeletedSubscription()
+nx::utils::Subscription<std::string>& SystemManager::systemMarkedAsDeletedSubscription()
 {
     return m_systemMarkedAsDeletedSubscription;
 }
