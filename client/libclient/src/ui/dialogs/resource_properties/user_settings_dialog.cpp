@@ -157,14 +157,22 @@ void QnUserSettingsDialog::updatePermissions()
     auto descriptionHtml =
         [](QnResourceAccessFilter::Filter filter, bool all, const std::pair<int, int>& counts)
         {
+            static const QString kHtmlRowTemplate1 =
+                lit("<td><b>%1</b></td><td width=16/><td>%2</td>");
+            static const QString kHtmlRowTemplate2 =
+                lit("<td><b>%1</b> / %2</td><td width=16/><td>%3</td>");
+
             QString name = kCategoryNameByFilter[filter];
             if (all)
-                return lit("<td colspan=2><b>%1 %2</b></td>").arg(tr("All")).arg(name);
+            {
+                //: This will be a part of "All Cameras & Resources" or "All Shared Layouts"
+                return kHtmlRowTemplate1.arg(tr("All")).arg(name);
+            }
 
             if (counts.second < 0)
-                return lit("<td><b>%1&nbsp;</b></td><td>%2</td>").arg(counts.first).arg(name);
+                return kHtmlRowTemplate1.arg(counts.first).arg(name);
 
-            return lit("<td><b>%1</b> / %2&nbsp;</td><td>%3</td>").arg(counts.first).arg(counts.second).arg(name);
+            return kHtmlRowTemplate2.arg(counts.first).arg(counts.second).arg(name);
         };
 
     auto descriptionById =
