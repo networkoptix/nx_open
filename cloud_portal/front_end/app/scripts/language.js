@@ -158,7 +158,7 @@ var L = {
         successDisconnected: 'System was successfully disconnected from PRODUCT_NAME',
         successDeleted: 'System {systemName} was successfully deleted from your account',
 
-        permissionsRemoved: 'Permissions were removed from {accountEmail}'
+        permissionsRemoved: 'Permissions were removed from {email}'
     },
     downloads:{
         noClientDetectedTitle: 'Install VMS_NAME to view your system',

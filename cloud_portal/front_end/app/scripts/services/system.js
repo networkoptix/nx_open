@@ -108,8 +108,8 @@ angular.module('cloudApp')
             return cloudApi.users(this.id).then(function(result){
                  _.each(result.data,function(user){
                     user.permissions = normalizePermissionString(user.customPermissions);
-
-                    if(user.accountEmail == self.currentUserEmail){
+                    user.email = user.accountEmail;
+                    if(user.email == self.currentUserEmail){
                         self.currentUserRecord = user;
                         self.checkPermissions(true);
                     }
@@ -138,7 +138,7 @@ angular.module('cloudApp')
 
 
         system.prototype.isOwner = function(user){
-            return user.isAdmin || user.accountEmail === this.info.ownerAccountEmail;
+            return user.isAdmin || user.email === this.info.ownerAccountEmail;
         };
 
         system.prototype.isAdmin = function(user){
@@ -204,9 +204,7 @@ angular.module('cloudApp')
                     user.role = self.findAccessRole(user);
                     user.accessRole = user.role.name;
 
-                    user.accountEmail = user.email;
-
-                    if(user.accountEmail == self.currentUserEmail){
+                    if(user.email == self.currentUserEmail){
                         self.currentUserRecord = user;
                         self.checkPermissions();
                     }
@@ -247,7 +245,7 @@ angular.module('cloudApp')
                     }
                     // Sort users here
                     self.users = _.sortBy(users,function(user){
-                        var isMe = user.accountEmail === self.currentUserEmail;
+                        var isMe = user.email === self.currentUserEmail;
                         var isOwner = self.isOwner(user);
                         var isAdmin = self.isAdmin(user);
 
@@ -273,17 +271,17 @@ angular.module('cloudApp')
             var accessRole = role.name || role.label;
 
             if(!user.userId){
-                if(user.accountEmail == this.currentUserEmail){
+                if(user.email == this.currentUserEmail){
                     var deferred = $q.defer();
                     deferred.reject({resultCode:'cantEditYourself'});
                     return deferred.promise;
                 }
 
                 var existingUser = _.find(this.users,function(u){
-                    return user.accountEmail == u.email;
+                    return user.email == u.email;
                 });
                 if(!existingUser){ // user not found - create a new one
-                    existingUser = this.mediaserver.userObject(user.fullName, user.accountEmail);
+                    existingUser = this.mediaserver.userObject(user.fullName, user.email);
                     this.users.push(existingUser);
                 }
                 user = existingUser;
@@ -311,7 +309,7 @@ angular.module('cloudApp')
             var self = this;
 
             // TODO: remove later
-            //cloudApi.unshare(self.id, user.accountEmail);
+            //cloudApi.unshare(self.id, user.email);
 
             return this.mediaserver.deleteUser(user.id).then(function(){
                 self.users = _.without(self.users, user);

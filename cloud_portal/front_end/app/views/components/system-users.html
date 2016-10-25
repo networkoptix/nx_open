@@ -16,7 +16,7 @@
             <tbody>
             <tr ng-repeat="user in system.users" class="hoverable">
                 <td class="user-name">{{user.fullName}}</td>
-                <td class="user-email">{{user.accountEmail}}</td>
+                <td class="user-email">{{user.email}}</td>
                 <td class="user-role">
                     <span class="inactive" ng-if="!system.isAvailable"
                         title="{{unavailableMessage}}">{{L.accessRoles[user.accessRole].label || user.accessRole}}</span>
