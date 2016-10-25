@@ -585,14 +585,14 @@ angular.module('webadminApp')
                 retry:function(){
                     checkInternet(true);
                 },
-                back:'systemName',
+                back:'chooseCloud',
                 skip:'localLogin'
             },
             noInternetOnClient:{
                 retry:function(){
                     checkInternet(true);
                 },
-                back:'systemName',
+                back:'chooseCloud',
                 skip:'localLogin'
             },
 
@@ -620,11 +620,11 @@ angular.module('webadminApp')
             },
 
             cloudIntro:{
-                back: 'systemName',
+                back: 'chooseCloud',
                 skip: 'localLogin'
             },
             cloudAuthorizedIntro:{
-                back: 'systemName',
+                back: 'chooseCloud',
                 skip: 'localLogin',
                 next: function(){
                     $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
@@ -672,7 +672,7 @@ angular.module('webadminApp')
             },
 
             localLogin:{
-                back: 'systemName',
+                back: 'chooseLocal',
                 next: initOfflineSystem,
                 valid: function(){
                     return checkForm($scope.forms.localForm) &&
