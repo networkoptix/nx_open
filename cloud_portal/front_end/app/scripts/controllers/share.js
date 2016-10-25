@@ -14,13 +14,13 @@ angular.module('cloudApp')
         $scope.isNewShare = !dialogSettings.params.user;
 
         $scope.user = dialogSettings.params.user ? _.clone(dialogSettings.params.user):{
-            accountEmail:'',
+            email:'',
             isEnabled: true
         };
 
         if(!$scope.isNewShare) {
             account.get().then(function (account) {
-                if(account.email == $scope.user.accountEmail) {
+                if(account.email == $scope.user.email) {
                     $scope.$parent.cancel(L.share.cantEditYourself);
                 }
             });
@@ -44,10 +44,10 @@ angular.module('cloudApp')
             var user = $scope.user;
 
             if(!user.fullName || user.fullName.trim() == ''){
-                return user.accountEmail;
+                return user.email;
             }
 
-            return user.fullName + ' (' + user.accountEmail +')';
+            return user.fullName + ' (' + user.email +')';
         };
 
         function doShare(){

@@ -13,7 +13,8 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
-    var cloudHost = 'cloud-dev.hdw.mx';  // 'cloud-local' // For local vagrant
+    var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
+    var cloudPort = 80;
 
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
@@ -92,8 +93,8 @@ module.exports = function (grunt) {
             ],
             proxies: [
                 // cloud-demo.hdw.mx
-                {context: '/api/',    host: cloudHost, port: 80},
-                {context: '/notifications/',    host: cloudHost, port: 80}/**/
+                {context: '/api/',    host: cloudHost, port: cloudPort},
+                {context: '/notifications/',    host: cloudHost, port: cloudPort}/**/
             ],
             livereload: {
                 options: {

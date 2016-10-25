@@ -12,31 +12,29 @@
                 <div class="col-md-3  col-md-push-9 border-left">
                     <p>
                         <b>Latest version</b>
-                        <h2><b>{{downloads.version}}</b></h2>
+                        <h2 class="version-number"><b>{{downloads.version}}</b></h2>
                     </p>
-                    <p ng-if="platform.description" ng-bind-html="platform.description"></p>
-                    <p><a ng-href="{{downloads.readMoreLink}}" target="_blank">What's new?</a></p>
+                    <p>
+                        <a ng-href="{{downloads.readMoreLink}}" target="_blank">What's new?</a>
+                        <br>&nbsp;
+                    </p>
                 </div>
 
                 <div class="col-md-9 col-md-pull-3 ">
                     <div class="row">
-                        <a ng-href="{{platform.installers[0].src}}" class="col-md-6 col-sm-8">
-                            <div class="panel panel-default hoverable">
-                                <div class="panel-body">
-                                    <span class="download-link pull-left"></span>
-                                    <h2><b>Download VMS_NAME</b></h2>
-                                    {{platform.installers[0].name}}
-                                </div>
-                            </div>
+                        <a ng-href="{{platform.installers[0].src}}" class="btn btn-lg btn-default download-button">
+                            <span class="download-link pull-left"></span>
+                            <h2><b>Download VMS_NAME</b></h2>
+                            {{platform.installers[0].name}}
                         </a>
-                    </div>
-                    <div ng-if="platform.installers.length>1">
 
+                        <p class="small" ng-if="platform.description" ng-bind-html="platform.description"></p>
+                    </div>
+
+                    <div ng-if="platform.installers.length>1">
+                        <p><b>Other packages:</b></p>
                         <div class="row">
-                            <div class="col-md-4 col-sm-6">
-                                <p><b>Other packages:</b></p>
-                            </div>
-                            <div class="col-md-4 col-sm-6" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
+                            <div class="col-lg-2 col-sm-3" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.src}}">
                                         {{link.name}}
@@ -45,7 +43,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4 col-sm-6" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
+                            <div class="col-lg-2 col-sm-3" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.src}}">
                                         {{link.name}}

@@ -18,7 +18,7 @@ var DownloadsConfig = {
         {
             os: 'Windows',
             name: 'Windows',
-            description: '<b>Supported versions:</b><br> Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012.',
+            description: 'Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012.',
 
             installers:[
                 {
@@ -34,23 +34,23 @@ var DownloadsConfig = {
                     src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x64-server-only.msi'
                 },
                 {
-                    name: 'x86 - Client & Server',
-                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86.exe'
-                },
-                {
                     name: 'x86 - Client only',
                     src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86-client-only.msi'
                 },
                 {
                     name: 'x86 - Server only',
                     src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86-server-only.msi'
+                },
+                {
+                    name: 'x86 - Client & Server',
+                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86.exe'
                 }
             ]
         },
         {
             os: 'Linux',
             name: 'Ubuntu Linux',
-            description: '<b>Supported versions:</b><br> Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS',
+            description: 'Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS',
             installers:[
                 {
                     name: 'Ubuntu x64 - Client',
@@ -61,19 +61,19 @@ var DownloadsConfig = {
                     src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-mediaserver-2.5.0.11500-x64-release.deb'
                 },
                 {
-                    name: 'x86 - Client',
-                    src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-client-2.5.0.11500-x86-release.deb'
-                },
-                {
                     name: 'x85 - Server',
                     src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-mediaserver-2.5.0.11500-x86-release.deb'
+                },
+                {
+                    name: 'x86 - Client',
+                    src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-client-2.5.0.11500-x86-release.deb'
                 }
             ]
         },
         {
             os: 'MacOS',
             name: 'Mac OS',
-            description: '<b>Supported versions:</b><br> OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion.',
+            description: 'OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion.',
             installers:[
                 {
                     name: 'Mac OSX - Client',
