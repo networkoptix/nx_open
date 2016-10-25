@@ -31,7 +31,11 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     handleLocalWeightsChanged();
     handleCloudSystemsChanged(qnCloudStatusWatcher->cloudSystems());
 
-    setSourceModel(new QnSystemsModel(this));
+    auto systemsModel = new QnSystemsModel(this);
+    setSourceModel(systemsModel);
+
+    connect(systemsModel, &QnSystemsModel::minimalVersionChanged,
+        this, &QnOrderedSystemsModel::minimalVersionChanged);
 
     setDynamicSortFilter(true);
     sort(0);
@@ -78,6 +82,19 @@ bool QnOrderedSystemsModel::getWeightFromData(
     return result;
 }
 
+QString QnOrderedSystemsModel::minimalVersion() const
+{
+    if (auto systemsModel = dynamic_cast<QnSystemsModel*>(sourceModel()))
+        return systemsModel->minimalVersion();
+    return QString();
+}
+
+void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
+{
+    if (auto systemsModel = dynamic_cast<QnSystemsModel*>(sourceModel()))
+        systemsModel->setMinimalVersion(minimalVersion);
+}
+
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
     qreal result = 0.0;
@@ -113,7 +130,6 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     }
 
     qnClientCoreSettings->setLocalSystemWeightsData(weightsData);
-    qnClientCoreSettings->save();
     return newSystemWeight;
 }
 
@@ -152,11 +168,11 @@ bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
     return (leftWeight > rightWeight);  // System with greater weight will be placed at begin
 }
 
-bool QnOrderedSystemsModel::filterAcceptsRow(int row,
-    const QModelIndex &parent) const
+bool QnOrderedSystemsModel::filterAcceptsRow(
+    int sourceRow, const QModelIndex &sourceParent) const
 {
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
-    const auto index = sourceModel()->index(row, 0, parent);
+    const auto index = sourceModel()->index(sourceRow, 0, sourceParent);
     if (!index.isValid())
         return true;
 
