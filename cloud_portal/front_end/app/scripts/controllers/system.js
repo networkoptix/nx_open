@@ -26,7 +26,13 @@ angular.module('cloudApp')
                 notFound: L.errorCodes.systemNotFound
             },
             errorPrefix:'System info is unavailable:'
-        }).then(loadUsers);
+        }).then(function (){
+            if($scope.system.permissions.editUsers){
+                $scope.gettingSystemUsers.run();
+            }else{
+                delayedUpdateSystemInfo();
+            }
+        });
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
@@ -51,7 +57,7 @@ angular.module('cloudApp')
 
 
         function loadUsers(){
-            $scope.gettingSystemUsers.run();
+            $scope.system.getUsers();
         }
         function cleanUrl(){
             $location.path('/systems/' + systemId, false);

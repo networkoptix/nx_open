@@ -333,9 +333,13 @@ angular.module('cloudApp')
             return self.getInfo().then(function(){
                 if(self.usersPromise){
                     self.usersPromise = null;
-                    return self.getUsers().then(function(){
+                    if(self.permissions.editUsers){
+                        return self.getUsers().then(function(){
+                            return self;
+                        });
+                    }else{
                         return self;
-                    });
+                    }
                 }
                 return self;
             });
