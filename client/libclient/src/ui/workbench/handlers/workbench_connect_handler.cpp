@@ -546,19 +546,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         return;
 
     const auto localId = helpers::getLocalSystemId(info);
-
-    /**
-     * TODO: #ynikitenkov Store inner state of tiles while sorting
-     * https://networkoptix.atlassian.net/browse/VMS-4343
-     *
-     * In case of weight change we have to sort tiles on welcome screen.
-     * While sorting, tiles are recreating and they loose their any state.
-     * As local recent connections updates some models, we have to store them first,
-     * before updating weights data. Thus we use raii guard to update weight at return
-     * from function. It is just workaround
-     */
-    const auto updateWeightDataAtReturn = QnRaiiGuard::createDestructable(
-        [localId]() { helpers::updateWeightData(localId); });
+    helpers::updateWeightData(localId);
 
     if (storeSettings->isConnectionToCloud)
     {

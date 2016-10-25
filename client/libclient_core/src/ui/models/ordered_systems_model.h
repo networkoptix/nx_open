@@ -53,6 +53,5 @@ private:
     IdWeightDataHash m_localWeights;
     IdWeightDataHash m_finalWeights;
     qreal m_maxRealWeight;
-    mutable IdWeightDataHash m_newSystemWeights;
     mutable bool m_updatingWeights;
 };

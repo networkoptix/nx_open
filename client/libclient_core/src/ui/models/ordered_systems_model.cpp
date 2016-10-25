@@ -15,7 +15,6 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_localWeights(),
     m_finalWeights(),
     m_maxRealWeight(0.0),
-    m_newSystemWeights(),
     m_updatingWeights(false)
 {
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::beforeCloudSystemsChanged,
@@ -98,8 +97,7 @@ void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
     qreal result = 0.0;
-    if (getWeightFromData(modelIndex, m_finalWeights, result)
-        || getWeightFromData(modelIndex, m_newSystemWeights, result))
+    if (getWeightFromData(modelIndex, m_finalWeights, result))
     {
         return result;
     }
@@ -109,9 +107,6 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     const auto localId = QnUuid(modelIndex.data(QnSystemsModel::LocalIdRoleId).toUuid());
     const auto newSystemWeight = m_maxRealWeight + 1;
     const auto lastLoginTime = QDateTime::currentMSecsSinceEpoch();
-
-    m_newSystemWeights.insert(localId.toString(),
-        QnWeightData({ localId, newSystemWeight, lastLoginTime, false }));
 
     auto weightsData = qnClientCoreSettings->localSystemWeightsData();
     const auto it = std::find_if(weightsData.begin(), weightsData.end(),
@@ -240,7 +235,6 @@ void QnOrderedSystemsModel::handleLocalWeightsChanged()
         return;
 
     m_localWeights = newWeights;
-    m_newSystemWeights.clear();
 
     updateFinalWeights();
 }

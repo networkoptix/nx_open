@@ -21,6 +21,13 @@ MaskedComboBox
     isEditableComboBox: true;
 
     activeFocusOnTab: true;
+
+    onVisibleChanged:
+    {
+        if (!visible)
+            control.isMaskedPrivate = false;
+    }
+
     onActiveFocusChanged:
     {
         if (!activeFocus || !isAvailable)
