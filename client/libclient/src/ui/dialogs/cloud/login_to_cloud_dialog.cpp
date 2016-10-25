@@ -98,13 +98,6 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     d->updateUi();
     d->lockUi(false);
 
-    setTabOrder(ui->loginInputField, ui->passwordInputField);
-    setTabOrder(ui->passwordInputField, ui->stayLoggedInCheckBox);
-    setTabOrder(ui->stayLoggedInCheckBox, ui->loginButton);
-    setTabOrder(ui->loginButton, ui->restorePasswordLabel);
-    setTabOrder(ui->restorePasswordLabel, ui->createAccountLabel);
-    ui->loginInputField->setFocus();
-
     ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 
     setResizeToContentsMode(Qt::Vertical);
@@ -117,6 +110,15 @@ QnLoginToCloudDialog::~QnLoginToCloudDialog()
 void QnLoginToCloudDialog::setLogin(const QString& login)
 {
     ui->loginInputField->setText(login);
+}
+
+void QnLoginToCloudDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    if (ui->loginInputField->text().isEmpty())
+        ui->loginInputField->setFocus();
+    else
+        ui->passwordInputField->setFocus();
 }
 
 void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)

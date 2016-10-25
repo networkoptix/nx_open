@@ -75,6 +75,7 @@ Page
             width: sessionsList.width
             systemName: model.systemName
             systemId: model.systemId
+            localId: model.localId
             cloudSystem: model.isCloudSystem
             ownerDescription: cloudSystem ? model.ownerDescription : ""
             online: model.isOnline

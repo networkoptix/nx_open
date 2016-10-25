@@ -514,7 +514,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
+        QApplication::setWindowIcon(qnSkin->icon("logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 

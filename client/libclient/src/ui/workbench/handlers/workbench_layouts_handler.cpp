@@ -209,10 +209,15 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
         //TODO: #GDM what if we've been disconnected while confirming?
         if (confirmLayoutChange(change))
         {
-            snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
             auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
             if (owner)
                 grantMissingAccessRights(owner, change);
+
+            snapshotManager()->save(layout,
+                [this](bool success, const QnLayoutResourcePtr &layout)
+                {
+                    at_layout_saved(success, layout);
+                });
         }
         else
         {

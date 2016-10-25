@@ -74,6 +74,9 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
     int handle,
     const QString& errorString)
 {
+    if (!m_twoStepRequests.contains(handle))
+        return;
+
     TwoStepRequestCtx& ctx = m_twoStepRequests[handle];
 
     QByteArray getKey = createHttpQueryAuthParam(
@@ -107,6 +110,9 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
     int handle,
     const QString& errorString)
 {
+    if (!m_twoStepRequests.contains(handle))
+        return;
+
     TwoStepRequestCtx& ctx = m_twoStepRequests[handle];
 
     QByteArray getKey = createHttpQueryAuthParam(

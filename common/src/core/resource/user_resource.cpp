@@ -49,9 +49,6 @@ QnUserResource::QnUserResource(const QnUserResource& right):
 
 Qn::UserRole QnUserResource::role() const
 {
-    if (!resourcePool())
-        return Qn::UserRole::CustomPermissions;
-
     if (isOwner())
         return Qn::UserRole::Owner;
 

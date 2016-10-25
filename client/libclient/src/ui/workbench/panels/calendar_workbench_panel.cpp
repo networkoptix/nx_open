@@ -124,19 +124,11 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
             setDayTimeWidgetOpened(false, true);
         });
 
-    m_opacityProcessor->addTargetItem(item);
-    m_opacityProcessor->addTargetItem(m_dayTimeItem);
-    m_opacityProcessor->addTargetItem(m_pinButton);
-    m_opacityProcessor->addTargetItem(m_dayTimeMinimizeButton);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &AbstractWorkbenchPanel::hoverLeft);
 
-    hidingProcessor->addTargetItem(item);
-    hidingProcessor->addTargetItem(m_dayTimeItem);
-    hidingProcessor->addTargetItem(m_pinButton);
-    hidingProcessor->addTargetItem(m_dayTimeMinimizeButton);
     hidingProcessor->setHoverLeaveDelay(kClosePanelTimeoutMs);
     hidingProcessor->setFocusLeaveDelay(kClosePanelTimeoutMs);
     connect(hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -145,6 +137,12 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
             if (!isPinned())
                 setOpened(false);
         });
+
+    for (auto item : activeItems())
+    {
+        m_opacityProcessor->addTargetItem(item);
+        hidingProcessor->addTargetItem(item);
+    }
 
     m_yAnimator->setTimer(animationTimer());
     m_yAnimator->setTargetObject(item);
@@ -155,6 +153,15 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
     m_opacityAnimatorGroup->setTimeLimit(kShowHideAnimationPeriodMs);
+}
+
+QList<QGraphicsItem*> CalendarWorkbenchPanel::activeItems() const
+{
+    return {
+        item,
+        m_dayTimeItem,
+        m_pinButton,
+        m_dayTimeMinimizeButton };
 }
 
 bool CalendarWorkbenchPanel::isEnabled() const
@@ -321,6 +328,8 @@ void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
         m_dayTimeItem->setOpacity(opacity);
         m_dayTimeMinimizeButton->setOpacity(opacity);
     }
+
+    emit geometryChanged();
 }
 
 void CalendarWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)

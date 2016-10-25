@@ -71,6 +71,8 @@ private:
 
     void rebuildSubjectTree(const QnResourceAccessSubject& subject);
 
+    void removeUserNode(const QnUserResourcePtr& user);
+
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
 
