@@ -34,8 +34,7 @@ public:
 class Notification
 {
 public:
-    /** Host:port of notification service. */
-    QString serviceEndpoint;
+    QString url;
     bool enabled;
 
     Notification();

@@ -648,8 +648,7 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     return resultData;
 }
 
-nx::utils::Subscription<std::string>&
-    SystemManager::systemMarkedAsDeletedSubscription()
+nx::utils::Subscription<std::string>& SystemManager::systemMarkedAsDeletedSubscription()
 {
     return m_systemMarkedAsDeletedSubscription;
 }
@@ -1110,6 +1109,7 @@ nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
     const api::SystemSharing& sharing)
 {
     auto notification = std::make_unique<SystemSharedNotification>();
+
     auto dbResult = fillSystemSharedNotification(
         queryContext,
         grantorEmail, sharing.systemId, sharing.accountEmail,

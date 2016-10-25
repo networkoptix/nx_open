@@ -17,6 +17,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/debug_utils.h>
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
@@ -29,8 +30,11 @@ namespace media {
 
 namespace {
 
-static const int kNoInputBuffers = -7;
 static const qint64 kDecodeOneFrameTimeout = 1000 * 33;
+
+// ATTENTION: These constants are coupled with the ones in QnVideoDecoder.java.
+static const int kNoInputBuffers = -7;
+static const int kCodecFailed = -8;
 
 // some decoders may have not input buffers left because of long decoding time
 // We will try to skip single output frame to clear space in input buffers
@@ -505,12 +509,17 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
                 if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)
                     break;
             }
+            else if (outFrameNum == kCodecFailed)
+            {
+                // Subsequent call to decode() will reinitialize javaDecoder.
+                d->initialized = false;
+                return 0;
+            }
         }
         else
         {
             outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) 0);
         }
-
     } while (outFrameNum == kNoInputBuffers && ++retryCounter < kDequeueInputBufferRetyrCounter);
 
     if (outFrameNum <= 0)

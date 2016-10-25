@@ -596,6 +596,15 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
             storage->setUsedForWriting(false);
     }
 
+    QString logMessage = lit("%1 Storage new candidates:\n").arg(Q_FUNC_INFO);
+    for (const auto& storage : storages)
+        logMessage.append(
+            lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
+                .arg(storage->getUrl())
+                .arg(storage->getTotalSpace())
+                .arg(storage->getSpaceLimit()));
+    NX_LOG(logMessage, cl_logDEBUG1);
+
     return storages;
 }
 
@@ -636,12 +645,24 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
                 if (it != partitions.end())
                     storageType = QnLexical::serialized(it->type);
             }
-            storage->setStorageType(storageType);
+            storage->setStorageType(
+                    storageType.isEmpty() 
+                    ? QnLexical::serialized(QnPlatformMonitor::UnknownPartition)
+                    : storageType);
             modified = true;
         }
         if (modified)
             result.insert(storage->getId(), storage);
     }
+
+    QString logMesssage = lit("%1 Modified storages:\n").arg(Q_FUNC_INFO);
+    for (const auto& storage : result.values())
+        logMesssage.append(
+            lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3\n")
+                .arg(storage->getUrl())
+                .arg(storage->getTotalSpace())
+                .arg(storage->getSpaceLimit()));
+    NX_LOG(logMesssage, cl_logDEBUG1);
 
     return result.values();
 }
@@ -1379,35 +1400,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     processor->startReceivingLocalNotifications(connection);
 }
 
-void MediaServerProcess::resetCloudParams(CloudConnectionManager& cloudConnectionManager)
-{
-    while (1)
-    {
-        auto adminUser = qnResPool->getAdministrator();
-        if (adminUser)
-        {
-            PasswordData data;
-            data.password = QnServer::kDefaultAdminPassword;
-            if (!updateUserCredentials(data, QnOptionalBool(true), adminUser, nullptr))
-            {
-                qWarning() << "Error while clearing cloud information. Trying again...";
-                QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-                continue;
-            }
-            qWarning() << "Enable admin user and reset its password to default value due to automatic cloud disconnect and admin user was disabled";
-        }
-
-        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
-        {
-            qWarning() << "Error while clearing cloud information. Trying again...";
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            continue;
-        }
-
-        break;
-    }
-}
-
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
     if (isStopping())
@@ -1856,14 +1848,44 @@ void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& clo
     qnGlobalSettings->setSystemName(systemName.value());
 
     if (systemName.isDefault())
-        resetCloudParams(cloudConnectionManager);
+    {
+        resetSystemState(cloudConnectionManager);
+    }
+    else
+    {
+        QString serverKey;
+        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+            serverKey = qMax(serverKey, server->getAuthKey());
+        const auto generatedLocalSystemId = guidFromArbitraryData(systemName.value() + serverKey);
 
-    qnGlobalSettings->setLocalSystemId(
-        systemName.isDefault() ? QnUuid() : guidFromArbitraryData(systemName.value()));
+        qnGlobalSettings->setLocalSystemId(generatedLocalSystemId);
+    }
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
     qnGlobalSettings->synchronizeNow();
+}
+
+void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
+{
+    for (;;)
+    {
+        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
+        {
+            qWarning() << "Error while clearing cloud information. Trying again...";
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            continue;
+        }
+
+        if (!resetSystemToStateNew())
+        {
+            qWarning() << "Error while resetting system to state \"new \". Trying again...";
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            continue;
+        }
+
+        break;
+    }
 }
 
 void MediaServerProcess::run()
@@ -2224,8 +2246,6 @@ void MediaServerProcess::run()
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
-        const auto port = server->getPort();
-
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
         server->setVersion(qnCommon->engineVersion());
@@ -2407,8 +2427,8 @@ void MediaServerProcess::run()
             if (isCloudInstanceChanged)
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
                     "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
-            resetCloudParams(cloudConnectionManager);
-            qnGlobalSettings->setLocalSystemId(QnUuid()); //< go to new state
+
+            resetSystemState(cloudConnectionManager);
         }
         if (isCloudInstanceChanged)
         {

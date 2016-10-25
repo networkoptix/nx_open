@@ -174,6 +174,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     if (!m_encoderCtx)
         open(video);
+    if (!m_encoderCtx)
+        return -3; //< encode error
 
     QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)

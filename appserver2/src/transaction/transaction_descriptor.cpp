@@ -698,13 +698,17 @@ struct ModifyCameraAttributesAccess
             return false;
         }
 
-        licenseUsageHelper.propose(camera, param.scheduleEnabled);
-        if (licenseUsageHelper.isOverflowForCamera(camera))
+        // Check the license if and only if recording goes from 'off' to 'on' state
+        const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+        if (prevScheduleEnabled != param.scheduleEnabled)
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraId;
-            return false;
+            licenseUsageHelper.propose(camera, param.scheduleEnabled);
+            if (licenseUsageHelper.isOverflowForCamera(camera))
+            {
+                qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraId;
+                return false;
+            }
         }
-
         return true;
     }
 };
@@ -735,7 +739,9 @@ struct ModifyCameraAttributesListAccess
                 return;
             }
             cameras.push_back(camera);
-            licenseUsageHelper.propose(camera, p.scheduleEnabled);
+            const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+            if (prevScheduleEnabled != p.scheduleEnabled)
+                licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
 
         for (const auto& camera : cameras)

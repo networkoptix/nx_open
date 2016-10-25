@@ -91,7 +91,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            nx_http::HttpRequestProcessedHandler completionHandler);
+            nx_http::RequestProcessedHandler completionHandler);
 
         CustomHttpHandler(
             ManagerType* manager,
@@ -108,7 +108,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            nx_http::HttpRequestProcessedHandler completionHandler) override
+            nx_http::RequestProcessedHandler completionHandler) override
         {
             (m_manager->*m_managerFuncPtr)(
                 connection,
