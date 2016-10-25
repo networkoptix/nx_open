@@ -30,6 +30,24 @@ QnWebPage::QnWebPage(QObject* parent):
         });
 }
 
+bool QnWebPage::event(QEvent* ev)
+{
+    switch (ev->type())
+    {
+        case QEvent::Drop:
+        case QEvent::GraphicsSceneDrop:
+        {
+            ev->accept();
+            return true;
+        }
+        default:
+            break;
+    }
+
+    return base_type::event(ev);
+}
+
+
 void QnWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID)
 {
     QString logMessage = lit("JS Console: %1:%2 %3").arg(sourceID, QString::number(lineNumber), message);
