@@ -8,6 +8,8 @@ front_end/.tmp
 front_end/.idea 
 front_end/.sass-cache
 front_end/bower_components
+front_end/test/visual
+
 app/bower_components
 env
 cloud/.idea
