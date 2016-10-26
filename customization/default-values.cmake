@@ -1,3 +1,4 @@
+<<<<<<< local
 set(updatefeed.auto "false")
 set(mac.skip.sign "false")
 set(windows.skip.sign "false")

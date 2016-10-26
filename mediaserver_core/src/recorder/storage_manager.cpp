@@ -2150,7 +2150,7 @@ void QnStorageManager::writeCameraInfoFiles()
                 auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
                 if (!camResource)
                 {
-                    NX_LOG(lit("%1. CameraResource is NULL for this unique id %2").arg(Q_FUNC_INFO).arg(cameraUniqueId), cl_logDEBUG1);
+                    NX_LOG(lit("%1. CameraResource is NULL for this unique id %2").arg(Q_FUNC_INFO).arg(cameraUniqueId), cl_logDEBUG2);
                     continue;
                 }
                 auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
