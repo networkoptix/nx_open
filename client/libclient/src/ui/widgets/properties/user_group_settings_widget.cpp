@@ -211,7 +211,7 @@ public:
 
         if (deleteRadioButton->isChecked())
         {
-            replacement = QnUserGroupSettingsModel::RoleReplacement::invalid();
+            replacement = QnUserGroupSettingsModel::RoleReplacement::empty();
             return true;
         }
 

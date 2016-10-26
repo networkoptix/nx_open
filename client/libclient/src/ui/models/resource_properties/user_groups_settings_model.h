@@ -18,8 +18,8 @@ public:
         Qn::GlobalPermissions permissions;
         RoleReplacement();
         RoleReplacement(const QnUuid& group, Qn::GlobalPermissions permissions);
-        bool isInvalid() const;
-        static RoleReplacement invalid();
+        bool isEmpty() const;
+        static RoleReplacement empty();
     };
 
 public:

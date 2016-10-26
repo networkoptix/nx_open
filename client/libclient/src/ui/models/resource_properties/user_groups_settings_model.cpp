@@ -23,12 +23,12 @@ QnUserGroupSettingsModel::RoleReplacement::RoleReplacement(
 {
 }
 
-bool QnUserGroupSettingsModel::RoleReplacement::isInvalid() const
+bool QnUserGroupSettingsModel::RoleReplacement::isEmpty() const
 {
     return group.isNull() && permissions == Qn::NoGlobalPermissions;
 }
 
-QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::RoleReplacement::invalid()
+QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::RoleReplacement::empty()
 {
     return RoleReplacement(QnUuid(), Qn::NoGlobalPermissions);
 }

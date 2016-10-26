@@ -184,7 +184,7 @@ void QnUserGroupsDialog::applyChanges()
         const auto& groupUsers = m_model->users(group.id, false);
         auto replacement = m_model->replacement(group.id);
 
-        if (replacement.isInvalid())
+        if (replacement.isEmpty())
         {
             qnResourcesChangesManager->deleteResources(groupUsers);
         }
