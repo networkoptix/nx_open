@@ -58,6 +58,3 @@ set (vmax "false")
 
 #VMS-1672: Sometimes unauthorized server is not visible in the servers list
 set (nxec.ec2ProtoVersion "2505")
-
-set (old.android.packagename "${namespace.major}.${namespace.minor}.${namespace.additional}")
-set (new.android.packagename "${namespace.major}.${namespace.minor}.${new.namespace.additional}")

@@ -148,10 +148,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-                <google.keystore>${customization.dir}/mobile_client/key.store</google.keystore>
-                <google.storepass>${android.storepass}</google.storepass>
-                <google.keypass>${android.keypass}</google.keypass>
-                <google.alias>${namespace.additional}</google.alias>
+                <android.keystore>${customization.dir}/mobile_client/key.store</android.keystore>
                 <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
                 <rdep.packages>openssl ffmpeg</rdep.packages>
             </properties>
