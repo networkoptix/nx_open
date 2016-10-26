@@ -343,4 +343,8 @@ mobile_client/arm
 statserver/.venv
 statserver/build
 statserver/dist
+
+*test-tmp.cfg
+func_tests/ssh.*.conf
+
 statserver/statserver.egg-info
