@@ -11,6 +11,7 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/string.h>
 #include <utils/common/app_info.h>
 
 #ifdef _WIN32
@@ -811,69 +812,6 @@ namespace nx_http
             }
         }
 
-        namespace
-        {
-            std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
-            {
-                std::vector<QnByteArrayConstRef> result;
-                QnByteArrayConstRef::size_type curTokenStart = 0;
-                bool quoted = false;
-                for( QnByteArrayConstRef::size_type
-                    pos = 0;
-                    pos < src.size();
-                    ++pos )
-                {
-                    const char ch = src[pos];
-                    if( !quoted && (ch == sep) )
-                    {
-                        result.push_back( src.mid( curTokenStart, pos - curTokenStart ) );
-                        curTokenStart = pos + 1;
-                    }
-                    else if( ch == '"' )
-                    {
-                        quoted = !quoted;
-                    }
-                }
-                result.push_back( src.mid( curTokenStart ) );
-
-                return result;
-            }
-        }
-
-        void parseDigestAuthParams(
-            const ConstBufferRefType& authenticateParamsStr,
-            QMap<BufferType, BufferType>* const params,
-            char sep )
-        {
-            const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, sep );
-            for( const ConstBufferRefType& token : paramsList )
-            {
-                const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
-                if( nameAndValue.empty() )
-                    continue;
-                ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
-                params->insert( nameAndValue[0].trimmed(), value.trimmed( "\"" ) );
-            }
-        }
-
-        void serializeAuthParams(
-            BufferType* const dstBuffer,
-            const QMap<BufferType, BufferType>& params )
-        {
-            for( QMap<BufferType, BufferType>::const_iterator
-                it = params.begin();
-                it != params.end();
-                ++it )
-            {
-                if( it != params.begin() )
-                    dstBuffer->append( ", " );
-                dstBuffer->append( it.key());
-                dstBuffer->append( "=\"" );
-                dstBuffer->append( it.value() );
-                dstBuffer->append( "\"" );
-            }
-        }
-
         ///////////////////////////////////////////////////////////////////
         //  Authorization
         ///////////////////////////////////////////////////////////////////
@@ -900,7 +838,7 @@ namespace nx_http
 
         bool DigestCredentials::parse( const BufferType& str, char separator )
         {
-            parseDigestAuthParams( str, &params, separator );
+            nx::utils::parseNameValuePairs(str, separator, &params);
             auto usernameIter = params.find( "username" );
             if( usernameIter != params.cend() )
                 userid = usernameIter.value();
@@ -909,7 +847,7 @@ namespace nx_http
 
         void DigestCredentials::serialize( BufferType* const dstBuffer ) const
         {
-            serializeAuthParams( dstBuffer, params );
+            nx::utils::serializeNameValuePairs(params, dstBuffer);
         }
 
 
@@ -1119,8 +1057,9 @@ namespace nx_http
 
             authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
 
-            parseDigestAuthParams(
+            nx::utils::parseNameValuePairs(
                 ConstBufferRefType( str, authSchemeEndPos + 1 ),
+                ',',
                 &params );
 
             return true;
@@ -1130,7 +1069,7 @@ namespace nx_http
         {
             dstBuffer->append( AuthScheme::toString( authScheme ) );
             dstBuffer->append( " " );
-            serializeAuthParams( dstBuffer, params );
+            nx::utils::serializeNameValuePairs(params, dstBuffer);
         }
 
         BufferType WWWAuthenticate::serialized() const

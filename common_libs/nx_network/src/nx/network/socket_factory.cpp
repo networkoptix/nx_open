@@ -17,7 +17,7 @@ SocketFactory::CreateStreamServerSocketFuncType createStreamServerSocketFunc;
 
 std::unique_ptr<AbstractDatagramSocket> SocketFactory::createDatagramSocket()
 {
-    return std::make_unique<UDPSocket>(false, s_tcpClientIpVersion.load());
+    return std::make_unique<UDPSocket>(s_tcpClientIpVersion.load());
 }
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
@@ -206,6 +206,8 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
+                    if (SocketGlobals::config().disableCloudSockets)
+                        return std::make_unique<TCPSocket>(false, ipVersion);
                     return std::make_unique<cloud::CloudStreamSocket>(ipVersion);
 
                 case SocketFactory::NatTraversalType::nttDisabled:

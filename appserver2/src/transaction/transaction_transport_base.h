@@ -18,6 +18,8 @@
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/auth_cache.h>
 #include <nx/network/http/httpstreamreader.h>
@@ -52,7 +54,8 @@ namespace ConnectionType
 
 class QnTransactionTransportBase
 :
-    public QObject
+    public QObject,
+    public nx::network::aio::BasicPollable
 {
     Q_OBJECT
 
@@ -112,12 +115,14 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
     ~QnTransactionTransportBase();
 
-    void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
 
     /** Enables outgoing transaction channel. */
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
@@ -126,10 +131,6 @@ public:
     int keepAliveProbeCount() const;
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
-    /**
-     * \note This method is non-blocking if called within internal socket's aio thread.
-     */
-    void close();
 
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
@@ -138,6 +139,8 @@ public:
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
+
+    void markAsNotSynchronized();
 
     bool isSyncDone() const { return m_syncDone; }
     void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
@@ -179,6 +182,7 @@ public:
 
     void processExtraData();
     void startListening();
+    bool remotePeerSupportsKeepAlive() const;
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
 
@@ -196,6 +200,8 @@ public:
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
 
+    void setKeepAliveEnabled(bool value);
+
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
 signals:
@@ -209,6 +215,7 @@ signals:
 
 protected:
     virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
+    virtual void onSomeDataReceivedFromRemotePeer() {};
 
     template<class T>
     void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header)
@@ -321,11 +328,11 @@ private:
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
-    ConnectionLockGuard m_connectionLockGuard;
+    ConnectionGuardSharedState* const m_connectionGuardSharedState;
+    std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;
-    quint64 m_sendKeepAliveTask;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
@@ -334,23 +341,24 @@ private:
     //!Number of threads waiting on \a QnTransactionTransportBase::waitForNewTransactionsReady
     int m_waiterCount;
     QnWaitCondition m_cond;
-    std::function<void ()> m_ttFinishCallback;
     std::chrono::milliseconds m_tcpKeepAliveTimeout;
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
     QAuthenticator m_remotePeerCredentials;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+    std::unique_ptr<nx::network::aio::Timer> m_timer;
+    bool m_remotePeerSupportsKeepAlive;
+    bool m_isKeepAliveEnabled;
 
 private:
     QnTransactionTransportBase(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
 
-    void sendHttpKeepAlive( quint64 taskID );
-    //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
-    void closeSocket();
+    void sendHttpKeepAlive();
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();

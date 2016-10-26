@@ -189,6 +189,7 @@ public:
     }
 
     ::ec2::QnTranState getTransactionState(const nx::String& systemId) const;
+
     /**
      * Asynchronously reads requested transactions from Db.
      * @param to State (transaction source id, sequence) to read up to. Boundary is inclusive
@@ -205,6 +206,8 @@ public:
         const ::ec2::QnTranState& to,
         int maxTransactionsToReturn,
         TransactionsReadHandler completionHandler);
+
+    void clearTransactionLogCacheForSystem(const nx::String& systemId);
 
 private:
     struct UpdateHistoryData

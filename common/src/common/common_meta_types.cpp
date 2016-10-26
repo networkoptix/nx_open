@@ -58,6 +58,7 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include <recording/stream_recorder.h>
+#include <recording/stream_recorder_data.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_mapper.h>
@@ -205,7 +206,7 @@ void QnCommonMetaTypes::initialize() {
 
 #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();
-    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
+    qRegisterMetaType<StreamRecorderErrorStruct>();
 #endif
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
@@ -282,28 +283,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<Qn::ConnectionResult>();
-
-    /*
-     * Following code requires full-scale refactor in the classes that uses signals with such parameters.
-     * MOC-generated code contains names, based on signal methods declaration. Example:
-     * ...
-     * class QnStreamRecorder:
-     * ...
-     * signals:
-     *     void recordingFinished(const ErrorStruct &status, const QString &fileName);
-     * ...
-     *
-     * This code will require metatype, registered as:
-     *    qRegisterMetaType<QnStreamRecorder::ErrorStruct>("ErrorStruct");
-     *
-     * Much more correct behavior is to change signal declaration to following:
-     * ...
-     * signals:
-     *     void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
-     * ...
-     * and therefore we can use simple registration:
-     *    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
-     */
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );

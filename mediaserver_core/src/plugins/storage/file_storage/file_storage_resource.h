@@ -44,28 +44,27 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() const override;
-    virtual qint64 getSpaceLimit() const override;
 
     virtual int getCapabilities() const override;
-    virtual Qn::StorageInitResult initOrUpdate() const override;
+    virtual Qn::StorageInitResult initOrUpdate() override;
 
     virtual void setUrl(const QString& url) override;
     virtual bool isSystem() const override;
 
     virtual QString getPath() const override;
 
-    qint64 getTotalSpaceWithoutInit() const;
+    qint64 getTotalSpaceWithoutInit();
 
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
-    // calculate space limit judging by storage URL
-    static qint64 calcSpaceLimit(const QString &url);
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
 private:
+    qint64 calcInitialSpaceLimit();
+
     QString removeProtocolPrefix(const QString& url);
-    Qn::StorageInitResult initOrUpdateInternal() const;
+    Qn::StorageInitResult initOrUpdateInternal();
     Qn::StorageInitResult updatePermissions(const QString& url) const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
@@ -84,10 +83,10 @@ private:
     QString translateUrlToRemote(const QString &url) const;
 
     // mounts network (smb) folder to temporary local path
-    Qn::StorageInitResult mountTmpDrive(const QString& url) const;
+    Qn::StorageInitResult mountTmpDrive(const QString& url);
     bool testWriteCapInternal() const;
 
-    void setLocalPathSafe(const QString &path) const;
+    void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
 public:
     // Try to remove old temporary dirs if any.
@@ -102,14 +101,12 @@ private:
 private:
     mutable QnMutex     m_mutexCheckStorage;
     mutable int         m_capabilities;
-    mutable QString     m_localPath;
+    QString     m_localPath;
 
     mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
-    mutable bool m_isSystem;
-    mutable qint64 m_spaceLimit;
-    mutable QnMutex m_spaceLimitMutex;
+    bool m_isSystem;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

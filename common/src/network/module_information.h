@@ -53,6 +53,9 @@ namespace helpers {
     QString getTargetSystemId(const QnConnectionInfo& info);
     QString getTargetSystemId(const QnModuleInformation& info);
 
+    QString getFactorySystemId(const QnModuleInformation& info);
+
+    bool isNewSystem(const QnModuleInformation& info);
 } // helpers namespace
 
 struct QnModuleInformationWithAddresses : QnModuleInformation

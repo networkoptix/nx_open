@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/resource_access/resource_access_subject.h>
+
 #include <ui/models/resource/resource_tree_model_node.h>
 
 class QnResourceTreeModelLayoutNode: public QnResourceTreeModelNode
@@ -10,15 +12,22 @@ public:
         Qn::NodeType nodeType = Qn::ResourceNode);
     virtual ~QnResourceTreeModelLayoutNode();
 
-    virtual void setResource(const QnResourcePtr &resource) override;
-    virtual void setParent(const QnResourceTreeModelNodePtr& parent) override;
     virtual void updateRecursive() override;
 
+    virtual void initialize() override;
+    virtual void deinitialize() override;
+
+protected:
+    void handleAccessChanged(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource);
+    virtual void handlePermissionsChanged(const QnResourcePtr& resource) override;
+    virtual QIcon calculateIcon() const override;
+
 private:
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    QnResourceAccessSubject getOwner() const;
+    QIcon iconBySubject(const QnResourceAccessSubject& subject) const;
 
     void handleResourceAdded(const QnResourcePtr& resource);
-    void handlePermissionsChanged(const QnResourcePtr& resource);
 
     void at_layout_itemAdded(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
     void at_layout_itemRemoved(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);

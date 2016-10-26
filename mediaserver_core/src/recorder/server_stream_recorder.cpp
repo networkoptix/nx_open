@@ -103,13 +103,11 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
     }
 }
 
-void QnServerStreamRecorder::at_recordingFinished(
-    const ErrorStruct   &status,
-    const QString       &filename
-)
+void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruct& status,
+    const QString& filename)
 {
     Q_UNUSED(filename)
-    if (status.lastError == QnStreamRecorder::NoError)
+    if (status.lastError == StreamRecorderError::noError)
         return;
 
     NX_ASSERT(m_mediaServer);

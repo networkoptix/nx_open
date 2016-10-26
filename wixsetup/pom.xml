@@ -248,32 +248,44 @@
                         </configuration>
                     </execution>	
                     <execution>
-                        <id>pack-debug-all</id>
+                        <id>pack-debug-main-apps</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/assembly-debug-all.xml</descriptor>
+                                <descriptor>${project.build.directory}/assembly-debug-main-apps.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pack-debug-apps</id>
+                        <id>pack-debug-other-apps.xml</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/assembly-debug-apps.xml</descriptor>
+                                <descriptor>${project.build.directory}/assembly-debug-other-apps.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
                         </configuration>
                     </execution>
-
+                    <execution>
+                        <id>pack-debug-libs.xml</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>server-update-package</id>
                         <phase>post-integration-test</phase>

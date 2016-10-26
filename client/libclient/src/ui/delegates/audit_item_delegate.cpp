@@ -496,7 +496,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         }
 
         /* Draw: */
-        QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
+        QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter, option.widget);
 
         /* Subtract button and padding from the item rectangle: */
         rect.setRight(button.rect.left() - style::Metrics::kStandardPadding);

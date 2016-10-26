@@ -199,8 +199,13 @@ void initLog()
 
     if (conf.enableEc2TranLog)
     {
+        #if defined(ANDROID) || defined(__ANDROID__)
+            const QString logFileBaseName = lit("-");
+        #else
+            const QString logFileBaseName = QLatin1String(conf.tempPath()) + lit("ec2_tran");
+        #endif
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            QLatin1String(conf.tempPath()) + QLatin1String("ec2_tran"),
+            logFileBaseName,
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
@@ -208,8 +213,13 @@ void initLog()
 
     if (conf.enableLog)
     {
+        #if defined(ANDROID) || defined(__ANDROID__)
+            const QString logFileBaseName = lit("-");
+        #else
+            const QString logFileBaseName = QLatin1String(conf.tempPath()) + lit("mobile_client");
+        #endif
         QnLog::instance(QnLog::MAIN_LOG_ID)->create(
-            QLatin1String(conf.tempPath()) + QLatin1String("mobile_client"),
+            logFileBaseName,
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);

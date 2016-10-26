@@ -120,12 +120,12 @@ void QnGraphicsScrollAreaPrivate::fitToBounds() {
 
     const auto maxOffset = (height - contentHeight);
 
-    if (contentHeight <= height) 
+    if (contentHeight <= height)
     {
         yOffset = 0;
         contentWidget->setPos(0, alignment.testFlag(Qt::AlignBottom) ? maxOffset : 0);
-    } 
-    else 
+    }
+    else
     {
         if (yOffset > -maxOffset)
             yOffset = -maxOffset;

@@ -162,4 +162,21 @@ typedef QWriteLocker QnWriteLocker;
 
 #endif  //USE_OWN_MUTEX
 
+class QnMutexUnlocker
+{
+public:
+    QnMutexUnlocker(QnMutexLockerBase* const locker):
+        m_locker(locker)
+    {
+        m_locker->unlock();
+    }
+    ~QnMutexUnlocker()
+    {
+        m_locker->relock();
+    }
+
+private:
+    QnMutexLockerBase* const m_locker;
+};
+
 #endif  //NX_MUTEX_H

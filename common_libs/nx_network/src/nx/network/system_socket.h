@@ -341,7 +341,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket(bool natTraversal = true, int ipVersion = AF_INET);
+    UDPSocket(int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;

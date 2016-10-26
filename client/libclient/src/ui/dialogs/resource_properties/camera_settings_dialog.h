@@ -53,7 +53,7 @@ private:
      * If user modified some of control elements but did not apply changes he will be asked to fix it.
      * \see Feature #1195
      */
-    void submitToResources(bool checkControls = false);
+    void submitToResources();
 
     void saveCameras(const QnVirtualCameraResourceList &cameras);
 

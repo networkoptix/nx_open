@@ -119,21 +119,15 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     stree::ResourceContainer,
     nx_http::Request request,
     nx_http::Response* const response,
-    nx_http::HttpRequestProcessedHandler handler)
+    nx_http::RequestProcessedHandler handler)
 {
     auto connectionIt = request.headers.find(kConnection);
     if (connectionIt == request.headers.end() || connectionIt->second != kUpgrade)
-        return handler(
-            nx_http::StatusCode::notAcceptable,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return handler(nx_http::StatusCode::notAcceptable);
 
     auto upgradeIt = request.headers.find(kUpgrade);
     if (upgradeIt == request.headers.end() || !upgradeIt->second.startsWith(kNxRc))
-        return handler(
-            nx_http::StatusCode::notImplemented,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return handler(nx_http::StatusCode::notImplemented);
 
     String upgrade = upgradeIt->second + ", ";
     request.requestLine.version.serialize(&upgrade);
@@ -142,10 +136,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
 
     auto hostNameIt = request.headers.find(kNxRcHostName);
     if (hostNameIt == request.headers.end() || hostNameIt->second.isEmpty())
-        return handler(
-            nx_http::StatusCode::badRequest,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return handler(nx_http::StatusCode::badRequest);
 
     NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
     connection->setSendCompletionHandler(
@@ -158,9 +149,9 @@ void ReverseAcceptor::NxRcHandler::processRequest(
 
     m_acceptor->fillNxRcHeaders(&response->headers);
     handler(
-        nx_http::StatusCode::upgrade,
-        std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none),
-        nx_http::ConnectionEvents());
+        nx_http::RequestResult(
+            nx_http::StatusCode::upgrade,
+            std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none)));
 }
 
 } // namespace tcp

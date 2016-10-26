@@ -146,8 +146,6 @@ QSize media_player_quality_chooser::applyTranscodingIfPossible(
     return resolution;
 }
 
-// TODO: #mike Remove width from resolution, add respective comment to QnArchiveStreamReader::setVideoQuality().
-
 QSize media_player_quality_chooser::chooseVideoQuality(
     AVCodecID transcodingCodec,
     int videoQuality,
@@ -173,6 +171,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
             lowResolution = stream.getResolution();
         }
     }
+    QN_UNUSED(lowCodec);
 
     const bool highStreamRequested = videoQuality == Player::HighVideoQuality
         || (!highResolution.isEmpty() && videoQuality == highResolution.height());

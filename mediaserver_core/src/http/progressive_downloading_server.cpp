@@ -95,14 +95,15 @@ public:
         QnDataPacketQueue tmpQueue(20);
         camera->copyLastGop(true, 0, tmpQueue, 0);
 
-        if (tmpQueue.size() > 0)
+        auto randomAccess = tmpQueue.lock();
+        if (randomAccess.size() > 0)
         {
-            qint64 lastTime = tmpQueue.last()->timestamp;
+            qint64 lastTime = randomAccess.last()->timestamp;
             int timeResolution = (1000000ll / m_owner->getVideoStreamResolution());
-            qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
-            for (int i = 0; i < tmpQueue.size(); ++i)
+            qint64 firstTime = lastTime - randomAccess.size() * timeResolution;
+            for (int i = 0; i < randomAccess.size(); ++i)
             {
-                const QnAbstractMediaDataPtr& srcMedia = std::dynamic_pointer_cast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
+                const QnAbstractMediaDataPtr& srcMedia = std::dynamic_pointer_cast<QnAbstractMediaData>(randomAccess.at(i));
                 QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
                 media->timestamp = firstTime + i*timeResolution;
                 m_dataQueue.push(media);

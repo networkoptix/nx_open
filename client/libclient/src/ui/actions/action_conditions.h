@@ -587,19 +587,31 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnOpenInCurrentLayoutActionCondition: public QnActionCondition
+class QnOpenInLayoutActionCondition: public QnActionCondition
 {
 public:
-    QnOpenInCurrentLayoutActionCondition(QObject *parent): QnActionCondition(parent) {}
+    QnOpenInLayoutActionCondition(QObject *parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
+protected:
+    bool canOpen(const QnResourceList &resources, const QnLayoutResourcePtr& layout) const;
+};
+
+class QnOpenInCurrentLayoutActionCondition: public QnOpenInLayoutActionCondition
+{
+public:
+    QnOpenInCurrentLayoutActionCondition(QObject *parent): QnOpenInLayoutActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
-class QnOpenInNewEntityActionCondition: public QnActionCondition
+class QnOpenInNewEntityActionCondition: public QnOpenInLayoutActionCondition
 {
 public:
-    QnOpenInNewEntityActionCondition(QObject *parent): QnActionCondition(parent) {}
+    QnOpenInNewEntityActionCondition(QObject *parent): QnOpenInLayoutActionCondition(parent) {}
 
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };

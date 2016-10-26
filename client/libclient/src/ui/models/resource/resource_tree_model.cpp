@@ -39,6 +39,7 @@
 #include <ui/models/resource/tree/resource_tree_model_user_nodes.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
+#include <ui/models/resource/tree/resource_tree_model_user_resources_node.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -82,7 +83,7 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::SeparatorNode
             << Qn::UsersNode
             << Qn::ServersNode
-            << Qn::UserDevicesNode
+            << Qn::UserResourcesNode
             << Qn::LayoutsNode
             << Qn::WebPagesNode
             << Qn::LocalResourcesNode
@@ -107,7 +108,11 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
     {
-        m_rootNodes[t] = QnResourceTreeModelNodePtr(new QnResourceTreeModelNode(this, t));
+        //TODO: #GDM move to factory
+        m_rootNodes[t] = QnResourceTreeModelNodePtr(t == Qn::UserResourcesNode
+            ? new QnResourceTreeModelUserResourcesNode(this)
+            : new QnResourceTreeModelNode(this, t));
+        m_rootNodes[t]->initialize();
         m_allNodes.append(m_rootNodes[t]);
     }
 
@@ -155,6 +160,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
 QnResourceTreeModel::~QnResourceTreeModel()
 {
+    for (auto node: m_allNodes)
+        node->deinitialize();
 }
 
 QnResourcePtr QnResourceTreeModel::resource(const QModelIndex &index) const
@@ -196,13 +203,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResou
             if (QnMediaServerResource::isHiddenServer(resource->getParentResource()))
                 nodeType = Qn::EdgeNode;
 
-        auto node = resource->hasFlags(Qn::layout)
+        QnResourceTreeModelNodePtr node(resource->hasFlags(Qn::layout)
             ? new QnResourceTreeModelLayoutNode(this, resource, nodeType)
-            : new QnResourceTreeModelNode(this, resource, nodeType);
+            : new QnResourceTreeModelNode(this, resource, nodeType));
+        node->initialize();
 
-        pos = m_resourceNodeByResource.insert(resource, QnResourceTreeModelNodePtr(node));
-        m_nodesByResource[resource].push_back(*pos);
-        m_allNodes.append(*pos);
+        pos = m_resourceNodeByResource.insert(resource, node);
+        m_nodesByResource[resource].push_back(node);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -215,10 +223,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureItemNode(const QnResourceT
     if (pos == items.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, uuid, nodeType));
+        node->initialize();
         node->setParent(parentNode);
 
         pos = items.insert(uuid, node);
-        m_allNodes.append(*pos);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -233,10 +242,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRecorderNode(
     if (pos == recorders.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(this, camera));
+        node->initialize();
         node->setParent(parentNode);
 
         pos = recorders.insert(id, node);
-        m_allNodes.append(*pos);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -247,13 +257,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSystemNode(const QString &
     if (pos == m_systemNodeBySystemName.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, Qn::SystemNode, systemName));
+        node->initialize();
         if (m_scope == FullScope)
             node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
         else
             node->setParent(m_rootNodes[Qn::BastardNode]);
 
         pos = m_systemNodeBySystemName.insert(systemName, node);
-        m_allNodes.append(*pos);
+        m_allNodes.append(node);
     }
     return *pos;
 }
@@ -265,6 +276,8 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         return;
 
     /* Remove node from all hashes where node can be the key. */
+    updateNodeResource(node, QnResourcePtr());
+    node->deinitialize();
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
@@ -301,9 +314,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     default:
         break;
     }
-
-    node->setParent(QnResourceTreeModelNodePtr());
-    updateNodeResource(node, QnResourcePtr());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceTreeModelNodePtr& node)
@@ -370,7 +380,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
             return rootNode;
         return bastardNode;
 
-    case Qn::UserDevicesNode:
+    case Qn::UserResourcesNode:
         if (m_scope == CamerasScope && !isAdmin)
             return QnResourceTreeModelNodePtr(); /*< Be the root node in this scope. */
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
@@ -422,7 +432,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (node->resourceFlags().testFlag(Qn::server))
     {
         /* Valid servers. */
-        if (!node->resource().dynamicCast<QnFakeMediaServerResource>())
+        if (!node->resourceFlags().testFlag(Qn::fake))
         {
             if (isAdmin)
                 return m_rootNodes[Qn::ServersNode];
@@ -505,7 +515,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         auto parentNode = isAdmin
             ? ensureResourceNode(parentResource)
-            : m_rootNodes[Qn::UserDevicesNode];
+            : bastardNode;
 
         QString groupId = camera->getGroupId();
         if (!groupId.isEmpty())
@@ -543,7 +553,7 @@ Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
     case QnResourceTreeModel::CamerasScope:
         return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
             ? Qn::ServersNode
-            : Qn::UserDevicesNode;
+            : Qn::UserResourcesNode;
     case QnResourceTreeModel::UsersScope:
         return Qn::UsersNode;
     default:

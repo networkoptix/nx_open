@@ -571,6 +571,20 @@ api::ResultCode CdbLauncher::updateSystemSharing(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::removeSystemSharing(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    const std::string& accountEmail)
+{
+    return updateSystemSharing(
+        email,
+        password,
+        systemID,
+        accountEmail,
+        api::SystemAccessRole::none);
+}
+
 api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& email,
     const std::string& password,
@@ -637,6 +651,24 @@ api::ResultCode CdbLauncher::renameSystem(
                 connection->systemManager(),
                 systemID,
                 newSystemName,
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::updateSystem(
+    const api::SystemData& system,
+    const api::SystemAttributesUpdate& updatedData)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(system.id, system.authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::update,
+                connection->systemManager(),
+                updatedData,
                 std::placeholders::_1));
     return resCode;
 }

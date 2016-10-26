@@ -75,6 +75,8 @@ private:
     int establishConnectionToRemoteServer(
         const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo);
 
+    void tryConnectToOldEC(const QUrl& ecUrl, impl::ConnectHandlerPtr handler, int reqId);
+
     template<class Handler>
     void connectToOldEC(const QUrl& ecURL, Handler completionFunc);
 

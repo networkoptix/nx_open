@@ -1,14 +1,23 @@
 #include "flag_config.h"
 
-#if !(defined(ANDROID) || defined(__ANDROID__))
+#define noDISABLE_FLAG_CONFIG
+#if !defined(DISABLE_FLAG_CONFIG)
 
 #include <string>
 #include <vector>
 #include <memory>
 #include <fstream>
 #include <iostream>
-#include <cstring>
 #include <map>
+
+#if defined(ANDROID) || defined(__ANDROID__)
+    #include <nx/utils/std/android.h>
+#endif // defined(ANDROID) || defined(__ANDROID__)
+
+#define OUTPUT_PREFIX ""
+#include "debug_utils.h"
+
+#define WRITE if (!s_isOutputAllowed || outputType != OutputType::verbose) {} else PRINT
 
 namespace nx {
 namespace utils {
@@ -26,6 +35,7 @@ static bool isWhitespace(char c)
 {
     // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do:
     //return isspace(c) || !isprint(c);
+
     return (((unsigned char) c) <= 32) || (c == 127);
 }
 
@@ -90,8 +100,7 @@ public:
         const char* const name;
         const char* const descr;
 
-        AbstractParam(FlagConfig::Impl* owner, const char* name, const char* descr)
-        :
+        AbstractParam(FlagConfig::Impl* owner, const char* name, const char* descr):
             owner(owner),
             name(name),
             descr(descr)
@@ -100,7 +109,9 @@ public:
 
         virtual ~AbstractParam() = default;
 
-        void printLine(const std::string& value, const char* valueNameSeparator,
+        void printLine(
+            OutputType outputType,
+            const std::string& value, const char* valueNameSeparator,
             const char* note, bool error, bool equalsDefault) const;
 
         virtual void reload(OutputType outputType) = 0;
@@ -122,7 +133,7 @@ private:
 
 private:
     bool parseIniFile(OutputType outputType);
-    void printFlagFileHeader() const;
+    void printFlagFileHeader(OutputType outputType) const;
     std::string iniFilename() const;
     std::string flagFilename(const char* value, const char* paramName) const;
     std::string txtFilename(const char* paramName) const;
@@ -132,13 +143,13 @@ private:
 // AbstractParam
 
 void FlagConfig::Impl::AbstractParam::printLine(
+    OutputType outputType,
     const std::string& value, const char* valueNameSeparator,
     const char* note, bool error, bool equalsDefault) const
 {
     const char* const prefix = error ? "!!! " : (equalsDefault ? "    " : "  + ");
     const char* const descr_prefix = (strlen(descr) == 0) ? "" : " // ";
-    std::cerr << prefix << value << valueNameSeparator << name
-        << note << descr_prefix << descr << "\n";
+    WRITE << prefix << value << valueNameSeparator << name << note << descr_prefix << descr;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -151,7 +162,7 @@ struct FlagConfig::Impl::FlagParam: FlagConfig::Impl::AbstractParam
 
     FlagParam(FlagConfig::Impl* owner, bool* pValue, bool defaultValue, const char* name,
         const char* descr)
-    :
+        :
         AbstractParam(owner, name, descr),
         pValue(pValue),
         defaultValue(defaultValue)
@@ -181,8 +192,7 @@ void FlagConfig::Impl::FlagParam::reload(OutputType outputType)
             }
         }
 
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-            printLine(std::to_string(*pValue), " ", note, error, *pValue == defaultValue);
+        printLine(outputType, std::to_string(*pValue), " ", note, error, *pValue == defaultValue);
     }
     else
     {
@@ -205,8 +215,7 @@ void FlagConfig::Impl::FlagParam::reload(OutputType outputType)
             note = " [.flag]";
         }
 
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-            printLine(std::to_string(*pValue), "_", note, error, *pValue == defaultValue);
+        printLine(outputType, std::to_string(*pValue), "_", note, error, *pValue == defaultValue);
     }
 }
 
@@ -262,15 +271,14 @@ void FlagConfig::Impl::IntParam::reload(OutputType outputType)
             {
                 *pValue = std::stoi(value);
             }
-            catch (...)
+            catch (const std::logic_error&)
             {
                 error = true;
                 note = " [.ini: invalid value]";
             }
         }
 
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-            printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
+        printLine(outputType, std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
     }
     else
     {
@@ -287,11 +295,8 @@ void FlagConfig::Impl::IntParam::reload(OutputType outputType)
             }
         }
 
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-        {
-            const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
-            printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
-        }
+        const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
+        printLine(outputType, std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
     }
 }
 
@@ -340,11 +345,8 @@ void FlagConfig::Impl::StringParam::reload(OutputType outputType)
             *pValue = strValue.c_str();
         }
 
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-        {
-            std::string valueString(*pValue);
-            printLine("\"" + valueString + "\"", " = ", note, error, valueString == defaultValue);
-        }
+        const std::string valStr(*pValue);
+        printLine(outputType, "\"" + valStr + "\"", " = ", note, error, valStr == defaultValue);
     }
     else
     {
@@ -365,11 +367,8 @@ void FlagConfig::Impl::StringParam::reload(OutputType outputType)
             }
         }
 
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-        {
-            const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
-            printLine(*pValue, " = ", note, error, std::string(*pValue) == defaultValue);
-        }
+        const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
+        printLine(outputType, *pValue, " = ", note, error, std::string(*pValue) == defaultValue);
     }
 }
 
@@ -384,23 +383,46 @@ std::string FlagConfig::Impl::StringParam::defaultValueStr() const
 FlagConfig::Impl::Impl(const char* moduleName):
     m_moduleName(moduleName)
 {
+    const OutputType outputType(OutputType::verbose); //< Used by WRITE macro.
+
     // Get temp directory path.
-    if (!std::tmpnam(m_tempPath))
-    {
-        m_tempPath[0] = '\0';
-        if (s_isOutputAllowed)
-            std::cerr << m_moduleName << " configuration WARNING: Unable to get temp path.\n";
-    }
-    else
-    {
-        for (int i = (int) strlen(m_tempPath) - 1; i >= 0; --i)
+
+    m_tempPath[0] = '\0';
+
+    #if defined(ANDROID) || defined(__ANDROID__)
+        // NOTE: On Android, both QDir::tempPath() and std::tmpnam() return "/tmp", which does not
+        // exist on Android.
+        strncpy(m_tempPath, "/sdcard/", sizeof(m_tempPath));
+
+        // NOTE: Another approach would be to use app cache dir, but this is not convenient because
+        // this dir is not accessible from the outside on non-rooted devices for app release build.
+        #if 0
         {
-            if (m_tempPath[i] == '/' || m_tempPath[i] == '\\')
+            // Typical path on Android 5: /data/user/0/com.networkoptix.nxwitness/cache/
+            #include <QtCore/QStandardPaths>
+            const QByteArray path =
+                QStandardPaths::writableLocation(QStandardPaths::CacheLocation).toLatin1();
+            if (!path.isEmpty() && path.size() + sizeof('/') + sizeof('\0') <= sizeof(m_tempPath))
+                strcpy(m_tempPath, (path + "/").constData());
+        }
+        #endif
+    #else // defined(ANDROID) || defined(__ANDROID__)
+        if (std::tmpnam(m_tempPath))
+        {
+            for (int i = (int) strlen(m_tempPath) - 1; i >= 0; --i)
             {
-                m_tempPath[i + 1] = '\0';
-                break;
+                if (m_tempPath[i] == '/' || m_tempPath[i] == '\\')
+                {
+                    m_tempPath[i + 1] = '\0';
+                    break;
+                }
             }
         }
+    #endif // defined(ANDROID) || defined(__ANDROID__)
+
+    if (m_tempPath[0] == '\0')
+    {
+        WRITE << m_moduleName << " configuration WARNING: Unable to get temp path.";
     }
 }
 
@@ -434,12 +456,8 @@ bool FlagConfig::Impl::parseIniFile(OutputType outputType)
         std::string name;
         if (!parseNameValue(lineStr.c_str(), &name, &value))
         {
-            if (outputType == OutputType::verbose && s_isOutputAllowed)
-            {
-                std::cerr << m_moduleName << " configuration WARNING: "
-                    << "Unable to parse .ini: line " << line << ", file: " << filename << "\n";
-            }
-
+            WRITE << m_moduleName << " configuration WARNING: "
+                << "Unable to parse .ini: line " << line << ", file: " << filename;
             continue;
         }
 
@@ -448,14 +466,12 @@ bool FlagConfig::Impl::parseIniFile(OutputType outputType)
     }
     if (line == 0) //< .ini file is empty: create the file with default values.
     {
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-            std::cerr << "    ATTENTION: .ini file is empty; filling with defaults.\n";
+        WRITE << "    ATTENTION: .ini file is empty; filling with defaults.";
 
         std::ofstream file(filename);
         if (!file.good())
         {
-            if (outputType == OutputType::verbose && s_isOutputAllowed)
-                std::cerr << "    ERRPR: Unable to rewrite .ini file.\n";
+            WRITE << "    ERROR: Unable to rewrite .ini file.";
         }
         else
         {
@@ -473,11 +489,11 @@ bool FlagConfig::Impl::parseIniFile(OutputType outputType)
     return true;
 }
 
-void FlagConfig::Impl::printFlagFileHeader() const
+void FlagConfig::Impl::printFlagFileHeader(OutputType outputType) const
 {
-    std::cerr << m_moduleName << " config ("
+    WRITE << m_moduleName << " config ("
         << flagFilename("<0|1>", "<FLAG>") << ", "
-        << txtFilename("<INT_PARAM>") << "):\n";
+        << txtFilename("<INT_PARAM>") << "):";
 }
 
 std::string FlagConfig::Impl::iniFilename() const
@@ -506,11 +522,9 @@ void FlagConfig::Impl::reload(OutputType outputType)
     if (kUseIniFile)
     {
         bool iniExists = fileExists(iniFilename().c_str());
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-        {
-            std::cerr << m_moduleName << " config (" << iniFilename()
-                << (iniExists ? "" : " not found; touch to fill with defaults") << "):\n";
-        }
+
+        WRITE << m_moduleName << " config (" << iniFilename()
+            << (iniExists ? "" : " not found; touch to fill with defaults") << "):";
 
         if (iniExists)
             parseIniFile(outputType);
@@ -519,8 +533,7 @@ void FlagConfig::Impl::reload(OutputType outputType)
     }
     else
     {
-        if (outputType == OutputType::verbose && s_isOutputAllowed)
-            printFlagFileHeader();
+        printFlagFileHeader(outputType);
     }
 
     for (const auto& param: m_params)
@@ -597,11 +610,13 @@ void FlagConfig::skipNextReload()
     d->skipNextReload();
 }
 
-//-------------------------------------------------------------------------------------------------
-#else // !(defined(ANDROID) || defined(__ANDROID__))
+} // namespace utils
+} // namespace nx
 
-// Stub implementation which never changes hard-coded defaults.
-// NOTE: Android NDK does not support std::to_string
+//-------------------------------------------------------------------------------------------------
+#else // !defined(DISABLE_FLAG_CONFIG)
+
+// Stub implementation which never changes hard-coded defaults and returns temp path "/tmp/".
 
 namespace nx {
 namespace utils {
@@ -611,8 +626,7 @@ struct FlagConfig::Impl
     const char* moduleName;
 };
 
-FlagConfig::FlagConfig(const char* moduleName)
-:
+FlagConfig::FlagConfig(const char* moduleName):
     d(new Impl())
 {
     d->moduleName = moduleName;
@@ -625,7 +639,7 @@ FlagConfig::~FlagConfig()
 
 const char* FlagConfig::tempPath() const
 {
-    return "/tmp";
+    return "/tmp/";
 }
 
 const char* FlagConfig::moduleName() const
@@ -659,7 +673,7 @@ void FlagConfig::skipNextReload()
 {
 }
 
-#endif // !(defined(ANDROID) || defined(__ANDROID__))
-
 } // namespace utils
 } // namespace nx
+
+#endif // !defined(DISABLE_FLAG_CONFIG)

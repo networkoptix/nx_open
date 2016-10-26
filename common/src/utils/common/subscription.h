@@ -29,8 +29,7 @@ class Subscription
     typedef Subscription<Data...> SelfType;
 
 public:
-    /** Notification callback. */
-    typedef nx::utils::MoveOnlyFunc<void(Data...)> Handler;
+    typedef nx::utils::MoveOnlyFunc<void(Data...)> NotificationCallback;
 
     Subscription()
     :
@@ -48,11 +47,13 @@ public:
     }
 
     /** 
-     * Subscribes @param hadler for this event.
+     * Subscribes handler for this event.
      * @param subscriptionId This value can be used to unsubscribe
      * NOTE: do not use blocking operations inside @param handler.
      */
-    void subscribe(Handler handler, SubscriptionId* const subscriptionId)
+    void subscribe(
+        NotificationCallback handler,
+        SubscriptionId* const subscriptionId)
     {
         QnMutexLocker lk(&m_mutex);
         if (m_previousSubscriptionId == kInvalidSubscriptionId)
@@ -70,8 +71,8 @@ public:
     {
         QnMutexLocker lk(&m_mutex);
 
-        while (m_eventReportingThread != 0 &&        //< Event handler is running.
-            m_eventReportingThread != currentThreadSystemId() &&      //< Running not in current thread.
+        while (m_eventReportingThread != 0 &&                    //< Event handler is running.
+            m_eventReportingThread != currentThreadSystemId() && //< Running not in current thread.
             m_runningSubscriptionId == subscriptionId)
         {
             // Waiting for handler to complete.
@@ -99,7 +100,8 @@ public:
             m_cond.wakeAll();
             currentSubscriptionIter->second(data...);
             lk.relock();
-            currentSubscriptionIter = m_handlers.upper_bound(m_runningSubscriptionId);
+            currentSubscriptionIter = 
+                m_handlers.upper_bound(m_runningSubscriptionId);
         }
 
         m_runningSubscriptionId = kInvalidSubscriptionId;
@@ -112,7 +114,7 @@ public:
 private:
     QnMutex m_mutex;
     QnWaitCondition m_cond;
-    std::map<SubscriptionId, Handler> m_handlers;
+    std::map<SubscriptionId, NotificationCallback> m_handlers;
     SubscriptionId m_previousSubscriptionId;
     uintptr_t m_eventReportingThread;
     SubscriptionId m_runningSubscriptionId;

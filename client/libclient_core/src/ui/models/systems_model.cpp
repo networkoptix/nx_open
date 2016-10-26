@@ -82,8 +82,6 @@ public:
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     bool isCompatibleInternal(const QnSystemDescriptionPtr& systemDescription) const;
-    bool isFactorySystem(const QnSystemDescriptionPtr& systemDescription) const;
-    QString getDisplayName(const QnSystemDescriptionPtr& systemDescription) const;
 
     QnDisconnectHelper disconnectHelper;
     InternalList internalData;
@@ -159,7 +157,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
                 ).join(lit(" "));
         }
         case SystemNameRoleId:
-            return d->getDisplayName(system);
+            return system->name();
         case SystemIdRoleId:
             return system->id();
         case OwnerDescriptionRoleId:
@@ -181,7 +179,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case LastPasswordsModelRoleId:
             return QVariant();  // TODO
         case IsFactorySystemRoleId:
-            return d->isFactorySystem(system);
+            return system->isNewSystem();
         case IsCloudSystemRoleId:
             return system->isCloudSystem();
         case IsOnlineRoleId:
@@ -476,26 +474,4 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
             return connectionResult != Qn::IncompatibleInternalConnectionResult;
         });
-}
-
-bool QnSystemsModelPrivate::isFactorySystem(
-        const QnSystemDescriptionPtr& systemDescription) const
-{
-    const auto servers = systemDescription->servers();
-    if (servers.isEmpty())
-        return false;
-
-    const auto predicate = [](const QnModuleInformation &serverInfo)
-    {
-        return serverInfo.serverFlags.testFlag(Qn::SF_NewSystem);
-    };
-
-    const bool isFactory =
-        std::any_of(servers.begin(), servers.end(), predicate);
-    return isFactory;
-}
-
-QString QnSystemsModelPrivate::getDisplayName(const QnSystemDescriptionPtr& systemDescription) const
-{
-    return (isFactorySystem(systemDescription) ? tr("New system") : systemDescription->name());
 }

@@ -164,8 +164,6 @@ protected:
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
-    void at_layoutSettingsAction_triggered();
-    void at_currentLayoutSettingsAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
@@ -217,7 +215,6 @@ protected:
 private:
     void notifyAboutUpdate();
 
-    void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
     void openFailoverPriorityDialog();
     void openBackupCamerasDialog();
 

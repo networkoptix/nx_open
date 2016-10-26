@@ -3,19 +3,17 @@
 #include <nx/utils/log/log.h>
 #include <transaction/transaction.h>
 
-#include "ec2/connection_manager.h"
+#include "ec2/synchronization_engine.h"
 
 namespace nx {
 namespace cdb {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
-    const ec2::ConnectionManager& connectionManager,
-    ec2::TransactionLog* const transactionLog)
+    ec2::SyncronizationEngine* const syncronizationEngine)
     :
     m_moduleGuid(moduleGuid),
-    m_connectionManager(connectionManager),
-    m_transactionLog(transactionLog)
+    m_syncronizationEngine(syncronizationEngine)
 {
 }
 
@@ -38,7 +36,7 @@ void MaintenanceManager::getVmsConnections(
         {
             completionHandler(
                 api::ResultCode::ok,
-                m_connectionManager.getVmsConnections());
+                m_syncronizationEngine->connectionManager().getVmsConnections());
         });
 }
 
@@ -56,7 +54,7 @@ void MaintenanceManager::getTransactionLog(
     ::ec2::QnTranState maxTranState;
     maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
 
-    m_transactionLog->readTransactions(
+    m_syncronizationEngine->transactionLog().readTransactions(
         systemID.systemID.c_str(),
         ::ec2::QnTranState(),
         maxTranState,

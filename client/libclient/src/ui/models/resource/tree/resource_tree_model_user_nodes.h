@@ -74,9 +74,6 @@ private:
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
 
-    /** Remove node from the model. */
-    void removeNodeInternal(const QnResourceTreeModelNodePtr& node);
-
     /** Remove all nodes. */
     void clean();
 

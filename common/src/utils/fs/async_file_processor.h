@@ -79,7 +79,7 @@ private:
         HandlerFunc m_handler;
     };
 
-    CLThreadQueue<FileTask*> m_taskQueue;
+    QnSafeQueue<FileTask*> m_taskQueue;
 
     void doOpenFile( const OpenFileTask* task );
     void doWriteFile( const WriteFileTask* task );

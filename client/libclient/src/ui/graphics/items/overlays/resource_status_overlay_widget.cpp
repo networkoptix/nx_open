@@ -280,8 +280,6 @@ void QnStatusOverlayWidget::initializeHandlers()
 
     connect(transformInstrument, &TransformListenerInstrument::transformChanged,
         this, &QnStatusOverlayWidget::updateAreasSizes);
-    connect(transformInstrument, &TransformListenerInstrument::transformChanged,
-        this, &QnStatusOverlayWidget::updateAreasSizes);
 
     m_initialized = true;
 }

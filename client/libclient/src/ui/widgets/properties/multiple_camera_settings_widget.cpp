@@ -2,6 +2,7 @@
 #include "ui_multiple_camera_settings_widget.h"
 
 #include <limits>
+#include <QtCore/QScopedValueRollback>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -23,13 +24,13 @@
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent),
-    QnUpdatable(),
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_loginWasEmpty(true),
     m_passwordWasEmpty(true),
     m_hasScheduleControlsChanges(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_updating(false)
 {
     ui->setupUi(this);
     ui->licensingWidget->initializeContext(this);
@@ -58,6 +59,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
         &QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
     connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::archiveRangeChanged, this,
         &QnMultipleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::alert, this,
+        [this](const QString& text) { m_alertText = text; updateAlertBar(); });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,
         &QnMultipleCameraSettingsWidget::at_dbDataChanged);
@@ -92,10 +95,10 @@ const QnVirtualCameraResourceList &QnMultipleCameraSettingsWidget::cameras() con
 
 void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &cameras)
 {
-    QnUpdatableGuard<QnMultipleCameraSettingsWidget> guard(this);
-
     if (m_cameras == cameras)
         return;
+
+    QScopedValueRollback<bool> updateRollback(m_updating, true);
 
     m_cameras = cameras;
     ui->cameraScheduleWidget->setCameras(m_cameras);
@@ -152,6 +155,14 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab)
             ui->tabWidget->setCurrentWidget(ui->tabGeneral);
             break;
     }
+}
+
+void QnMultipleCameraSettingsWidget::updateAlertBar()
+{
+    if (currentTab() == Qn::RecordingSettingsTab)
+        ui->alertBar->setText(m_alertText);
+    else
+        ui->alertBar->setText(QString());
 }
 
 void QnMultipleCameraSettingsWidget::setScheduleEnabled(bool enabled)
@@ -253,16 +264,6 @@ bool QnMultipleCameraSettingsWidget::hasDbChanges() const
     return m_hasDbChanges;
 }
 
-bool QnMultipleCameraSettingsWidget::hasScheduleControlsChanges() const
-{
-    return m_hasScheduleControlsChanges;
-}
-
-void QnMultipleCameraSettingsWidget::clearScheduleControlsChanges()
-{
-    m_hasScheduleControlsChanges = false;
-}
-
 bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
 {
     return m_hasScheduleEnabledChanges;
@@ -270,6 +271,9 @@ bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
 
 void QnMultipleCameraSettingsWidget::updateFromResources()
 {
+    m_alertText = QString();
+    updateAlertBar();
+
     ui->imageControlWidget->updateFromResources(m_cameras);
     ui->licensingWidget->setCameras(m_cameras);
     ui->cameraScheduleWidget->updateFromResources();
@@ -420,7 +424,7 @@ void QnMultipleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab
 // -------------------------------------------------------------------------- //
 void QnMultipleCameraSettingsWidget::at_dbDataChanged()
 {
-    if (isUpdating())
+    if (m_updating)
         return;
 
     setHasDbChanges(true);
@@ -428,20 +432,17 @@ void QnMultipleCameraSettingsWidget::at_dbDataChanged()
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged()
 {
-    if (isUpdating())
+    if (m_updating)
         return;
 
     at_dbDataChanged();
-
-    m_hasScheduleControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state)
 {
-    if (isUpdating())
+    if (m_updating)
         return;
 
     ui->licensingWidget->setState(static_cast<Qt::CheckState>(state));
     at_dbDataChanged();
-    m_hasScheduleEnabledChanges = true;
 }

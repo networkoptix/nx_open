@@ -20,10 +20,10 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
         [this](int valueId)
-        {
-            if (valueId == QnClientCoreSettings::LocalSystemWeightsData)
-                handleLocalWeightsChanged();
-        });
+    {
+        if (valueId == QnClientCoreSettings::LocalSystemWeightsData)
+            handleLocalWeightsChanged();
+    });
 
     setSourceModel(new QnSystemsModel(this));
 
@@ -134,9 +134,6 @@ bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
 bool QnOrderedSystemsModel::filterAcceptsRow(int row,
     const QModelIndex &parent) const
 {
-    if (!base_type::filterAcceptsRow(row, parent))
-        return false;
-
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
     const auto index = sourceModel()->index(row, 0, parent);
     if (!index.isValid())
@@ -149,12 +146,12 @@ bool QnOrderedSystemsModel::filterAcceptsRow(int row,
     }
 
     const auto systemId = index.data(QnSystemsModel::SystemIdRoleId).toString();
-    const auto itLocalSystemWeight = m_localWeights.find(systemId);
-    if (itLocalSystemWeight == m_localWeights.end())
+    const auto itFinalSystemWeight = m_finalWeights.find(systemId);
+    if (itFinalSystemWeight == m_finalWeights.end())
         return true;
 
     static const auto kMinWeight = 0.00001;
-    const auto weight = itLocalSystemWeight.value().weight;
+    const auto weight = itFinalSystemWeight.value().weight;
     return (weight > kMinWeight);
 }
 
@@ -169,9 +166,9 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
             IdWeightDataHash result;
             for (const auto system : systems)
             {
-                const auto weightData = QnWeightData( {system.id, system.weight,
+                const auto weightData = QnWeightData( {system.localId, system.weight,
                     system.lastLoginTimeUtcMs, true });   // Cloud connections are real always
-                result.insert(system.id, weightData);
+                result.insert(system.localId, weightData);
             }
             return result;
         };
@@ -218,7 +215,14 @@ void QnOrderedSystemsModel::updateFinalWeights()
 
     auto newWeights = m_localWeights;
     for (auto it = m_cloudWeights.begin(); it != m_cloudWeights.end(); ++it)
-        newWeights[it.key()] = it.value();  // Could rewrite local weights
+    {
+        const auto nextWeightData = it.value();
+        auto& currentWeightData = newWeights[it.key()];
+
+        // Force to replace with greater weight to prevent "jumping"
+        if (currentWeightData.weight > nextWeightData.weight)
+            currentWeightData = nextWeightData;
+    }
 
     // Recalculates weights according to last connection time
     for (auto& data : newWeights)

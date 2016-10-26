@@ -19,7 +19,6 @@ public:
 
     virtual ~QnSystemsFinder();
 
-    // TODO: #ynikitenkov Think about finder types.
     void addSystemsFinder(QnAbstractSystemsFinder *finder,
         int priority);
 

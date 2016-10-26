@@ -24,7 +24,15 @@ public:
         const QByteArray& contentEncoding,
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
-    QnTransactionTransport(const ApiPeerData& localPeer);
+    QnTransactionTransport(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
+        const ApiPeerData& localPeer);
+    ~QnTransactionTransport();
+
+    /**
+     * @note This method is non-blocking if called within internal socket's aio thread.
+     */
+    void close();
 
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
@@ -83,6 +91,8 @@ public:
         const QByteArray& serializedTran,
         const QnTransactionTransportHeader& _header);
 
+    void setBeforeDestroyCallback(std::function<void()> ttFinishCallback);
+
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
 
 protected:
@@ -92,6 +102,7 @@ protected:
 
 private:
     const Qn::UserAccessData m_userAccessData;
+    std::function<void()> m_beforeDestructionHandler;
 
     template<class T>
     bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)

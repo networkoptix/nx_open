@@ -38,7 +38,7 @@ def add_prebuild_events(root):
     """
     <Target Name="BeforeClean">
         <Message Text="Cleaning moc generated files"/>
-        <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
+        <Exec Command="del \$\(ProjectDir\)..\\\${arch}\\build\\$\(Configuration\)\\generated\\moc_*.* /F /Q" />
     </Target>    
     <ItemDefinitionGroup>
         <Link>
@@ -52,9 +52,9 @@ def add_prebuild_events(root):
     print "Adding custom header with pre-build steps"
        
     target = Element('Target', {'Name': 'BeforeClean'})
-    root.insert(0, target)   
+    root.append(target)   
     target.append(Element('Message', {'Text': 'Cleaning moc generated files'}))
-    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\$(Platform)\\build\\{0}\\generated\\moc_*.* /F /Q'.format(arch)}))
+    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\{0}\\build\\$(Configuration)\\generated\\moc_*.* /F /Q'.format(arch)}))
     indent(target, 1)
     
     group = Element('ItemDefinitionGroup')

@@ -15,7 +15,11 @@ namespace {
 static const int kMillisecondsInSeconds = 1000;
 static const int kMillisecondsInDay = 60 * 60 * 24 * 1000;
 
-static const QDateTime kDefaultStartDate(QDate(2000, 1, 1));
+
+QDate defaultStartDate()
+{
+    return QDate::currentDate().addDays(-7);
+}
 
 qint64 getStartOfTheDayMs(qint64 timeMs)
 {
@@ -27,10 +31,16 @@ qint64 getEndOfTheDayMs(qint64 timeMs)
     return getStartOfTheDayMs(timeMs) + kMillisecondsInDay;
 }
 
-QDateTime maxAllowedDate()
+QDate minAllowedDate()
+{
+    static const QDate kMinAllowedDate(2000, 1, 1);
+    return kMinAllowedDate;
+}
+
+QDate maxAllowedDate()
 {
     // 1 month forward should cover all local timezones diffs.
-    return QDateTime::currentDateTime().addMonths(1);
+    return QDate::currentDate().addMonths(1);
 }
 
 }
@@ -79,11 +89,11 @@ void QnDateRangeWidget::setRange(qint64 startTimeMs, qint64 endTimeMs)
     m_endTimeMs = end;
 
     QSignalBlocker blockFrom(ui->dateEditFrom);
-    ui->dateEditFrom->setDateRange(kDefaultStartDate.date(), maxAllowedDate().date());
+    ui->dateEditFrom->setDateRange(minAllowedDate(), maxAllowedDate());
     ui->dateEditFrom->setDate(displayDate(start));
 
     QSignalBlocker blockTo(ui->dateEditTo);
-    ui->dateEditTo->setDateRange(kDefaultStartDate.date(), maxAllowedDate().date());
+    ui->dateEditTo->setDateRange(minAllowedDate(), maxAllowedDate());
     ui->dateEditTo->setDate(displayDate(end));
 
     updateAllowedRange();
@@ -102,7 +112,7 @@ QDate QnDateRangeWidget::endDate() const
 
 void QnDateRangeWidget::reset()
 {
-    setRange(kDefaultStartDate.toMSecsSinceEpoch(), QDateTime::currentMSecsSinceEpoch());
+    setRange(QDateTime(defaultStartDate()).toMSecsSinceEpoch(), QDateTime::currentMSecsSinceEpoch());
 }
 
 void QnDateRangeWidget::updateRange()
@@ -121,8 +131,8 @@ void QnDateRangeWidget::updateRange()
 
 void QnDateRangeWidget::updateAllowedRange()
 {
-    ui->dateEditFrom->setDateRange(kDefaultStartDate.date(), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), maxAllowedDate().date());
+    ui->dateEditFrom->setDateRange(minAllowedDate(), ui->dateEditTo->date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), maxAllowedDate());
 }
 
 QDateTime QnDateRangeWidget::actualDateTime(const QDate &userDate) const

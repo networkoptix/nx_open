@@ -29,7 +29,7 @@ void ConnectHandler::processRequest(
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     static_cast<void>(authInfo);
     static_cast<void>(response);
@@ -40,10 +40,7 @@ void ConnectHandler::processRequest(
     {
         // No cloud address means direct IP
         if (!m_settings.cloudConnect().allowIpTarget)
-            return completionHandler(
-                nx_http::StatusCode::forbidden,
-                nullptr,
-                nx_http::ConnectionEvents());
+            return completionHandler(nx_http::StatusCode::forbidden);
 
         if (targetAddress.port == 0)
             targetAddress.port = m_settings.http().proxyTargetPort;
@@ -58,10 +55,7 @@ void ConnectHandler::processRequest(
         NX_LOGX(lm("Failed to set socket options. %1")
             .arg(SystemError::getLastOSErrorText()), cl_logINFO);
 
-        return completionHandler(
-            nx_http::StatusCode::internalServerError,
-            nullptr,
-            nx_http::ConnectionEvents());
+        return completionHandler(nx_http::StatusCode::internalServerError);
     }
 
     m_request = std::move(request);
@@ -126,7 +120,7 @@ void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
         .arg(socket).arg(SystemError::toString(error)), cl_logDEBUG1);
 
     const auto handler = std::move(m_completionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable, nullptr, nx_http::ConnectionEvents());
+    handler(nx_http::StatusCode::serviceUnavailable);
 }
 
 void ConnectHandler::stream(Socket* source, Socket* target, Buffer* buffer)

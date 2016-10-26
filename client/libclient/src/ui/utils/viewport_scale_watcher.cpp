@@ -52,7 +52,7 @@ void QnViewportScaleWatcher::updateScale()
         return;
 
     m_scale = newScale;
-    emit scaleChanged();
+    emit scaleChanged(newScale);
 }
 
 bool QnViewportScaleWatcher::eventFilter(QObject* watched, QEvent* event)

@@ -87,12 +87,12 @@ angular.module('webadminApp')
         function checkInternet(reload){
             $log.log("check internet connection");
 
-            mediaserver.checkInternet().then(function(hasInternetOnServer){
+            mediaserver.checkInternet(reload).then(function(hasInternetOnServer){
                 $scope.hasInternetOnServer = hasInternetOnServer;
                 $log.log("internet on server: " + $scope.hasInternetOnServer);
             });
 
-            cloudAPI.checkConnection().then(function(){
+            cloudAPI.checkConnection(reload).then(function(){
                 $scope.hasInternetOnClient = true;
             },function(error){
                 $scope.hasInternetOnClient = false;
@@ -126,7 +126,7 @@ angular.module('webadminApp')
                 $log.log("failed to get systemCloudInfo");
                 return mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
-                    $scope.settings.systemName = $scope.serverInfo.name;
+                    $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
                     checkInternet(false);
                     if($scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
                         $log.log("System is new - go to master");
@@ -571,16 +571,7 @@ angular.module('webadminApp')
                 back: 'start',
                 skip: 'merge',
                 next: function(){
-                    if(!$scope.hasInternetOnServer){
-                        $scope.next('noInternetOnServer');
-                        return;
-                    }
-
-                    if(!$scope.hasInternetOnClient){
-                        $scope.next('noInternetOnClient');
-                        return;
-                    }
-                    $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
+                    $scope.next(cloudAuthorized?'chooseCloud':'chooseLocal');
                 },
                 valid: function(){
                     return checkForm($scope.forms.systemNameForm);
@@ -604,6 +595,30 @@ angular.module('webadminApp')
                 back:'systemName',
                 skip:'localLogin'
             },
+
+            chooseLocal:{
+                back:'systemName',
+                next:'localLogin',
+                skip:'chooseCloud'
+            },
+            chooseCloud:{
+                back:'systemName',
+                next:function(){
+                    if(!$scope.hasInternetOnServer){
+                        $scope.next('noInternetOnServer');
+                        return;
+                    }
+
+                    if(!$scope.hasInternetOnClient){
+                        $scope.next('noInternetOnClient');
+                        return;
+                    }
+
+                    $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
+                },
+                skip:'chooseLocal'
+            },
+
             cloudIntro:{
                 back: 'systemName',
                 skip: 'localLogin'

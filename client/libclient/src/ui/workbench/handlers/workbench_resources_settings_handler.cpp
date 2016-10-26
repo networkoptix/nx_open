@@ -4,17 +4,21 @@
 #include <ui/actions/action.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/fake_media_server.h>
 
 #include <ui/dialogs/resource_properties/camera_settings_dialog.h>
+#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_groups_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <core/resource/fake_media_server.h>
+#include <ui/workbench/workbench_layout.h>
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
@@ -33,6 +37,10 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
         &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
     connect(action(QnActions::UserRolesAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
+    connect(action(QnActions::LayoutSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
+    connect(action(QnActions::CurrentLayoutSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered);
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
@@ -132,5 +140,42 @@ void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
         groupsDialog->selectGroup(groupId);
 
     groupsDialog->exec();
+}
+
+void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()
+{
+    QnActionParameters params = menu()->currentParameters(sender());
+    openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
+}
+
+void QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered()
+{
+    openLayoutSettingsDialog(workbench()->currentLayout()->resource());
+}
+
+void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
+    const QnLayoutResourcePtr& layout)
+{
+    if (!layout)
+        return;
+
+    if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
+        return;
+
+    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->readFromResource(layout);
+
+    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
+    if (!dialog->exec() || !dialog->submitToResource(layout))
+        return;
+
+    /* Move layout items to grid center to best fit the background */
+    if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
+    {
+        if (auto wlayout = QnWorkbenchLayout::instance(layout))
+            wlayout->centralizeItems();
+    }
+    menu()->triggerIfPossible(QnActions::SaveLayoutAction, layout);
 }
 

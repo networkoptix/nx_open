@@ -34,7 +34,7 @@
         <x>0</x>
         <y>0</y>
         <width>460</width>
-        <height>141</height>
+        <height>139</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -57,7 +57,7 @@
        <item>
         <widget class="QGroupBox" name="businessEventsGroupBox">
          <property name="title">
-          <string>Alarms/Events</string>
+          <string>Events</string>
          </property>
          <property name="flat">
           <bool>true</bool>

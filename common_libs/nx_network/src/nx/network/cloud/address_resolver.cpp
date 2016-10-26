@@ -457,7 +457,7 @@ void AddressResolver::mediatorResolve(
     if (kResolveOnMediator)
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
-    SystemError::ErrorCode resolveResult;
+    SystemError::ErrorCode resolveResult = SystemError::notImplemented;
     if (info->second.isLikelyCloudAddress
         && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
     {
@@ -472,7 +472,7 @@ void AddressResolver::mediatorResolve(
 
     const auto guards = grabHandlers(resolveResult, info);
     if (needDns && !info->second.isResolved(true))
-        dnsResolve(info, lk, false, ipVersion);
+        return dnsResolve(info, lk, false, ipVersion);
 
     lk->unlock(); //< Fire guards away from mutex scope.
 }

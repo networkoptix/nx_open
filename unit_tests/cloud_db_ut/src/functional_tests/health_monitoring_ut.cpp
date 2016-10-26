@@ -50,7 +50,7 @@ TEST_F(HealthMonitoring, general)
         if (i == 0)
         {
             appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
-            cdb()->restart();
+            ASSERT_TRUE(cdb()->restart());
         }
     }
 }

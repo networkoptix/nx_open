@@ -15,7 +15,11 @@
 
 #include <utils/common/delayed.h>
 
+#include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
 
 using namespace nx::cdb;
 
@@ -26,17 +30,23 @@ using namespace nx::cdb;
 #define TRACE(...)
 #endif
 
-
 namespace {
 
-const auto kIdTag = lit("id");
-const auto kNameTag = lit("name");
-const auto kOwnerAccounEmail = lit("email");
-const auto kOwnerFullName = lit("owner_full_name");
-const auto kWeight = lit("weight");
-const auto kLastLoginTimeUtcMs = lit("kLastLoginTimeUtcMs");
+const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
+
+QString getLocalSystemId(const std::string& opaque)
+{
+    QMap<QByteArray, QByteArray> params;
+    nx::utils::parseNameValuePairs(QByteArray::fromStdString(opaque), ',', &params);
+
+    static const auto kOpaqueLocalSystemIdTag = QByteArray("localSystemId");
+    if (!params.contains(kOpaqueLocalSystemIdTag))
+        return QString();
+
+    return QString::fromUtf8(params.value(kOpaqueLocalSystemIdTag));
+}
 
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 {
@@ -48,7 +58,11 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
             continue;
 
         QnCloudSystem system;
-        system.id = QString::fromStdString(systemData.id);
+        system.cloudId = QString::fromStdString(systemData.id);
+        system.localId = getLocalSystemId(systemData.opaque);
+        if (system.localId.isEmpty())
+            system.localId = system.cloudId;
+
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -59,32 +73,12 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         result.append(system);
     }
 
-    {
-        // TODO: #ynikitenkov remove this section when weights are available
-
-        // Temporary code section.
-        const bool isTmpValues = std::all_of(result.begin(), result.end(),
-            [](const QnCloudSystem& system) -> bool { return !system.weight; });
-        if (isTmpValues)
-        {
-            static const auto initialWeight = 10000.0;
-            static const auto step = 100.0;
-
-            qreal tmpWeight = initialWeight;
-            const auto tmpLastLoginTime = QDateTime::currentMSecsSinceEpoch();
-            for (auto& system : result)
-            {
-                system.weight = tmpWeight;
-                system.lastLoginTimeUtcMs = tmpLastLoginTime;
-                tmpWeight += step;
-            }
-        }
-    }
-
     return result;
 }
 
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCloudSystem), (json), _Fields)
 
 class QnCloudStatusWatcherPrivate : public QObject
 {
@@ -167,6 +161,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         [this]()
         {
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
+            qnClientCoreSettings->save();
         });
 
     setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
@@ -556,12 +551,12 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
 
     const auto it = std::find_if(
         cloudSystems.begin(), cloudSystems.end(),
-        [systemId](const QnCloudSystem& system) { return systemId == system.id; });
+        [systemId](const QnCloudSystem& system) { return systemId == system.cloudId; });
 
     if (it == cloudSystems.end())
         return;
 
-    if (!it->fullEqual(currentSystem))
+    if (!it->visuallyEqual(currentSystem))
     {
         currentSystem = *it;
         emit q->currentSystemChanged(currentSystem);
@@ -669,39 +664,37 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
 bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 {
-    return id == other.id &&
-           name == other.name &&
-           authKey == other.authKey;
+    return ((cloudId == other.cloudId)
+        && (localId == other.localId)
+        && (name == other.name)
+        && (authKey == other.authKey)
+        && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
+        && qFuzzyEquals(weight, other.weight));
 }
 
-bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
+bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const
 {
-    return id == other.id &&
-           name == other.name &&
-           authKey == other.authKey &&
-           ownerAccountEmail == other.ownerAccountEmail &&
-           ownerFullName == other.ownerFullName;
+    return (cloudId == other.cloudId
+        && (localId == other.localId)
+        && (name == other.name)
+        && (authKey == other.authKey)
+        && (ownerAccountEmail == other.ownerAccountEmail)
+        && (ownerFullName == other.ownerFullName));
 }
 
 void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-    settings->setValue(kIdTag, id);
-    settings->setValue(kNameTag, name);
-    settings->setValue(kOwnerAccounEmail, ownerAccountEmail);
-    settings->setValue(kOwnerFullName, ownerFullName);
-    settings->setValue(kWeight, weight);
-    settings->setValue(kLastLoginTimeUtcMs, lastLoginTimeUtcMs);
+
+    QByteArray json;
+    QJson::serialize(*this, &json);
+    const auto value = QVariant::fromValue(json);
+    settings->setValue(kCloudSystemJsonHolderTag, value);
 }
 
 QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
 {
     QnCloudSystem result;
-
-    result.id = settings->value(kIdTag).toString();
-    result.name = settings->value(kNameTag).toString();
-    result.ownerAccountEmail = settings->value(kOwnerAccounEmail).toString();
-    result.ownerFullName = settings->value(kOwnerFullName).toString();
-    result.weight = settings->value(kWeight, 0.0).toReal();
-    result.lastLoginTimeUtcMs = settings->value(kLastLoginTimeUtcMs, 0).toLongLong();
+    const auto json = settings->value(kCloudSystemJsonHolderTag).toByteArray();
+    QJson::deserialize(json, &result);
     return result;
 }

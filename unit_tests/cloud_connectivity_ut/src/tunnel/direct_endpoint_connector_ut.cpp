@@ -9,7 +9,6 @@
 
 #include "cross_nat_connector_test.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -108,8 +107,8 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
     }
 }
 
-}   //namespace test
-}   //namespace tcp
-}   //namespace cloud
-}   //namespace network
-}   //namespace nx
+} // namespace test
+} // namespace tcp
+} // namespace cloud
+} // namespace network
+} // namespace nx

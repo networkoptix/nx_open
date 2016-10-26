@@ -476,8 +476,17 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (!resource)
             return;
 
-        QnResourceDisplayInfo info(resource);
-        extInfo = info.extraInfo();
+        if ((nodeType == Qn::LayoutItemNode || nodeType == Qn::SharedResourceNode)
+            && resource->hasFlags(Qn::server)
+            && !resource->hasFlags(Qn::fake))
+        {
+            extInfo = kCustomExtInfoTemplate.arg(tr("Health Monitor"));
+        }
+        else
+        {
+            QnResourceDisplayInfo info(resource);
+            extInfo = info.extraInfo();
+        }
 
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
             extInfo = kCustomExtInfoTemplate.arg(extInfo);

@@ -12,39 +12,11 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/common/html.h>
+
 namespace {
 
-
-    // let code be here until it will be properly implemented
-    /*
-    const int kMaxResourcesInTooltip = 10;
-    QString getTooltip()
-    {
-        int count = 0;
-        QString tooltip;
-
-        // Show only first kMaxResourcesInTooltip names from the sorted list:
-        for (const auto& name : names)
-        {
-            if (++count > kMaxResourcesInTooltip)
-                break;
-
-            tooltip += lit("<br>&nbsp;&nbsp;&nbsp;%1").arg(name);
-        }
-
-        if (!tooltip.isEmpty())
-        {
-            QString suffix;
-            if (count > kMaxResourcesInTooltip)
-                suffix = lit("<br>&nbsp;&nbsp;&nbsp;%1").arg(tr("...and %n more", "", count - kMaxResourcesInTooltip));
-
-            tooltip = lit("<div style='white-space: pre'>%1<b>%2</b>%3</div>").
-                arg(tr("Access granted by:")).
-                arg(tooltip).
-                arg(suffix);
-        }
-    }
-    */
+static const int kMaxResourcesInTooltip = 10;
 
 } // anonymous namespace
 
@@ -147,13 +119,19 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
     {
         case IndirectAccessColumn:
         {
+            auto resource = index.sibling(index.row(), NameColumn).
+                data(Qn::ResourceRole).value<QnResourcePtr>();
+
+            /* Providers calculation is a bit long so using it only when needed. */
+            QnResourceList providers;
+            auto source = (role == Qt::ToolTipRole)
+                ? qnResourceAccessProvider->accessibleVia(m_subject, resource, &providers)
+                : qnResourceAccessProvider->accessibleVia(m_subject, resource);
+
             switch (role)
             {
                 case Qt::DecorationRole:
                 {
-                    auto resource = index.sibling(index.row(), NameColumn).
-                        data(Qn::ResourceRole).value<QnResourcePtr>();
-                    auto source = qnResourceAccessProvider->accessibleVia(m_subject, resource);
                     switch (source)
                     {
                         case QnAbstractResourceAccessProvider::Source::layout:
@@ -163,13 +141,10 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                         default:
                             return QVariant();
                     }
-
-
                 }
 
-                //TODO: #GDM #implement me #high #3.0
                 case Qt::ToolTipRole:
-                    return lit("WILL_BE_FIXED_A_BIT_LATER");
+                    return getTooltip(providers);
 
                 case Qn::DisabledRole:
                     return index.sibling(index.row(), NameColumn).data(role);
@@ -218,6 +193,30 @@ void QnAccessibleResourcesModel::setAllChecked(bool value)
         index(0, CheckColumn),
         index(rowCount() - 1, CheckColumn),
         { Qt::CheckStateRole });
+}
+
+QString QnAccessibleResourcesModel::getTooltip(const QnResourceList& providers) const
+{
+    if (providers.empty())
+        return QString();
+
+    static const QString kSpacer = lit("<br>&nbsp;&nbsp;&nbsp;");
+
+    QStringList lines;
+    lines << tr("Access granted by:");
+
+    const auto maxTooltipLines = std::min(kMaxResourcesInTooltip, providers.size());
+    std::for_each(providers.begin(), providers.begin() + maxTooltipLines,
+        [&lines](const QnResourcePtr& provider)
+        {
+            lines << htmlBold(provider->getName());
+        });
+
+    const auto more = providers.size() - kMaxResourcesInTooltip;
+    if (more > 0)
+        lines << tr("...and %n more", "", more);
+
+    return lit("<div style='white-space: pre'>%1</div>").arg(lines.join(kSpacer));
 }
 
 void QnAccessibleResourcesModel::accessChanged()

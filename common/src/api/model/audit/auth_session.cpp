@@ -1,5 +1,5 @@
 #include "auth_session.h"
-#include <nx/network/http/qnbytearrayref.h>
+#include <nx/utils/qnbytearrayref.h>
 
 #include <nx/fusion/model_functions.h>
 

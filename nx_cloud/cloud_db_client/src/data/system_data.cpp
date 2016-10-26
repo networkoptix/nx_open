@@ -26,21 +26,21 @@ MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, opaque)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
-    return 
-        url::deserializeField(
-            urlQuery,
-            SystemRegistrationData_name_field,
-            &data->name)
-        &&
-        url::deserializeField(
+    if (!url::deserializeField(urlQuery, SystemRegistrationData_name_field, &data->name))
+        return false;
+
+    if (!url::deserializeField(
             urlQuery,
             SystemRegistrationData_customization_field,
-            &data->customization)
-        &&
-        url::deserializeField(
-            urlQuery,
-            SystemRegistrationData_opaque_field,
-            &data->opaque);
+            &data->customization))
+    {
+        return false;
+    }
+
+    // Optional field.
+    url::deserializeField(urlQuery, SystemRegistrationData_opaque_field, &data->opaque);
+
+    return true;
 }
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
@@ -151,22 +151,63 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 
 
 ////////////////////////////////////////////////////////////
-//// class SystemNameUpdate
+//// class SystemAttributesUpdate
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, systemID)
-MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, name)
+MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, systemID)
+MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, name)
+MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, opaque)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data)
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemAttributesUpdate* const data)
 {
-    return url::deserializeField(urlQuery, SystemNameUpdate_systemID_field, &data->systemID)
-        && url::deserializeField(urlQuery, SystemNameUpdate_name_field, &data->name);
+    return url::deserializeField(urlQuery, SystemAttributesUpdate_systemID_field, &data->systemID)
+        && url::deserializeField(urlQuery, SystemAttributesUpdate_name_field, &data->name)
+        && url::deserializeField(urlQuery, SystemAttributesUpdate_opaque_field, &data->opaque);
 }
 
-void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery)
+void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const urlQuery)
 {
-    url::serializeField(urlQuery, SystemNameUpdate_systemID_field, data.systemID);
-    url::serializeField(urlQuery, SystemNameUpdate_name_field, data.name);
+    url::serializeField(urlQuery, SystemAttributesUpdate_systemID_field, data.systemID);
+    url::serializeField(urlQuery, SystemAttributesUpdate_name_field, data.name);
+    url::serializeField(urlQuery, SystemAttributesUpdate_opaque_field, data.opaque);
+}
+
+void serialize(QnJsonContext*, const SystemAttributesUpdate& data, QJsonValue* jsonValue)
+{
+    QJsonObject jsonObject;
+    jsonObject.insert(
+        SystemAttributesUpdate_systemID_field,
+        QString::fromStdString(data.systemID));
+    if (data.name)
+        jsonObject.insert(
+            SystemAttributesUpdate_name_field,
+            QString::fromStdString(data.name.get()));
+    if (data.opaque)
+        jsonObject.insert(
+            SystemAttributesUpdate_opaque_field,
+            QString::fromStdString(data.opaque.get()));
+    *jsonValue = jsonObject;
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& value, SystemAttributesUpdate* data)
+{
+    if (value.type() != QJsonValue::Object)
+        return false;
+    const QJsonObject map = value.toObject();
+
+    auto systemIdIter = map.find(SystemAttributesUpdate_systemID_field);
+    if (systemIdIter == map.constEnd())
+        return false;
+    data->systemID = systemIdIter.value().toString().toStdString();
+
+    auto nameIter = map.find(SystemAttributesUpdate_name_field);
+    if (nameIter != map.constEnd())
+        data->name = nameIter.value().toString().toStdString();
+    auto opaqueIter = map.find(SystemAttributesUpdate_opaque_field);
+    if (opaqueIter != map.constEnd())
+        data->opaque = opaqueIter.value().toString().toStdString();
+
+    return data->name || data->opaque;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -220,7 +261,7 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, UserSessionDescriptor*
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (json),
     _Fields/*,
     (optional, false)*/)

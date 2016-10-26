@@ -65,7 +65,7 @@ namespace indications
          *         \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
          *         \class UdtHpEndpointList (opt)
          */
-        connectionRequested,
+        connectionRequested = MethodType::userIndication,
 
         /** Indicates update information about on-going connection establishment
          *  Attrs: \class ConnectionId,

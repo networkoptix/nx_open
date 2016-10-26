@@ -86,14 +86,16 @@ private:
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
+    Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
     void saveAdminPswdHash();
     bool isStopping() const;
-    void resetCloudParams(CloudConnectionManager& cloudConnectionManager);
     void migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager);
+    void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+
 private:
     int m_argc;
     char** m_argv;

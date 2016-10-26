@@ -89,7 +89,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     nx::network::SocketGlobals::init();
 
-    m_dirtyModuleInformation = false;
+    m_dirtyModuleInformation = true;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
@@ -262,7 +262,7 @@ void QnCommonModule::updateModuleInformationUnsafe()
     NX_ASSERT(!moduleGUID().isNull());
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
-    NX_ASSERT(server);
+    //NX_ASSERT(server);
     if (!server)
         return;
 

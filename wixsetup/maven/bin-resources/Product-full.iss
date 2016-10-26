@@ -148,6 +148,7 @@ begin
     for I := 0 to WizardForm.TypesCombo.Items.Count - 1 do
     begin
         RadioButton := TNewRadioButton.Create(WizardForm);
+        RadioButton.Height := 20;
         RadioButton.Parent := WizardForm.SelectComponentsPage;
         RadioButton.Left := WizardForm.TypesCombo.Left;
         RadioButton.Top := WizardForm.TypesCombo.Top + I * RadioButton.Height;

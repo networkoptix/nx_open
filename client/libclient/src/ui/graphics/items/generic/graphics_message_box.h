@@ -13,7 +13,6 @@
 #include <nx/utils/singleton.h>
 
 class GraphicsLabel;
-class QnCountdownTimer;
 
 class QnGraphicsMessageBoxHolder:
     public GraphicsWidget,

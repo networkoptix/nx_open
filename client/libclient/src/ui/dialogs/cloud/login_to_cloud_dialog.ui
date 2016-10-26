@@ -138,7 +138,7 @@
        </spacer>
       </item>
       <item row="3" column="1" colspan="2">
-       <widget class="QCheckBox" name="stayLoggedInChackBox">
+       <widget class="QCheckBox" name="stayLoggedInCheckBox">
         <property name="text">
          <string>Stay logged in</string>
         </property>
@@ -244,7 +244,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>stayLoggedInChackBox</tabstop>
+  <tabstop>stayLoggedInCheckBox</tabstop>
   <tabstop>loginButton</tabstop>
   <tabstop>restorePasswordLabel</tabstop>
   <tabstop>createAccountLabel</tabstop>

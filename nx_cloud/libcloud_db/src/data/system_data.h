@@ -33,13 +33,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 namespace data {
 
-class SubscriptionData
-    :
-    public api::SubscriptionData
-{
-public:
-};
-
 //!Information required to register system in cloud
 class SystemRegistrationData
     :
@@ -125,9 +118,9 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class SystemNameUpdate
+class SystemAttributesUpdate
     :
-    public api::SystemNameUpdate,
+    public api::SystemAttributesUpdate,
     public stree::AbstractResourceReader
 {
 public:
@@ -144,7 +137,7 @@ class UserSessionDescriptor
 };
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

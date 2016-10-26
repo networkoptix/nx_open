@@ -24,10 +24,10 @@ void RepeatingBufferSender::processRequest(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request /*request*/,
     nx_http::Response* const /*response*/,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     completionHandler(
-        nx_http::StatusCode::ok,
-        std::make_unique<RepeatingBufferMsgBodySource>(m_mimeType, m_buffer),
-        nx_http::ConnectionEvents());
+        nx_http::RequestResult(
+            nx_http::StatusCode::ok,
+            std::make_unique<RepeatingBufferMsgBodySource>(m_mimeType, m_buffer)));
 }

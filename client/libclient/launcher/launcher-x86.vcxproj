@@ -42,18 +42,18 @@
     <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <IntDir>x86\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <IntDir>x86\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog>
-      <Path>..\..\x86\$(IntDir)BuildLog.htm</Path>
+      <Path>.\$(IntDir)BuildLog.htm</Path>
     </BuildLog>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -63,33 +63,33 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader />
-      <ObjectFileName>..\..\x86\$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\x86\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
-      <XMLDocumentationFileName>..\..\x86\$(IntDir)</XMLDocumentationFileName>
+      <ObjectFileName>.\$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>.\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <XMLDocumentationFileName>.\$(IntDir)</XMLDocumentationFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <ResourceOutputFileName>..\..\x86\$(IntDir)%(Filename).res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)%(Filename).res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\x86\resources\$(ProjectName).exe</OutputFile>
-      <ManifestFile>..\..\x86\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
+      <ManifestFile>.\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <Manifest>
-      <OutputManifestFile>..\..\x86\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
+      <OutputManifestFile>.\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
     </Manifest>
     <ManifestResourceCompile>
-      <ResourceOutputFileName>..\..\x86\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <BuildLog>
-      <Path>..\..\x86\$(IntDir)BuildLog.htm</Path>
+      <Path>.\$(IntDir)BuildLog.htm</Path>
     </BuildLog>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -99,19 +99,19 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader />
-      <ObjectFileName>..\..\x86\$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\x86\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
-      <XMLDocumentationFileName>..\..\x86\$(IntDir)</XMLDocumentationFileName>
+      <ObjectFileName>.\$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>.\$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <XMLDocumentationFileName>.\$(IntDir)</XMLDocumentationFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <ResourceOutputFileName>..\..\x86\$(IntDir)%(Filename).res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)%(Filename).res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>msi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\x86\resources\$(ProjectName).exe</OutputFile>
-      <ManifestFile>..\..\x86\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
+      <ManifestFile>.\$(IntDir)$(TargetFileName).intermediate.manifest</ManifestFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -119,10 +119,10 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <Manifest>
-      <OutputManifestFile>..\..\x86\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
+      <OutputManifestFile>.\$(IntDir)$(TargetFileName).embed.manifest</OutputManifestFile>
     </Manifest>
     <ManifestResourceCompile>
-      <ResourceOutputFileName>..\..\x86\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
+      <ResourceOutputFileName>.\$(IntDir)$(TargetFileName).embed.manifest.res</ResourceOutputFileName>
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
