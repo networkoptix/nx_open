@@ -623,7 +623,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             auto isOwner = subject.user() && subject.user()->isOwner();
 
             /* Admins can only be edited by owner, other users - by all admins. */
-            if (isOwner || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
+            bool targetIsAdmin = targetUser->getRawPermissions().testFlag(Qn::GlobalAdminPermission);
+            if (isOwner || !targetIsAdmin)
                 result |= Qn::FullUserPermissions;
         }
     }
