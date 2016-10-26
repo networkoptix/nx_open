@@ -1117,6 +1117,13 @@ void QnPlOnvifResource::notificationReceived(
                 }
             }
         }
+        else
+        {
+            auto portIndex = getInputPortNumberFromString(portSourceIter->value);
+
+            if (!portIndex.isEmpty())
+                portId = portIndex;
+        }
 
         currentPortState = newPortState;
         emit cameraInput(
@@ -1527,6 +1534,12 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         setCameraCapability( Qn::RelayInputCapability, true );
     }
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    m_portAliases = resData.value<std::vector<QString>>(Qn::ONVIF_INPUT_PORT_ALIASES_PARAM_NAME);
+
+    if (!m_portAliases.empty())
+        return true;
+
     const QAuthenticator& auth = getAuth();
     DeviceIOWrapper soapWrapper(
         m_deviceIOUrl,
@@ -1853,6 +1866,22 @@ CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(MediaSoapWrap
     }
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
+{
+    QString portIndex;
+    bool canBeConvertedToNumber = false;
+
+    if (portName.startsWith(lit("DI")))
+        portIndex = portName.mid(2);
+
+    auto portNum = portIndex.toInt(&canBeConvertedToNumber);
+
+    if (canBeConvertedToNumber)
+        return QString::number(portNum + 1);
+
+    return QString();
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
