@@ -8,6 +8,7 @@
 #include <client_core/local_connection_data.h>
 #include <network/base_system_description.h>
 
+class QTimer;
 class QnAbstractSystemsFinder;
 
 typedef QHash<QString, QnWeightData> QnWeightsDataHash;
@@ -43,13 +44,16 @@ private:
 
     void resetWeights();
 
-    void handleWeightsChanged();
+    void afterBaseWeightsUpdated();
 
-    void updateWeightData();
+    void handleSourceWeightsChanged();
 
 private:
+    QTimer* const m_updateTimer;
+
     QnAbstractSystemsFinder* m_finder;
-    QnWeightsDataHash m_weights;
+    QnWeightsDataHash m_baseWeights;
+    QnWeightsDataHash m_updatedWeights;
     qreal m_unknownSystemWeight;
 };
 
