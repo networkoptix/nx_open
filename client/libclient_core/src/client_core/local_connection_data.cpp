@@ -1,11 +1,9 @@
 #include "local_connection_data.h"
 
-#include <QtCore/QUrl>
-
 #include <nx/fusion/model_functions.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnLocalConnectionData)(QnWeightData), (eq)(json), _Fields)
+    (QnLocalConnectionData)(QnWeightData), (datastream)(eq)(json), _Fields)
 
 QnLocalConnectionData::QnLocalConnectionData() {}
 
@@ -18,4 +16,13 @@ QnLocalConnectionData::QnLocalConnectionData(
     localId(localId),
     url(url),
     password(url.password())
-{}
+{
+    this->url.setPassword(QString());
+}
+
+QUrl QnLocalConnectionData::urlWithPassword() const
+{
+    auto url = this->url;
+    url.setPassword(password.value());
+    return url;
+}

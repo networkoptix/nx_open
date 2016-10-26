@@ -56,6 +56,14 @@ public:
         NX_ASSERT(m_hoverTracker);
     }
 
+    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+        if (index.column() == QnUserListModel::UserTypeColumn)
+            return QnSkin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
+
+        return base_type::sizeHint(option, index);
+    }
+
     virtual void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
     {
         /* Determine item opacity based on user enabled state: */
@@ -64,6 +72,22 @@ public:
             index.sibling(index.row(), QnUserListModel::EnabledColumn).data(Qt::CheckStateRole).toInt() != Qt::Checked)
         {
             painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+        }
+
+        /* Paint right-aligned user type icon: */
+        if (index.column() == QnUserListModel::UserTypeColumn)
+        {
+            auto icon = index.data(Qt::DecorationRole).value<QIcon>();
+            if (icon.isNull())
+                return;
+
+            auto rect = QStyle::alignedRect(Qt::LeftToRight,
+                Qt::AlignRight | Qt::AlignVCenter,
+                QnSkin::maximumSize(icon),
+                option.rect);
+
+            icon.paint(painter, rect);
+            return;
         }
 
         /* Determine if link should be drawn: */

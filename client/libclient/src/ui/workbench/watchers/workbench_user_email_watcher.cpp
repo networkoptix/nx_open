@@ -57,7 +57,7 @@ bool QnWorkbenchUserEmailWatcher::isUserEmailValid(const QnUserResourcePtr &user
         return true;
 
     /* Suppress errors for disabled users. */
-    return !user->isEnabled() || QnEmailAddress::isValid(user->getEmail());
+    return !user->isEnabled() || nx::email::isValidAddress(user->getEmail());
 }
 
 

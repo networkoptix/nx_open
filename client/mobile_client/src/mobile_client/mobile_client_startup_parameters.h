@@ -6,6 +6,7 @@ class QCoreApplication;
 
 struct QnMobileClientStartupParameters
 {
+    QnMobileClientStartupParameters();
     QnMobileClientStartupParameters(const QCoreApplication& application);
 
     QString basePath;
@@ -15,3 +16,5 @@ struct QnMobileClientStartupParameters
     bool testMode = false;
     QString initialTest;
 };
+
+Q_DECLARE_METATYPE(QnMobileClientStartupParameters)

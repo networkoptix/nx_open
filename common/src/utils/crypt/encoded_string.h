@@ -22,6 +22,9 @@ private:
     QString m_value;
 };
 
+QDataStream &operator<<(QDataStream &stream, const QnEncodedString &encodedString);
+QDataStream &operator>>(QDataStream &stream, QnEncodedString &encodedString);
+
 QDebug operator<<(QDebug dbg, const QnEncodedString& value);
 
 QN_FUSION_DECLARE_FUNCTIONS(QnEncodedString, (metatype)(lexical)(json))

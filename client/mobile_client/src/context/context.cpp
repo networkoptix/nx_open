@@ -10,7 +10,6 @@
 #include <context/context_settings.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
-#include <ui/models/recent_local_connections_model.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
@@ -147,49 +146,24 @@ void QnContext::removeSavedConnection(const QString& systemName)
     qnClientCoreSettings->save();
 }
 
-void QnContext::setLastUsedConnection(const QString& systemId, const QUrl& url)
-{
-    qnSettings->setLastUsedSystemId(systemId);
-    QUrl clearedUrl = url;
-    clearedUrl.setPassword(QString());
-    qnSettings->setLastUsedUrl(clearedUrl);
-}
-
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedSystemId(QString());
-    qnSettings->setLastUsedUrl(QUrl());
+    qnSettings->setLastUsedConnection(QnLocalConnectionData());
 }
 
-QString QnContext::getLastUsedSystemId() const
+QString QnContext::getLastUsedSystemName() const
 {
-    return qnSettings->lastUsedSystemId();
+    return qnSettings->lastUsedConnection().systemName;
 }
 
-QString QnContext::getLastUsedUrl() const
+QUrl QnContext::getLastUsedUrl() const
 {
-    QUrl url = qnSettings->lastUsedUrl();
+    return qnSettings->lastUsedConnection().urlWithPassword();
+}
 
-    if (!url.isValid() || url.userName().isEmpty())
-        return QString();
-
-    if (url.password().isEmpty())
-    {
-        QnRecentLocalConnectionsModel connectionsModel;
-        connectionsModel.setSystemId(getLastUsedSystemId());
-        if (!connectionsModel.hasConnections())
-            return QString();
-
-        const auto firstIndex = connectionsModel.index(0);
-        const auto password = connectionsModel.data(
-            firstIndex, QnRecentLocalConnectionsModel::PasswordRole).toString();
-        if (password.isEmpty())
-            return QString();
-
-        url.setPassword(password);
-    }
-
-    return url.toString();
+QUrl QnContext::getInitialUrl() const
+{
+    return qnSettings->startupParameters().url;
 }
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)
