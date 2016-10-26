@@ -78,6 +78,13 @@ protected:
         return base_type::lessThan(source_left, source_right);
     }
 
+    virtual QVariant data(const QModelIndex& index, int role) const override
+    {
+        if (role == Qt::FontRole && index.column() == QnLicenseListModel::LicenseKeyColumn)
+            return monospaceFont();
+
+        return base_type::data(index, role);
+    }
 };
 
 }

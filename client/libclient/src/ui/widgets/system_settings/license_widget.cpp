@@ -36,6 +36,9 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
 
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
+    /* Choose monospace font for license input line: */
+    setMonospaceFont(ui->onlineKeyEdit);
+
     /* Upon taking focus by license input line set cursor to first empty position: */
     auto focusSignalizer = new QnSingleEventSignalizer(this);
     focusSignalizer->setEventType(QEvent::FocusIn);

@@ -132,3 +132,16 @@ void fadeWidget(
                 });
         });
 }
+
+void setMonospaceFont(QWidget* widget)
+{
+    widget->ensurePolished();
+    widget->setFont(monospaceFont(widget->font()));
+}
+
+QFont monospaceFont(const QFont& font)
+{
+    QFont mono(font);
+    mono.setFamily(lit("Roboto Mono"));
+    return mono;
+}
