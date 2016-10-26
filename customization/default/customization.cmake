@@ -43,7 +43,6 @@ set (ios.bundle_identifier "com.networkoptix.HDWitness")
 set (ios.new_bundle_identifier "com.networkoptix.NxMobile")
 set (ios.group_identifier "group.com.networkoptix.NxMobile")
 set (ios.sign.identity "iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)")
-set (ios.playButton.tint "#00A1D4")
 set (ios.old_app_appstore_id "id648369716")
 
 set (mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
