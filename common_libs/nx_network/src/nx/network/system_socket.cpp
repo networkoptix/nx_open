@@ -1423,9 +1423,9 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // UDPSocket Code
 
-UDPSocket::UDPSocket(bool natTraversal, int ipVersion)
+UDPSocket::UDPSocket(int ipVersion)
 :
-    base_type(natTraversal, SOCK_DGRAM, IPPROTO_UDP, ipVersion),
+    base_type(false, SOCK_DGRAM, IPPROTO_UDP, ipVersion),
     m_destAddr()
 {
     setBroadcast();

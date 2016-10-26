@@ -8,6 +8,7 @@
 #include <utils/common/credentials.h>
 #include <core/dataprovider/stream_mixer.h>
 #include <core/resource/resource_data_structures.h>
+#include <core/resource/camera_advanced_param.h>
 
 class QnResourceDataJsonSerializer: public QnJsonSerializer {
 public:
@@ -29,6 +30,8 @@ public:
 
         registerKey<QnBounds>(Qn::HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME);
         registerKey<QnBounds>(Qn::LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME);
+
+        registerKey<std::vector<QnCameraAdvancedParameterOverload>>(Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
     }
 
 protected:

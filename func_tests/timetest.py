@@ -116,7 +116,7 @@ class TimeSyncTest(FuncTestCase):
             proc = [
                 #FIXME make the interface name the same with $EXT_IF fom conf.sh !!!
                 (box, subprocess.Popen(
-                    ['./vssh.sh', box, 'sudo', 'ifup', IF_EXT], shell=False, stdout=FNULL, stderr=subprocess.STDOUT)
+                    ['./vssh-ip.sh', box, 'sudo', 'ifup', IF_EXT], shell=False, stdout=FNULL, stderr=subprocess.STDOUT)
                  ) for box in cls.hosts
             ]
             for b, p in proc:

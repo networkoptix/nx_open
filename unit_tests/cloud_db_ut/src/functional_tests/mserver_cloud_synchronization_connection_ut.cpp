@@ -12,8 +12,7 @@ namespace cdb {
  * This test launches cdb and establishes transaction connection(s) to it.
  * Does not bring up whole appserver2 peer.
  */
-class Ec2MserverCloudSynchronizationConnection
-    :
+class Ec2MserverCloudSynchronizationConnection:
     public CdbFunctionalTest
 {
 public:

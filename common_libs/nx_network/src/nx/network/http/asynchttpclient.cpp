@@ -80,7 +80,7 @@ namespace nx_http
 
     AsyncHttpClient::~AsyncHttpClient()
     {
-        pleaseStopSync();
+        pleaseStopSync(false);
     }
 
     const std::unique_ptr<AbstractStreamSocket>& AsyncHttpClient::socket()

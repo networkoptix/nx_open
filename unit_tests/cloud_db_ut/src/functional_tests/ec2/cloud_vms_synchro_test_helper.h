@@ -11,8 +11,7 @@
 namespace nx {
 namespace cdb {
 
-class Ec2MserverCloudSynchronization
-    :
+class Ec2MserverCloudSynchronization:
     public ::testing::Test
 {
 public:
