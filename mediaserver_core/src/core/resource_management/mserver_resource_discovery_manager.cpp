@@ -205,8 +205,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
             DLOG(lit("%1 Found existing cam res %1 for new resource %2")
                     .arg(FL1(Q_FUNC_INFO))
-                    .arg(NetResString(newNetRes))
-                    .arg(NetResString(rpNetRes)));
+                    .arg(NetResString(rpNetRes))
+                    .arg(NetResString(newNetRes)));
                     
             newNetRes->setPhysicalId(rpNetRes->getUniqueId());
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
