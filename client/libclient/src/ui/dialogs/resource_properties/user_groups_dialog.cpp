@@ -181,15 +181,24 @@ void QnUserGroupsDialog::applyChanges()
         if (groupsLeft.contains(group.id))
             continue;
 
+        const auto& groupUsers = m_model->users(group.id, false);
         auto replacement = m_model->replacement(group.id);
-        for (auto user : m_model->users(group.id, false))
+
+        if (replacement.isInvalid())
         {
-            qnResourcesChangesManager->saveUser(user,
-                [replacement](const QnUserResourcePtr &user)
-                {
-                    user->setUserGroup(replacement.group);
-                    user->setRawPermissions(replacement.permissions);
-                });
+            qnResourcesChangesManager->deleteResources(groupUsers);
+        }
+        else
+        {
+            for (const auto& user : groupUsers)
+            {
+                qnResourcesChangesManager->saveUser(user,
+                    [replacement](const QnUserResourcePtr &user)
+                    {
+                        user->setUserGroup(replacement.group);
+                        user->setRawPermissions(replacement.permissions);
+                    });
+            }
         }
 
         qnResourcesChangesManager->removeUserRole(group.id);
