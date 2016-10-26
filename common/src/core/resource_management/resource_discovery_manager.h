@@ -21,6 +21,22 @@
 #include <core/resource/resource_processor.h>
 
 #include <utils/common/connective.h>
+#include <sys/time.h>
+
+#define DISCOVERY_DBG
+
+#if define DISCOVERY_DBG
+#   define DLOG(...) NX_LOG(__VA_ARGS__, cl_logINFO)
+#else
+#   define DLOG(...)
+#endif
+
+#define NetResString(res) \
+    lit("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4") \
+        .arg(res->getUrl()) \
+        .arg(res->getHostAddress()) \
+        .arg(res->getMAC().toString()) \
+        .arg(res->getUniqueId()) 
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -116,10 +132,7 @@ public:
     QSet<QString> lastDiscoveredIds() const;
     void addResourcesImmediatly(QnResourceList& resources);
 
-    static bool sameResourceWithAnotherGuidExists(
-        const QnResourcePtr& resource, 
-        std::function<bool(const QnNetworkResourcePtr& resource)> filterFunc,
-        bool manuallyAdded);
+    static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
 
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;

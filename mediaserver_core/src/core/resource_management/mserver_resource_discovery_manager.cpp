@@ -150,14 +150,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (needToStop())
             return false;
 
-        if (QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
-                *it, 
-                [](const QnNetworkResourcePtr& res) { return true; },
-                false))
-        {
-            it = resources.erase(it);
-            continue;
-        }
+        //if (QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
+        //        *it, 
+        //        [](const QnNetworkResourcePtr& res) { return true; },
+        //        false))
+        //{
+        //    it = resources.erase(it);
+        //    continue;
+        //}
 
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
@@ -168,7 +168,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-        QnResourcePtr rpResource = qnResPool->getResourceByUniqueId(newNetRes->getUniqueId());
+        DLOG(lit("%1 Processing resource %2").arg(NetResString(neNetres));)
+
+        // QnResourcePtr rpResource = qnResPool->getResourceByUniqueId(newNetRes->getUniqueId());
+        QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
+        
         if (!rpResource) {
             ++it; // keep new resource in a list
             continue;
