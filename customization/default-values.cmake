@@ -14,6 +14,9 @@ set(short.company.name "${company.name}")
 set(company.support.link "${company.support.address}")
 set(backgroundImage "{}")
 
+set(freeLicenseCount "4")
+set(freeLicenseIsTrial "true")
+
 # Help and settings URLs
 set(helpUrl "http://networkoptix.com/files/help")
 set(settings.url "http://networkoptix.com/files/settings")

@@ -2,10 +2,14 @@ cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 project(vms VERSION 3.0.0)
 
-set(release_version ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-
 set(customization "default" CACHE STRING "Product customization")
 set(box "none" CACHE STRING "Target box")
+set(beta "false" CACHE STRING "Is this build is beta build (true or false)")
+set(buildNumber "0" CACHE STRING "Build number")
+
+set(releaseVersion ${PROJECT_VERSION})
+set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -32,8 +36,11 @@ rdep_configure()
 
 include(package_versions)
 include(ec_protocol)
+include(maven_compatibility)
 
 include(customization/default-values.cmake)
+include(customization/${customization}/customization.cmake)
+include(properties)
 
 rdep_add_package(qt)
 get_full_package_name(qt QT_DIR)
