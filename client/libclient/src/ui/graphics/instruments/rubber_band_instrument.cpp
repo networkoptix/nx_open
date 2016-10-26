@@ -64,9 +64,9 @@ public:
         QColor highlight = palette.color(QPalette::Active, QPalette::Highlight);
 
         QnScopedPainterTransformRollback transformRollback(painter, QTransform());
-        QnScopedPainterPenRollback penRollback(painter, QPen(highlight, 0.5));
+        QnScopedPainterPenRollback penRollback(painter, QPen(highlight, 0.0));
         QnScopedPainterBrushRollback brushRollback(painter, toTransparent(highlight, 0.2));
-        painter->drawRect(m_rubberBandRect);
+        painter->drawRect(QRectF(m_rubberBandRect).adjusted(0.5, 0.5, -0.5, -0.5));
     }
 
     /**
