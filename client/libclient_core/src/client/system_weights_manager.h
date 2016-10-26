@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 
 #include <nx/utils/singleton.h>
@@ -10,14 +11,12 @@
 class QnAbstractSystemsFinder;
 
 typedef QHash<QString, QnWeightData> QnWeightsDataHash;
-class QnSystemsWeightsManager : public Singleton<QnSystemsWeightsManager>,
-    public QObject
+
+class QnSystemsWeightsManager : public QObject,
+    public Singleton<QnSystemsWeightsManager>
 {
     Q_OBJECT
     using base_type = QObject;
-
-    Q_PROPERTY(QnWeightDataList weights READ weights NOTIFY weightsChanged)
-    Q_PROPERTY(qreal unknownSystemsWeight READ unknownSystemsWeight NOTIFY unknownSystemsWeight)
 
 public:
     QnSystemsWeightsManager();
@@ -28,20 +27,30 @@ public:
 public:
     QnWeightsDataHash weights() const;
 
+    qreal unknownSystemsWeight() const;
+
 signals:
     void weightsChanged();
 
+    void unknownSystemsWeightChanged();
+
 private:
+    void setUnknownSystemsWeight(qreal value);
+
     void addLocalWeightData(const QnWeightData& data);
 
     void processSystemDiscovered(const QnSystemDescriptionPtr& system);
 
-    void setWeights(const QnWeightsDataHash& weights);
-
     void resetWeights();
+
+    void handleWeightsChanged();
+
+    void updateWeightData();
 
 private:
     QnAbstractSystemsFinder* m_finder;
     QnWeightsDataHash m_weights;
     qreal m_unknownSystemWeight;
 };
+
+#define qnSystemWeightsManager  QnSystemsWeightsManager::instance()

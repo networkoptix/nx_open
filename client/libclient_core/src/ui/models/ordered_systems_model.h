@@ -1,10 +1,7 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
-#include <watchers/cloud_status_watcher.h>
-#include <client_core/local_connection_data.h>
-
-class QTimer;
+#include <client/system_weights_manager.h>
 
 class QnOrderedSystemsModel : public QSortFilterProxyModel
 {
@@ -24,34 +21,20 @@ protected: // overrides
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
-    void handleCloudSystemsChanged(const QnCloudSystemList& systems);
-
-    void handleLocalWeightsChanged();
-
-    void updateFinalWeights();
-
-    void updateMaxRealWeight();
+    void handleWeightsChanged();
 
     qreal getWeight(const QModelIndex& modelIndex) const;
 
-    typedef QHash<QString, QnWeightData> IdWeightDataHash;
     bool getWeightFromData(const QModelIndex& modelIndex,
-        const IdWeightDataHash& data,
         qreal& weight) const;
 
     void softInvalidate();
 
     QString minimalVersion() const;
-    void setMinimalVersion(const QString& minimalVersion);
-
+    QnWeightsDataHash m_weights;
+    qreal m_unknownSystemsWeight;
 signals:
     void minimalVersionChanged();
 
 private:
-    QTimer* const m_updateTimer;
-    IdWeightDataHash m_cloudWeights;
-    IdWeightDataHash m_localWeights;
-    IdWeightDataHash m_finalWeights;
-    qreal m_maxRealWeight;
-    mutable bool m_updatingWeights;
 };

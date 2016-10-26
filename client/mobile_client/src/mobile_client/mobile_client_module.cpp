@@ -24,6 +24,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/client_recent_connections_manager.h>
+#include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
 #include "mobile_client_message_processor.h"
@@ -84,7 +85,7 @@ QnMobileClientModule::QnMobileClientModule(
 
     common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
-
+    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());

@@ -24,6 +24,7 @@
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
+#include <client/system_weights_manager.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -295,6 +296,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Just to feel safe */
     common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
+
+    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
