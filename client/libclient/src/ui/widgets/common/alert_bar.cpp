@@ -61,7 +61,11 @@ void QnAlertBar::setReservedSpace(bool reservedSpace)
 
 void QnAlertBar::updateVisibility()
 {
-    setHidden(m_label->isHidden() && !m_reservedSpace);
+    bool hidden = !m_reservedSpace && m_label->isHidden();
+    if (hidden == isHidden())
+        return;
+
+    setHidden(hidden);
 
     if (parentWidget() && parentWidget()->layout() && parentWidget()->isVisible())
         parentWidget()->layout()->activate();
