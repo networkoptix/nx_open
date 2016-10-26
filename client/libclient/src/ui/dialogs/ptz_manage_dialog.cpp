@@ -319,6 +319,16 @@ void QnPtzManageDialog::clear()
     ui->tourStackedWidget->setCurrentIndex(ui->tourStackedWidget->indexOf(ui->noTourPage));
 }
 
+void QnPtzManageDialog::showSetPositionWarning()
+{
+    QnMessageBox::critical(
+        this,
+        tr("Could not set position for camera."),
+        tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
+        + tr("Please wait for the camera to go online.")
+    );
+}
+
 void QnPtzManageDialog::saveData()
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_submitting, true);
@@ -456,12 +466,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            this,
-            tr("Could not set position for camera."),
-            tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        showSetPositionWarning();
         return;
     }
 
@@ -502,12 +507,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            this,
-            tr("Could not set position for camera."),
-            tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        showSetPositionWarning();
         return;
     }
 

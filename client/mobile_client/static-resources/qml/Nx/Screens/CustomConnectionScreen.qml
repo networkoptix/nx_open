@@ -32,8 +32,8 @@ Page
     Column
     {
         width: parent.width
-        leftPadding: 16
-        rightPadding: 16
+        leftPadding: 8
+        rightPadding: 8
         spacing: 8
         enabled: !d.connecting
 

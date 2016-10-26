@@ -276,11 +276,13 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         return;
 
     /* Remove node from all hashes where node can be the key. */
-    updateNodeResource(node, QnResourcePtr());
+    auto resource = node->resource();
     node->deinitialize();
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
+    if (resource)
+        m_nodesByResource[resource].removeAll(node);
 
     /* Recursively remove all child nodes. */
     for (auto child : children(node))

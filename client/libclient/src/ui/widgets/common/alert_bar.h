@@ -17,6 +17,13 @@ public:
     QString text() const;
     void setText(const QString& text);
 
+    bool reservedSpace() const;
+    void setReservedSpace(bool reservedSpace);
+
+private:
+    void updateVisibility();
+
 private:
     QLabel* m_label;
+    bool m_reservedSpace;
 };

@@ -9,6 +9,7 @@ class QTimer;
 class QnOrderedSystemsModel : public QSortFilterProxyModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString minimalVersion READ minimalVersion WRITE setMinimalVersion NOTIFY minimalVersionChanged)
     typedef QSortFilterProxyModel base_type;
 
 public:
@@ -20,8 +21,7 @@ protected: // overrides
     virtual bool lessThan(const QModelIndex& left,
         const QModelIndex& right) const override;
 
-    virtual bool filterAcceptsRow(int row,
-        const QModelIndex &parent) const override;
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
     void handleCloudSystemsChanged(const QnCloudSystemList& systems);
@@ -39,8 +39,15 @@ private:
         const IdWeightDataHash& data,
         qreal& weight) const;
 
-private:
+    void softInvalidate();
 
+    QString minimalVersion() const;
+    void setMinimalVersion(const QString& minimalVersion);
+
+signals:
+    void minimalVersionChanged();
+
+private:
     QTimer* const m_updateTimer;
     IdWeightDataHash m_cloudWeights;
     IdWeightDataHash m_localWeights;

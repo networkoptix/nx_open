@@ -79,3 +79,16 @@ QDebug operator<<(QDebug dbg, const QnEncodedString& value)
     dbg.nospace() << value.value() << " (" << value.encoded() << ")";
     return dbg.space();
 }
+
+QDataStream& operator<<(QDataStream& stream, const QnEncodedString& encodedString)
+{
+    return stream << encodedString.encoded();
+}
+
+QDataStream& operator>>(QDataStream& stream, QnEncodedString& encodedString)
+{
+    QString encoded;
+    stream >> encoded;
+    encodedString.setEncoded(encoded);
+    return stream;
+}

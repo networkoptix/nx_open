@@ -146,7 +146,7 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked()
     if (QnMessageBox::question(this,
         tr("Confirm File Deletion"),
         tr("Are you sure you want to delete '%1'?").arg(title),
-        QDialogButtonBox::Ok,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 

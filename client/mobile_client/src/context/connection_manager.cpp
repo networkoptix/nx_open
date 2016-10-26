@@ -263,7 +263,7 @@ void QnConnectionManagerPrivate::resume() {
 
 void QnConnectionManagerPrivate::doConnect()
 {
-    if (!url.isValid())
+    if (!url.isValid() || url.host().isEmpty())
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
@@ -344,11 +344,12 @@ void QnConnectionManagerPrivate::doConnect()
 
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
-            helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url);
+            const auto connectionData =
+                helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url);
             helpers::updateWeightData(localId);
-            qnSettings->setLastUsedSystemId(connectionInfo.systemName);
-            url.setPassword(QString());
-            qnSettings->setLastUsedUrl(url);
+
+            qnSettings->setLastUsedConnection(connectionData);
+            qnSettings->save();
 
             connectionVersion = connectionInfo.version;
             emit q->connectionVersionChanged();

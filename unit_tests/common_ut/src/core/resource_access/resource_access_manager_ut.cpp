@@ -454,3 +454,13 @@ TEST_F(QnResourceAccessManagerTest, checkLockedChanged)
     layout->setLocked(true);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
 }
+
+TEST_F(QnResourceAccessManagerTest, checkEditDisabledAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+    auto user = m_currentUser;
+    auto otherAdmin = createUser(Qn::GlobalAdminPermission);
+    otherAdmin->setEnabled(false);
+    qnResPool->addResource(otherAdmin);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
+}
