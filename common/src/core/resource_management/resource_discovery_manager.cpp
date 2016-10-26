@@ -519,21 +519,33 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     if (!camRes)
         return QnNetworkResourcePtr();
 
-    QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+    DLOG(lit("%1 Checking resource %2")
+        .arg(QString::fromLatin1(Q_FUNC_INFO))
+        .arg(NetResString(netRes)));
+
+    QnNetworkResourceList existResList = qnResPool->getResources<QnNetworkResource>();
     existResList = existResList.filtered(
         [&netRes](const QnNetworkResourcePtr& existRes)
         {
-            return (bool)qnResPool->getResourceById(existRes->getParentId()) 
-                && existRes->getStatus() != Qn::Offline;
-        });
+            DLOG(lit("%1 Existing candidate: %2").arg(FL1(Q_FUNC_INFO)).arg(NetResString(existRes)));
 
-    DLOG(lit("%1 Checking resource %2")
-        .arg(Q_FUNC_INFO)
-        .arg(NetResString));
+            bool sameIp = (!netRes->getHostAddress().isEmpty() && !existRes->getHostAddress().isEmpty()
+                    && netRes->getHostAddress() == existRes->getHostAddress()) 
+                        ||  (!netRes->getUrl().isEmpty() && !existRes->getUrl().isEmpty()
+                            && QUrl(netRes->getUrl()).host() == QUrl(existRes->getUrl()).host());
+
+            DLOG(lit("%1 sameIp = %2, parent = %3, getStatus() == online = %4")
+                .arg(FL1(Q_FUNC_INFO))
+                .arg(sameIp)
+                .arg((bool)qnResPool->getResourceById(existRes->getParentId()))
+                .arg(existRes->getStatus() != Qn::Offline));
+                
+            return sameIp && (bool)qnResPool->getResourceById(existRes->getParentId()); 
+        });
 
     if (existResList.isEmpty())
     {
-        DLOG(lit("%1 existRes list is empty").arg(Q_FUNC_INFO));
+        DLOG(lit("%1 existRes list is empty").arg(QString::fromLatin1(Q_FUNC_INFO)));
     }
 
     for(const QnNetworkResourcePtr& existRes: existResList)
@@ -563,7 +575,7 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
                 \t MAC1 == MAC2: %3\n \
                 \t UniqueId1 == UniqueId2: %4\n \
                 \t port1 == port2: %5\n")
-                     .arg(Q_FUNC_INFO)
+                     .arg(QString::fromLatin1(Q_FUNC_INFO))
                      .arg(NetResString(existRes))
                      .arg(sameMACs)
                      .arg(sameIds)

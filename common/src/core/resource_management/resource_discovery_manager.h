@@ -21,22 +21,23 @@
 #include <core/resource/resource_processor.h>
 
 #include <utils/common/connective.h>
-#include <sys/time.h>
+#include <nx/utils/log/log.h>
 
-#define DISCOVERY_DBG
+//#define DISCOVERY_DBG
 
-#if define DISCOVERY_DBG
+#if defined (DISCOVERY_DBG)
 #   define DLOG(...) NX_LOG(__VA_ARGS__, cl_logINFO)
+#   define NetResString(res) \
+        QString::fromLatin1("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4") \
+            .arg(res->getUrl()) \
+            .arg(res->getHostAddress()) \
+            .arg(res->getMAC().toString()) \
+            .arg(res->getUniqueId()) 
+# define FL1(x) QString::fromLatin1(x)
 #else
 #   define DLOG(...)
 #endif
 
-#define NetResString(res) \
-    lit("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4") \
-        .arg(res->getUrl()) \
-        .arg(res->getHostAddress()) \
-        .arg(res->getMAC().toString()) \
-        .arg(res->getUniqueId()) 
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
