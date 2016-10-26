@@ -54,7 +54,7 @@ class TestLoader(unittest.TestLoader):
 
 def _reportResult(resData, resType, name):
     if resData:
-        print "*** %s test has %s:" % (name, resType)
+        print "%s: %d" % (resType.capitalize(), len(resData))
         for res in resData:
             where = res[0]
             print "%s.%s (%s)" % (type(where).__name__, where._testMethodName, where._testMethodDoc)
@@ -74,6 +74,7 @@ def _singleSuiteName(testclass, suite_name, config, args):
         ).run(
             TestLoader().load(testclass, suite_name, config, *args)
         )
+    print "[%s] Total test run: %s" % (suite_name, result.testRun)
     _reportResult(result.errors, "errors", suite_name)
     _reportResult(result.failures, "failures", suite_name)
     _reportResult(result.expectedFailures, "expected failures", suite_name)
@@ -436,7 +437,7 @@ class FuncTestCase(unittest.TestCase):
             if tocheck:
                 time.sleep(0.5)
         if tocheck:
-            self.fail("Servers' startup timed out: %s" % (', '.join(map(self.sl.get, tocheck))))
+            self.fail("Servers' startup timed out: %s" % (', '.join(self.sl[b] for b in tocheck)))
             #TODO: Report the last error on each unready server!
 
     def _change_system_name(self, host, newName):

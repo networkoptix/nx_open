@@ -71,7 +71,7 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
     params.insert(lit("clientId"),      qnCommon->moduleGUID().toString());
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
-    return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
+    return (lit("/api/transmitAudio"), params, callback, (qint64) targetThread);
 }
 
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
@@ -383,7 +383,6 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     request.headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
     request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toLower().toUtf8());
-    request.headers.emplace("User-Agent", nx_http::userAgentString());
 
     QnRoute route = QnRouter::instance()->routeTo(server->getId());
     if (route.reverseConnect)

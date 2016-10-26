@@ -1854,8 +1854,11 @@ void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& clo
     else
     {
         QString serverKey;
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
-            serverKey = qMax(serverKey, server->getAuthKey());
+        if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
+        {
+            for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+                serverKey = qMax(serverKey, server->getAuthKey());
+        }
         const auto generatedLocalSystemId = guidFromArbitraryData(systemName.value() + serverKey);
 
         qnGlobalSettings->setLocalSystemId(generatedLocalSystemId);

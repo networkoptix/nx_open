@@ -188,6 +188,7 @@ public:
         }
         m_bufferLen = 0;
         m_headIndex = 0;
+        m_waitCond.wakeOne();
     }
 
     /**
