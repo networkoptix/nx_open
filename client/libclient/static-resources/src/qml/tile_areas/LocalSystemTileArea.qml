@@ -75,6 +75,8 @@ Item
         anchors.left: parent.left;
         anchors.right: parent.right;
 
+        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 0);
+
         InfoItem
         {
             id: hostChooseItem;
@@ -163,6 +165,7 @@ Item
             if (currentItemIndex == -1) //< In case of non-existent user
             {
                 expandedArea.savePasswordCheckbox.checked = false;  // Reset "Store password" checkbox
+                expandedArea.passwordTextField.text = "";
                 return;
             }
 

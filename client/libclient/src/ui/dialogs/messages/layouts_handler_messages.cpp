@@ -25,7 +25,8 @@ QDialogButtonBox::StandardButton QnLayoutsHandlerMessages::askOverrideLayout(
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Layout already exists."));
-    messageBox.setText(tr("A layout with the same name already exists. "
+    messageBox.setText(tr("Layout already exists."));
+    messageBox.setInformativeText(tr("A layout with the same name already exists. "
         "Would you like to overwrite it?"));
     messageBox.setStandardButtons(buttons);
     messageBox.setDefaultButton(defaultButton);

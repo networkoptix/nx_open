@@ -179,11 +179,11 @@ void QnUserProfileWidget::applyChanges()
 
             auto connections = qnClientCoreSettings->recentLocalConnections();
             if (!connections.isEmpty() &&
-                !connections.first().url.password().isEmpty() &&
+                !connections.first().password.isEmpty() &&
                 qnUrlEqual(connections.first().url, url))
             {
                 auto current = connections.takeFirst();
-                current.url = url;
+                current.password.setValue(m_newPassword);
                 connections.prepend(current);
                 qnClientCoreSettings->setRecentLocalConnections(connections);
             }

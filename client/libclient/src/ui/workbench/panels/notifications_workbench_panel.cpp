@@ -99,7 +99,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
             if (!isPinned())

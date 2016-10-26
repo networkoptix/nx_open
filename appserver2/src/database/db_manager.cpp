@@ -1390,7 +1390,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
     {
-        if (!ec2::db::migrateUserPermissions(m_sdb))
+        if (!ec2::db::migrateV25UserPermissions(m_sdb))
             return false;
 
         if (!m_dbJustCreated)
@@ -1457,6 +1457,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needClearLog = true;
             m_needResyncLog = true;
         }
+    }
+    else if (updateName == lit(":/updates/77_fix_custom_permission_flag.sql"))
+    {
+        if (!ec2::db::fixCustomPermissionFlag(m_sdb))
+            return false;
+
+        if (!m_dbJustCreated)
+            m_needResyncUsers = true;
     }
 
     return true;

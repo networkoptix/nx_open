@@ -62,6 +62,20 @@ void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool sil
     base_type::setStatus(newStatus, silenceMode);
 }
 
+QUrl QnFakeMediaServerResource::getApiUrl() const
+{
+    auto url = base_type::getApiUrl();
+    url.setUserName(m_authenticator.user());
+    url.setPassword(m_authenticator.password());
+    return url;
+}
+
+void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authenticator)
+{
+    m_authenticator = authenticator;
+    apiConnection()->setUrl(getApiUrl());
+}
+
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)
 {
     Q_ASSERT("This function should be not used for fake media servers");

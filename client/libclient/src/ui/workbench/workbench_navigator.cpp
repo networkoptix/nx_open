@@ -528,23 +528,16 @@ bool QnWorkbenchNavigator::setLive(bool live)
 
 bool QnWorkbenchNavigator::isPlayingSupported() const
 {
-    if (m_currentMediaWidget)
-        return m_currentMediaWidget->display()->archiveReader() && !m_currentMediaWidget->display()->isStillImage();
-    return false;
+    if (!m_currentMediaWidget)
+        return false;
+
+    return m_currentMediaWidget->display()->archiveReader()
+        && !m_currentMediaWidget->display()->isStillImage();
 }
 
 bool QnWorkbenchNavigator::isTimelineRelevant() const
 {
-    if (!currentWidget() || !m_currentWidgetLoaded)
-        return false;
-
-    if (!isPlayingSupported())
-        return false;
-
-    if (hasArchive())
-        return true;
-
-    return currentWidget()->resource()->flags().testFlag(Qn::local);
+    return m_timelineRelevant;
 }
 
 bool QnWorkbenchNavigator::isPlaying() const
@@ -654,6 +647,8 @@ void QnWorkbenchNavigator::updateHasArchiveState()
 
     m_hasArchive = newValue;
     emit hasArchiveChanged();
+
+    updateTimelineRelevancy();
 }
 
 bool QnWorkbenchNavigator::currentWidgetHasVideo() const
@@ -1103,6 +1098,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     updateSpeedRange();
     updateSpeed();
     updateThumbnailsLoader();
+    updateTimelineRelevancy();
 
     emit currentWidgetChanged();
 }
@@ -1268,17 +1264,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 {
     if (!m_timeSlider)
         return;
-
-    QnRaiiGuard timelineRelevancyUpdater(QnRaiiGuard::Handler(),
-        [this]()
-        {
-            bool timelineRelevant = isTimelineRelevant();
-            if (m_timelineRelevant == timelineRelevant)
-                return;
-
-            m_timelineRelevant = timelineRelevant;
-            emit timelineRelevancyChanged(timelineRelevant);
-        });
 
     if (!m_currentMediaWidget)
         return;
@@ -1487,6 +1472,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             m_sliderDataInvalid = false;
             m_sliderWindowInvalid = false;
         }
+
+        updateTimelineRelevancy();
     }
 }
 
@@ -1767,6 +1754,20 @@ void QnWorkbenchNavigator::updateSpeedRange()
     m_lastMaximalSpeed = maximalSpeed;
 
     emit speedRangeChanged();
+}
+
+void QnWorkbenchNavigator::updateTimelineRelevancy()
+{
+    auto value = currentWidget()
+        && m_currentWidgetLoaded
+        && isPlayingSupported()
+        && (hasArchive() || currentWidget()->resource()->flags().testFlag(Qn::local));
+
+    if (m_timelineRelevant == value)
+        return;
+
+    m_timelineRelevant = value;
+    emit timelineRelevancyChanged(value);
 }
 
 void QnWorkbenchNavigator::updateThumbnailsLoader()

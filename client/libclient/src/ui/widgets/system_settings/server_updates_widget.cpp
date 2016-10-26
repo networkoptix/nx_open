@@ -61,6 +61,21 @@ namespace {
     /* N-dash 5 times: */
     const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
 
+    QString elidedText(const QString& text, const QFontMetrics& fontMetrics)
+    {
+        QString result;
+
+        for (const auto& line: text.split(L'\n', QString::KeepEmptyParts))
+        {
+            if (result.isEmpty())
+                result += L'\n';
+
+            result += fontMetrics.elidedText(line, Qt::ElideMiddle, kMaxLabelWidth);
+        }
+
+        return result;
+    }
+
 } // anonymous namespace
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
@@ -663,11 +678,10 @@ QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList
         if (!result.isEmpty())
             result += lit("\n");
 
-        QString name = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
-        result.append(fontMetrics().elidedText(name, Qt::ElideMiddle, kMaxLabelWidth));
+        result += QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
     }
 
-    return result;
+    return elidedText(result, fontMetrics());
 }
 
 void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
@@ -681,7 +695,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
         {
             case QnUpdateResult::Successful:
             {
-                QString message = tr("Update has been successfully finished.");
+                QString message = result.errorMessage();
 
                 bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
                 if (clientUpdated)
@@ -731,82 +745,25 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
             }
 
             case QnUpdateResult::Cancelled:
-                QnMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
-                break;
-
-            case QnUpdateResult::LockFailed:
-                QnMessageBox::critical(this, tr("Update unsuccessful."), tr("Another user has already started an update."));
+                QnMessageBox::information(this, tr("Update cancelled"), result.errorMessage());
                 break;
 
             case QnUpdateResult::AlreadyUpdated:
-                QnMessageBox::information(this, tr("Update is not needed."), tr("All servers are already updated."));
+                QnMessageBox::information(this, tr("Update is not needed."), result.errorMessage());
                 break;
 
+            case QnUpdateResult::LockFailed:
             case QnUpdateResult::DownloadingFailed:
-                QnMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not download updates."));
-                break;
-
             case QnUpdateResult::DownloadingFailed_NoFreeSpace:
-                QnMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
-                break;
-
             case QnUpdateResult::UploadingFailed:
-            {
-                QString message = tr("Could not push updates to servers.");
-                if (!result.failedServers.isEmpty())
-                {
-                    message += lit("\n");
-                    message += tr("The problem is caused by %n servers:", "", result.failedServers.size());
-                    message += lit("\n");
-                    message += serverNamesString(result.failedServers);
-                }
-                QnMessageBox::critical(this, tr("Update unsuccessful."), message);
-                break;
-            }
-
             case QnUpdateResult::UploadingFailed_NoFreeSpace:
-                QnMessageBox::critical(this, tr("Update unsuccessful."),
-                    tr("Could not push updates to servers.") +
-                    lit("\n") +
-                    tr("No free space left on %n servers:", "", result.failedServers.size()) +
-                    lit("\n") +
-                    serverNamesString(result.failedServers));
-                break;
-
             case QnUpdateResult::UploadingFailed_Timeout:
-                QnMessageBox::critical(this, tr("Update unsuccessful."),
-                    tr("Could not push updates to servers.") +
-                    lit("\n") +
-                    tr("%n servers are not responding:", "", result.failedServers.size()) +
-                    lit("\n") +
-                    serverNamesString(result.failedServers));
-                break;
-
             case QnUpdateResult::UploadingFailed_Offline:
-                QnMessageBox::critical(this, tr("Update unsuccessful."),
-                    tr("Could not push updates to servers.") +
-                    lit("\n") +
-                    tr("%n servers have gone offline:", "", result.failedServers.size()) +
-                    lit("\n") +
-                    serverNamesString(result.failedServers));
-                break;
-
             case QnUpdateResult::UploadingFailed_AuthenticationFailed:
-                QnMessageBox::critical(this, tr("Update unsuccessful."),
-                    tr("Could not push updates to servers.") +
-                    lit("\n") +
-                    tr("Authentication failed for %n servers:", "", result.failedServers.size()) +
-                    lit("\n") +
-                    serverNamesString(result.failedServers));
-                break;
-
             case QnUpdateResult::ClientInstallationFailed:
-                QnMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not install an update to the client."));
-                break;
-
             case QnUpdateResult::InstallationFailed:
             case QnUpdateResult::RestInstallationFailed:
-                QnMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not install updates on one or more servers."));
+                QnMessageBox::critical(this, tr("Update unsuccessful."), result.errorMessage());
                 break;
         }
     }

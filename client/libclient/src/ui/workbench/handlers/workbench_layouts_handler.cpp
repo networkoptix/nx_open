@@ -4,6 +4,7 @@
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -126,8 +127,11 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
                 delete layout;
             }
 
-            if (workbench()->layouts().empty())
+            if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
+                && workbench()->layouts().empty())
+            {
                 action(QnActions::OpenNewTabAction)->trigger();
+            }
         });
 }
 
@@ -205,10 +209,15 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
         //TODO: #GDM what if we've been disconnected while confirming?
         if (confirmLayoutChange(change))
         {
-            snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
             auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
             if (owner)
                 grantMissingAccessRights(owner, change);
+
+            snapshotManager()->save(layout,
+                [this](bool success, const QnLayoutResourcePtr &layout)
+                {
+                    at_layout_saved(success, layout);
+                });
         }
         else
         {

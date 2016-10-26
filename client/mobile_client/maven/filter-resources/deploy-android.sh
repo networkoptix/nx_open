@@ -13,9 +13,9 @@ SIGN=
 SOURCE_APK=
 if [[ "${build.configuration}" == "release" ]]; then
     BUILD_TYPE=--release
-    SIGN="--sign ${google.keystore} ${google.alias} --storepass ${google.storepass} --keypass ${google.keypass}"
+    SIGN="--sign ${android.keystore} ${android.alias} --storepass ${android.storepass} --keypass ${android.keypass}"
     SOURCE_APK=apk/bin/QtApp-release-signed.apk
-    if [[ -z "${google.storepass}" ]]; then
+    if [[ -z "${android.storepass}" ]]; then
         SIGN=
         SOURCE_APK=apk/bin/QtApp-release-unsigned.apk
     fi

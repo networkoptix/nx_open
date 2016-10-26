@@ -119,13 +119,6 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         return;
     }
 
-    /* Check indicators in this implementation are handled elsewhere: */
-    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
-    {
-        base_type::paint(painter, option, index);
-        return;
-    }
-
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
     /* If item is separator, draw it: */
@@ -163,6 +156,16 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
         default:
             NX_ASSERT(false); // Should never get here
+    }
+
+    // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
+    /* Check indicators in this implementation are handled elsewhere: */
+    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
+    {
+        mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
+        option.palette.setColor(QPalette::Text, mainColor);
+        base_type::paint(painter, option, index);
+        return;
     }
 
     /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */

@@ -1,16 +1,9 @@
 .import com.networkoptix.qml 1.0 as Nx
 
-function makeUrl(address, login, password, cloud)
+function extractHost(url)
 {
-    var result =
-            (cloud ? "cloud" : "http") +
-            "://" +
-            encodeURIComponent(login) +
-            ":" +
-            encodeURIComponent(password) +
-            "@" +
-            address
-    return result
+    var m = /(?:.*\:\/\/)?([^/]+(\:\d+)?)/.exec(url)
+    return m ? m[1] : url
 }
 
 function connectionErrorText(status, info)

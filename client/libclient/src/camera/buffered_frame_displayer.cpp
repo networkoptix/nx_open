@@ -5,6 +5,7 @@
 #include "abstract_renderer.h"
 
 QnBufferedFrameDisplayer::QnBufferedFrameDisplayer():
+    base_type(),
     m_queue(11)
 {
     m_currentTime = AV_NOPTS_VALUE;
@@ -86,6 +87,12 @@ void QnBufferedFrameDisplayer::overrideTimestampOfNextFrameToRender(qint64 value
 {
     QnMutexLocker lock( &m_sync );
     m_lastDisplayedTime = value;
+}
+
+void QnBufferedFrameDisplayer::pleaseStop()
+{
+    base_type::pleaseStop();
+    m_queue.setTerminated(true);
 }
 
 void QnBufferedFrameDisplayer::run()

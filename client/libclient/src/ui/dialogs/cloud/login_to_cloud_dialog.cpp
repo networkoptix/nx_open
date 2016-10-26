@@ -17,7 +17,6 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
-
 #include <utils/common/html.h>
 
 namespace
@@ -73,8 +72,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
-
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
+
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
@@ -96,7 +95,6 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
 
-    ui->loginInputField->setFocus();
     d->updateUi();
     d->lockUi(false);
 
@@ -112,6 +110,15 @@ QnLoginToCloudDialog::~QnLoginToCloudDialog()
 void QnLoginToCloudDialog::setLogin(const QString& login)
 {
     ui->loginInputField->setText(login);
+}
+
+void QnLoginToCloudDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    if (ui->loginInputField->text().isEmpty())
+        ui->loginInputField->setFocus();
+    else
+        ui->passwordInputField->setFocus();
 }
 
 void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)

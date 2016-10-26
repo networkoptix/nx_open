@@ -46,22 +46,30 @@ ApplicationWindow
     {
         updateNavigationBarPadding()
 
-        var lastUsedUrl = getLastUsedUrl()
+        var url = getInitialUrl()
+        var systemName = ""
 
-        if (lastUsedUrl)
+        if (url == "")
         {
-            Workflow.openResourcesScreen(getLastUsedSystemId())
-            connectionManager.connectToServer(lastUsedUrl)
+            url = getLastUsedUrl()
+            systemName = getLastUsedSystemName()
         }
+
+        if (url != "")
+        {
+            Workflow.openResourcesScreen(systemName)
+            connectionManager.connectToServer(url)
+            return
+        }
+
         // TODO: #dklychkov Check if need it in #3.1 and uncomment.
-        // else if (cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
+        // if (cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
         // {
         //     Workflow.openCloudWelcomeScreen()
+        //     return
         // }
-        else
-        {
-            Workflow.openSessionsScreen()
-        }
+
+        Workflow.openSessionsScreen()
 
         if (initialTest)
             Workflow.startTest(initialTest)

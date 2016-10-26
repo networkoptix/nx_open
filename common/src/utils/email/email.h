@@ -8,6 +8,14 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include "email_fwd.h"
 
+//TODO: #GDM move other methods to this namespace, then move module to nx/email? lib
+namespace nx {
+namespace email {
+
+bool isValidAddress(const QString& address);
+
+}
+}
 
 struct QnEmailSmtpServerPreset {
     QnEmailSmtpServerPreset();
@@ -48,11 +56,11 @@ struct QnEmailSettings {
 };
 #define QnEmailSettings_Fields (email)(server)(user)(password)(signature)(supportEmail)(connectionType)(port)(timeout)(simple)
 
-class QnEmailAddress {
+class QnEmailAddress
+{
 public:
     explicit QnEmailAddress(const QString &email);
 
-    static bool isValid(const QString &email);
     bool isValid() const;
 
     /**
@@ -64,8 +72,19 @@ public:
 
     QnEmailSettings settings() const;
 
+    /** Username */
     QString user() const;
+
+    /** Smtp domain */
     QString domain() const;
+
+    /** Email value. */
+    QString value() const;
+
+    /** User's full name (if provided) */
+    QString fullName() const;
+
+    bool operator==(const QnEmailAddress& other) const;
 
 private:
     /**
@@ -75,6 +94,7 @@ private:
     void initSmtpPresets() const;
 
     QString m_email;
+    QString m_fullName;
 };
 
 

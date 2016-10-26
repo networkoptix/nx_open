@@ -61,5 +61,5 @@ public:
     QnGenericPalette palette;
     QnNoptixStyleAnimator* idleAnimator;
     QnNoptixStyleAnimator* stateAnimator;
-    QWidget* lastProxiedWidgetUnderMouse;
+    QPointer<QWidget> lastProxiedWidgetUnderMouse;
 };
