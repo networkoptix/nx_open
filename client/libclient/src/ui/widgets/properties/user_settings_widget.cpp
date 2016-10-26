@@ -252,7 +252,7 @@ void QnUserSettingsWidget::applyChanges()
             NX_ASSERT(permissions.testFlag(Qn::WriteNamePermission));
             NX_ASSERT(permissions.testFlag(Qn::WriteEmailPermission));
 
-            const QString cloudLogin = ui->cloudEmailInputField->text().trimmed();
+            const QString cloudLogin = QnEmailAddress(ui->cloudEmailInputField->text()).value();
             m_model->user()->setName(cloudLogin);
             m_model->user()->setEmail(cloudLogin);
         }
