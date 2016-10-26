@@ -14,6 +14,8 @@
 #include <ui/style/custom_style.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
 
 namespace {
 bool isValidSerialKey(const QString &key)
@@ -33,6 +35,24 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     ui->setupUi(this);
 
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
+
+    /* Upon taking focus by license input line set cursor to first empty position: */
+    auto focusSignalizer = new QnSingleEventSignalizer(this);
+    focusSignalizer->setEventType(QEvent::FocusIn);
+    ui->onlineKeyEdit->installEventFilter(focusSignalizer);
+    connect(focusSignalizer, &QnSingleEventSignalizer::activated, this,
+        [this]()
+        {
+            auto adjustCursorPosition =
+                [this]()
+                {
+                    auto pos = ui->onlineKeyEdit->displayText().indexOf(L'_');
+                    if (pos != -1)
+                        ui->onlineKeyEdit->setCursorPosition(pos);
+                };
+
+            executeDelayedParented(adjustCursorPosition, 0, ui->onlineKeyEdit);
+        });
 
     ui->onlineKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(QnAppInfo::freeLicenseIsTrial() ? tr("Activate Trial License") : tr("Activate Free License"));
