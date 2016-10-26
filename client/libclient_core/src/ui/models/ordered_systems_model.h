@@ -14,6 +14,13 @@ public:
 
     virtual ~QnOrderedSystemsModel() = default;
 
+    QString minimalVersion() const;
+
+    void setMinimalVersion(const QString& minimalVersion);
+
+signals:
+    void minimalVersionChanged();
+
 protected: // overrides
     virtual bool lessThan(const QModelIndex& left,
         const QModelIndex& right) const override;
@@ -30,11 +37,7 @@ private:
 
     void softInvalidate();
 
-    QString minimalVersion() const;
+private:
     QnWeightsDataHash m_weights;
     qreal m_unknownSystemsWeight;
-signals:
-    void minimalVersionChanged();
-
-private:
 };
