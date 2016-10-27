@@ -529,10 +529,15 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
         {
             DLOG(lit("%1 Existing candidate: %2").arg(FL1(Q_FUNC_INFO)).arg(NetResString(existRes)));
 
-            bool sameIp = (!netRes->getHostAddress().isEmpty() && !existRes->getHostAddress().isEmpty()
-                    && netRes->getHostAddress() == existRes->getHostAddress()) 
-                        ||  (!netRes->getUrl().isEmpty() && !existRes->getUrl().isEmpty()
-                            && QUrl(netRes->getUrl()).host() == QUrl(existRes->getUrl()).host());
+            bool sameHostAddress = !netRes->getHostAddress().isEmpty() 
+                && !existRes->getHostAddress().isEmpty() 
+                && netRes->getHostAddress() == existRes->getHostAddress();
+
+            bool sameUrlHost = !netRes->getUrl().isEmpty() 
+                && !existRes->getUrl().isEmpty() 
+                && QUrl(netRes->getUrl()).host() == QUrl(existRes->getUrl()).host();
+
+            bool sameIp = sameHostAddress || sameUrlHost;
 
             DLOG(lit("%1 sameIp = %2, parent = %3, getStatus() == online = %4")
                 .arg(FL1(Q_FUNC_INFO))
