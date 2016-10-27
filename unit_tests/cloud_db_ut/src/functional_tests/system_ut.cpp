@@ -537,7 +537,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency1 = systems[0].usageFrequency;
-    const auto lastLoginTime1 = systems[0].lastLoginTime;
 
     // Second access.
     ASSERT_EQ(
@@ -549,7 +548,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency2 = systems[0].usageFrequency;
-    const auto lastLoginTime2 = systems[0].lastLoginTime;
 
     ASSERT_GT(usageFrequency2, usageFrequency1);
 
@@ -561,7 +559,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency3 = systems[0].usageFrequency;
-    const auto lastLoginTime3 = systems[0].lastLoginTime;
 
     ASSERT_LT(usageFrequency3, usageFrequency2);
 
@@ -573,7 +570,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency4 = systems[0].usageFrequency;
-    const auto lastLoginTime4 = systems[0].lastLoginTime;
 
     ASSERT_LT(usageFrequency4, usageFrequency3);
 
@@ -585,7 +581,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency5 = systems[0].usageFrequency;
-    const auto lastLoginTime5 = systems[0].lastLoginTime;
 
     ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
@@ -703,8 +698,6 @@ TEST_F(System, sorting_order_new_system_is_on_top)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
-    const auto lastLoginTime1 = systems[0].lastLoginTime;
-    const auto usageFrequency1 = systems[0].usageFrequency;
 
     const auto system2 = addRandomSystemToAccount(account);
 
