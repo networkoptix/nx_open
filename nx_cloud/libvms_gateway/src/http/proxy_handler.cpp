@@ -30,7 +30,7 @@ void ProxyHandler::processRequest(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     auto requestOptions = cutTargetFromRequest(*connection, &request);
     if (!nx_http::StatusCode::isSuccessCode(requestOptions.status))

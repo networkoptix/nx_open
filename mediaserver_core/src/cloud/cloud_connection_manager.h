@@ -43,6 +43,7 @@ public:
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
+    bool detachFromCloudSilently();
     bool cleanUpCloudDataInLocalDb();
 
     void setProxyVia(const SocketAddress& proxyEndpoint);

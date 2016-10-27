@@ -76,7 +76,6 @@ public:
     virtual ~AbstractNotification() = default;
 
     virtual void setAddressee(std::string addressee) = 0;
-    virtual void setSecret(std::string secret) = 0;
     virtual QByteArray serializeToJson() const = 0;
 };
 
@@ -99,12 +98,6 @@ public:
     {
         static_cast<FusionEnabledDescendantType*>(this)->user_email
             = std::move(addressee);
-    }
-
-    virtual void setSecret(std::string secret) override
-    {
-        static_cast<FusionEnabledDescendantType*>(this)->secret
-            = std::move(secret);
     }
 
     virtual QByteArray serializeToJson() const override

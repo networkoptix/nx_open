@@ -1192,7 +1192,7 @@ def CallTest(testClass):
     ###if not testMaster.openerReady:
     ###    testMaster.setUpPassword()
     # this print is used by FunctestParser.parse_timesync_start
-    print "%s suits: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
+    print "%s suites: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
     return RunBoxTests(testClass, testMaster.getConfig())
 
 
@@ -1232,19 +1232,22 @@ def RunByAutotest(arg0):
         print "" # FIXME add startup message
         ret, reason = testMaster.init(notest=True)
         if not ret:
-            print "Failed to initialize the cluster test object: %s" % (reason)
+            print "FAIL: can't initialize the cluster test object: %s" % (reason)
             return False
         config = testMaster.getConfig()
         with LegacyTestWrapper(config):
             if not testMaster.testConnection():
-                print "Connection test failed"
+                print "FAIL: connection test"
                 return False
             ret, reason = testMaster.initial_tests()
             if ret == False:
-                print "The initial cluster test failed: %s" % (reason)
+                print "FAIL: initial cluster test: %s" % (reason)
                 return False
             print "Basic functional tests start"
-            the_test = unittest.main(module=legacy_main, exit=False, argv=[arg0])
+            the_test = unittest.main(module=legacy_main, exit=False, argv=[arg0],
+                                     testRunner=unittest.TextTestRunner(
+                                         stream=sys.stdout,
+                                     ))
             if the_test.result.wasSuccessful():
                 print "Basic functional tests end"
                 if testMaster.unittestRollback:
@@ -1329,7 +1332,7 @@ def DoTests(argv):
 
     ret, reason = testMaster.initial_tests()
     if ret == False:
-        print "The initial cluster test failed: %s" % (reason)
+        print "FAIL: initial cluster test: %s" % (reason)
         return False
 
     if argc == 2 and argv[1] == '--sync':

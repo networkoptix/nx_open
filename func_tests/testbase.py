@@ -35,7 +35,7 @@ class FuncTestError(AssertionError):
 
 def boxssh(box, command):
     return check_output(
-        ['./vssh.sh', box, 'sudo'] + list(command),
+        ['./vssh-ip.sh', box, 'sudo'] + list(command),
         shell=False, stderr=STDOUT
     )
 
@@ -54,21 +54,27 @@ class TestLoader(unittest.TestLoader):
 
 def _reportResult(resData, resType, name):
     if resData:
-        print "*** %s test has %s:" % (name, resType)
+        print "%s: %d" % (resType.capitalize(), len(resData))
         for res in resData:
             where = res[0]
             print "%s.%s (%s)" % (type(where).__name__, where._testMethodName, where._testMethodDoc)
-            print res[1].split('\n')[-2]
+            trace = res[1].split('\n')
+            if len(trace) > 1:
+                print res[1].split('\n')[-2]
+            else:
+                print "((%s))" % res[1]
             if len(res) > 2:
                 print "Other data: %s" % (res,)
 
 
 
 def _singleSuiteName(testclass, suite_name, config, args):
-    result = unittest.TextTestRunner(verbosity=2, failfast=testclass.isFailFast(suite_name)
+    result = unittest.TextTestRunner(
+            stream=sys.stdout, verbosity=2, failfast=testclass.isFailFast(suite_name)
         ).run(
             TestLoader().load(testclass, suite_name, config, *args)
         )
+    print "[%s] Total test run: %s" % (suite_name, result.testsRun)
     _reportResult(result.errors, "errors", suite_name)
     _reportResult(result.failures, "failures", suite_name)
     _reportResult(result.expectedFailures, "expected failures", suite_name)
@@ -431,7 +437,7 @@ class FuncTestCase(unittest.TestCase):
             if tocheck:
                 time.sleep(0.5)
         if tocheck:
-            self.fail("Servers startup timed out: %s" % (', '.join(map(str, tocheck))))
+            self.fail("Servers' startup timed out: %s" % (', '.join(self.sl[b] for b in tocheck)))
             #TODO: Report the last error on each unready server!
 
     def _change_system_name(self, host, newName):
@@ -662,6 +668,9 @@ class FuncTestMaster(object):
     need_dump = False
     api = ServerApi
 
+    # specific test flags
+    _natconTest = False
+
     _argFlags = {
         '--autorollback': 'auto_rollback',
         '--arb': 'auto_rollback', # an alias for the previous
@@ -706,7 +715,10 @@ class FuncTestMaster(object):
 
     def _loadConfig(self):
         parser = self.getConfig()
-        self.clusterTestServerList = parser.get("General","serverList").split(",")
+
+        _section = "Nat" if self._natconTest else "General" # Fixme: ugly hack :(
+        self.clusterTestServerList = parser.get(_section,"serverList").split(",")
+
         parser.rtset('ServerList', self.clusterTestServerList)
         self.clusterTestSleepTime = parser.getint("General","clusterTestSleepTime")
         parser.rtset('SleepTime', self.clusterTestSleepTime)
@@ -749,12 +761,14 @@ class FuncTestMaster(object):
                 print "Use config", self.configFname
             elif arg in self._argFlags:
                 setattr(self, self._argFlags[arg], True)
-            elif arg == '--config':
+            elif arg in ('--config', '-c'):
                 config_next = True
             elif arg.startswith('--config='):
                 self.configFname = arg[len('--config='):]
                 print "Use config", self.configFname
             else:
+                if arg == '--natcon':
+                    self._natconTest = True
                 other.append(arg)
         self.argv = other
         return other
@@ -905,7 +919,7 @@ class FuncTestMaster(object):
         for i, name in enumerate(self._ec2GetRequests):
             if name.startswith('.'):
                 self._ec2GetRequests[i] = getattr(self.api, name[1:])
-                print "*** DEBUG0: substituted %s with %s" % (name, self._ec2GetRequests[i])
+                #print "*** DEBUG0: substituted %s with %s" % (name, self._ec2GetRequests[i])
 
 
     # This checkResultEqual function will categorize the return value from each

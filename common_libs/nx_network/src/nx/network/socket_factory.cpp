@@ -17,7 +17,7 @@ SocketFactory::CreateStreamServerSocketFuncType createStreamServerSocketFunc;
 
 std::unique_ptr<AbstractDatagramSocket> SocketFactory::createDatagramSocket()
 {
-    return std::make_unique<UDPSocket>(false, s_tcpClientIpVersion.load());
+    return std::make_unique<UDPSocket>(s_tcpClientIpVersion.load());
 }
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(

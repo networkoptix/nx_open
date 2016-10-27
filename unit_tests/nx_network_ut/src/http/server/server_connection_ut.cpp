@@ -55,7 +55,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler )
     {
         m_timer.start(
             std::chrono::seconds(5),
@@ -117,7 +117,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler )
     {
         response->headers.emplace(
             "Seq",

@@ -36,9 +36,9 @@ QString NX_NETWORK_API toString(TestTrafficLimitType type)
 {
     switch (type)
     {
-        case TestTrafficLimitType::none: return QLatin1String("none");
-        case TestTrafficLimitType::incoming: return QLatin1String("incoming");
-        case TestTrafficLimitType::outgoing: return QLatin1String("outgoing");
+        case TestTrafficLimitType::none: return lit("none");
+        case TestTrafficLimitType::incoming: return lit("incoming");
+        case TestTrafficLimitType::outgoing: return lit("outgoing");
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -49,9 +49,9 @@ QString NX_NETWORK_API toString(TestTransmissionMode type)
 {
     switch (type)
     {
-        case TestTransmissionMode::spam: return QLatin1String("spam");
-        case TestTransmissionMode::ping: return QLatin1String("ping");
-        case TestTransmissionMode::pong: return QLatin1String("pong");
+        case TestTransmissionMode::spam: return lit("spam");
+        case TestTransmissionMode::ping: return lit("ping");
+        case TestTransmissionMode::pong: return lit("pong");
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));

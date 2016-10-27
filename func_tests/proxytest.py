@@ -4,7 +4,7 @@ __author__ = 'Danil Lavrentyuk'
 
 import sys
 import urllib2
-from httplib import HTTPException
+#from httplib import HTTPException
 import json
 import time
 from collections import namedtuple
@@ -92,7 +92,8 @@ class ProxyTest(object):
                 raise FuncTestError(
                     "Wrong result %s: resulting data len: %s. Content-Length: %s" % (action, len(data), content_len))
             return Result(func, peer, redirectTo, data, json.loads(data), content_len)
-        except HTTPException as err:
+        except urllib2.HTTPError as err:
+#        except HTTPException as err:
             print "Failed: " + action
             raise FuncTestError("error " + action, err)
 
