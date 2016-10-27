@@ -42,9 +42,9 @@ private slots:
 
     void at_downloadError();
     void at_licensesReceived(const QByteArray& licenseKey, ec2::ErrorCode errorCode, const QnLicenseList& licenses);
-    void at_licenseDetailsButton_clicked();
-    void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
+
+    void licenseDetailsRequested(const QModelIndex& index);
 
     void showMessage(const QString &title, const QString &message, bool warning);
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);

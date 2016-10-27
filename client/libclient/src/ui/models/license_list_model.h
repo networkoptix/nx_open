@@ -41,10 +41,8 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     //virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-
     void updateLicenses(const QnLicenseList& licenses);
 
-    QnLicensePtr license(const QModelIndex &index) const;
     void addLicense(const QnLicensePtr& license);
     void removeLicense(const QnLicensePtr& license);
 
@@ -53,6 +51,7 @@ public:
 
 private:
     QString getLicenseStatus(const QnLicensePtr& license) const;
+    QnLicensePtr license(const QModelIndex& index) const;
 
 private:
     QnLicensesListModelColors m_colors;

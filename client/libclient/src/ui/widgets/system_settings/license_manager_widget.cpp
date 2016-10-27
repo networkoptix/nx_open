@@ -129,20 +129,34 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         }
     });
 
-
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
-    connect(ui->detailsButton,  &QPushButton::clicked, this, &QnLicenseManagerWidget::at_licenseDetailsButton_clicked);
-    connect(ui->removeButton,   &QPushButton::clicked, this, &QnLicenseManagerWidget::removeSelectedLicenses);
-    connect(ui->exportLicensesButton, &QPushButton::clicked, this, &QnLicenseManagerWidget::exportLicenses);
+    connect(ui->detailsButton,  &QPushButton::clicked, this,
+        [this]()
+        {
+            licenseDetailsRequested(ui->gridLicenses->selectionModel()->currentIndex());
+        });
 
-    connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,   this, &QnLicenseManagerWidget::updateButtons);
-    connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnLicenseManagerWidget::updateButtons);
+    connect(ui->removeButton, &QPushButton::clicked,
+        this, &QnLicenseManagerWidget::removeSelectedLicenses);
 
-    connect(ui->gridLicenses,   &QTreeView::doubleClicked,      this,   &QnLicenseManagerWidget::at_gridLicenses_doubleClicked);
-    connect(ui->licenseWidget,  &QnLicenseWidget::stateChanged, this,   &QnLicenseManagerWidget::at_licenseWidget_stateChanged);
+    connect(ui->exportLicensesButton, &QPushButton::clicked,
+        this, &QnLicenseManagerWidget::exportLicenses);
 
-    connect(this, &QnLicenseManagerWidget::showMessageLater, this, &QnLicenseManagerWidget::showMessage, Qt::QueuedConnection);
+    connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,
+        this, &QnLicenseManagerWidget::updateButtons);
+
+    connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::selectionChanged,
+        this, &QnLicenseManagerWidget::updateButtons);
+
+    connect(ui->gridLicenses, &QTreeView::doubleClicked,
+        this,   &QnLicenseManagerWidget::licenseDetailsRequested);
+
+    connect(ui->licenseWidget, &QnLicenseWidget::stateChanged, this,
+        &QnLicenseManagerWidget::at_licenseWidget_stateChanged);
+
+    connect(this, &QnLicenseManagerWidget::showMessageLater,
+        this, &QnLicenseManagerWidget::showMessage, Qt::QueuedConnection);
 
     auto updateLicensesIfNeeded = [this]
     {
@@ -483,7 +497,7 @@ void QnLicenseManagerWidget::updateButtons()
     ui->exportLicensesButton->setEnabled(!m_licenses.isEmpty());
 
     QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
-    QnLicensePtr license = m_model->license(idx);
+    QnLicensePtr license = idx.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
 
     ui->detailsButton->setEnabled(!license.isNull());
 
@@ -602,19 +616,13 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
     validateLicenses(licenseKey, licenses);
 
-
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void QnLicenseManagerWidget::at_gridLicenses_doubleClicked(const QModelIndex &index)
+void QnLicenseManagerWidget::licenseDetailsRequested(const QModelIndex& index)
 {
-    showLicenseDetails(m_model->license(index));
-}
-
-void QnLicenseManagerWidget::at_licenseDetailsButton_clicked()
-{
-    QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
-    showLicenseDetails(m_model->license(index));
+    if (index.isValid())
+        showLicenseDetails(index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>());
 }
 
 void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)
