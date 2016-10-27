@@ -458,6 +458,12 @@ SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAd
         return SockAddrPtr();
     }
 
+    if (SocketGlobals::config().isAddressDisabled(socketAddress.address))
+    {
+        SystemError::setLastErrorCode(SystemError::noPermission);
+        return SockAddrPtr();
+    }
+
     if (m_ipVersion == AF_INET)
     {
         if (const auto ip = socketAddress.address.ipV4())
