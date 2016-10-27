@@ -51,7 +51,6 @@ public:
 
 private:
     QString getLicenseStatus(const QnLicensePtr& license) const;
-    QnLicensePtr license(const QModelIndex& index) const;
 
 private:
     QnLicensesListModelColors m_colors;
