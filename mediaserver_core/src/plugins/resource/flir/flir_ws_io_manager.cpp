@@ -109,25 +109,27 @@ nx_io_managment::IOPortState FlirWsIOManager::getPortDefaultState(const QString&
 
 void FlirWsIOManager::setPortDefaultState(const QString& portId, nx_io_managment::IOPortState state)
 {
-
+    // Do nothing.
 }
 
 
 void FlirWsIOManager::setInputPortStateChangeCallback(QnAbstractIOManager::InputStateChangeCallback callback)
 {
-
+    QnMutexLocker lock(&m_mutex);
+    m_stateChangeCallback = callback;
 }
 
 
 void FlirWsIOManager::setNetworkIssueCallback(QnAbstractIOManager::NetworkIssueCallback callback)
 {
-
+    QnMutexLocker lock(&m_mutex);
+    m_networkIssueCallback = callback;
 }
 
 
 void FlirWsIOManager::terminate()
 {
-
+    directDisconnectAll();
 }
 
 void FlirWsIOManager::at_connected()
@@ -135,7 +137,7 @@ void FlirWsIOManager::at_connected()
     qDebug() << "Websocket connected";
 
     requestControlToken();
-    QObject::connect(
+    Qn::directConnect(
         m_notificationWebSocket.get(), &QWebSocket::textMessageReceived,
         this, &FlirWsIOManager::parseNotification);
 
@@ -148,11 +150,11 @@ void FlirWsIOManager::at_disconnected()
 
 bool FlirWsIOManager::initiateWsConnection()
 {
-    QObject::connect(
+    Qn::directConnect(
         m_controlWebSocket.get(), &QWebSocket::connected,
         this, &FlirWsIOManager::at_connected);
 
-    QObject::connect(
+    Qn::directConnect(
         m_controlWebSocket.get(), &QWebSocket::disconnected,
         this, &FlirWsIOManager::at_disconnected);
 
@@ -187,9 +189,9 @@ void FlirWsIOManager::requestControlToken()
                 kKeepAliveTimeout);
         };
 
-    QObject::connect(
+    Qn::directConnect(
         m_controlWebSocket.get(), &QWebSocket::textMessageReceived,
-        paresResponseAndScheduleKeepAlive);
+        this, paresResponseAndScheduleKeepAlive); //< Am not sure this is right. Looks like it's required to use member functions
 
     auto bytesSent = m_controlWebSocket->sendTextMessage(message);
     //TODO: #dmishin check number of sent bytes;
@@ -234,7 +236,29 @@ void FlirWsIOManager::subscribeToNotifications()
 FlirWsIOManager::FlirAlarmNotification FlirWsIOManager::parseNotification(const QString& message)
 {
     FlirAlarmNotification notification;
+    auto parts = message.split(L',');
+
+    const std::size_t kPartsCount = 14;
+    NX_ASSERT(
+        parts.size() == kPartsCount,
+        lm("Number of fields is %1, expected %2")
+            .arg(parts.size())
+            .arg(kPartsCount));
+
+    notification.deviceId = parts[1].toInt();
+    notification.health = parts[2].toInt();
+    notification.lastBIT = parts[3].toInt();
+    notification.timestamp = parseFlirDateTime(parts[4]);
+    notification.deviceType = parts[5].toInt();
+    notification.sourceIndex = parts[6].toInt();
+
+
     return notification;
+}
+
+quint64 FlirWsIOManager::parseFlirDateTime(const QString& dateTime)
+{
+    return 0;
 }
 
 void FlirWsIOManager::sendKeepAlive()

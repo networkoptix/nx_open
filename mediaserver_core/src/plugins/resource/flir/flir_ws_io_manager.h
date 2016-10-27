@@ -4,8 +4,12 @@
 
 #include <plugins/common_interfaces/abstract_io_manager.h>
 #include <nx/utils/timer_manager.h>
+#include <utils/common/safe_direct_connection.h>
 
-class FlirWsIOManager : public QObject, public QnAbstractIOManager
+class FlirWsIOManager :
+    public QObject,
+    public Qn::EnableSafeDirectConnection,
+    public QnAbstractIOManager
 {
     Q_OBJECT
 
@@ -17,7 +21,7 @@ class FlirWsIOManager : public QObject, public QnAbstractIOManager
         quint64 timestamp;
         int deviceType;
         int sourceIndex;
-        int sourceName;
+        QString sourceName;
         int timestamp2;
         double latitude;
         double longitude;
@@ -66,6 +70,7 @@ private:
     QString buildNotificationSubsctionString(const QString& subscriptionType);
     void subscribeToNotifications();
     FlirAlarmNotification parseNotification(const QString& message);
+    quint64 parseFlirDateTime(const QString& dateTime);
 
     void sendKeepAlive();
 
@@ -75,5 +80,10 @@ private:
     std::atomic<bool> m_monitoringIsInProgress;
     std::unique_ptr<QWebSocket> m_controlWebSocket;
     std::unique_ptr<QWebSocket> m_notificationWebSocket;
+
+    InputStateChangeCallback m_stateChangeCallback;
+    NetworkIssueCallback m_networkIssueCallback;
+
+    QnMutex m_mutex;
 
 };
