@@ -29,5 +29,5 @@ smtp:
 
 admins:
     -
-        - 'Evgeny'
-        - 'ebalashov@networkoptix.com'
+        - 'Cloud Portal Admins'
+        - 'cloud-portal-admins@networkoptix.com'
