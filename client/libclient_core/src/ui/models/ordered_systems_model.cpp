@@ -31,15 +31,15 @@ bool QnOrderedSystemsModel::getWeightFromData(
 {
     const auto fillWeightByRole =
         [this, modelIndex](int role, qreal& weight)
-    {
-        const auto id = modelIndex.data(role).toString();
-        const auto itWeight = m_weights.find(id);
-        if (itWeight == m_weights.end())
-            return false;
+        {
+            const auto id = modelIndex.data(role).toString();
+            const auto itWeight = m_weights.find(id);
+            if (itWeight == m_weights.end())
+                return false;
 
-        weight = itWeight.value().weight;
-        return true;
-    };
+            weight = itWeight.value().weight;
+            return true;
+        };
 
     // Searching for maximum weight
     static const QVector<int> kIdRoles =
@@ -47,7 +47,7 @@ bool QnOrderedSystemsModel::getWeightFromData(
 
     weight = 0.0;
     bool result = false;
-    for (const auto role : kIdRoles)
+    for (const auto& role : kIdRoles)
     {
         qreal foundWeight = 0.0;
         if (fillWeightByRole(role, foundWeight))
@@ -84,10 +84,10 @@ bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
     static const auto finalLess =
         [](const QModelIndex& left, const QModelIndex& right) -> bool
         {
-            const auto leftsystemName = left.data(QnSystemsModel::SystemNameRoleId).toString();
+            const auto leftSystemName = left.data(QnSystemsModel::SystemNameRoleId).toString();
             const auto rightSystemName = right.data(QnSystemsModel::SystemNameRoleId).toString();
             const auto compareResult = nx::utils::naturalStringCompare(
-                leftsystemName, rightSystemName, Qt::CaseInsensitive);
+                leftSystemName, rightSystemName, Qt::CaseInsensitive);
             if (compareResult)
                 return (compareResult < 0);
 

@@ -25,7 +25,7 @@ void addOrUpdateWeightData(const QString& id, const QnWeightData& data,
 QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
 {
     QnWeightsDataHash result;
-    for (const auto cloudData : data)
+    for (const auto& cloudData : data)
     {
         const QnWeightData weightData = { cloudData.localId, cloudData.weight,
             cloudData.lastLoginTimeUtcMs, true};
@@ -83,7 +83,7 @@ void QnSystemsWeightsManager::handleSourceWeightsChanged()
     const auto cloudSystemsData = qnCloudStatusWatcher->cloudSystems();
     auto targetWeights = fromCloudSystemData(cloudSystemsData);
 
-    for (const auto weightData : localWeights)
+    for (const auto& weightData : localWeights)
         addOrUpdateWeightData(weightData.localId.toString(), weightData, targetWeights);
 
     if (targetWeights == m_baseWeights)
@@ -106,7 +106,7 @@ void QnSystemsWeightsManager::setSystemsFinder(QnAbstractSystemsFinder* finder)
     connect(m_finder, &QnAbstractSystemsFinder::systemDiscovered,
         this, &QnSystemsWeightsManager::processSystemDiscovered);
 
-    for (const auto system : m_finder->systems())
+    for (const auto& system : m_finder->systems())
         processSystemDiscovered(system);
 
     // TODO: #ynikitenkov add processing of systems's removal.
@@ -171,7 +171,7 @@ void QnSystemsWeightsManager::afterBaseWeightsUpdated()
     m_updatedWeights = updatedWeights;
 
     qreal targetUnknownSystemWeight = 0;
-    for (const auto data : m_updatedWeights)
+    for (const auto& data : m_updatedWeights)
     {
         if (data.realConnection)
             std::max(targetUnknownSystemWeight, data.weight);
@@ -193,7 +193,7 @@ void QnSystemsWeightsManager::setUnknownSystemsWeight(qreal value)
     if (qFuzzyEquals(m_unknownSystemWeight, value))
         return;
 
-    m_unknownSystemWeight;
+    m_unknownSystemWeight = value;
     emit unknownSystemsWeightChanged();
 }
 
