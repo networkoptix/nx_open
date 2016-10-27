@@ -265,12 +265,14 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
-    /* Let the style calculate text offset: */
-    option.rect.setSize(QSize(10000, 20)); // any nonzero height and some really big width
+    /* Let the style calculate text rect so we can determine side paddings dictated by it: */
+    option.rect.setSize(QSize(10000, 20)); // some really big width and any nonzero height
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
 
+    int paddingsFromStyle = textRect.left() + (option.rect.right() - textRect.right());
+
     /* Initial size: */
-    int width = textRect.left();
+    int width = paddingsFromStyle;
     int height = option.decorationSize.height();
 
     /* Adjust size to text: */
