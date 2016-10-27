@@ -93,7 +93,7 @@ TEST_F(ListeningPeer, peer_disconnect)
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
 
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-    data::ListeningPeersBySystem listeningPeers;
+    data::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
 

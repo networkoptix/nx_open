@@ -1,30 +1,24 @@
-/**********************************************************
-* May 4, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 
 #include "data/listening_peer.h"
 
-
 namespace nx {
 namespace hpm {
 
-class ListeningPeerPool;
+class PeerRegistrator;
 
 namespace http {
 
 class GetListeningPeerListHandler
 :
-    public nx_http::AbstractFusionRequestHandler<void, data::ListeningPeersBySystem>
+    public nx_http::AbstractFusionRequestHandler<void, data::ListeningPeers>
 {
 public:
     static const char* kHandlerPath;
 
-    GetListeningPeerListHandler(const ListeningPeerPool& listeningPeerPool);
+    GetListeningPeerListHandler(const PeerRegistrator& registrator);
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
@@ -32,7 +26,7 @@ public:
         stree::ResourceContainer authInfo) override;
 
 private:
-    const ListeningPeerPool& m_listeningPeerPool;
+    const PeerRegistrator& m_registrator;
 };
 
 } // namespace http
