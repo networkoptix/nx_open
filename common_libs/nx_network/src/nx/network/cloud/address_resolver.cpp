@@ -193,8 +193,11 @@ void AddressResolver::resolveDomain(
 }
 
 void AddressResolver::resolveAsync(
-    const HostAddress& hostName, ResolveHandler handler,
-    bool natTraversal, int ipVersion, void* requestId)
+    const HostAddress& hostName,
+    ResolveHandler handler,
+    NatTraversalSupport natTraversalSupport,
+    int ipVersion,
+    void* requestId)
 {
     if (hostName.isResolved())
     {
@@ -211,7 +214,7 @@ void AddressResolver::resolveAsync(
         HostAddressInfo(isCloudHostName(&lk, hostName.toString()))).first;
     info->second.checkExpirations();
     tryFastDomainResolve(info);
-    if (info->second.isResolved(natTraversal))
+    if (info->second.isResolved(natTraversalSupport))
     {
         auto entries = info->second.getAll();
         lk.unlock();
@@ -221,27 +224,31 @@ void AddressResolver::resolveAsync(
     }
 
     info->second.pendingRequests.insert(requestId);
-    m_requests.insert(std::make_pair(requestId,
-        RequestInfo(info->first, natTraversal, std::move(handler))));
+    m_requests.insert(
+        std::make_pair(
+            requestId,
+            RequestInfo(info->first, natTraversalSupport, std::move(handler))));
 
     DEBUG_LOG(lm("Address %1 will be resolved later by request %2").strs(hostName, requestId));
-    if (info->second.isLikelyCloudAddress && natTraversal)
+    if (info->second.isLikelyCloudAddress && natTraversalSupport == NatTraversalSupport::enabled)
         mediatorResolve(info, &lk, true, ipVersion);
     else
-        dnsResolve(info, &lk, natTraversal, ipVersion);
+        dnsResolve(info, &lk, natTraversalSupport == NatTraversalSupport::enabled, ipVersion);
 }
 
 std::vector<AddressEntry> AddressResolver::resolveSync(
-     const HostAddress& hostName, bool natTraversal, int ipVersion)
+    const HostAddress& hostName,
+    NatTraversalSupport natTraversalSupport,
+    int ipVersion)
 {
     utils::promise<std::vector<AddressEntry>> promise;
-    auto handler = [&](
-        SystemError::ErrorCode /*code*/, std::vector<AddressEntry> entries)
-    {
-        promise.set_value(std::move(entries));
-    };
+    auto handler = 
+        [&](SystemError::ErrorCode /*code*/, std::vector<AddressEntry> entries)
+        {
+            promise.set_value(std::move(entries));
+        };
 
-    resolveAsync(hostName, std::move(handler), natTraversal, ipVersion);
+    resolveAsync(hostName, std::move(handler), natTraversalSupport, ipVersion);
     return promise.get_future().get();
 }
 
@@ -344,13 +351,15 @@ void AddressResolver::HostAddressInfo::checkExpirations()
     }
 }
 
-bool AddressResolver::HostAddressInfo::isResolved(bool natTraversal) const
+bool AddressResolver::HostAddressInfo::isResolved(
+    NatTraversalSupport natTraversalSupport) const
 {
-    if(!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
+    if (!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
         return true; // any address is better than nothing
 
-    return (m_dnsState == State::resolved) &&
-        (!natTraversal || m_mediatorState == State::resolved);
+    return (m_dnsState == State::resolved)
+        && (natTraversalSupport == NatTraversalSupport::disabled
+            || m_mediatorState == State::resolved);
 }
 
 template<typename Container>
@@ -377,12 +386,14 @@ std::vector<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
 }
 
 AddressResolver::RequestInfo::RequestInfo(
-    HostAddress _address, bool _natTraversal, ResolveHandler _handler)
+    HostAddress address,
+    NatTraversalSupport natTraversalSupport,
+    ResolveHandler handler)
 :
-    address(std::move(_address)),
+    address(std::move(address)),
     inProgress(false),
-    natTraversal(_natTraversal),
-    handler(std::move(_handler))
+    natTraversalSupport(natTraversalSupport),
+    handler(std::move(handler))
 {
 }
 
@@ -436,7 +447,7 @@ void AddressResolver::dnsResolve(
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            if (needMediator && !info->second.isResolved(true))
+            if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },
         ipVersion,
@@ -474,7 +485,7 @@ void AddressResolver::mediatorResolve(
     }
 
     const auto guards = grabHandlers(resolveResult, info);
-    if (needDns && !info->second.isResolved(true))
+    if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
         return dnsResolve(info, lk, false, ipVersion);
 
     lk->unlock(); //< Fire guards away from mutex scope.
@@ -520,7 +531,7 @@ void AddressResolver::mediatorResolveImpl(
 
             info->second.setMediatorEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            if (needDns && !info->second.isResolved(true))
+            if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
                 dnsResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         });
 }
@@ -540,7 +551,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
         {
             if (it->second.address != info->first ||
                 it->second.inProgress ||
-                !info->second.isResolved(it->second.natTraversal))
+                !info->second.isResolved(it->second.natTraversalSupport))
             {
                 noPending = false;
                 continue;

@@ -586,7 +586,6 @@ namespace
 
 template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
-    bool natTraversal,
     int type,
     int protocol,
     int ipVersion,
@@ -595,7 +594,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     Socket<InterfaceToImplement>(
         std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
             new aio::AsyncSocketImplHelper<Pollable>(
-                this, this, natTraversal, ipVersion)),
+                this, this, ipVersion)),
         type,
         protocol,
         ipVersion,
@@ -608,7 +607,6 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
 
 template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
-    bool natTraversal,
     int newConnSD,
     int ipVersion,
     PollableSystemSocketImpl* sockImpl )
@@ -616,12 +614,12 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     Socket<InterfaceToImplement>(
         std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
             new aio::AsyncSocketImplHelper<Pollable>(
-                this, this, natTraversal, ipVersion)),
+                this, this, ipVersion)),
         newConnSD,
         ipVersion,
         sockImpl),
     m_aioHelper(nullptr),
-    m_connected(true)   //this constructor is used is server socket
+    m_connected(true)   // This constructor is used by server socket.
 {
     m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
@@ -944,10 +942,9 @@ public:
 };
 #endif
 
-TCPSocket::TCPSocket(bool natTraversal, int ipVersion)
+TCPSocket::TCPSocket(int ipVersion)
 :
     base_type(
-        natTraversal,
         SOCK_STREAM,
         IPPROTO_TCP,
         ipVersion
@@ -961,7 +958,6 @@ TCPSocket::TCPSocket(bool natTraversal, int ipVersion)
 TCPSocket::TCPSocket(int newConnSD, int ipVersion)
 :
     base_type(
-        false, // in TCPSocket nat traversal only helps to resolve public address
         newConnSD,
         ipVersion
 #ifdef _WIN32
@@ -1431,7 +1427,7 @@ bool TCPServerSocket::setListen(int queueLen)
 
 UDPSocket::UDPSocket(int ipVersion)
 :
-    base_type(false, SOCK_DGRAM, IPPROTO_UDP, ipVersion),
+    base_type(SOCK_DGRAM, IPPROTO_UDP, ipVersion),
     m_destAddr()
 {
     setBroadcast();

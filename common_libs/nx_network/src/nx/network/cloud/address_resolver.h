@@ -140,11 +140,16 @@ public:
         \a natTraversal defines if mediator should be used for address resolution
     */
     void resolveAsync(
-        const HostAddress& hostName, ResolveHandler handler,
-        bool natTraversal, int ipVersion, void* requestId = nullptr);
+        const HostAddress& hostName,
+        ResolveHandler handler,
+        NatTraversalSupport natTraversalSupport,
+        int ipVersion,
+        void* requestId = nullptr);
 
     std::vector<AddressEntry> resolveSync(
-        const HostAddress& hostName, bool natTraversal, int ipVersion);
+        const HostAddress& hostName,
+        NatTraversalSupport natTraversalSupport,
+        int ipVersion);
 
     //!Cancels request
     /*!
@@ -191,7 +196,7 @@ protected:
         void setMediatorEntries(std::vector< AddressEntry > entries = {});
 
         void checkExpirations();
-        bool isResolved(bool natTraversal = false) const;
+        bool isResolved(NatTraversalSupport natTraversalSupport) const;
         std::vector<AddressEntry> getAll() const;
 
     private:
@@ -211,12 +216,14 @@ protected:
     {
         const HostAddress address;
         bool inProgress;
-        bool natTraversal;
+        NatTraversalSupport natTraversalSupport;
         ResolveHandler handler;
         Guard guard;
 
         RequestInfo(
-            HostAddress _address, bool _natTraversal, ResolveHandler _handler);
+            HostAddress address,
+            NatTraversalSupport natTraversalSupport,
+            ResolveHandler handler);
     };
 
     void tryFastDomainResolve(HaInfoIterator info);

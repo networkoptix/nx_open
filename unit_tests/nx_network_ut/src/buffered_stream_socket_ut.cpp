@@ -14,7 +14,7 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     []()
     {
         return std::make_unique<BufferedStreamSocket>(
-            std::make_unique<TCPSocket>(false, AF_INET));
+            std::make_unique<TCPSocket>(AF_INET));
     })
 
 class BufferedStreamSocketTest:
@@ -32,13 +32,13 @@ protected:
     {
         server = std::make_unique<TCPServerSocket>(AF_INET);
         ASSERT_TRUE(server->setReuseAddrFlag(true));
-        ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+        ASSERT_TRUE(server->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(server->listen(10));;
 
         const auto serverAddress = server->getLocalAddress();
         NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
 
-        client = std::make_unique<TCPSocket>(false, AF_INET);
+        client = std::make_unique<TCPSocket>(AF_INET);
         ASSERT_TRUE(client->setSendTimeout(500));
         ASSERT_TRUE(client->connect(serverAddress, 500));
 
