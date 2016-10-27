@@ -201,8 +201,6 @@ protected:
 
     void at_escapeHotkeyAction_triggered();
 
-    void at_messageBoxAction_triggered();
-
     void at_browseUrlAction_triggered();
 
     void at_versionMismatchMessageAction_triggered();

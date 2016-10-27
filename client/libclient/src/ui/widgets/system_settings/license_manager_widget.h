@@ -46,11 +46,11 @@ private slots:
 
     void licenseDetailsRequested(const QModelIndex& index);
 
-    void showMessage(const QString &title, const QString &message, bool warning);
+    void showMessage(const QString &title, const QString &message);
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
 
 signals:
-    void showMessageLater(const QString &title, const QString &message, bool warning);
+    void showMessageLater(const QString &title, const QString &message);
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
