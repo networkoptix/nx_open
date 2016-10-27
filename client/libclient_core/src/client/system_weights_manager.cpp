@@ -68,12 +68,16 @@ QnSystemsWeightsManager::QnSystemsWeightsManager():
                 handleSourceWeightsChanged();
         });
 
+    setSystemsFinder(qnSystemsFinder);
+
     handleSourceWeightsChanged();
+
 
     static const int kUpdateInterval = 1000 * 60 * 10;// 10 minutes
     m_updateTimer->setInterval(kUpdateInterval);
     connect(m_updateTimer, &QTimer::timeout,
         this, &QnSystemsWeightsManager::afterBaseWeightsUpdated);
+
 }
 
 void QnSystemsWeightsManager::handleSourceWeightsChanged()

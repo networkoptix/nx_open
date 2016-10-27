@@ -85,7 +85,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
-    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
@@ -109,6 +108,7 @@ QnMobileClientModule::QnMobileClientModule(
     common->store<QnRouter>(new QnRouter(moduleFinder));
 
     common->store<QnSystemsFinder>(new QnSystemsFinder());
+    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleFinder](Qt::ApplicationState state)
