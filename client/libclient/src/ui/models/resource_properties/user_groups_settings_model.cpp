@@ -11,7 +11,7 @@
 
 
 QnUserGroupSettingsModel::RoleReplacement::RoleReplacement() :
-    RoleReplacement(QnUuid(), Qn::GlobalLiveViewerPermissionSet)
+    RoleReplacement(QnUuid(), Qn::NoGlobalPermissions)
 {
 }
 
@@ -26,11 +26,6 @@ QnUserGroupSettingsModel::RoleReplacement::RoleReplacement(
 bool QnUserGroupSettingsModel::RoleReplacement::isEmpty() const
 {
     return group.isNull() && permissions == Qn::NoGlobalPermissions;
-}
-
-QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::RoleReplacement::empty()
-{
-    return RoleReplacement(QnUuid(), Qn::NoGlobalPermissions);
 }
 
 QnUserGroupSettingsModel::QnUserGroupSettingsModel(QObject* parent /*= nullptr*/) :

@@ -24,6 +24,7 @@
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
+#include <client/system_weights_manager.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -561,4 +562,5 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);
+    qnCommon->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 }

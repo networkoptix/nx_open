@@ -23,6 +23,8 @@ BaseTile
     // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
     readonly property bool offlineCloudConnectionsDisabled: true;
 
+    onSystemIdChanged: { forceCollapsedState();}
+
     isConnecting: ((control.systemId == context.connectingToSystem)
         && context.connectingToSystem.length && !isFactoryTile);
 

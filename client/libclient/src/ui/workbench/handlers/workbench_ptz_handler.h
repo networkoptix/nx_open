@@ -23,6 +23,9 @@ private slots:
 
     void at_debugCalibratePtzAction_triggered();
     void at_debugGetPtzPositionAction_triggered();
+
+private:
+    void showSetPositionWarning(const QnResourcePtr& resource);
 };
 
 #endif // WORKBENCH_PTZ_HANDLER_H

@@ -900,11 +900,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+F"), QnActionBuilder::Mac, true).
         shortcutContext(Qt::ApplicationShortcut);
 
-
-    factory(QnActions::MessageBoxAction).
-        flags(Qn::NoTarget).
-        text(lit("Show Message"));
-
     factory(QnActions::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).

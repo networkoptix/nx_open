@@ -431,7 +431,9 @@ Rectangle
         target: context;
         onIsVisibleChanged:
         {
-            grid.watcher.resetCurrentItem();
+            if (grid.watcher.currentItem)
+                grid.watcher.currentItem.forceCollapsedState();
+
             pageSwitcher.setPage(0);
         }
     }

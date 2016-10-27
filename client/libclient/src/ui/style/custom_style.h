@@ -15,6 +15,9 @@ void setAccentStyle(QAbstractButton* button, bool accent = true);
 
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape);
 
+void setMonospaceFont(QWidget* widget);
+QFont monospaceFont(const QFont& font = QFont());
+
 /*
 * Fade a widget in or out using QGraphicsOpacityEffect.
 * Intended for use in dialogs.

@@ -29,6 +29,20 @@ Item
 
     signal collapsedTileClicked();
 
+    property bool forceImmediateAnimation: false;
+
+    function getDuration(duration)
+    {
+        return (forceImmediateAnimation ? 0 : duration);
+    }
+
+    function forceCollapsedState()
+    {
+        control.forceImmediateAnimation = true;
+        tileHolder.state = "collapsed";
+        control.forceImmediateAnimation = false;
+    }
+
     function toggle()
     {
         tileHolder.state = (isExpanded ? "collapsed" : "expanded");
@@ -132,6 +146,8 @@ Item
 
             SequentialAnimation
             {
+                id: anim;
+
                 PropertyAction
                 {
                     target: control;
@@ -149,14 +165,14 @@ Item
                         {
                             properties: "x, y";
                             easing.type: Easing.InOutCubic;
-                            duration: 400;
+                            duration: control.getDuration(400);
                         }
 
                         NumberAnimation
                         {
                             properties: "height";
                             easing.type: Easing.OutCubic;
-                            duration: 400;
+                            duration: control.getDuration(400);
                         }
                     }
 
@@ -165,7 +181,7 @@ Item
                         targets: [collapseTileButton, menuButtonControl];
                         properties: "opacity";
                         easing.type: Easing.OutCubic;
-                        duration: 200;
+                        duration: control.getDuration(200);
                     }
 
                     NumberAnimation
@@ -173,7 +189,7 @@ Item
                         targets: [shadow];
                         properties: "opacity";
                         easing.type: Easing.OutCubic;
-                        duration: 400;
+                        duration: control.getDuration(400);
                     }
 
                     NumberAnimation
@@ -182,7 +198,7 @@ Item
                         properties: "opacity";
                         easing.type: (tileHolder.state == "collapsed" ?
                               Easing.InCubic : Easing.OutCubic);
-                        duration: 200;
+                        duration: control.getDuration(200);
                     }
                 }
 

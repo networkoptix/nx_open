@@ -261,7 +261,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::SetAsBackgroundAction), SIGNAL(triggered()), this, SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(QnActions::WhatsThisAction), SIGNAL(triggered()), this, SLOT(at_whatsThisAction_triggered()));
     connect(action(QnActions::EscapeHotkeyAction), SIGNAL(triggered()), this, SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(QnActions::MessageBoxAction), SIGNAL(triggered()), this, SLOT(at_messageBoxAction_triggered()));
     connect(action(QnActions::BrowseUrlAction), SIGNAL(triggered()), this, SLOT(at_browseUrlAction_triggered()));
     connect(action(QnActions::VersionMismatchMessageAction), &QAction::triggered, this, &QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(QnActions::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
@@ -1283,8 +1282,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
-    if (period.durationMs < steps[1]) {
-        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QDialogButtonBox::Ok);
+    if (period.durationMs < steps[1])
+    {
+        QnMessageBox::warning(
+            mainWindow(),
+            tr("Unable to perform preview search."),
+            tr("Selected time period is too short to perform preview search. Please select a longer period."));
         return;
     }
 
@@ -1816,14 +1819,21 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
         if (!checkCondition())
             return;
 
-        if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded) {
-            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024 * 1024))
-                );
+        if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
+        {
+            QnMessageBox::warning(
+                mainWindow(),
+                tr("Error"),
+                tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024 * 1024)));
             return;
         }
 
-        if (status != QnAppServerFileCache::OperationResult::ok) {
-            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
+        if (status != QnAppServerFileCache::OperationResult::ok)
+        {
+            QnMessageBox::warning(
+                mainWindow(),
+                tr("Error"),
+                tr("Error while uploading picture."));
             return;
         }
 
@@ -1987,15 +1997,6 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
         menu()->trigger(QnActions::ToggleTourModeAction);
 }
 
-void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
-    QString title = menu()->currentParameters(sender()).argument<QString>(Qn::TitleRole);
-    QString text = menu()->currentParameters(sender()).argument<QString>(Qn::TextRole);
-    if (text.isEmpty())
-        text = title;
-
-    QnMessageBox::information(mainWindow(), title, text);
-}
-
 void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
     QString url = menu()->currentParameters(sender()).argument<QString>(Qn::UrlRole);
     if (url.isEmpty())
@@ -2122,8 +2123,9 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     QnMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),
-        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
-            "If you would like to disable this feature you can do so in the System Administration dialog.")
+        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.")
+            + L'\n'
+            + tr("If you would like to disable this feature you can do so in the System Administration dialog.")
         );
 
     qnGlobalSettings->setStatisticsAllowed(true);
@@ -2131,25 +2133,36 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 }
 
 
-void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
+{
 
-    QnSoftwareVersion version = parameters.hasArgument(Qn::SoftwareVersionRole)
-        ? parameters.argument<QnSoftwareVersion>(Qn::SoftwareVersionRole)
-        : QnSoftwareVersion();
-    QUrl url = parameters.hasArgument(Qn::UrlRole)
-        ? parameters.argument<QUrl>(Qn::UrlRole)
-        : context()->user()
-        ? QnAppServerConnectionFactory::url()
-        : QUrl();
-    QByteArray auth = url.toEncoded();
+    auto tryToRestartClient = []
+        {
+            using namespace applauncher;
+            if (!checkOnline())
+                return false;
 
-    bool isInstalled = false;
-    bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
-    if (success && isInstalled)
-        success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
+            /* Try to run applauncher if it is not running. */
+            if (!checkOnline())
+                return false;
 
-    if (!success) {
+            const auto result = restartClient();
+            if (result == api::ResultType::ok)
+                return true;
+
+            static const int kMaxTries = 5;
+            for (int i = 0; i < kMaxTries; ++i)
+            {
+                QThread::msleep(100);
+                qApp->processEvents();
+                if (restartClient() == api::ResultType::ok)
+                    return true;
+            }
+            return false;
+        };
+
+    if (!tryToRestartClient())
+    {
         QnMessageBox::critical(
             mainWindow(),
             tr("Launcher process not found."),
