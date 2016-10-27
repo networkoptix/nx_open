@@ -44,6 +44,8 @@
 #include <utils/common/qtimespan.h>
 #include <utils/common/unused.h>
 
+#include <utils/math/color_transformations.h>
+
 #include <common/common_globals.h>
 
 namespace
@@ -103,8 +105,6 @@ namespace
 
         virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
         {
-            QnScopedPainterOpacityRollback opacityRollback(painter);
-
             QStyleOptionViewItem opt(option);
             initStyleOption(&opt, index);
 
@@ -142,7 +142,8 @@ namespace
             else if (index.column() < QnStorageListModel::RemoveActionColumn
                  && !index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
             {
-                painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+                opt.palette.setColor(QPalette::Text, toTransparent(
+                    opt.palette.color(QPalette::Text), style::Hints::kDisabledItemOpacity));
             }
 
             QStyle* style = option.widget ? option.widget->style() : QApplication::style();
