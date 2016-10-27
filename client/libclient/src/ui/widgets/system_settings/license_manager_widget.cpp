@@ -26,10 +26,13 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 
+#include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/globals.h>
 #include <ui/models/license_list_model.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/utils/table_export_helper.h>
@@ -42,10 +45,12 @@ namespace {
 class QnLicenseListSortProxyModel : public QSortFilterProxyModel
 {
     using base_type = QSortFilterProxyModel;
+
 public:
     QnLicenseListSortProxyModel(QObject* parent = nullptr) :
         base_type(parent)
-    {}
+    {
+    }
 
 protected:
     virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
@@ -77,13 +82,38 @@ protected:
 
         return base_type::lessThan(source_left, source_right);
     }
+};
 
-    virtual QVariant data(const QModelIndex& index, int role) const override
+class QnLicenseListItemDelegate : public QnResourceItemDelegate
+{
+    using base_type = QnResourceItemDelegate;
+
+public:
+    explicit QnLicenseListItemDelegate(QObject* parent = nullptr) :
+        base_type(parent)
     {
-        if (role == Qt::FontRole && index.column() == QnLicenseListModel::LicenseKeyColumn)
-            return monospaceFont();
+    }
 
-        return base_type::data(index, role);
+    virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override
+    {
+        base_type::initStyleOption(option, index);
+        if (!index.isValid())
+            return;
+
+        if (index.column() == QnLicenseListModel::LicenseKeyColumn)
+        {
+            option->font = monospaceFont(option->font);
+            option->fontMetrics = QFontMetrics(option->font);
+        }
+
+        if (index.data(Qt::ForegroundRole).canConvert<QBrush>())
+            return;
+
+        if (auto license = index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>())
+        {
+            if (!license->isValid())
+                option->state &= ~QStyle::State_Enabled;
+        }
     }
 };
 
@@ -94,19 +124,32 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui(new Ui::LicenseManagerWidget),
     m_model(new QnLicenseListModel(this)),
     m_httpClient(nullptr),
+    m_exportLicensesButton(nullptr),
     m_licenses()
 {
     ui->setupUi(this);
 
-    QnSnappedScrollBar *tableScrollBar = new QnSnappedScrollBar(this);
+    m_exportLicensesButton = new QPushButton(ui->groupBox);
+    auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
+    anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
+    static const int kButtonTopAdjustment = -4;
+    anchor->setMargins(0, kButtonTopAdjustment, 0, 0);
+    m_exportLicensesButton->setText(tr("Export"));
+    m_exportLicensesButton->setFlat(true);
+    m_exportLicensesButton->resize(m_exportLicensesButton->minimumSizeHint());
+
+    QnSnappedScrollBar* tableScrollBar = new QnSnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
     QSortFilterProxyModel* sortModel = new QnLicenseListSortProxyModel(this);
     sortModel->setSourceModel(m_model);
 
     ui->gridLicenses->setModel(sortModel);
+    ui->gridLicenses->setItemDelegate(new QnLicenseListItemDelegate(this));
+
+    ui->gridLicenses->header()->setSectionsMovable(false);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseStatusColumn, QHeaderView::Interactive);
+    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::ServerColumn, QHeaderView::Stretch);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
@@ -140,7 +183,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(ui->removeButton, &QPushButton::clicked,
         this, &QnLicenseManagerWidget::removeSelectedLicenses);
 
-    connect(ui->exportLicensesButton, &QPushButton::clicked,
+    connect(m_exportLicensesButton, &QPushButton::clicked,
         this, &QnLicenseManagerWidget::exportLicenses);
 
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,
@@ -174,7 +217,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
-{}
+{
+}
 
 void QnLicenseManagerWidget::loadDataToUi()
 {
@@ -230,22 +274,18 @@ void QnLicenseManagerWidget::updateLicenses()
     {
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
-        QString msg(tr("The software is licensed to: "));
+        QStringList messages;
 
         QnCamLicenseUsageHelper camUsageHelper;
         QnVideoWallLicenseUsageHelper vwUsageHelper;
-        QList<QnLicenseUsageHelper*> helpers;
-        helpers
-            << &camUsageHelper
-            << &vwUsageHelper
-            ;
+        QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
         for (QnLicenseUsageHelper* helper: helpers)
         {
             for(Qn::LicenseType lt: helper->licenseTypes())
             {
                 if (helper->totalLicenses(lt) > 0)
-                    msg += L'\n' + lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    messages << lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
 
@@ -257,7 +297,7 @@ void QnLicenseManagerWidget::updateLicenses()
                 for (Qn::LicenseType lt: helper->licenseTypes())
                 {
                     if (helper->usedLicenses(lt) > 0)
-                        msg += L'\n' + tr("At least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                        messages << tr("At least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
             else
@@ -265,11 +305,11 @@ void QnLicenseManagerWidget::updateLicenses()
                 for (Qn::LicenseType lt: helper->licenseTypes())
                 {
                     if (helper->usedLicenses(lt) > 0)
-                        msg += L'\n' + tr("%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
         }
-        ui->infoLabel->setText(msg);
+        ui->infoLabel->setText(messages.join(L'\n'));
     }
     else
     {
@@ -495,14 +535,11 @@ void QnLicenseManagerWidget::exportLicenses()
 
 void QnLicenseManagerWidget::updateButtons()
 {
-    ui->exportLicensesButton->setEnabled(!m_licenses.isEmpty());
-
-    QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
-    QnLicensePtr license = idx.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
-
-    ui->detailsButton->setEnabled(!license.isNull());
+    m_exportLicensesButton->setEnabled(!m_licenses.isEmpty());
 
     QnLicenseList selected = selectedLicenses();
+    ui->detailsButton->setEnabled(selected.size() == 1 && !selected[0].isNull());
+
     bool canRemoveAny = std::any_of(selected.cbegin(), selected.cend(), [this](const QnLicensePtr& license)
     {
         return canRemoveLicense(license);
