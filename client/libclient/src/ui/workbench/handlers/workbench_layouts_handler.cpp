@@ -206,7 +206,6 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
 
         auto change = calculateLayoutChange(layout);
 
-        //TODO: #GDM what if we've been disconnected while confirming?
         if (confirmLayoutChange(change))
         {
             auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
@@ -214,7 +213,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
                 grantMissingAccessRights(owner, change);
 
             snapshotManager()->save(layout,
-                [this](bool success, const QnLayoutResourcePtr &layout)
+                [this](bool success, const QnLayoutResourcePtr& layout)
                 {
                     at_layout_saved(success, layout);
                 });
@@ -1077,7 +1076,6 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (sharedLayouts.isEmpty())
         return;
 
-    //TODO: #GDM what if we've been disconnected while confirming?
     if (!confirmStopSharingLayouts(subject, sharedLayouts))
         return;
 
