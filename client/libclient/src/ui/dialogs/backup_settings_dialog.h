@@ -38,5 +38,6 @@ protected:
 private:
     QScopedPointer<Ui::BackupSettingsDialog> ui;
     QnServerBackupSchedule m_schedule;
+    QnVirtualCameraResourceList m_camerasToBackup;
     bool m_backupNewCameras;
 };

@@ -124,6 +124,12 @@ void QnServerSettingsDialog::retranslateUi()
     }
 }
 
+void QnServerSettingsDialog::showEvent(QShowEvent* event)
+{
+    loadDataToUi();
+    base_type::showEvent(event);
+}
+
 QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog()
 {
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");

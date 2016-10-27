@@ -1,5 +1,6 @@
-
 #include "systems_model.h"
+
+#include <QtCore/QUrl>
 
 #include <utils/math/math.h>
 #include <utils/common/app_info.h>
@@ -8,7 +9,6 @@
 #include <nx/utils/disconnect_helper.h>
 #include <network/system_description.h>
 #include <network/connection_validator.h>
-#include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -20,6 +20,7 @@ namespace
         RoleNames result;
         result.insert(QnSystemsModel::SystemNameRoleId, "systemName");
         result.insert(QnSystemsModel::SystemIdRoleId, "systemId");
+        result.insert(QnSystemsModel::LocalIdRoleId, "localId");
         result.insert(QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription");
         result.insert(QnSystemsModel::LastPasswordRoleId, "lastPassword");
 
@@ -160,6 +161,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->name();
         case SystemIdRoleId:
             return system->id();
+        case LocalIdRoleId:
+            return system->localId().toQUuid();
         case OwnerDescriptionRoleId:
         {
             if (!system->isCloudSystem())

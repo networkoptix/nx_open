@@ -50,7 +50,7 @@ public:
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
-    QUrl getApiUrl() const;
+    virtual QUrl getApiUrl() const;
 
     SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const SocketAddress &getPrimaryAddress);

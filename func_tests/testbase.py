@@ -74,7 +74,7 @@ def _singleSuiteName(testclass, suite_name, config, args):
         ).run(
             TestLoader().load(testclass, suite_name, config, *args)
         )
-    print "[%s] Total test run: %s" % (suite_name, result.testRun)
+    print "[%s] Total test run: %s" % (suite_name, result.testsRun)
     _reportResult(result.errors, "errors", suite_name)
     _reportResult(result.failures, "failures", suite_name)
     _reportResult(result.expectedFailures, "expected failures", suite_name)

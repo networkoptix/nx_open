@@ -3,6 +3,8 @@
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 #include <mobile_client/mobile_client_meta_types.h>
+#include <mobile_client/mobile_client_startup_parameters.h>
+#include <client_core/local_connection_data.h>
 
 class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings>
 {
@@ -14,8 +16,7 @@ public:
     {
         SettingsVersion,
 
-        LastUsedSystemId,
-        LastUsedUrl,
+        LastUsedConnection,
         CamerasAspectRatios,
         LastUsedQuality,
         LiteMode,
@@ -24,6 +25,8 @@ public:
         BasePath,
         TestMode,
         InitialTest,
+
+        StartupParameters,
 
         // Depracated properties
         SavedSessions,
@@ -54,8 +57,8 @@ protected:
 private:
     QN_BEGIN_PROPERTY_STORAGE(VariableCount)
         QN_DECLARE_RW_PROPERTY(int,                         settingsVersion,            setSettingsVersion,         SettingsVersion,            0)
-        QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSystemId,           setLastUsedSystemId,        LastUsedSystemId,           QString())
-        QN_DECLARE_RW_PROPERTY(QUrl,                        lastUsedUrl,                setLastUsedUrl,             LastUsedUrl,                QUrl())
+
+        QN_DECLARE_RW_PROPERTY(QnLocalConnectionData,       lastUsedConnection,         setLastUsedConnection,      LastUsedConnection,         QnLocalConnectionData())
         QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
@@ -65,6 +68,11 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     basePath,                   setBasePath,                BasePath,                   lit("qrc:///"))
         QN_DECLARE_RW_PROPERTY(bool,                        testMode,                   setTestMode,                TestMode,                   false)
         QN_DECLARE_RW_PROPERTY(QString,                     initialTest,                setInitialTest,             InitialTest,                QString())
+
+        QN_DECLARE_RW_PROPERTY(
+            QnMobileClientStartupParameters,
+            startupParameters, setStartupParameters,
+            StartupParameters, QnMobileClientStartupParameters())
 
         // Deprecated properties
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())

@@ -32,8 +32,8 @@ Page
     Column
     {
         width: parent.width
-        leftPadding: 16
-        rightPadding: 16
+        leftPadding: 8
+        rightPadding: 8
         spacing: 8
         enabled: !d.connecting
 
@@ -100,7 +100,7 @@ Page
         hideWarning()
         connectButton.forceActiveFocus()
         d.connecting = true
-        connectionManager.connectToServer(LoginUtils.makeUrl(address, login, password))
+        connectionManager.connectToServer("http://" + address, login, password)
     }
 
     function showWarning(status, info)

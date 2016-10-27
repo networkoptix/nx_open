@@ -157,7 +157,7 @@ void QnUserGroupsDialog::applyChanges()
         auto existing = qnUserRolesManager->userRole(group.id);
 
         if (existing != group)
-            qnResourcesChangesManager->saveUserGroup(group);
+            qnResourcesChangesManager->saveUserRole(group);
 
         auto resources = m_model->accessibleResources(group);
         QnLayoutResourceList layoutsToShare = qnResPool->getResources(resources)
@@ -181,18 +181,27 @@ void QnUserGroupsDialog::applyChanges()
         if (groupsLeft.contains(group.id))
             continue;
 
+        const auto& groupUsers = m_model->users(group.id, false);
         auto replacement = m_model->replacement(group.id);
-        for (auto user : m_model->users(group.id, false))
+
+        if (replacement.isEmpty())
         {
-            qnResourcesChangesManager->saveUser(user,
-                [replacement](const QnUserResourcePtr &user)
-                {
-                    user->setUserGroup(replacement.group);
-                    user->setRawPermissions(replacement.permissions);
-                });
+            qnResourcesChangesManager->deleteResources(groupUsers);
+        }
+        else
+        {
+            for (const auto& user : groupUsers)
+            {
+                qnResourcesChangesManager->saveUser(user,
+                    [replacement](const QnUserResourcePtr &user)
+                    {
+                        user->setUserGroup(replacement.group);
+                        user->setRawPermissions(replacement.permissions);
+                    });
+            }
         }
 
-        qnResourcesChangesManager->removeUserGroup(group.id);
+        qnResourcesChangesManager->removeUserRole(group.id);
     }
 
     updateButtonBox();

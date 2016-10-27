@@ -207,6 +207,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     createTimelineWidget(settings[Qn::WorkbenchPane::Navigation]);
 
+    /* Make timeline panel aware of calendar panel. */
+    m_timeline->setCalendarPanel(m_calendar);
+
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
         Qt::TopEdge, NxUi::kShadowThickness, true);
@@ -493,8 +496,7 @@ bool QnWorkbenchUi::isHovered() const
         || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notifications && m_notifications->isHovered())
-        || (m_calendar && m_calendar->isHovered())
-        ;
+        || (m_calendar && m_calendar->isHovered());
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
@@ -669,7 +671,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             /* User may have opened some panels while zoomed,
              * we want to leave them opened even if they were closed before. */
-            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels() | TimelinePanel, true);
+            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels(), true);
 
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
@@ -1326,14 +1328,6 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateCalendarGeometry();
         });
 
-    /*
-     * Calendar is created before navigation slider (alot of logic relies on that).
-     * Therefore we have to bind calendar showing/hiding processors to navigation
-     * pane button "CLND" here and not in createCalendarWidget()
-     */
-    if (m_calendar)
-        m_calendar->hidingProcessor->addTargetItem(m_timeline->item->calendarButton());
-
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
@@ -1407,7 +1401,6 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             params.setArgument(Qn::BookmarkTagRole, tag);
             menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
         });
-
 }
 
 #pragma endregion Timeline methods

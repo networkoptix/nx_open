@@ -2,9 +2,13 @@
 
 #include <QtCore/QObject>
 
-class QnMobileClientModule : public QObject {
-    Q_OBJECT
+struct QnMobileClientStartupParameters;
+
+class QnMobileClientModule: public QObject
+{
 public:
-    QnMobileClientModule(QObject *parent = NULL);
+    QnMobileClientModule(
+        const QnMobileClientStartupParameters& startupParameters,
+        QObject* parent = nullptr);
     ~QnMobileClientModule();
 };

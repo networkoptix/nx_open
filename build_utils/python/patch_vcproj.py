@@ -142,6 +142,25 @@ def add_qt_path(root):
     env.text= 'PATH={0}\\bin$(LocalDebuggerEnvironment)'.format(qt_path)
     target.append(env)
     indent(target, 1)
+    
+def ignore_link_4221(root):
+    """Adding librarian additional parameter to ignore this warning."""
+    #xpath = "./Project/ItemDefinitionGroup/Lib/AdditionalOptions"
+    
+    print "Suppress linker 4221 message"
+    xpath = "./ms:ItemDefinitionGroup/ms:Lib"
+    nodes = root.findall(xpath, namespaces_dict)
+    for node in nodes:
+        existing = node.findall("./ms:AdditionalOptions", namespaces_dict)
+        if existing:
+            for e in existing:
+                e.text = '/ignore:4221 ' + e.text
+        else:  
+            target = Element('AdditionalOptions')
+            target.text = '/ignore:4221 %(AdditionalOptions)'
+            node.append(target)
+        indent(node, 2)
+       
             
 def patch_project(project):
     print "Patching {0}...".format(project)
@@ -156,6 +175,7 @@ def patch_project(project):
     add_prebuild_events(root)
     add_qt_path(root)
     enable_fastlink(root)
+    ignore_link_4221(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():

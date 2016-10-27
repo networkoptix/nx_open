@@ -2097,7 +2097,7 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
-    qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
+    qnCommon->setRemoteGUID(connectInfo.serverId());
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {

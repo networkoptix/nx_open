@@ -19,44 +19,7 @@
 #include <network/authutil.h>
 #include <nx/network/http/asynchttpclient.h>
 
-namespace {
-
-    QnMergeSystemsTool::ErrorCode errorStringToErrorCode(const QString &str) {
-        if (str.isEmpty())
-            return QnMergeSystemsTool::NoError;
-        if (str == lit("FAIL"))
-            return QnMergeSystemsTool::NotFoundError;
-        else if (str == lit("INCOMPATIBLE"))
-            return QnMergeSystemsTool::VersionError;
-        else if (str == lit("UNAUTHORIZED"))
-            return QnMergeSystemsTool::AuthentificationError;
-        else if (str == lit("FORBIDDEN"))
-            return QnMergeSystemsTool::ForbiddenError;
-        else if (str == lit("NOT_LOCAL_OWNER"))
-            return QnMergeSystemsTool::notLocalOwner;
-        else if (str == lit("BACKUP_ERROR"))
-            return QnMergeSystemsTool::BackupError;
-        else if (str == lit("STARTER_LICENSE_ERROR"))
-            return QnMergeSystemsTool::StarterLicenseError;
-        else if (str == lit("SAFE_MODE"))
-            return QnMergeSystemsTool::SafeModeError;
-        else if (str == lit("CONFIGURATION_ERROR"))
-            return QnMergeSystemsTool::ConfigurationError;
-        else if (str == lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD"))
-            return QnMergeSystemsTool::DependentSystemBoundToCloudError;
-        else if (str == lit("BOTH_SYSTEM_BOUND_TO_CLOUD"))
-            return QnMergeSystemsTool::BothSystemBoundToCloudError;
-        else if (str == lit("DIFFERENT_CLOUD_HOST"))
-            return QnMergeSystemsTool::differentCloudHostError;
-        else if (str == lit("UNCONFIGURED_SYSTEM"))
-            return QnMergeSystemsTool::UnconfiguredSystemError;
-        else
-            return QnMergeSystemsTool::InternalError;
-    }
-
-} // anonymous namespace
-
-QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
+QnMergeSystemsTool::QnMergeSystemsTool(QObject* parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
@@ -67,7 +30,7 @@ void QnMergeSystemsTool::pingSystem(const QUrl& url, const QAuthenticator& userA
     if (!m_twoStepRequests.isEmpty())
         return;
 
-    m_foundModule.first = NotFoundError;
+    m_foundModule.first = utils::MergeSystemsStatus::notFound;
 
     TwoStepRequestCtx ctx;
     ctx.url = url;
@@ -111,6 +74,9 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
     int handle,
     const QString& errorString)
 {
+    if (!m_twoStepRequests.contains(handle))
+        return;
+
     TwoStepRequestCtx& ctx = m_twoStepRequests[handle];
 
     QByteArray getKey = createHttpQueryAuthParam(
@@ -144,6 +110,9 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
     int handle,
     const QString& errorString)
 {
+    if (!m_twoStepRequests.contains(handle))
+        return;
+
     TwoStepRequestCtx& ctx = m_twoStepRequests[handle];
 
     QByteArray getKey = createHttpQueryAuthParam(
@@ -160,7 +129,10 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
         SLOT(at_pingSystem_finished(int, QnModuleInformation, int, QString)));
 }
 
-int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth)
+int QnMergeSystemsTool::configureIncompatibleServer(
+    const QnMediaServerResourcePtr& proxy,
+    const QUrl& url,
+    const QAuthenticator& userAuth)
 {
     TwoStepRequestCtx ctx;
     ctx.proxy = proxy;
@@ -170,12 +142,17 @@ int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourceP
     ctx.oneServer = true;
     ctx.ignoreIncompatible = true;
 
-    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(
+        url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
     m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
     return ctx.nonceRequestHandle;
 }
 
-void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
+void QnMergeSystemsTool::at_pingSystem_finished(
+    int status,
+    const QnModuleInformation& moduleInformation,
+    int handle,
+    const QString& errorString)
 {
     bool ctxFound = false;
     TwoStepRequestCtx ctx;
@@ -197,31 +174,41 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
         .arg(ctx.proxy->getApiUrl().toString()).arg(status).arg(errorString),
         cl_logDEBUG1);
 
-    ErrorCode errorCode = (status == 0) ? errorStringToErrorCode(errorString) : InternalError;
+    auto errorCode = (status == 0)
+        ? utils::MergeSystemsStatus::fromString(errorString)
+        : utils::MergeSystemsStatus::unknownError;
 
-    auto isOk = [](ErrorCode errorCode) { return errorCode == NoError || errorCode == StarterLicenseError; };
+    auto isOk = [](utils::MergeSystemsStatus::Value errorCode)
+        {
+            return errorCode == utils::MergeSystemsStatus::ok
+                || errorCode == utils::MergeSystemsStatus::starterLicense;
+        };
 
     if (isOk(errorCode) && moduleInformation.ecDbReadOnly)
-        errorCode = ErrorCode::SafeModeError;
+        errorCode = utils::MergeSystemsStatus::safeMode;
 
     if (isOk(errorCode))
     {
         m_twoStepRequests.clear();
-        emit systemFound(moduleInformation, ctx.proxy, errorCode);
+        emit systemFound(errorCode, moduleInformation, ctx.proxy);
         return;
     }
 
-    if (errorCode != NotFoundError)
+    if (errorCode != utils::MergeSystemsStatus::notFound)
     {
         m_foundModule.first = errorCode;
         m_foundModule.second = moduleInformation;
     }
 
     if (m_twoStepRequests.isEmpty())
-        emit systemFound(m_foundModule.second, QnMediaServerResourcePtr(), m_foundModule.first);
+        emit systemFound(m_foundModule.first, m_foundModule.second, QnMediaServerResourcePtr());
 }
 
-void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
+void QnMergeSystemsTool::at_mergeSystem_finished(
+    int status,
+    const QnModuleInformation& moduleInformation,
+    int handle,
+    const QString& errorString)
 {
     bool ctxFound = false;
     for (const auto& ctx: m_twoStepRequests)
@@ -237,13 +224,14 @@ void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInfor
     if (!ctxFound)
         return;
 
-    NX_LOG(lit("QnMergeSystemsTool: merge reply id=%1 error=%2").arg(moduleInformation.id.toString()).arg(errorString), cl_logDEBUG1);
+    NX_LOG(lit("QnMergeSystemsTool: merge reply id=%1 error=%2")
+        .arg(moduleInformation.id.toString()).arg(errorString), cl_logDEBUG1);
 
-    QnMergeSystemsTool::ErrorCode errCode = InternalError;
+    auto errorCode = utils::MergeSystemsStatus::unknownError;
     if (status == QNetworkReply::ContentOperationNotPermittedError)
-        errCode = ForbiddenError;
+        errorCode = utils::MergeSystemsStatus::forbidden;
     else if (status == 0)
-        errCode = errorStringToErrorCode(errorString);
+        errorCode = utils::MergeSystemsStatus::fromString(errorString);
 
-    emit mergeFinished(errCode, moduleInformation, handle);
+    emit mergeFinished(errorCode, moduleInformation, handle);
 }

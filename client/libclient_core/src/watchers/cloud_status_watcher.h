@@ -8,35 +8,10 @@
 #include <nx/utils/singleton.h>
 
 #include <utils/common/credentials.h>
-#include <nx/fusion/model_functions_fwd.h>
+#include <network/cloud_system_data.h>
 
 class QSettings;
-
-struct QnCloudSystem
-{
-    QString cloudId;
-    QString localId;
-    QString name;
-    QString ownerAccountEmail;
-    QString ownerFullName;
-    std::string authKey;
-    qreal weight;
-    qint64 lastLoginTimeUtcMs;
-
-    bool operator ==(const QnCloudSystem &other) const;
-
-    bool visuallyEqual(const QnCloudSystem& other) const;
-
-    void writeToSettings(QSettings* settings) const;
-
-    static QnCloudSystem fromSettings(QSettings* settings);
-};
-#define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)(authKey)
-QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype))
-
-typedef QList<QnCloudSystem> QnCloudSystemList;
-Q_DECLARE_METATYPE(QnCloudSystemList);
-
+class QnSystemDescription;
 class QnCloudStatusWatcherPrivate;
 
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
@@ -92,9 +67,6 @@ public:
 
     QnCredentials createTemporaryCredentials() const;
 
-    QString cloudEndpoint() const;
-    void setCloudEndpoint(const QString &endpoint);
-
     Status status() const;
 
     ErrorCode error() const;
@@ -112,7 +84,8 @@ signals:
     void passwordChanged();
     void effectiveUserNameChanged();
     void statusChanged(Status status);
-    void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
+    void beforeCloudSystemsChanged(const QnCloudSystemList &newCloudSystems);
+    void cloudSystemsChanged(const QnCloudSystemList &currectCloudSystems);
     void recentCloudSystemsChanged();
     void currentSystemChanged(const QnCloudSystem& system);
     void errorChanged();

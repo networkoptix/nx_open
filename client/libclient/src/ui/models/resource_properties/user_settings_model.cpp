@@ -48,27 +48,33 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
     m_user = value;
 
     auto calculateMode = [this]
-    {
-        if (!m_user)
-            return Invalid;
+        {
+            if (!m_user)
+                return Invalid;
 
-        if (m_user == context()->user())
-            return OwnProfile;
+            if (m_user == context()->user())
+                return OwnProfile;
 
-        if (m_user->flags().testFlag(Qn::local))
-            return NewUser;
+            if (m_user->flags().testFlag(Qn::local))
+                return NewUser;
 
-        if (!accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
-            return OtherProfile;
+            if (!accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+                return OtherProfile;
 
-        return OtherSettings;
-    };
+            return OtherSettings;
+        };
 
     m_mode = calculateMode();
+
+    updatePermissions();
+    emit userChanged(m_user);
+}
+
+void QnUserSettingsModel::updatePermissions()
+{
     m_accessibleResources = m_user
         ? qnSharedResourcesManager->sharedResources(m_user)
         : QSet<QnUuid>();
-    emit userChanged(m_user);
 }
 
 Qn::GlobalPermissions QnUserSettingsModel::rawPermissions() const

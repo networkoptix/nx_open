@@ -9,6 +9,8 @@
 
 class QnSystemDescription : public QnBaseSystemDescription
 {
+    Q_OBJECT
+
     typedef QnBaseSystemDescription base_type;
 
 public:
@@ -18,10 +20,12 @@ public:
 
     static PointerType createLocalSystem(
         const QString &systemId,
+        const QnUuid &localSystemId,
         const QString &systemName);
 
     static PointerType createCloudSystem(
         const QString &systemId,
+        const QnUuid& localSystemId,
         const QString &systemName,
         const QString &ownerAccountEmail,
         const QString &ownerFullName);
@@ -30,6 +34,8 @@ public:
 
 public: // overrides
     QString id() const override;
+
+    QnUuid localId() const override;
 
     QString name() const override;
 
@@ -68,14 +74,19 @@ private:
     QnSystemDescription(const QString& systemId);
 
     // Ctor for local system
-    QnSystemDescription(const QString& systemId, const QString& systemName);
+    QnSystemDescription(const QString& systemId,
+        const QnUuid &localSystemId,
+        const QString& systemName);
 
     // Ctor for cloud system
     QnSystemDescription(
         const QString& systemId,
+        const QnUuid &localSystemId,
         const QString& systemName,
         const QString& cloudOwnerAccountEmail,
         const QString& ownerFullName);
+
+    static QString extractSystemName(const QString& systemName);
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
@@ -84,6 +95,7 @@ private:
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QString m_id;
+    const QnUuid m_localId;
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     const bool m_isCloudSystem;

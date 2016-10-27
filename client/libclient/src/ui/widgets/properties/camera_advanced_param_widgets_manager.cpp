@@ -1,10 +1,18 @@
 #include "camera_advanced_param_widgets_manager.h"
 
+#include <set>
+
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <ui/style/helper.h>
 #include <ui/widgets/properties/camera_advanced_param_widget_factory.h>
+
+#include <nx/utils/log/assert.h>
+
+using ConditionType = QnCameraAdvancedParameterCondition::ConditionType;
+using Dependency = QnCameraAdvancedParameterDependency;
+using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
 
 QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
 	QObject(parent),
@@ -20,6 +28,7 @@ void QnCameraAdvancedParamWidgetsManager::clear() {
 		disconnect(widget, NULL, this, NULL);
 
 	m_paramWidgetsById.clear();
+    m_paramLabelsById.clear();
 	m_groupWidget->clear();
 	while (m_contentsWidget->count() > 0)
 		m_contentsWidget->removeWidget(m_contentsWidget->widget(0));
@@ -106,7 +115,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 	groupBox->layout()->addWidget(scrollArea);
 
     auto scrollAreaWidgetContents = new QWidget();
-    scrollAreaWidgetContents->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+    scrollAreaWidgetContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
 	scrollAreaWidgetContents->setLayout(gridLayout);
@@ -118,6 +127,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
         if (!widget)
             continue;
 
+        bool rowAdded = 0;
         if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
@@ -126,9 +136,11 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             label->setBuddy(widget);
             gridLayout->addWidget(label, gridLayout->rowCount(), 0);
+            m_paramLabelsById[param.id] = label;
+            rowAdded = 1;
         }
 
-        gridLayout->addWidget(widget, gridLayout->rowCount(), 1);
+        gridLayout->addWidget(widget, gridLayout->rowCount() - rowAdded, 1, Qt::AlignLeft | Qt::AlignVCenter);
 		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receives correct value. */
@@ -142,6 +154,90 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                 &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
         }
 	}
+
+    for (const auto& param: params)
+    {
+        if (param.dependencies.empty())
+            continue;
+
+        std::set<QString> watches;
+        std::map<DependencyType, std::vector<std::function<bool()>>> handlerChains;
+
+        for (const auto& dependency: param.dependencies)
+        {
+            for (const auto& cond: dependency.conditions)
+                watches.insert(cond.paramId);
+
+            auto handler = [dependency, paramId = param.id, this]() -> bool
+                {
+                    bool allConditionsSatisfied = true;
+                    for (const auto& condition: dependency.conditions)
+                    {
+                        if (!m_paramWidgetsById.contains(condition.paramId))
+                        {
+                            allConditionsSatisfied = false;
+                            break;
+                        }
+
+                        auto value = m_paramWidgetsById[condition.paramId]->value();
+
+                        if (!condition.checkValue(value))
+                        {
+                            allConditionsSatisfied = false;
+                            break;
+                        }
+                    }
+
+                    //TODO: #dmishin move this somewhere.
+                    if (dependency.type == DependencyType::Show)
+                    {
+                        if (allConditionsSatisfied)
+                        {
+                            m_paramLabelsById[paramId]->show();
+                            m_paramWidgetsById[paramId]->show();
+                        }
+                        else
+                        {
+                            m_paramLabelsById[paramId]->hide();
+                            m_paramWidgetsById[paramId]->hide();
+                        }
+                    }
+                    else if (dependency.type == DependencyType::Range)
+                    {
+                        if (allConditionsSatisfied)
+                            m_paramWidgetsById[paramId]->setRange(dependency.range);
+                    }
+
+                    return allConditionsSatisfied;
+                };
+
+            handlerChains[dependency.type].push_back(handler);
+        }
+
+        auto runHandlerChains = [handlerChains](const QString& /*id*/, const QString& /*value*/)
+            {
+                for (const auto& chainPair: handlerChains)
+                {
+                    auto& chain = chainPair.second;
+
+                    for (const auto& handler: chain)
+                    {
+                        if (handler())
+                            break;
+                    }
+                }
+            };
+
+        for (const auto& watch: watches)
+        {
+            connect(
+                m_paramWidgetsById[watch],
+                &QnAbstractCameraAdvancedParamWidget::valueChanged,
+                runHandlerChains);
+
+            runHandlerChains(QString(), QString());
+        }
+    }
 
 	return page;
 }

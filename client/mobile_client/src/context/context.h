@@ -59,10 +59,10 @@ public:
 
     Q_INVOKABLE void removeSavedConnection(const QString& systemName);
 
-    Q_INVOKABLE void setLastUsedConnection(const QString& systemId, const QUrl& url);
     Q_INVOKABLE void clearLastUsedConnection();
-    Q_INVOKABLE QString getLastUsedSystemId() const;
-    Q_INVOKABLE QString getLastUsedUrl() const;
+    Q_INVOKABLE QString getLastUsedSystemName() const;
+    Q_INVOKABLE QUrl getLastUsedUrl() const;
+    Q_INVOKABLE QUrl getInitialUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 

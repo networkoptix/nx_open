@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/assert.h>
 
+#include <ui/workaround/label_link_tabstop_workaround.h>
+
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
@@ -22,6 +24,9 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
     hoverSignalizer->addEventType(QEvent::HoverLeave);
     hoverSignalizer->addEventType(QEvent::HoverMove);
     m_label->installEventFilter(hoverSignalizer);
+
+    auto tabstopListener = new QnLabelFocusListener(this);
+    m_label->installEventFilter(tabstopListener);
 
     connect(hoverSignalizer, &QnMultiEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
     {

@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    package="${new.android.packagename}"
+    package="${android.packageName}"
     android:versionCode="${project.version.code}"
     android:versionName="${project.version.name}.${project.version.code}">
 
@@ -86,7 +86,7 @@
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="22"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
-    <uses-permission android:name="${old.android.packagename}.readLogonEntries"/>
+    <uses-permission android:name="${android.oldPackageName}.readLogonEntries"/>
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
          Remove the comment if you do not require these default permissions. -->

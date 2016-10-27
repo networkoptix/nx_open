@@ -26,6 +26,8 @@ public:
 public: // overrides
     QString id() const override;
 
+    QnUuid localId() const override;
+
     QString name() const override;
 
     QString ownerAccountEmail() const override;

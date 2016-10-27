@@ -87,10 +87,10 @@
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
 
         <client.name>${company.name} ${product.name} Client</client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+        <client.display.name>${display.product.name} Client</client.display.name>
 
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
-        <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
+        <mobile_client.display.name>${display.product.name} Mobile Client</mobile_client.display.name>
 
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
@@ -352,6 +352,14 @@
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
                                 </resource>
+                                <resource>
+                                    <directory>${customization.dir}/icons/${platform}</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                
+                                <resource>
+                                    <directory>${customization.dir}/icons/all</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                                                                                
                             </resources>
                         </configuration>
                     </execution>

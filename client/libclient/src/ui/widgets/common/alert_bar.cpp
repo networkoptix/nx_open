@@ -7,7 +7,8 @@
 
 QnAlertBar::QnAlertBar(QWidget* parent):
     base_type(parent),
-    m_label(new QLabel(this))
+    m_label(new QLabel(this)),
+    m_reservedSpace(false)
 {
     setFixedHeight(style::Metrics::kHeaderSize); //< Height equal to table headers
 
@@ -40,4 +41,32 @@ void QnAlertBar::setText(const QString& text)
 
     m_label->setText(text);
     m_label->setHidden(text.isEmpty());
+
+    updateVisibility();
+}
+
+bool QnAlertBar::reservedSpace() const
+{
+    return m_reservedSpace;
+}
+
+void QnAlertBar::setReservedSpace(bool reservedSpace)
+{
+    if (m_reservedSpace == reservedSpace)
+        return;
+
+    m_reservedSpace = reservedSpace;
+    updateVisibility();
+}
+
+void QnAlertBar::updateVisibility()
+{
+    bool hidden = !m_reservedSpace && m_label->isHidden();
+    if (hidden == isHidden())
+        return;
+
+    setHidden(hidden);
+
+    if (parentWidget() && parentWidget()->layout() && parentWidget()->isVisible())
+        parentWidget()->layout()->activate();
 }

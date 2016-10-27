@@ -201,8 +201,11 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
+    if (server->hasFlags(Qn::fake_server)
+        && server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
+    {
         return;
+    }
 
     int row = m_items.size();
     beginInsertRows(QModelIndex(), row, row);
@@ -231,7 +234,8 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
 
     QModelIndex idx = index(server);
     bool exists = idx.isValid();
-    bool isOurServer = (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemId());
+    bool isOurServer = !server->hasFlags(Qn::fake_server)
+        || (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemId());
 
     if (exists == isOurServer) {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));

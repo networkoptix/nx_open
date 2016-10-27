@@ -258,7 +258,7 @@
   <customwidget>
    <class>QnSelectDevicesButton</class>
    <extends>QPushButton</extends>
-   <header location="global">ui/widgets/select_devices_button.h</header>
+   <header location="global">ui/widgets/select_resources_button.h</header>
   </customwidget>
   <customwidget>
    <class>QnTreeComboBox</class>

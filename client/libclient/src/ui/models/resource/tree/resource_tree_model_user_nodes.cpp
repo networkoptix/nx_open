@@ -47,7 +47,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
             if (auto user = resource.dynamicCast<QnUserResource>())
             {
                 connect(user, &QnUserResource::enabledChanged, this,
-                    &QnResourceTreeModelUserNodes::handleUserEnabledChanged);
+                    &QnResourceTreeModelUserNodes::rebuildSubjectTree);
             }
         });
 
@@ -55,14 +55,21 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         [this](const QnResourcePtr& resource)
         {
             disconnect(resource, nullptr, this, nullptr);
+            if (auto user = resource.dynamicCast<QnUserResource>())
+                removeUserNode(user);
         });
 
-    /* Handling only rename here, all other issues are handled by access provider. */
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         [this](const ec2::ApiUserGroupData& role)
         {
+            ensureRoleNode(role)->update();
+        });
+
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+        [this](const ec2::ApiUserGroupData& role)
+        {
             if (m_roles.contains(role.id))
-                m_roles[role.id]->update();
+                removeNode(m_roles.take(role.id));
         });
 }
 
@@ -437,6 +444,12 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
+    if (subject.user() && !subject.user()->isEnabled())
+    {
+        removeUserNode(subject.user());
+        return;
+    }
+
     ensureSubjectNode(subject);
     for (auto nodetype : allPlaceholders())
     {
@@ -446,6 +459,13 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
 
     for (const auto& resource: qnResPool->getResources())
         ensureResourceNode(subject, resource);
+}
+
+void QnResourceTreeModelUserNodes::removeUserNode(const QnUserResourcePtr& user)
+{
+    auto id = user->getId();
+    if (m_users.contains(id))
+        removeNode(m_users.take(id));
 }
 
 void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& node)
@@ -570,12 +590,4 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     //TODO: #GDM really we need only handle permissions change that modifies placeholders
     rebuildSubjectTree(subject);
     cleanupRecorders();
-}
-
-void QnResourceTreeModelUserNodes::handleUserEnabledChanged(const QnUserResourcePtr& user)
-{
-    if (user->isEnabled())
-        ensureSubjectNode(user);
-    else if (m_users.contains(user->getId()))
-        removeNode(m_users.take(user->getId()));
 }

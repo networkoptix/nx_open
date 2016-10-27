@@ -34,6 +34,12 @@ QnUserRolesModel::~QnUserRolesModel()
 {
 }
 
+int QnUserRolesModel::rowForUser(const QnUserResourcePtr& user) const
+{
+    Q_D(const QnUserRolesModel);
+    return d->rowForUser(user);
+}
+
 void QnUserRolesModel::setUserRoles(const ec2::ApiUserGroupDataList& roles)
 {
     Q_D(QnUserRolesModel);

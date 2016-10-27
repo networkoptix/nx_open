@@ -190,7 +190,7 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${customization.dir}/icons/hdw_logo.ico
+  ICON = ${customization.dir}/icons/favicon.ico
   LIBS += ${windows.oslibs}
   DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}

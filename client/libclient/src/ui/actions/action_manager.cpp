@@ -804,7 +804,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+Shift+S")).
         shortcut(lit("Ctrl+Alt+S"), QnActionBuilder::Windows, true).
         autoRepeat(false).
-        condition(new QnSaveLayoutAsActionCondition(true, this));
+        condition(new QnConjunctionActionCondition(
+            new QnLoggedInCondition(this),
+            new QnSaveLayoutAsActionCondition(true, this),
+            this));
 
     factory(QnActions::ShareLayoutAction).
         mode(QnActionTypes::DesktopMode).

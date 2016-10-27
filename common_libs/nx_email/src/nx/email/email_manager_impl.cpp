@@ -55,7 +55,7 @@ bool EmailManagerImpl::sendEmail(
     MimeMessage message;
     QString sender;
     if (!settings.email.isEmpty())
-        sender = settings.email;
+        sender = QnEmailAddress(settings.email).value();
     else if (settings.user.contains(L'@'))
         sender = settings.user;
     else if (settings.server.startsWith(lit("smtp.")))
@@ -88,7 +88,7 @@ bool EmailManagerImpl::sendEmail(
         return false;
     }
 
-    if (!settings.user.isEmpty() && 
+    if (!settings.user.isEmpty() &&
         !smtp.login(settings.user, settings.password))
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
