@@ -70,9 +70,6 @@ QnSystemsWeightsManager::QnSystemsWeightsManager():
 
     setSystemsFinder(qnSystemsFinder);
 
-    handleSourceWeightsChanged();
-
-
     static const int kUpdateInterval = 1000 * 60 * 10;// 10 minutes
     m_updateTimer->setInterval(kUpdateInterval);
     connect(m_updateTimer, &QTimer::timeout,
@@ -103,6 +100,8 @@ void QnSystemsWeightsManager::setSystemsFinder(QnAbstractSystemsFinder* finder)
         disconnect(m_finder, nullptr, this, nullptr);
 
     resetWeights();
+
+    NX_ASSERT(finder, "System finder is nullptr");
     if (!finder)
         return;
 
@@ -157,8 +156,8 @@ void QnSystemsWeightsManager::processSystemDiscovered(const QnSystemDescriptionP
 
 void QnSystemsWeightsManager::resetWeights()
 {
-    m_baseWeights = QnWeightsDataHash();
-    afterBaseWeightsUpdated();
+    // Resets weights to stored in cloud and settings
+    handleSourceWeightsChanged();
 }
 
 QnWeightsDataHash QnSystemsWeightsManager::weights() const

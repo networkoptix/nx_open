@@ -23,8 +23,6 @@ public:
     QnSystemsWeightsManager();
     ~QnSystemsWeightsManager() = default;
 
-    void setSystemsFinder(QnAbstractSystemsFinder* finder);
-
 public:
     QnWeightsDataHash weights() const;
 
@@ -36,6 +34,8 @@ signals:
     void unknownSystemsWeightChanged();
 
 private:
+    void setSystemsFinder(QnAbstractSystemsFinder* finder);
+
     void setUnknownSystemsWeight(qreal value);
 
     void addLocalWeightData(const QnWeightData& data);

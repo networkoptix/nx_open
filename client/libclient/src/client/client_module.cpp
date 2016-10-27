@@ -297,8 +297,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
-    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
-
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
@@ -564,4 +562,5 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);
+    qnCommon->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 }
