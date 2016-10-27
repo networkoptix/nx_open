@@ -201,7 +201,7 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.isOnline; });
+                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
