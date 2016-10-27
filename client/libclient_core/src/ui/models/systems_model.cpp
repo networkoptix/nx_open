@@ -404,10 +404,16 @@ void QnSystemsModelPrivate::at_serverChanged(
 
 void QnSystemsModelPrivate::resetModel()
 {
+    Q_Q(QnSystemsModel);
+
+    q->beginResetModel();
+
     internalData.clear();
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
+
+    q->endResetModel();
 }
 
 QString QnSystemsModelPrivate::getCompatibleVersion(
