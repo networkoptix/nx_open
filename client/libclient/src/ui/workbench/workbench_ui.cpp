@@ -191,7 +191,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Connect to display. */
     display()->view()->addAction(action(QnActions::FreespaceAction));
-    connect(display(), &QnWorkbenchDisplay::widgetChanged, this, &QnWorkbenchUi::at_display_widgetChanged);
+    connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
+        &QnWorkbenchUi::at_display_widgetChanged);
+
+    /* After widget was removed we can possibly increase margins. */
+    connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
+        &QnWorkbenchUi::updateViewportMargins, Qt::QueuedConnection);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
     connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this,
@@ -282,6 +287,32 @@ void QnWorkbenchUi::updateCursor()
 #endif
 }
 
+bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
+{
+    if (action(QnActions::ToggleTourModeAction)->isChecked())
+        return false;
+
+    if (!widget)
+        return false;
+
+    const auto resource = widget->resource();
+    if (!resource)
+        return false;
+
+    const auto flags = resource->flags();
+
+    /* Any of the flags is sufficient. */
+    if (flags & (Qn::still_image | Qn::server | Qn::videowall))
+        return false;
+
+    /* Qn::web_page is as flag combination. */
+    if (flags.testFlag(Qn::web_page))
+        return false;
+
+    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+        || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
+}
+
 Qn::ActionScope QnWorkbenchUi::currentScope() const
 {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
@@ -328,31 +359,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
 
-    const auto calculateTimelineVisible = [this]()
-        {
-            if (action(QnActions::ToggleTourModeAction)->isChecked())
-                return false;
-
-            if (!navigator()->currentWidget())
-                return false;
-
-            const auto resource = navigator()->currentWidget()->resource();
-            if (!resource)
-                return false;
-
-            const auto flags = resource->flags();
-
-            if (flags & (Qn::still_image | Qn::server | Qn::videowall))  /* Any of the flags is sufficient. */
-                return false;
-
-            if ((flags & Qn::web_page) == Qn::web_page)                  /* Qn::web_page is as flag combination. */
-                return false;
-
-            return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
-                || !navigator()->currentWidget()->resource()->flags().testFlag(Qn::live);   /* Show slider for local files. */
-        };
-
-    bool timelineVisible = calculateTimelineVisible();
+    bool timelineVisible = calculateTimelineVisible(navigator()->currentWidget());
 
     if (qnRuntime->isVideoWallMode())
     {
@@ -397,13 +404,23 @@ void QnWorkbenchUi::updateControlsVisibilityAnimated()
     updateControlsVisibility(true);
 }
 
-QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX)
+QMargins QnWorkbenchUi::calculateViewportMargins(
+    QRectF treeGeometry,
+    qreal titleY, qreal titleH,
+    QRectF timelineGeometry,
+    QRectF notificationsGeometry)
 {
-    QMargins result(
-        isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
-        std::floor(qMax(0.0, titleY + titleH)),
-        m_notifications ? std::floor(qMax(0.0, isNotificationsPinned() ? m_controlsWidgetRect.right() - notificationsX : 0.0)) : 0.0,
-        std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY)));
+    using namespace std;
+    QMargins result;
+    if (treeGeometry.isValid())
+        result.setLeft(max(0.0, floor(treeGeometry.left() + treeGeometry.width())));
+    result.setTop(max(0.0, floor(titleY + titleH)));
+
+    if (notificationsGeometry.isValid())
+        result.setRight(max(0.0, floor(m_controlsWidgetRect.right() - notificationsGeometry.left())));
+
+    if (timelineGeometry.isValid())
+        result.setBottom(max(0.0, floor(m_controlsWidgetRect.bottom() - timelineGeometry.top())));
 
     if (result.left() + result.right() >= m_controlsWidgetRect.width())
     {
@@ -412,7 +429,6 @@ QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal
     }
 
     return result;
-
 }
 
 void QnWorkbenchUi::setFlags(Flags flags)
@@ -433,21 +449,43 @@ bool QnWorkbenchUi::isTitleUsed() const
 
 void QnWorkbenchUi::updateViewportMargins()
 {
-    if (!m_flags.testFlag(AdjustMargins))
+    using boost::algorithm::any_of;
+
+    auto panelEffectiveGeometry = [](NxUi::AbstractWorkbenchPanel* panel)
+        {
+            if (panel && panel->isVisible() && panel->isPinned())
+                return panel->effectiveGeometry();
+            return QRectF();
+        };
+
+    const bool timelineCanBeVisible = m_timeline && any_of(display()->widgets(),
+        [this](QnResourceWidget* widget)
+        {
+            return calculateTimelineVisible(widget);
+        });
+
+    auto timelineEffectiveGeometry = (m_timeline && timelineCanBeVisible)
+        ? m_timeline->effectiveGeometry()
+        : QRectF();
+
+    auto oldMargins = display()->viewportMargins();
+
+    QMargins newMargins(0, 0, 0, 0);
+    if (m_flags.testFlag(AdjustMargins))
     {
-        display()->setViewportMargins(QMargins(0, 0, 0, 0));
-    }
-    else
-    {
-        display()->setViewportMargins(calculateViewportMargins(
-            m_tree ? (m_tree->xAnimator->isRunning() ? m_tree->xAnimator->targetValue().toReal() : m_tree->item->pos().x()) : 0.0,
-            m_tree ? m_tree->item->size().width() : 0.0,
+        newMargins = calculateViewportMargins(
+            panelEffectiveGeometry(m_tree),
             m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
             m_titleItem ? m_titleItem->size().height() : 0.0,
-            m_timeline->effectiveGeometry().top(),
-            m_notifications ? m_notifications->xAnimator->isRunning() ? m_notifications->xAnimator->targetValue().toReal() : m_notifications->item->pos().x() : 0.0
-        ));
+            timelineEffectiveGeometry,
+            panelEffectiveGeometry(m_notifications)
+        );
     }
+
+    if (oldMargins == newMargins)
+        return;
+    display()->setViewportMargins(newMargins);
+    display()->fitInView(true);
 }
 
 void QnWorkbenchUi::updateActivityInstrumentState()
@@ -565,9 +603,6 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
         setTimelineOpened(false, isFullscreen);
         setNotificationsOpened(false, isFullscreen);
 
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
-        action(QnActions::FitInViewAction)->trigger();
-
         m_inFreespace = true;
     }
     else
@@ -577,9 +612,6 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
         setTitleOpened(settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, isFullscreen);
         setTimelineOpened(settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, isFullscreen);
         setNotificationsOpened(settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, isFullscreen);
-
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
-        action(QnActions::FitInViewAction)->trigger();
 
         m_inFreespace = false;
     }
@@ -684,7 +716,6 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     m_timeline->updateGeometry();
 
-
     if (m_titleItem)
     {
         m_titleItem->setGeometry(QRectF(
@@ -704,6 +735,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
+    updateViewportMargins();
 }
 
 void QnWorkbenchUi::createControlsWidget()
@@ -774,6 +806,7 @@ void QnWorkbenchUi::updateTreeGeometry()
 {
     if (!m_tree)
         return;
+    qDebug() << "updateTreeGeometry";
 
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedTreeGeometry(m_tree->item->geometry(), m_titleItem->geometry(), m_timeline->item->geometry());
@@ -1279,6 +1312,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         {
             updateTreeGeometry();
             updateCalendarVisibility(animated);
+            updateViewportMargins();
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,

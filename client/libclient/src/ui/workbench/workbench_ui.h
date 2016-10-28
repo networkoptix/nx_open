@@ -150,7 +150,11 @@ public slots:
 protected:
     virtual void tick(int deltaMSecs) override;
 
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX);
+    QMargins calculateViewportMargins(
+        QRectF treeGeometry,
+        qreal titleY, qreal titleH,
+        QRectF timelineGeometry,
+        QRectF notificationsGeometry);
     void updateViewportMargins();
 
     void updateTreeGeometry();
@@ -191,6 +195,8 @@ private:
     void storeSettings();
 
     void updateCursor();
+
+    bool calculateTimelineVisible(QnResourceWidget* widget) const;
 
 private slots:
     void updateTitleOpacity(bool animate = true);

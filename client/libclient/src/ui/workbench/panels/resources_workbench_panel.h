@@ -62,9 +62,11 @@ private:
 
 private:
     bool m_ignoreClickEvent;
-    bool m_ignoreResizerGeometryChanges;
-    bool m_updateResizerGeometryLater;
     bool m_visible;
+
+    /** We are currently in the resize process. */
+    bool m_resizing;
+    bool m_updateResizerGeometryLater;
 
     QnResizerWidget* m_resizerWidget;
 
