@@ -20,7 +20,8 @@ struct ListeningPeer
 };
 
 #define ListeningPeer_Fields (connectionEndpoint)(directTcpEndpoints)
-typedef std::map<QString, std::map<QString, ListeningPeer>> ListeningPeersBySystems;
+typedef std::map<QString /*peerId*/, ListeningPeer> ListeningPeersById;
+typedef std::map<QString /*systemId*/, ListeningPeersById> ListeningPeersBySystems;
 
 struct BoundClientInfo
 {
