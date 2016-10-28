@@ -32,6 +32,13 @@ void TimeProtocolClient::stopWhileInAioThread()
     m_tcpSock.reset();
 }
 
+void TimeProtocolClient::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    AbstractAccurateTimeFetcher::bindToAioThread(aioThread);
+    if (m_tcpSock)
+        m_tcpSock->bindToAioThread(aioThread);
+}
+
 void TimeProtocolClient::getTimeAsync(
     CompletionHandler completionHandler)
 {
