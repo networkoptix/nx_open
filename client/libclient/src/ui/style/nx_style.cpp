@@ -464,6 +464,9 @@ void QnNxStyle::drawPrimitive(
             if (!option->state.testFlag(State_Enabled))
                 return;
 
+            if (qobject_cast<QAbstractItemView*>(option->styleObject))
+                return;
+
             QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ?
                                         option->palette.color(QPalette::HighlightedText) :
                                         option->palette.color(QPalette::Highlight);
