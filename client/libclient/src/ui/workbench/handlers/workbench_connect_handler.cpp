@@ -925,6 +925,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
+            setLogicalState(LogicalState::connecting);
             connectToServer(url);
             break;
         case Qn::IncompatibleProtocolConnectionResult:
