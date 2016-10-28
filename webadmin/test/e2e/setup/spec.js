@@ -90,7 +90,7 @@ describe('Setup Wizard', function () {
         browser.refresh();
         browser.sleep(1000);
         p.helper.waitIfNotDisplayed(p.setupDialog, 1000);
-        p.setupDialog.isPresent().then(function(is) {console.log(is, 'SETUP DIALOF IS')});
+        p.setupDialog.isPresent().then(function(is) {console.log(is, 'setup dialog is present or not')});
         expect(p.setupDialog.isPresent()).toBe(true);
         p.helper.completeSetup();
     });

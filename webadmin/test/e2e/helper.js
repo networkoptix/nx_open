@@ -108,7 +108,8 @@ var Helper = function () {
         nextButton.click();
         systemNameInput.sendKeys('autotest-system');
         nextButton.click();
-        skipCloud.click();
+        nextButton.click();
+        // skipCloud.click();
         localPasswordInput.sendKeys(self.password);
         localPasswordConfInput.sendKeys(self.password);
         expect(setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
