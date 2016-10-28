@@ -1,8 +1,8 @@
 #!/bin/bash
 PATH=$PATH:/$(pwd)/node_modules/.bin
 
-if [ -z $1 ]; then IP=10.1.5.147; else IP=$1
-if [ -z $2 ]; then PORT=7001; else PORT=$2
+if [ -z $1 ]; then IP=10.1.5.147; else IP=$1; fi
+if [ -z $2 ]; then PORT=7001; else PORT=$2; fi
 
 kill_pids () {
     echo "Killing all $1 instances..."
