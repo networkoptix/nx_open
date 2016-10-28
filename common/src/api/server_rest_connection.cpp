@@ -71,7 +71,7 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
     params.insert(lit("clientId"),      qnCommon->moduleGUID().toString());
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
-    return (lit("/api/transmitAudio"), params, callback, (qint64) targetThread);
+    return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
 }
 
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
