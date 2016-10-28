@@ -233,23 +233,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
     connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(forceUpdateFilter()));
 
-    auto dropResource =
-        [this](const QnResourcePtr& resource)
-        {
-            // handle resources that should not be dropped on the scene
-            if (!resource
-                || resource->hasFlags(Qn::user)
-                || resource->hasFlags(Qn::server)
-                )
-            {
-                return;
-            }
-
-            menu()->trigger(QnActions::DropResourcesAction, resource);
-        };
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
-    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this,
+        &QnResourceBrowserWidget::handleItemActivated);
+    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this,
+        &QnResourceBrowserWidget::handleItemActivated);
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SIGNAL(selectionChanged()));
@@ -947,4 +934,20 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
         model->addCriterion(QnResourceCriterion(Qn::user));
         model->addCriterion(QnResourceCriterion(Qn::layout));
     }
+}
+
+void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
+{
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+    /* Do not open users or fake servers. */
+    if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
+        return;
+
+    /* Do not open servers of admin.  */
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server))
+        return;
+
+    menu()->trigger(QnActions::DropResourcesAction, resource);
 }

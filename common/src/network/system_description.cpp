@@ -144,6 +144,16 @@ bool QnSystemDescription::isNewSystem() const
     return m_isNewSystem;
 }
 
+bool QnSystemDescription::isOnline() const
+{
+    return !m_onlineServers.isEmpty();
+}
+
+bool QnSystemDescription::isOnlineServer(const QnUuid& serverId) const
+{
+    return m_onlineServers.contains(serverId);
+}
+
 QnSystemDescription::ServersList QnSystemDescription::servers() const
 {
     ServersList result;
@@ -156,7 +166,8 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
     return result;
 }
 
-void QnSystemDescription::addServer(const QnModuleInformation& serverInfo, int priority)
+void QnSystemDescription::addServer(const QnModuleInformation& serverInfo,
+    int priority, bool online)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
     NX_ASSERT(!containsServer, Q_FUNC_INFO, "System contains specified server");
@@ -166,6 +177,9 @@ void QnSystemDescription::addServer(const QnModuleInformation& serverInfo, int p
         updateServer(serverInfo);
         return;
     }
+
+    if (online)
+        handleOnlineServerAdded(serverInfo.id);
 
     m_prioritized.insertMulti(priority, serverInfo.id);
     m_servers.insert(serverInfo.id, serverInfo);
@@ -209,6 +223,27 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation& serv
     return changes;
 }
 
+void QnSystemDescription::handleOnlineServerAdded(const QnUuid& serverId)
+{
+    const bool wasOnline = isOnline();
+
+    const bool containsAlready = m_onlineServers.contains(serverId);
+    NX_ASSERT(!containsAlready, "Server is supposed as online already");
+    if (containsAlready)
+        return;
+
+    m_onlineServers.insert(serverId);
+    if (wasOnline != isOnline())
+        emit onlineStateChanged();
+}
+
+void QnSystemDescription::handleServerRemoved(const QnUuid& serverId)
+{
+    const bool wasOnline = isOnline();
+    if (m_onlineServers.remove(serverId) && (wasOnline != isOnline()))
+        emit onlineStateChanged();
+}
+
 void QnSystemDescription::removeServer(const QnUuid& serverId)
 {
     const bool containsServer = m_servers.contains(serverId);
@@ -217,6 +252,7 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
     if (!containsServer)
         return;
 
+    handleServerRemoved(serverId);
     const auto priorityPred = [serverId](const QnUuid &id) { return (serverId == id); };
     const auto it = std::find_if(m_prioritized.begin(), m_prioritized.end(), priorityPred);
     if (it != m_prioritized.end())

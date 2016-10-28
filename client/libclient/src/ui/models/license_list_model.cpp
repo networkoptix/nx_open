@@ -240,13 +240,6 @@ QString QnLicenseListModel::getLicenseStatus(const QnLicensePtr& license) const
     return tr("OK");
 }
 
-QnLicensePtr QnLicenseListModel::license(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QnLicensePtr();
-    return data(index, LicenseRole).value<QnLicensePtr>();
-}
-
 void QnLicenseListModel::addLicense(const QnLicensePtr& license)
 {
     int count = m_licenses.size();

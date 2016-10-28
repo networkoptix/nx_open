@@ -646,7 +646,7 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
                     storageType = QnLexical::serialized(it->type);
             }
             storage->setStorageType(
-                    storageType.isEmpty() 
+                    storageType.isEmpty()
                     ? QnLexical::serialized(QnPlatformMonitor::UnknownPartition)
                     : storageType);
             modified = true;
@@ -2793,6 +2793,8 @@ protected:
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLogLevel::cl_logINFO );
 
+        initPermissionsLog(logDir);
+
         NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
         NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
         NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
@@ -2884,6 +2886,18 @@ private:
         if (!obsoleteGuid.isNull()) {
             qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
+    }
+
+    void initPermissionsLog(const QString& logDir)
+    {
+        QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
+            logDir + QLatin1String("/permissions"),
+            MSSettings::roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+            MSSettings::roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+            QnLogLevel::cl_logNONE);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     }
 
 private:

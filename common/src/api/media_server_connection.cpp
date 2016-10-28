@@ -1,11 +1,11 @@
 #include "media_server_connection.h"
 
-#include <QtGui/QImage>
 #include <QtCore/QSharedPointer>
-#include <QtGui/QImage>
-#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
+
 #include <QtNetwork/QNetworkReply>
+
+#include <nx/utils/uuid.h>
 
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/bookmark_request_data.h>
@@ -81,7 +81,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraSearchStopObject, "manualCamera/stop")
     (CameraAddObject, "manualCamera/add")
     (EventLogObject, "events")
-    (ImageObject, "image")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
     (GetSystemIdObject, "getSystemId")
@@ -242,14 +241,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             emitFinished(this, response.status, events, handle);
             break;
         }
-        case ImageObject:
-        {
-            QImage image;
-            if (response.status == 0)
-                image.loadFromData(response.msgBody);
-            emitFinished(this, response.status, image, handle);
-            break;
-        }
         case checkCamerasObject:
             processJsonReply<QnCameraListReply>(this, response, handle);
             break;
@@ -408,30 +399,6 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
 
     trace(handle, object);
     return handle;
-}
-
-int QnMediaServerConnection::getThumbnailAsync(
-    const QnNetworkResourcePtr& camera, qint64 timeUsec, const int rotation, const QSize& size,
-    const QString& imageFormat, QnThumbnailRequestData::RoundMethod method, QObject* target,
-    const char* slot)
-{
-    QnRequestParamList params;
-
-    params << QnRequestParam("cameraId", camera->getId());
-    if (timeUsec < 0)
-        params << QnRequestParam("time", "latest");
-    else
-        params << QnRequestParam("time", timeUsec);
-    if (size.width() > 0)
-        params << QnRequestParam("width", size.width());
-    if (size.height() > 0)
-        params << QnRequestParam("height", size.height());
-    if (rotation != -1)
-        params << QnRequestParam("rotate", rotation);
-    params << QnRequestParam("format", imageFormat);
-    params << QnRequestParam("method", QnLexical::serialized(method));
-
-    return sendAsyncGetRequestLogged(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
 }
 
 int QnMediaServerConnection::checkCameraList(

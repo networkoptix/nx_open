@@ -6,6 +6,8 @@
 
 #include <core/resource/layout_resource.h>
 
+#include <nx/utils/log/log.h>
+
 QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
@@ -32,14 +34,30 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         if (!layout->isShared())
+        {
+            NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 is not shared, ignore it")
+                .arg(layout->getName()),
+                cl_logDEBUG1);
             return false;
+        }
     }
     else if (!isMediaResource(resource))
     {
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 has invalid type, ignore it")
+            .arg(resource->getName()),
+            cl_logDEBUG1);
         return false;
     }
 
-    return qnSharedResourcesManager->sharedResources(subject).contains(resource->getId());
+    bool result = qnSharedResourcesManager->sharedResources(subject).contains(resource->getId());
+
+    NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: update access %1 to %2: %3")
+        .arg(subject.name())
+        .arg(resource->getName())
+        .arg(result),
+        cl_logDEBUG1);
+
+    return result;
 }
 
 void QnSharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
@@ -64,6 +82,24 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
 
     auto changed = (newValues | oldValues) - (newValues & oldValues);
 
+    QString subjectName = subject.name();
+
     for (auto resource: qnResPool->getResources(changed))
+    {
+        if (newValues.contains(resource->getId()))
+        {
+            NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 shared to %2")
+                .arg(resource->getName())
+                .arg(subjectName),
+                cl_logDEBUG1);
+        }
+        else
+        {
+            NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 no more shared to %2")
+                .arg(resource->getName())
+                .arg(subjectName),
+                cl_logDEBUG1);
+        }
         updateAccess(subject, resource);
+    }
 }

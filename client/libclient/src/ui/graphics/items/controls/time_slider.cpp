@@ -139,7 +139,7 @@ namespace
     /** Gap between position marker and tooltip tail. */
     const qreal kToolTipMargin = 4.0;
 
-    const qreal kDegreesFor2x = 180.0;
+    const qreal kDegreesFor2x = 90.0;
 
     const qreal kZoomSideSnapDistance = 0.075;
 

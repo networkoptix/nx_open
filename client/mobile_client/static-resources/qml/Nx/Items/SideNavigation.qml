@@ -168,6 +168,9 @@ Drawer
         }
     }
 
+    // TODO: #dklychkov Use closePolicy after switching to Qt 5.7 or higher.
+    onClicked: close()
+
     Keys.onPressed:
     {
         if (Utils.keyIsBack(event.key))

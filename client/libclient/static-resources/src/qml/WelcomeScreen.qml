@@ -214,6 +214,7 @@ Rectangle
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
+                        isOnline: model.isOnline;
 
                         Component.onCompleted:
                         {
@@ -431,7 +432,9 @@ Rectangle
         target: context;
         onIsVisibleChanged:
         {
-            grid.watcher.resetCurrentItem();
+            if (grid.watcher.currentItem)
+                grid.watcher.currentItem.forceCollapsedState();
+
             pageSwitcher.setPage(0);
         }
     }

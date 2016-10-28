@@ -47,11 +47,12 @@ public:
         labelPageLayout->addStretch();
         pages->addWidget(labelPage);
 
-        label->setCursor(Qt::IBeamCursor);
         label->setElideMode(Qt::ElideRight);
         label->setForegroundRole(QPalette::Text);
         label->setProperty(style::Properties::kDontPolishFontProperty, true);
         label->setFont(q->font());
+
+        updateCursor();
 
         auto clickSignalizer = new QnSingleEventSignalizer(q);
         clickSignalizer->setEventType(QEvent::MouseButtonPress);
@@ -116,7 +117,7 @@ public:
 
     void beginEditing()
     {
-        if (editing())
+        if (editing() || readOnly())
             return;
 
         pages->setCurrentWidget(editPage);
@@ -174,6 +175,31 @@ public:
 
         edit->setText(input);
         return true;
+    }
+
+    bool readOnly() const
+    {
+        return button->isHidden();
+    }
+
+    void setReadOnly(bool readOnly)
+    {
+        if (readOnly == this->readOnly())
+            return;
+
+        if (readOnly && editing())
+            revert();
+
+        button->setHidden(readOnly);
+        updateCursor();
+    }
+
+    void updateCursor()
+    {
+        if (readOnly())
+            label->unsetCursor();
+        else
+            label->setCursor(Qt::IBeamCursor);
     }
 
     /* Event filter to handle global mouse clicks and intercept Esc and Enter keys: */
@@ -298,6 +324,18 @@ void QnEditableLabel::setButtonIcon(const QIcon& icon)
     auto size = QnSkin::maximumSize(icon);
     d->button->setIconSize(size);
     d->button->setFixedSize(size);
+}
+
+bool QnEditableLabel::readOnly() const
+{
+    Q_D(const QnEditableLabel);
+    return d->readOnly();
+}
+
+void QnEditableLabel::setReadOnly(bool readOnly)
+{
+    Q_D(QnEditableLabel);
+    d->setReadOnly(readOnly);
 }
 
 void QnEditableLabel::setValidator(Validator validator)

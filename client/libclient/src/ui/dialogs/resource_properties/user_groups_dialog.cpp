@@ -193,11 +193,14 @@ void QnUserGroupsDialog::applyChanges()
             for (const auto& user : groupUsers)
             {
                 qnResourcesChangesManager->saveUser(user,
-                    [replacement](const QnUserResourcePtr &user)
+                    [replacement](const QnUserResourcePtr& user)
                     {
                         user->setUserGroup(replacement.group);
                         user->setRawPermissions(replacement.permissions);
                     });
+
+                if (replacement.permissions == Qn::GlobalCustomUserPermission)
+                    qnResourcesChangesManager->saveAccessibleResources(user, QSet<QnUuid>());
             }
         }
 

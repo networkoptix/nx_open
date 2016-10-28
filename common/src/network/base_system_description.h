@@ -53,10 +53,14 @@ public:
 
     virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
+    virtual bool isOnlineServer(const QnUuid& serverId) const = 0;
+
     // TODO: #ynikitenkov Rename host "field" to appropriate
     virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
+
+    virtual bool isOnline() const = 0;
 
 signals:
     void idChanged();
@@ -70,6 +74,8 @@ signals:
     void serverAdded(const QnUuid& serverId);
 
     void serverRemoved(const QnUuid& serverId);
+
+    void onlineStateChanged();
 
     void serverChanged(const QnUuid& serverId, QnServerFields flags);
 };
