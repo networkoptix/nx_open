@@ -806,7 +806,6 @@ void QnWorkbenchUi::updateTreeGeometry()
 {
     if (!m_tree)
         return;
-    qDebug() << "updateTreeGeometry";
 
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedTreeGeometry(m_tree->item->geometry(), m_titleItem->geometry(), m_timeline->item->geometry());
