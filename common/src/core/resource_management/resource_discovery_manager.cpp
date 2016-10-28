@@ -536,8 +536,9 @@ bool QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
         if (newIsRtsp && !existIsRtsp)
             continue; // allow to stack RTSP and non RTSP cameras with same IP:port
 
-        bool resourceWasAddedAnotherWay = manuallyAdded && !existCam->isManuallyAdded() ||
-                                          !manuallyAdded && existCam->isManuallyAdded();
+        bool resourceWasAddedAnotherWay =
+            (manuallyAdded && !existCam->isManuallyAdded()) ||
+            (!manuallyAdded && existCam->isManuallyAdded());
 
         if (resourceWasAddedAnotherWay)
         {
