@@ -97,7 +97,7 @@ private:
         if (it == m_transactionProcessors.end())
         {
             NX_LOGX(lm("Received unsupported transaction %1")
-                .arg(ApiCommand::toString(transaction.command)), cl_logDEBUG2);
+                .arg(::ec2::ApiCommand::toString(transaction.command)), cl_logDEBUG2);
             // No handler registered for transaction type.
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
