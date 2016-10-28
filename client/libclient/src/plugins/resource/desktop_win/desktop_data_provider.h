@@ -95,6 +95,7 @@ private:
         QQueue<WAVEHDR*> m_buffers;
         QnMutex m_mtx;
         bool m_terminated;
+        bool m_waveInOpened;
     };
 
     int m_encodedFrames;

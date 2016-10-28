@@ -55,10 +55,11 @@ namespace {
 } // namespace
 
 QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
-    m_owner(owner),
     m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
-    m_speexPreprocess(0),
-    m_terminated(false)
+    m_speexPreprocess(nullptr),
+    m_owner(owner),
+    m_terminated(false),
+    m_waveInOpened(false)
 {
 }
 
@@ -172,9 +173,12 @@ void QnDesktopDataProvider::EncodedAudioInfo::stop()
 {
     m_terminated = true;
     QnMutexLocker lock( &m_mtx );
-    waveInReset(hWaveIn);
-    waveInClose(hWaveIn);
-    clearBuffers();
+    if (m_waveInOpened)
+    {
+        waveInReset(hWaveIn);
+        waveInClose(hWaveIn);
+        clearBuffers();
+    }
 }
 
 bool QnDesktopDataProvider::EncodedAudioInfo::start()
@@ -230,7 +234,7 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
         (DWORD_PTR) this,
         CALLBACK_FUNCTION) != MMSYSERR_NOERROR != S_OK)
         return false;
-
+    m_waveInOpened = true;
     for (int i = 0; i < AUDIO_BUFFERS_COUNT; ++i)
     {
         if (!addBuffer())
