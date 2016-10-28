@@ -93,8 +93,8 @@ SystemManager::SystemManager(
         <::ec2::ApiCommand::removeResourceParam,
          ::ec2::ApiResourceParamWithRefData,
          int>(
-            std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3, _4),
-            std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1, _2, _3));
+            std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3),
+            std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1, _2));
 }
 
 SystemManager::~SystemManager()
@@ -2252,8 +2252,7 @@ void SystemManager::onEc2SetResourceParamDone(
 nx::db::DBResult SystemManager::processRemoveResourceParam(
     nx::db::QueryContext* /*queryContext*/,
     const nx::String& systemId,
-    ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
-    int* const /*dummy*/)
+    ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
     NX_LOGX(
@@ -2268,8 +2267,7 @@ nx::db::DBResult SystemManager::processRemoveResourceParam(
 
 void SystemManager::onEc2RemoveResourceParamDone(
     nx::db::QueryContext* /*queryContext*/,
-    nx::db::DBResult /*dbResult*/,
-    int /*dummy*/)
+    nx::db::DBResult /*dbResult*/)
 {
 }
 
