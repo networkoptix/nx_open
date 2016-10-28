@@ -473,6 +473,16 @@ private:
         nx::db::DBResult dbResult,
         data::SystemAttributesUpdate systemNameUpdate);
 
+    nx::db::DBResult processRemoveResourceParam(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
+        int* const dummy);
+    void onEc2RemoveResourceParamDone(
+        nx::db::QueryContext* /*queryContext*/,
+        nx::db::DBResult dbResult,
+        int dummy);
+
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,

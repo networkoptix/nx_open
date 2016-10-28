@@ -107,6 +107,8 @@ public:
     {
         HighVideoQuality = 0, //< Native stream, high quality.
         LowVideoQuality = 1, //< Native stream, low quality.
+        LowIframesOnlyVideoQuality = 2, //< Native stream, low quality, I-frames only.
+        CustomVideoQuality //< A number greater or equal to this is treated as a number of lines.
     };
 
 public:

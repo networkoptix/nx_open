@@ -70,6 +70,7 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
     NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
     NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
     NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
+    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
 };
 NxMediaFlagConfig conf("nx_media");
 
@@ -609,6 +610,10 @@ void PlayerPrivate::applyVideoQuality()
     {
         archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
     }
+    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
+    {
+        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+    }
     else
     {
         NX_ASSERT(quality.isValid());
@@ -911,6 +916,14 @@ int Player::videoQuality() const
 void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
+
+    if (conf.forceIframesOnly && videoQuality == LowVideoQuality)
+    {
+        d->log(lit("setVideoQuality(%1): config forceIframesOnlyis true => use value %2")
+            .arg(videoQuality).arg(LowIframesOnlyVideoQuality));
+        videoQuality = LowIframesOnlyVideoQuality;
+    }
+
     if (d->videoQuality == videoQuality)
     {
         d->log(lit("setVideoQuality(%1): no change, ignoring").arg(videoQuality));

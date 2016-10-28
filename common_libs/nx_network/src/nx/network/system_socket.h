@@ -172,14 +172,12 @@ class CommunicatingSocket
 {
 public:
     CommunicatingSocket(
-        bool natTraversal,
         int type,
         int protocol,
         int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
 
     CommunicatingSocket(
-        bool natTraversal,
         int newConnSD,
         int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
@@ -239,12 +237,9 @@ class NX_NETWORK_API TCPSocket
 
 public:
     /**
-     *   Construct a TCP socket with no connection
+     * Construct a TCP socket with no connection.
      */
-    TCPSocket(bool natTraversal, int ipVersion);
-
-    //!User by \a TCPServerSocket class
-    TCPSocket(int newConnSD, int ipVersion);
+    TCPSocket(int ipVersion);
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -274,11 +269,14 @@ public:
 
 private:
     // Access for TCPServerSocket::accept() connection creation
-    friend class TCPServerSocket;
+    friend class TCPServerSocketPrivate;
 
     #if defined(Q_OS_WIN)
         KeepAliveOptions m_keepAlive;
     #endif
+
+    /** Used by TCPServerSocket class. */
+    TCPSocket(int newConnSD, int ipVersion);
 };
 
 /**

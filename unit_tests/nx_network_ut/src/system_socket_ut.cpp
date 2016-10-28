@@ -18,7 +18,7 @@ TEST( TcpSocket, KeepAliveOptions )
     if( SocketFactory::isStreamSocketTypeEnforced() )
         return;
 
-    const auto socket = std::make_unique< TCPSocket >( false, AF_INET );
+    const auto socket = std::make_unique< TCPSocket >(AF_INET );
     boost::optional< KeepAliveOptions > result;
     result.is_initialized();
 
@@ -49,7 +49,7 @@ TEST( TcpSocket, KeepAliveOptions )
 
 TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 {
-    const auto socket = std::make_unique< TCPSocket >( false, AF_INET );
+    const auto socket = std::make_unique< TCPSocket >(AF_INET );
     boost::optional< KeepAliveOptions > result;
     ASSERT_TRUE( socket->getKeepAlive( &result ) );
     ASSERT_FALSE( static_cast< bool >( result ) );
@@ -59,30 +59,30 @@ TEST(TcpSocket, ErrorHandling)
 {
     nx::network::test::socketErrorHandling(
         []() { return std::make_unique<TCPServerSocket>(AF_INET); },
-        []() { return std::make_unique<TCPSocket>(false, AF_INET); });
+        []() { return std::make_unique<TCPSocket>(AF_INET); });
 }
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, TcpSocketV4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
-    [](){ return std::make_unique<TCPSocket>(false, AF_INET); })
+    [](){ return std::make_unique<TCPSocket>(AF_INET); })
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, TcpSocketV6,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
-    [](){ return std::make_unique<TCPSocket>(false, AF_INET6); })
+    [](){ return std::make_unique<TCPSocket>(AF_INET6); })
 
 // TODO: Figure out why it does not work for any local address:
 NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV4to6,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
-    [](){ return std::make_unique<TCPSocket>(false, AF_INET); })
+    [](){ return std::make_unique<TCPSocket>(AF_INET); })
 
 // TODO: Figure out why it does not work for any local address:
 NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV6to4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
-    [](){ return std::make_unique<TCPSocket>(false, AF_INET6); })
+    [](){ return std::make_unique<TCPSocket>(AF_INET6); })
 
 }   //test
 }   //network

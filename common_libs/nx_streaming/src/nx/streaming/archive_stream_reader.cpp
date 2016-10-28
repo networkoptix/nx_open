@@ -1337,3 +1337,10 @@ bool QnArchiveStreamReader::isRealTimeSource() const
 {
     return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == (qint64)AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
 }
+
+bool QnArchiveStreamReader::needKeyData(int channel) const
+{
+    if (m_quality == MEDIA_Quality_LowIframesOnly)
+        return true;
+    return base_type::needKeyData(channel);
+}

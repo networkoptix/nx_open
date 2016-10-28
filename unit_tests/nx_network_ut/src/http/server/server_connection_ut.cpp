@@ -240,7 +240,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
 
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock(false, AF_INET);
+    nx::network::TCPSocket sock(AF_INET);
     ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
     ASSERT_EQ(sizeof(testData) - 1, sock.send(testData, sizeof(testData)-1));
 }
@@ -257,7 +257,7 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     m_testHttpServer->server().setConnectionInactivityTimeout(kTimeout);
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock(false, AF_INET);
+    nx::network::TCPSocket sock(AF_INET);
     ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
     ASSERT_EQ(sock.send(kQuery.data(), kQuery.size()), kQuery.size());
 
