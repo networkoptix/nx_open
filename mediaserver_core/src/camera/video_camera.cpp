@@ -151,22 +151,23 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
 
 int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly)
 {
-    auto addData = [&] (const QnConstAbstractDataPacketPtr& data)
-    {
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
-        if (video)
+    auto addData = 
+        [&](const QnConstAbstractDataPacketPtr& data)
         {
-            QnCompressedVideoData* newData = video->clone();
-            if (skipTime && video->timestamp <= skipTime)
-                newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
-            newData->opaque = cseq;
-            dstQueue.push(QnAbstractMediaDataPtr(newData));
-        }
-        else {
-            dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data)); //TODO: #ak remove const_cast
-        }
-    };
-
+            const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
+            if (video)
+            {
+                QnCompressedVideoData* newData = video->clone();
+                if (skipTime && video->timestamp <= skipTime)
+                    newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+                newData->opaque = cseq;
+                dstQueue.push(QnAbstractMediaDataPtr(newData));
+            }
+            else {
+                dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data)); //TODO: #ak remove const_cast
+            }
+        };
+    
     int rez = 0;
     if (iFramesOnly)
     {

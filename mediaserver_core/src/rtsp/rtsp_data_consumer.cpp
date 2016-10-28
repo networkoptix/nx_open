@@ -18,11 +18,13 @@
 #include <nx/streaming/archive_stream_reader.h>
 
 namespace {
-    bool needSecondaryStream(MediaQuality q)
-    {
-        return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
-    }
+
+bool needSecondaryStream(MediaQuality q)
+{
+    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
 }
+
+} // namespace
 
 const auto checkConstantsEquality = []()
 {
@@ -737,13 +739,13 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
     bool usePrimaryStream, 
     qint64 skipTime, 
     quint32 cseq,
-    bool IFramesOnly)
+    bool iFramesOnly)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     int copySize = 0;
     if (camera) // && !res->hasFlags(Qn::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq, IFramesOnly);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq, iFramesOnly);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 

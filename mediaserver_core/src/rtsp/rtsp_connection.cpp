@@ -367,9 +367,11 @@ void QnRtspConnectionProcessor::parseRequest()
             d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
     }
 
-    QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
-    if (!q.isEmpty())
-        d->quality = QnLexical::deserialized<MediaQuality>(q, MEDIA_Quality_High);
+    QString qualityStr = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
+    if (!qualityStr.isEmpty())
+    {
+        d->quality = QnLexical::deserialized<MediaQuality>(qualityStr, MEDIA_Quality_High);
+    }
     else
     {
         d->quality = MEDIA_Quality_High;
@@ -1293,7 +1295,7 @@ int QnRtspConnectionProcessor::composePlay()
             copySize = d->dataProcessor->copyLastGopFromCamera(
                 camera, 
                 usePrimaryStream, 
-                0, 
+                0, /* skipTime */
                 d->lastPlayCSeq, 
                 iFramesOnly);
         }

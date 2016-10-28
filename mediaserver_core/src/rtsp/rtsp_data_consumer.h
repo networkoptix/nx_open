@@ -44,7 +44,7 @@ public:
         bool usePrimaryStream, 
         qint64 skipTime, 
         quint32 cseq,
-        bool IFramesOnly);
+        bool iFramesOnly);
     QnMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
 
