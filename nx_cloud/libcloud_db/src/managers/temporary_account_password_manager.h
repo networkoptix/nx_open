@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 15, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
-#define NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
+#pragma once
 
 #include "access_control/abstract_authentication_data_provider.h"
 
@@ -28,10 +22,11 @@
 namespace nx {
 namespace cdb {
 
-namespace conf
-{
+namespace conf {
+
 class Settings;
-}
+
+} // namespace
 
 class TemporaryAccountCredentialsEx
 :
@@ -104,6 +99,10 @@ private:
     typedef boost::multi_index::multi_index_container<
         TemporaryAccountCredentialsEx,
         boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                TemporaryAccountCredentialsEx,
+                std::string,
+                &TemporaryAccountCredentialsEx::id>>,
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
                 data::TemporaryAccountCredentials,
                 std::string,
@@ -115,8 +114,9 @@ private:
         >
     > TemporaryCredentialsDictionary;
 
-    constexpr static const int kIndexByLogin = 0;
-    constexpr static const int kIndexByAccountEmail = 1;
+    constexpr static const int kIndexById = 0;
+    constexpr static const int kIndexByLogin = 1;
+    constexpr static const int kIndexByAccountEmail = 2;
 
     const conf::Settings& m_settings;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
@@ -142,16 +142,21 @@ private:
     nx::db::DBResult deleteTempPassword(
         nx::db::QueryContext* const queryContext,
         std::string tempPasswordID);
-    void tempPasswordDeleted(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult resultCode,
-        std::string tempPasswordID,
-        std::function<void(api::ResultCode)> completionHandler);
    
+    boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
+        const QnMutexLockerBase& lk,
+        const std::string& username,
+        std::function<bool(const nx::Buffer&)> checkPasswordHash);
+    void runExpirationRulesOnSuccessfulLogin(
+        const QnMutexLockerBase& lk,
+        const TemporaryAccountCredentialsEx& temporaryCredentials);
+
+    template<typename Index, typename Iterator>
+    void updateExpirationRulesAfterSuccessfulLogin(
+        const QnMutexLockerBase& lk,
+        Index& index,
+        Iterator it);
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
+} // namespace cdb
+} // namespace nx
