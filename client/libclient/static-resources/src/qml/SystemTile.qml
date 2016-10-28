@@ -16,6 +16,7 @@ BaseTile
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
     property bool isCompatibleInternal: false;
+    property bool isOnline: false;
 
     property string wrongVersion;
     property string compatibleVersion;
@@ -41,7 +42,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.impl.hasHosts;
+        return control.isOnline;
     }
 
     tileColor:
@@ -67,7 +68,7 @@ BaseTile
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
-                || !impl.hasHosts || !isCompatibleInternal);
+                || !control.isOnline || !isCompatibleInternal);
         }
 
         text:
@@ -78,7 +79,7 @@ BaseTile
                 return wrongVersion;
             if (compatibleVersion.length)
                 return compatibleVersion;
-            if (!impl.hasHosts)
+            if (!control.isOnline)
                 return qsTr("OFFLINE");
 
             return "";
@@ -175,7 +176,7 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
-                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.hasHosts; });
+                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
@@ -200,7 +201,7 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.hasHosts = Qt.binding( function() { return control.impl.hasHosts; });
+                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
@@ -244,7 +245,6 @@ BaseTile
                 return kLocalSystemTileType;
         }
 
-        readonly property bool hasHosts: !control.impl.hostsModel.isEmpty;
         readonly property color standardColor: Style.colors.custom.systemTile.background;
         readonly property color hoveredColor: Style.lighterColor(standardColor);
         readonly property color inactiveColor: Style.colors.shadow;

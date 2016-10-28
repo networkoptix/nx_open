@@ -234,15 +234,25 @@ Item
             height: tileHolder.parent.height;
 
             hoverEnabled: true;
-            onClicked:
+            onPressed:
+            {
+                if (context.connectingToSystem.length)
+                    return;
+
+                if (control.isExpanded)
+                {
+                    control.toggle();
+                    mouse.accepted = false;
+                }
+            }
+
+            onReleased:
             {
                 if (context.connectingToSystem.length)
                     return;
 
                 if (!control.isExpanded)
                     control.collapsedTileClicked();
-                else
-                    control.toggle();
             }
         }
 

@@ -214,6 +214,7 @@ Rectangle
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
+                        isOnline: model.isOnline;
 
                         Component.onCompleted:
                         {
