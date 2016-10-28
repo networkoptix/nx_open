@@ -93,7 +93,7 @@ public:
     void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
         QnDataPacketQueue tmpQueue(20);
-        camera->copyLastGop(true, 0, tmpQueue, 0);
+        camera->copyLastGop(true, 0, tmpQueue, 0, false);
 
         auto randomAccess = tmpQueue.lock();
         if (randomAccess.size() > 0)

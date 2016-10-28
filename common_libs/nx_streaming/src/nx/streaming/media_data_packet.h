@@ -25,7 +25,7 @@ class QIODevice;
 
 struct AVCodecContext;
 
-enum MediaQuality 
+enum MediaQuality
 {
     MEDIA_Quality_High = 1, //< high quality
     MEDIA_Quality_Low = 2, //< low quality
@@ -38,7 +38,7 @@ enum MediaQuality
     MEDIA_Quality_None
 };
 
-const char* mediaQualityToString(MediaQuality value);
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MediaQuality), (lexical))
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {

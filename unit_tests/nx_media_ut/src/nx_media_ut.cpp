@@ -15,6 +15,7 @@
 #include <common/common_module.h>
 #include <utils/media/ffmpeg_initializer.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 // Config for debugging the tests.
 static const struct
@@ -353,8 +354,8 @@ private:
         if (expectedMediaQuality != m_actualQuality)
         {
             ADD_FAILURE() << "MediaQuality: "
-                << "expected " << mediaQualityToString(expectedMediaQuality)
-                << ", actual " << mediaQualityToString(m_actualQuality);
+                << "expected " << QnLexical::serialized(expectedMediaQuality).toUtf8().constData()
+                << ", actual " << QnLexical::serialized(m_actualQuality).toUtf8().constData();
         }
 
         if (expectedResolution != m_actualResolution)
@@ -373,11 +374,11 @@ private:
         m_calledSetQuality = true;
 
         LOG(lit("setQuality(%1, fastSwitch: %2, %3 x %4);")
-            .arg(mediaQualityToString(quality))
+            .arg(QnLexical::serialized(quality))
             .arg(fastSwitch)
             .arg(resolution.width())
             .arg(resolution.height()));
-
+            
         m_actualQuality = quality;
         m_actualResolution = resolution;
     }

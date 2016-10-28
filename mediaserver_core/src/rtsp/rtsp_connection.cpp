@@ -55,6 +55,7 @@ extern "C"
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 class QnTcpListener;
 
@@ -367,15 +368,9 @@ void QnRtspConnectionProcessor::parseRequest()
     }
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
-    if (q == QString("low"))
-    {
-        d->quality = MEDIA_Quality_Low;
-    }
-    else if (q == QString("force-high"))
-    {
-        d->quality = MEDIA_Quality_ForceHigh;
-    }
-    else if( q.isEmpty() )
+    if (!q.isEmpty())
+        d->quality = QnLexical::deserialized<MediaQuality>(q, MEDIA_Quality_High);
+    else
     {
         d->quality = MEDIA_Quality_High;
 
@@ -389,10 +384,6 @@ void QnRtspConnectionProcessor::parseRequest()
             else if( streamIndex == 1 )
                 d->quality = MEDIA_Quality_Low;
         }
-    }
-    else
-    {
-        d->quality = MEDIA_Quality_High;
     }
     d->qualityFastSwitch = true;
     d->clientRequest.clear();
@@ -1117,7 +1108,8 @@ void QnRtspConnectionProcessor::createDataProvider()
 void QnRtspConnectionProcessor::checkQuality()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->liveDpHi && d->quality == MEDIA_Quality_Low)
+    if (d->liveDpHi && 
+       (d->quality == MEDIA_Quality_Low || d->quality == MEDIA_Quality_LowIframesOnly))
     {
         if (d->liveDpLow == 0) {
             d->quality = MEDIA_Quality_High;
@@ -1293,8 +1285,17 @@ int QnRtspConnectionProcessor::composePlay()
         QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
         int copySize = 0;
-        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
-            copySize = d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
+        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) 
+        {
+            bool usePrimaryStream = 
+                d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly;
+            bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
+            copySize = d->dataProcessor->copyLastGopFromCamera(
+                camera, 
+                usePrimaryStream, 
+                0, 
+                d->lastPlayCSeq, 
+                iFramesOnly);
         }
 
         if (copySize == 0) {
@@ -1416,12 +1417,8 @@ int QnRtspConnectionProcessor::composeSetParameter()
             return CODE_INVALID_PARAMETER;
         if (normParam.startsWith("x-media-quality"))
         {
-            if (vals[1].trimmed() == "low")
-                d->quality = MEDIA_Quality_Low;
-            else if (vals[1].trimmed() == "force-high")
-                d->quality = MEDIA_Quality_ForceHigh;
-            else
-                d->quality = MEDIA_Quality_High;
+            QString q = vals[1].trimmed();
+            d->quality = QnLexical::deserialized<MediaQuality>(q, MEDIA_Quality_High);
 
             checkQuality();
             d->qualityFastSwitch = false;
@@ -1434,7 +1431,14 @@ int QnRtspConnectionProcessor::composeSetParameter()
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
+                bool usePrimaryStream = d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly;
+                bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
+                d->dataProcessor->copyLastGopFromCamera(
+                    camera, 
+                    usePrimaryStream,
+                    time, 
+                    d->lastPlayCSeq,
+                    iFramesOnly); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
