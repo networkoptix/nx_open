@@ -393,7 +393,10 @@ TEST_F(System, rename)
     shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
 
     const auto account3 = addActivatedAccount2();
-    shareSystemEx(account1, system1, account3, api::SystemAccessRole::advancedViewer);
+    shareSystemEx(account1, system1, account3, api::SystemAccessRole::localAdmin);
+
+    const auto account4 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account4, api::SystemAccessRole::advancedViewer);
 
     std::string actualSystemName = "new system name";
     // Owner is allowed to rename his system.
@@ -424,9 +427,14 @@ TEST_F(System, rename)
         api::ResultCode::ok,
         renameSystem(account2.data.email, account2.password, system1.id, actualSystemName));
 
+    actualSystemName = "sdfn[rtsdh111";
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        renameSystem(account3.data.email, account3.password, system1.id, actualSystemName));
+
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        renameSystem(account3.data.email, account3.password, system1.id, "xxx"));
+        renameSystem(account4.data.email, account4.password, system1.id, "xxx"));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
