@@ -69,7 +69,7 @@ public:
                 {
                     handler(
                         SystemError::noError,
-                        std::make_unique<TCPSocket>(false, AF_INET),
+                        std::make_unique<TCPSocket>(AF_INET),
                         !m_singleShot);
 
                     if (m_singleShot)

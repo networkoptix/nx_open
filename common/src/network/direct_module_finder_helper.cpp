@@ -89,14 +89,10 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     QnUrlSet additionalUrls;
     QnUrlSet ignoredUrls;
 
-    {
-        // TODO: We have to do this also when system connects to cloud.
-        const auto systemId = qnGlobalSettings->cloudSystemId();
-        if (!systemId.isEmpty()) {
-            QUrl url = makeUrl(serverId.toSimpleString() + lit(".") + systemId, 0);
-            urls.insert(url);
-            addUrl(url, m_urls);
-        }
+    if (auto cloudAddress = server->getCloudAddress()) {
+        QUrl url = makeUrl(cloudAddress->address.toString(), cloudAddress->port);
+        urls.insert(url);
+        addUrl(url, m_urls);
     }
 
     for (const auto &address: server->getNetAddrList()) {

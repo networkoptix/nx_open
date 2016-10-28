@@ -95,7 +95,7 @@ struct FakeTcpTunnelAcceptor
         size_t clientsLimit = 5)
     :
         m_designatedAioThread(designatedAioThread),
-        m_ioThreadSocket(new TCPSocket(false, AF_INET)),
+        m_ioThreadSocket(new TCPSocket(AF_INET)),
         m_addressManager(std::move(addressManager)),
         m_hasConnection(hasConnection),
         m_clientsLimit(clientsLimit)
@@ -312,7 +312,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto list = addressBinder.get(addressManager.key);
     ASSERT_EQ(list.size(), 1);
 
-    auto client = std::make_unique<TCPSocket>(false, AF_INET);
+    auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(500));
 
@@ -421,7 +421,7 @@ protected:
 
     void startClient(const SocketAddress& peer)
     {
-        auto socketPtr = std::make_unique<TCPSocket>(false, AF_INET);
+        auto socketPtr = std::make_unique<TCPSocket>(AF_INET);
         auto socket = socketPtr.get();
         const auto timeout = 3000 * utils::TestOptions::timeoutMultiplier();
         ASSERT_TRUE(socketPtr->setSendTimeout(timeout));

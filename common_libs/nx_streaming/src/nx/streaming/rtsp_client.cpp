@@ -396,7 +396,6 @@ QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_proxyPort(0),
     m_responseCode(CODE_OK),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
@@ -621,8 +620,6 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_outStreamFile.open( ss.str(), std::ios_base::binary );
 #endif
 
-
-
     if (startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
 
@@ -636,9 +633,6 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
 
-
-    //unsigned int port = DEFAULT_RTP_PORT;
-
     if (m_tcpSock->isClosed())
     {
         QnMutexLocker lock(&m_socketMutex);
@@ -648,20 +642,14 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT);
 
-    QString targetAddress;
-    int destinationPort = 0;
-    if( m_proxyPort == 0 )
-    {
-        targetAddress = m_url.host();
-        destinationPort = m_url.port(DEFAULT_RTP_PORT);
-    }
+    SocketAddress targetAddress;
+    if (m_proxyAddress)
+        targetAddress = *m_proxyAddress;
     else
-    {
-        targetAddress = m_proxyAddr;
-        destinationPort = m_proxyPort;
-    }
-    if( !m_tcpSock->connect(targetAddress, destinationPort, TCP_CONNECT_TIMEOUT) )
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, destinationPort);
+        targetAddress = SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
+
+    if (!m_tcpSock->connect(targetAddress, TCP_CONNECT_TIMEOUT))
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
 
     m_tcpSock->setNoDelay(true);
 
@@ -677,7 +665,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, targetAddress.port);
     }
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
@@ -1769,8 +1757,7 @@ bool QnRtspClient::isAudioEnabled() const
 
 void QnRtspClient::setProxyAddr(const QString& addr, int port)
 {
-    m_proxyAddr = addr;
-    m_proxyPort = port;
+    m_proxyAddress = SocketAddress(addr, (uint16_t) port);
 }
 
 QString QnRtspClient::mediaTypeToStr(TrackType trackType)

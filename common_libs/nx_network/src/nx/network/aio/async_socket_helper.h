@@ -77,7 +77,6 @@ public:
     AsyncSocketImplHelper(
         SocketType* _socket,
         AbstractCommunicatingSocket* _abstractSocketPtr,
-        bool _natTraversalEnabled,
         int _ipVersion )
     :
         BaseAsyncSocketImplHelper<SocketType>( _socket ),
@@ -92,7 +91,6 @@ public:
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
-        m_natTraversalEnabled( _natTraversalEnabled ),
         m_asyncSendIssued( false ),
         m_addressResolverIsInUse( false ),
         m_ipVersion( _ipVersion )
@@ -247,7 +245,11 @@ public:
             };
 
         nx::network::SocketGlobals::addressResolver().resolveAsync(
-            addr.address, std::move(resolveHandler), false, m_ipVersion, this);
+            addr.address,
+            std::move(resolveHandler),
+            NatTraversalSupport::disabled,
+            m_ipVersion,
+            this);
     }
 
     void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -385,7 +387,6 @@ private:
     bool* m_timerHandlerTerminatedFlag;
 
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
-    const bool m_natTraversalEnabled;
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
     const int m_ipVersion;

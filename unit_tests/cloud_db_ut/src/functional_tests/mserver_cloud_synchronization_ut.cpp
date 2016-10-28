@@ -434,6 +434,9 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
 
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
+    // Waiting for cloud owner to be synchronized to vms db.
+    waitForCloudAndVmsToSyncUsers();
+
     ::ec2::ApiUserData accountVmsData;
     const std::string testEmail = "test_123@mail.ru";
     addCloudUserLocally(testEmail, &accountVmsData);
