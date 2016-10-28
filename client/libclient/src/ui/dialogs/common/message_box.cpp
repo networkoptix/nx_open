@@ -828,6 +828,21 @@ bool QnMessageBox::event(QEvent* event)
 {
     bool res = QDialog::event(event);
 
+    if (event->type() == QEvent::Show)
+    {
+        Q_D(QnMessageBox);
+        for (auto customWidget : d->customWidgets)
+        {
+            if (customWidget->focusPolicy() != Qt::NoFocus)
+            {
+                customWidget->setFocus();
+                break;
+            }
+        }
+
+        return res;
+    }
+
     if (event->type() != QEvent::LayoutRequest)
         return res;
 
