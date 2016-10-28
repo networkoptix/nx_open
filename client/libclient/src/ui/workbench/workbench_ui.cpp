@@ -2,29 +2,12 @@
 
 #include <cmath> /* For std::floor. */
 
-#include <QtCore/QSettings>
-#include <QtCore/QTimer>
-
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMenu>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <common/common_module.h>
-
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/camera_bookmark.h>
-
-#include <camera/resource_display.h>
+#include <core/resource/resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -39,32 +22,22 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
-#include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/fps_counting_instrument.h>
-#include <ui/graphics/instruments/drop_instrument.h>
-#include <ui/graphics/instruments/focus_listener_instrument.h>
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
-#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
-#include <ui/graphics/items/controls/speed_slider.h>
-#include <ui/graphics/items/controls/volume_slider.h>
-#include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -72,18 +45,12 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/statistics/modules/controls_statistics_module.h>
-
-#include <ui/style/skin.h>
-
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
-
-#include <ui/workaround/qtbug_workaround.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -1343,64 +1310,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    const auto getActionParamsFunc =
-        [this](const QnCameraBookmark &bookmark) -> QnActionParameters
-        {
-            QnActionParameters bookmarkParams(currentParameters(Qn::TimelineScope));
-            bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
-            return bookmarkParams;
-        };
 
-    /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
-    const auto bookmarksViewer = m_timeline->item->timeSlider()->bookmarksViewer();
-
-    const auto updateBookmarkActionsAvailability =
-        [this, bookmarksViewer]()
-        {
-            const bool readonly = qnCommon->isReadOnly()
-                || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
-
-            bookmarksViewer->setReadOnly(readonly);
-        };
-
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        updateBookmarkActionsAvailability);
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, updateBookmarkActionsAvailability);
-    connect(context(), &QnWorkbenchContext::userChanged, this, updateBookmarkActionsAvailability);
-
-    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_edit"));
-            menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
-        });
-
-    connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
-            menu()->triggerIfPossible(QnActions::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
-        });
-
-    connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
-
-            enum { kMicrosecondsFactor = 1000 };
-            navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
-            navigator()->setPlaying(true);
-        });
-
-    connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this,
-        [this, bookmarksViewer](const QString &tag)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
-
-            QnActionParameters params;
-            params.setArgument(Qn::BookmarkTagRole, tag);
-            menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
-        });
 }
 
 #pragma endregion Timeline methods

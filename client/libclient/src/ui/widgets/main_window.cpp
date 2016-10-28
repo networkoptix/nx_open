@@ -80,7 +80,6 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
 
 #include <client/client_settings.h>
