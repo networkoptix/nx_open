@@ -499,7 +499,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 #else
     Q_UNUSED(startupParams);
     QString customizationPath = lit(":/skin_dark");
-    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+    QScopedPointer<QnSkin> skin(new QnSkin({lit(":/skin"), customizationPath}));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QnCustomization customization;
@@ -515,7 +515,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        QApplication::setWindowIcon(qnSkin->icon("logo.png"));
+        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 

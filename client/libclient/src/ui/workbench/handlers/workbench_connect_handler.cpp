@@ -101,7 +101,6 @@ QString getConnectionName(const QnLocalConnectionData& data)
 
 void removeCustomConnection(const QnLocalConnectionData& data)
 {
-    //TODO: #ynikitenkov why this check?
     if (!data.password.isEmpty())
         return;
 
@@ -925,6 +924,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
+            setLogicalState(LogicalState::connecting);
             connectToServer(url);
             break;
         case Qn::IncompatibleProtocolConnectionResult:

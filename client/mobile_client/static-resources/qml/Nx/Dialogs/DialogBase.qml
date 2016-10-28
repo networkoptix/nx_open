@@ -20,7 +20,7 @@ Popup
 
     background: null
 
-    contentItem: Item
+    contentItem: MouseArea
     {
         anchors.fill: parent
         anchors.topMargin: getStatusBarHeight()
@@ -52,6 +52,14 @@ Popup
 
                 color: ColorTheme.contrast3
             }
+        }
+
+        onClicked: close()
+
+        Keys.onPressed:
+        {
+            if (Utils.keyIsBack(event.key))
+                close()
         }
     }
 

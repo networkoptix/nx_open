@@ -11,7 +11,6 @@ DialogBase
     property int activeQuality: QnPlayer.LowVideoQuality
     property size actualQuality
 
-    closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
 
     Column
