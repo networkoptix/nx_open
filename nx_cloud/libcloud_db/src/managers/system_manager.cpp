@@ -88,6 +88,13 @@ SystemManager::SystemManager(
          data::SystemAttributesUpdate>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2SetResourceParamDone, this, _1, _2, _3));
+
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
+        <::ec2::ApiCommand::removeResourceParam,
+         ::ec2::ApiResourceParamWithRefData,
+         int>(
+            std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3, _4),
+            std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1, _2, _3));
 }
 
 SystemManager::~SystemManager()
@@ -2219,10 +2226,10 @@ nx::db::DBResult SystemManager::processSetResourceParam(
     {
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
-            lm("Ignoring transaction setResourceParam with. "
+            lm("Ignoring transaction setResourceParam with "
                "systemId %1, resourceId %2, param name %3, param value %4")
                 .arg(systemId).arg(data.resourceId).arg(data.name).arg(data.value),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         return nx::db::DBResult::ok;
     }
 
@@ -2240,6 +2247,30 @@ void SystemManager::onEc2SetResourceParamDone(
     {
         updateSystemAttributesInCache(std::move(systemNameUpdate));
     }
+}
+
+nx::db::DBResult SystemManager::processRemoveResourceParam(
+    nx::db::QueryContext* /*queryContext*/,
+    const nx::String& systemId,
+    ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
+    int* const /*dummy*/)
+{
+    // This can only be removal of already-removed user attribute.
+    NX_LOGX(
+        QnLog::EC2_TRAN_LOG,
+        lm("Ignoring transaction %1 with "
+            "systemId %2, resourceId %3, param name %4")
+            .arg(::ec2::ApiCommand::toString(data.command)).arg(systemId)
+            .arg(data.params.resourceId).arg(data.params.name),
+        cl_logDEBUG2);
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::onEc2RemoveResourceParamDone(
+    nx::db::QueryContext* /*queryContext*/,
+    nx::db::DBResult /*dbResult*/,
+    int /*dummy*/)
+{
 }
 
 float SystemManager::calculateSystemUsageFrequency(
