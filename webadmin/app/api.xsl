@@ -142,7 +142,7 @@
                                                 </h4>
                                                 <div class="well">
                                                     <xsl:copy-of select="description"/>
-                                                    <xsl:if test="@permissions">
+                                                    <xsl:if test="permissions">
                                                         <p><b>Permissions: </b><xsl:copy-of select="permissions"/></p>
                                                     </xsl:if>
                                                 </div>
