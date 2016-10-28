@@ -240,14 +240,12 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     okButton = new QnBusyIndicatorButton(q);
     okButton->setText(baseOkButton->text()); // Title from OS theme
     okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
-    okButton->setDefault(true);
     okButton->setProperty(style::Properties::kAccentStyleProperty, true);
     q->removeButton(baseOkButton.data());
     q->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     nextButton = new QnBusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
-    nextButton->setDefault(true);
     nextButton->setProperty(style::Properties::kAccentStyleProperty, true);
     q->addButton(nextButton, QDialogButtonBox::ActionRole);
     nextButton->setVisible(false);
@@ -262,7 +260,8 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + L'\n'
                 + enterPasswordMessage(),
                 false);
-            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
+            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
+                0, Qt::Alignment(), true);
             q->setDefaultButton(okButton);
             break;
         }
@@ -275,14 +274,16 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + disconnectWarnMessage()
                 + L'\n'
                 + enterPasswordMessage());
-            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
+            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
+                0, Qt::Alignment(), true);
             q->setDefaultButton(okButton);
             break;
         }
         case Scenario::CloudOwnerOnly:
         {
             q->setText(enterPasswordMessage());
-            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
+            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
+                0, Qt::Alignment(), true);
             okButton->setVisible(false);
             nextButton->setVisible(true);
             q->setDefaultButton(nextButton);
@@ -386,8 +387,8 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
 
     authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
     q->removeCustomWidget(authorizeWidget);
-    q->addCustomWidget(resetPasswordWidget, QnMessageBox::Layout::Main);
-    resetPasswordField->setFocus(); /*< dialog is already shown so we have to set focus manually */
+    q->addCustomWidget(resetPasswordWidget, QnMessageBox::Layout::Main,
+        0, Qt::Alignment(), true);
     nextButton->disconnect(this);
     connect(nextButton, &QPushButton::clicked, this,
         &QnDisconnectFromCloudDialogPrivate::setupConfirmationPage);
@@ -525,6 +526,9 @@ void QnDisconnectFromCloudDialogPrivate::createResetPasswordWidget()
 
     connect(resetPasswordField, &QnInputField::editingFinished,
         confirmPasswordField, &QnInputField::validate);
+
+    resetPasswordWidget->setFocusPolicy(Qt::TabFocus);
+    resetPasswordWidget->setFocusProxy(resetPasswordField);
 
     QnAligner* aligner = new QnAligner(resetPasswordWidget);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
