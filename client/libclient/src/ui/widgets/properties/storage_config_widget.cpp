@@ -720,11 +720,6 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
     if (!qnServerStorageManager->rebuildServerStorages(m_server, isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
         return;
 
-    if (isMain)
-        ui->rebuildMainButton->setEnabled(false);
-    else
-        ui->rebuildBackupButton->setEnabled(false);
-
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     storagePool.rebuildCancelled = false;
 }
