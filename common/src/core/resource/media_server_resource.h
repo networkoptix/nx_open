@@ -46,6 +46,8 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    boost::optional<SocketAddress> getCloudAddress() const;
+
     virtual QString getUrl() const override;
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
@@ -124,6 +126,7 @@ private slots:
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+    void at_cloudSettingsChanged();
 
 signals:
     void portChanged(const QnResourcePtr &resource);
