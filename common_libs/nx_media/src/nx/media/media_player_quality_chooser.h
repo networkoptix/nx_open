@@ -4,6 +4,7 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -19,8 +20,9 @@ namespace media {
 class media_player_quality_chooser
 {
 public:
-    static const QSize kQualityLow; //< Token-value indicating low quality; isValid() is false.
-    static const QSize kQualityHigh; //< Token-value indicating high quality; isValid() is false.
+    static const QSize kQualityLow; //< Token-value; isValid() is false.
+    static const QSize kQualityHigh; //< Token-value; isValid() is false.
+    static const QSize kQualityLowIframesOnly; //< Token-value; isValid() is false.
 
     /**
      * @param videoQuality Video quality desired by the user. Same as Player::videoQuality: either
@@ -40,13 +42,14 @@ public:
 private:
     media_player_quality_chooser() = delete;
 
-    /**
-     * @return Transcoding resolution, or invalid (default) QSize if transcoding is not possible.
-     */
-    static QSize applyTranscodingIfPossible(
+    static QSize chooseHighStreamIfPossible(
         AVCodecID transcodingCodec,
-        bool liveMode, qint64 positionMs,
-        const QnVirtualCameraResourcePtr& camera, const QSize& desiredResolution);
+        bool liveMode,
+        qint64 positionMs,
+        const QnVirtualCameraResourcePtr& camera,
+        AVCodecID highCodec,
+        const QSize& highResolution,
+        const QnConstResourceVideoLayoutPtr& videoLayout);
 };
 
 } // namespace media

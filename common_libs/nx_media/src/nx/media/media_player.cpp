@@ -609,6 +609,10 @@ void PlayerPrivate::applyVideoQuality()
     {
         archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
     }
+    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
+    {
+        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+    }
     else
     {
         NX_ASSERT(quality.isValid());
