@@ -897,6 +897,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Admin required.
      * %param userId User unique id.
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
