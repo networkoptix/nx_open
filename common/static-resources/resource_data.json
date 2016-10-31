@@ -1297,6 +1297,24 @@
                     "ve7,ve15"
                 ]
             },
+	        "trustToVideoSourceSize": false,
+	        "useExistingOnvifProfies": true,
+		    "controlFpsViaEncodingInterval": true,
+		    "forcedSecondaryStreamResolution": "352x288",
+		    "fpsBase": 25
+        },
+        {
+            "keys": [
+                "Pelco|NET5504*"
+            ],
+            "forcedOnvifParams": {
+                "videoEncoders": [
+                    "ve0,ve4",
+                    "ve1,ve5",
+                    "ve2,ve6",
+                    "ve3,ve7"
+                ]
+            },
 			"trustToVideoSourceSize": false,
 			"useExistingOnvifProfies": true,
 			"controlFpsViaEncodingInterval": true,
