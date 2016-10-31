@@ -1874,13 +1874,24 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
     QString portIndex;
     bool canBeConvertedToNumber = false;
 
-    if (portName.startsWith(lit("DI")))
+    if (portName.toLower().startsWith(lit("di")))
+    {
         portIndex = portName.mid(2);
 
-    auto portNum = portIndex.toInt(&canBeConvertedToNumber);
+        auto portNum = portIndex.toInt(&canBeConvertedToNumber);
 
-    if (canBeConvertedToNumber)
-        return QString::number(portNum + 1);
+        if (canBeConvertedToNumber)
+            return QString::number(portNum + 1);
+    }
+    else if (portName.startsWith("AlarmIn"))
+    {
+        portIndex = portName.mid(lit("AlarmIn_").length());
+
+        auto portNum = portIndex.toInt(&canBeConvertedToNumber);
+
+        if (canBeConvertedToNumber)
+            return QString::number(portNum);
+    }
 
     return QString();
 }
