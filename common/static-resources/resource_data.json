@@ -570,6 +570,33 @@
         },
         {
             "keys": [
+                "Hikvision|DS-6716HWI"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA17",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA18",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA19",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA20",
+                    "VideoEncoderConfigurationA05,VideoEncoderConfigurationA21",
+                    "VideoEncoderConfigurationA06,VideoEncoderConfigurationA22",
+                    "VideoEncoderConfigurationA07,VideoEncoderConfigurationA23",
+                    "VideoEncoderConfigurationA08,VideoEncoderConfigurationA24",
+                    "VideoEncoderConfigurationA09,VideoEncoderConfigurationA25",
+                    "VideoEncoderConfigurationA10,VideoEncoderConfigurationA26",
+                    "VideoEncoderConfigurationA11,VideoEncoderConfigurationA27",
+                    "VideoEncoderConfigurationA12,VideoEncoderConfigurationA28",
+                    "VideoEncoderConfigurationA13,VideoEncoderConfigurationA29",
+                    "VideoEncoderConfigurationA14,VideoEncoderConfigurationA30",
+                    "VideoEncoderConfigurationA15,VideoEncoderConfigurationA31",
+                    "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
+                ]
+            }
+        },
+        {
+            "keys": [
                 "DW|DWC-MPTZ20X", 
                 "DW|DWC-MPZ20XFM|2.1.0.8", "DW|DWC-MPZ20XFM"
             ],
