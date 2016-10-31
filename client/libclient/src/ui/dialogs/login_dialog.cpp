@@ -51,7 +51,9 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
+
 namespace {
+static const QnUuid kCustomConnectionLocalId;
 
 static std::array<const char*, 5> kIntroNames {
     "intro.mkv",
@@ -361,7 +363,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
         url.setUserName(lit("admin"));
 
-        customConnections.append(QnConnectionData(lit("default"), url, true));
+        customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
     }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
@@ -369,10 +371,10 @@ void QnLoginDialog::resetSavedSessionsModel()
     std::sort(customConnections.begin(), customConnections.end(),
         [](const QnConnectionData& left, const QnConnectionData& right)
         {
-            if (left.isCustom == right.isCustom)
+            if (left.isCustom() == right.isCustom())
                 return (left.name < right.name);
 
-            return left.isCustom;
+            return left.isCustom();
         });
 
     for (const auto& connection : customConnections)
@@ -574,7 +576,8 @@ void QnLoginDialog::at_saveButton_clicked()
     }
 
     const QUrl url = currentUrl();
-    auto connectionData = QnConnectionData(name, url, true);
+    auto connectionData = QnConnectionData(name, url, kCustomConnectionLocalId);
+
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);

@@ -29,7 +29,7 @@ static const QString kXorKey = lit("ItIsAGoodDayToDie");
 
 static const auto kNameTag = lit("name");
 static const auto kUrlTag = lit("url");
-static const auto kIsCustomTag = lit("isCustom");
+static const auto kLocalId = lit("localId");
 static const auto kPasswordTag = lit("pwd");
 
 QnConnectionData readConnectionData(QSettings *settings)
@@ -40,8 +40,7 @@ QnConnectionData readConnectionData(QSettings *settings)
     connection.url = settings->value(kUrlTag).toString();
     connection.url.setScheme(useHttps ? lit("https") : lit("http"));
     connection.name = settings->value(kNameTag).toString();
-    connection.isCustom = settings->value(kIsCustomTag, true).toBool();
-
+    connection.localId = settings->value(kLocalId).toUuid();
     const auto password = settings->value(kPasswordTag).toString();
     if (!password.isEmpty())
         connection.url.setPassword(nx::utils::xorDecrypt(password, kXorKey));
@@ -60,9 +59,9 @@ void writeConnectionData(QSettings *settings, const QnConnectionData &connection
     url.setPassword(QString()); /* Don't store password in plain text. */
 
     settings->setValue(kNameTag, connection.name);
-    settings->setValue(kIsCustomTag, connection.isCustom);
     settings->setValue(kPasswordTag, password);
     settings->setValue(kUrlTag, url.toString());
+    settings->setValue(kLocalId, connection.localId.toQUuid());
 }
 
 } // anonymous namespace
