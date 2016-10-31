@@ -63,8 +63,6 @@ public:
     virtual bool isOnline() const = 0;
 
 signals:
-    void idChanged();
-
     void isCloudSystemChanged();
 
     void ownerChanged();

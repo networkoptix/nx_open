@@ -130,15 +130,15 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
     if (!index.isValid())
         return true;
 
-    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool()
-        || index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
-    {
-        return true;   //< Skip online or cloud systems
-    }
+    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool())
+        return true;    //< Skips every online system
 
     const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
     if (qnForgottenSystemsManager->isForgotten(id))
         return false;
+
+    if (index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
+        return true;    //< Skips offline cloud systems
 
     qreal weight = 0.0;
     if (!getWeightFromData(index, weight))
