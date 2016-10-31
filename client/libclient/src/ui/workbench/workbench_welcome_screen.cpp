@@ -464,7 +464,6 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
     qnForgottenSystemsManager->forgetSystem(systemId);
 }
 
-
 void QnWorkbenchWelcomeScreen::showScreen()
 {
     setVisible(true);

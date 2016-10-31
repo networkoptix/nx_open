@@ -9,11 +9,10 @@
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
-class QnForgottenSystemsManager : public QObject, public Singleton<QnForgottenSystemsManager>
+class QnForgottenSystemsManager: public QObject, public Singleton<QnForgottenSystemsManager>
 {
     Q_OBJECT
     typedef QObject base_type;
-
 
 public:
     QnForgottenSystemsManager();
