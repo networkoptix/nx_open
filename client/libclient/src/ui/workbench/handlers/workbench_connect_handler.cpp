@@ -79,10 +79,24 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 namespace {
 
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
+
+bool isConnectionToCloud(const QUrl& url)
+{
+    const bool isCloudHost = nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
+    const bool isCloudUser = (qnCloudStatusWatcher->credentials().user == url.userName());
+
+    /**
+     * Connection to the new system is always through the non-cloud host.
+     * So, we have to check if cloud user is used.
+     */
+    return (isCloudUser || isCloudHost);
+}
 
 bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
 {
@@ -566,7 +580,6 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (storeSettings->isConnectionToCloud)
     {
         using namespace nx::network;
-        NX_EXPECT(SocketGlobals::addressResolver().isCloudHostName(info.ecUrl.host()));
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
         return;
     }
@@ -802,7 +815,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     else if (url.isValid())
     {
         const auto connectionSettings = ConnectionSettings::create(
-            nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()),
+            isConnectionToCloud(url),
             parameters.argument(Qn::StorePasswordRole, false),
             parameters.argument(Qn::AutoLoginRole, false));
 
