@@ -613,7 +613,7 @@ module.exports = function (grunt) {
         'shell:print_version',
         //'shell:run_ffmpeg',
         'protractor:all',
-        'shell:close_ffmpeg'
+        //'shell:close_ffmpeg'
         //'newer:jshint'
         //'karma
     ]);
