@@ -496,7 +496,18 @@ bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& re
         && accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             return true;
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    bool result = qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    if (!result)
+        NX_LOG(
+            lit("%1 \n\tuser %2 with %3 permissions is asking for \
+                \n\t%4 resource with %5 permissions and fails...")
+                .arg(Q_FUNC_INFO)
+                .arg(accessData.userId.toString())
+                .arg((int)accessData.access)
+                .arg(resourceId.toString())
+                .arg(permissions), cl_logDEBUG1);
+
+    return result;
 }
 
 struct ModifyResourceAccess
