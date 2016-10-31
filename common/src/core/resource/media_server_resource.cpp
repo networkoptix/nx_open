@@ -60,10 +60,20 @@ QnMediaServerResource::QnMediaServerResource():
     if (!resList.isEmpty())
         m_firstCamera = resList.first();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
-    connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
-    connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+
+    connect(this, &QnResource::resourceChanged,
+        this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
+
+    connect(this, &QnResource::propertyChanged,
+        this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -77,6 +87,11 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, co
 {
     if (key == QnMediaResource::panicRecordingKey())
         m_panicModeCache.update();
+}
+
+void QnMediaServerResource::at_cloudSettingsChanged()
+{
+    emit auxUrlsChanged(toSharedPointer(this));
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -196,6 +211,16 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
     return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
 }
 
+
+boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
+{
+    const auto systemId = qnGlobalSettings->cloudSystemId();
+    if (systemId.isEmpty())
+        return boost::none;
+
+    return SocketAddress(getId().toSimpleString() + lit(".") + systemId);
+}
+
 quint16 QnMediaServerResource::getPort() const
 {
     return getPrimaryAddress().port;
@@ -206,6 +231,9 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
     auto toAddress = [](const QUrl& url) { return SocketAddress(url.host(), url.port(0)); };
 
     QSet<SocketAddress> result;
+    if (auto cloudAddress = getCloudAddress()) //< Goes first to be prefered
+        result.insert(std::move(*cloudAddress));
+
     QSet<SocketAddress> ignored;
     for (const QUrl &url : getIgnoredUrls())
         ignored.insert(toAddress(url));

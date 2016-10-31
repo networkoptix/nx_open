@@ -185,7 +185,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     return systemServers;
 }
 
-std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
+std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
     MediatorFunctionalTest::getListeningPeers() const
 {
     nx_http::HttpClient httpClient;
@@ -195,12 +195,12 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
     if (!httpClient.doGet(QUrl(urlStr)))
         return std::make_tuple(
             nx_http::StatusCode::serviceUnavailable,
-            data::ListeningPeersBySystem());
+            data::ListeningPeers());
     if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
         return std::make_tuple(
             static_cast<nx_http::StatusCode::Value>(
                 httpClient.response()->statusLine.statusCode),
-            data::ListeningPeersBySystem());
+            data::ListeningPeers());
 
     QByteArray responseBody;
     while (!httpClient.eof())
@@ -208,7 +208,7 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
 
     return std::make_tuple(
         nx_http::StatusCode::ok,
-        QJson::deserialized<data::ListeningPeersBySystem>(responseBody));
+        QJson::deserialized<data::ListeningPeers>(responseBody));
 }
 
 }   // namespace hpm

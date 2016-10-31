@@ -933,6 +933,48 @@ TEST_F(Account, temporary_credentials_login_to_system)
     ASSERT_EQ(account.data.email, authResponse.authenticatedAccountData.accountEmail);
 }
 
+TEST_F(Account, temporary_credentials_removed_on_password_change)
+{
+    constexpr const auto expirationPeriod = std::chrono::seconds(50);
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    auto account = addActivatedAccount2();
+    const auto system = addRandomSystemToAccount(account);
+
+    api::TemporaryCredentialsParams params;
+    params.timeouts.expirationPeriod = expirationPeriod;
+    api::TemporaryCredentials temporaryCredentials;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        createTemporaryCredentials(
+            account.data.email,
+            account.password,
+            params,
+            &temporaryCredentials));
+
+    std::string account1NewPassword = account.password + "new";
+    api::AccountUpdateData accountUpdateData;
+    accountUpdateData.passwordHa1 = nx_http::calcHa1(
+        account.data.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str()).constData();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateAccount(account.data.email, account.password, accountUpdateData));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        api::AccountData accountData;
+        ASSERT_EQ(
+            api::ResultCode::notAuthorized,
+            getAccount(temporaryCredentials.login, temporaryCredentials.password, &accountData));
+    }
+}
+
 TEST_F(Account, created_while_sharing)
 {
     EmailManagerMocked mockedEmailManager;

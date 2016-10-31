@@ -70,6 +70,7 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
     NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
     NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
     NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
+    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
 };
 NxMediaFlagConfig conf("nx_media");
 
@@ -84,6 +85,42 @@ static qint64 usecToMsec(qint64 posUsec)
 }
 
 } // namespace
+
+class DataProviderGarbageCollector: public QObject
+{
+public:
+    DataProviderGarbageCollector()
+    {
+        connect(&m_timer, &QTimer::timeout, this, &DataProviderGarbageCollector::cleanup);
+        m_timer.start(1000);
+    }
+
+    static DataProviderGarbageCollector* instance()
+    {
+        static DataProviderGarbageCollector inst;
+        return &inst;
+    }
+
+    void addReader(std::unique_ptr<QnArchiveStreamReader> reader)
+    {
+        m_readersToClose.emplace_back(std::move(reader));
+        cleanup();
+    }
+
+    void cleanup()
+    {
+        for (auto itr = m_readersToClose.begin(); itr != m_readersToClose.end();)
+        {
+            if (!(*itr)->isRunning())
+                itr = m_readersToClose.erase(itr);
+            else
+                ++itr;
+        }
+    }
+private:
+    std::vector<std::unique_ptr<QnArchiveStreamReader>> m_readersToClose;
+    QTimer m_timer;
+};
 
 class PlayerPrivate: public QObject
 {
@@ -573,6 +610,10 @@ void PlayerPrivate::applyVideoQuality()
     {
         archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
     }
+    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
+    {
+        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+    }
     else
     {
         NX_ASSERT(quality.isValid());
@@ -785,7 +826,8 @@ void Player::stop()
         d->archiveReader->pleaseStop();
 
     d->dataConsumer.reset();
-    d->archiveReader.reset();
+    if (d->archiveReader)
+        DataProviderGarbageCollector::instance()->addReader(std::move(d->archiveReader));
     d->videoFrameToRender.reset();
 
     d->setState(State::Stopped);
@@ -874,6 +916,14 @@ int Player::videoQuality() const
 void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
+
+    if (conf.forceIframesOnly && videoQuality == LowVideoQuality)
+    {
+        d->log(lit("setVideoQuality(%1): config forceIframesOnlyis true => use value %2")
+            .arg(videoQuality).arg(LowIframesOnlyVideoQuality));
+        videoQuality = LowIframesOnlyVideoQuality;
+    }
+
     if (d->videoQuality == videoQuality)
     {
         d->log(lit("setVideoQuality(%1): no change, ignoring").arg(videoQuality));

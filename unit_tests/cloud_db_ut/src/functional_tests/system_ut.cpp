@@ -392,7 +392,13 @@ TEST_F(System, rename)
     const auto account2 = addActivatedAccount2();
     shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
 
-    const std::string actualSystemName = "new system name";
+    const auto account3 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account3, api::SystemAccessRole::localAdmin);
+
+    const auto account4 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account4, api::SystemAccessRole::advancedViewer);
+
+    std::string actualSystemName = "new system name";
     // Owner is allowed to rename his system.
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -415,14 +421,24 @@ TEST_F(System, rename)
         ASSERT_EQ(actualSystemName, systemData.name);
     }
 
-    // Only owner can rename system.
+    // Owner and admin can rename system.
+    actualSystemName = "sdfn[rtsdh";
     ASSERT_EQ(
-        api::ResultCode::forbidden,
-        renameSystem(system1.id, system1.authKey, system1.id, "aaa"));
+        api::ResultCode::ok,
+        renameSystem(account2.data.email, account2.password, system1.id, actualSystemName));
+
+    actualSystemName = "sdfn[rtsdh111";
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        renameSystem(account3.data.email, account3.password, system1.id, actualSystemName));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        renameSystem(account2.data.email, account2.password, system1.id, "xxx"));
+        renameSystem(account4.data.email, account4.password, system1.id, "xxx"));
+
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        renameSystem(system1.id, system1.authKey, system1.id, "aaa"));
 
     // Trying bad system names.
     ASSERT_EQ(
@@ -537,7 +553,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency1 = systems[0].usageFrequency;
-    const auto lastLoginTime1 = systems[0].lastLoginTime;
 
     // Second access.
     ASSERT_EQ(
@@ -549,7 +564,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency2 = systems[0].usageFrequency;
-    const auto lastLoginTime2 = systems[0].lastLoginTime;
 
     ASSERT_GT(usageFrequency2, usageFrequency1);
 
@@ -561,7 +575,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency3 = systems[0].usageFrequency;
-    const auto lastLoginTime3 = systems[0].lastLoginTime;
 
     ASSERT_LT(usageFrequency3, usageFrequency2);
 
@@ -573,7 +586,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency4 = systems[0].usageFrequency;
-    const auto lastLoginTime4 = systems[0].lastLoginTime;
 
     ASSERT_LT(usageFrequency4, usageFrequency3);
 
@@ -585,7 +597,6 @@ TEST_F(System, sorting_order_weight_expiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency5 = systems[0].usageFrequency;
-    const auto lastLoginTime5 = systems[0].lastLoginTime;
 
     ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
@@ -703,8 +714,6 @@ TEST_F(System, sorting_order_new_system_is_on_top)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
-    const auto lastLoginTime1 = systems[0].lastLoginTime;
-    const auto usageFrequency1 = systems[0].usageFrequency;
 
     const auto system2 = addRandomSystemToAccount(account);
 

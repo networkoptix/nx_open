@@ -43,6 +43,7 @@ public:
     QString userName;
     QString password;
     QString connectOptions;
+    QString encoding;
     size_t maxConnectionCount;
     /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout;
