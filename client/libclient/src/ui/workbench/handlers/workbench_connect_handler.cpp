@@ -193,6 +193,7 @@ void storeLocalSystemConnection(
 
     const auto connectionData =
         helpers::storeLocalSystemConnection(systemName, localSystemId, url);
+    qnClientCoreSettings->save();
 
     const auto lastUsed = QnConnectionData(systemName, url, localSystemId);
     qnSettings->setLastUsedConnection(lastUsed);

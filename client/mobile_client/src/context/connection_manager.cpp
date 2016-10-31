@@ -352,7 +352,6 @@ void QnConnectionManagerPrivate::doConnect()
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 
-
             connectionVersion = connectionInfo.version;
             emit q->connectionVersionChanged();
         });
