@@ -63,7 +63,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
         {
             api::ConnectionRequestedEvent connectionRequestedEvent;
             connectionRequestedEvent.connectSessionId = std::move(request.connectSessionId);
-            connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerID);
+            connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerId);
             std::move(
                 request.udpEndpointList.begin(),
                 request.udpEndpointList.end(),

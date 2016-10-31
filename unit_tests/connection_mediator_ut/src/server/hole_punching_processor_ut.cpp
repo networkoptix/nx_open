@@ -82,7 +82,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
                 connectResultPromise.set_value(resultCode);
             };
         api::ConnectRequest connectRequest;
-        connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
+        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
         connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
         connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
@@ -103,7 +103,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         //checking server has received connectionRequested indication
         ASSERT_TRUE(static_cast<bool>(connectionRequestedEventData));
         ASSERT_EQ(
-            connectRequest.originatingPeerID,
+            connectRequest.originatingPeerId,
             connectionRequestedEventData->originatingPeerID);
         ASSERT_EQ(1, connectionRequestedEventData->udpEndpointList.size());
         ASSERT_EQ(
@@ -193,7 +193,7 @@ TEST_F(HolePunchingProcessor, server_failure)
             waitCond.wakeAll();
         };
         api::ConnectRequest connectRequest;
-        connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
+        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
         connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
         connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
@@ -246,7 +246,7 @@ TEST_F(HolePunchingProcessor, destruction)
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
         api::ConnectRequest connectRequest;
-        connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
+        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
         connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
         connectRequest.destinationHostName = server1->serverId() + "." + system1.id;

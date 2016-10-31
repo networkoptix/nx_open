@@ -24,7 +24,7 @@ ConnectRequest::ConnectRequest()
 void ConnectRequest::serializeAttributes(nx::stun::Message* const message)
 {
     message->newAttribute<stun::cc::attrs::HostName>(std::move(destinationHostName));
-    message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerID));
+    message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerId));
     message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
     message->newAttribute<stun::cc::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
@@ -39,7 +39,7 @@ bool ConnectRequest::parseAttributes(const nx::stun::Message& message)
     
     return
         readStringAttributeValue<stun::cc::attrs::HostName>(message, &destinationHostName) &&
-        readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
+        readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerId) &&
         readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
         readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
         readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&

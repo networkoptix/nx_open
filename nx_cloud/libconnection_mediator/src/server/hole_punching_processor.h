@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 13, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -15,7 +10,6 @@
 
 #include "udp_hole_punching_connection_initiation_fsm.h"
 #include "../request_processor.h"
-
 
 namespace nx {
 
@@ -31,9 +25,10 @@ namespace conf {
 
 class ListeningPeerPool;
 
-/** Handles requests used to establish hole punching connection. 
-    Implements hole punching connection mediation techniques
-*/
+/**
+ * Handles requests used to establish hole punching connection.
+ * Implements hole punching connection mediation techniques.
+ */
 class HolePunchingProcessor
 :
     protected RequestProcessor
