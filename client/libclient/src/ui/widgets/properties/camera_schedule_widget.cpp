@@ -514,6 +514,7 @@ void QnCameraScheduleWidget::updateFromResources()
     updateMotionButtons();
     updateLicensesLabelText();
     updateGridParams();
+    setScheduleAlert(QString());
     retranslateUi();
 }
 
@@ -565,6 +566,7 @@ void QnCameraScheduleWidget::submitToResources()
     {
         QSignalBlocker blocker(ui->enableRecordingCheckBox);
         updateScheduleEnabled();
+        setScheduleAlert(QString());
     }
 }
 
@@ -946,8 +948,6 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
             break;
     }
     ui->licensesUsageWidget->loadData(&helper);
-
-    checkCanEnableRecording();
 }
 
 void QnCameraScheduleWidget::updateLicensesButtonVisible()
