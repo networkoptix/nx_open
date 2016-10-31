@@ -112,7 +112,7 @@ public:
         const nx::String& systemId) const;
 
     // TODO: rename to getListeningPeersBySystem
-    data::ListeningPeersBySystems getListeningPeers() const;
+    data::ListeningPeersBySystem getListeningPeers() const;
     std::vector<ConnectionWeakRef> getAllConnections() const;
 
 private:

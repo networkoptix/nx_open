@@ -7,7 +7,7 @@ namespace hpm {
 namespace data {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ListeningPeer)(BoundClientInfo)(ListeningPeers),
+    (ListeningPeer)(BoundClient)(ListeningPeers),
     (json),
     _Fields);
 
