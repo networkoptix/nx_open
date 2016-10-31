@@ -249,7 +249,7 @@ bool QnArchiveStreamReader::init()
                     m_requiredJumpTime = AV_NOPTS_VALUE;
                 m_jumpMtx.unlock();
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
-                    emit jumpOccured(requiredJumpTime);
+                    emit jumpOccured(requiredJumpTime, m_delegate->getSequence());
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
@@ -262,7 +262,7 @@ bool QnArchiveStreamReader::init()
     m_delegate->setQuality(quality, true, resolution);
     if (!m_delegate->open(m_resource)) {
         if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
-            emit jumpOccured(requiredJumpTime);
+            emit jumpOccured(requiredJumpTime, m_delegate->getSequence());
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime)
                 m_requiredJumpTime = AV_NOPTS_VALUE;
@@ -353,7 +353,10 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
         rez->flags |= QnAbstractMediaData::MediaFlags_BOF;
     if (isReverseMode)
         rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-    rez->opaque = m_dataMarker;
+    if (m_dataMarker)
+        rez->opaque = m_dataMarker;
+    else
+        rez->opaque = m_delegate->getSequence();
     QnSleep::msleep(50);
     return rez;
 }
@@ -479,7 +482,7 @@ begin_label:
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
-                emit jumpOccured(displayTime);
+                emit jumpOccured(displayTime, m_delegate->getSequence());
                 m_BOF = true;
             }
         }
@@ -505,7 +508,7 @@ begin_label:
         if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
         internalJumpTo(jumpTime);
-        emit jumpOccured(jumpTime);
+        emit jumpOccured(jumpTime, m_delegate->getSequence());
         m_BOF = true;
     }
 
@@ -554,7 +557,7 @@ begin_label:
         m_BOF = true;
         m_afterBOFCounter = 0;
         if (jumpTime != qint64(AV_NOPTS_VALUE))
-            emit jumpOccured(displayTime);
+            emit jumpOccured(displayTime, m_delegate->getSequence());
     }
 
     if (m_outOfPlaybackMask)
@@ -811,7 +814,7 @@ begin_label:
         m_singleQuantProcessed = true;
         //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
-    if (m_currentData)
+    if (m_currentData && m_dataMarker)
         m_currentData->opaque = m_dataMarker;
 
     //if (m_currentData)

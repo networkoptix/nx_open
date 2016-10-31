@@ -40,6 +40,8 @@ enum MediaQuality
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MediaQuality), (lexical))
 
+bool isLowMediaQuality(MediaQuality q);
+
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
     enum MediaFlag {

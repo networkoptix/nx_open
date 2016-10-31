@@ -644,6 +644,11 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     return time;
 }
 
+int QnRtspClientArchiveDelegate::getSequence() const
+{
+    return m_sendedCSec;
+}
+
 void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
 {
     if (value == m_singleShotMode)

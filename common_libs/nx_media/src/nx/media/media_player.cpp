@@ -224,6 +224,7 @@ private:
     PlayerPrivate(Player* parent);
 
     void at_hurryUp();
+    void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
     void presentNextFrameDelayed();
 
@@ -345,6 +346,20 @@ void PlayerPrivate::at_hurryUp()
     {
         execTimer->stop();
         presentNextFrame();
+    }
+}
+
+void PlayerPrivate::at_jumpOccurred(int sequence)
+{
+    if (!videoFrameToRender)
+        return;
+    FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+    if (sequence && sequence != metadata.sequence)
+    {
+        // Drop deprecate frame
+        execTimer->stop();
+        videoFrameToRender.reset();
+        at_gotVideoFrame();
     }
 }
 
@@ -620,6 +635,7 @@ void PlayerPrivate::applyVideoQuality()
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
             QSize(/*width*/ 0, quality.height())); //< Use "auto" width.
     }
+    at_hurryUp(); //< skip waiting for current frame
 }
 
 bool PlayerPrivate::createArchiveReader()
@@ -676,6 +692,8 @@ bool PlayerPrivate::initDataProvider()
         this, &PlayerPrivate::at_gotVideoFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
         this, &PlayerPrivate::at_hurryUp);
+    connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
+        this, &PlayerPrivate::at_jumpOccurred);
     connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
         [this]()
         {

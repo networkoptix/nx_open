@@ -21,7 +21,7 @@ namespace {
 
 bool needSecondaryStream(MediaQuality q)
 {
-    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
+    return isLowMediaQuality(q);
 }
 
 } // namespace
