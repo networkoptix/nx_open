@@ -125,6 +125,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnResourceWidgetFrameColors>();
     QnJsonSerializer::registerSerializer<QnCompositeTextOverlayColors>();
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
+    QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
     QnJsonSerializer::registerSerializer<QnAuditLogColors>();
     QnJsonSerializer::registerSerializer<QnRecordingStatsColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
