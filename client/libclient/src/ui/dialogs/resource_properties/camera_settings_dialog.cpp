@@ -298,18 +298,6 @@ void QnCameraSettingsDialog::submitToResources()
         return;
     }
 
-    //checking if showing Licenses limit exceeded is appropriate
-    if (m_settingsWidget->licensedParametersModified())
-    {
-        QnCamLicenseUsageHelper helper(cameras, m_settingsWidget->isScheduleEnabled());
-        if (!helper.isValid())
-        {
-            QString message = tr("License limit exceeded. Changes have been saved, but will not be applied.");
-            QnMessageBox::warning(this, tr("Could not apply changes."), message);
-            m_settingsWidget->setScheduleEnabled(false);
-        }
-    }
-
     /* Submit and save it. */
     saveCameras(cameras);
 }

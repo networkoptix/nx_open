@@ -21,6 +21,11 @@
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/license_usage_helper.h>
+
+using boost::algorithm::any_of;
+using boost::algorithm::all_of;
+
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent),
@@ -67,6 +72,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,
         [this]
         {
+        if (m_updating)
+            return;
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
@@ -165,16 +172,6 @@ void QnMultipleCameraSettingsWidget::updateAlertBar()
         ui->alertBar->setText(QString());
 }
 
-void QnMultipleCameraSettingsWidget::setScheduleEnabled(bool enabled)
-{
-    ui->cameraScheduleWidget->setScheduleEnabled(enabled);
-}
-
-bool QnMultipleCameraSettingsWidget::isScheduleEnabled() const
-{
-    return ui->cameraScheduleWidget->isScheduleEnabled();
-}
-
 void QnMultipleCameraSettingsWidget::submitToResources()
 {
     if (isReadOnly())
@@ -199,12 +196,6 @@ void QnMultipleCameraSettingsWidget::submitToResources()
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported())
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
-
-        if (m_hasScheduleEnabledChanges)
-        {
-            camera->setLicenseUsed(ui->cameraScheduleWidget->isScheduleEnabled());
-            camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
-        }
     }
 
     ui->cameraScheduleWidget->submitToResources();
@@ -217,7 +208,7 @@ void QnMultipleCameraSettingsWidget::submitToResources()
 bool QnMultipleCameraSettingsWidget::isValidSecondStream()
 {
     /* Do not check validness if there is no recording anyway. */
-    if (!isScheduleEnabled())
+    if (!ui->cameraScheduleWidget->isScheduleEnabled())
         return true;
 
     auto filteredTasks = ui->cameraScheduleWidget->scheduleTasks();
@@ -264,11 +255,6 @@ bool QnMultipleCameraSettingsWidget::hasDbChanges() const
     return m_hasDbChanges;
 }
 
-bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
-{
-    return m_hasScheduleEnabledChanges;
-}
-
 void QnMultipleCameraSettingsWidget::updateFromResources()
 {
     m_alertText = QString();
@@ -290,9 +276,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
     else
     {
         /* Aggregate camera parameters first. */
-        using boost::algorithm::any_of;
-        using boost::algorithm::all_of;
-
         const bool isDtsBased = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isDtsBased(); });
         const bool hasVideo = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
         const bool audioSupported = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioSupported(); });
@@ -384,10 +367,6 @@ void QnMultipleCameraSettingsWidget::setHasDbChanges(bool hasChanges)
         return;
 
     m_hasDbChanges = hasChanges;
-    if (!m_hasDbChanges)
-    {
-        m_hasScheduleEnabledChanges = false;
-    }
 
     emit hasChangesChanged();
 }
