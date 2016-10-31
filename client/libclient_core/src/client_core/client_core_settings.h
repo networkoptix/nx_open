@@ -67,9 +67,9 @@ private:
             recentCloudSystems, setRecentCloudSystems,
             RecentCloudSystems, QnCloudSystemList())
         QN_END_PROPERTY_STORAGE()
-        QN_DECLARE_RW_PROPERTY(QnForgottenSystemsSet,
+        QN_DECLARE_RW_PROPERTY(QnStringSet,
             forgottenSystems, setForgottenSystems,
-            ForgottenSystems, QnForgottenSystemsSet())
+            ForgottenSystems, QnStringSet())
         QN_END_PROPERTY_STORAGE()
 
 private:

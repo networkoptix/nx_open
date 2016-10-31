@@ -16,8 +16,8 @@ void QnClientCoreMetaTypes::initialize()
     qRegisterMetaType<QnLocalConnectionDataList>();
     qRegisterMetaTypeStreamOperators<QnLocalConnectionDataList>();
 
-    qRegisterMetaType<QnForgottenSystemsSet>();
-    qRegisterMetaTypeStreamOperators<QnForgottenSystemsSet>();
+    qRegisterMetaType<QnStringSet>();
+    qRegisterMetaTypeStreamOperators<QnStringSet>();
 
     qmlRegisterType<QnQmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
     qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");

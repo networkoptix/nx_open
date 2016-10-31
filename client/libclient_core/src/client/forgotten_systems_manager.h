@@ -3,11 +3,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <client_core/client_core_meta_types.h>
+
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
-
-typedef QSet<QString> QnForgottenSystemsSet;
 
 class QnForgottenSystemsManager : public QObject, public Singleton<QnForgottenSystemsManager>
 {
@@ -31,7 +31,7 @@ private:
     void rememberSystem(const QString& id);
 
 private:
-    QnForgottenSystemsSet m_systems;
+    QnStringSet m_systems;
 };
 
 #define qnForgottenSystemsManager QnForgottenSystemsManager::instance()
