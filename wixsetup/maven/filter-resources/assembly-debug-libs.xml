@@ -9,24 +9,11 @@
 			<directory>${libdir}/bin/${build.configuration}</directory>
 			<outputDirectory>../</outputDirectory>
 			<includes>
-				<include>**/*.pdb</include>
+				<include>**/nx_network.pdb</include>
+				<include>**/nx_utils.pdb</include>                
+                <include>**/nx_vms_utils.pdb</include>
+				<include>**/udt.pdb</include>
 			</includes>
-			<excludes>
-				<exclude>**/applauncher.pdb</exclude>
-                <exclude>**/desktop_client.pdb</exclude>
-				<exclude>**/mediaserver.pdb</exclude>     
-				<exclude>**/traytool.pdb</exclude>                
-                <exclude>**/minilauncher.pdb</exclude>
-				<exclude>**/mobile_client.pdb</exclude>
-				<exclude>**/nxtool.pdb</exclude>
-				<exclude>**/testcamera.pdb</exclude>
-				<exclude>**/AxNxWitness*.pdb</exclude>                
-				<exclude>**/cloud_connect_test_util.pdb</exclude>
-				<exclude>**/cloud_db.pdb</exclude>
-				<exclude>**/connection_mediator.pdb</exclude>
-				<exclude>**/media_db_util.pdb</exclude>
-				<exclude>**/vms_gateway.pdb</exclude>                
-			</excludes>           
 		</fileSet>			
 	</fileSets>
 </assembly>
