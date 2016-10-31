@@ -54,6 +54,22 @@ void OutgoingTunnelPool::establishNewConnection(
         std::move(handler));
 }
 
+String OutgoingTunnelPool::getSelfPeerId()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_selfPeerId.isEmpty())
+        m_selfPeerId = QnUuid::createUuid().toSimpleString().toUtf8();
+
+    return m_selfPeerId;
+}
+
+void OutgoingTunnelPool::setSelfPeerId(String value)
+{
+    QnMutexLocker lock(&m_mutex);
+    NX_CRITICAL(m_selfPeerId.isEmpty(), "selfPeerId is not supposed to be changed");
+    m_selfPeerId = value;
+}
+
 const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     const AddressEntry& targetHostAddress)
 {

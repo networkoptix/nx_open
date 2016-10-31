@@ -20,9 +20,9 @@ class TcpReverseAcceptorTest:
 {
 protected:
     TcpReverseAcceptorTest():
-        m_acceptor(kAcceptorHostName, m_acceptResults.pusher())
+        m_acceptor(m_acceptResults.pusher())
     {
-        NX_CRITICAL(m_acceptor.start(SocketAddress::anyAddress));
+        NX_CRITICAL(m_acceptor.start(kAcceptorHostName, SocketAddress::anyAddress));
         m_acceptorAddress = SocketAddress(HostAddress::localhost, m_acceptor.address().port);
     }
 
