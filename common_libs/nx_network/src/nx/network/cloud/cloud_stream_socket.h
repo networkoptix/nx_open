@@ -107,8 +107,7 @@ private:
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */
     std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
-    std::atomic<SocketResultPrimisePtr> m_recvPromisePtr;
-    std::atomic<SocketResultPrimisePtr> m_sendPromisePtr;
+    std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
 
     QnMutex m_mutex;
     bool m_terminated;

@@ -21,8 +21,7 @@ namespace cloud {
 CloudStreamSocket::CloudStreamSocket(int ipVersion)
 :
     m_aioThreadBinder(SocketFactory::createDatagramSocket()),
-    m_recvPromisePtr(nullptr),
-    m_sendPromisePtr(nullptr),
+    m_connectPromisePtr(nullptr),
     m_terminated(false),
     m_ipVersion(ipVersion)
 {
@@ -83,15 +82,8 @@ bool CloudStreamSocket::shutdown()
     pleaseStop(
         [this, &stoppedPromise]()
         {
-            auto sendPromise = m_sendPromisePtr.exchange(nullptr);
-            auto recvPromise = m_recvPromisePtr.exchange(nullptr);
-            
-            const auto interrupted = std::make_pair(SystemError::interrupted, 0);
-
-            if (sendPromise)
-                sendPromise->set_value(interrupted);
-            if (recvPromise)
-                recvPromise->set_value(interrupted);
+            if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
+                promisePtr->set_value(std::make_pair(SystemError::interrupted, 0));
 
             stoppedPromise.set_value();
         });
@@ -142,7 +134,7 @@ bool CloudStreamSocket::connect(
         }
 
         SocketResultPrimisePtr expected = nullptr;
-        if (!m_sendPromisePtr.compare_exchange_strong(expected, &promise))
+        if (!m_connectPromisePtr.compare_exchange_strong(expected, &promise))
         {
             NX_ASSERT(false);
             SystemError::setLastErrorCode(SystemError::already);
@@ -156,8 +148,7 @@ bool CloudStreamSocket::connect(
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
             m_aioThreadBinder->post([this, code](){
-                auto promisePtr = m_sendPromisePtr.exchange(nullptr);
-                if (promisePtr)
+                if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
                     promisePtr->set_value(std::make_pair(code, 0));
             });
         });
