@@ -240,6 +240,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         cameras << m_camera;
     ui->advancedSettingsWidget->setCamera(camera);
     ui->cameraScheduleWidget->setCameras(cameras);
+    ui->licensingWidget->setCameras(cameras);
 
     if (m_camera)
     {
@@ -405,7 +406,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     QnVirtualCameraResourceList cameras;
     if (m_camera)
         cameras << m_camera;
-    ui->licensingWidget->setCameras(cameras);
+
     ui->imageControlWidget->updateFromResources(cameras);
 
     if (!m_camera)
@@ -489,6 +490,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     updateWebPageText();
     ui->advancedSettingsWidget->updateFromResource();
     ui->ioPortSettingsWidget->updateFromResource(m_camera);
+    ui->licensingWidget->updateFromResources();
 
     setHasDbChanges(false);
     m_hasMotionControlsChanges = false;

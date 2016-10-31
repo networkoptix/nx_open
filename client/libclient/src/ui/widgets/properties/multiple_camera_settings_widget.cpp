@@ -104,6 +104,7 @@ void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceLis
 
     m_cameras = cameras;
     ui->cameraScheduleWidget->setCameras(m_cameras);
+    ui->licensingWidget->setCameras(m_cameras);
 
     updateFromResources();
 }
@@ -256,7 +257,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
     updateAlertBar();
 
     ui->imageControlWidget->updateFromResources(m_cameras);
-    ui->licensingWidget->setCameras(m_cameras);
+    ui->licensingWidget->updateFromResources();
     ui->cameraScheduleWidget->updateFromResources();
 
     if (m_cameras.empty())

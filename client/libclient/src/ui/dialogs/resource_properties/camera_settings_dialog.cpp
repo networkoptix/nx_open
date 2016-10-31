@@ -215,7 +215,7 @@ void QnCameraSettingsDialog::updateReadOnly()
     m_settingsWidget->setReadOnly(!permissions.testFlag(Qn::WritePermission));
 }
 
-void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
+bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
     bool askConfirmation =
         !force
@@ -254,13 +254,14 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
                 break;
             default:
                 /* Cancel changes. */
-                return;
+                return false;
         }
 
     }
 
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
+    return true;
 }
 
 Qn::CameraSettingsTab QnCameraSettingsDialog::currentTab() const
@@ -300,6 +301,11 @@ void QnCameraSettingsDialog::submitToResources()
 
     /* Submit and save it. */
     saveCameras(cameras);
+}
+
+void QnCameraSettingsDialog::updateFromResources()
+{
+    m_settingsWidget->updateFromResources();
 }
 
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras)

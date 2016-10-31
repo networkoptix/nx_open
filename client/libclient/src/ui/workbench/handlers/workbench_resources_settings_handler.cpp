@@ -60,7 +60,10 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
     dialogConstructor.setDontFocus(true);
 
-    m_cameraSettingsDialog->setCameras(cameras);
+    if (!m_cameraSettingsDialog->setCameras(cameras))
+        return;
+
+    m_cameraSettingsDialog->updateFromResources();
 
     if (parameters.hasArgument(Qn::FocusTabRole))
     {
