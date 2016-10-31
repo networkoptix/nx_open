@@ -17,6 +17,13 @@ public:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;
+    virtual QnIOPortDataList getRelayOutputList() const override;
+    virtual QnIOPortDataList getInputPortList() const override;
+
+    virtual bool setRelayOutputState(
+        const QString& outputID,
+        bool isActive,
+        unsigned int autoResetTimeoutMS) override;
 
 private:
     std::unique_ptr<FlirWsIOManager> m_ioManager;

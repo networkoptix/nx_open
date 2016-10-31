@@ -1,10 +1,13 @@
 #pragma once
 
+#include <map>
+
 #include <QtWebSockets/QWebSocket>
 
 #include <plugins/common_interfaces/abstract_io_manager.h>
 #include <nx/utils/timer_manager.h>
 #include <utils/common/safe_direct_connection.h>
+#include <nx/network/http/asynchttpclient.h>
 
 class FlirWsIOManager :
     public QObject,
@@ -22,15 +25,25 @@ class FlirWsIOManager :
         int deviceType;
         int sourceIndex;
         QString sourceName;
-        int timestamp2;
+        QString timestamp2;
+        int state;
         double latitude;
         double longitude;
         double altitude;
         int autoacknowledge;
     };
 
+    struct FlirServerWhoAmIResponse
+    {
+        qint64 returnCode;
+        QString returnString;
+        qint64 sessionId;
+        bool owner;
+        QString ip;
+    };
+
 public:
-    FlirWsIOManager();
+    FlirWsIOManager(QnResource* resource);
 
     virtual ~FlirWsIOManager();
 
@@ -59,31 +72,68 @@ public:
     virtual void terminate() override;
 
 private slots:
-    void at_connected();
-    void at_disconnected();
+    void at_controlWebSocketConnected();
+    void at_controlWebSocketDisconnected();
+    void at_notificationWebSocketConnected();
+    void at_notificationWebSocketDisconnected();
+    void at_controlWebSocketError(QAbstractSocket::SocketError error);
+    void at_notificationWebSocketError(QAbstractSocket::SocketError error);
 
 private:
-    bool initiateWsConnection();
-    void requestControlToken();
-    qint64 parseControlMessage(const QString& message);
 
-    QString buildNotificationSubsctionString(const QString& subscriptionType);
+    enum class InitState
+    {
+        initial,
+        settingsRequested,
+        nexusServerEnabled,
+        controlSocketConnected,
+        sessionIdObtained,
+        notificationSocketConnected,
+        subscribed,
+        error
+    };
+
+    void routeIOMonitoringInitialization(InitState newState);
+
+    bool initHttpClient();
+
+    bool tryToEnableNexusServer();
+    bool tryToGetNexusSettings();
+
+    void connectWebsocket(const QString& path, QWebSocket* socket);
+    void connectControlWebsocket();
+    void connectNotificationWebSocket();
+    void requestSessionId();
+    FlirServerWhoAmIResponse parseControlMessage(const QString& message);
+
+    QString buildNotificationSubscriptionPath() const; 
+    QString buildNotificationSubscriptionParamString(const QString& subscriptionType) const;
+
     void subscribeToNotifications();
-    FlirAlarmNotification parseNotification(const QString& message);
-    quint64 parseFlirDateTime(const QString& dateTime);
+    void handleNotification(const QString& message);
+    FlirAlarmNotification parseNotification(const QString& message, bool *outStatus);
+    qint64 parseFlirDateTime(const QString& dateTime, bool* outStatus);
+    void checkAndNotifyIfNeeded(const FlirAlarmNotification& notification);
 
     void sendKeepAlive();
 
 private:
+    QnResource* m_resource;
+    InitState m_initializationState;
     qint64 m_nexusSessionId;
     nx::utils::TimerId m_timerId;
     std::atomic<bool> m_monitoringIsInProgress;
     std::unique_ptr<QWebSocket> m_controlWebSocket;
     std::unique_ptr<QWebSocket> m_notificationWebSocket;
+    nx_http::AsyncHttpClientPtr m_asyncHttpClient;
 
     InputStateChangeCallback m_stateChangeCallback;
     NetworkIssueCallback m_networkIssueCallback;
 
-    QnMutex m_mutex;
+    mutable std::map<QString, bool> m_alarmStates; //< TODO: #dmishin mutable looks a little bit odd here, remove it.
 
+    bool m_isNexusServerEnabled;
+    quint16 m_nexusPort;
+
+    QnMutex m_mutex;
 };
