@@ -13,12 +13,6 @@
 	static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
-#ifdef Q_OS_WIN32
-    #define END_OF_LINE "\r\n"
-#else
-    #define END_OF_LINE std::endl
-#endif
-
 const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
@@ -88,7 +82,7 @@ public:
 #else
             QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << END_OF_LINE;
+            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
 
         {
             std::unique_lock<std::mutex> lk( m_mutex );
@@ -164,17 +158,29 @@ private:
             return;
 
         #ifdef Q_OS_WIN
-            m_file.open(currFileName().toStdWString(), std::ios_base::app | std::ios_base::out);
+            m_file.open(currFileName().toStdWString(), std::ios_base::in | std::ios_base::out);
         #else
-            m_file.open(currFileName().toStdString(), std::ios_base::app | std::ios_base::out);
+            m_file.open(currFileName().toStdString(), std::ios_base::in | std::ios_base::out);
+        #endif
+
+        if (!m_file.fail())
+        {
+            // File exists, prepare to append.
+            m_file.seekp(std::ios_base::streamoff(0), std::ios_base::end);
+            return;
+        }
+
+        #ifdef Q_OS_WIN
+            m_file.open(currFileName().toStdWString(), std::ios_base::out);
+        #else
+            m_file.open(currFileName().toStdString(), std::ios_base::out);
         #endif
 
         if (m_file.fail())
             return;
 
-        // Ensure 1st char is UTF8 BOM
-        if (m_file.tellp() == std::fstream::pos_type(0))
-            m_file.write("\xEF\xBB\xBF", 3);
+        // Ensure 1st char is UTF8 BOM.
+        m_file.write("\xEF\xBB\xBF", 3);
     }
 
     QString currFileName() const

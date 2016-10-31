@@ -873,13 +873,13 @@ void initLog(const QString& _logLevel)
     const QString& logFileLocation = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
     if (!QDir().mkpath(logFileLocation))
         NX_LOG(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    const QString& logFileName = logFileLocation + QLatin1String("/log_file");
+    const QString& logFileName = logFileLocation + QLatin1String("log_file");
     if (!cl_log.create(
             logFileName,
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(logLevel)))
-        NX_LOG(lit("Could not create log file") + logFileName, cl_logALWAYS);
+        NX_LOG(lit("Could not create log file ") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
 }
