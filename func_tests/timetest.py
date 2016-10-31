@@ -77,12 +77,15 @@ class TimeSyncTest(FuncTestCase):
             'ChangePrimaryServer',
             'PrimarySystemTimeChange',
             'SecondarySystemTimeChange',
-            'StopPrimary', 'RestartSecondaryWhilePrimaryOff', 'StartPrimary',
+            'StopPrimary',
+            'RestartSecondaryWhilePrimaryOff',
+            'StartPrimary',
             'PrimaryStillSynchronized',
             'MakeSecondaryAlone'
         ]),
         ('InetTimeSyncTests', [
-            'TurnInetOn', 'ChangePrimarySystime',
+            'TurnInetOn',
+            'ChangePrimarySystime',
             'KeepInetTimeAfterIfdown',
             'KeepInetTimeAfterSecondaryOff',
             'KeepInetTimeAfterSecondaryOn',
@@ -383,7 +386,7 @@ class TimeSyncTest(FuncTestCase):
 
     def TurnInetOn(self):
         #raw_input("[Press ENTER to continue with Internet time sync test init...]")
-        self._prepare_test_phase(self._prepare_inet_test, postUp=True)
+        self._prepare_test_phase(self._prepare_inet_test)
         self._check_time_sync()
         #TODO check for primary, make it primary if not bn
         # until that, set it to be sure

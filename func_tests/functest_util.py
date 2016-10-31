@@ -10,8 +10,8 @@ import Queue
 import threading
 import difflib
 
-__all__ = ['JsonDiff', 'FtConfigParser', 'compareJson', 'showHelp', 'ManagerAddPassword',
-           'SafeJsonLoads', 'TestJsonLoads', 'checkResultsEqual',
+__all__ = ['JsonDiff', 'FtConfigParser', 'compareJson', 'showHelp', 'getHelpDesc',
+           'ManagerAddPassword', 'SafeJsonLoads', 'TestJsonLoads', 'checkResultsEqual',
            'textdiff',
            'ClusterWorker', 'ClusterLongWorker', 'parse_size', 'real_caps',
            'CAMERA_ATTR_EMPTY', 'FULL_SCHEDULE_TASKS',
@@ -529,36 +529,43 @@ _helpMenu = {
         ))
     }
 
-def showHelp(argv):
-    if len(argv) == 2:
-        helpStrHeader=("Help for auto test tool\n\n"
-                 "*****************************************\n"
-                 "**************Function Menu**************\n"
-                 "*****************************************\n"
-                 "Entry            Introduction            \n")
+def showHelp(arg):
+    if not arg:
+        print """Help for auto test tool
 
-        print helpStrHeader
-
-        maxitemlen = max(len(s) for s in _helpMenu.iterkeys())+1
+*****************************************
+************* Function Menu *************
+*****************************************
+Entry            Introduction
+"""
+        maxitemlen = max(len(s) for s in _helpMenu.iterkeys())
         for k,v in _helpMenu.iteritems():
-            print "%s   %s" % ( (k+':').ljust(maxitemlen), v[0])
+            print "%s  %s" % ( k.ljust(maxitemlen) + ':', v[0])
 
-        helpStrFooter = ("\n\nTo see detail help information, please run command:\n"
-               "python main.py --help Entry\n\n"
-               "Eg: python main.py --help auto-test\n"
-               "This will list detail information about auto-test\n")
+        print """
 
-        print helpStrFooter
+To see detail help information, please run command:
+python main.py --help Entry
+
+Eg: python main.py --help auto-test
+This will list detail information about auto-test
+"""
     else:
-        option = argv[2]
-        if option in _helpMenu:
+        if arg in _helpMenu:
             print "==================================="
-            print option
-            print "===================================\n\n"
-            print _helpMenu[option][1]
+            print arg
+            print "===================================\n"
+            print _helpMenu[arg][1]
+            print
         else:
-            print "Option: %s is not found !"%(option)
+            print "Option: %s is not found !" % (arg,)
 
+
+def getHelpDesc(topic, full=False):
+    if topic in _helpMenu:
+        return _helpMenu[topic][int(full)]
+    else:
+        return "<description not found>"
 
 # A helper function to unify pasword managers' configuration
 def ManagerAddPassword(passman, host, user, pwd):

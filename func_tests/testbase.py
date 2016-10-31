@@ -300,15 +300,14 @@ class FuncTestCase(unittest.TestCase):
             self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
         sys.stdout.write("Box %s is ready\n" % box)
 
-    def _prepare_test_phase(self, method, postUp=False):
+    def _prepare_test_phase(self, method):
         self._worker.clearOks()
         for num, box in enumerate(self.hosts):
             self._worker.enqueue(method, (box, num))
         self._worker.joinQueue()
         self.assertTrue(self._worker.allOk(), "Failed to prepare test phase")
-        if postUp:
-            time.sleep(0.5)
-            self._servers_th_ctl('safe-start')
+        time.sleep(0.5)
+        self._servers_th_ctl('safe-start')
         self._wait_servers_up()
         if self._serv_version is None:
             self._getVersion()
@@ -502,7 +501,7 @@ class UnitTestRollback(object):
 
     def __init__(self, autorollback=False, nocreate=False):
         # nocreate is used only for `functest.py --recover` call only that doesn't run any tests
-        self._auto = autorollback or _testMaster.auto_rollback
+        self._auto = autorollback or _testMaster.args.autorollback
         if os.path.isfile(".rollback") and self._askRollback():
             self.doRecover(checkFile=False)
         if not nocreate:
@@ -651,37 +650,14 @@ class FuncTestMaster(object):
     clusterTestServerObjs = dict()
     configFname = CONFIG_FNAME
     config = None
-    argv = []
+    args = None
     openerReady = False
     threadNumber = 16
     testCaseSize = 2
     unittestRollback = None
     #CHUNK_SIZE=4*1024*1024 # 4 MB
     #TRANSACTION_LOG="__transaction.log"
-    auto_rollback = False
-    skip_timesync = False
-    skip_backup = False
-    skip_mservarc = False
-    skip_streming = False
-    skip_dbup = False
-    do_main_only = False
-    need_dump = False
     api = ServerApi
-
-    # specific test flags
-    _natconTest = False
-
-    _argFlags = {
-        '--autorollback': 'auto_rollback',
-        '--arb': 'auto_rollback', # an alias for the previous
-        '--skiptime': 'skip_timesync',
-        '--skipbak': 'skip_backup',
-        '--skipmsa': 'skip_mservarc',
-        '--skipstrm': 'skip_streming',
-        '--skipdbup': 'skip_dbup',
-        '--mainonly': 'do_main_only',
-        '--dump': 'need_dump',
-    }
 
     _getterAPIList = ["getResourceParams",
         "getMediaServersEx",
@@ -716,7 +692,7 @@ class FuncTestMaster(object):
     def _loadConfig(self):
         parser = self.getConfig()
 
-        _section = "Nat" if self._natconTest else "General" # Fixme: ugly hack :(
+        _section = "Nat" if self.args.natcon else "General" # Fixme: ugly hack :(
         self.clusterTestServerList = parser.get(_section,"serverList").split(",")
 
         parser.rtset('ServerList', self.clusterTestServerList)
@@ -724,7 +700,7 @@ class FuncTestMaster(object):
         parser.rtset('SleepTime', self.clusterTestSleepTime)
         self.threadNumber = parser.getint("General","threadNumber")
         self.testCaseSize = parser.getint_safe("General","testCaseSize", 2)
-        parser.rtset('need_dump', self.need_dump)
+        parser.rtset('need_dump', self.args.dump)
 
     def setUpPassword(self):
         config = self.getConfig()
@@ -739,39 +715,12 @@ class FuncTestMaster(object):
         self.openerReady = True
 #        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
 
-    def check_flags(self, argv):
-        "Checks flag options and remove them from argv"
-        #FIXME not used now. remove it?
-        g = globals()
-        found = False
-        for arg in argv:
-            if arg in self._argFlags:
-                g[self._argFlags[arg]] = True
-                found = True
-        if found:
-            argv[:] = [arg for arg in argv if arg not in self._argFlags]
-
-    def preparseArgs(self, argv):
-        other = [argv[0]]
-        config_next = False
-        for arg in argv[1:]:
-            if config_next:
-                self.configFname = arg
-                config_next = False
-                print "Use config", self.configFname
-            elif arg in self._argFlags:
-                setattr(self, self._argFlags[arg], True)
-            elif arg in ('--config', '-c'):
-                config_next = True
-            elif arg.startswith('--config='):
-                self.configFname = arg[len('--config='):]
-                print "Use config", self.configFname
-            else:
-                if arg == '--natcon':
-                    self._natconTest = True
-                other.append(arg)
-        self.argv = other
-        return other
+    def preparseArgs(self, args):
+        if args.config:
+            self.configFname = args.config
+            print "Use config", self.configFname
+        self.args = args
+        return
 
     def _callAllGetters(self):
         print "======================================"
