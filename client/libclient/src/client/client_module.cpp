@@ -25,6 +25,7 @@
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
+#include <client/forgotten_systems_manager.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -480,6 +481,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     qnCommon->store<QnModuleFinder>(moduleFinder);
 
     qnCommon->store<QnSystemsFinder>(new QnSystemsFinder());
+    qnCommon->store<QnForgottenSystemsManager>(new QnForgottenSystemsManager());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);

@@ -18,6 +18,8 @@ Button
       ? Style.darkerColor(hoveredColor) : control.bkgColor);
 
     property string iconUrl;
+    property string hoveredIconUrl;
+    property string pressedIconUrl;
 
     height: 28;
 
@@ -39,7 +41,22 @@ Button
         anchors.fill: parent;
 
         visible: control.iconUrl.length;
-        source: control.iconUrl;
+
+
+        function nonEmptyIcon(target, base)
+        {
+            return (target.length ? target : base);
+        }
+
+        source:
+        {
+            if (control.isPressed)
+                return nonEmptyIcon(control.pressedIconUrl, control.iconUrl);
+
+            return (control.isHovered && control.hoveredIconUrl.length
+                ? control.hoveredIconUrl
+                : control.iconUrl);
+        }
     }
 
     MouseArea
@@ -53,6 +70,7 @@ Button
 
     background: Item
     {
+        visible: !control.iconUrl.length;
         Rectangle
         {
             anchors.fill: parent;

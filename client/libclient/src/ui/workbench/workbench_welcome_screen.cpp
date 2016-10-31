@@ -24,6 +24,7 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+#include <client/forgotten_systems_manager.h>
 
 #include <utils/common/app_info.h>
 
@@ -450,6 +451,12 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
     color.setAlphaF(alpha);
     return color;
 }
+
+void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
+{
+    qnForgottenSystemsManager->forgetSystem(systemId);
+}
+
 
 void QnWorkbenchWelcomeScreen::showScreen()
 {
