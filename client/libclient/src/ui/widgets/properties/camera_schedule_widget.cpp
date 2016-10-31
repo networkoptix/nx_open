@@ -842,9 +842,6 @@ int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
 
 void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
 {
-    if (m_updating)
-        return;
-
     if (m_disableUpdateGridParams)
         return;
 
@@ -896,7 +893,9 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     updateMaxFPS();
 
     checkScheduleSet();
-    emit gridParamsChanged();
+
+    if (!m_updating)
+        emit gridParamsChanged();
 }
 
 void QnCameraScheduleWidget::setFps(int value)
