@@ -1,4 +1,3 @@
-
 #include "forgotten_systems_manager.h"
 
 #include <nx/utils/log/assert.h>
@@ -21,13 +20,13 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
         {
             const auto checkOnlineSystem =
                 [this, id = system->id(), localId = system->localId(), rawSystem = system.data()]()
-            {
-                if (rawSystem->isOnline())
                 {
-                    rememberSystem(id);
-                    rememberSystem(localId.toString());
-                }
-            };
+                    if (rawSystem->isOnline())
+                    {
+                        rememberSystem(id);
+                        rememberSystem(localId.toString());
+                    }
+                };
 
             connect(system.data(), &QnBaseSystemDescription::onlineStateChanged,
                 this, checkOnlineSystem);
@@ -37,7 +36,7 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
         this, processSystemDiscovered);
 
-    for (const auto& system : qnSystemsFinder->systems())
+    for (const auto& system: qnSystemsFinder->systems())
         processSystemDiscovered(system);
 
     connect(this, &QnForgottenSystemsManager::forgottenSystemsChanged, this,
