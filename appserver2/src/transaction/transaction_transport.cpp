@@ -54,8 +54,8 @@ QnTransactionTransport::~QnTransactionTransport()
 {
     pleaseStopSync();
 
-    if (m_ttFinishCallback)
-        m_ttFinishCallback();
+    if (m_beforeDestructionHandler)
+        m_beforeDestructionHandler();
 }
 
 void QnTransactionTransport::close()
@@ -161,7 +161,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
 void QnTransactionTransport::setBeforeDestroyCallback(
     std::function<void()> ttFinishCallback)
 {
-    m_ttFinishCallback = ttFinishCallback;
+    m_beforeDestructionHandler = ttFinishCallback;
 }
 
 }   // namespace ec2

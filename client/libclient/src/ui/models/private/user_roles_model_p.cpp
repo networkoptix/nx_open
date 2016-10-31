@@ -248,7 +248,14 @@ RoleDescription QnUserRolesModelPrivate::roleByRow(int row) const
 
     NX_ASSERT(m_customRoleEnabled);
     if (m_customRoleEnabled)
-        return RoleDescription(Qn::UserRole::CustomPermissions);
+    {
+        auto result = RoleDescription(Qn::UserRole::CustomPermissions);
+        if (!m_customRoleName.isEmpty())
+            result.name = m_customRoleName;
+        if (!m_customRoleDescription.isEmpty())
+            result.description = m_customRoleDescription;
+        return result;
+    }
 
     return RoleDescription();
 }
@@ -261,3 +268,18 @@ int QnUserRolesModelPrivate::count() const
     return total;
 }
 
+void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QString& description)
+{
+    if (m_customRoleName == name && m_customRoleDescription == description)
+        return;
+
+    m_customRoleName = name;
+    m_customRoleDescription = description;
+
+    if (!m_customRoleEnabled)
+        return;
+
+    Q_Q(QnUserRolesModel);
+    QModelIndex customRoleIndex = q->index(count() - 1, 0);
+    emit q->dataChanged(customRoleIndex, customRoleIndex);
+}

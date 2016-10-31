@@ -21,7 +21,7 @@ enum class ConnectionState
 
 /**
  * Connection can be closed by timeout or due to error. 
- * Use \a DbRequestExecutionThread::isOpen to test it.
+ * Use DbRequestExecutionThread::isOpen to test it.
  */
 class DbRequestExecutionThread
 :
@@ -55,6 +55,9 @@ private:
     QSqlDatabase m_dbConnection;
     QueryExecutorQueue* const m_queryExecutorQueue;
     ConnectionState m_state;
+
+    bool tuneConnection();
+    bool tuneMySqlConnection();
 
     static bool isDbErrorRecoverable(DBResult dbResult);
 };

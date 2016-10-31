@@ -1,5 +1,5 @@
  <assembly>
-	<id>${profile.classifier}-pdb-main-apps</id>
+	<id>${profile.classifier}-pdb-misc</id>
 	<formats>
 		<format>dir</format>
 	</formats>
@@ -10,9 +10,12 @@
 			<outputDirectory>../</outputDirectory>
 			<includes>
 				<include>**/applauncher.pdb</include>
-				<include>**/mediaserver.pdb</include>
-				<include>**/desktop_client.pdb</include>
-				<include>**/traytool.pdb</include>
+				<include>**/traytool.pdb</include>                
+                <include>**/minilauncher.pdb</include>
+				<include>**/mobile_client.pdb</include>
+				<include>**/nxtool.pdb</include>
+				<include>**/testcamera.pdb</include>
+				<include>**/AxNxWitness*.pdb</include>                
 			</includes>           
 		</fileSet>			
 	</fileSets>

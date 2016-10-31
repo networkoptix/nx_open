@@ -63,6 +63,9 @@ public:
     bool isWheelingAccelerated() const;
     void setWheelingAccelerated(bool enable);
 
+    qreal wheelFactor() const;
+    void setWheelFactor(qreal factor);
+
     enum SliderAction
     {
         SliderNoAction,

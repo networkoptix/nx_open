@@ -108,12 +108,6 @@ void QnWidgetAnchor::updateGeometry()
     if (!parentWidget)
         return;
 
-    if (parentWidget->layout())
-    {
-        qWarning() << "QnWidgetAnchor: widget is controlled by a layout";
-        return;
-    }
-
     QRect geometry = m_widget->geometry();
     QSize parentSize = parentWidget->size();
 

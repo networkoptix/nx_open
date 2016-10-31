@@ -347,6 +347,7 @@ void QnConnectionManagerPrivate::doConnect()
             const auto connectionData =
                 helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url);
             helpers::updateWeightData(localId);
+            qnClientCoreSettings->save();
 
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();

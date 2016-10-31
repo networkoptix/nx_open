@@ -242,6 +242,16 @@ void AbstractGraphicsSlider::setWheelingAccelerated(bool enable)
     d_func()->acceleratedWheeling = enable;
 }
 
+qreal AbstractGraphicsSlider::wheelFactor() const
+{
+    return d_func()->wheelFactor;
+}
+
+void AbstractGraphicsSlider::setWheelFactor(qreal factor)
+{
+    d_func()->wheelFactor = factor;
+}
+
 void AbstractGraphicsSlider::triggerAction(SliderAction action)
 {
     Q_D(AbstractGraphicsSlider);
@@ -357,7 +367,7 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
     if (orientation == Qt::Horizontal)
         delta = -delta;
 
-    qreal offset = qreal(delta) / 120;
+    qreal offset = wheelFactor * delta / 120.0;
 
     if (modifiers & (Qt::ControlModifier | Qt::ShiftModifier))
     {

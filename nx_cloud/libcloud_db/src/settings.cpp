@@ -46,6 +46,9 @@ const QLatin1String kDefaultDbPassword("");
 const QLatin1String kDbConnectOptions("db/connectOptions");
 const QLatin1String kDefaultDbConnectOptions("");
 
+const QLatin1String kDbEncoding("db/encoding");
+const QLatin1String kDefaultDbEncoding("utf8");
+
 const QLatin1String kDbMaxConnections("db/maxConnections");
 const QLatin1String kDefaultDbMaxConnections("1");
 
@@ -60,8 +63,7 @@ std::chrono::minutes(1);
 const QLatin1String kChangeUser("changeUser");
 
 //notification settings
-const QLatin1String kNotificationServiceEndpoint("notification/serviceEndpoint");
-const QLatin1String kNotificationSecret("notification/secret");
+const QLatin1String kNotificationUrl("notification/url");
 
 const QLatin1String kNotificationEnabled("notification/enabled");
 const bool kDefaultNotificationEnabled = true;
@@ -263,6 +265,7 @@ void Settings::loadConfiguration()
     m_dbConnectionOptions.userName = m_settings.value(kDbUserName, kDefaultDbUserName).toString();
     m_dbConnectionOptions.password = m_settings.value(kDbPassword, kDefaultDbPassword).toString();
     m_dbConnectionOptions.connectOptions = m_settings.value(kDbConnectOptions, kDefaultDbConnectOptions).toString();
+    m_dbConnectionOptions.encoding = m_settings.value(kDbEncoding, kDefaultDbEncoding).toString();
     m_dbConnectionOptions.maxConnectionCount = m_settings.value(kDbMaxConnections, kDefaultDbMaxConnections).toUInt();
     if (m_dbConnectionOptions.maxConnectionCount == 0)
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
@@ -279,12 +282,7 @@ void Settings::loadConfiguration()
     m_changeUser = m_settings.value(kChangeUser).toString();
 
     //email
-    m_notification.serviceEndpoint =
-        m_settings.value(kNotificationServiceEndpoint).toString();
-
-    m_notification.secret =
-        m_settings.value(kNotificationSecret).toString();
-
+    m_notification.url = m_settings.value(kNotificationUrl).toString();
     m_notification.enabled =
         m_settings.value(
             kNotificationEnabled,

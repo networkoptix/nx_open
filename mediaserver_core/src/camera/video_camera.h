@@ -32,7 +32,12 @@ public:
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
 
-    int copyLastGop(bool primaryLiveStream, qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq);
+    int copyLastGop(
+        bool primaryLiveStream, 
+        qint64 skipTime, 
+        QnDataPacketQueue& dstQueue, 
+        int cseq,
+        bool iFramesOnly);
 
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);

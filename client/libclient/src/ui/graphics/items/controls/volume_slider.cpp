@@ -6,6 +6,13 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+namespace {
+
+static const qreal kMouseWheelFactor = 2.0;
+
+} // namespace
+
+
 QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
     base_type(parent),
     m_updating(false)
@@ -14,6 +21,8 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     setProperty(style::Properties::kSliderFeatures, static_cast<int>(style::SliderFeature::FillingUp));
+
+    setWheelFactor(kMouseWheelFactor);
 
     setRange(0, 100);
     setSliderPosition(nx::audio::AudioDevice::instance()->volume() * 100);
@@ -25,7 +34,7 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
         [this]
         {
             QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-            setSliderPosition(nx::audio::AudioDevice::instance()->volume() * 100);  
+            setSliderPosition(nx::audio::AudioDevice::instance()->volume() * 100);
         });
 }
 

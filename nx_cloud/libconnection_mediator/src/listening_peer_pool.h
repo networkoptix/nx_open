@@ -111,7 +111,8 @@ public:
     std::vector<MediaserverData> findPeersBySystemId(
         const nx::String& systemId) const;
 
-    data::ListeningPeersBySystem getListeningPeers() const;
+    // TODO: rename to getListeningPeersBySystem
+    data::ListeningPeersBySystems getListeningPeers() const;
     std::vector<ConnectionWeakRef> getAllConnections() const;
 
 private:

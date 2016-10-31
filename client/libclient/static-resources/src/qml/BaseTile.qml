@@ -26,8 +26,26 @@ Item
     property bool isExpanded: false;
     property bool isAvailable: false;
     property real expandedOpacity: shadow.opacity;
+    property bool isOnline: false;
+    property bool isCloudTile: false;
+    property string systemId;
+    property string localId;
 
     signal collapsedTileClicked();
+
+    property bool forceImmediateAnimation: false;
+
+    function getDuration(duration)
+    {
+        return (forceImmediateAnimation ? 0 : duration);
+    }
+
+    function forceCollapsedState()
+    {
+        control.forceImmediateAnimation = true;
+        tileHolder.state = "collapsed";
+        control.forceImmediateAnimation = false;
+    }
 
     function toggle()
     {
@@ -70,6 +88,12 @@ Item
 
                 PropertyChanges
                 {
+                    target: hideTileButton;
+                    opacity: (control.isOnline ? 0 : 1);
+                }
+
+                PropertyChanges
+                {
                     target: shadow;
                     opacity: 0;
                 }
@@ -108,6 +132,13 @@ Item
 
                 PropertyChanges
                 {
+                    target: hideTileButton;
+                    opacity: 0;
+                }
+
+
+                PropertyChanges
+                {
                     target: shadow;
                     opacity: 1;
                 }
@@ -132,6 +163,8 @@ Item
 
             SequentialAnimation
             {
+                id: anim;
+
                 PropertyAction
                 {
                     target: control;
@@ -149,23 +182,23 @@ Item
                         {
                             properties: "x, y";
                             easing.type: Easing.InOutCubic;
-                            duration: 400;
+                            duration: control.getDuration(400);
                         }
 
                         NumberAnimation
                         {
                             properties: "height";
                             easing.type: Easing.OutCubic;
-                            duration: 400;
+                            duration: control.getDuration(400);
                         }
                     }
 
                     NumberAnimation
                     {
-                        targets: [collapseTileButton, menuButtonControl];
+                        targets: [collapseTileButton, hideTileButton, menuButtonControl];
                         properties: "opacity";
                         easing.type: Easing.OutCubic;
-                        duration: 200;
+                        duration: control.getDuration(200);
                     }
 
                     NumberAnimation
@@ -173,7 +206,7 @@ Item
                         targets: [shadow];
                         properties: "opacity";
                         easing.type: Easing.OutCubic;
-                        duration: 400;
+                        duration: control.getDuration(400);
                     }
 
                     NumberAnimation
@@ -182,7 +215,7 @@ Item
                         properties: "opacity";
                         easing.type: (tileHolder.state == "collapsed" ?
                               Easing.InCubic : Easing.OutCubic);
-                        duration: 200;
+                        duration: control.getDuration(200);
                     }
                 }
 
@@ -218,15 +251,25 @@ Item
             height: tileHolder.parent.height;
 
             hoverEnabled: true;
-            onClicked:
+            onPressed:
+            {
+                if (context.connectingToSystem.length)
+                    return;
+
+                if (control.isExpanded)
+                {
+                    control.toggle();
+                    mouse.accepted = false;
+                }
+            }
+
+            onReleased:
             {
                 if (context.connectingToSystem.length)
                     return;
 
                 if (!control.isExpanded)
                     control.collapsedTileClicked();
-                else
-                    control.toggle();
             }
         }
 
@@ -299,16 +342,43 @@ Item
                     width: 40;
                     height: 40;
 
+                    iconUrl: "qrc:/skin/welcome_page/close.png";
                     visible: (opacity != 0) && isExpanded;
                     anchors.right: parent.right;
                     anchors.top: parent.top;
 
-                    iconUrl: "qrc:/skin/welcome_page/close.png";
                     bkgColor: tileArea.color;
                     hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
                     enabled: !control.isConnecting;
 
                     onClicked: { control.toggle(); }
+                }
+
+                NxButton
+                {
+                    id: hideTileButton;
+
+                    width: 24;
+                    height: 24;
+
+                    visible: (opacity != 0);
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+
+                    anchors.rightMargin: 6;
+                    anchors.topMargin: 12;
+
+                    iconUrl: "qrc:/skin/welcome_page/tile_hide.png";
+                    hoveredIconUrl: "qrc:/skin/welcome_page/tile_hide_hovered.png";
+                    pressedIconUrl: "qrc:/skin/welcome_page/tile_hide_pressed.png";
+                    showBackground: false;
+
+                    bkgColor: tileArea.color;
+                    onClicked:
+                    {
+                        var id = (isCloudTile ? control.systemId : control.localId);
+                        context.hideSystem(id);
+                    }
                 }
 
                 Loader

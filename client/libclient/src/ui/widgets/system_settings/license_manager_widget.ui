@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>447</width>
-    <height>425</height>
+    <height>251</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="spacing">
     <number>16</number>
    </property>
@@ -28,13 +28,19 @@
    </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Active Licenses</string>
      </property>
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -47,10 +53,31 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0" colspan="3">
-       <widget class="QTreeView" name="gridLicenses">
+      <property name="verticalSpacing">
+       <number>16</number>
+      </property>
+      <item row="0" column="0" colspan="4">
+       <widget class="QnTreeView" name="gridLicenses">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>500</height>
+         </size>
+        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustToContents</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
@@ -61,11 +88,27 @@
         <property name="rootIsDecorated">
          <bool>false</bool>
         </property>
+        <property name="uniformRowHeights">
+         <bool>true</bool>
+        </property>
         <property name="itemsExpandable">
          <bool>false</bool>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>
+        </property>
+        <property name="allColumnsShowFocus">
+         <bool>true</bool>
+        </property>
+        <attribute name="headerStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QPushButton" name="detailsButton">
+        <property name="text">
+         <string>Details...</string>
         </property>
        </widget>
       </item>
@@ -77,48 +120,54 @@
        </widget>
       </item>
       <item row="1" column="0" rowspan="2">
-       <widget class="QLabel" name="infoLabel">
-        <property name="wordWrap">
-         <bool>true</bool>
+       <widget class="QGroupBox" name="infoGroupBox">
+        <property name="title">
+         <string>The software is licensed to</string>
         </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLabel" name="infoLabel"/>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="detailsButton">
-        <property name="text">
-         <string>Selected License Details</string>
+      <item row="1" column="1" rowspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
-      <item row="2" column="1" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="exportLicensesButton">
-          <property name="text">
-           <string>Export Licenses...</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="2" column="2" colspan="2">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>1</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="newLicenseGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>New License</string>
      </property>
@@ -147,6 +196,19 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>1</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -156,7 +218,17 @@
    <header location="global">ui/widgets/system_settings/license_widget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QnTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">ui/widgets/common/tree_view.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>gridLicenses</tabstop>
+  <tabstop>removeButton</tabstop>
+  <tabstop>detailsButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>

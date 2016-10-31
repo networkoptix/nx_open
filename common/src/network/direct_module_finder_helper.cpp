@@ -2,6 +2,7 @@
 
 #include <QtCore/QTimer>
 
+#include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
@@ -87,6 +88,12 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     QnUrlSet urls;
     QnUrlSet additionalUrls;
     QnUrlSet ignoredUrls;
+
+    if (auto cloudAddress = server->getCloudAddress()) {
+        QUrl url = makeUrl(cloudAddress->address.toString(), cloudAddress->port);
+        urls.insert(url);
+        addUrl(url, m_urls);
+    }
 
     for (const auto &address: server->getNetAddrList()) {
         QUrl url = makeUrl(address.address.toString(), address.port);

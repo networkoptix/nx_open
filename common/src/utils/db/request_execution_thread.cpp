@@ -2,6 +2,7 @@
 
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
@@ -27,7 +28,7 @@ DbRequestExecutionThread::~DbRequestExecutionThread()
 
 bool DbRequestExecutionThread::open()
 {
-    //using guid as a unique connection name
+    // Using guid as a unique connection name.
     m_dbConnection = QSqlDatabase::addDatabase(
         QnLexical::serialized<RdbmsDriverType>(m_connectionOptions.driverType),
         QUuid::createUuid().toString());
@@ -45,6 +46,13 @@ bool DbRequestExecutionThread::open()
             cl_logWARNING);
         return false;
     }
+
+    if (!tuneConnection())
+    {
+        m_dbConnection.close();
+        return false;
+    }
+
     return true;
 }
 
@@ -105,6 +113,35 @@ void DbRequestExecutionThread::run()
 
         previousActivityTime = std::chrono::steady_clock::now();
     }
+}
+
+bool DbRequestExecutionThread::tuneConnection()
+{
+    switch (m_connectionOptions.driverType)
+    {
+        case RdbmsDriverType::mysql:
+            return tuneMySqlConnection();
+        default:
+            return true;
+    }
+}
+
+bool DbRequestExecutionThread::tuneMySqlConnection()
+{
+    if (!m_connectionOptions.encoding.isEmpty())
+    {
+        QSqlQuery query(m_dbConnection);
+        query.prepare(lit("SET NAMES '%1'").arg(m_connectionOptions.encoding));
+        if (!query.exec())
+        {
+            NX_LOGX(lm("Failed to set connection character set to \"%1\". %2")
+                .arg(m_connectionOptions.encoding).arg(query.lastError().text()),
+                cl_logWARNING);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)

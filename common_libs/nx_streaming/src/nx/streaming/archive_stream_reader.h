@@ -16,7 +16,7 @@ class FrameTypeExtractor;
 class QnArchiveStreamReader: public QnAbstractArchiveStreamReader
 {
     Q_OBJECT;
-
+    typedef QnAbstractArchiveStreamReader base_type;
 public:
     QnArchiveStreamReader(const QnResourcePtr& dev);
     virtual ~QnArchiveStreamReader();
@@ -55,6 +55,7 @@ public:
     virtual bool isMediaPaused() const;
     virtual void resumeMedia();
     virtual QnAbstractMediaDataPtr getNextData();
+    virtual bool needKeyData(int channel) const override;
 
     bool setSendMotion(bool value);
 

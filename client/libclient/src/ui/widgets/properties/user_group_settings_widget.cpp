@@ -177,30 +177,25 @@ public:
             {
                 return role.id == selectedId;
             });
+
+        Qn::GlobalPermissions oldPermissions = Qn::NoGlobalPermissions;
         if (selectedRole != roles.end())
+        {
+            oldPermissions = selectedRole->permissions;
             roles.erase(selectedRole);
+        }
 
         replacementRolesModel->setUserRoles(roles);
 
-        //TODO: #vkutin Find the best replacement instead of just choosing Live Viewer
-        QnUuid bestReplacementId;
-        Qn::GlobalPermissions bestReplacementPermissions = Qn::GlobalLiveViewerPermissionSet;
+        Qn::UserRole defaultReplacementRole =
+            oldPermissions.testFlag(Qn::GlobalAccessAllMediaPermission)
+                ? Qn::UserRole::LiveViewer
+                : Qn::UserRole::CustomPermissions;
 
-        QModelIndexList indices;
-        if (bestReplacementId.isNull())
-        {
-            indices = replacementRolesModel->match(replacementRolesModel->index(0, 0),
-                Qn::GlobalPermissionsRole,
-                QVariant::fromValue(bestReplacementPermissions),
-                1, Qt::MatchExactly);
-        }
-        else
-        {
-            indices = replacementRolesModel->match(replacementRolesModel->index(0, 0),
-                Qn::UuidRole,
-                QVariant::fromValue(bestReplacementId),
-                1, Qt::MatchExactly);
-        }
+        auto indices = replacementRolesModel->match(replacementRolesModel->index(0, 0),
+            Qn::UserRoleRole,
+            QVariant::fromValue(defaultReplacementRole),
+            1, Qt::MatchExactly);
 
         replacementComboBox->setCurrentIndex(indices.empty() ? 0 : indices[0].row());
 
@@ -211,7 +206,7 @@ public:
 
         if (deleteRadioButton->isChecked())
         {
-            replacement = QnUserGroupSettingsModel::RoleReplacement::empty();
+            replacement = QnUserGroupSettingsModel::RoleReplacement();
             return true;
         }
 
@@ -238,12 +233,16 @@ private:
         NX_ASSERT(!replacementMessageBox && !replacementComboBox
             && !deleteRadioButton && !changeRadioButton);
 
-        replacementRolesModel = new QnUserRolesModel(this, QnUserRolesModel::StandardRoleFlag);
+        replacementRolesModel = new QnUserRolesModel(this, QnUserRolesModel::StandardRoleFlag
+                                                         | QnUserRolesModel::CustomRoleFlag);
+        replacementRolesModel->setCustomRoleStrings(
+            tr("Custom with no permissions"),
+            tr("Users will have no permissions unless changed later."));
 
         Q_Q(QnUserGroupSettingsWidget);
 
         replacementMessageBox = new QnMessageBox(QnMessageBox::Warning,
-            Qn::Empty_Help, //TODO: #vkutin #GDM Change to correct topic
+            Qn::Empty_Help,
             q->ui->deleteGroupButton->text(),
             tr("Choose an action to do with users who had this role:"),
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel,

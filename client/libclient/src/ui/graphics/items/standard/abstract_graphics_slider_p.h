@@ -26,6 +26,7 @@ public:
         invertedAppearance(false), invertedControls(false),
         acceleratedWheeling(false),
         repeatAction(AbstractGraphicsSlider::SliderNoAction),
+        wheelFactor(1.0),
         mouseButtons(0)
 #ifdef QT_KEYPAD_NAVIGATION
       , isAutoRepeating(false)
@@ -57,6 +58,8 @@ public:
     QBasicTimer repeatActionTimer;
     int repeatActionTime;
     AbstractGraphicsSlider::SliderAction repeatAction;
+
+    qreal wheelFactor;
 
 #ifdef QT_KEYPAD_NAVIGATION
     qint64 origValue;

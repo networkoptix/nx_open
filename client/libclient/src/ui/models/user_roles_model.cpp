@@ -77,6 +77,12 @@ int QnUserRolesModel::columnCount(const QModelIndex& parent) const
     return 1;
 }
 
+void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& description)
+{
+    Q_D(QnUserRolesModel);
+    d->setCustomRoleStrings(name, description);
+}
+
 QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
 {
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))

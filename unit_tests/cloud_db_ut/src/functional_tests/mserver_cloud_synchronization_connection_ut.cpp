@@ -12,8 +12,7 @@ namespace cdb {
  * This test launches cdb and establishes transaction connection(s) to it.
  * Does not bring up whole appserver2 peer.
  */
-class Ec2MserverCloudSynchronizationConnection
-    :
+class Ec2MserverCloudSynchronizationConnection:
     public CdbFunctionalTest
 {
 public:
@@ -101,7 +100,6 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
 TEST_F(Ec2MserverCloudSynchronizationConnection, checking_connection_blink_stability)
 {
     constexpr int maxConcurrentConnectionsToCreate = 50;
-    constexpr auto delayBeforeCheckingConnectionState = std::chrono::seconds(3);
     constexpr auto testRunTime = std::chrono::seconds(10);
 
     ASSERT_TRUE(startAndWaitUntilStarted());

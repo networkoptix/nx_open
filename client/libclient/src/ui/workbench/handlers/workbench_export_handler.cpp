@@ -428,8 +428,9 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                     int result = QnMessageBox::warning(
                         mainWindow(),
                         tr("AVI format is not recommended"),
-                        tr("AVI format is not recommended for export of non-continuous recording when audio track is present."
-                            "Do you want to continue?"),
+                        tr("AVI format is not recommended for export of non-continuous recording when audio track is present.")
+                        + L'\n'
+                        + tr("Do you want to continue?"),
                         QDialogButtonBox::Yes | QDialogButtonBox::No,
                         QDialogButtonBox::No
                     );

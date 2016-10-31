@@ -70,7 +70,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler);
+        nx_http::RequestProcessedHandler completionHandler);
     /**
      * Mediaserver uses this method to push transactions.
      */
@@ -79,7 +79,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler);
+        nx_http::RequestProcessedHandler completionHandler);
 
     /**
      * Dispatches transaction to corresponding peers.

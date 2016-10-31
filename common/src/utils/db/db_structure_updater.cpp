@@ -155,6 +155,10 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
         static_cast< size_t >(dbVersion) < (m_initialVersion + m_updateScripts.size());
         ++dbVersion)
     {
+        NX_LOGX(lm("Updating structure to version %1. %2")
+            .arg(dbVersion).arg(m_updateScripts[dbVersion - m_initialVersion].sqlScript),
+            cl_logDEBUG2);
+
         if (!execDbUpdate(m_updateScripts[dbVersion - m_initialVersion], queryContext))
         {
             NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2").

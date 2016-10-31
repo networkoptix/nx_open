@@ -299,7 +299,7 @@ void CloudStreamSocket::connectAsync(
         std::bind(
             &CloudStreamSocket::onAddressResolved,
             this, sharedOperationGuard, remotePort, _1, _2),
-        true,
+        NatTraversalSupport::enabled,
         m_ipVersion,
         this);
 }
@@ -402,7 +402,7 @@ bool CloudStreamSocket::startAsyncConnect(
     {
         case AddressType::direct:
             //using tcp connection
-            m_socketDelegate.reset(new TCPSocket(true, m_ipVersion));
+            m_socketDelegate.reset(new TCPSocket(m_ipVersion));
             setDelegate(m_socketDelegate.get());
             if (!m_socketDelegate->setNonBlockingMode(true))
                 return false;

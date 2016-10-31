@@ -186,7 +186,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case IsCloudSystemRoleId:
             return system->isCloudSystem();
         case IsOnlineRoleId:
-            return !system->servers().isEmpty();
+            return system->isOnline();
         case IsCompatibleRoleId:
             return d->isCompatibleSystem(system);
         case IsCompatibleInternalRoleId:
@@ -265,12 +265,6 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             at_serverChanged(systemDescription, serverId, fields);
         });
 
-    data->connections << connect(systemDescription, &QnBaseSystemDescription::idChanged,this,
-        [this, systemDescription]()
-        {
-            emitDataChanged(systemDescription, QVector<int>() << QnSystemsModel::SystemIdRoleId);
-        });
-
     data->connections << connect(systemDescription, &QnBaseSystemDescription::systemNameChanged, this,
         [this, systemDescription]()
         {
@@ -305,6 +299,16 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
         << connect(systemDescription, &QnBaseSystemDescription::serverAdded, this, serverAction);
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::serverRemoved, this, serverAction);
+
+    const auto emitOnlineChanged =
+        [this, systemDescription]()
+        {
+            const auto roles = QVector<int>() << QnSystemsModel::IsOnlineRoleId;
+            emitDataChanged(systemDescription, roles);
+        };
+
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::onlineStateChanged, this, emitOnlineChanged);
 
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
     internalData.append(data);
@@ -404,10 +408,16 @@ void QnSystemsModelPrivate::at_serverChanged(
 
 void QnSystemsModelPrivate::resetModel()
 {
+    Q_Q(QnSystemsModel);
+
+    q->beginResetModel();
+
     internalData.clear();
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
+
+    q->endResetModel();
 }
 
 QString QnSystemsModelPrivate::getCompatibleVersion(
@@ -434,14 +444,18 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
         const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
+
     if (servers.isEmpty())
         return QString();
 
-    const auto predicate = [this](const QnModuleInformation& serverInfo)
-    {
-        auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-        return connectionResult == Qn::IncompatibleVersionConnectionResult;
-    };
+    const auto predicate =
+        [this, systemDescription](const QnModuleInformation& serverInfo)
+        {
+            if (!systemDescription->isOnlineServer(serverInfo.id))
+                return false;
+            auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+            return connectionResult == Qn::IncompatibleVersionConnectionResult;
+        };
 
     const auto incompatibleIt =
         std::find_if(servers.begin(), servers.end(), predicate);
@@ -460,8 +474,11 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
-        [](const QnModuleInformation& serverInfo)
+        [systemDescription](const QnModuleInformation& serverInfo)
         {
+            if (!systemDescription->isOnlineServer(serverInfo.id))
+                return true;
+
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
             return connectionResult == Qn::SuccessConnectionResult;
         });
@@ -472,8 +489,11 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
-        [](const QnModuleInformation& serverInfo)
+        [systemDescription](const QnModuleInformation& serverInfo)
         {
+            if (!systemDescription->isOnlineServer(serverInfo.id))
+                return true;
+
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
             return connectionResult != Qn::IncompatibleInternalConnectionResult;
         });

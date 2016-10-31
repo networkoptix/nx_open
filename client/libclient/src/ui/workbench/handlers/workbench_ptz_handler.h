@@ -1,7 +1,8 @@
-#ifndef WORKBENCH_PTZ_HANDLER_H
-#define WORKBENCH_PTZ_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
+
+#include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -23,6 +24,7 @@ private slots:
 
     void at_debugCalibratePtzAction_triggered();
     void at_debugGetPtzPositionAction_triggered();
-};
 
-#endif // WORKBENCH_PTZ_HANDLER_H
+private:
+    void showSetPositionWarning(const QnResourcePtr& resource);
+};

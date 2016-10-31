@@ -49,7 +49,7 @@ namespace
     const char* kViewportMarginsBackupId = "viewportMargins";
     const char* kContentsMarginsBackupId = "contentsMargins";
 
-    const char* kHoveredWidgetProperty = "_qn_hoveredWidget";
+    const char* kHoveredWidgetProperty = "_qn_hoveredWidget"; // QPointer<QWidget>
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
 
@@ -235,7 +235,7 @@ namespace
 
         /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
          * To overcome this problem we process hover events and track hovered children: */
-        auto hoveredWidget = widget->property(kHoveredWidgetProperty).value<QWidget*>();
+        auto hoveredWidget = widget->property(kHoveredWidgetProperty).value<QPointer<QWidget>>();
         if (!hoveredWidget)
             return false;
 
@@ -462,6 +462,9 @@ void QnNxStyle::drawPrimitive(
         case PE_FrameFocusRect:
         {
             if (!option->state.testFlag(State_Enabled))
+                return;
+
+            if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
             QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ?
@@ -3753,9 +3756,10 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
             }
             case QEvent::HoverLeave:
             {
-                if (tabBar->property(kHoveredWidgetProperty).value<QWidget*>() != hoveredWidget)
+                if (tabBar->property(kHoveredWidgetProperty).value<QPointer<QWidget>>() != hoveredWidget)
                 {
-                    tabBar->setProperty(kHoveredWidgetProperty, QVariant::fromValue(hoveredWidget));
+                    tabBar->setProperty(kHoveredWidgetProperty,
+                        QVariant::fromValue(QPointer<QWidget>(hoveredWidget)));
                     tabBar->update();
                 }
                 break;

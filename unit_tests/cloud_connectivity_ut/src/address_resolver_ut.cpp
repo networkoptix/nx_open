@@ -103,7 +103,7 @@ public:
 
                     syncQueue.push(true);
                 },
-                true,
+                NatTraversalSupport::enabled,
                 AF_INET);
         }
 
@@ -345,10 +345,13 @@ TEST(AddressResolverRealTest, Cancel)
     {
         for (const auto& address : kTestAddresses)
         {
-            SocketGlobals::addressResolver().resolveAsync(address, doNone, true, AF_INET, this);
-            if (timeout) std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+            SocketGlobals::addressResolver().resolveAsync(
+                address, doNone, NatTraversalSupport::enabled, AF_INET, this);
+            if (timeout)
+                std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             SocketGlobals::addressResolver().cancel(this);
-            if (!timeout) timeout = 10;
+            if (!timeout)
+                timeout = 10;
         }
     }
 }

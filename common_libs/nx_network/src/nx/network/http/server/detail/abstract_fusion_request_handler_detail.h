@@ -36,7 +36,7 @@ public:
     }
 
 protected:
-    HttpRequestProcessedHandler m_completionHandler;
+    RequestProcessedHandler m_completionHandler;
     Qn::SerializationFormat m_outputDataFormat;
     nx_http::Method::ValueType m_requestMethod;
 
@@ -253,7 +253,7 @@ private:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,
-        HttpRequestProcessedHandler completionHandler ) override
+        RequestProcessedHandler completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;

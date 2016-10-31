@@ -88,7 +88,8 @@ public:
     void setInformativeText(const QString &text, bool split = true);
 
     /** Delegate widget with custom details. QnMessageBox will take ownership. */
-    void addCustomWidget(QWidget* widget, Layout layout = Layout::Content, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
+    void addCustomWidget(QWidget* widget, Layout layout = Layout::Content, int stretch = 0,
+        Qt::Alignment alignment = Qt::Alignment(), bool focusThisWidget = false);
 
     /**
      * Widget will be removed from layout, but you should manually hide and delete it if required.
@@ -174,10 +175,11 @@ public:
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
 
 protected:
-    virtual void closeEvent(QCloseEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void closeEvent(QCloseEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
 
-    virtual bool event(QEvent* event) override;
+    virtual void afterLayout() override;
 
 private:
     QScopedPointer<Ui::MessageBox> ui;

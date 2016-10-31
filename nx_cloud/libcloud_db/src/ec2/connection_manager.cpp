@@ -82,7 +82,7 @@ void ConnectionManager::createTransactionConnection(
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     // GET ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
     //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
@@ -157,7 +157,7 @@ void ConnectionManager::pushTransaction(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath))
         return completionHandler(nx_http::StatusCode::notFound);
@@ -579,9 +579,8 @@ nx_http::RequestResult
     response->headers.emplace("X-Nx-Cloud", "true");
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
 
-    nx_http::RequestResult requestResult;
+    nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
 
-    requestResult.statusCode = nx_http::StatusCode::ok;
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, connectionId](
             nx_http::HttpServerConnection* connection)

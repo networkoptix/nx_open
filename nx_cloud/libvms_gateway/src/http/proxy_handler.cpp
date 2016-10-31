@@ -30,7 +30,7 @@ void ProxyHandler::processRequest(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     auto requestOptions = cutTargetFromRequest(*connection, &request);
     if (!nx_http::StatusCode::isSuccessCode(requestOptions.status))
@@ -42,7 +42,7 @@ void ProxyHandler::processRequest(
     if (!requestOptions.isSsl && m_settings.http().sslSupport)
         requestOptions.isSsl = m_runTimeOptions.isSslEnforsed(requestOptions.target);
 
-    //TODO #ak avoid request loop by using Via header
+    // TODO: #ak avoid request loop by using Via header.
 
     m_targetPeerSocket = SocketFactory::createStreamSocket(requestOptions.isSsl);
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
@@ -60,7 +60,7 @@ void ProxyHandler::processRequest(
     m_requestCompletionHandler = std::move(completionHandler);
     m_request = std::move(request);
 
-    //TODO #ak updating request (e.g., Host header)
+    // TODO: #ak updating request (e.g., Host header).
     m_targetPeerSocket->connectAsync(
         requestOptions.target,
         std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
@@ -79,7 +79,7 @@ void ProxyHandler::closeConnection(
     NX_ASSERT(m_requestCompletionHandler);
 
     auto handler = std::move(m_requestCompletionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable);  //TODO #ak better status code
+    handler(nx_http::StatusCode::serviceUnavailable);
 }
 
 ProxyHandler::TargetWithOptions::TargetWithOptions(
@@ -113,7 +113,7 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
     if (!network::SocketGlobals::addressResolver()
             .isCloudHostName(requestOptions.target.address.toString()))
     {
-        // No cloud address means direct IP
+        // No cloud address means direct IP.
         if (!m_settings.cloudConnect().allowIpTarget)
             return {nx_http::StatusCode::forbidden};
 
@@ -138,7 +138,7 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request*
     if (!m_settings.http().allowTargetEndpointInUrl)
         return {nx_http::StatusCode::forbidden};
 
-    //using original url path
+    // Using original url path.
     auto targetEndpoint = SocketAddress(
         request->requestLine.url.host(),
         request->requestLine.url.port(nx_http::DEFAULT_HTTP_PORT));
@@ -156,13 +156,13 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request*
 
 ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
 {
-    // Parse path, expected format: /target[/some/longer/url]
+    // Parse path, expected format: /target[/some/longer/url].
     const auto path = request->requestLine.url.path();
     auto pathItems = path.splitRef('/', QString::SkipEmptyParts);
     if (pathItems.isEmpty())
         return {nx_http::StatusCode::badRequest};
 
-    // Parse first path item, expected format: [protocol:]address[:port]
+    // Parse first path item, expected format: [protocol:]address[:port].
     TargetWithOptions requestOptions(nx_http::StatusCode::ok);
     auto targetParts = pathItems[0].split(':', QString::SkipEmptyParts);
 
@@ -190,11 +190,11 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
     if (targetParts.size() > 1)
         return {nx_http::StatusCode::badRequest};
 
-    // Get address
+    // Get address.
     requestOptions.target.address = HostAddress(targetParts.front().toString());
     pathItems.pop_front();
 
-    // Restore path without 1st item: /[some/longer/url]
+    // Restore path without 1st item: /[some/longer/url].
     auto query = request->requestLine.url.query();
     if (pathItems.isEmpty())
     {
@@ -255,7 +255,7 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
             .str(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
 
         auto handler = std::move(m_requestCompletionHandler);
-        handler(nx_http::StatusCode::serviceUnavailable);  //TODO #ak better status code
+        handler(nx_http::StatusCode::serviceUnavailable);  //< TODO: #ak better status code.
         return;
     }
 
@@ -266,7 +266,8 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
         nx_http::insertOrReplaceHeader(
             &message.response->headers,
             nx_http::HttpHeader("Content-Encoding", "identity"));
-        message.response->headers.erase("Transfer-Encoding");   //no support for streaming body yet
+        // No support for streaming body yet.
+        message.response->headers.erase("Transfer-Encoding");
 
         msgBody = std::make_unique<nx_http::BufferSource>(
             contentTypeIter->second,
@@ -289,6 +290,6 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
             std::move(msgBody)));
 }
 
-}   //namespace gateway
-}   //namespace cloud
-}   //namespace nx
+} // namespace gateway
+} // namespace cloud
+} // namespace nx

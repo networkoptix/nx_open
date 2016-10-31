@@ -14,12 +14,12 @@
 #include <ui/workbench/workbench.h>
 
 namespace {
-    const qreal degreesFor2x = 180.0;
+    const qreal kDegreesFor2x = 90.0;
 }
 
-WheelZoomInstrument::WheelZoomInstrument(QObject *parent): 
+WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     Instrument(
-        makeSet(QEvent::Wheel, AnimationEvent::Animation), 
+        makeSet(QEvent::Wheel, AnimationEvent::Animation),
         makeSet(),
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
@@ -30,9 +30,9 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.4);
-    processor->setFriction(degreesFor2x / 2);
-    processor->setMaxSpeedMagnitude(degreesFor2x * 8);
-    processor->setSpeedCuttingThreshold(degreesFor2x / 3);
+    processor->setFriction(kDegreesFor2x / 2);
+    processor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
+    processor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
     processor->setFlags(KineticProcessor::IgnoreDeltaTime);
     animationTimer()->addListener(processor);
 }
@@ -73,7 +73,7 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
     if(viewport == NULL)
         return false;
 
-    /* delta() returns the distance that the wheel is rotated 
+    /* delta() returns the distance that the wheel is rotated
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
 
@@ -90,7 +90,7 @@ void WheelZoomInstrument::kineticMove(const QVariant &degrees) {
     if(viewport == NULL)
         return;
 
-    qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
+    qreal factor = std::pow(2.0, -degrees.toReal() / kDegreesFor2x);
     scaleViewport(this->view(viewport), factor, m_viewportAnchor);
 }
 
