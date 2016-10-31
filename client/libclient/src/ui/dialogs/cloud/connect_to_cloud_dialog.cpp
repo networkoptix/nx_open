@@ -11,6 +11,7 @@
 #include <core/resource/user_resource.h>
 
 #include <cloud/cloud_connection.h>
+#include <cloud/cloud_result_info.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -307,7 +308,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             showCredentialsError(true);
             break;
         default:
-            showFailure(QString()); // TODO: #dklychkov More detailed diagnostics
+            showFailure(QnCloudResultInfo(result));
             break;
         }
         lockUi(false);
