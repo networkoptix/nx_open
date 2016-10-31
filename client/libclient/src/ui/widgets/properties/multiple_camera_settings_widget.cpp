@@ -21,11 +21,6 @@
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/license_usage_helper.h>
-
-using boost::algorithm::any_of;
-using boost::algorithm::all_of;
-
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent),
@@ -72,8 +67,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,
         [this]
         {
-        if (m_updating)
-            return;
+            if (m_updating)
+                return;
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
@@ -276,6 +271,9 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
     else
     {
         /* Aggregate camera parameters first. */
+        using boost::algorithm::any_of;
+        using boost::algorithm::all_of;
+
         const bool isDtsBased = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isDtsBased(); });
         const bool hasVideo = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
         const bool audioSupported = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioSupported(); });
