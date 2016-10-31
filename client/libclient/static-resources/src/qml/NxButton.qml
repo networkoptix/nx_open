@@ -21,6 +21,8 @@ Button
     property string hoveredIconUrl;
     property string pressedIconUrl;
 
+    property bool showBackground: true;
+
     height: 28;
 
     Keys.enabled: true;
@@ -50,7 +52,7 @@ Button
 
         source:
         {
-            if (control.isPressed)
+            if (control.pressed)
                 return nonEmptyIcon(control.pressedIconUrl, control.iconUrl);
 
             return (control.isHovered && control.hoveredIconUrl.length
@@ -70,7 +72,7 @@ Button
 
     background: Item
     {
-        visible: !control.iconUrl.length;
+        visible: control.showBackground;
         Rectangle
         {
             anchors.fill: parent;

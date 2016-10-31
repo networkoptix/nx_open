@@ -354,20 +354,6 @@ Item
                     onClicked: { control.toggle(); }
                 }
 
-                Loader
-                {
-                    id: areaLoader;
-
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-                    anchors.top: systemNameLabel.bottom;
-
-                    anchors.leftMargin: 12;
-                    anchors.rightMargin: 16;
-
-                    sourceComponent: control.centralAreaDelegate;
-                }
-
                 NxButton
                 {
                     id: hideTileButton;
@@ -385,6 +371,7 @@ Item
                     iconUrl: "qrc:/skin/welcome_page/tile_hide.png";
                     hoveredIconUrl: "qrc:/skin/welcome_page/tile_hide_hovered.png";
                     pressedIconUrl: "qrc:/skin/welcome_page/tile_hide_pressed.png";
+                    showBackground: false;
 
                     bkgColor: tileArea.color;
                     onClicked:
@@ -392,6 +379,20 @@ Item
                         var id = (isCloudTile ? control.systemId : control.localId);
                         context.hideSystem(id);
                     }
+                }
+
+                Loader
+                {
+                    id: areaLoader;
+
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    anchors.top: systemNameLabel.bottom;
+
+                    anchors.leftMargin: 12;
+                    anchors.rightMargin: 16;
+
+                    sourceComponent: control.centralAreaDelegate;
                 }
 
                 Indicator
