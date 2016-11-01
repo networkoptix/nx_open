@@ -127,6 +127,18 @@ QString QnStorageResource::urlToPath(const QString& url)
         return QUrl(url).path();
 }
 
+QString QnStorageResource::urlWithoutCredentials(const QString& url)
+{
+    if (!url.contains(lit("://")))
+        return url;
+    
+    QUrl result(url);
+    result.setUserName(QString());
+    result.setPassword(QString());
+
+    return result.toString();
+}
+
 float QnStorageResource::getAvarageWritingUsage() const
 {
     return 0.0;
