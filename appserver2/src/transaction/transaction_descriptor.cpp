@@ -14,6 +14,7 @@
 #include <nx_ec/data/api_tran_state_data.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/storage_resource.h>
 
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
@@ -552,6 +553,16 @@ void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData&
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
+}
+
+void applyColumnFilter(const Qn::UserAccessData& accessData, ApiStorageData& data)
+{
+    if (!hasSystemAccess(accessData) && !qnResourceAccessManager->hasGlobalPermission(
+            accessData,
+            Qn::GlobalPermission::GlobalAdminPermission))
+    {
+        data.url = QnStorageResource::urlWithoutCredentials(data.url);
+    }
 }
 
 struct ReadResourceAccess
