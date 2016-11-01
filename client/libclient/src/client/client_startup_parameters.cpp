@@ -98,7 +98,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.enforceSocketType, "--enforce-socket");
     addParserParam(commandLineParser, &result.enforceMediatorEndpoint, "--enforce-mediator");
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr);
 
     if (!strCustomUri.isEmpty())
     {
