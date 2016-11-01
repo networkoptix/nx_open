@@ -310,8 +310,11 @@ bool QnUserSettingsWidget::canApplyChanges() const
         return true;
 
     for (auto field : inputFields())
+    {
         if (!field->isHidden() && !field->isValid())
             return false;
+        }
+    }
 
     return true;
 }
@@ -372,6 +375,12 @@ void QnUserSettingsWidget::setupInputFields()
     ui->cloudEmailInputField->setTitle(tr("Email"));
     ui->cloudEmailInputField->setValidator([this](const QString& text)
     {
+        if (m_model->mode() != QnUserSettingsModel::NewUser)
+            return Qn::kValidResult;
+
+        if (ui->userTypeComboBox->currentIndex() != kCloudIndex)
+            return Qn::kValidResult;
+
         auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
         if (result.state != QValidator::Acceptable)
             return result;
