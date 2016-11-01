@@ -4,6 +4,7 @@
 
 class QnSwitchItemDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
     typedef QStyledItemDelegate base_type;
 
 public:
