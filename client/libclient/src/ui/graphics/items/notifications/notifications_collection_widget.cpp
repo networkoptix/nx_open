@@ -306,7 +306,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         if (QnBusiness::isSourceServerRequired(eventType))
         {
             NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
-            if (!server || !accessController()->hasPermissions(server, Qn::ReadPermission))
+            /* Only admins should see notifications with servers. */
+            if (!server || !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
                 return;
         }
 
