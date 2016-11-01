@@ -10,6 +10,7 @@ var Config = {
 
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
+    globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
 
     productName: 'VMS NAME',
     cloud: {

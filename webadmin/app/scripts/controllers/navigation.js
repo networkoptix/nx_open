@@ -13,10 +13,7 @@ angular.module('webadminApp')
                 if(user === null){
                     return;
                 }
-                $scope.user = {
-                    isAdmin: user.isAdmin,
-                    name: user.name
-                };
+                $scope.user = user;
             },function(error){
                 if(error.status !== 401 && error.status !== 403) {
                     dialogs.alert(L.navigaion.cannotGetUser);

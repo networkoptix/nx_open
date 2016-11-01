@@ -6,7 +6,7 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
             <tabset ng-hide="settings.ecDbReadOnly">
-                <tab heading="Health monitoring">
+                <tab heading="Health monitoring" ng-if="user.hasAllResources">
                     <br>
                     <ng-include src="'views/components/health.html'"></ng-include>
                 </tab>

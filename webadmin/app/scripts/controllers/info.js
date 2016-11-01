@@ -41,13 +41,9 @@ angular.module('webadminApp')
             return Number(bytes).toFixed(precision) + ' ' + sizes[posttxt];
         };
 
-
-
         mediaserver.getUser().then(function (user) {
-
             $scope.user = user;
-            console.log(user);
-            if (!user.isAdmin) {
+            if (user.isAdmin) {
                 getStorages();
             }
         });

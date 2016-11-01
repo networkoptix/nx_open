@@ -214,6 +214,7 @@ angular.module('webadminApp')
                 return this.getCurrentUser(reload).then(function(result){
                     /*jshint bitwise: false*/
                     var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
+                    var hasAllResources = result.data.reply.permissions.indexOf(Config.globalAccessAllMediaPermission)>=0;
                     /*jshint bitwise: true*/
                     var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
@@ -222,7 +223,9 @@ angular.module('webadminApp')
                     return {
                         isAdmin:isAdmin,
                         isOwner:isOwner,
-                        name:result.data.reply.name
+                        name:result.data.reply.name,
+                        hasAllResources:hasAllResources || isAdmin,
+                        permissions:result.data.reply.permissions
                     };
                 });
             },
