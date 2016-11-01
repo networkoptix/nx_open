@@ -11,6 +11,7 @@ QnCloudResultInfo::operator QString() const
     return m_text;
 }
 
+//TODO: #placeholder #stub Fill with better human-readable strings
 QString QnCloudResultInfo::toString(ResultCode code)
 {
     switch (code)
@@ -20,13 +21,13 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Successful.");
 
         case ResultCode::notAuthorized:
-            return tr("Not authorized.");
+            return tr("Invalid login or password.");
 
         case ResultCode::forbidden:
             return tr("Requested operation is not allowed with provided credentials.");
 
         case ResultCode::accountNotActivated:
-            return tr("This account is not activated.");
+            return tr("This account is not activated. Please check your email.");
 
         case ResultCode::accountBlocked:
             return tr("This account is blocked.");
@@ -38,7 +39,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Already exists.");
 
         case ResultCode::dbError:
-            return tr("Database error.");
+            return tr("Internal server error. Please contact support team.");
 
         case ResultCode::networkError:
             return tr("Network operation failed.");

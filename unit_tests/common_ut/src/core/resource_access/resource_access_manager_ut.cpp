@@ -9,6 +9,7 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource_stub.h>
 
@@ -463,4 +464,49 @@ TEST_F(QnResourceAccessManagerTest, checkEditDisabledAdmin)
     otherAdmin->setEnabled(false);
     qnResPool->addResource(otherAdmin);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
+}
+
+/************************************************************************/
+/* Checking servers access rights                                       */
+/************************************************************************/
+
+/* Admin must have full permissions for servers. */
+TEST_F(QnResourceAccessManagerTest, checkServerAsAdmin)
+{
+    loginAsOwner();
+
+    auto server = addServer();
+
+    Qn::Permissions desired = Qn::FullServerPermissions;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(server, desired, forbidden);
+}
+
+/* All users has read-only access to server by default. */
+TEST_F(QnResourceAccessManagerTest, checkServerAsViewer)
+{
+    loginAs(Qn::GlobalCustomUserPermission);
+
+    auto server = addServer();
+
+    Qn::Permissions desired = Qn::ReadPermission;
+    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    forbidden &= ~desired;
+
+    checkPermissions(server, desired, forbidden);
+}
+
+/* User can view health monitor if server is shared to him. */
+TEST_F(QnResourceAccessManagerTest, checkAccessibleServerAsViewer)
+{
+    loginAs(Qn::GlobalLiveViewerPermissionSet);
+
+    auto server = addServer();
+
+    Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
+    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    forbidden &= ~desired;
+
+    checkPermissions(server, desired, forbidden);
 }

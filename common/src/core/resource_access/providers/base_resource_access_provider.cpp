@@ -89,7 +89,7 @@ void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessS
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
-    NX_ASSERT(acceptable(subject, resource));
+    /* We can get removed auto-generated layout here when switching videowall item control. */
     if (!acceptable(subject, resource))
         return;
 
