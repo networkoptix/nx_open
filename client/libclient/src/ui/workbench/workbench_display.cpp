@@ -1023,6 +1023,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QnResourceWidget *widget = nullptr;
     if (resource->hasFlags(Qn::server))
     {
+        if (!accessController()->hasPermissions(resource, Qn::ViewContentPermission))
+        {
+            qnDeleteLater(item);
+            return false;
+        }
+
         widget = new QnServerResourceWidget(context(), item);
     }
     else if (resource->hasFlags(Qn::videowall))
