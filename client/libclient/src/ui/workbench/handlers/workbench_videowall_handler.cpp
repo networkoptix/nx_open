@@ -1087,7 +1087,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 void QnWorkbenchVideoWallHandler::setControlMode(bool active)
 {
     auto layoutResource = workbench()->currentLayout()->resource();
-    NX_ASSERT(layoutResource);
+    NX_ASSERT(layoutResource || !active);
 
     if (active && !canStartControlMode())
         return;
