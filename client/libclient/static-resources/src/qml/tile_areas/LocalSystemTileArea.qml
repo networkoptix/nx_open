@@ -110,6 +110,7 @@ Item
             Connections
             {
                 target: userChooseItem.model;
+                ignoreUnknownSignals: true;
                 onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
             }
 
