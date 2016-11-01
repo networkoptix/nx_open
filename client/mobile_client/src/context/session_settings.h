@@ -1,6 +1,8 @@
 #pragma once
 
 #include <utils/common/property_storage.h>
+
+#include <client_core/client_core_meta_types.h>
 #include <mobile_client/mobile_client_meta_types.h>
 
 class QnSessionSettings : public QnPropertyStorage {

@@ -107,11 +107,16 @@ void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
     {
         m_thumbnailManager->selectResource(camera);
 
-        CameraMediaStreams s = camera->mediaStreams();
-        if (!s.streams.empty())
+        auto customAspectRatio = camera->customAspectRatio();
+        if (!qFuzzyIsNull(customAspectRatio))
         {
-            m_resolutionHint = s.streams[0].getResolution();
-            m_aspectRatio = static_cast<qreal>(m_resolutionHint.width()) / m_resolutionHint.height();
+            m_aspectRatio = customAspectRatio;
+        }
+        else
+        {
+            CameraMediaStreams s = camera->mediaStreams();
+            if (!s.streams.empty())
+                m_aspectRatio = QnGeometry::aspectRatio(s.streams[0].getResolution());
         }
     }
 

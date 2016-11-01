@@ -320,6 +320,7 @@ public:
     //!Log level of http requests log
     QString msgLogLevel;
     QString ec2TranLogLevel;
+    QString permissionsLogLevel;
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
@@ -2791,20 +2792,7 @@ protected:
             cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
                 nx_ms_conf::EC2_TRAN_LOG_LEVEL,
                 nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
-
-        //on "always" log level only server start messages are logged, so using it instead of disabled
-        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            logDir + QLatin1String("/ec2_tran"),
-            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+        initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
 
         QnLog::instance(QnLog::HWID_LOG)->create(
             logDir + QLatin1String("/hw_log"),
@@ -2812,7 +2800,7 @@ protected:
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLogLevel::cl_logINFO );
 
-        initPermissionsLog(logDir);
+        initPermissionsLog(logDir, QnLog::logLevelFromString(cmdLineArguments.permissionsLogLevel));
 
         NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
         NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
@@ -2907,13 +2895,31 @@ private:
         }
     }
 
-    void initPermissionsLog(const QString& logDir)
+    void initTransactionLog(const QString& logDir, QnLogLevel level)
     {
-        QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
-            logDir + QLatin1String("/permissions"),
+        //on "always" log level only server start messages are logged, so using it instead of disabled
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            logDir + lit("ec2_tran"),
             MSSettings::roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
             MSSettings::roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-            QnLogLevel::cl_logNONE);
+            level);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+    }
+
+    void initPermissionsLog(const QString& logDir, QnLogLevel level)
+    {
+        QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
+            logDir + lit("permissions"),
+            MSSettings::roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+            MSSettings::roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+            level);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::PERMISSIONS_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
         NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
         NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
@@ -3029,6 +3035,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
+        "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
@@ -3061,7 +3069,7 @@ int MediaServerProcess::main(int argc, char* argv[])
             lit("Disables crash signal handler (linux only)"), true);
     #endif
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr);
     if( showVersion )
     {
         std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;

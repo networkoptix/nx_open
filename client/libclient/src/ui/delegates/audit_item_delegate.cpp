@@ -18,7 +18,7 @@
 namespace
 {
     /* Default text flags: */
-    const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignLeft | Qt::AlignVCenter;
+    const int kTextFlags = Qt::TextSingleLine | Qt::AlignLeft | Qt::AlignVCenter;
 
     /* Table row height: */
     const int kRowHeight = style::Metrics::kViewRowHeight;
@@ -514,7 +514,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
 
     /* Draw main text: */
     QRect actualRect;
-    QString elidedMainText = option.fontMetrics.elidedText(mainText, option.textElideMode, rect.width(), kTextFlags);
+    QString elidedMainText = option.fontMetrics.elidedText(mainText, option.textElideMode, rect.width());
 
     painter->drawText(rect, kTextFlags, elidedMainText, &actualRect);
 
@@ -525,7 +525,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         if (actualRect.isValid())
             linkRect.setLeft(actualRect.right());
 
-        QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width(), kTextFlags);
+        QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width());
 
         QPalette::ColorGroup group = option.state.testFlag(QStyle::State_MouseOver) ? QPalette::Normal : QPalette::Inactive;
 
@@ -566,7 +566,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
 
             /* Draw camera name: */
             QString name = QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
-            QString elidedName = smallFontMetrics.elidedText(name, option.textElideMode, nameRect.width(), kTextFlags);
+            QString elidedName = smallFontMetrics.elidedText(name, option.textElideMode, nameRect.width());
             painter->drawText(nameRect, kTextFlags, elidedName);
             nameRect.moveTop(nameRect.top() + smallRowHeight);
             markerCenter.setY(markerCenter.y() + smallRowHeight);

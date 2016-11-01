@@ -61,11 +61,12 @@ QnWorkbenchLicenseNotifier::~QnWorkbenchLicenseNotifier()
 
 void QnWorkbenchLicenseNotifier::checkLicenses()
 {
-    if (context()->closingDown())
+    if (context()->closingDown() || !context()->user())
         return;
 
      if (m_checked)
          return;
+
      m_checked = true;
 
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))

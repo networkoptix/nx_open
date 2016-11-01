@@ -24,6 +24,8 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+#include <client/forgotten_systems_manager.h>
+#include <client_core/client_core_settings.h>
 
 #include <utils/common/app_info.h>
 
@@ -394,8 +396,14 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             }
             else if (dialog->cloudCredentials().isValid())
             {
-                qnCloudStatusWatcher->setCloudCredentials(dialog->cloudCredentials(), true);
-                connectToSystemInternal(QString(), serverUrl, dialog->cloudCredentials(),
+                const auto cloudCredentials = dialog->cloudCredentials();
+
+                // We suppose that connection to cloud from new systems is always permanent
+                qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
+                qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
+
+                qnCloudStatusWatcher->setCloudCredentials(cloudCredentials, true);
+                connectToSystemInternal(QString(), serverUrl, cloudCredentials,
                     false, false, controlsGuard);
             }
 
@@ -449,6 +457,11 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
 {
     color.setAlphaF(alpha);
     return color;
+}
+
+void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
+{
+    qnForgottenSystemsManager->forgetSystem(systemId);
 }
 
 void QnWorkbenchWelcomeScreen::showScreen()

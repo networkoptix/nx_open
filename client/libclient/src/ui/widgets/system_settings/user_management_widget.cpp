@@ -113,7 +113,7 @@ public:
         QString linkText = tr("Edit");
 
         /* Measure link width: */
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignVCenter;
+        const int kTextFlags = Qt::TextSingleLine | Qt::AlignVCenter;
         int linkWidth = option.fontMetrics.width(linkText, -1, kTextFlags);
 
         int lineHeight = option.rect.height();
@@ -123,7 +123,7 @@ public:
 
         /* Draw original text elided: */
         int newTextWidth = textRect.width() - linkWidth - style::Metrics::kStandardPadding;
-        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth, kTextFlags);
+        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth);
         style->drawControl(QStyle::CE_ItemViewItem, &newOption, painter, newOption.widget);
 
         opacityRollback.rollback();

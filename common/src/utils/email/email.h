@@ -1,5 +1,4 @@
-#ifndef QN_EMAIL_H
-#define QN_EMAIL_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -8,14 +7,20 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include "email_fwd.h"
 
-//TODO: #GDM move other methods to this namespace, then move module to nx/email? lib
+//TODO: #GDM move other methods to this namespace, then move module to nx/email (?) lib
 namespace nx {
 namespace email {
 
+/**
+ *  Check is string looks like correct email address.
+ *  Supports suffixes ( user+suffix1@domain.com ).
+ *  Supports custom names ( Vasya Pupkin <vasya@pupkin.com> )
+ *  Domain length is limited to 255 symbols.
+ */
 bool isValidAddress(const QString& address);
 
-}
-}
+} // namespace email
+} // namespace nx
 
 struct QnEmailSmtpServerPreset {
     QnEmailSmtpServerPreset();
@@ -97,8 +102,4 @@ private:
     QString m_fullName;
 };
 
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (metatype)(lexical)(json))
-
-#endif // QN_EMAIL_H
-

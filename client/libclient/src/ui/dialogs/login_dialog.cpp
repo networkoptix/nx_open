@@ -7,7 +7,6 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
-#include <QtWidgets/QDesktopWidget>
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 #include <api/model/connection_info.h>
@@ -50,7 +49,19 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <rest/server/json_rest_result.h>
 
+#include <ui/workaround/widgets_signals_workaround.h>
+
+
 namespace {
+static const QnUuid kCustomConnectionLocalId;
+
+static std::array<const char*, 5> kIntroNames {
+    "intro.mkv",
+    "intro.avi",
+    "intro.png",
+    "intro.jpg",
+    "intro.jpeg"
+};
 
 void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled)
 {
@@ -100,12 +111,12 @@ bool QnLoginDialog::QnFoundSystemData::operator!=(const QnFoundSystemData& other
 /* QnLoginDialog                                                        */
 /************************************************************************/
 
-QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
+QnLoginDialog::QnLoginDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
-    m_renderingWidget(NULL)
+    m_renderingWidget(QnGlWidgetFactory::create<QnRenderingWidget>())
 {
     ui->setupUi(this);
 
@@ -126,11 +137,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
         bbLayout->insertWidget(0, versionLabel);
     }
 
-    static const char *introNames[] = {"intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL};
+
     QString introPath;
-    for (const char **introName = introNames; *introName != NULL; introName++)
+    for (auto name: kIntroNames)
     {
-        introPath = qnSkin->path(*introName);
+        introPath = qnSkin->path(name);
         if (!introPath.isEmpty())
             break;
     }
@@ -139,7 +150,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
     if (FileTypeSupport::isImageFileExt(introPath))
         resource->addFlags(Qn::still_image);
 
-    m_renderingWidget = QnGlWidgetFactory::create<QnRenderingWidget>();
     m_renderingWidget->setResource(resource);
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
@@ -160,16 +170,22 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
     m_connectionsModel->appendRow(m_savedSessionsItem);
     m_connectionsModel->appendRow(m_autoFoundItem);
 
-    connect(ui->connectionsComboBox, SIGNAL(currentIndexChanged(QModelIndex)), this, SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
-    connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
-    connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(at_saveButton_clicked()));
-    connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->passwordLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateAcceptibility()));
-    connect(ui->loginLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateAcceptibility()));
-    connect(ui->hostnameLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateAcceptibility()));
-    connect(ui->portSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateAcceptibility()));
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(ui->connectionsComboBox, &QnTreeComboBox::currentIndexChanged, this,
+        &QnLoginDialog::at_connectionsComboBox_currentIndexChanged);
+    connect(ui->testButton, &QPushButton::clicked, this,
+        &QnLoginDialog::at_testButton_clicked);
+    connect(ui->saveButton, &QPushButton::clicked, this,
+        &QnLoginDialog::at_saveButton_clicked);
+    connect(ui->deleteButton, &QPushButton::clicked, this,
+        &QnLoginDialog::at_deleteButton_clicked);
+    connect(ui->passwordLineEdit, &QLineEdit::textChanged, this,
+        &QnLoginDialog::updateAcceptibility);
+    connect(ui->loginLineEdit, &QLineEdit::textChanged, this,
+        &QnLoginDialog::updateAcceptibility);
+    connect(ui->hostnameLineEdit, &QLineEdit::textChanged, this,
+        &QnLoginDialog::updateAcceptibility);
+    connect(ui->portSpinBox, QnSpinboxIntValueChanged, this,
+        &QnLoginDialog::updateAcceptibility);
 
     resetConnectionsModel();
     updateFocus();
@@ -177,11 +193,14 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
-    connect(qnModuleFinder, &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(qnModuleFinder, &QnModuleFinder::moduleAddressFound, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(qnModuleFinder, &QnModuleFinder::moduleLost, this, &QnLoginDialog::at_moduleFinder_moduleLost);
+    connect(qnModuleFinder, &QnModuleFinder::moduleChanged, this,
+        &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(qnModuleFinder, &QnModuleFinder::moduleAddressFound, this,
+        &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(qnModuleFinder, &QnModuleFinder::moduleLost, this,
+        &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    foreach(const QnModuleInformation &moduleInformation, qnModuleFinder->foundModules())
+    for(const auto& moduleInformation: qnModuleFinder->foundModules())
         at_moduleFinder_moduleChanged(moduleInformation);
 }
 
@@ -204,46 +223,59 @@ QUrl QnLoginDialog::currentUrl() const
     return url;
 }
 
-void QnLoginDialog::accept()
+bool QnLoginDialog::isValid() const
 {
     QUrl url = currentUrl();
-    if (!url.isValid())
-    {
-        QnMessageBox::warning(this, tr("Invalid Login Information"), tr("The login information you have entered is not valid."));
+    return !ui->passwordLineEdit->text().isEmpty()
+        && !ui->loginLineEdit->text().trimmed().isEmpty()
+        && !ui->hostnameLineEdit->text().trimmed().isEmpty()
+        && ui->portSpinBox->value() != 0
+        && url.isValid()
+        && !url.host().isEmpty();
+}
+
+void QnLoginDialog::accept()
+{
+    NX_EXPECT(isValid());
+    if (!isValid())
         return;
-    }
 
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url, this,
+    QUrl url = currentUrl();
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url, this,
         [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
-    {
-        if (m_requestHandle != handle)
-            return; //connect was cancelled
-
-        m_requestHandle = -1;
-        updateUsability();
-
-        auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, this);
-        switch (status)
         {
-            case Qn::SuccessConnectionResult:
-            {
-                const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-                QnActionParameters params;
-                params.setArgument(Qn::UrlRole, url);
-                params.setArgument(Qn::AutoLoginRole, autoLogin);
-                params.setArgument(Qn::StorePasswordRole, autoLogin);
-                menu()->trigger(QnActions::ConnectAction, params);
-                break;
-            }
-            case Qn::IncompatibleProtocolConnectionResult:
-                menu()->trigger(QnActions::DelayedForcedExitAction);
-                break; // to avoid cycle
-            default:    //error
-                return;
-        }
+            if (m_requestHandle != handle)
+                return; //connect was cancelled
 
-        base_type::accept();
-    });
+            m_requestHandle = -1;
+            updateUsability();
+
+            auto status = QnConnectionDiagnosticsHelper::validateConnection(
+                connectionInfo, errorCode, this);
+
+            switch (status)
+            {
+                case Qn::SuccessConnectionResult:
+                {
+                    const bool autoLogin = ui->autoLoginCheckBox->isChecked();
+                    QnActionParameters params;
+                    params.setArgument(Qn::UrlRole, url);
+                    params.setArgument(Qn::AutoLoginRole, autoLogin);
+                    params.setArgument(Qn::StorePasswordRole, autoLogin);
+                    menu()->trigger(QnActions::ConnectAction, params);
+                    break;
+                }
+                case Qn::IncompatibleProtocolConnectionResult:
+                    menu()->trigger(QnActions::DelayedForcedExitAction);
+                    break; // to avoid cycle
+                default:    //error
+                    return;
+            }
+
+            base_type::accept();
+        });
+
     updateUsability();
 }
 
@@ -331,7 +363,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
         url.setUserName(lit("admin"));
 
-        customConnections.append(QnConnectionData(lit("default"), url, true));
+        customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
     }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
@@ -339,10 +371,10 @@ void QnLoginDialog::resetSavedSessionsModel()
     std::sort(customConnections.begin(), customConnections.end(),
         [](const QnConnectionData& left, const QnConnectionData& right)
         {
-            if (left.isCustom == right.isCustom)
+            if (left.isCustom() == right.isCustom())
                 return (left.name < right.name);
 
-            return left.isCustom;
+            return left.isCustom();
         });
 
     for (const auto& connection : customConnections)
@@ -408,14 +440,10 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
 void QnLoginDialog::updateAcceptibility()
 {
-    bool acceptable =
-        !ui->passwordLineEdit->text().isEmpty() &&
-        !ui->loginLineEdit->text().trimmed().isEmpty() &&
-        !ui->hostnameLineEdit->text().trimmed().isEmpty() &&
-        ui->portSpinBox->value() != 0;
-
+    bool acceptable = isValid();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(acceptable);
     ui->testButton->setEnabled(acceptable);
+    ui->saveButton->setEnabled(acceptable);
 }
 
 void QnLoginDialog::updateUsability()
@@ -463,23 +491,20 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
 
 void QnLoginDialog::at_testButton_clicked()
 {
-    QUrl url = currentUrl();
-
-    if (!url.isValid())
-    {
-        QnMessageBox::warning(this, tr("Invalid Parameters"), tr("The information you have entered is not valid."));
+    NX_EXPECT(isValid());
+    if (!isValid())
         return;
-    }
 
     bool connectRequested = false;
 
     QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
-    connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this, [&connectRequested]
-    {
-        connectRequested = true;
-    });
+    connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this,
+        [&connectRequested]
+        {
+            connectRequested = true;
+        });
 
-    dialog->testConnection(url);
+    dialog->testConnection(currentUrl());
     dialog->exec();
 
     updateFocus();
@@ -502,21 +527,9 @@ QStandardItem* QnLoginDialog::newConnectionItem(const QnConnectionData& connecti
 
 void QnLoginDialog::at_saveButton_clicked()
 {
-    const QUrl url = currentUrl();
-
-    if (!url.isValid())
-    {
-        QnMessageBox::warning(this, tr("Invalid Parameters"), tr("Entered host name is not valid."));
-        ui->hostnameLineEdit->setFocus();
+    NX_EXPECT(isValid());
+    if (!isValid())
         return;
-    }
-
-    if (url.host().length() == 0)
-    {
-        QnMessageBox::warning(this, tr("Invalid Parameters"), tr("Host field cannot be empty."));
-        ui->hostnameLineEdit->setFocus();
-        return;
-    }
 
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
     bool savePassword = !ui->passwordLineEdit->text().isEmpty();
@@ -540,8 +553,10 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::warning(this, tr("Connection already exists."),
-            tr("A connection with this name already exists. Do you want to overwrite it?"),
+        const auto button = QnMessageBox::question(
+            this,
+            tr("Overwrite existing connection?"),
+            tr("There is an another connection with the same name."),
             QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
             QDialogButtonBox::Yes);
 
@@ -560,7 +575,9 @@ void QnLoginDialog::at_saveButton_clicked()
         }
     }
 
-    auto connectionData = QnConnectionData(name, url, true);
+    const QUrl url = currentUrl();
+    auto connectionData = QnConnectionData(name, url, kCustomConnectionLocalId);
+
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
@@ -601,13 +618,15 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    static const auto kCaption = tr("Delete Connections");
-    static const auto kTemplate = tr("Are you sure you want to delete this connection: %1?");
-    static const auto kMessage = kTemplate.arg(L'\n' + connection.name);
-    static const auto kButtons = (QDialogButtonBox::Yes | QDialogButtonBox::No);
-    static const auto kDefault = QDialogButtonBox::No;
+    const auto result = QnMessageBox::question(
+        this,
+        tr("Delete connection?"),
+//         tr("Are you sure you want to delete this connection: %1?")
+//         + L'\n' + connection.name,
+        connection.name,
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::Yes);
 
-    const auto result = QnMessageBox::warning(this, kCaption, kMessage, kButtons, kDefault);
     if (result != QDialogButtonBox::Yes)
         return;
 

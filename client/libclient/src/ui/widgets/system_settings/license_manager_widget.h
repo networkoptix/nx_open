@@ -13,6 +13,7 @@
 class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QPushButton;
 
 class QnLicenseListModel;
 
@@ -68,7 +69,8 @@ private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
-    QnLicenseListModel *m_model;
-    QNetworkAccessManager *m_httpClient;
+    QnLicenseListModel* m_model;
+    QNetworkAccessManager* m_httpClient;
+    QPushButton* m_exportLicensesButton;
     QnLicenseList m_licenses;
 };

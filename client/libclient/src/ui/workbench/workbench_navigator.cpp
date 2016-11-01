@@ -1311,15 +1311,16 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         }
         else if (noRecordedPeriodsFound)
         {
-            /* Set to default value. */
-            endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-            startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
-
-            /* And then try to read saved value - it was valid someday. */
             if (qnRuntime->isActiveXMode())
-            { //TODO: #gdm refactor this safety check sometime
-                if (QnWorkbenchItem *item = m_currentMediaWidget->item())
+            {
+                /* Set to default value. */
+                endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+                startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
+
+                //TODO: #gdm refactor this safety check sometime
+                if (QnWorkbenchItem* item = m_currentMediaWidget->item())
                 {
+                    /* And then try to read saved value - it was valid someday. */
                     QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
                     if (window.isValid())
                     {
@@ -1329,6 +1330,11 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                             : window.endTimeMs();
                     }
                 }
+            }
+            else
+            {
+                // #vkutin It seems we shouldn't do anything here until we receive actual data.
+                return;
             }
         }
         else
@@ -1593,7 +1599,7 @@ void QnWorkbenchNavigator::updateLines()
         m_timeSlider->setLineVisible(SyncedLine, false);
     }
 
-    QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource().staticCast<QnLayoutResource>();
+    QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
     if (currentLayoutResource &&
         (currentLayoutResource->isFile() || !currentLayoutResource->getLocalRange().isEmpty())
         )

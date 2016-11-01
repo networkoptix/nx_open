@@ -11,12 +11,8 @@ BaseTile
     property string systemName;
     property string ownerDescription;
 
-    property string systemId;
-    property string localId;
     property bool isFactoryTile: false;
-    property bool isCloudTile: false;
     property bool isCompatibleInternal: false;
-    property bool isOnline: false;
 
     property string wrongVersion;
     property string compatibleVersion;

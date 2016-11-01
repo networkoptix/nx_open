@@ -265,12 +265,6 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             at_serverChanged(systemDescription, serverId, fields);
         });
 
-    data->connections << connect(systemDescription, &QnBaseSystemDescription::idChanged,this,
-        [this, systemDescription]()
-        {
-            emitDataChanged(systemDescription, QVector<int>() << QnSystemsModel::SystemIdRoleId);
-        });
-
     data->connections << connect(systemDescription, &QnBaseSystemDescription::systemNameChanged, this,
         [this, systemDescription]()
         {
