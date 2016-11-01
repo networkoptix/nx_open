@@ -71,6 +71,7 @@ EMPTY_TIME = dict(
 
 class TimeSyncTest(FuncTestCase):
     #num_serv = _NUM_SERV # override
+    helpStr = "Time synchronization tests (both)"
     _suits = (
         ('SyncTimeNoInetTests', [
             'InitialSynchronization',
@@ -512,11 +513,13 @@ class TimeSyncTest(FuncTestCase):
 
 
 class TimeSyncNoInetTest(TimeSyncTest):
+    helpStr = "Time synchnonization without Internet access test"
     "TimeSyncTest with only SyncTimeNoInetTests suite"
     _suits = TimeSyncTest.filterSuites('SyncTimeNoInetTests')
 
 
 class TimeSyncWithInetTest(TimeSyncTest):
+    helpStr = "Time synchnonization with Internet access test"
     "TimeSyncTest with only InetTimeSyncTests suite"
     _suits = TimeSyncTest.filterSuites('InetTimeSyncTests')
 

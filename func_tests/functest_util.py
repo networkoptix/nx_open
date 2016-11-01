@@ -11,8 +11,8 @@ import threading
 import difflib
 
 __all__ = ['JsonDiff', 'FtConfigParser', 'compareJson', 'showHelp', 'getHelpDesc',
-           'ManagerAddPassword', 'SafeJsonLoads', 'TestJsonLoads', 'checkResultsEqual',
-           'textdiff',
+           'TestDigestAuthHandler', 'ManagerAddPassword',
+           'SafeJsonLoads', 'TestJsonLoads', 'checkResultsEqual', 'textdiff',
            'ClusterWorker', 'ClusterLongWorker', 'parse_size', 'real_caps',
            'CAMERA_ATTR_EMPTY', 'FULL_SCHEDULE_TASKS',
            'sendRequest', 'TestRequestError', 'LegacyTestFailure', 'ServerCompareFailure']
@@ -488,17 +488,6 @@ _helpMenu = {
         "It is used to delete specific resource. \n"
         "Optionally, you could specify --fake flag , if this flag is on, then the remove will only \n"
         "remove resource that has name prefixed with \"ec2_test\" which typically means fake resource")),
-    "auto-test":("Automatic test",(
-        "Usage: python main.py \n\n"
-        "This command is used to run built-in automatic test.\n"
-        "The automatic test includes 11 types of test and they will be runed automatically."
-        "The configuration parameter is as follow: \n"
-        "threadNumber                  The thread number that will be used to fire operations\n"
-        "mergeTestTimeout              The timeout for merge test\n"
-        "clusterTestSleepTime          The timeout for other auto test\n"
-        "All the above configuration parameters needs to be defined in the General section.\n"
-        "The test will try to rollback afterwards and try to recover at first.\n"
-        "Also the sync operation will be performed before any test\n")),
     "rtsp-perf":("Rtsp performance test",(
         "Usage: python main.py --rtsp-perf \n\n"
         "Usage: python main.py --rtsp-perf --dump \n\n"
@@ -566,6 +555,19 @@ def getHelpDesc(topic, full=False):
         return _helpMenu[topic][int(full)]
     else:
         return "<description not found>"
+
+###########################################
+
+class TestDigestAuthHandler(urllib2.HTTPDigestAuthHandler):
+    "Used to avoid AbstractDigestAuthHandler.retried counter usage in http_error_auth_reqed"
+
+    def http_error_auth_reqed(self, auth_header, host, req, headers):
+        authreq = headers.get(auth_header, None)
+        if authreq:
+            scheme = authreq.split()[0]
+            if scheme.lower() == 'digest':
+                return self.retry_http_digest_auth(req, authreq)
+
 
 # A helper function to unify pasword managers' configuration
 def ManagerAddPassword(passman, host, user, pwd):
@@ -674,8 +676,11 @@ class ClusterWorker(object):
                 print "ERROR: ClusterWorker call " + msg
                 self._oks.append(False)
                 self._fails.append(msg)
-            except Exception:
-                print "ERROR: ClusterWorker call to %s got an Exception: %s" % (func.__name__, traceback.format_exc())
+            except Exception as err:
+                etype, value, tb = sys.exc_info()
+                print "ERROR: ClusterWorker call to %s failed with %s: %s\nTraceback:\n%s" % (
+                    func.__name__, type(err).__name__, getattr(err, 'message', str(err)),
+                    ''.join(traceback.format_tb(tb)))
                 self._oks.append(False)
             else:
                 self._oks.append(True)

@@ -11,11 +11,11 @@ from subprocess import CalledProcessError, check_output, STDOUT
 import time
 import traceback
 import unittest
-import urllib, urllib2
+import urllib, urllib2, httplib
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
-                          checkResultsEqual, ManagerAddPassword, SafeJsonLoads,\
-                          LegacyTestFailure, ServerCompareFailure, fixApi as utilFixApi
+    checkResultsEqual, TestDigestAuthHandler, ManagerAddPassword, \
+    SafeJsonLoads, LegacyTestFailure, ServerCompareFailure, fixApi as utilFixApi
 
 CONFIG_FNAME = "functest.cfg"
 
@@ -136,6 +136,7 @@ class FuncTestCase(unittest.TestCase):
     # TODO: describe this class logic!
     """A base class for mediaserver functional tests using virtual boxes.
     """
+    helpStr = "No help provided for this test"
     config = None
     num_serv = NUM_SERV
     testset = None
@@ -387,8 +388,10 @@ class FuncTestCase(unittest.TestCase):
                 print "DEBUG: with data %s" % (pprint.pformat(data),)
         try:
             response = urllib2.urlopen(req, **({} if timeout is None else {'timeout': timeout}))
-        except urllib2.URLError , e:
-            self.fail("%s request failed with %s" % (url, e))
+        except httplib.HTTPException as err:
+            self.fail("%s request failed with %s: %s" % (url, type(err).__name__, err))
+        except urllib2.URLError as err:
+            self.fail("%s request failed with %s" % (url, err))
         except Exception, e:
             self.fail("%s request failed with exception:\n%s\n\n" % (url, traceback.format_exc()))
         self.assertEqual(response.getcode(), 200, "%s request returns error code %d" % (url, response.getcode()))
@@ -652,6 +655,7 @@ class FuncTestMaster(object):
     config = None
     args = None
     openerReady = False
+    authHandler = None
     threadNumber = 16
     testCaseSize = 2
     unittestRollback = None
@@ -671,7 +675,7 @@ class FuncTestMaster(object):
         "getCameras",
         "getCamerasEx",
         "getCameraHistoryItems",
-        "getCameraBookmarkTags",
+        "bookmarks/tags",
         ".getEventRules",
         "getUsers",
         "getVideowalls",
@@ -711,7 +715,8 @@ class FuncTestMaster(object):
         for s in self.clusterTestServerList:
             ManagerAddPassword(passman, s, un, pwd)
 
-        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+        self.authHandler = TestDigestAuthHandler(passman)
+        urllib2.install_opener(urllib2.build_opener(self.authHandler))
         self.openerReady = True
 #        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
 

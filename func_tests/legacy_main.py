@@ -180,6 +180,7 @@ class UserTest(_pvt.LegacyFuncTestBase):
         return ["getUsers"]
 
 
+""" temporary turned of because of special rights for /ec2/saveMediaServer request
 class MediaServerTest(_pvt.LegacyFuncTestBase):
     _gen = None
     _testCase = testMaster.testCaseSize
@@ -199,6 +200,7 @@ class MediaServerTest(_pvt.LegacyFuncTestBase):
 
     def _getObserverNames(self):
         return ["getMediaServersEx"]
+"""
 
 
 class ResourceParamTest(_pvt.LegacyFuncTestBase):
