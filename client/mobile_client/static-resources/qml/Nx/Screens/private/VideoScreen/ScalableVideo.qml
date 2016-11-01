@@ -2,12 +2,13 @@ import QtQuick 2.6
 import QtMultimedia 5.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import com.networkoptix.qml 1.0
 
 ZoomableFlickable
 {
     id: zf
 
-    property alias source: video.source
+    property alias source: video.player
     property alias customAspectRatio: content.customAspectRatio
     property alias videoRotation: content.videoRotation
 
@@ -45,10 +46,10 @@ ZoomableFlickable
         height: contentHeight
         sourceSize: Qt.size(video.sourceRect.width, video.sourceRect.height)
 
-        item: VideoOutput
+        item: QnVideoOutput
         {
             id: video
-            fillMode: VideoOutput.Stretch
+            fillMode: QnVideoOutput.Stretch
         }
 
         onSourceSizeChanged: fitToBounds()
