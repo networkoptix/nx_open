@@ -514,6 +514,7 @@ void QnCameraScheduleWidget::updateFromResources()
     updateMotionButtons();
     updateLicensesLabelText();
     updateGridParams();
+    setScheduleAlert(QString());
     retranslateUi();
 }
 
@@ -531,6 +532,9 @@ void QnCameraScheduleWidget::submitToResources()
             basicScheduleTasks.append(scheduleTaskData);
     }
     updateRecordThresholds(basicScheduleTasks);
+
+    bool enableRecording = isScheduleEnabled();
+    bool canChangeRecording = !enableRecording || canEnableRecording();
 
     for (const auto& camera: m_cameras)
     {
@@ -550,6 +554,19 @@ void QnCameraScheduleWidget::submitToResources()
             updateRecordThresholds(scheduleTasks);
         }
         camera->setScheduleTasks(scheduleTasks);
+
+        if (canChangeRecording)
+        {
+            camera->setLicenseUsed(enableRecording);
+            camera->setScheduleDisabled(!enableRecording);
+        }
+    }
+
+    if (!canChangeRecording)
+    {
+        QSignalBlocker blocker(ui->enableRecordingCheckBox);
+        updateScheduleEnabled();
+        setScheduleAlert(QString());
     }
 }
 
@@ -792,6 +809,16 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
         emit scheduleTasksChanged();
 }
 
+bool QnCameraScheduleWidget::canEnableRecording() const
+{
+    QnCamLicenseUsageHelper licenseHelper(m_cameras, true);
+    return all_of(m_cameras,
+        [&licenseHelper](const QnVirtualCameraResourcePtr& camera)
+        {
+            return licenseHelper.isValid(camera->licenseType());
+        });
+}
+
 void QnCameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
 {
     int before = ui->recordBeforeSpinBox->value();
@@ -815,9 +842,6 @@ int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
 
 void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
 {
-    if (m_updating)
-        return;
-
     if (m_disableUpdateGridParams)
         return;
 
@@ -869,7 +893,9 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     updateMaxFPS();
 
     checkScheduleSet();
-    emit gridParamsChanged();
+
+    if (!m_updating)
+        emit gridParamsChanged();
 }
 
 void QnCameraScheduleWidget::setFps(int value)
@@ -1284,22 +1310,53 @@ void QnCameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthA
     emit alert(m_archiveLengthAlert.isEmpty() ? m_scheduleAlert : m_archiveLengthAlert);
 }
 
+bool QnCameraScheduleWidget::checkCanEnableRecording()
+{
+    setScheduleAlert(QString());
+    if (canEnableRecording())
+        return true;
+
+    switch (ui->enableRecordingCheckBox->checkState())
+    {
+        case Qt::Unchecked:
+        case Qt::PartiallyChecked:
+            setScheduleAlert(tr("Not enough licenses to enable recording"));
+            break;
+        case Qt::Checked:
+            setScheduleAlert(tr("License limit exceeded, recording will not be enabled."));
+            break;
+        default:
+            break;
+    }
+
+    return false;
+}
+
 void QnCameraScheduleWidget::checkRecordingEnabled()
 {
-    if (!isScheduleEnabled())
-        setScheduleAlert(tr("Turn on selector at the top of the window to enable recording."));
-    else
+    if (!checkCanEnableRecording())
+        return;
+
+    if (isScheduleEnabled())
         setScheduleAlert(QString());
+    else
+        setScheduleAlert(tr("Turn on selector at the top of the window to enable recording."));
 }
 
 void QnCameraScheduleWidget::checkScheduleSet()
 {
+    if (!checkCanEnableRecording())
+        return;
+
     if (!isRecordingScheduled())
         setScheduleAlert(tr("Select areas on the schedule to apply chosen parameters to."));
 }
 
 void QnCameraScheduleWidget::checkScheduleParamsSet()
 {
+    if (!checkCanEnableRecording())
+        return;
+
     if (!isRecordingScheduled())
         setScheduleAlert(tr("Set recording parameters and select areas on the schedule grid to apply them to."));
     else

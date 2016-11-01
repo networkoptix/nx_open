@@ -224,15 +224,6 @@ struct QnCompositeTextOverlayColors
 #define QnCompositeTextOverlayColors_Fields (bookmarkColors)(textOverlayItemColor)
 
 
-struct QnLicensesListModelColors {
-    QnLicensesListModelColors();
-
-    QColor normal;
-    QColor warning;
-    QColor expired;
-};
-#define QnLicensesListModelColors_Fields (normal)(warning)(expired)
-
 struct QnVideowallManageWidgetColors {
     QnVideowallManageWidgetColors();
 
@@ -346,7 +337,7 @@ struct QnPasswordStrengthColors
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
-    (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
+    (QnHistogramColors)(QnResourceWidgetFrameColors) \
     (QnTwoWayAudioWidgetColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \

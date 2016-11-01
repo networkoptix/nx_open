@@ -3042,7 +3042,7 @@ int MediaServerProcess::main(int argc, char* argv[])
             lit("Disables crash signal handler (linux only)"), true);
     #endif
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr);
     if( showVersion )
     {
         std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;

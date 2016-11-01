@@ -1,5 +1,5 @@
  <assembly>
-	<id>${profile.classifier}-pdb-libs</id>
+	<id>${profile.classifier}-pdb-client</id>
 	<formats>
 		<format>dir</format>
 	</formats>
@@ -9,11 +9,8 @@
 			<directory>${libdir}/bin/${build.configuration}</directory>
 			<outputDirectory>../</outputDirectory>
 			<includes>
-				<include>**/nx_network.pdb</include>
-				<include>**/nx_utils.pdb</include>                
-                <include>**/nx_vms_utils.pdb</include>
-				<include>**/udt.pdb</include>
-			</includes>
+				<include>**/desktop_client.pdb</include>
+			</includes>           
 		</fileSet>			
 	</fileSets>
 </assembly>

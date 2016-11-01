@@ -117,35 +117,6 @@ void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab)
     setCurrentTab(mode(), tab);
 }
 
-void QnCameraSettingsWidget::setScheduleEnabled(bool enabled)
-{
-    switch (mode())
-    {
-        case SingleMode:
-            m_singleWidget->setScheduleEnabled(enabled);
-            break;
-        case MultiMode:
-            m_multiWidget->setScheduleEnabled(enabled);
-            break;
-        default:
-            break;
-    }
-}
-
-bool QnCameraSettingsWidget::isScheduleEnabled() const
-{
-    switch (mode())
-    {
-        case SingleMode:
-            return m_singleWidget->isScheduleEnabled();
-        case MultiMode:
-            return m_multiWidget->isScheduleEnabled();
-        default:
-            break;
-    }
-    return false;
-}
-
 bool QnCameraSettingsWidget::hasDbChanges() const
 {
     switch (mode())
@@ -165,19 +136,6 @@ void QnCameraSettingsWidget::setReadOnly(bool readOnly) const
 {
     m_singleWidget->setReadOnly(readOnly);
     m_multiWidget->setReadOnly(readOnly);
-}
-
-bool QnCameraSettingsWidget::licensedParametersModified() const
-{
-    switch (mode())
-    {
-        case SingleMode:
-            return m_singleWidget->licensedParametersModified();
-        case MultiMode:
-            return m_multiWidget->licensedParametersModified();
-        default:
-            return true;
-    }
 }
 
 void QnCameraSettingsWidget::updateFromResources()

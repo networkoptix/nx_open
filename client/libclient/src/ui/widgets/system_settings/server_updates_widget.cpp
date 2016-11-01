@@ -433,13 +433,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         case QnCheckForUpdateResult::UpdateFound:
         {
             if (!result.version.isNull() && result.clientInstallerRequired)
-            {
-#ifdef Q_OS_MAC
-                detail = tr("You will have to update the client manually.");
-#else
                 detail = tr("You will have to update the client manually using an installer.");
-#endif
-            }
             break;
         }
 

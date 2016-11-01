@@ -960,7 +960,7 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusine
     }
 
     QStringList recipients;
-    for (auto addr : unfiltered)
+    for (const auto &addr: unfiltered)
     {
         QnEmailAddress email(addr);
         if (email.isValid())

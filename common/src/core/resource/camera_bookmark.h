@@ -162,7 +162,6 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList)
-Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

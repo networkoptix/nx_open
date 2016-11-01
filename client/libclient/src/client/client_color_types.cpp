@@ -163,12 +163,6 @@ QnCompositeTextOverlayColors::QnCompositeTextOverlayColors()
 {
 }
 
-QnLicensesListModelColors::QnLicensesListModelColors() {
-    normal = QColor(255, 255, 255, 255);
-    warning = QColor(Qt::yellow);
-    expired = QColor(Qt::red);
-}
-
 QnRoutingManagementColors::QnRoutingManagementColors() {
     readOnly = Qt::lightGray;
 }

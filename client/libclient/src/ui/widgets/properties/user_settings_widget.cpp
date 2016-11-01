@@ -310,7 +310,7 @@ bool QnUserSettingsWidget::canApplyChanges() const
         return true;
 
     for (auto field : inputFields())
-        if (field->isVisible() && !field->isValid())
+        if (!field->isHidden() && !field->isValid())
             return false;
 
     return true;

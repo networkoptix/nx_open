@@ -67,6 +67,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,
         [this]
         {
+            if (m_updating)
+                return;
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
@@ -102,6 +104,7 @@ void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceLis
 
     m_cameras = cameras;
     ui->cameraScheduleWidget->setCameras(m_cameras);
+    ui->licensingWidget->setCameras(m_cameras);
 
     updateFromResources();
 }
@@ -165,16 +168,6 @@ void QnMultipleCameraSettingsWidget::updateAlertBar()
         ui->alertBar->setText(QString());
 }
 
-void QnMultipleCameraSettingsWidget::setScheduleEnabled(bool enabled)
-{
-    ui->cameraScheduleWidget->setScheduleEnabled(enabled);
-}
-
-bool QnMultipleCameraSettingsWidget::isScheduleEnabled() const
-{
-    return ui->cameraScheduleWidget->isScheduleEnabled();
-}
-
 void QnMultipleCameraSettingsWidget::submitToResources()
 {
     if (isReadOnly())
@@ -199,12 +192,6 @@ void QnMultipleCameraSettingsWidget::submitToResources()
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported())
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
-
-        if (m_hasScheduleEnabledChanges)
-        {
-            camera->setLicenseUsed(ui->cameraScheduleWidget->isScheduleEnabled());
-            camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
-        }
     }
 
     ui->cameraScheduleWidget->submitToResources();
@@ -217,7 +204,7 @@ void QnMultipleCameraSettingsWidget::submitToResources()
 bool QnMultipleCameraSettingsWidget::isValidSecondStream()
 {
     /* Do not check validness if there is no recording anyway. */
-    if (!isScheduleEnabled())
+    if (!ui->cameraScheduleWidget->isScheduleEnabled())
         return true;
 
     auto filteredTasks = ui->cameraScheduleWidget->scheduleTasks();
@@ -264,18 +251,13 @@ bool QnMultipleCameraSettingsWidget::hasDbChanges() const
     return m_hasDbChanges;
 }
 
-bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
-{
-    return m_hasScheduleEnabledChanges;
-}
-
 void QnMultipleCameraSettingsWidget::updateFromResources()
 {
     m_alertText = QString();
     updateAlertBar();
 
     ui->imageControlWidget->updateFromResources(m_cameras);
-    ui->licensingWidget->setCameras(m_cameras);
+    ui->licensingWidget->updateFromResources();
     ui->cameraScheduleWidget->updateFromResources();
 
     if (m_cameras.empty())
@@ -384,10 +366,6 @@ void QnMultipleCameraSettingsWidget::setHasDbChanges(bool hasChanges)
         return;
 
     m_hasDbChanges = hasChanges;
-    if (!m_hasDbChanges)
-    {
-        m_hasScheduleEnabledChanges = false;
-    }
 
     emit hasChangesChanged();
 }
