@@ -313,7 +313,6 @@ bool QnUserSettingsWidget::canApplyChanges() const
     {
         if (!field->isHidden() && !field->isValid())
             return false;
-        }
     }
 
     return true;
