@@ -40,13 +40,12 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
 
+    void forcedUpdate();
+
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
-
     virtual void applyChanges() override;
-
-    virtual void showEvent(QShowEvent* event) override;
 
 private:
     void applyChangesInternal();

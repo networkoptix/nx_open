@@ -275,8 +275,14 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
+    forcedUpdate();
+}
+
+void QnUserSettingsDialog::forcedUpdate()
+{
     loadDataToUi();
     updatePermissions();
+    updateButtonBox();
 }
 
 QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
@@ -367,15 +373,7 @@ void QnUserSettingsDialog::applyChanges()
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         setUser(QnUserResourcePtr());
 
-    updateButtonBox();
-    loadDataToUi();
-}
-
-void QnUserSettingsDialog::showEvent(QShowEvent* event)
-{
-    loadDataToUi();
-    updatePermissions();
-    base_type::showEvent(event);
+    forcedUpdate();
 }
 
 void QnUserSettingsDialog::applyChangesInternal()
