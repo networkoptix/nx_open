@@ -68,7 +68,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
         return;
 
     if (m_checked)
-         return;
+        return;
 
      m_checked = true;
 
