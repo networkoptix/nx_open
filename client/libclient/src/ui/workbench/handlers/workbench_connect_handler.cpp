@@ -122,9 +122,9 @@ void removeCustomConnection(const QnLocalConnectionData& data)
 
     auto customConnections = qnSettings->customConnections();
     const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [localId = data.localId](const QnConnectionData& value)
+        [localId = data.localId, user = data.url.userName()](const QnConnectionData& value)
         {
-            return (localId == value.localId);
+            return ((localId == value.localId) && (value.url.userName() == user));
         });
 
     if (itSameSystem == customConnections.end())
@@ -171,10 +171,10 @@ void storeCustomConnection(const QnLocalConnectionData& data)
     ///
 
     const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [id = data.localId](const QnConnectionData& value)
-    {
-        return (id == value.localId);
-    });
+        [id = data.localId, user = data.url.userName()](const QnConnectionData& value)
+        {
+            return ((id == value.localId) && (value.url.userName() == user));
+        });
 
     const bool sameSystemFound = (itSameSystem != customConnections.end());
     if (sameSystemFound)
