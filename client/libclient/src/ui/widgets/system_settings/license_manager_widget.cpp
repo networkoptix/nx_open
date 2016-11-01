@@ -32,7 +32,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/models/license_list_model.h>
-#include <ui/delegates/resource_item_delegate.h>
+#include <ui/delegates/license_list_item_delegate.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/utils/table_export_helper.h>
@@ -84,40 +84,8 @@ protected:
     }
 };
 
-class QnLicenseListItemDelegate : public QnResourceItemDelegate
-{
-    using base_type = QnResourceItemDelegate;
+} // namespace
 
-public:
-    explicit QnLicenseListItemDelegate(QObject* parent = nullptr) :
-        base_type(parent)
-    {
-    }
-
-    virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override
-    {
-        base_type::initStyleOption(option, index);
-        if (!index.isValid())
-            return;
-
-        if (index.column() == QnLicenseListModel::LicenseKeyColumn)
-        {
-            option->font = monospaceFont(option->font);
-            option->fontMetrics = QFontMetrics(option->font);
-        }
-
-        if (index.data(Qt::ForegroundRole).canConvert<QBrush>())
-            return;
-
-        if (auto license = index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>())
-        {
-            if (!license->isValid())
-                option->state &= ~QStyle::State_Enabled;
-        }
-    }
-};
-
-}
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
