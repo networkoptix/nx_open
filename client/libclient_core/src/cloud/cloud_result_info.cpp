@@ -11,6 +11,7 @@ QnCloudResultInfo::operator QString() const
     return m_text;
 }
 
+//TODO: #placeholder #stub Fill with better human-readable strings
 QString QnCloudResultInfo::toString(ResultCode code)
 {
     switch (code)
