@@ -737,9 +737,11 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
 
                 if (canShowLayoutBackground())
                 {
+                    auto layout = workbench()->currentLayout()->resource();
+
                     ensureRaisedConeItem(newWidget);
                     setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-                    raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+                    raisedConeItem(newWidget)->setEffectEnabled(layout && !layout->backgroundImageFilename().isEmpty());
                 }
 
                 synchronize(newWidget, true);

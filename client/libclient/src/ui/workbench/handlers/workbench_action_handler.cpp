@@ -289,7 +289,10 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler()
     deleteDialogs();
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const
+{
+    if (!layout)
+        return;
 
     if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
         while (!layout->getItems().isEmpty())
@@ -864,7 +867,10 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     if (!workbench()->currentLayout()->resource())
         menu()->trigger(QnActions::OpenNewTabAction);
 
-    if (workbench()->currentLayout()->resource()->locked() &&
+    NX_ASSERT(workbench()->currentLayout()->resource());
+
+    if (workbench()->currentLayout()->resource() &&
+        workbench()->currentLayout()->resource()->locked() &&
         !resources.empty() &&
         layouts.empty() &&
         videowalls.empty()) {
@@ -1745,24 +1751,40 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 }
 
 
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(0.0);
-    action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered()
+{
+    if (auto layout = workbench()->currentLayout()->resource())
+    {
+        layout->setCellSpacing(0.0);
+        action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
+    }
 }
 
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(0.1);
-    action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered()
+{
+    if (auto layout = workbench()->currentLayout()->resource())
+    {
+        layout->setCellSpacing(0.1);
+        action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
+    }
 }
 
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(0.2);
-    action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered()
+{
+    if (auto layout = workbench()->currentLayout()->resource())
+    {
+        layout->setCellSpacing(0.2);
+        action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
+    }
 }
 
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(0.3);
-    action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered()
+{
+    if (auto layout = workbench()->currentLayout()->resource())
+    {
+        layout->setCellSpacing(0.3);
+        action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+    }
 }
 
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
