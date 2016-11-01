@@ -161,6 +161,8 @@ private:
         bool autoLogin,
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
 
+    void handleStartupTileAction(const QString& systemId, bool initial);
+
 private:
     void showScreen();
 

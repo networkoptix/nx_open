@@ -24,8 +24,10 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+#include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_settings.h>
+#include <finders/systems_finder.h>
 
 #include <utils/common/app_info.h>
 
@@ -105,6 +107,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_message(),
     m_appInfo(new QnAppInfo(this))
 {
+    NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
@@ -123,7 +126,10 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
         if (!m_visible)
-            setGlobalPreloaderVisible(false);   ///< Auto toggle off preloader
+        {
+            setGlobalPreloaderVisible(false);         //< Auto toggle off preloader
+            qnStartupTileManager->forbidTileAction(); //< available only on first show
+        }
 
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
     });
@@ -135,10 +141,81 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
         if (valueId == QnClientSettings::AUTO_LOGIN)
             emit resetAutoLogin();
     });
+
+    connect(qnStartupTileManager, &QnStartupTileManager::tileAction,
+        this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
 {}
+
+void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, bool initial)
+{
+    const auto system = qnSystemsFinder->getSystem(systemId);
+    NX_ASSERT(system, "System is empty");
+    if (!system)
+        return;
+
+    if (qnSettings->autoLogin())
+        return; // Do nothing in case of auto-login option set
+
+    if (system->isCloudSystem() || !system->isOnline())
+        return; // Do nothing with cloud and offline (recent) systems
+
+    static const auto wrongServers =
+        [](const QnSystemDescriptionPtr& system) -> bool
+        {
+            const bool wrong = system->servers().isEmpty();
+            NX_ASSERT(!wrong, "Wrong local system - at least one server should exist");
+            return wrong;
+        };
+
+    if (system->isNewSystem())
+    {
+        if (!initial)
+            return; // We found system after initial discovery
+
+        if (wrongServers(system))
+            return;
+
+        const auto firstServerId = system->servers().first().id;
+        const auto host = system->getServerHost(firstServerId);
+        setupFactorySystem(host.toString());
+        return;
+    }
+
+    // Here we have online local system.
+
+    if (initial)
+    {
+        const auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+        const auto itConnection = std::find_if(recentConnections.begin(), recentConnections.end(),
+            [localId = system->localId()](const QnLocalConnectionData& data)
+        {
+            return (localId == data.localId);
+        });
+
+        if (wrongServers(system))
+            return;
+
+        if ((itConnection != recentConnections.end()) && !itConnection->password.isEmpty())
+        {
+            static const bool kNeverAutologin = false;
+            static const bool kAlwaysStorePassword = true;
+
+            const auto firstServerId = system->servers().first().id;
+            const auto serverHost = system->getServerHost(firstServerId);
+            connectToLocalSystem(system->id(), serverHost.toString(),
+                itConnection->url.userName(), itConnection->password.value(),
+                kAlwaysStorePassword, kNeverAutologin);
+
+            return;
+        }
+    }
+
+    // Just expand online local tile
+    executeDelayedParented([this, system]() { emit openTile(system->id());  }, 0, this);
+}
 
 QWidget* QnWorkbenchWelcomeScreen::widget()
 {
