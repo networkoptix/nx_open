@@ -404,13 +404,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 {
     NX_ASSERT(server);
 
-    Qn::Permissions result = Qn::NoPermissions;
+    Qn::Permissions result = Qn::ReadPermission;
     if (!qnResourceAccessProvider->hasAccess(subject, server))
         return result;
 
-    result |= Qn::ReadPermission;
+    result |= Qn::ViewContentPermission;
     if (hasGlobalPermission(subject, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
-        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        result |= Qn::FullServerPermissions;
 
     return result;
 }
