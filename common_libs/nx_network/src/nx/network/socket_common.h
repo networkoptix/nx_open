@@ -126,6 +126,7 @@ public:
     bool isNull() const;
 
     static const SocketAddress anyAddress;
+    static const SocketAddress anyPrivateAddress;
     static QString trimIpV6(const QString& ip);
 };
 

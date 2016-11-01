@@ -289,6 +289,7 @@ public:
     SocketAddress bind();
     void add(const SocketAddress& key, SocketAddress address);
     void remove(const SocketAddress& key, const SocketAddress& address);
+    void remove(const SocketAddress& key);
     std::set<SocketAddress> get(const SocketAddress& key) const;
     boost::optional<SocketAddress> random(const SocketAddress& key) const;
 
@@ -297,8 +298,9 @@ public:
         AddressBinder* const binder;
         const SocketAddress key;
 
-        explicit Manager(AddressBinder* b) : binder(b), key(b->bind()) {}
-        Manager(AddressBinder* b, SocketAddress k) : binder(b), key(std::move(k)) {}
+        explicit Manager(AddressBinder* b): binder(b), key(b->bind()) {}
+        Manager(AddressBinder* b, SocketAddress k): binder(b), key(std::move(k)) {}
+        void wipe() { binder->remove(key); }
 
         void add(SocketAddress a) { binder->add(key, std::move(a)); }
         void remove(const SocketAddress& a) { binder->remove(key, a); }

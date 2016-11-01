@@ -306,6 +306,7 @@ bool SocketAddress::isNull() const
 }
 
 const SocketAddress SocketAddress::anyAddress(HostAddress::anyHost, 0);
+const SocketAddress SocketAddress::anyPrivateAddress(HostAddress::localhost, 0);
 
 QString SocketAddress::trimIpV6(const QString& ip)
 {
