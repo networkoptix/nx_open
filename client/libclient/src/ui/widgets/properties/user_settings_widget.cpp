@@ -306,15 +306,50 @@ void QnUserSettingsWidget::applyChanges()
 
 bool QnUserSettingsWidget::canApplyChanges() const
 {
-    if (!validMode())
-        return true;
+    auto checkFields = [](QList<QnInputField*> fields)
+        {
+            return std::all_of(fields.cbegin(), fields.cend(),
+                 [](QnInputField* field)
+                 {
+                     return field->isValid();
+                 });
+        };
 
-    for (auto field : inputFields())
+    const QList<QnInputField*> kLocalUserFields{
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->passwordInputField,
+        ui->confirmPasswordInputField,
+        ui->emailInputField
+    };
+
+    switch (m_model->mode())
     {
-        if (!field->isHidden() && !field->isValid())
-            return false;
+        case QnUserSettingsModel::NewUser:
+        {
+            switch (ui->userTypeComboBox->currentIndex())
+            {
+                case kCloudIndex:
+                    return checkFields({ui->cloudEmailInputField});
+                case kLocalIndex:
+                    return checkFields(kLocalUserFields);
+                default:
+                    break;
+            }
+            break;
+        }
+        case QnUserSettingsModel::OtherSettings:
+        {
+            if (m_model->user()->isCloud())
+                return true;
+
+            return checkFields(kLocalUserFields);
+        }
+        default:
+            break;
     }
 
+    NX_ASSERT(false);
     return true;
 }
 
@@ -375,9 +410,6 @@ void QnUserSettingsWidget::setupInputFields()
     ui->cloudEmailInputField->setValidator([this](const QString& text)
     {
         if (m_model->mode() != QnUserSettingsModel::NewUser)
-            return Qn::kValidResult;
-
-        if (ui->userTypeComboBox->currentIndex() != kCloudIndex)
             return Qn::kValidResult;
 
         auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
