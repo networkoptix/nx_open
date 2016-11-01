@@ -8,15 +8,12 @@ ZoomableFlickable
     id: zf
 
     property alias source: video.source
-    property alias screenshotSource: screenshot.source
     property alias customAspectRatio: content.customAspectRatio
     property alias videoRotation: content.videoRotation
 
     property real maxZoomFactor: 4
 
-    readonly property size sourceSize: (screenshot.visible
-        ? screenshot.sourceSize
-        : Qt.size(video.sourceRect.width, video.sourceRect.height))
+    readonly property size sourceSize: Qt.size(video.sourceRect.width, video.sourceRect.height)
 
     minContentWidth: width
     minContentHeight: height
@@ -54,14 +51,6 @@ ZoomableFlickable
             fillMode: VideoOutput.Stretch
         }
 
-        Image
-        {
-            id: screenshot
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectFit
-            visible: source != ""
-        }
-
         onSourceSizeChanged: fitToBounds()
     }
 
@@ -70,7 +59,7 @@ ZoomableFlickable
 
     function fitToBounds()
     {
-        if (content.sourceSize.width <= 0 || content.sourceSize.height <= 0)
+        if (sourceSize.width <= 0 || sourceSize.height <= 0)
         {
             resizeContent(width, height, false, true)
             return

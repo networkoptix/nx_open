@@ -12,7 +12,7 @@ PageBase
     objectName: "videoScreen"
 
     property alias resourceId: videoScreenController.resourceId
-    property string initialScreenshot
+    property alias initialScreenshot: screenshot.source
 
     VideoScreenController
     {
@@ -21,7 +21,7 @@ PageBase
         mediaPlayer.onPlayingChanged:
         {
             if (mediaPlayer.playing)
-                video.screenshotSource = ""
+                screenshot.source = ""
         }
 
         onOfflineChanged:
@@ -158,15 +158,23 @@ PageBase
         width: mainWindow.width
         height: mainWindow.height
 
-        visible: dummyLoader.status != Loader.Ready
+        visible: dummyLoader.status != Loader.Ready && !screenshot.visible
 
         source: videoScreenController.mediaPlayer
-        screenshotSource: initialScreenshot
         customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
             || videoScreenController.mediaPlayer.aspectRatio)
         videoRotation: videoScreenController.resourceHelper.customRotation
 
         onClicked: toggleUi()
+    }
+
+    Image
+    {
+        id: screenshot
+        width: parent.width
+        height: sourceSize.height == 0 ? 0 : width * sourceSize.height / sourceSize.width
+        y: (mainWindow.height - height) / 3 - header.height
+        visible: status == Image.Ready
     }
 
     Loader
