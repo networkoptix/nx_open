@@ -491,7 +491,8 @@ TEST_F(QnResourceAccessManagerTest, checkServerAsViewer)
     auto server = addServer();
 
     Qn::Permissions desired = Qn::ReadPermission;
-    Qn::Permissions forbidden = Qn::FullServerPermissions &~ desired;
+    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    forbidden &= ~desired;
 
     checkPermissions(server, desired, forbidden);
 }
@@ -504,5 +505,8 @@ TEST_F(QnResourceAccessManagerTest, checkAccessibleServerAsViewer)
     auto server = addServer();
 
     Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
-    Qn::Permissions forbidden = Qn::FullServerPermissions &~ desired;
+    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    forbidden &= ~desired;
+
+    checkPermissions(server, desired, forbidden);
 }
