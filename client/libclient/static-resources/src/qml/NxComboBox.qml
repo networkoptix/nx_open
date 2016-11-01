@@ -59,7 +59,7 @@ ComboBox
             {
                 var newCurrenIndex = currentIndex + (last - first + 1);
                 if (newCurrenIndex < count)
-                    currentItemIndex = newCurrenIndex;
+                    currentIndex = newCurrenIndex;
                 else
                     overflowCurrentIndex = newCurrenIndex;
             }
