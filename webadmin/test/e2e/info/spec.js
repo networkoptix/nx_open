@@ -74,6 +74,7 @@ describe('Information Page', function () {
             p.helper.ignoreSyncFor( function() {
                 expect(browser.getCurrentUrl()).toContain('/web/api/showLog?lines=1000');
             });
+            browser.close();
         });
     });
 
