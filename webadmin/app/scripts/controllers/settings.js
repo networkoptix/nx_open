@@ -59,6 +59,8 @@ angular.module('webadminApp')
 
                 getCloudInfo();
                 requestScripts();
+
+                $scope.user = user;
             });
         }
         $scope.Config = Config;
@@ -81,7 +83,6 @@ angular.module('webadminApp')
 
         $scope.openRestoreDefaultsDialog = function () {
             //1. confirm detach
-            var confirmation = L.settings.confirmRestoreDefault;
             dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
 
                 mediaserver.checkCurrentPassword(oldPassword).then(function() {
@@ -180,7 +181,7 @@ angular.module('webadminApp')
 
 
         function runResultHandler(result){
-            resultHandler(result, 'Client application was started. Use a keyboard or mobile application to control it.');
+            resultHandler(result, L.settings.nx1ControlHint);
         }
         $scope.runClient = function(){
             mediaserver.execute('start_lite_client').then(runResultHandler, errorHandler);
@@ -263,6 +264,22 @@ angular.module('webadminApp')
                 window.location.reload();
             });
         }
+
+        $scope.changePassword = function(){
+            dialogs.confirmWithPassword(
+                L.settings.confirmChangePasswordTitle,
+                L.settings.confirmChangePassword,
+                L.settings.confirmChangePasswordAction,
+                'danger').then(function (oldPassword) {
+                    //1. Check password
+                    return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                        // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
+                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(resultHandler, errorHandler);
+                    },function(){
+                        dialogs.alert(L.settings.wrongPassword);
+                    });
+                });
+        };
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             //Open Disconnect Dialog
 
@@ -314,8 +331,7 @@ angular.module('webadminApp')
         };
 
         $scope.connectToCloud = function() { // Connect to Cloud
-            //Open Connect Dialog
-            openCloudDialog(true);
+            openCloudDialog(true); //Open Connect Dialog
         };
 
 

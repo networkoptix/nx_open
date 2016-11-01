@@ -1,6 +1,5 @@
 <div class="container">
     <div class="row">
-
         <div class="col-md-4 col-md-push-8">
             <system-info></system-info>
         </div>
@@ -35,6 +34,23 @@
                         <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                    </div>
+                    <div ng-if="user.isOwner">
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                            <h3>Change admin password</h3>
+                            <p>This will change password for user admin as well as root system password for some servers</p>
+                            <div class="form-group" ng-class="{'has-error':!rootPasswordForm.password.$valid}">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="password" placeholder="Password" name="password"
+                                           ng-model="settings.rootPassword" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
+                                            ng-click="changePassword()">Change password</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
                         <h3>Restore Server Settings</h3>

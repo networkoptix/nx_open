@@ -321,6 +321,12 @@ angular.module('webadminApp')
             },
 
 
+            changeAdminPassword: function(password) {
+                return wrapPost(proxy + '/web/api/configure', {
+                    password:password
+                });
+            },
+
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
                 // 1. get remote nonce
                 // /proxy/http/{url}/api/getNonce
