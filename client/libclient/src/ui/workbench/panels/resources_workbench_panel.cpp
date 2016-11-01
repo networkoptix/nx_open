@@ -26,7 +26,7 @@ namespace {
 static const int kShowAnimationDurationMs = 300;
 static const int kHideAnimationDurationMs = 300;
 
-static const int kResizerWidth = 16;
+static const int kResizerWidth = 8;
 
 }
 
@@ -264,7 +264,7 @@ void ResourceTreeWorkbenchPanel::updateResizerGeometry()
         m_parentWidget->mapFromItem(item, treeRect.topRight()),
         m_parentWidget->mapFromItem(item, treeRect.bottomRight()));
 
-    resizerGeometry.moveTo(resizerGeometry.topLeft() - QPointF(kResizerWidth/2, 0));
+    resizerGeometry.moveTo(resizerGeometry.topLeft());
     resizerGeometry.setWidth(kResizerWidth);
 
     if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))
