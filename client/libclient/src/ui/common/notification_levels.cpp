@@ -8,12 +8,12 @@
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusinessActionPtr &businessAction) {
 
-    if (businessAction->actionType() == QnBusiness::PlaySoundAction) 
+    if (businessAction->actionType() == QnBusiness::PlaySoundAction)
         return Value::CommonNotification;
 
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) 
+    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
         return Value::CriticalNotification;
-    
+
     auto params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
@@ -29,7 +29,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
     case QnBusiness::BackupFinishedEvent:
         {
             QnBusiness::EventReason reason = static_cast<QnBusiness::EventReason>(params.reasonCode);
-            bool isCriticalNotification = reason == QnBusiness::BackupFailedChunkError || 
+            bool isCriticalNotification = reason == QnBusiness::BackupFailedChunkError ||
                                           reason == QnBusiness::BackupFailedNoBackupStorageError ||
                                           reason == QnBusiness::BackupFailedSourceFileError ||
                                           reason == QnBusiness::BackupFailedSourceStorageError ||
@@ -50,7 +50,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
     case QnBusiness::LicenseIssueEvent:
         return Value::CriticalNotification;
 
-    default:                                        
+    default:
         NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
         return Value::NoNotification;
     }
@@ -61,6 +61,8 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
         return QnNotificationLevel::Value::CommonNotification;
+    case QnSystemHealth::UsersEmailIsEmpty:
+        return QnNotificationLevel::Value::ImportantNotification;
     default:
         break;
     }
@@ -77,7 +79,7 @@ QColor QnNotificationLevel::notificationColor(Value level) {
     case Value::SystemNotification:    return qnGlobals->notificationColorSystem();
     default:
         NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
-        break;        
+        break;
     }
     return QColor();
 }
