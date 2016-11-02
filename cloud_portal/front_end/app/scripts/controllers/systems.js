@@ -10,6 +10,7 @@ angular.module('cloudApp')
         });
 
         $scope.Config = Config;
+        $scope.showSearch = false;
 
         function sortSystems(systems){
             // Alphabet sorting
@@ -25,7 +26,10 @@ angular.module('cloudApp')
         function delayedUpdateSystems(){
             var pollingSystemsUpdate = $poll(function(){
                 return cloudApi.systems().then(function(result){
-                    return $scope.systems = sortSystems(result.data);
+                    $scope.systems = sortSystems(result.data);
+
+                    $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
+                    return $scope.systems;
                 });
             },Config.updateInterval);
 
@@ -46,6 +50,7 @@ angular.module('cloudApp')
                 return;
             }
             $scope.systems = sortSystems(result.data);
+            $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
             delayedUpdateSystems();
         });
 
@@ -68,13 +73,13 @@ angular.module('cloudApp')
             return system.ownerAccountEmail;
         }
 
-        $scope.search = '';
+        $scope.search = {value:''};
         function hasMatch(str,search){
             return str.toLowerCase().indexOf(search.toLowerCase())>=0;
         }
         $scope.searchSystems = function(system){
-            var search = $scope.search;
-            return  $scope.search == '' ||
+            var search = $scope.search.value;
+            return  !search ||
                     hasMatch(L.system.mySystemSearch, search) && (system.ownerAccountEmail == $scope.account.email) ||
                     hasMatch(system.name, search) ||
                     hasMatch(system.ownerFullName, search) ||
