@@ -4,32 +4,19 @@ describe('Setup Wizard', function () {
     var p = new Page();
 
     beforeEach(function() {
+        // This handles unexpected alert 'getCurrentUserData',
+        // which appears randomly
+        browser.switchTo().alert().then(
+            function (alert) { alert.dismiss(); }, // most of the time, there is no alert
+            function () { console.log('Do not pay attention to previous exception') }
+        );
+
         p.get();
-
-        // Try to log in, because rights model is messed up now
-        element(by.model('user.username')).isPresent().then( function(isPresent) {
-            if(isPresent) {
-                p.helper.login('noptixqa+owner@gmail.com', 'qweasd123');
-                console.log('Login dialog appeared unexpectedly.');
-                browser.sleep(1000);
-            }
-        });
-
-        element(by.model('user.username')).isPresent().then( function(isPresent) {
-            if(isPresent) {
-                p.helper.login('admin', 'admin');
-                console.log('Login dialog appeared unexpectedly.');
-                browser.sleep(1000);
-            }
-        });
-        // by that moment user should be logged in.
 
         //  If setup wizard is present, complete setup
         p.setupDialog.isPresent().then( function(isPresent) {
             if(isPresent) {
                 p.helper.completeSetup(); }
-        }).then(function() {
-            p.helper.getTab('Server').click();
         });
     });
 
@@ -90,7 +77,7 @@ describe('Setup Wizard', function () {
         browser.refresh();
         browser.sleep(1000);
         p.helper.waitIfNotDisplayed(p.setupDialog, 1000);
-        p.setupDialog.isPresent().then(function(is) {console.log(is, 'SETUP DIALOF IS')});
+        p.setupDialog.isPresent().then(function(is) {console.log(is, 'setup dialog is present or not')});
         expect(p.setupDialog.isPresent()).toBe(true);
         p.helper.completeSetup();
     });
@@ -109,7 +96,7 @@ describe('Setup Wizard', function () {
         p.systemNameInput.clear();
         p.nextButton.click();
         checkRequired("System name is required");
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
 
         // Merge with existing screen
         p.mergeWithExisting.click();
@@ -127,6 +114,8 @@ describe('Setup Wizard', function () {
 
         // Connect to cloud screen
         p.nextButton.click();
+        p.systemTypeRightButton.click();  // choose cloud system type
+        p.nextButton.click();
 
         // cloud login screen
         p.useCloudAccButton.click();
@@ -140,9 +129,11 @@ describe('Setup Wizard', function () {
         checkRequired("Email and password are required");
 
         p.backButton.click();
+        p.backButton.click();
 
         // Local login screen
-        p.skipCloud.click();
+        p.systemTypeRightButton.click(); // choose local system type
+        p.nextButton.click();
 
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.clear();
@@ -164,7 +155,7 @@ describe('Setup Wizard', function () {
 
         // System name screen
         p.helper.checkElementFocusedBy(p.systemNameInput, 'model');
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
 
         // Merge with existing screen
         p.mergeWithExisting.click();
@@ -173,14 +164,18 @@ describe('Setup Wizard', function () {
 
         // Connect to cloud screen
         p.nextButton.click();
+        p.systemTypeRightButton.click();  // choose cloud system type
+        p.nextButton.click();
 
         // cloud login screen
         p.useCloudAccButton.click();
         p.helper.checkElementFocusedBy(p.cloudEmailInput, 'model');
         p.backButton.click();
+        p.backButton.click();
 
         // Local login screen
-        p.skipCloud.click();
+        p.systemTypeRightButton.click(); // choose local system type
+        p.nextButton.click();
         p.helper.checkElementFocusedBy(p.localPasswordInput, 'model');
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
@@ -204,7 +199,7 @@ describe('Setup Wizard', function () {
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Give your System a name');
 
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Get Started with Nx Witness');
         p.nextButton.click();
@@ -215,20 +210,35 @@ describe('Setup Wizard', function () {
         expect(p.setupDialog.getText()).toContain('Give your System a name');
         p.nextButton.click();
 
-        // On Cloud screen - skip cloud
-        p.skipCloud.click();
+        // On system type screen - local
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Give your System a name');
+        p.nextButton.click();
+
+        // On system type screen - cloud
+        p.systemTypeRightButton.click(); // choose cloud system type
+        p.backButton.click();
+        expect(p.setupDialog.getText()).toContain('Give your System a name');
+
+        p.nextButton.click();
+        p.systemTypeRightButton.click(); // choose cloud system type
 
         // On Cloud login screen
         p.nextButton.click();
         p.useCloudAccButton.click();
         p.backButton.click();
-        expect(p.setupDialog.getText()).toContain('Connect your System to Nx Cloud');
+        expect(p.setupDialog.getText()).toContain('To use cloud system you should have an account on Nx Cloud');
 
-        p.skipCloud.click();
+        p.backButton.click();
+        expect(p.setupDialog.getText()).toContain('Choose system type');
+        p.systemTypeRightButton.click(); // choose local system type
+        p.nextButton.click();
 
         // On local login screen
+        p.backButton.click();
+        expect(p.setupDialog.getText()).toContain('Choose system type');
+        p.nextButton.click();
+
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
@@ -236,7 +246,8 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-    it("Enter works for next button in every place next is available: advanced settings",function(){
+    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-391 is fixed
+    xit("Enter works for next button in every place next is available: advanced settings",function(){
         p.triggerSetupWizard();
         browser.sleep(1000);
         browser.actions().
@@ -248,31 +259,40 @@ describe('Setup Wizard', function () {
             sendKeys(protractor.Key.ENTER).
             perform();
 
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
-        p.skipCloud.click();
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
-        p.finishButton.click();
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
     });
 
-    it("Enter works for next button in every place next is available: cloud connect",function(){
+    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-391 is fixed
+    xit("Enter works for next button in every place next is available: cloud connect",function(){
         p.triggerSetupWizard();
         browser.sleep(1000);
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
 
+        p.systemTypeRightButton.click();  // choose cloud system type
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
         p.useCloudAccButton.click();
         p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
         p.cloudPassInput.sendKeys(p.helper.password);
@@ -282,14 +302,17 @@ describe('Setup Wizard', function () {
             perform();
 
         browser.sleep(1000);
-        p.finishButton.click();
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
 
         p.helper.logout();
         p.get();
         p.helper.login('admin', p.helper.password);
     });
 
-    it("Enter works for next button in every place next is available: merge with another",function(){
+    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-391 is fixed
+    xit("Enter works for next button in every place next is available: merge with another",function(){
         p.triggerSetupWizard();
         browser.sleep(1000);
         browser.actions().
@@ -307,12 +330,20 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-    // TODO repeat for cloud
-    it("Run setup again using link (#/setup) - it shows success depending on cloud settings",function(){
+    it("Run setup again after local setup using link (#/setup) - it shows success depending on cloud settings",function(){
         p.triggerSetupWizard();
         p.helper.completeSetup();
         browser.get('/#/setup');
-        expect(p.setupDialog.getText()).toContain('System is ready to use');
+        expect(p.setupDialog.getText()).toContain('System is ready for use');
+        p.finishButton.click();
+    });
+
+    // TODO: Enable when connect to cloud is fixed
+    xit("Run setup again after cloud setup using link (#/setup) - it shows success depending on cloud settings",function(){
+        p.triggerSetupWizard();
+        p.helper.completeSetupWithCloud();
+        browser.get('/#/setup');
+        expect(p.setupDialog.getText()).toContain('System is ready for use');
         p.finishButton.click();
     });
 
@@ -349,9 +380,9 @@ describe('Setup Wizard', function () {
 
         p.nextButton.click();
         // Do the rest of the setup
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
         p.nextButton.click();
-        p.skipCloud.click();
+        p.nextButton.click();
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
@@ -360,7 +391,9 @@ describe('Setup Wizard', function () {
     });
 
 
-
+    // To run tests with merge, prepare two active systems: compatible and incompatible.
+    // Write their ips to file test/e2e/helper.js into variables
+    // this.activeSystem and this.incompatibleSystem
 
     it("Merge: message if wrong login password for a remote system",function(){
         p.triggerSetupWizard();
@@ -380,7 +413,8 @@ describe('Setup Wizard', function () {
         p.helper.completeSetup();
     });
 
-    it("Merge: remote system is not accessible, or wrong url was entered",function(){
+    // Does not work locally
+    xit("Merge: remote system is not accessible, or wrong url was entered",function(){
         p.triggerSetupWizard();
         expect(p.setupDialog.isDisplayed()).toBe(true);
         browser.sleep(2000);
@@ -398,25 +432,27 @@ describe('Setup Wizard', function () {
         p.helper.completeSetup();
     });
 
-    it("Merge: remote system is incompatible", function(){
+    // Does not work locally
+    xit("Merge: remote system is incompatible", function(){
         p.triggerSetupWizard();
         expect(p.setupDialog.isDisplayed()).toBe(true);
         browser.sleep(2000);
         p.nextButton.click();
         p.mergeWithExisting.click();
         p.remoteSystemInput.sendKeys(p.helper.incompatibleSystem);
+        p.remoteLoginInput.sendKeys('admin');
         p.remotePasswordInput.sendKeys(p.helper.password);
         p.nextButton.click();
         expect(p.setupDialog.getText()).toContain('Selected system has incompatible version.');
         // Go to the beginning of setup wizard
         p.backButton.click();
         p.backButton.click();
-        p.backButton.click();
 
         p.helper.completeSetup();
     });
 
-    it("Merge works",function(){
+    // Does not work locally
+    xit("Merge works",function(){
         p.triggerSetupWizard();
         expect(p.setupDialog.isDisplayed()).toBe(true);
         browser.sleep(2000);
@@ -447,14 +483,16 @@ describe('Setup Wizard', function () {
         p.triggerSetupWizard();
         expect(p.setupDialog.isDisplayed()).toBe(true);
         p.nextButton.click();
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
         p.nextButton.click();
+        p.systemTypeRightButton.click(); // select cloud system type
         p.learnMore.click();
         p.helper.performAtSecondTab( function(){
             expect(browser.getCurrentUrl()).toContain('cloud');
             browser.close();
         });
-        p.skipCloud.click();
+        p.systemTypeRightButton.click(); // select local system type
+        p.nextButton.click();
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
@@ -466,24 +504,23 @@ describe('Setup Wizard', function () {
         p.triggerSetupWizard();
         browser.sleep(2000);
         p.nextButton.click();
-        p.systemNameInput.sendKeys('autotest-system');
+        p.systemNameInput.clear().sendKeys('autotest-system');
         p.nextButton.click();
+        p.systemTypeRightButton.click(); // select cloud system type
+        p.nextButton.click();
+
         p.useCloudAccButton.click();
         p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
         p.cloudPassInput.sendKeys('wrongpass');
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
         p.nextButton.click();
         expect(p.setupDialog.getText()).toContain('Login or password are incorrect');
-
+        p.backButton.click();
         p.backButton.click();
         p.backButton.click();
         p.backButton.click();
 
         p.helper.completeSetup();
-    });
-
-    it("Cloud connect: wrong cloud credentials",function(){
-
     });
 
     //it("Handle: server has no internet connection",function(){

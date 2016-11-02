@@ -322,9 +322,9 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Connect to the Internet</h2>
+    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
-        Connect your device to the Internet to connect your system to {{Config.cloud.productName}}.
+        Check your internet connection.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
