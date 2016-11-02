@@ -177,7 +177,7 @@ void QnSystemsWeightsManager::afterBaseWeightsUpdated()
     for (const auto& data : m_updatedWeights)
     {
         if (data.realConnection)
-            std::max(targetUnknownSystemWeight, data.weight);
+            targetUnknownSystemWeight = std::max(targetUnknownSystemWeight, data.weight);
     }
 
     setUnknownSystemsWeight(targetUnknownSystemWeight);
