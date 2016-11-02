@@ -911,7 +911,9 @@ void QnWorkbenchNavigator::jumpForward()
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
-        qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
+        /* We want timeline to jump relatively to current position, not camera frame. */
+        qint64 currentTime = m_timeSlider->value();
+
         QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
         if (itr != periods.cend())
             ++itr;
