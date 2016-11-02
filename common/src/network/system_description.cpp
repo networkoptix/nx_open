@@ -10,24 +10,31 @@ namespace
 #define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(                \
     before.fieldName != after.fieldName ? flag : QnServerField::NoField)
 
-#define EXTRACT_CHANGE_FLAG_FOR_FLAGS(serverFlag, flag) static_cast<QnServerFields>(     \
-    before.serverFlags.testFlag(serverFlag) != after.serverFlags.testFlag(serverFlag)    \
-        ? flag                                                                           \
-        : QnServerField::NoField)
+QnServerField testServerFlag(
+    const QnModuleInformation& before,
+    const QnModuleInformation& after,
+    Qn::ServerFlag value,
+    QnServerField flag)
+{
+    if (before.serverFlags.testFlag(value) != after.serverFlags.testFlag(value))
+        return flag;
 
-    QnServerFields getChanges(const QnModuleInformation &before
-        , const QnModuleInformation &after)
-    {
-        const auto fieldsResult =
-            (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
-            | EXTRACT_CHANGE_FLAG(name, QnServerField::Name)
-            | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId));
+    return QnServerField::NoField;
+}
 
-        const auto flagsResult =
-            EXTRACT_CHANGE_FLAG_FOR_FLAGS(Qn::SF_HasPublicIP, QnServerField::HasInternet);
+QnServerFields getChanges(const QnModuleInformation &before
+    , const QnModuleInformation &after)
+{
+    const auto fieldsResult =
+        (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
+        | EXTRACT_CHANGE_FLAG(name, QnServerField::Name)
+        | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId));
 
-        return (fieldsResult | flagsResult);
-    }
+    const auto flagsResult =
+        testServerFlag(before, after, Qn::SF_HasPublicIP, QnServerField::HasInternet);
+
+    return (fieldsResult | flagsResult);
+}
 #undef EXTRACT_CHANGE_FLAG
 }
 
