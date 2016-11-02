@@ -38,7 +38,7 @@ void paintLabelIcon(
 QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos);
 QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos)
 {
-    if (auto proxied = QnNxStylePrivate::graphicsProxiedParent(to))
+    if (auto proxied = QnNxStylePrivate::graphicsProxiedWidget(to))
     {
         return to->mapFrom(proxied, mapFromGlobal(
             proxied->graphicsProxyWidget(), globalPos));
@@ -496,7 +496,7 @@ bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
     return true;
 }
 
-const QWidget* QnNxStylePrivate::graphicsProxiedParent(const QWidget* widget)
+const QWidget* QnNxStylePrivate::graphicsProxiedWidget(const QWidget* widget)
 {
     while (widget)
     {
@@ -511,7 +511,7 @@ const QWidget* QnNxStylePrivate::graphicsProxiedParent(const QWidget* widget)
 
 QGraphicsProxyWidget* QnNxStylePrivate::graphicsProxyWidget(const QWidget* widget)
 {
-    if (auto proxied = graphicsProxiedParent(widget))
+    if (auto proxied = graphicsProxiedWidget(widget))
         return proxied->graphicsProxyWidget();
 
     return nullptr;

@@ -62,7 +62,7 @@ public:
 
     /* Unlike QWidget::graphicsProxyWidget finds proxy recursively. */
     static QGraphicsProxyWidget* graphicsProxyWidget(const QWidget* widget);
-    static const QWidget* graphicsProxiedParent(const QWidget* widget);
+    static const QWidget* graphicsProxiedWidget(const QWidget* widget);
 
 public:
     QnGenericPalette palette;
