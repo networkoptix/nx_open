@@ -980,7 +980,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
-        text(tr("Manage account"));
+        text(tr("Manage account..."));
 
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
