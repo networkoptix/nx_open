@@ -2,6 +2,7 @@
 
 angular.module('cloudApp').directive('validateEmail', function() {
     var EMAIL_REGEXP = new RegExp(Config.emailRegex);
+    var BRACKETS_REGEXP = /<([^<]+?)>/;
 
     return {
         require: '?ngModel',
@@ -12,6 +13,17 @@ angular.module('cloudApp').directive('validateEmail', function() {
                 ctrl.$validators.email = function(modelValue) {
                     return ctrl.$isEmpty(modelValue) || EMAIL_REGEXP.test(modelValue);
                 };
+
+                ctrl.$parsers.push(function(viewValue) {
+                    var extractedEmail = viewValue;
+                    if(extractedEmail){
+                        var match = extractedEmail.match(BRACKETS_REGEXP);
+                        if(match){
+                            extractedEmail = match[1];
+                        }
+                    }
+                    return extractedEmail;
+                });
             }
         }
     };
