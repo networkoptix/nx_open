@@ -31,6 +31,3 @@ admins:
     -
         - 'Admins'
         - 'cloud-portal-admins@networkoptix.com'
-
-notification_module:
-    secret: '$NOTIFICATION_SECRET'
