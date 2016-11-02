@@ -33,6 +33,38 @@ void paintLabelIcon(
         labelRect->setRight(iconRect.left() - padding - 1);
 }
 
+/* Workaround while Qt's QWidget::mapFromGlobal is broken: */
+
+QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos);
+QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos)
+{
+    if (auto proxied = QnNxStylePrivate::graphicsProxiedParent(to))
+    {
+        return to->mapFrom(proxied, mapFromGlobal(
+            proxied->graphicsProxyWidget(), globalPos));
+    }
+
+    return to->mapFromGlobal(globalPos);
+}
+
+QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos)
+{
+    static const QPoint kInvalidPos(
+        std::numeric_limits<int>::max(),
+        std::numeric_limits<int>::max());
+
+    auto scene = to->scene();
+    if (!scene)
+        return kInvalidPos;
+
+    auto views = scene->views();
+    if (views.empty())
+        return kInvalidPos;
+
+    auto viewPos = mapFromGlobal(views[0], globalPos);
+    return to->mapFromScene(views[0]->mapToScene(viewPos)).toPoint();
+}
+
 } // namespace
 
 QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const
@@ -462,4 +494,52 @@ bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
     newLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
     return true;
+}
+
+const QWidget* QnNxStylePrivate::graphicsProxiedParent(const QWidget* widget)
+{
+    while (widget)
+    {
+        if (widget->graphicsProxyWidget())
+            return widget;
+
+        widget = widget->parentWidget();
+    }
+
+    return nullptr;
+}
+
+QGraphicsProxyWidget* QnNxStylePrivate::graphicsProxyWidget(const QWidget* widget)
+{
+    if (auto proxied = graphicsProxiedParent(widget))
+        return proxied->graphicsProxyWidget();
+
+    return nullptr;
+}
+
+void QnNxStylePrivate::updateScrollAreaHover(QScrollBar* scrollBar) const
+{
+    QAbstractScrollArea* area = nullptr;
+    for (auto parent = scrollBar->parent(); parent && !area; parent = parent->parent())
+        area = qobject_cast<QAbstractScrollArea*>(parent);
+
+    if (!area)
+        return;
+
+    auto viewport = area->viewport();
+    if (!viewport->underMouse())
+        return;
+
+    auto globalPos = QCursor::pos(); //< relative to the primary screen
+    auto localPos = mapFromGlobal(viewport, globalPos);
+
+    QMouseEvent mouseMove(
+        QEvent::MouseMove,
+        localPos,
+        globalPos,
+        Qt::NoButton,
+        qApp->mouseButtons(),
+        qApp->keyboardModifiers());
+
+    qApp->notify(viewport, &mouseMove);
 }
