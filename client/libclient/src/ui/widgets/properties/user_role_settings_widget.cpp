@@ -322,7 +322,15 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* mod
         });
 
     connect(ui->nameInputField, &QnInputField::textChanged, this,
-        &QnUserRoleSettingsWidget::applyChanges);
+        [this]
+        {
+            ui->nameInputField->validate();
+            if (canApplyChanges())
+                applyChanges();
+            else
+                emit hasChangesChanged();
+        });
+
     connect(ui->deleteGroupButton, &QPushButton::clicked, d,
         &QnUserRoleSettingsWidgetPrivate::deleteCurrentGroup);
 }
@@ -349,15 +357,7 @@ void QnUserRoleSettingsWidget::loadDataToUi()
 
 void QnUserRoleSettingsWidget::applyChanges()
 {
-    ui->nameInputField->validate();
-    if (!ui->nameInputField->isValid())
-    {
-        emit hasChangesChanged();
-        return;
-    }
-
     Q_D(QnUserRoleSettingsWidget);
-
     d->model->setRoleName(ui->nameInputField->text());
     emit hasChangesChanged();
 }
