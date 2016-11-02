@@ -69,10 +69,8 @@ PageBase
         anchors.fill: parent
         visible: !dummyLoader.visible && !screenshot.visible
 
-        source: videoScreenController.mediaPlayer
-        customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
-            || videoScreenController.mediaPlayer.aspectRatio)
-        videoRotation: videoScreenController.resourceHelper.customRotation
+        mediaPlayer: videoScreenController.mediaPlayer
+        resourceHelper: videoScreenController.resourceHelper
     }
 
     Image

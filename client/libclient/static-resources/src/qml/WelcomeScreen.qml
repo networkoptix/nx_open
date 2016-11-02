@@ -314,8 +314,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to another system")
-                : qsTr("Connect to system")
+                ? qsTr("Connect to Another System")
+                : qsTr("Connect to System")
 
             onClicked: context.connectToAnotherSystem();
         }

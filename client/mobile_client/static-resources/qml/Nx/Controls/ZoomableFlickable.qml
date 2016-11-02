@@ -166,10 +166,10 @@ Item
             if (-x > xMargin)
                 x = -xMargin
 
-            var topMargin = Math.max(allowedVerticalMargin, (height - h) / 3)
-            var bottomMargin = Math.max(allowedVerticalMargin, (height - h) / 3 * 2)
-            if (-y + h < height - bottomMargin)
-                y = h - height + bottomMargin
+            var topMargin = Math.max(allowedVerticalMargin, (rootItem.height - h) / 3)
+            var bottomMargin = Math.max(allowedVerticalMargin, (rootItem.height - h) / 3 * 2)
+            if (-y + h < rootItem.height - bottomMargin)
+                y = h - rootItem.height + bottomMargin
             if (-y > topMargin)
                 y = -topMargin
 

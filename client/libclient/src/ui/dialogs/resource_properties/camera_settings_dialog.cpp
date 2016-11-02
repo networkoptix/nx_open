@@ -139,10 +139,12 @@ void QnCameraSettingsDialog::retranslateUi()
 
 bool QnCameraSettingsDialog::tryClose(bool force)
 {
-    setCameras(QnVirtualCameraResourceList(), force);
-    if (force)
+    auto result = setCameras(QnVirtualCameraResourceList(), force);
+    result |= force;
+    if (result)
         hide();
-    return true;
+
+    return result;
 }
 
 

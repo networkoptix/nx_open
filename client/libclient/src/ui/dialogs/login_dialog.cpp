@@ -48,7 +48,7 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <rest/server/json_rest_result.h>
-
+#include <client_core/client_core_settings.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 
@@ -83,6 +83,41 @@ QStandardItem* newConnectionItem(const QString& text, const QUrl& url)
     auto result = new QStandardItem(text);
     result->setData(url, Qn::UrlRole);
     return result;
+}
+
+bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
+{
+    /**
+     * At first we check if we have stored connection to same system
+     * with specified user and it stores password.
+     */
+    const auto recent = qnClientCoreSettings->recentLocalConnections();
+    const auto itConnection = std::find_if(recent.begin(), recent.end(),
+        [localId, userName = url.userName()](const QnLocalConnectionData& data)
+        {
+            return ((data.localId == localId) && (userName == data.url.userName()));
+        });
+
+    if ((itConnection != recent.end()) && (itConnection->isStoredPassword()))
+        return true;
+
+    /**
+     * Looking for saved connections in login dialog (used till 2.6).
+     * If we find connection with same host/user we can store password too.
+     */
+    const auto custom = qnSettings->customConnections();
+    const auto itCustom = std::find_if(custom.begin(), custom.end(),
+        [host = url.host(), port = url.port(), userName = url.userName()]
+            (const QnConnectionData& data)
+        {
+            return (data.isCustom()
+                && (data.url.host() == host)
+                && (data.url.port() == port)
+                && (data.url.userName() == userName));
+        });
+
+    const bool savedConnectionFound = (itCustom != custom.end());
+    return savedConnectionFound;
 }
 
 } // anonymous namespace
@@ -260,9 +295,11 @@ void QnLoginDialog::accept()
                 {
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     QnActionParameters params;
+                    const bool storePassword =
+                        (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
                     params.setArgument(Qn::UrlRole, url);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
-                    params.setArgument(Qn::StorePasswordRole, autoLogin);
+                    params.setArgument(Qn::StorePasswordRole, storePassword);
                     menu()->trigger(QnActions::ConnectAction, params);
                     break;
                 }

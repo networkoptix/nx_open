@@ -352,19 +352,6 @@ namespace
         return false;
     }
 
-    QGraphicsProxyWidget* findProxyWidget(QWidget* widget)
-    {
-        while (widget)
-        {
-            if (auto proxy = widget->graphicsProxyWidget())
-                return proxy;
-
-            widget = widget->parentWidget();
-        }
-
-        return nullptr;
-    }
-
     enum ScrollBarStyle
     {
         CommonScrollBar,
@@ -750,11 +737,11 @@ void QnNxStyle::drawPrimitive(
                 bool hasHover = item->state.testFlag(State_MouseOver);
                 if (widget)
                 {
-                    if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
-                        (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
+                    if (widget->property(Properties::kSuppressHoverPropery).toBool()
+                        || qobject_cast<const QTreeView*>(widget))
                     {
                         /* Itemviews with kSuppressHoverProperty should suppress hover. */
-                        /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
+                        /* Treeviews already have hover painted in PE_PanelItemViewRow. */
                         hasHover = false;
                     }
                     else
@@ -3354,7 +3341,8 @@ void QnNxStyle::polish(QWidget *widget)
 
     /* #QTBUG 18838 */
     /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
-    if (findProxyWidget(widget))
+    Q_D(QnNxStyle);
+    if (d->graphicsProxyWidget(widget))
         widget->installEventFilter(this);
 
     if (qobject_cast<QAbstractSpinBox*>(widget) ||
@@ -3488,11 +3476,21 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
-    if (qobject_cast<QScrollBar*>(widget))
+    if (auto scrollBar = qobject_cast<QScrollBar*>(widget))
     {
         /* In certain containers we want scrollbars with transparent groove: */
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         widget->setAttribute(Qt::WA_Hover);
+
+        /* Workaround to update scroll areas hover when they're scrolled: */
+        auto updateScrollAreaHover =
+            [d, scrollBar]()
+            {
+                d->updateScrollAreaHover(scrollBar);
+            };
+
+        connect(scrollBar, &QScrollBar::valueChanged,
+            this, updateScrollAreaHover, Qt::QueuedConnection);
     }
 
     if (qobject_cast<QTabBar*>(widget))
@@ -3563,10 +3561,7 @@ void QnNxStyle::polish(QWidget *widget)
      * Since input dialogs are short-lived, don't bother with unpolishing.
      */
     if (auto inputDialog = qobject_cast<QInputDialog*>(widget))
-    {
-        Q_D(const QnNxStyle);
         d->polishInputDialog(inputDialog);
-    }
 
     if (auto label = qobject_cast<QLabel*>(widget))
         QnObjectCompanion<QnLinkHoverProcessor>::installUnique(label, kLinkHoverProcessorCompanion);
@@ -3602,6 +3597,7 @@ void QnNxStyle::polish(QWidget *widget)
 void QnNxStyle::unpolish(QWidget* widget)
 {
     widget->removeEventFilter(this);
+    widget->disconnect(this);
 
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QHeaderView*>(widget) ||
@@ -3699,10 +3695,9 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
     if (auto widget = qobject_cast<QWidget*>(object))
     {
-        if (auto proxy = findProxyWidget(widget))
+        Q_D(QnNxStyle);
+        if (auto proxy = d->graphicsProxyWidget(widget))
         {
-            Q_D(QnNxStyle);
-
             switch (event->type())
             {
                 case QEvent::Leave:

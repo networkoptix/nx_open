@@ -186,6 +186,25 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultValue.value<QnBackgroundImage>()));
         }
 
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel defaultLevel = defaultValue.value<Qn::ResourceInfoLevel>();
+
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+
+            if (asJson.isEmpty())
+            {
+                /* Compatibility with 2.5 and older versions. */
+                bool result = settings->value(lit("isIpShownInTree"), false).toBool();
+                if (result)
+                    return QVariant::fromValue(Qn::RI_FullInfo);
+            }
+
+            return QVariant::fromValue(QJson::deserialized<Qn::ResourceInfoLevel>(asJson,
+                defaultLevel));
+        }
+
         default:
             return base_type::readValueFromSettings(settings, id, defaultValue);
             break;
@@ -258,6 +277,15 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         {
             QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnBackgroundImage>()));
             base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel level = value.value<Qn::ResourceInfoLevel>();
+            QString asJson = QString::fromUtf8(QJson::serialized(level));
+            base_type::writeValueToSettings(settings, id, asJson);
+            settings->setValue(lit("isIpShownInTree"), (level != Qn::RI_NameOnly));
             break;
         }
 

@@ -107,6 +107,13 @@ Item
 
             model: control.recentLocalConnectionsModel;
 
+            Connections
+            {
+                target: userChooseItem.model;
+                ignoreUnknownSignals: true;
+                onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
+            }
+
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;
 

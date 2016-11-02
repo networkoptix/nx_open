@@ -24,7 +24,8 @@ const qint64 kExpirationWarningTimeMs = 15ll * 1000ll * 60ll * 60ll * 24ll;
 } // namespace
 
 QnLicenseListModel::QnLicenseListModel(QObject* parent) :
-    base_type(parent)
+    base_type(parent),
+    m_extendedStatus(false)
 {
 }
 
@@ -117,11 +118,13 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
 
         case LicenseStatusColumn:
         {
+            bool fullStatus = fullText || m_extendedStatus;
+
             QnLicense::ErrorCode code;
             if (qnLicensePool->isLicenseValid(license, &code))
-                return expirationInfo(license, fullText).second;
+                return expirationInfo(license, fullStatus).second;
 
-            if (fullText)
+            if (fullStatus)
                 return license->errorMessage(code);
 
             return code == QnLicense::Expired
@@ -328,4 +331,23 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
 QnMediaServerResourcePtr QnLicenseListModel::serverByLicense(const QnLicensePtr& license)
 {
     return qnResPool->getResourceById<QnMediaServerResource>(license->serverId());
+}
+
+bool QnLicenseListModel::extendedStatus() const
+{
+    return m_extendedStatus;
+}
+
+void QnLicenseListModel::setExtendedStatus(bool value)
+{
+    if (m_extendedStatus == value)
+        return;
+
+    m_extendedStatus = value;
+
+    auto numRows = rowCount();
+    if (numRows == 0)
+        return;
+
+    emit dataChanged(index(0, LicenseStatusColumn), index(numRows - 1, LicenseStatusColumn));
 }

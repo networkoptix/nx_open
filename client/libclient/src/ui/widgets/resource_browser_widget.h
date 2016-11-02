@@ -147,7 +147,7 @@ private:
 
     void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
 
-    void handleItemActivated(const QModelIndex& index);
+    void handleItemActivated(const QModelIndex& index, bool withMouse);
 
 private slots:
     void updateFilter(bool force = false);

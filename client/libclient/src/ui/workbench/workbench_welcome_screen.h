@@ -161,8 +161,7 @@ private:
         bool autoLogin,
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
 
-private:
-    void showScreen();
+    void handleStartupTileAction(const QString& systemId, bool initial);
 
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;

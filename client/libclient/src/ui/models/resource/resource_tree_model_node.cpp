@@ -947,8 +947,10 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case Qn::LayoutsNode:
-        case Qn::AllLayoutsAccessNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
+
+        case Qn::AllLayoutsAccessNode:
+            return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
         case Qn::RecorderNode:
             return qnResIconCache->icon(QnResourceIconCache::Recorder);
