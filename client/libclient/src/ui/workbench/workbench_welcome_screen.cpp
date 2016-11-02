@@ -121,16 +121,17 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
 
-    connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
-    {
-        if (!m_visible)
+    connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this,
+        [this]()
         {
-            setGlobalPreloaderVisible(false);         //< Auto toggle off preloader
-            qnStartupTileManager->forbidTileAction(); //< available only on first show
-        }
+            if (!m_visible)
+            {
+                setGlobalPreloaderVisible(false);         //< Auto toggle off preloader
+                qnStartupTileManager->skipTileAction(); //< available only on first show
+            }
 
-        context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
-    });
+            context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
+        });
 
     setVisible(true);
 
@@ -140,7 +141,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
             emit resetAutoLogin();
     });
 
-    connect(qnStartupTileManager, &QnStartupTileManager::tileAction,
+    connect(qnStartupTileManager, &QnStartupTileManager::tileActionRequested,
         this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
 }
 
@@ -189,9 +190,9 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
         const auto recentConnections = qnClientCoreSettings->recentLocalConnections();
         const auto itConnection = std::find_if(recentConnections.begin(), recentConnections.end(),
             [localId = system->localId()](const QnLocalConnectionData& data)
-        {
-            return (localId == data.localId);
-        });
+            {
+                return (localId == data.localId);
+            });
 
         if (wrongServers(system))
             return;

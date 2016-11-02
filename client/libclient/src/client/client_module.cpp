@@ -482,6 +482,8 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     qnCommon->store<QnSystemsFinder>(new QnSystemsFinder());
     qnCommon->store<QnForgottenSystemsManager>(new QnForgottenSystemsManager());
+
+    // Depends on qnSystemsFinder
     qnCommon->store<QnStartupTileManager>(new QnStartupTileManager());
 
     QnRouter* router = new QnRouter(moduleFinder);

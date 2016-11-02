@@ -14,29 +14,28 @@ public:
 
     virtual ~QnStartupTileManager() = default;
 
-    void forbidTileAction();
+    void skipTileAction();
 
 signals:
     /**
      * Forces tile action:
      * - in case of factory systems we have to connect to it;
-     * - in case of cloud system (and connection to cloud presence)
-     *   or systems with saved password - we have to connect to system;
+     * - in case of systems with saved password - we have to connect to system;
+     * - in case of cloud systems do nothing (as for now)
      * - otherwise just expand tile
      */
-
-    void tileAction(const QString& systemId, bool initial);
+    void tileActionRequested(const QString& systemId, bool initial);
 
 private:
     void handleFirstSystems();
 
-    void throwTileAction(const QnSystemDescriptionPtr& system
-    , bool initial = false);
+    void emitTileAction(
+        const QnSystemDescriptionPtr& system,
+        bool initial = false);
 
     void cancelAndUninitialize();
 
 private:
-    bool m_firstWaveHandled;
     bool m_actionThrown;
 };
 

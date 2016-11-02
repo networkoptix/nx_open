@@ -11,7 +11,6 @@
 
 QnStartupTileManager::QnStartupTileManager():
     base_type(),
-    m_firstWaveHandled(),
     m_actionThrown(false)
 {
     NX_ASSERT(qnSystemsFinder, "Systems finder is nullptr");
@@ -67,12 +66,12 @@ void QnStartupTileManager::handleFirstSystems()
     {
         // Will open first discovered system later
         connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered, this,
-            [this](const QnSystemDescriptionPtr& system) { throwTileAction(system, false); });
+            [this](const QnSystemDescriptionPtr& system) { emitTileAction(system, false); });
     }
     else if (currentSystems.size() == 1)
     {
         // Throw system tile action immediately
-        throwTileAction(currentSystems.first(), true);
+        emitTileAction(currentSystems.first(), true);
     }
     else
     {
@@ -81,19 +80,19 @@ void QnStartupTileManager::handleFirstSystems()
     }
 }
 
-void QnStartupTileManager::forbidTileAction()
+void QnStartupTileManager::skipTileAction()
 {
     m_actionThrown = true;
 }
 
-void QnStartupTileManager::throwTileAction(
+void QnStartupTileManager::emitTileAction(
     const QnSystemDescriptionPtr& system,
     bool initial)
 {
     if (m_actionThrown || qnClientCoreSettings->skipStartupTilesManagement())
         return;
 
-    emit tileAction(system->id(), initial);
+    emit tileActionRequested(system->id(), initial);
 }
 
 void QnStartupTileManager::cancelAndUninitialize()
