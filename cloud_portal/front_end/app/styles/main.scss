@@ -607,3 +607,19 @@ h2.version-number{
 .disabled{
     color: $light10;
 }
+.input-overlay{
+    input{
+        padding-right:30px;
+        padding-left:30px;
+    }
+    .input-overlay-left{
+        position:absolute;
+        color:$light8;
+        left:17px;
+    }
+    .input-overlay-right{
+        position:absolute;
+        color:$light8;
+        right:17px;
+    }
+}
