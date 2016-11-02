@@ -867,7 +867,8 @@ void QnWorkbenchNavigator::jumpBackward()
 
         if (!periods.empty())
         {
-            qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
+            /* We want timeline to jump relatively to current position, not camera frame. */
+            qint64 currentTime = m_timeSlider->value();
 
             if (currentTime == DATETIME_NOW)
             {
@@ -883,7 +884,9 @@ void QnWorkbenchNavigator::jumpBackward()
             }
         }
     }
+
     reader->jumpTo(pos, pos);
+    updateSliderFromReader(false);
     emit positionChanged();
 }
 
@@ -936,7 +939,9 @@ void QnWorkbenchNavigator::jumpForward()
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }
     }
+
     reader->jumpTo(pos, pos);
+    updateSliderFromReader(false);
     emit positionChanged();
 }
 
@@ -951,7 +956,9 @@ void QnWorkbenchNavigator::stepBackward()
 
     m_pausedOverride = false;
 
-    qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
+    /* We want timeline to jump relatively to current position, not camera frame. */
+    qint64 currentTime = m_timeSlider->value();
+
     if (!reader->isSkippingFrames() && currentTime > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
     {
 
@@ -959,7 +966,9 @@ void QnWorkbenchNavigator::stepBackward()
             m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
 
         reader->previousFrame(currentTime);
+        updateSliderFromReader(false);
     }
+
     emit positionChanged();
 }
 
@@ -975,6 +984,8 @@ void QnWorkbenchNavigator::stepForward()
     m_pausedOverride = false;
 
     reader->nextFrame();
+    updateSliderFromReader(false);
+
     emit positionChanged();
 }
 
