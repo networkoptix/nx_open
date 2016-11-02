@@ -54,6 +54,8 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
             this, &QnMediaResourceHelper::resourceStatusChanged);
         connect(d->camera, &QnResource::propertyChanged,
             d, &QnMediaResourceHelperPrivate::at_propertyChanged);
+        connect(d->camera, &QnResource::videoLayoutChanged,
+            this, &QnMediaResourceHelper::videoLayoutChanged);
     }
 
     emit resourceIdChanged();
@@ -85,6 +87,24 @@ int QnMediaResourceHelper::customRotation() const
 {
     Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getProperty(QnMediaResource::rotationKey()).toInt() : 0;
+}
+
+int QnMediaResourceHelper::channelCount() const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->camera ? d->camera->getVideoLayout()->channelCount() : 0;
+}
+
+QSize QnMediaResourceHelper::layoutSize() const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->camera ? d->camera->getVideoLayout()->size() : QSize();
+}
+
+QPoint QnMediaResourceHelper::channelPosition(int channel) const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->camera ? d->camera->getVideoLayout()->position(channel) : QPoint();
 }
 
 QnMediaResourceHelperPrivate::QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent):
