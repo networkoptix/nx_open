@@ -674,7 +674,9 @@ void QnNxStyle::drawPrimitive(
                 {
                     /* Markers can be semi-transparent, so we draw all layers on top of each other. */
 
-                    /* Obtain hover information: */
+                    /* Obtain hover information.
+                     * An item has enabled state here if whole widget is enabled
+                     * and the item has Qt::ItemIsEnabled flag. */
                     QBrush hoverBrush = option->palette.midlight();
                     bool hasHover = item->state.testFlag(State_MouseOver) && item->state.testFlag(State_Enabled) &&
                         !tree->property(Properties::kSuppressHoverPropery).toBool();
@@ -735,26 +737,42 @@ void QnNxStyle::drawPrimitive(
                 bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
                 bool hasHover = item->state.testFlag(State_MouseOver);
-                if (widget)
+                bool suppressHover = selectionOpaque;
+
+                if (widget && !suppressHover)
                 {
-                    if (widget->property(Properties::kSuppressHoverPropery).toBool()
-                        || qobject_cast<const QTreeView*>(widget))
+                    if (!widget->isEnabled() || widget->property(Properties::kSuppressHoverPropery).toBool())
                     {
                         /* Itemviews with kSuppressHoverProperty should suppress hover. */
-                        /* Treeviews already have hover painted in PE_PanelItemViewRow. */
-                        hasHover = false;
+                        suppressHover = true;
                     }
                     else
                     {
-                        /* Obtain Nx hovered row information: */
-                        QVariant value = widget->property(Properties::kHoveredRowProperty);
-                        if (value.isValid())
-                            hasHover = value.toInt() == item->index.row();
+                        /* Treeviews can handle hover in a special way. */
+                        if (auto treeView = qobject_cast<const QTreeView*>(widget))
+                        {
+                            /* For items with Qt::ItemIsEnabled flag
+                             * treeviews draws hover in PE_PanelItemViewRow. */
+                            bool hoverDrawn = item->index.flags().testFlag(Qt::ItemIsEnabled);
+
+                            /* For items without Qt::ItemIsEnabled flag we should
+                             * draw hover only if selection behavior is SelectRows. */
+                            suppressHover = hoverDrawn
+                                || treeView->selectionBehavior() != QAbstractItemView::SelectRows;
+                        }
+
+                        if (!suppressHover)
+                        {
+                            /* Obtain Nx hovered row information: */
+                            QVariant value = widget->property(Properties::kHoveredRowProperty);
+                            if (value.isValid())
+                                hasHover = value.toInt() == item->index.row();
+                        }
                     }
                 }
 
                 /* Draw hover marker if needed: */
-                if (hasHover && !selectionOpaque)
+                if (hasHover && !suppressHover)
                     painter->fillRect(item->rect, option->palette.midlight());
 
                 /* Draw selection marker if needed: */
