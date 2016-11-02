@@ -1,5 +1,5 @@
-#include "user_groups_dialog.h"
-#include "ui_user_groups_dialog.h"
+#include "user_roles_dialog.h"
+#include "ui_user_roles_dialog.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -12,10 +12,10 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/common/indents.h>
-#include <ui/models/resource_properties/user_groups_settings_model.h>
+#include <ui/models/resource_properties/user_roles_settings_model.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/properties/user_group_settings_widget.h>
+#include <ui/widgets/properties/user_role_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
@@ -24,22 +24,30 @@
 #include <nx/utils/string.h>
 
 
-QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
+QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     base_type(parent),
-    ui(new Ui::UserGroupsDialog()),
-    m_model(new QnUserGroupSettingsModel(this)),
-    m_settingsPage(new QnUserGroupSettingsWidget(m_model, this)),
-    m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this))
+    ui(new Ui::UserRolesDialog()),
+    m_model(new QnUserRolesSettingsModel(this))
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
 
-    addPage(SettingsPage, m_settingsPage, tr("Role Info"));
-    addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
-    addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
-    addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
+    addPage(
+        SettingsPage,
+        new QnUserRoleSettingsWidget(m_model, this),
+        tr("Role Info"));
+    addPage(
+        PermissionsPage,
+        new QnPermissionsWidget(m_model, this),
+        tr("Permissions"));
+    addPage(
+        CamerasPage,
+        new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this),
+        tr("Cameras && Resources"));
+    addPage(
+        LayoutsPage,
+        new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this),
+        tr("Layouts"));
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -60,17 +68,17 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 
-    m_model->setGroups(qnUserRolesManager->userRoles());
+    m_model->setRoles(qnUserRolesManager->userRoles());
     ui->groupsTreeView->setModel(m_model);
 
     connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
-        &QnUserGroupsDialog::at_model_currentChanged);
+        &QnUserRolesDialog::at_model_currentChanged);
 
     connect(ui->newGroupButton, &QPushButton::clicked, this,
         [this]
         {
             QStringList usedNames;
-            for (const auto& group: m_model->groups())
+            for (const auto& group: m_model->roles())
                 usedNames << group.name;
 
             ec2::ApiUserGroupData group;
@@ -78,8 +86,9 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
             group.name = nx::utils::generateUniqueString(usedNames, tr("New Role"), tr("New Role %1"));
             group.permissions = Qn::NoGlobalPermissions;
 
-            int row = m_model->addGroup(group);
-            ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row), QItemSelectionModel::ClearAndSelect);
+            int row = m_model->addRole(group);
+            ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row),
+                QItemSelectionModel::ClearAndSelect);
             updateButtonBox();
         });
 
@@ -104,13 +113,13 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     modelChanged();
 }
 
-QnUserGroupsDialog::~QnUserGroupsDialog()
+QnUserRolesDialog::~QnUserRolesDialog()
 {
 }
 
-bool QnUserGroupsDialog::selectGroup(const QnUuid& groupId)
+bool QnUserRolesDialog::selectGroup(const QnUuid& groupId)
 {
-    ec2::ApiUserGroupDataList groups = m_model->groups();
+    ec2::ApiUserGroupDataList groups = m_model->roles();
     ec2::ApiUserGroupDataList::const_iterator group = std::find_if(groups.cbegin(), groups.cend(),
         [groupId](const ec2::ApiUserGroupData& elem)
         {
@@ -126,13 +135,13 @@ bool QnUserGroupsDialog::selectGroup(const QnUuid& groupId)
     return true;
 }
 
-bool QnUserGroupsDialog::hasChanges() const
+bool QnUserRolesDialog::hasChanges() const
 {
     /* Quick check */
-    if (qnUserRolesManager->userRoles().size() != m_model->groups().size())
+    if (qnUserRolesManager->userRoles().size() != m_model->roles().size())
         return true;
 
-    for (const auto& group : m_model->groups())
+    for (const auto& group : m_model->roles())
     {
         auto existing = qnUserRolesManager->userRole(group.id);
 
@@ -146,12 +155,12 @@ bool QnUserGroupsDialog::hasChanges() const
     return base_type::hasChanges();
 }
 
-void QnUserGroupsDialog::applyChanges()
+void QnUserRolesDialog::applyChanges()
 {
     base_type::applyChanges();
 
     QSet<QnUuid> groupsLeft;
-    for (const auto& group : m_model->groups())
+    for (const auto& group : m_model->roles())
     {
         groupsLeft << group.id;
         auto existing = qnUserRolesManager->userRole(group.id);
@@ -195,7 +204,7 @@ void QnUserGroupsDialog::applyChanges()
                 qnResourcesChangesManager->saveUser(user,
                     [replacement](const QnUserResourcePtr& user)
                     {
-                        user->setUserGroup(replacement.group);
+                        user->setUserGroup(replacement.role);
                         user->setRawPermissions(replacement.permissions);
                     });
 
@@ -211,7 +220,7 @@ void QnUserGroupsDialog::applyChanges()
     loadDataToUi();
 }
 
-void QnUserGroupsDialog::at_model_currentChanged(const QModelIndex& current)
+void QnUserRolesDialog::at_model_currentChanged(const QModelIndex& current)
 {
     bool valid = current.isValid();
     ui->groupInfoStackedWidget->setCurrentWidget(valid ? ui->groupInfoPage : ui->noGroupsPage);
@@ -219,12 +228,12 @@ void QnUserGroupsDialog::at_model_currentChanged(const QModelIndex& current)
         return;
 
     QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
-    if (m_model->selectedGroup() == groupId)
+    if (m_model->selectedRole() == groupId)
         return;
 
     /* Apply page changes to current group in the model. */
     base_type::applyChanges();
-    m_model->selectGroup(groupId);
+    m_model->selectRole(groupId);
     loadDataToUi();
 }
 

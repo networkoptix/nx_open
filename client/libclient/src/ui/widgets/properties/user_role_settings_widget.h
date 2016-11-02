@@ -11,29 +11,29 @@
 
 namespace Ui
 {
-    class UserGroupSettingsWidget;
+class UserRoleSettingsWidget;
 }
 
-class QnUserGroupSettingsModel;
+class QnUserRolesSettingsModel;
 class QnUserRolesModel;
-class QnUserGroupSettingsWidgetPrivate;
+class QnUserRoleSettingsWidgetPrivate;
 
-class QnUserGroupSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnUserRoleSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
-    QnUserGroupSettingsWidget(QnUserGroupSettingsModel* model, QWidget* parent = 0);
-    virtual ~QnUserGroupSettingsWidget();
+    QnUserRoleSettingsWidget(QnUserRolesSettingsModel* model, QWidget* parent = 0);
+    virtual ~QnUserRoleSettingsWidget();
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
 private:
-    QScopedPointer<Ui::UserGroupSettingsWidget> ui;
+    QScopedPointer<Ui::UserRoleSettingsWidget> ui;
 
-    QnUserGroupSettingsWidgetPrivate* d_ptr;
-    Q_DECLARE_PRIVATE(QnUserGroupSettingsWidget);
+    QnUserRoleSettingsWidgetPrivate* d_ptr;
+    Q_DECLARE_PRIVATE(QnUserRoleSettingsWidget);
 };
