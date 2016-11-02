@@ -2,15 +2,13 @@
 Including FuncTestCase - the base class for all mediaserver functional test classes.
 """
 __author__ = 'Danil Lavrentyuk'
-from collections import OrderedDict
+import os, random, sys, time, traceback
 import json
 import pprint
-import random
-import sys, os
-from subprocess import CalledProcessError, check_output, STDOUT
-import time
-import traceback
 import unittest
+from collections import OrderedDict
+from StringIO import StringIO
+from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
@@ -52,44 +50,75 @@ class TestLoader(unittest.TestLoader):
             print "ERROR: No test set '%s' found!" % testset
 
 
-def _reportResult(resData, resType, name):
-    if resData:
-        print "%s: %d" % (resType.capitalize(), len(resData))
-        for res in resData:
-            where = res[0]
-            print "%s.%s (%s)" % (type(where).__name__, where._testMethodName, where._testMethodDoc)
-            trace = res[1].split('\n')
-            if len(trace) > 1:
-                print res[1].split('\n')[-2]
-            else:
-                print "((%s))" % res[1]
-            if len(res) > 2:
-                print "Other data: %s" % (res,)
+def _addResult(textList, resData, resType, name):
+    if not resData:
+        return
+    textList.append(
+    ("\t%s: %d\n" % (resType.capitalize(), len(resData))) +
+    ''.join(
+#        "%s.%s (%s)\n" % (type(res[0]).__name__, res[0]._testMethodName, res[0]._testMethodDoc)
+        "\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
+        for res in resData
+    ))
+            #trace = res[1].split('\n')
+            #if len(trace) > 1:
+            #    print res[1].split('\n')[-2]
+            #else:
+            #    print "((%s))" % res[1]
+            #if len(res) > 2:
+            #    print "Other data: %s" % (res,)
 
 
+def _testResNum(result):
+    d = {
+        "all": result.testsRun,
+        "error": len(result.errors),
+        "fail": len(result.failures),
+        "e_fail": len(result.expectedFailures),
+        "u_ok": len(result.unexpectedSuccesses),
+        "skip": len(result.skipped),
+    }
+    d['bad'] = d['error'] + d['fail'] + d['u_ok']
+    if not d['bad']:
+        d['status'] = "OK"
+    elif d['fail']:
+        d['status'] = "FAIL"
+    elif d['error']:
+        d['status'] = "ERROR"
+    elif d['u_ok']:
+        d['status'] = "UNEXPECTED-OK"
+    return d
 
-def _singleSuiteName(testclass, suite_name, config, args):
+
+def _singleSuiteRun(testclass, suite_name, config, args):
     result = unittest.TextTestRunner(
-            stream=sys.stdout, verbosity=2, failfast=testclass.isFailFast(suite_name)
+            stream=_testMaster.log or sys.stdout,
+            verbosity=2,
+            failfast=testclass.isFailFast(suite_name)
         ).run(
             TestLoader().load(testclass, suite_name, config, *args)
         )
-    print "[%s] Total test run: %s" % (suite_name, result.testsRun)
-    _reportResult(result.errors, "errors", suite_name)
-    _reportResult(result.failures, "failures", suite_name)
-    _reportResult(result.expectedFailures, "expected failures", suite_name)
-    _reportResult(result.unexpectedSuccesses, "unexpected successes", suite_name)
-    _reportResult(result.skipped, "skipped cases", suite_name)
-    return result.wasSuccessful()
+    resNum = _testResNum(result)
+    resTexts = ["[%s] %s Total tests run: %s\n" % (suite_name, resNum['status'], result.testsRun)]
+    #sys.__stdout__.write(resText+"\n")
+    _addResult(resTexts, result.errors, "errors", suite_name)
+    _addResult(resTexts, result.failures, "failures", suite_name)
+    _addResult(resTexts, result.expectedFailures, "expected failures", suite_name)
+    _addResult(resTexts, result.unexpectedSuccesses, "unexpected successes", suite_name)
+    _addResult(resTexts, result.skipped, "skipped cases", suite_name)
+    #ok = result.wasSuccessful()
+    _testMaster.logResult(''.join(resTexts), not resNum['bad'])
+    return resNum['bad'] == 0
 
 
-def RunTests(testclass, config, *args):
+def RunTests(testclass, *args):
     """
     Runs all test suits from the testclass which is derived from FuncTestCase
     :type testclass: FuncTestCase
     :type config: FtConfigParser
     """
     #print "DEBUG: run test class %s" % testclass
+    config = _testMaster.getConfig()
     try:
         try:
             testclass.globalInit(config)
@@ -97,9 +126,9 @@ def RunTests(testclass, config, *args):
             print "FAIL: %s initialization failed: %s!" % (testclass.__name__, err)
             return
         return all([
-                _singleSuiteName(testclass, suite_name, config, args)
-                for suite_name in testclass.iter_suites()
-            ])
+                    _singleSuiteRun(testclass, suite_name, config, args)
+                    for suite_name in testclass.iter_suites()
+                   ])
     finally:
         testclass.globalFinalise()
 
@@ -643,6 +672,37 @@ class UnitTestRollback(object):
         self._savedIds.clear()
 
 
+class LogCatcher(StringIO):
+
+    def __init__(self, fname=""):
+        StringIO.__init__(self)
+        self.outFile = open(fname, "wt") if fname != "" else None
+        self.saved = sys.stdout  # so it can re-substitute
+        sys.stdout = self
+
+    def write(self, s):
+        if self.outFile is None:
+            StringIO.write(self, s)
+        else:
+            self.outFile.write(s)
+
+    def flush(self):
+        if self.outFile is None:
+            StringIO.flush(self)
+        else:
+            self.outFile.flush()
+
+    def close(self):
+        if self.outFile is not None:
+            self.outFile.close()
+        StringIO.close(self)
+
+    def unbind(self):
+        if not self.closed:
+            self.close()
+        sys.stdout = self.saved
+
+
 class FuncTestMaster(object):
     """
     The main service class to run legacy functional tests.
@@ -662,6 +722,7 @@ class FuncTestMaster(object):
     #CHUNK_SIZE=4*1024*1024 # 4 MB
     #TRANSACTION_LOG="__transaction.log"
     api = ServerApi
+    log = None
 
     _getterAPIList = ["getResourceParams",
         "getMediaServersEx",
@@ -706,6 +767,27 @@ class FuncTestMaster(object):
         self.testCaseSize = parser.getint_safe("General","testCaseSize", 2)
         parser.rtset('need_dump', self.args.dump)
 
+    def applyArgs(self, args):
+        if args.config:
+            self.configFname = args.config
+            print "Use config", self.configFname
+        if args.log is not None:
+            self.log = LogCatcher(args.log)
+        self.args = args
+        return
+
+    def logResult(self, text, testOk):
+        (sys.stdout if self.log is None else self.log.saved).write(text)
+        if not testOk and  self.log is not None:
+            if self.log.outFile is None:
+                self.log.saved.write(
+                    "\nFailed test accumulated log:\n============================\n")
+                self.log.saved.write(self.log.getvalue())
+                self.log.truncate()
+            else:
+                self.log.flush()
+
+
     def setUpPassword(self):
         config = self.getConfig()
         pwd = config.get("General","password")
@@ -719,13 +801,6 @@ class FuncTestMaster(object):
         urllib2.install_opener(urllib2.build_opener(self.authHandler))
         self.openerReady = True
 #        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
-
-    def preparseArgs(self, args):
-        if args.config:
-            self.configFname = args.config
-            print "Use config", self.configFname
-        self.args = args
-        return
 
     def _callAllGetters(self):
         print "======================================"
@@ -875,11 +950,6 @@ class FuncTestMaster(object):
                 self._ec2GetRequests[i] = getattr(self.api, name[1:])
                 #print "*** DEBUG0: substituted %s with %s" % (name, self._ec2GetRequests[i])
 
-
-    # This checkResultEqual function will categorize the return value from each
-    # server
-    # and report the difference status of this
-
     def _reportDetailDiff(self,key_list):
         for i in xrange(len(key_list)):
             for k in xrange(i + 1,len(key_list)):
@@ -907,6 +977,7 @@ class FuncTestMaster(object):
         print "\n**************************************************\n"
 
     def _checkResultEqual(self,responseList,methodName):
+        " categorize the return value from each  server and report the difference status of this "
         statusDict = dict()
 
         for entry in responseList:

@@ -20,7 +20,7 @@ import argparse
 from collections import OrderedDict
 
 from functest_util import *
-from testbase import RunTests as RunBoxTests, LegacyTestWrapper, getTestMaster, UnitTestRollback, FuncTestError
+from testbase import RunTests, LegacyTestWrapper, getTestMaster, UnitTestRollback, FuncTestError
 testMaster = getTestMaster()
 
 from generator import *
@@ -1198,7 +1198,7 @@ def CallTest(testClass):
     ###    testMaster.setUpPassword()
     # this print is used by FunctestParser.parse_timesync_start
     print "%s suites: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
-    return RunBoxTests(testClass, testMaster.getConfig())
+    return RunTests(testClass)
 
 
 def RunByAutotest():
@@ -1396,14 +1396,11 @@ def DoTests(argv):
             return res[0]
         #FIXME no result code returning!
 
-CommonArgs = ('config', 'autorollback', )
-
 #class MyArgParser(argparse.ArgumentParser):
 #
 #    def print_help(self, file=None):
 #        super(MyArgParser, self).print_help(file)
 #
-
 
 class BoxTestAction(argparse.Action):
     def __init__(self, option_strings, dest, help=None):
@@ -1413,6 +1410,7 @@ class BoxTestAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         namespace.BoxTest = self.dest
 
+CommonArgs = ('config', 'autorollback', 'log')
 
 def parseArgs():
     parser = argparse.ArgumentParser()
@@ -1420,6 +1418,7 @@ def parseArgs():
     parser.add_argument('--help-arg', metavar="ARG", nargs="?", const="", help="Additional help for some (legacy) options. Without argument print the list of that options.")
     parser.add_argument('-c', '--config', metavar="FILE", help="Use alternative configuration file")
     parser.add_argument('--recover', action="store_true", help=getHelpDesc('recover'))
+    parser.add_argument('--log', metavar="FILE", nargs="?", const="", help="Suppress direct output, storing it into a file. See '--help-arg log' for details ")
 
     parser.add_argument('--autorollback', '--arb', action="store_true", help="Automativally rollback changes done by the legacy tests")
     parser.add_argument('--skiplegacy', action="store_true", help="Skip 'legacy' functional tests")
@@ -1449,6 +1448,8 @@ def parseArgs():
 
     args, other = parser.parse_known_args()
     args.natcon = '--natcon' in other # we need it as a flag
+    #if args.log is not None and getattr(args, 'BoxTest', None) is None:
+    #    print "WARNING: --log is used only with one of 'Functional test selection' arguments!"
     return args, other
 
 
@@ -1461,7 +1462,7 @@ def main(args, other):
     if args.recover:
         UnitTestRollback(autorollback=True, nocreate=True)
         return True
-    testMaster.preparseArgs(args)
+    testMaster.applyArgs(args)
     try:
         if other:
             return DoTests(other)
@@ -1473,9 +1474,12 @@ def main(args, other):
     except FuncTestError as err:
         print "FAIL: functional test failed: %s, %s" % err.args
         return False
+    finally:
+        if testMaster.log:
+            testMaster.log.unbind()
 
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf8')
-    if main(*parseArgs()):
+    if not main(*parseArgs()):
         sys.exit(1)
