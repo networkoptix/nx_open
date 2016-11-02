@@ -36,7 +36,7 @@ public:
     ~QnVideoOutput();
 
     nx::media::Player* player() const;
-    void setPlayer(nx::media::Player* player, int channel = 0);
+    Q_INVOKABLE void setPlayer(nx::media::Player* player, int channel = 0);
 
     FillMode fillMode() const;
     void setFillMode(FillMode mode);
