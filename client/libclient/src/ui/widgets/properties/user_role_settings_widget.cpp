@@ -333,7 +333,8 @@ QnUserRoleSettingsWidget::~QnUserRoleSettingsWidget()
 
 bool QnUserRoleSettingsWidget::hasChanges() const
 {
-    return false;
+    Q_D(const QnUserRoleSettingsWidget);
+    return ui->nameInputField->text() != d->model->roleName();
 }
 
 void QnUserRoleSettingsWidget::loadDataToUi()
@@ -350,10 +351,18 @@ void QnUserRoleSettingsWidget::applyChanges()
 {
     ui->nameInputField->validate();
     if (!ui->nameInputField->isValid())
+    {
+        emit hasChangesChanged();
         return;
+    }
 
     Q_D(QnUserRoleSettingsWidget);
 
     d->model->setRoleName(ui->nameInputField->text());
     emit hasChangesChanged();
+}
+
+bool QnUserRoleSettingsWidget::canApplyChanges() const
+{
+    return ui->nameInputField->isValid();
 }
