@@ -85,7 +85,7 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
             return;
 
         Q_Q(QnPasswordStrengthIndicator);
-        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine | Qt::TextHideMnemonic, currentInformation.text());
+        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine, currentInformation.text());
         q->resize(qMax(textSize.width() + textMargins, q->minimumWidth()), q->height());
 
         int extraContentMargin = q->width() + q->indicatorMargins().right() * 2;
@@ -248,5 +248,5 @@ void QnPasswordStrengthIndicator::paintEvent(QPaintEvent* event)
     painter.drawRoundedRect(rect().adjusted(0.5, 0.5, -0.5, -0.5), d->roundingRadius, d->roundingRadius);
 
     painter.setPen(palette().color(QPalette::Shadow));
-    painter.drawText(rect(), Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignCenter, d->currentInformation.text());
+    painter.drawText(rect(), Qt::TextSingleLine | Qt::AlignCenter, d->currentInformation.text());
 }

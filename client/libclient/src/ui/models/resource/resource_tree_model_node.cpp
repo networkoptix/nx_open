@@ -471,6 +471,9 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
+        if (m_resource->hasFlags(Qn::server))
+            return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
+
         return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
     }
 

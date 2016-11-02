@@ -1599,7 +1599,7 @@ void QnWorkbenchNavigator::updateLines()
         m_timeSlider->setLineVisible(SyncedLine, false);
     }
 
-    QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource().staticCast<QnLayoutResource>();
+    QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
     if (currentLayoutResource &&
         (currentLayoutResource->isFile() || !currentLayoutResource->getLocalRange().isEmpty())
         )

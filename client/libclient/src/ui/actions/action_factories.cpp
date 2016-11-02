@@ -177,14 +177,12 @@ QList<QAction *> QnAspectRatioActionFactory::newActions(const QnActionParameters
     QActionGroup *actionGroup = new QActionGroup(parent);
 
     QnWorkbenchLayout *currentLayout = workbench()->currentLayout();
-    QnAspectRatio currentAspectRatio;
 
-    if (currentLayout) {
-        float current = currentLayout->cellAspectRatio();
-        if (current <= 0)
-            current = qnGlobals->defaultLayoutCellAspectRatio();
-        currentAspectRatio = QnAspectRatio::closestStandardRatio(current);
-    }
+    float current = currentLayout->cellAspectRatio();
+    if (current <= 0)
+        current = qnGlobals->defaultLayoutCellAspectRatio();
+    QnAspectRatio currentAspectRatio = QnAspectRatio::closestStandardRatio(current);
+
 
     for (const QnAspectRatio &aspectRatio: QnAspectRatio::standardRatios()) {
         QAction *action = new QAction(parent);
@@ -204,8 +202,6 @@ QList<QAction *> QnAspectRatioActionFactory::newActions(const QnActionParameters
 
 void QnAspectRatioActionFactory::at_action_triggered(QAction *action) {
     QnWorkbenchLayout *currentLayout = workbench()->currentLayout();
-    if (!currentLayout)
-        return;
 
     float aspectRatio = action->data().value<QnActionParameters>().argument(Qn::LayoutCellAspectRatioRole).toFloat();
     currentLayout->setCellAspectRatio(aspectRatio);

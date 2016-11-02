@@ -81,9 +81,8 @@ QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
             return qVariantFromValue(license(index));
 
         case Qn::ResourceRole:
-            if (index.column() != ServerColumn)
-                break;
-            return qVariantFromValue<QnResourcePtr>(serverByLicense(license(index)));
+            if (index.column() == ServerColumn)
+                return qVariantFromValue<QnResourcePtr>(serverByLicense(license(index)));
             break;
 
         case Qt::ForegroundRole:
@@ -272,19 +271,21 @@ void QnLicenseListModel::removeLicense(const QnLicensePtr& license)
 QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirationInfo(
     const QnLicensePtr& license, bool fullText) const
 {
-    auto goodLicense = [this, fullText]() -> QPair<ExpirationState, QString>
-    {
-        return{ Good, fullText
-            ? tr("License is active")
-            : tr("OK") };
-    };
+    auto goodLicense =
+        [this, fullText]() -> QPair<ExpirationState, QString>
+        {
+            return { Good, fullText
+                ? tr("License is active")
+                : tr("OK") };
+        };
 
-    auto expiredLicense = [this, fullText]() -> QPair<ExpirationState, QString>
-    {
-        return{ Expired, fullText
-            ? tr("License is expired")
-            : tr("Expired") };
-    };
+    auto expiredLicense =
+        [this, fullText]() -> QPair<ExpirationState, QString>
+        {
+            return { Expired, fullText
+                ? tr("License is expired")
+                : tr("Expired") };
+        };
 
     if (license->neverExpire())
         return goodLicense();

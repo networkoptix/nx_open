@@ -203,11 +203,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
 
-        const int textFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
+        const int textFlags = Qt::TextSingleLine | option.displayAlignment;
         const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
         textRect.adjust(textPadding, 0, -textPadding, 0);
 
-        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width(), textFlags);
+        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width());
 
         QRect actualRect;
         painter->drawText(textRect, textFlags, elidedName, &actualRect);
@@ -221,7 +221,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
             textRect.setLeft(startPos + textPadding * 2);
-            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width(), textFlags);
+            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width());
 
             painter->setFont(option.font);
             painter->setPen(extraColor);
@@ -286,21 +286,20 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         QString extraInfo;
         getDisplayInfo(index, baseName, extraInfo);
 
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
         int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
 
         /* Adjust height to text: */
         height = qMax(height, option.fontMetrics.height());
 
         /* Width of the main text: */
-        width += option.fontMetrics.width(baseName, -1, kTextFlags);
+        width += option.fontMetrics.width(baseName);
 
         if (!extraInfo.isEmpty())
         {
             /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-            width += option.fontMetrics.width(extraInfo, -1, kTextFlags) + leftRightPadding;
+            width += option.fontMetrics.width(extraInfo) + leftRightPadding;
         }
 
         /* Add paddings: */

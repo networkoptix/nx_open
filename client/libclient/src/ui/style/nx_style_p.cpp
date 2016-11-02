@@ -415,7 +415,8 @@ void QnNxStylePrivate::drawTextButton(
     QString text = option->fontMetrics.elidedText(
         option->text,
         Qt::ElideRight,
-        textRect.width());
+        textRect.width(),
+        Qt::TextShowMnemonic);
 
     QnScopedPainterPenRollback penRollback(painter, QPen(brush.color()));
     painter->drawText(textRect, kTextFlags, text);
