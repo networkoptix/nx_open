@@ -206,9 +206,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         QVariant::fromValue(QnIndents(0, 0)));
 
     connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
-        &QnResourceTreeWidget::activated);
+        [this](const QModelIndex& index){emit activated(index, false); });
     connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,
-        &QnResourceTreeWidget::activated);
+        [this](const QModelIndex& index){emit activated(index, true); });
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
         &QnResourceTreeWidget::at_treeView_spacePressed);

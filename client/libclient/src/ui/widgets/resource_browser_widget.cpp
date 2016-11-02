@@ -946,7 +946,7 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
     }
 }
 
-void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
+void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
 {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
@@ -956,7 +956,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
 
     /* Do not open servers of admin.  */
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server))
+    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 
     menu()->trigger(QnActions::DropResourcesAction, resource);
