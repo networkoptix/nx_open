@@ -30,8 +30,8 @@ smtp:
 
 admins:
     -
-        - 'Evgeny'
-        - 'ebalashov@networkoptix.com'
+        - 'Admins'
+        - 'cloud-portal-admins@networkoptix.com'
 
 notification_module:
     secret: '$NOTIFICATION_SECRET'
