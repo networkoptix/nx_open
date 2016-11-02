@@ -544,6 +544,7 @@ module.exports = function (grunt) {
                 singleRun: true
             }
         },
+
         protractor: {
             options: {
                 configFile: 'protractor-conf.js', // Default config file
@@ -555,12 +556,48 @@ module.exports = function (grunt) {
             },
             all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
                 options: {
-                    //configFile: 'e2e.conf.js', // Target-specific config file
-                    args: {} // Target-specific arguments
+                    //args: {specs: ['test/e2e/*/*spec.js']} // Target-specific arguments
                 }
             },
-            server:{
-
+            advanced: {
+                options: {
+                    args: {specs: ['test/e2e/advanced/*spec.js']} // Target-specific arguments
+                }
+            },
+            developers: {
+                options: {
+                    args: {specs: ['test/e2e/developers/*spec.js']} // Target-specific arguments
+                }
+            },
+            help: {
+                options: {
+                    args: {specs: ['test/e2e/help/*spec.js']} // Target-specific arguments
+                }
+            },
+            info: {
+                options: {
+                    args: {specs: ['test/e2e/info/*spec.js']} // Target-specific arguments
+                }
+            },
+            merge: {
+                options: {
+                    args: {specs: ['test/e2e/merge/*spec.js']} // Target-specific arguments
+                }
+            },
+            restart: {
+                options: {
+                    args: {specs: ['test/e2e/restart/*spec.js']} // Target-specific arguments
+                }
+            },
+            settings: {
+                options: {
+                    args: {specs: ['test/e2e/settings/*spec.js']} // Target-specific arguments
+                }
+            },
+            setup: {
+                options: {
+                    args: {specs: ['test/e2e/setup/*spec.js']} // Target-specific arguments
+                }
             }
         },
         'protractor_webdriver': {
@@ -611,11 +648,91 @@ module.exports = function (grunt) {
         'connect:test',
         'protractor_webdriver',
         'shell:print_version',
-        //'shell:run_ffmpeg',
+        // 'shell:run_ffmpeg',
         'protractor:all',
-        //'shell:close_ffmpeg'
-        //'newer:jshint'
-        //'karma
+        // 'shell:close_ffmpeg',
+        // 'newer:jshint',
+        // 'karma'
+    ]);
+    grunt.registerTask('test-advanced', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:advanced'
+    ]);
+    grunt.registerTask('test-developers', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:developers'
+    ]);
+    grunt.registerTask('test-help', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:help'
+    ]);
+    grunt.registerTask('test-info', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:info'
+    ]);
+    grunt.registerTask('test-merge', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:merge'
+    ]);
+    grunt.registerTask('test-restart', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:restart'
+    ]);
+    grunt.registerTask('test-settings', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settings'
+    ]);
+    grunt.registerTask('test-setup', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settings'
     ]);
     grunt.registerTask('code', [
         'newer:jshint'
