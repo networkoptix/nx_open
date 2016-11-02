@@ -136,7 +136,7 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
         return true;    //< Skips every online system
 
     const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
-    if (qnForgottenSystemsManager->isForgotten(id))
+    if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
         return false;
 
     if (index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
