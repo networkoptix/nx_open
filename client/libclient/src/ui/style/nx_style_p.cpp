@@ -498,15 +498,10 @@ bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
 
 const QWidget* QnNxStylePrivate::graphicsProxiedWidget(const QWidget* widget)
 {
-    while (widget)
-    {
-        if (widget->graphicsProxyWidget())
-            return widget;
-
+    while (widget && !widget->graphicsProxyWidget())
         widget = widget->parentWidget();
-    }
 
-    return nullptr;
+    return widget;
 }
 
 QGraphicsProxyWidget* QnNxStylePrivate::graphicsProxyWidget(const QWidget* widget)
