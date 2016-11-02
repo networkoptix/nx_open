@@ -318,7 +318,7 @@ class MediaServerConflictionDataGenerator(BasicGenerator):
         return bool(self._existedMediaServerList)
 
     def __init__(self, dataGen):
-        if not elf._fetchExistedMediaServer(dataGen):
+        if not self._fetchExistedMediaServer(dataGen):
             raise Exception("Cannot fetch media server list")
 
     def _generateModify(self, server):
