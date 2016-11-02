@@ -79,10 +79,24 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 namespace {
 
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
+
+bool isConnectionToCloud(const QUrl& url)
+{
+    const bool isCloudHost = nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
+    const bool isCloudUser = (qnCloudStatusWatcher->credentials().user == url.userName());
+
+    /**
+     * Connection to the new system is always through the non-cloud host.
+     * So, we have to check if cloud user is used.
+     */
+    return (isCloudUser || isCloudHost);
+}
 
 bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
 {
@@ -104,17 +118,19 @@ void removeCustomConnection(const QnLocalConnectionData& data)
     if (!data.password.isEmpty())
         return;
 
+    NX_ASSERT(!data.localId.isNull(), "We can't remove custom user connections");
+
     auto customConnections = qnSettings->customConnections();
-    const auto it = std::find_if(customConnections.begin(), customConnections.end(),
-        [url = data.url](const QnConnectionData& value)
+    const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
+        [localId = data.localId](const QnConnectionData& value)
         {
-            return isSameConnectionUrl(value.url, url);
+            return (localId == value.localId);
         });
 
-    if ((it == customConnections.end()) || it->isCustom)
+    if (itSameSystem == customConnections.end())
         return;
 
-    customConnections.erase(it);
+    customConnections.erase(itSameSystem);
     qnSettings->setCustomConnections(customConnections);
 }
 
@@ -122,6 +138,8 @@ void storeCustomConnection(const QnLocalConnectionData& data)
 {
     if (data.password.isEmpty())
         return;
+
+    NX_ASSERT(!data.localId.isNull(), "We can't remove custom user connections");
 
     auto customConnections = qnSettings->customConnections();
 
@@ -132,34 +150,45 @@ void storeCustomConnection(const QnLocalConnectionData& data)
     QUrl urlWithPassword = data.url;
     urlWithPassword.setPassword(data.password.value());
 
-    auto connection = QnConnectionData(connectionName, urlWithPassword, false);
+    /*
+    if (itSameSystem != customConnections.end())
+        return; // We don't add stored connection to system if it is exist
+    */
 
-    const auto it = std::find_if(customConnections.begin(), customConnections.end(),
-        [connectionName](const QnConnectionData& value) { return (value.name == connectionName); });
-    if (it != customConnections.end())
+    const auto itSameUrl = std::find_if(customConnections.begin(), customConnections.end(),
+        [url = data.url](const QnConnectionData& value)
+        {
+            return isSameConnectionUrl(url, value.url);
+        });
+
+    const bool sameUrlFound = (itSameUrl != customConnections.end());
+    if (sameUrlFound && (itSameUrl->url.password() == urlWithPassword.password()))
+        return; // We don't add/update stored connection with existing url and same password
+
+    if (sameUrlFound)
+        itSameUrl->url = urlWithPassword; // Just updates password
+
+    ///
+
+    const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
+        [id = data.localId](const QnConnectionData& value)
     {
-        auto& targetConnection = *it;
+        return (id == value.localId);
+    });
 
-        if (targetConnection.isCustom)
-        {
-            if (isSameConnectionUrl(targetConnection.url, connection.url))
-            {
-                targetConnection.url = connection.url;
-            }
-            else
-            {
-                // We have to add new connection data with different name
-                connection.name = customConnections.generateUniqueName(connectionName);
-                customConnections.append(connection);
-            }
-        }
-        else
-        {
-            targetConnection = connection;
-        }
-    }
-    else
+    const bool sameSystemFound = (itSameSystem != customConnections.end());
+    if (sameSystemFound)
+        itSameSystem->url = urlWithPassword;    // Updates credentials and host
+
+    if (!sameSystemFound && !sameUrlFound)
+    {
+        // Adds new stored connection
+        auto connection = QnConnectionData(connectionName, urlWithPassword, data.localId);
+        if (customConnections.contains(connectionName))
+            connection.name = customConnections.generateUniqueName(connectionName);
+
         customConnections.append(connection);
+    }
 
     qnSettings->setCustomConnections(customConnections);
 }
@@ -178,8 +207,9 @@ void storeLocalSystemConnection(
 
     const auto connectionData =
         helpers::storeLocalSystemConnection(systemName, localSystemId, url);
+    qnClientCoreSettings->save();
 
-    const auto lastUsed = QnConnectionData(systemName, url, false);
+    const auto lastUsed = QnConnectionData(systemName, url, localSystemId);
     qnSettings->setLastUsedConnection(lastUsed);
     qnSettings->setAutoLogin(autoLogin);
 
@@ -550,7 +580,6 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (storeSettings->isConnectionToCloud)
     {
         using namespace nx::network;
-        NX_EXPECT(SocketGlobals::addressResolver().isCloudHostName(info.ecUrl.host()));
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
         return;
     }
@@ -786,7 +815,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     else if (url.isValid())
     {
         const auto connectionSettings = ConnectionSettings::create(
-            nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()),
+            isConnectionToCloud(url),
             parameters.argument(Qn::StorePasswordRole, false),
             parameters.argument(Qn::AutoLoginRole, false));
 

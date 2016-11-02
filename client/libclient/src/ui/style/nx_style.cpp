@@ -2258,8 +2258,9 @@ void QnNxStyle::drawControl(
                         | Qt::TextSingleLine
                         | Qt::TextHideMnemonic;
 
+                    /* Measurements don't support Qt::TextHideMnemonic, must use Qt::TextShowMnemonic: */
                     QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
-                        Qt::ElideRight, textRect.width(), textFlags);
+                        Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
                     proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
                         buttonOption->state.testFlag(State_Enabled), text, foregroundRole);
@@ -2454,7 +2455,10 @@ QRect QnNxStyle::subControlRect(
                         if (groupBox->text.isEmpty() || !groupBox->subControls.testFlag(SC_GroupBoxLabel))
                             return QRect();
 
-                        const int kTextFlags = Qt::AlignLeft | Qt::TextHideMnemonic;
+                        /* Measurements don't support Qt::TextHideMnemonic,
+                         * so if we draw with Qt::TextHideMnemonic we
+                         * must measure with Qt::TextShowMnemonic: */
+                        const int kTextFlags = Qt::AlignLeft | Qt::TextShowMnemonic;
                         int left = option->rect.left();
 
                         if (panel)
@@ -2858,8 +2862,10 @@ QRect QnNxStyle::subElementRect(
                     rect.setLeft(rect.left() + arrowSize + margin);
                 }
 
-                int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
-                rect = option->fontMetrics.boundingRect(rect, flags, header->text);
+                rect = option->fontMetrics.boundingRect(
+                    rect,
+                    Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic,
+                    header->text);
 
                 if (!header->icon.isNull())
                 {
@@ -3032,7 +3038,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             if (auto header = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
-                QSize textSize = header->fontMetrics.size(Qt::TextHideMnemonic, header->text);
+                QSize textSize = header->fontMetrics.size(Qt::TextShowMnemonic, header->text);
 
                 int width = textSize.width();
 

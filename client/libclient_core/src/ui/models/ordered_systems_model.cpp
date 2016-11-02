@@ -5,12 +5,18 @@
 #include <nx/utils/string.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <client/forgotten_systems_manager.h>
 
 QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     base_type(parent),
     m_weights(),
     m_unknownSystemsWeight(0.0)
 {
+    NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
+    NX_ASSERT(qnForgottenSystemsManager, "QnForgottenSystemsManager is not available");
+    if (!qnSystemWeightsManager || !qnForgottenSystemsManager)
+        return;
+
     auto systemsModel = new QnSystemsModel(this);
     setSourceModel(systemsModel);
 
@@ -21,6 +27,9 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 
     connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
         this, &QnOrderedSystemsModel::handleWeightsChanged);
+
+    connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemsChanged,
+        this, &QnOrderedSystemsModel::softInvalidate);
 
     handleWeightsChanged();
 }
@@ -121,19 +130,21 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
     if (!index.isValid())
         return true;
 
-    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool()
-        || index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
-    {
-        return true;   //< Skip online or cloud systems
-    }
+    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool())
+        return true;    //< Skips every online system
 
-    const auto systemId = index.data(QnSystemsModel::SystemIdRoleId).toString();
-    const auto itFinalSystemWeight = m_weights.find(systemId);
-    if (itFinalSystemWeight == m_weights.end())
+    const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
+    if (qnForgottenSystemsManager->isForgotten(id))
+        return false;
+
+    if (index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
+        return true;    //< Skips offline cloud systems
+
+    qreal weight = 0.0;
+    if (!getWeightFromData(index, weight))
         return true;
 
     static const auto kMinWeight = 0.00001;
-    const auto weight = itFinalSystemWeight.value().weight;
     return (weight > kMinWeight);
 }
 

@@ -68,6 +68,8 @@ protected:
     virtual void afterContextInitialized() override;
 
 private:
+    bool canEnableRecording() const;
+
     void updateRecordThresholds(QnScheduleTaskList& tasks);
 
     void updateGridParams(bool pickedFromGrid = false);
@@ -94,6 +96,7 @@ private:
     void setScheduleAlert(const QString& scheduleAlert);
     void setArchiveLengthAlert(const QString& archiveLengthAlert);
 
+    bool checkCanEnableRecording();
     void checkRecordingEnabled();
     void checkScheduleParamsSet();
     void checkScheduleSet();

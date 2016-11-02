@@ -730,6 +730,15 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
 
+        /**
+         * Permission to view resource content.
+         * Currently used for server's health monitor access check only.
+         */
+        ViewContentPermission           = 0x0020,
+
+        /** Full set of permissions which can be available for server resource. */
+        FullServerPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ViewContentPermission,
+
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */

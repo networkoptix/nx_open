@@ -3,14 +3,14 @@
 QnConnectionData::QnConnectionData():
     name(),
     url(),
-    isCustom(false)
-
+    localId()
 {}
 
-QnConnectionData::QnConnectionData(const QString &name, const QUrl &url, bool isCustom):
+QnConnectionData::QnConnectionData(const QString &name, const QUrl &url,
+    const QnUuid& localId):
     name(name),
     url(url),
-    isCustom(isCustom)
+    localId(localId)
 {}
 
 bool QnConnectionData::operator==(const QnConnectionData &other) const
@@ -21,6 +21,11 @@ bool QnConnectionData::operator==(const QnConnectionData &other) const
 bool QnConnectionData::operator!=(const QnConnectionData &other) const
 {
     return !(*this == other);
+}
+
+bool QnConnectionData::isCustom() const
+{
+    return localId.isNull();
 }
 
 bool QnConnectionData::isValid() const

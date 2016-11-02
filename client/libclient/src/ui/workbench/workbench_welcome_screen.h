@@ -118,7 +118,6 @@ public slots:
 
     void forceActiveFocus();
 
-
 public slots:
     QColor getPaletteColor(const QString& group, int index);
 
@@ -127,6 +126,8 @@ public slots:
     QColor getLighterColor(const QColor& color, int offset = 1);
 
     QColor colorWithAlpha(QColor color, qreal alpha);
+
+    void hideSystem(const QString& systemId);
 
 signals:
     void visibleChanged();

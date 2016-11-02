@@ -128,7 +128,6 @@ QnLocalConnectionData storeLocalSystemConnection(
     recentConnections.prepend(connectionData);
 
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);
-    qnClientCoreSettings->save();
 
     return connectionData;
 }

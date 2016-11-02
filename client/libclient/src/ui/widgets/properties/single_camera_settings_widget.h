@@ -36,9 +36,6 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    void setScheduleEnabled(bool enabled);
-    bool isScheduleEnabled() const;
-
     bool hasDbChanges() const;
     bool hasAdvancedCameraChanges() const;
     bool hasChanges() const;
@@ -46,8 +43,6 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
-    bool licensedParametersModified() const;
     void updateFromResource(bool silent = false);
     void submitToResource();
 
@@ -71,8 +66,6 @@ protected:
 private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
-    void at_cameraScheduleWidget_scheduleTasksChanged();
-    void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
@@ -114,8 +107,6 @@ private:
     bool m_cameraSupportsMotion;
 
     bool m_hasDbChanges;
-
-    bool m_scheduleEnabledChanged;
 
     /** Indicates that the user changed motion sensitivity controls but not applied them */
     bool m_hasMotionControlsChanges;

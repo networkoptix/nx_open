@@ -1070,6 +1070,8 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
             : qnSettings->maxSceneVideoItems();
 
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if (!layout)
+        return;
     if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);

@@ -92,7 +92,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnResourceWidgetFrameColors>();
     qRegisterMetaType<QnCompositeTextOverlayColors>();
     qRegisterMetaType<QnPtzManageModelColors>();
-    qRegisterMetaType<QnLicensesListModelColors>();
     qRegisterMetaType<QnRoutingManagementColors>();
     qRegisterMetaType<QnAuditLogColors>();
     qRegisterMetaType<QnRecordingStatsColors>();
@@ -126,7 +125,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnResourceWidgetFrameColors>();
     QnJsonSerializer::registerSerializer<QnCompositeTextOverlayColors>();
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
-    QnJsonSerializer::registerSerializer<QnLicensesListModelColors>();
     QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
     QnJsonSerializer::registerSerializer<QnAuditLogColors>();
     QnJsonSerializer::registerSerializer<QnRecordingStatsColors>();
