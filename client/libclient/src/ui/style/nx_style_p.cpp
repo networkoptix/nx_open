@@ -1,6 +1,8 @@
 #include "nx_style_p.h"
 #include "skin.h"
 
+#include <limits>
+
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
 
