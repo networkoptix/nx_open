@@ -737,11 +737,11 @@ void QnNxStyle::drawPrimitive(
                 bool hasHover = item->state.testFlag(State_MouseOver);
                 if (widget)
                 {
-                    if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
-                        (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
+                    if (widget->property(Properties::kSuppressHoverPropery).toBool()
+                        || qobject_cast<const QTreeView*>(widget))
                     {
                         /* Itemviews with kSuppressHoverProperty should suppress hover. */
-                        /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
+                        /* Treeviews already have hover painted in PE_PanelItemViewRow. */
                         hasHover = false;
                     }
                     else
