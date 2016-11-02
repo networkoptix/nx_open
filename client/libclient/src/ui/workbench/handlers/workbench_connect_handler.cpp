@@ -860,9 +860,15 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
     bool force = parameters.hasArgument(Qn::ForceRole)
         ? parameters.argument(Qn::ForceRole).toBool()
         : false;
-    disconnectFromServer(force);
+
+    if (!disconnectFromServer(force))
+        return;
+
     qnSettings->setAutoLogin(false);
     qnSettings->save();
+
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setVisible(true);
 }
 
 QnWorkbenchConnectHandler::ConnectionSettingsPtr

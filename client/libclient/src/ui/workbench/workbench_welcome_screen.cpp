@@ -120,8 +120,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_widget->installEventFilter(this);
     m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
-    connect(action(QnActions::DisconnectAction), &QAction::triggered,
-        this, &QnWorkbenchWelcomeScreen::showScreen);
 
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
@@ -539,11 +537,6 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
 void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
 {
     qnForgottenSystemsManager->forgetSystem(systemId);
-}
-
-void QnWorkbenchWelcomeScreen::showScreen()
-{
-    setVisible(true);
 }
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)

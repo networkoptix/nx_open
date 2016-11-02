@@ -163,9 +163,6 @@ private:
 
     void handleStartupTileAction(const QString& systemId, bool initial);
 
-private:
-    void showScreen();
-
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;
 
