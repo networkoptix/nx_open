@@ -11,7 +11,7 @@
 
 QnStartupTileManager::QnStartupTileManager():
     base_type(),
-    m_actionThrown(false)
+    m_actionEmitted(false)
 {
     NX_ASSERT(qnSystemsFinder, "Systems finder is nullptr");
     if (!qnSystemsFinder)
@@ -82,14 +82,14 @@ void QnStartupTileManager::handleFirstSystems()
 
 void QnStartupTileManager::skipTileAction()
 {
-    m_actionThrown = true;
+    m_actionEmitted = true;
 }
 
 void QnStartupTileManager::emitTileAction(
     const QnSystemDescriptionPtr& system,
     bool initial)
 {
-    if (m_actionThrown || qnClientCoreSettings->skipStartupTilesManagement())
+    if (m_actionEmitted || qnClientCoreSettings->skipStartupTilesManagement())
         return;
 
     emit tileActionRequested(system->id(), initial);

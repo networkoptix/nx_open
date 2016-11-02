@@ -36,7 +36,7 @@ private:
     void cancelAndUninitialize();
 
 private:
-    bool m_actionThrown;
+    bool m_actionEmitted;
 };
 
 #define qnStartupTileManager QnStartupTileManager::instance()
