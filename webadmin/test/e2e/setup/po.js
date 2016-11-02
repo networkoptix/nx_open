@@ -29,7 +29,7 @@ var Page = function () {
     this.finishButton = this.setupDialog.element(by.buttonText('Finish'));
     this.advancedSysSett = this.setupDialog.element(by.linkText('Advanced system settings'));
     this.camOptimCheckbox = this.setupDialog.element(by.id('cameraSettingsOptimization'));
-    this.autoDiscovCheckbox = this.setupDialog.element(by.id('serverAutoDiscoveryEnabled'));
+    this.autoDiscovCheckbox = this.setupDialog.element(by.id('autoDiscoveryEnabled'));
     this.statisticsCheckbox = this.setupDialog.element(by.id('statisticsAllowed'));
 
     this.mergeWithExisting = this.setupDialog.element(by.linkText('Merge server with existing system'));
@@ -37,6 +37,7 @@ var Page = function () {
     this.remoteLoginInput = this.setupDialog.element(by.model('settings.remoteLogin'));
     this.remotePasswordInput = this.setupDialog.element(by.model('settings.remotePassword'));
 
+    this.systemTypeRightButton = this.setupDialog.element(by.css('.pull-right'));
     this.useCloudAccButton = this.setupDialog.element(by.buttonText('Use existing'));
     this.cloudEmailInput = this.setupDialog.element(by.model('settings.cloudEmail'));
     this.cloudPassInput = this.setupDialog.element(by.model('settings.cloudPassword'));
@@ -54,15 +55,6 @@ var Page = function () {
     };
 
     this.triggerSetupWizard = function() {
-        element(by.model('user.username')).isPresent().then( function(isPresent) {
-            if(isPresent) {
-                // if there's login dialog
-                element(by.model('user.username')).sendKeys('admin');
-                element(by.model('user.password')).sendKeys('admin');
-                element(by.buttonText('Log in')).click();
-                browser.sleep(1500);
-            }
-        });
         this.resetButton.click();
         this.oldPasswordInput.sendKeys(this.helper.password);
         this.detachButton.click();
@@ -76,34 +68,8 @@ var Page = function () {
             }
         });
 
-        // If login dialog appears, log in.
-        browser.sleep(500);
-        element(by.model('user.username')).isPresent().then( function(isPresent) {
-            if(isPresent) {
-                p.helper.login('admin', 'qweasd123');
-                console.log('Login dialog appeared unexpectedly.');
-                browser.sleep(1000);
-            }
-        });
         this.helper.waitIfNotPresent(this.setupDialog, 10000);
         browser.refresh();
-
-        // If login dialog appears, log in.
-        browser.sleep(500);
-        element(by.model('user.username')).isPresent().then( function(isPresent) {
-            if(isPresent) {
-                p.helper.login('admin', 'qweasd123');
-                console.log('Login dialog appeared unexpectedly.');
-                browser.sleep(1000);
-            }
-        });
-        element(by.model('user.username')).isPresent().then( function(isPresent) {
-            if(isPresent) {
-                p.helper.login('admin', 'admin');
-                console.log('Login dialog appeared unexpectedly.');
-                browser.sleep(1000);
-            }
-        });
     }
 };
 
