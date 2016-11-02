@@ -53,6 +53,8 @@ public: // overrides
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
+    bool hasInternet() const override;
+
 private:
     void emitHeadChanged();
 

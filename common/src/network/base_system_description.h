@@ -11,11 +11,11 @@ typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 enum class QnServerField
 {
     NoField = 0x00,
-    NameField = 0x01,
-    SystemNameField = 0x02,
-    HostField = 0x04,
-    FlagsField = 0x08,
-    CloudIdField = 0x10
+    Name = 0x01,
+    SystemName = 0x02,
+    Host = 0x04,
+    HasInternet = 0x08,
+    CloudId = 0x10
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -62,6 +62,8 @@ public:
 
     virtual bool isOnline() const = 0;
 
+    virtual bool hasInternet() const = 0;
+
 signals:
     void isCloudSystemChanged();
 
@@ -74,6 +76,8 @@ signals:
     void serverRemoved(const QnUuid& serverId);
 
     void onlineStateChanged();
+
+    void hasInternetChanged();
 
     void serverChanged(const QnUuid& serverId, QnServerFields flags);
 };

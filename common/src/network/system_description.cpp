@@ -7,19 +7,26 @@ namespace
 {
 
 // TODO: #ynikitenkov Add fusion functions
-#define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(     \
+#define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(                \
     before.fieldName != after.fieldName ? flag : QnServerField::NoField)
+
+#define EXTRACT_CHANGE_FLAG_FOR_FLAGS(serverFlag, flag) static_cast<QnServerFields>(     \
+    before.serverFlags.testFlag(serverFlag) != after.serverFlags.testFlag(serverFlag)    \
+        ? flag                                                                           \
+        : QnServerField::NoField)
 
     QnServerFields getChanges(const QnModuleInformation &before
         , const QnModuleInformation &after)
     {
-        auto result =
-            (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
-            | EXTRACT_CHANGE_FLAG(name, QnServerField::NameField)
-            | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField)
-            | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudIdField));
+        const auto fieldsResult =
+            (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
+            | EXTRACT_CHANGE_FLAG(name, QnServerField::Name)
+            | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId));
 
-        return result;
+        const auto flagsResult =
+            EXTRACT_CHANGE_FLAG_FOR_FLAGS(Qn::SF_HasPublicIP, QnServerField::HasInternet);
+
+        return (fieldsResult | flagsResult);
     }
 #undef EXTRACT_CHANGE_FLAG
 }
@@ -60,9 +67,12 @@ QnSystemDescription::QnSystemDescription(const QString& systemId) :
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts()
-{}
-
+    m_hosts(),
+    m_onlineServers(),
+    m_hasInternet(false)
+{
+    init();
+}
 
 QnSystemDescription::QnSystemDescription(const QString& systemId,
     const QnUuid &localId,
@@ -78,8 +88,12 @@ QnSystemDescription::QnSystemDescription(const QString& systemId,
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts()
-{}
+    m_hosts(),
+    m_onlineServers(),
+    m_hasInternet(false)
+{
+    init();
+}
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
@@ -98,8 +112,12 @@ QnSystemDescription::QnSystemDescription(
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts()
-{}
+    m_hosts(),
+    m_onlineServers(),
+    m_hasInternet(false)
+{
+    init();
+}
 
 QnSystemDescription::~QnSystemDescription()
 {}
@@ -292,7 +310,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const QUrl& host
     if (!changed)
         return;
     m_hosts[serverId] = host;
-    emit serverChanged(serverId, QnServerField::HostField);
+    emit serverChanged(serverId, QnServerField::Host);
 }
 
 QUrl QnSystemDescription::getServerHost(const QnUuid& serverId) const
@@ -311,3 +329,37 @@ qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
     return m_serverTimestamps.value(serverId).elapsed();
 }
 
+bool QnSystemDescription::hasInternet() const
+{
+    return m_hasInternet;
+}
+
+void QnSystemDescription::updateHasInternetState()
+{
+    const bool newHasInternet = std::any_of(m_servers.begin(), m_servers.end(),
+        [](const QnModuleInformation& info)
+        {
+            return info.serverFlags.testFlag(Qn::SF_HasPublicIP);
+        });
+
+    if (newHasInternet == m_hasInternet)
+        return;
+
+    m_hasInternet = newHasInternet;
+    emit hasInternetChanged();
+}
+
+void QnSystemDescription::init()
+{
+    connect(this, &QnBaseSystemDescription::serverAdded,
+        this, &QnSystemDescription::updateHasInternetState);
+    connect(this, &QnBaseSystemDescription::serverRemoved,
+        this, &QnSystemDescription::updateHasInternetState);
+
+    connect(this, &QnBaseSystemDescription::serverChanged, this,
+        [this](const QnUuid& /*id*/, QnServerFields fields)
+        {
+            if (fields.testFlag(QnServerField::HasInternet))
+                updateHasInternetState();
+        });
+}
