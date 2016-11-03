@@ -732,7 +732,7 @@ module.exports = function (grunt) {
         'connect:test',
         'protractor_webdriver',
         'shell:print_version',
-        'protractor:settings'
+        'protractor:setup'
     ]);
     grunt.registerTask('code', [
         'newer:jshint'
