@@ -131,6 +131,10 @@ Global
 		${nx_audio.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_audio.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_audio.guid}.Release|x64.Build.0 = Release|x64
+		${nx_media.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_media.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_media.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_media.guid}.Release|x64.Build.0 = Release|x64
 		${nx_network.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${nx_network.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_network.guid}.Release|x64.ActiveCfg = Release|x64

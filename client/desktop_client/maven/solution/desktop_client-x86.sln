@@ -144,6 +144,10 @@ Global
 		${nx_audio.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_audio.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${nx_audio.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_media.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_media.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_media.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_media.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_network.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_network.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_network.guid}.Release|Win32.ActiveCfg = Release|Win32
