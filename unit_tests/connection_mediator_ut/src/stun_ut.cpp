@@ -32,7 +32,7 @@ protected:
         , server(
             &stunMessageDispatcher,
             false,
-            SocketFactory::NatTraversalType::nttDisabled)
+            nx::network::NatTraversalSupport::disabled)
     {
         EXPECT_TRUE(server.bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server.listen());
