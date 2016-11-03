@@ -188,6 +188,11 @@ public:
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
+
+    virtual bool connectToIp(
+        const SocketAddress& remoteAddress,
+        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
+
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send

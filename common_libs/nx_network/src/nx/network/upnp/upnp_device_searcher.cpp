@@ -306,7 +306,8 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
 
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
-    if (!sock->setReuseAddrFlag( true ) ||
+    if (!sock->setNonBlockingMode( true ) ||
+        !sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||

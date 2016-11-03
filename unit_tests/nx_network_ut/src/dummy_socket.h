@@ -42,6 +42,11 @@ public:
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+
+    virtual bool connectToIp(
+        const SocketAddress& remoteSocketAddress,
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+
     virtual SocketAddress getForeignAddress() const override;
     virtual void cancelIOAsync(
         aio::EventType eventType,
@@ -98,6 +103,11 @@ public:
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+
+    virtual bool connectToIp(
+        const SocketAddress& remoteSocketAddress,
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     virtual bool isConnected() const override;

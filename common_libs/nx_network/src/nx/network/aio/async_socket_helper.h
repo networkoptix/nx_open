@@ -1,15 +1,10 @@
-/**********************************************************
-* 15 aug 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef ASYNC_SOCKET_HELPER_H
-#define ASYNC_SOCKET_HELPER_H
+#pragma once
 
 #include <atomic>
 #include <exception>
 #include <functional>
 #include <type_traits>
+#include <queue>
 
 #include <QtCore/QThread>
 
@@ -19,7 +14,6 @@
 
 #include "../abstract_socket.h"
 #include "../socket_global.h"
-
 
 namespace nx {
 namespace network {
@@ -133,18 +127,65 @@ public:
                 "deleting socket if you delete socket from non-aio thread";
             NX_CRITICAL(
                 !(m_addressResolverIsInUse.load() &&
-                    nx::network::SocketGlobals::addressResolver()
+                    SocketGlobals::addressResolver().dnsResolver()
                         .isRequestIdKnown(this)), kFailureMessage);
             NX_CRITICAL(
-                !nx::network::SocketGlobals::aioService()
+                !SocketGlobals::aioService()
                     .isSocketBeingWatched(this->m_socket), kFailureMessage);
         }
     }
 
     void connectAsync(
-        const SocketAddress& addr,
-        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
+        const SocketAddress& address,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
+        NX_ASSERT(isNonBlockingMode());
+        if (address.address.isIpAddress())
+            return connectToIpAsync(address, std::move(handler));
+
+        m_addressResolverIsInUse = true;
+        SocketGlobals::addressResolver().dnsResolver().resolveAsync(
+            address.address.toString(),
+            [this, address, handler = std::move(handler)](
+                SystemError::ErrorCode code, DnsResolver::HostAddresses ips) mutable
+            {
+                if (code != SystemError::noError)
+                    return this->post(std::bind(std::move(handler), code));
+
+                std::queue<HostAddress> ipQueue;
+                for (auto& ip: ips)
+                    ipQueue.push(std::move(ip));
+
+                NX_CRITICAL(!ipQueue.empty());
+                connectToIpsAsync(std::move(ipQueue), address.port, std::move(handler));
+            },
+            m_ipVersion,
+            this);
+    }
+
+    void connectToIpsAsync(
+        std::queue<HostAddress> ips, uint16_t port,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    {
+        SocketAddress firstAddress(std::move(ips.front()), port);
+        ips.pop();
+        connectToIpAsync(
+            firstAddress,
+            [this, ips = std::move(ips), port, handler = std::move(handler)](
+                SystemError::ErrorCode code) mutable
+            {
+                if (code == SystemError::noError || ips.empty())
+                    return handler(code);
+
+                connectToIpsAsync(std::move(ips), port, std::move(handler));
+            });
+    }
+
+    void connectToIpAsync(
+        const SocketAddress& addr,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    {
+        NX_CRITICAL(addr.address.isIpAddress());
         //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
 
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
@@ -179,77 +220,15 @@ public:
 #endif
 
         m_connectHandler = std::move( handler );
-
-        //TODO #ak if address is already resolved (or is an ip address) better make synchronous non-blocking call
-        //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with NX_ASSERT
-
-        if( addr.address.isResolved() )
+        if (!startAsyncConnect(addr))
         {
-            if (!startAsyncConnect(addr))
-                this->post(
-                    [handler = move(m_connectHandler),
-                        errorCode = SystemError::getLastOSErrorCode()]() mutable
-                    {
-                        handler(errorCode);
-                    });
-            return;
+            this->post(
+                [handler = move(m_connectHandler),
+                    code = SystemError::getLastOSErrorCode()]() mutable
+                {
+                    handler(code);
+                });
         }
-
-        m_addressResolverIsInUse = true;
-
-        auto resolveHandler =
-            [this, addr](
-                SystemError::ErrorCode errorCode,
-                std::vector< nx::network::cloud::AddressEntry > addresses )
-            {
-                //always calling m_connectHandler within aio thread socket is bound to
-                if( addresses.empty() )
-                {
-                    if (errorCode == SystemError::noError)
-                        errorCode = SystemError::hostNotFound;
-                    this->post(
-                        [handler = move(m_connectHandler), errorCode]() mutable
-                        {
-                            handler(errorCode);
-                        });
-                    return;
-                }
-
-
-                // TODO: iterate over addresses and try to connect to each of them
-                //       instead of just using the first one
-                const auto& entry = addresses.front();
-                switch( entry.type )
-                {
-                    case nx::network::cloud::AddressType::direct:
-                    {
-                        SocketAddress target( entry.host, addr.port );
-                        for( const auto& attr : entry.attributes )
-                            if( attr.type == nx::network::cloud::AddressAttributeType::port )
-                                target.port = static_cast< quint16 >( attr.value );
-                        if( startAsyncConnect( target ) )
-                            return;
-                        errorCode = SystemError::getLastOSErrorCode();
-                        break;
-                    }
-                    default:
-                        errorCode = SystemError::hostNotFound;
-                        break;
-                }
-
-                this->post(
-                    [handler = move(m_connectHandler), errorCode]() mutable
-                    {
-                        handler(errorCode);
-                    });
-            };
-
-        nx::network::SocketGlobals::addressResolver().resolveAsync(
-            addr.address,
-            std::move(resolveHandler),
-            NatTraversalSupport::disabled,
-            m_ipVersion,
-            this);
     }
 
     void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -257,6 +236,7 @@ public:
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
 
+        NX_ASSERT( isNonBlockingMode() );
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
         //this assert is not critical but is a signal of possible 
@@ -278,6 +258,7 @@ public:
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
 
+        NX_ASSERT( isNonBlockingMode() );
         NX_ASSERT( buf.size() > 0 );
         NX_CRITICAL( !m_asyncSendIssued.exchange(true) );
 
@@ -327,11 +308,9 @@ public:
         };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::network::SocketGlobals::addressResolver().cancel(
-                this,
-                std::move(cancelImpl));
-        else
-            cancelImpl();
+            nx::network::SocketGlobals::addressResolver().dnsResolver().cancel(this, true);
+
+        cancelImpl();
     }
 
     void cancelIOSync(aio::EventType eventType)
@@ -390,6 +369,20 @@ private:
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
     const int m_ipVersion;
+
+    bool isNonBlockingMode() const
+    {
+        bool value;
+        if (!m_abstractSocketPtr->getNonBlockingMode(&value))
+        {
+            // TODO: MUST return FALSE;
+            // Currently here is a problem in UDT, getsockopt(...) can not find descriptor by some
+            // reason, but send(...) and recv(...) work just fine.
+            return true;
+        }
+
+        return value;
+    }
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
@@ -543,8 +536,8 @@ private:
             boost::none,
             [this, resolvedAddress, sendTimeout]()
             {
-                m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
-            });    //to be called between pollset.add and pollset.poll
+                m_abstractSocketPtr->connectToIp( resolvedAddress, sendTimeout );
+            });    //to be called between pollset.add and pollset.polladdress
         return true;
     }
 
@@ -595,6 +588,8 @@ private:
             std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_read)> cleanupGuard(this, __finally_read);
 
             NX_ASSERT(m_recvHandler);
+            if (!isNonBlockingMode())
+                return recvHandlerLocal(SystemError::invalidData, (size_t) -1);
 
             //reading to buffer
             const auto bufSizeBak = m_recvBuffer->size();
@@ -656,6 +651,8 @@ private:
             {
                 //can send some bytes
                 NX_ASSERT(m_sendHandler);
+                if (!isNonBlockingMode())
+                    return sendHandlerLocal(SystemError::invalidData, (size_t) -1);
 
                 std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)> cleanupGuard(this, __finally_write);
 
@@ -749,7 +746,7 @@ private:
     //!Call this from within aio thread only
     void stopPollingSocket(const aio::EventType eventType)
     {
-        nx::network::SocketGlobals::addressResolver().cancel(this);    //TODO #ak must not block here!
+        nx::network::SocketGlobals::addressResolver().dnsResolver().cancel(this, true);    //TODO #ak must not block here!
 
         //TODO #ak move this method to aioservice?
         if (eventType == aio::etNone)
@@ -902,8 +899,6 @@ private:
     bool* m_terminatedFlagPtr;
 };
 
-}   //aio
-}   //network
-}   //nx
-
-#endif  //ASYNC_SOCKET_HELPER_H
+} // namespace aio
+} // namespace network
+} // namespace nx
