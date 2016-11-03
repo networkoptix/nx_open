@@ -46,8 +46,6 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
-//TODO: #gdm simple graphics item depends on workbench globals? should move out
-#include <ui/workbench/workbench_ui_globals.h>
 
 namespace
 {
@@ -1585,16 +1583,11 @@ void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
         animated = false;
 
     bool visible = canBeVisible && m_tooltipVisible;
-    if (!animated)
-    {
-        toolTipItem()->setOpacity(visible ? NxUi::kOpaque : NxUi::kHidden);
-        return;
-    }
 
     if (visible)
-        showToolTip();
+        showToolTip(animated);
     else
-        hideToolTip();
+        hideToolTip(animated);
 }
 
 void QnTimeSlider::updateToolTipText()
