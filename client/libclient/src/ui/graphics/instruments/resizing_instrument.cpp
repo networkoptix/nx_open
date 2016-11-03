@@ -10,25 +10,33 @@
 
 namespace {
 
-struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem*, bool>
+auto itemIsAffectedWidget = [](QGraphicsItem* item)
 {
-    bool operator()(QGraphicsItem* item) const
+    if (!item->isWidget())
+        return false;
+
+    return true;
+};
+
+auto itemIsResizableWidget = [](QGraphicsItem* item)
+{
+    if (!itemIsAffectedWidget(item))
+        return false;
+
+    if (!item->acceptedMouseButtons().testFlag(Qt::LeftButton))
+        return false;
+
+    auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(item);
+    if (mediaWidget && mediaWidget->options().testFlag(
+        QnMediaResourceWidget::WindowResizingForbidden))
     {
-        if (!item->isWidget() || !item->acceptedMouseButtons().testFlag(Qt::LeftButton))
-            return false;
-
-        auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(item);
-        if (mediaWidget && mediaWidget->options().testFlag(
-            QnMediaResourceWidget::WindowResizingForbidden))
-        {
-            return false;
-        }
-
-        if (auto webView = dynamic_cast<QnGraphicsWebView*>(item))
-            return false;
-
-        return true;
+        return false;
     }
+
+    if (auto webView = dynamic_cast<QnGraphicsWebView*>(item))
+        return false;
+
+    return true;
 };
 
 class GraphicsWidget: public QGraphicsWidget
@@ -159,10 +167,19 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
 
     getWidgetAndFrameSection(viewport, event->pos(), section, widget);
 
-    if (m_affectedWidget && (m_affectedWidget != widget || section == Qt::NoSection))
+    auto oldTargetWidget = m_affectedWidgets.isEmpty()
+        ? QGraphicsWidgetPtr()
+        : m_affectedWidgets.last();
+
+    bool needUnsetCursor = !widget || oldTargetWidget != widget || section == Qt::NoSection;
+    if (needUnsetCursor)
     {
-        m_affectedWidget->unsetCursor();
-        m_affectedWidget.clear();
+        for (auto w : m_affectedWidgets)
+        {
+            if (w)
+                w->unsetCursor();
+        }
+        m_affectedWidgets.clear();
     }
 
     if (!widget || section == Qt::NoSection)
@@ -180,8 +197,14 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
         widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())) * 180.0 / M_PI;
     const auto cursor = QnCursorCache::instance()->cursor(cursorShape, rotation, 5.0);
 
-    m_affectedWidget = widget;
-    m_affectedWidget->setCursor(cursor);
+    m_affectedWidgets = getAffectedWidgets(viewport, event->pos());
+    NX_ASSERT(m_affectedWidgets.last() == widget);
+    for (auto w : m_affectedWidgets)
+    {
+        NX_ASSERT(w);
+        if (w)
+            w->setCursor(cursor);
+    }
 
     event->accept();
     return false;
@@ -316,7 +339,7 @@ void ResizingInstrument::getWidgetAndFrameSection(
         return;
 
     /* Find the item to resize. */
-    widget = static_cast<QGraphicsWidget*>(item(view, pos, ItemIsResizableWidget()));
+    widget = static_cast<QGraphicsWidget*>(item(view, pos, itemIsResizableWidget));
     if (!widget || !satisfiesItemConditions(widget))
         return;
 
@@ -341,4 +364,32 @@ void ResizingInstrument::getWidgetAndFrameSection(
     section = queryable->windowFrameSectionAt(QRectF(
         itemPos - QPointF(effectRadius, effectRadius),
         QSizeF(2 * effectRadius, 2 * effectRadius)));
+}
+
+QList<ResizingInstrument::QGraphicsWidgetPtr> ResizingInstrument::getAffectedWidgets(
+    QWidget* viewport,
+    const QPoint& pos) const
+{
+    QList<QGraphicsWidgetPtr> result;
+
+    if (!dragProcessor()->isWaiting())
+        return result;
+
+    const auto view = this->view(viewport);
+    if (!view->isInteractive())
+        return result;
+
+    for (auto item : this->items(view, pos))
+    {
+        if (!itemIsAffectedWidget(item))
+            continue;
+
+        result.append(static_cast<QGraphicsWidget*>(item));
+
+        if (itemIsResizableWidget(item))
+            break;
+    }
+
+    return result;
+
 }
