@@ -101,17 +101,6 @@ size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
     return m_transcodeContext.size();
 }
 
-//void StreamingChunkTranscoderThread::cancel( int transcodingID )
-//{
-//    QnMutexLocker lk( &m_mutex );
-//
-//    map<int, std::unique_ptr<TranscodeContext>>::iterator it = m_transcodeContext.find( transcodingID );
-//    if( it == m_transcodeContext.end() )
-//        return;
-//    disconnect( it->second->dataSource.data(), 0, this, 0 );
-//    removeTranscodingNonSafe( it, true, &lk );
-//}
-
 void StreamingChunkTranscoderThread::pleaseStop()
 {
     QnMutexLocker lk( &m_mutex );
@@ -174,7 +163,7 @@ void StreamingChunkTranscoderThread::run()
             NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
                 arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            removeTranscodingNonSafe( transcodeIter, false, &lk );
+            finishTranscoding(&lk, transcodeIter, false);
             continue;
         }
 
@@ -195,8 +184,6 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
-        QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
-
         //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done),
         //that required for minimizing hls live delay
         if ((quint64) srcMediaData->timestamp
@@ -213,23 +200,12 @@ void StreamingChunkTranscoderThread::run()
 #ifdef SAVE_OUTPUT_TO_FILE
             transcodeIter->second->outputFile.close();
 #endif
-            //neccessary source data has been processed, depleting transcoder buffer
-            for (;; )
-            {
-                resultStream.clear();
-                int res = transcodeIter->second->dataSourceCtx->transcoder->transcodePacket(
-                    QnAbstractMediaDataPtr(new QnEmptyMediaData()),
-                    &resultStream);
-                if (res || resultStream.size() == 0)
-                    break;
-                transcodeIter->second->chunk->appendData(
-                    QByteArray::fromRawData(resultStream.constData(), resultStream.size()));
-            }
 
-            //removing transcoding
-            removeTranscodingNonSafe(transcodeIter, true, &lk);
+            finishTranscoding(&lk, transcodeIter, true);
             continue;
         }
+
+        QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
 
 #ifdef SAVE_INPUT_STREAM_TO_FILE
         m_inputFile.write( srcMediaData->data.constData(), srcMediaData->data.size() );
@@ -309,4 +285,28 @@ void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
         tc->dataSourceCtx );
     tc.reset();
     lk->relock();
+}
+
+void StreamingChunkTranscoderThread::finishTranscoding(
+    QnMutexLockerBase* const lk,
+    const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
+    bool transcodingFinishedSuccessfully)
+{
+    QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
+
+    //neccessary source data has been processed, depleting transcoder buffer
+    for (;;)
+    {
+        resultStream.clear();
+        int res = transcodingIter->second->dataSourceCtx->transcoder->transcodePacket(
+            QnAbstractMediaDataPtr(new QnEmptyMediaData()),
+            &resultStream);
+        if (res || (resultStream.size() == 0))
+            break;
+        transcodingIter->second->chunk->appendData(
+            QByteArray::fromRawData(resultStream.constData(), resultStream.size()));
+    }
+
+    //removing transcoding
+    removeTranscodingNonSafe(transcodingIter, transcodingFinishedSuccessfully, lk);
 }
