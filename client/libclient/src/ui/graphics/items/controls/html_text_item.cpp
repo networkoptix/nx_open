@@ -135,6 +135,7 @@ QnHtmlTextItem::QnHtmlTextItem(const QString &html
     , d_ptr(new QnHtmlTextItemPrivate(options, this))
 {
     setHtml(html);
+    setAcceptedMouseButtons(Qt::NoButton);
 }
 
 QnHtmlTextItem::~QnHtmlTextItem()
