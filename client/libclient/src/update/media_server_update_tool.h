@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
@@ -9,6 +11,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/connective.h>
 
 class QnCheckForUpdatesPeerTask;
 class QnUploadUpdatesPeerTask;
@@ -16,16 +19,20 @@ class QnInstallUpdatesPeerTask;
 class QnRestUpdatePeerTask;
 struct QnLowFreeSpaceWarning;
 
-class QnMediaServerUpdateTool : public QObject {
+class QnMediaServerUpdateTool: public Connective<QObject>
+{
     Q_OBJECT
+
+    using base_type = Connective<QObject>;
 public:
-    QnMediaServerUpdateTool(QObject *parent = 0);
+    QnMediaServerUpdateTool(QObject* parent = nullptr);
     ~QnMediaServerUpdateTool();
 
     QnFullUpdateStage stage() const;
 
     bool isUpdating() const;
     bool idle() const;
+    bool isCheckingUpdates() const;
 
     QnMediaServerResourceList targets() const;
     void setTargets(const QSet<QnUuid> &targets, bool client = false);
@@ -45,6 +52,7 @@ public:
 
     bool canCancelUpdate() const;
     bool cancelUpdate();
+    bool cancelUpdatesCheck();
 
 signals:
     void stageChanged(QnFullUpdateStage stage);
@@ -57,11 +65,15 @@ signals:
     void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
 
+    void updatesCheckCanceled();
+
     void lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
 
 private:
     void startUpdate(const QnUpdateTarget &target);
-    void checkForUpdates(const QnUpdateTarget &target, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
+    void checkForUpdates(
+        const QnUpdateTarget& target,
+        std::function<void(const QnCheckForUpdateResult& result)> callback = nullptr);
 
     void setStage(QnFullUpdateStage stage);
     void setStageProgress(int progress);
@@ -74,7 +86,8 @@ private:
 private:
     QnFullUpdateStage m_stage;
 
-    QnUpdateProcess* m_updateProcess;
+    QPointer<QnCheckForUpdatesPeerTask> m_checkUpdatesTask;
+    QPointer<QnUpdateProcess> m_updateProcess;
 
     QnMediaServerResourceList m_targets;
 

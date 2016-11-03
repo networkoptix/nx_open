@@ -39,8 +39,8 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void hideToolTip();
-    void showToolTip();
+    void hideToolTip(bool animated = true);
+    void showToolTip(bool animated = true);
 
 protected:
     virtual void sliderChange(SliderChange change) override;

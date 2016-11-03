@@ -587,3 +587,8 @@ QnUpdateTarget QnCheckForUpdatesPeerTask::target() const
 {
     return m_target;
 }
+
+void QnCheckForUpdatesPeerTask::doCancel()
+{
+    m_runningRequests.clear();
+}
