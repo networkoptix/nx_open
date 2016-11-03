@@ -109,6 +109,8 @@ QnCommonModule::QnCommonModule(QObject *parent):
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
 
+    instance<nx_http::ClientPool>();
+
     instance<QnResourcePool>();             /*< Depends on nothing. */
     instance<QnUserRolesManager>();         /*< Depends on nothing. */
     instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
@@ -126,7 +128,6 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
 
     instance<QnGlobalSettings>();
-    instance<nx_http::ClientPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
