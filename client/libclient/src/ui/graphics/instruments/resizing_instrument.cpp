@@ -92,7 +92,8 @@ ResizingInstrument::ResizingInstrument(QObject* parent):
             QEvent::MouseButtonRelease,
             QEvent::Paint),
         parent),
-    m_effectRadius(0.0)
+    m_innerEffectRadius(0.0),
+    m_outerEffectRadius(0.0)
 {
     dragProcessor()->setStartDragDistance(0);
     dragProcessor()->setStartDragTime(0);
@@ -103,14 +104,24 @@ ResizingInstrument::~ResizingInstrument()
     ensureUninstalled();
 }
 
-qreal ResizingInstrument::effectRadius() const
+qreal ResizingInstrument::innerEffectRadius() const
 {
-    return m_effectRadius;
+    return m_innerEffectRadius;
 }
 
-void ResizingInstrument::setEffectRadius(qreal effectRadius)
+void ResizingInstrument::setInnerEffectRadius(qreal effectRadius)
 {
-    m_effectRadius = effectRadius;
+    m_innerEffectRadius = effectRadius;
+}
+
+qreal ResizingInstrument::outerEffectRadius() const
+{
+    return m_outerEffectRadius;
+}
+
+void ResizingInstrument::setOuterEffectRadius(qreal effectRadius)
+{
+    m_outerEffectRadius = effectRadius;
 }
 
 void ResizingInstrument::rehandle()
@@ -128,7 +139,8 @@ bool ResizingInstrument::mousePressEvent(QWidget* viewport, QMouseEvent* event)
     QGraphicsWidget* widget = nullptr;
     auto section = Qt::NoSection;
 
-    getWidgetAndFrameSection(viewport, event->pos(), section, widget);
+    QPoint correctedPos;
+    getWidgetAndFrameSection(viewport, event->pos(), section, widget, correctedPos);
     if (section == Qt::NoSection)
         return false;
 
@@ -165,7 +177,8 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     QGraphicsWidget* widget = nullptr;
     auto section = Qt::NoSection;
 
-    getWidgetAndFrameSection(viewport, event->pos(), section, widget);
+    QPoint correctedPos;
+    getWidgetAndFrameSection(viewport, event->pos(), section, widget, correctedPos);
 
     auto oldTargetWidget = m_affectedWidgets.isEmpty()
         ? QGraphicsWidgetPtr()
@@ -197,7 +210,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
         widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())) * 180.0 / M_PI;
     const auto cursor = QnCursorCache::instance()->cursor(cursorShape, rotation, 5.0);
 
-    m_affectedWidgets = getAffectedWidgets(viewport, event->pos());
+    m_affectedWidgets = getAffectedWidgets(viewport, correctedPos);
     NX_ASSERT(m_affectedWidgets.last() == widget);
     for (auto w : m_affectedWidgets)
     {
@@ -326,10 +339,12 @@ void ResizingInstrument::getWidgetAndFrameSection(
     QWidget* viewport,
     const QPoint& pos,
     Qt::WindowFrameSection& section,
-    QGraphicsWidget*& widget) const
+    QGraphicsWidget*& widget,
+    QPoint& correctedPos) const
 {
     section = Qt::NoSection;
     widget = nullptr;
+    correctedPos = pos;
 
     if (!dragProcessor()->isWaiting())
         return;
@@ -339,31 +354,77 @@ void ResizingInstrument::getWidgetAndFrameSection(
         return;
 
     /* Find the item to resize. */
-    widget = static_cast<QGraphicsWidget*>(item(view, pos, itemIsResizableWidget));
-    if (!widget || !satisfiesItemConditions(widget))
+    widget = resizableWidgetAtPos(view, pos);
+    if (widget)
+    {
+        section = queryFrameSection(view, widget, pos, m_innerEffectRadius);
+        return;
+    }
+
+    QList<QPoint> locationsNearby{
+        pos - QPoint(m_outerEffectRadius, m_outerEffectRadius),
+        pos - QPoint(-m_outerEffectRadius, m_outerEffectRadius),
+        pos - QPoint(-m_outerEffectRadius, -m_outerEffectRadius),
+        pos - QPoint(m_outerEffectRadius, -m_outerEffectRadius)
+    };
+
+    QGraphicsWidget* widgetNearby = nullptr;
+    for (const auto& pos : locationsNearby)
+    {
+        auto w = resizableWidgetAtPos(view, pos);
+        if (!w)
+            continue;
+
+        if (!widgetNearby)
+        {
+            widgetNearby = w;
+            correctedPos = pos;
+            continue;
+        }
+
+        if (w != widgetNearby)
+            return;
+    }
+    if (!widgetNearby)
         return;
 
+
+    widget = widgetNearby;
+    section = queryFrameSection(view, widget, pos, m_outerEffectRadius);
+}
+
+QGraphicsWidget* ResizingInstrument::resizableWidgetAtPos(
+    QGraphicsView* view,
+    const QPoint& pos) const
+{
+    const auto widget = static_cast<QGraphicsWidget*>(item(view, pos, itemIsResizableWidget));
+    if (widget && satisfiesItemConditions(widget))
+        return widget;
+    return nullptr;
+}
+
+Qt::WindowFrameSection ResizingInstrument::queryFrameSection(
+    QGraphicsView* view,
+    QGraphicsWidget* widget,
+    const QPoint& pos,
+    qreal effectRadius) const
+{
     /* Check frame section. */
     const auto queryable = dynamic_cast<FrameSectionQueryable*>(widget);
-    if (!queryable && !(widget->windowFlags().testFlag(Qt::Window)
+    if (!queryable
+        && !(widget->windowFlags().testFlag(Qt::Window)
             && widget->windowFlags().testFlag(Qt::WindowTitleHint)))
     {
-        return; /* Has no decorations and not queryable for frame sections. */
+        return Qt::NoSection; /* Has no decorations and not queryable for frame sections. */
     }
 
     const auto itemPos = widget->mapFromScene(view->mapToScene(pos));
     if (!queryable)
-    {
-        section = open(widget)->getWindowFrameSectionAt(itemPos);
-        return;
-    }
+        return open(widget)->getWindowFrameSectionAt(itemPos);
 
-    const auto effectRadius =
-        mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius)).width();
-
-    section = queryable->windowFrameSectionAt(QRectF(
-        itemPos - QPointF(effectRadius, effectRadius),
-        QSizeF(2 * effectRadius, 2 * effectRadius)));
+    const auto radius = mapRectToScene(view, QRectF(0, 0, effectRadius, effectRadius)).width();
+    return queryable->windowFrameSectionAt(QRectF(
+        itemPos - QPointF(radius, radius), QSizeF(2 * radius, 2 * radius)));
 }
 
 QList<ResizingInstrument::QGraphicsWidgetPtr> ResizingInstrument::getAffectedWidgets(

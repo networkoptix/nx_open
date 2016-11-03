@@ -61,8 +61,11 @@ public:
     ResizingInstrument(QObject* parent = nullptr);
     virtual ~ResizingInstrument();
 
-    qreal effectRadius() const;
-    void setEffectRadius(qreal effectRadius);
+    qreal innerEffectRadius() const;
+    void setInnerEffectRadius(qreal effectRadius);
+
+    qreal outerEffectRadius() const;
+    void setOuterEffectRadius(qreal effectRadius);
 
     void rehandle();
 
@@ -90,14 +93,28 @@ private:
         QWidget* viewport,
         const QPoint& pos,
         Qt::WindowFrameSection& section,
-        QGraphicsWidget*& widget) const;
+        QGraphicsWidget*& widget,
+        QPoint& correctedPos) const;
+
+    QGraphicsWidget* resizableWidgetAtPos(
+        QGraphicsView* view,
+        const QPoint& pos
+    ) const;
+
+    Qt::WindowFrameSection queryFrameSection(
+        QGraphicsView* view,
+        QGraphicsWidget* widget,
+        const QPoint& pos,
+        qreal effectRadius) const;
 
     QList<QGraphicsWidgetPtr> getAffectedWidgets(QWidget* viewport, const QPoint& pos) const;
 
 private:
     friend class ResizingInfo;
 
-    qreal m_effectRadius;
+    qreal m_innerEffectRadius;
+    qreal m_outerEffectRadius;
+
     QPointF m_startPinPoint;
     QSizeF m_startSize;
     QTransform m_startTransform;
