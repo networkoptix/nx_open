@@ -105,11 +105,6 @@
          <property name="text">
           <string>Advanced...</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normalon>.</normalon>
-          </iconset>
-         </property>
         </widget>
        </item>
       </layout>

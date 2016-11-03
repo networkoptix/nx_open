@@ -57,7 +57,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection)
     {
-        const auto serverId = connection->connectionInfo().serverId();
+        const auto& info = connection->connectionInfo();
+        const auto serverId = info.serverId();
         trace(lit("Connection established to %1").arg(serverId.toString()));
 
         /*
@@ -69,18 +70,13 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
         QString host = currentUrl.host();
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         {
-            const auto serverPrefix = serverId.toSimpleString() + L'.';
-            bool isValidHost = host.startsWith(serverPrefix);
-            if (!isValidHost)
+            const auto fullHost = serverId.toSimpleString() + L'.' + info.cloudSystemId;
+            NX_EXPECT(nx::network::SocketGlobals::addressResolver().isCloudHostName(fullHost));
+            if (host != fullHost)
             {
-                NX_ASSERT(!host.contains(L'.'));
-                if (!host.contains(L'.'))
-                {
-                    host = serverPrefix + host;
-                    currentUrl.setHost(host);
-                    QnAppServerConnectionFactory::setUrl(currentUrl);
-                    trace(lit("Url fixed to %1").arg(host));
-                }
+                trace(lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
+                currentUrl.setHost(fullHost);
+                QnAppServerConnectionFactory::setUrl(currentUrl);
             }
         }
 
