@@ -148,6 +148,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
         {
             bool reset = m_timeSlider->isVisible() != isRelevant;
             m_timeSlider->setVisible(isRelevant);
+            m_timeSlider->toolTipItem()->setVisible(isRelevant);
             m_timeScrollBar->setVisible(isRelevant);
             timelinePlaceholder->setVisible(!isRelevant);
             m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));

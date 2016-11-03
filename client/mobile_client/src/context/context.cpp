@@ -18,6 +18,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
+#include <helpers/nx_globals_object.h>
 
 using namespace nx::vms::utils;
 
@@ -29,6 +30,7 @@ const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
+    m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this)),

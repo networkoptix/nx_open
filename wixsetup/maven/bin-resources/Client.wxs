@@ -221,6 +221,9 @@
                 <File Id="Qt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="10"  />
             </Component>
             <Component>
+                <File Id="Qt5MultimediaQuick_p.dll" Name="Qt5MultimediaQuick_p.dll" Source="$(var.QtDir)\Qt5MultimediaQuick_p.dll" DiskId="10"  />
+            </Component>
+            <Component>
                 <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="10"  />
             </Component>
             <Component>

@@ -12,11 +12,13 @@ class QnCloudStatusWatcher;
 class QnMobileClientUiController;
 class QnUserWatcher;
 class QnCloudUrlHelper;
+class NxGlobalsObject;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
+    Q_PROPERTY(NxGlobalsObject* Nx MEMBER m_nxGlobals CONSTANT)
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnContextSettings* settings MEMBER m_settings CONSTANT)
@@ -70,6 +72,7 @@ public:
     void setLocalPrefix(const QString& prefix);
 
 private:
+    NxGlobalsObject* m_nxGlobals;
     QnConnectionManager *m_connectionManager;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;

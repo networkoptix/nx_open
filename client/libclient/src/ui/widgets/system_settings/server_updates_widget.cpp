@@ -424,7 +424,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         : result.version;
 
     QString detail;
-    QString versionText(displayVersion.toString());
+    auto versionText = displayVersion.isNull() ? kNoVersionNumberText : displayVersion.toString();
 
     setWarningStyle(ui->errorLabel);
 

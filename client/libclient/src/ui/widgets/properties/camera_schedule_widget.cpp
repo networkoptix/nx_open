@@ -567,6 +567,7 @@ void QnCameraScheduleWidget::submitToResources()
         QSignalBlocker blocker(ui->enableRecordingCheckBox);
         updateScheduleEnabled();
         setScheduleAlert(QString());
+        updateLicensesLabelText();
     }
 }
 
