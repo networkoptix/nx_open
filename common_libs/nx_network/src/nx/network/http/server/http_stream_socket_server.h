@@ -28,9 +28,9 @@ namespace nx_http
             nx_http::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher,
             bool sslRequired,
-            SocketFactory::NatTraversalType natTraversalRequired )
+            nx::network::NatTraversalSupport natTraversalSupport)
 		:
-			base_type(sslRequired, natTraversalRequired),
+			base_type(sslRequired, natTraversalSupport),
 			m_authenticationManager(authenticationManager),
 			m_httpMessageDispatcher(httpMessageDispatcher),
             m_forceConnectionClose(false)
