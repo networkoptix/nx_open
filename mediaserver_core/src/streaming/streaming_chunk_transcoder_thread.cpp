@@ -168,7 +168,8 @@ void StreamingChunkTranscoderThread::run()
 
         QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
 
-        if( !srcMediaData || srcMediaData->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF) )
+        if( !srcMediaData || 
+            std::dynamic_pointer_cast<QnEmptyMediaData>(srcMediaData) ) //< QnEmptyMediaData signals end-of-stream
         {
             NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
