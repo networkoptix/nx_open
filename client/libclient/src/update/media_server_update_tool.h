@@ -11,6 +11,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/connective.h>
 
 class QnCheckForUpdatesPeerTask;
 class QnUploadUpdatesPeerTask;
@@ -18,10 +19,11 @@ class QnInstallUpdatesPeerTask;
 class QnRestUpdatePeerTask;
 struct QnLowFreeSpaceWarning;
 
-class QnMediaServerUpdateTool: public QObject
+class QnMediaServerUpdateTool: public Connective<QObject>
 {
     Q_OBJECT
 
+    using base_type = Connective<QObject>;
 public:
     QnMediaServerUpdateTool(QObject* parent = nullptr);
     ~QnMediaServerUpdateTool();

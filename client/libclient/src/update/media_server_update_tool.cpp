@@ -41,7 +41,7 @@ namespace {
 } // anonymous namespace
 
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject* parent):
-    QObject(parent),
+    base_type(parent),
     m_stage(QnFullUpdateStage::Init),
     m_enableClientUpdates(defaultEnableClientUpdates)
 {
@@ -280,8 +280,7 @@ void QnMediaServerUpdateTool::checkForUpdates(
 
     if (callback)
     {
-        connect(m_checkUpdatesTask, &QnCheckForUpdatesPeerTask::checkFinished, this,
-            [callback](const QnCheckForUpdateResult& result) { callback(result); });
+        connect(m_checkUpdatesTask, &QnCheckForUpdatesPeerTask::checkFinished, this, callback);
     }
     else
     {
