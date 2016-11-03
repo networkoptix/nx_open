@@ -280,7 +280,8 @@ void QnMediaServerUpdateTool::checkForUpdates(
 
     if (callback)
     {
-        connect(m_checkUpdatesTask, &QnCheckForUpdatesPeerTask::checkFinished, this, callback);
+        connect(m_checkUpdatesTask, &QnCheckForUpdatesPeerTask::checkFinished, this,
+            [callback](const QnCheckForUpdateResult& result) { callback(result); });
     }
     else
     {
