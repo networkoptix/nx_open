@@ -166,6 +166,17 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
+        QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
+
+        if( !srcMediaData || srcMediaData->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF) )
+        {
+            NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
+                arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
+                arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
+            removeTranscodingNonSafe( transcodeIter, false, &lk );
+            continue;
+        }
+
         if( !transcodeIter->second->chunk->wantMoreData() )
         {
             // Output stream does not want more data. Will try later...
@@ -175,18 +186,6 @@ void StreamingChunkTranscoderThread::run()
             transcodeIter->second->dataAvailable = false;
             continue;
         }
-
-        if( !srcPacket )
-        {
-            NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
-                arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
-                arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            removeTranscodingNonSafe( transcodeIter, false, &lk );
-            continue;
-        }
-
-        QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
-        NX_ASSERT( srcMediaData );
 
         if (srcMediaData->dataType == QnAbstractMediaData::VIDEO &&
             srcMediaData->channelNumber != transcodeIter->second->transcodeParams.channel())
