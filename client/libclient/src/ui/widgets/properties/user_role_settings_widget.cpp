@@ -357,6 +357,9 @@ void QnUserRoleSettingsWidget::loadDataToUi()
 
 void QnUserRoleSettingsWidget::applyChanges()
 {
+    if (!canApplyChanges())
+        return;
+
     Q_D(QnUserRoleSettingsWidget);
     d->model->setRoleName(ui->nameInputField->text());
     emit hasChangesChanged();
