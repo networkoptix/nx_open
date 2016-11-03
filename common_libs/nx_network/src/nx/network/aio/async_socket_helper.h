@@ -150,7 +150,8 @@ public:
                 SystemError::ErrorCode code, DnsResolver::HostAddresses ips) mutable
             {
                 if (code != SystemError::noError)
-                    return this->post(std::bind(std::move(handler), code));
+                    return this->post(
+                        [handler = std::move(handler), code]() { handler(code); });
 
                 std::queue<HostAddress> ipQueue;
                 for (auto& ip: ips)
