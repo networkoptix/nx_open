@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <QtCore/QHash>
@@ -13,7 +12,8 @@ class QnAbstractSystemsFinder;
 
 typedef QHash<QString, QnWeightData> QnWeightsDataHash;
 
-class QnSystemsWeightsManager : public QObject,
+class QnSystemsWeightsManager:
+    public QObject,
     public Singleton<QnSystemsWeightsManager>
 {
     Q_OBJECT

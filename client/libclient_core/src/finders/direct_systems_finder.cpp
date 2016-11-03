@@ -167,8 +167,8 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(moduleInformation);
-    if (!changes.testFlag(QnServerField::SystemNameField)
-        && !changes.testFlag(QnServerField::CloudIdField))
+    if (!changes.testFlag(QnServerField::SystemName)
+        && !changes.testFlag(QnServerField::CloudId))
     {
         return;
     }

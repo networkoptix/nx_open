@@ -559,9 +559,9 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
 
     if (qFuzzyCompare(0.0, value))
         action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
-    else if (qFuzzyCompare(0.2, value))
+    else if (qFuzzyCompare(0.1, value))
         action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
-    else if (qFuzzyCompare(0.3, value))
+    else if (qFuzzyCompare(0.15, value))
         action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     else
         action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
@@ -1764,7 +1764,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered(
 {
     if (auto layout = workbench()->currentLayout()->resource())
     {
-        layout->setCellSpacing(0.1);
+        layout->setCellSpacing(0.05);
         action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
     }
 }
@@ -1773,7 +1773,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered(
 {
     if (auto layout = workbench()->currentLayout()->resource())
     {
-        layout->setCellSpacing(0.2);
+        layout->setCellSpacing(0.1);
         action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
     }
 }
@@ -1782,7 +1782,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 {
     if (auto layout = workbench()->currentLayout()->resource())
     {
-        layout->setCellSpacing(0.3);
+        layout->setCellSpacing(0.15);
         action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     }
 }

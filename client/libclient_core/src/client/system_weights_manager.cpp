@@ -1,4 +1,3 @@
-
 #include "system_weights_manager.h"
 
 #include <QtCore/QTimer>
@@ -12,7 +11,9 @@
 
 namespace {
 
-void addOrUpdateWeightData(const QString& id, const QnWeightData& data,
+void addOrUpdateWeightData(
+    const QString& id,
+    const QnWeightData& data,
     QnWeightsDataHash& target)
 {
     const auto it = target.find(id);
@@ -25,10 +26,10 @@ void addOrUpdateWeightData(const QString& id, const QnWeightData& data,
 QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
 {
     QnWeightsDataHash result;
-    for (const auto& cloudData : data)
+    for (const auto& cloudData: data)
     {
-        const QnWeightData weightData = { cloudData.localId, cloudData.weight,
-            cloudData.lastLoginTimeUtcMs, true};
+        const QnWeightData weightData({ cloudData.localId, cloudData.weight,
+            cloudData.lastLoginTimeUtcMs, true});
 
         result.insert(cloudData.cloudId, weightData);
         const auto localSystemId = cloudData.localId.toString();
@@ -39,7 +40,7 @@ QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
 
 QnWeightsDataHash recalculatedWeights(QnWeightsDataHash source)
 {
-    for (auto& data : source)
+    for (auto& data: source)
         data.weight = helpers::calculateSystemWeight(data.weight, data.lastConnectedUtcMs);
 
     return source;
@@ -70,7 +71,7 @@ QnSystemsWeightsManager::QnSystemsWeightsManager():
 
     setSystemsFinder(qnSystemsFinder);
 
-    static const int kUpdateInterval = 1000 * 60 * 10;// 10 minutes
+    static const int kUpdateInterval = 1000 * 60 * 10; //< 10 minutes
     m_updateTimer->setInterval(kUpdateInterval);
     connect(m_updateTimer, &QTimer::timeout,
         this, &QnSystemsWeightsManager::afterBaseWeightsUpdated);
@@ -84,7 +85,7 @@ void QnSystemsWeightsManager::handleSourceWeightsChanged()
     const auto cloudSystemsData = qnCloudStatusWatcher->cloudSystems();
     auto targetWeights = fromCloudSystemData(cloudSystemsData);
 
-    for (const auto& weightData : localWeights)
+    for (const auto& weightData: localWeights)
         addOrUpdateWeightData(weightData.localId.toString(), weightData, targetWeights);
 
     if (targetWeights == m_baseWeights)
@@ -109,7 +110,7 @@ void QnSystemsWeightsManager::setSystemsFinder(QnAbstractSystemsFinder* finder)
     connect(m_finder, &QnAbstractSystemsFinder::systemDiscovered,
         this, &QnSystemsWeightsManager::processSystemDiscovered);
 
-    for (const auto& system : m_finder->systems())
+    for (const auto& system: m_finder->systems())
         processSystemDiscovered(system);
 
     // TODO: #ynikitenkov add processing of systems's removal.
@@ -149,8 +150,8 @@ void QnSystemsWeightsManager::processSystemDiscovered(const QnSystemDescriptionP
 
     // Inserts weight for unknown system
     static const bool kFakeConnection = false;
-    const QnWeightData unknownSystemWeight = { system->localId(), m_unknownSystemWeight,
-        QDateTime::currentMSecsSinceEpoch(), kFakeConnection };
+    const QnWeightData unknownSystemWeight({ system->localId(), m_unknownSystemWeight,
+        QDateTime::currentMSecsSinceEpoch(), kFakeConnection });
     addLocalWeightData(unknownSystemWeight);
 }
 
@@ -174,10 +175,10 @@ void QnSystemsWeightsManager::afterBaseWeightsUpdated()
     m_updatedWeights = updatedWeights;
 
     qreal targetUnknownSystemWeight = 0;
-    for (const auto& data : m_updatedWeights)
+    for (const auto& data: m_updatedWeights)
     {
         if (data.realConnection)
-            std::max(targetUnknownSystemWeight, data.weight);
+            targetUnknownSystemWeight = std::max(targetUnknownSystemWeight, data.weight);
     }
 
     setUnknownSystemsWeight(targetUnknownSystemWeight);

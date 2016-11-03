@@ -160,10 +160,8 @@ PageBase
 
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
 
-        source: videoScreenController.mediaPlayer
-        customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
-            || videoScreenController.mediaPlayer.aspectRatio)
-        videoRotation: videoScreenController.resourceHelper.customRotation
+        mediaPlayer: videoScreenController.mediaPlayer
+        resourceHelper: videoScreenController.resourceHelper
 
         onClicked: toggleUi()
     }

@@ -323,6 +323,10 @@ bool QnUserSettingsWidget::canApplyChanges() const
         ui->emailInputField
     };
 
+    const QList<QnInputField*> kCloudUserFields{
+        ui->cloudEmailInputField
+    };
+
     switch (m_model->mode())
     {
         case QnUserSettingsModel::NewUser:
@@ -330,7 +334,7 @@ bool QnUserSettingsWidget::canApplyChanges() const
             switch (ui->userTypeComboBox->currentIndex())
             {
                 case kCloudIndex:
-                    return checkFields({ui->cloudEmailInputField});
+                    return checkFields(kCloudUserFields);
                 case kLocalIndex:
                     return checkFields(kLocalUserFields);
                 default:

@@ -867,23 +867,28 @@ void QnWorkbenchNavigator::jumpBackward()
 
         if (!periods.empty())
         {
-            qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
-
-            if (currentTime == DATETIME_NOW)
+            if (m_timeSlider->isLive())
             {
                 pos = periods.last().startTimeMs * 1000;
             }
             else
             {
-                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime / 1000, true);
-                itr = qMax(itr - 1, periods.cbegin());
+                /* We want timeline to jump relatively to current position, not camera frame. */
+                qint64 currentTime = m_timeSlider->value();
+
+                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
+                if (itr != periods.cbegin())
+                    --itr;
+
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && !itr->isInfinite())
                     pos += itr->durationMs * 1000;
             }
         }
     }
+
     reader->jumpTo(pos, pos);
+    updateSliderFromReader(true);
     emit positionChanged();
 }
 
@@ -911,12 +916,14 @@ void QnWorkbenchNavigator::jumpForward()
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
-        qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
+        /* We want timeline to jump relatively to current position, not camera frame. */
+        qint64 currentTime = m_timeSlider->value();
+
         QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
-        if (itr != periods.cend())
+        if (itr != periods.cend() && currentTime >= itr->startTimeMs)
             ++itr;
 
-        if (itr == periods.cend())
+        if (itr == periods.cend() || m_timeSlider->isLive())
         {
             /* Do not make step forward to live if we are playing backward. */
             if (reader->isReverseMode())
@@ -934,7 +941,9 @@ void QnWorkbenchNavigator::jumpForward()
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }
     }
+
     reader->jumpTo(pos, pos);
+    updateSliderFromReader(true);
     emit positionChanged();
 }
 
@@ -949,15 +958,21 @@ void QnWorkbenchNavigator::stepBackward()
 
     m_pausedOverride = false;
 
+    /* Here we want to know real reader time. */
     qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
-    if (!reader->isSkippingFrames() && currentTime > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
+
+    if (!reader->isSkippingFrames()
+        && currentTime > reader->startTime()
+        && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
     {
 
         if (reader->isSingleShotMode())
             m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
 
         reader->previousFrame(currentTime);
+        updateSliderFromReader(true);
     }
+
     emit positionChanged();
 }
 
@@ -973,6 +988,8 @@ void QnWorkbenchNavigator::stepForward()
     m_pausedOverride = false;
 
     reader->nextFrame();
+    updateSliderFromReader(true);
+
     emit positionChanged();
 }
 
