@@ -28,6 +28,7 @@
 #include <nx/utils/debug_utils.h>
 
 #include "media_player_quality_chooser.h"
+#include <utils/common/long_runable_async_stopper.h>
 
 namespace nx {
 namespace media {
@@ -85,42 +86,6 @@ static qint64 usecToMsec(qint64 posUsec)
 }
 
 } // namespace
-
-class DataProviderGarbageCollector: public QObject
-{
-public:
-    DataProviderGarbageCollector()
-    {
-        connect(&m_timer, &QTimer::timeout, this, &DataProviderGarbageCollector::cleanup);
-        m_timer.start(1000);
-    }
-
-    static DataProviderGarbageCollector* instance()
-    {
-        static DataProviderGarbageCollector inst;
-        return &inst;
-    }
-
-    void addReader(std::unique_ptr<QnArchiveStreamReader> reader)
-    {
-        m_readersToClose.emplace_back(std::move(reader));
-        cleanup();
-    }
-
-    void cleanup()
-    {
-        for (auto itr = m_readersToClose.begin(); itr != m_readersToClose.end();)
-        {
-            if (!(*itr)->isRunning())
-                itr = m_readersToClose.erase(itr);
-            else
-                ++itr;
-        }
-    }
-private:
-    std::vector<std::unique_ptr<QnArchiveStreamReader>> m_readersToClose;
-    QTimer m_timer;
-};
 
 class PlayerPrivate: public QObject
 {
@@ -840,12 +805,10 @@ void Player::stop()
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
     if (d->dataConsumer)
         d->dataConsumer->pleaseStop();
-    if (d->archiveReader)
-        d->archiveReader->pleaseStop();
 
     d->dataConsumer.reset();
     if (d->archiveReader)
-        DataProviderGarbageCollector::instance()->addReader(std::move(d->archiveReader));
+        QnLongRunableAsyncStopper::instance()->stopAsync(std::move(d->archiveReader));
     d->videoFrameToRender.reset();
 
     d->setState(State::Stopped);
