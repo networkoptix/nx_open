@@ -52,7 +52,7 @@ public:
             m_q.removeAtUnsafe(index);
         }
 
-        void pop_front()
+        void popFront()
         {
             m_q.m_buffer[m_q.m_headIndex++] = T();
             if (m_q.m_headIndex >= (int) m_q.m_buffer.size())
@@ -80,7 +80,6 @@ public:
         QnSafeQueue& m_q;
     };
 
-
     QnSafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
         : m_headIndex(0),
         m_bufferLen(0),
@@ -90,7 +89,8 @@ public:
         reallocateBufferUnsafe(maxSize);
     }
 
-    ~QnSafeQueue() {
+    ~QnSafeQueue()
+    {
         clear();
     }
 
