@@ -67,3 +67,4 @@ include(compiler_options)
 
 add_subdirectory(common_libs)
 add_subdirectory(common)
+add_subdirectory(appserver2)

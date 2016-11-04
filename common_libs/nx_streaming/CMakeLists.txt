@@ -7,33 +7,12 @@ add_library(nx_streaming
 
 add_precompiled_header(nx_streaming src/StdAfx.h FORCEINCLUDE)
 
-target_include_directories(nx_streaming PUBLIC src)
+target_include_directories(nx_streaming
+    PRIVATE ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
+    PUBLIC src)
 
 target_compile_definitions(nx_streaming
     PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO}
 )
 
-target_link_libraries(nx_utils PUBLIC common)
-
-project(nx_streaming)
-set(PROJECT_SHORTNAME "nx_streaming")
-set(PROJECT_LONGNAME "${short.company.name} Streaming Library")
-
-find_sources(src)
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
-
-find_package(Qt5Network REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
-
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
-)
-target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Network Qt5::Concurrent
-)
+target_link_libraries(nx_streaming PUBLIC common)
