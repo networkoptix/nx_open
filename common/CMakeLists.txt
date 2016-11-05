@@ -26,11 +26,13 @@ target_include_directories(common
     PRIVATE
         ${Qt5Core_PRIVATE_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src
+    PUBLIC
         ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
-    PUBLIC src)
+        src
+)
 
 target_compile_definitions(common
-    PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO})
+    PUBLIC NX_NETWORK_API=${API_IMPORT_MACRO})
 
 target_link_libraries(common
     PUBLIC

@@ -1,22 +1,11 @@
-project(nx_email)
-set(PROJECT_SHORTNAME "nx_email")
-set(PROJECT_LONGNAME "${short.company.name} E-Mail Library")
+find_sources(src CPP_FILES)
 
-find_sources(src)
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
-
-find_package(Qt5Network REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
-
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
+add_library(nx_email
+    ${CPP_FILES}
+    src/StdAfx.cpp src/StdAfx.h
 )
-target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Network Qt5::Concurrent
-)
+
+add_precompiled_header(nx_email src/StdAfx.h FORCEINCLUDE)
+
+target_include_directories(nx_email PUBLIC src)
+target_link_libraries(nx_email PUBLIC common)
