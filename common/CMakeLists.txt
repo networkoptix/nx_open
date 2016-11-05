@@ -1,13 +1,20 @@
 find_sources(src CPP_FILES)
+generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/common.qrc
+    "${CMAKE_CURRENT_SOURCE_DIR}/static-resources"
+    "${customization_dir}/common/resources"
+)
 
 configure_file(
     maven/filter-resources/app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp)
+    ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp
+)
 
 add_library(common
     ${CPP_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp
-    src/StdAfx.cpp src/StdAfx.h)
+    src/StdAfx.cpp src/StdAfx.h
+    ${CMAKE_CURRENT_BINARY_DIR}/common.qrc
+)
 
 add_precompiled_header(common src/StdAfx.h FORCEINCLUDE)
 

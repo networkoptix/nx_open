@@ -41,8 +41,10 @@ include(package_versions)
 include(ec_protocol)
 include(maven_compatibility)
 
+set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+
 include(customization/default-values.cmake)
-include(customization/${customization}/customization.cmake)
+include(${customization_dir}/customization.cmake)
 include(properties)
 
 rdep_add_package(qt)
