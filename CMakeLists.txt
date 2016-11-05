@@ -63,7 +63,9 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia)
+        Multimedia
+        Quick
+)
 
 include(compiler_options)
 
@@ -71,3 +73,4 @@ add_subdirectory(common_libs)
 add_subdirectory(common)
 add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
+add_subdirectory(client)
