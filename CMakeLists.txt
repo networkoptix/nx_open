@@ -53,6 +53,9 @@ set(QT_DIR ${PACKAGES_DIR}/${QT_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 
 rdep_add_package(any/boost)
+rdep_add_package(any/qtservice)
+rdep_add_package(any/qtsinglecoreapplication)
+rdep_add_package(any/qtsingleapplication)
 
 find_package(Qt5
     COMPONENTS
