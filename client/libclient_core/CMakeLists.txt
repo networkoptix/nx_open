@@ -8,9 +8,9 @@ add_library(client_core
 add_precompiled_header(client_core src/StdAfx.h FORCEINCLUDE)
 
 target_include_directories(client_core
-    PRIVATE
+    PUBLIC
         ${Qt5Quick_PRIVATE_INCLUDE_DIRS}
-    PUBLIC src
+        src
 )
 
 target_link_libraries(client_core

@@ -67,7 +67,13 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia
+        OpenGL
+        Qml
         Quick
+        QuickWidgets
+        WebKit
+        WebKitWidgets
+        X11Extras
 )
 
 include(compiler_options)

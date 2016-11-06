@@ -1,1 +1,2 @@
 add_subdirectory(libclient_core)
+add_subdirectory(libclient)
