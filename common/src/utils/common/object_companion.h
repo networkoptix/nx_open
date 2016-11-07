@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
 #include <type_traits>
 #include <utility>
+#include <memory>
 
 /*
  *  A set of static methods to attach/detach a companion object to/from another object.
@@ -12,27 +12,17 @@
 class QnObjectCompanionManager
 {
 public:
-    /** Get an attached companion: */
+    /** Returns an attached companion: */
     static QObject* companion(QObject* parent, const char* id);
 
-    /** Attach a companion if no other companion was attached: */
-    static bool attachUnique(QObject* parent, QObject* companion, const char* id);
+    /** Attaches a companion and returns previously attached companion: */
+    static std::unique_ptr<QObject> attach(QObject* parent, QObject* companion, const char* id);
 
-    /** Attach a companion and return previously attached companion: */
-    static void attach(QObject* parent, QObject* companion, const char* id, QScopedPointer<QObject>& previousCompanion);
+    /** Detaches a companion and returns it (or null if no companion was attached): */
+    static std::unique_ptr<QObject> detach(QObject* parent, const char* id);
 
-    /** Detach a companion and return it (nullptr if no companion was attached): */
-    static QObject* detach(QObject* parent, const char* id);
-
-    /** Detach and delete a companion (returns false if no companion was attached): */
+    /** Detaches and deletes a companion (returns false if no companion was attached): */
     static bool uninstall(QObject* parent, const char* id);
-
-protected:
-    static QObject* getCompanion(QObject* parent, const QByteArray& internalId);
-    static void setCompanion(QObject* parent, const QByteArray& internalId, QObject* companion);
-    static void clearCompanion(QObject* parent, const QByteArray& internalId);
-
-    static QByteArray companionId(const char* id);
 };
 
 /*
@@ -49,33 +39,18 @@ public:
     template<class ParentType>
     explicit QnObjectCompanion(ParentType* parent) : Base(parent) {}
 
-    /** Create and attach a companion if no other companion was attached: */
+    /** Creates and attaches a new companion and returns a pointer to it.
+    * If an old companion exists, deletes it if `unique` is false,
+    * or keeps it and returns nullptr if `unique` is true.
+    */
     template<class ParentType>
-    static QnObjectCompanion<Base>* installUnique(ParentType* parent, const char* id)
+    static QnObjectCompanion<Base>* install(ParentType* parent, const char* id, bool unique)
     {
-        const QByteArray internalId = QnObjectCompanionManager::companionId(id);
-        if (QnObjectCompanionManager::getCompanion(parent, internalId))
+        if (unique && QnObjectCompanionManager::companion(parent, id))
             return nullptr;
 
         auto result = new QnObjectCompanion<Base>(parent);
-        QnObjectCompanionManager::setCompanion(parent, internalId, result);
+        QnObjectCompanionManager::attach(parent, result, id);
         return result;
-    }
-
-    /** Create and attach a companion and return previously attached companion: */
-    template<class ParentType>
-    static QnObjectCompanion<Base>* install(ParentType* parent, const char* id, QScopedPointer<QObject>& previousCompanion)
-    {
-        auto result = new QnObjectCompanion<Base>(parent);
-        QnObjectCompanionManager::attach(parent, result, id, previousCompanion);
-        return result;
-    }
-
-    /** Create and attach a companion, uninstall and delete previously attached companion: */
-    template<class ParentType>
-    static QnObjectCompanion<Base>* installNew(ParentType* parent, const char* id)
-    {
-        QScopedPointer<QObject> previousCompanion;
-        return install(parent, id, previousCompanion);
     }
 };
