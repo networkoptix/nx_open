@@ -35,6 +35,10 @@ public: // overrides
 private:
     typedef QPair<QnUuid, int> IdCountPair;
     typedef QHash<QString, IdCountPair> IdsDataHash;
+
+    // We don't allow to discover recent systems if we have online ones
     IdsDataHash m_filteringSystems;
+
+    // Recent systems that have no online ones
     SystemsHash m_finalSystems;
 };

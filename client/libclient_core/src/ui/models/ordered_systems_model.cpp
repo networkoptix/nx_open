@@ -1,4 +1,3 @@
-
 #include "ordered_systems_model.h"
 
 #include <ui/models/systems_model.h>
@@ -53,8 +52,9 @@ bool QnOrderedSystemsModel::getWeightFromData(
         };
 
     // Searching for maximum weight
-    static const QVector<int> kIdRoles =
-        { QnSystemsModel::SystemIdRoleId, QnSystemsModel::LocalIdRoleId };
+    static const QVector<int> kIdRoles{
+        QnSystemsModel::SystemIdRoleId,
+        QnSystemsModel::LocalIdRoleId};
 
     weight = 0.0;
     bool result = false;
