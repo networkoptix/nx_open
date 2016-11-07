@@ -28,36 +28,6 @@ static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROG
 
 namespace {
 
-    /**
-     * @brief resourceExistsInPool          Check if found camera is already exists in pool by its unique ID. For onvif cameras host is also checked.
-     * @param resource                      Camera resource.
-     * @return                              True if resource is already in resource pool, false otherwise.
-     */
-    bool resourceExistsInPool(const QnResourcePtr &resource)
-    {
-        bool existResource = false;
-        QnResourcePtr res = qnResPool->getResourceByUniqueId(resource->getUniqueId());
-        if (res && qnResPool->getResourceById(res->getParentId()))
-        {
-            if (res->getTypeId() == qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName()))
-                return false;
-            existResource = true; // already in resource pool
-        }
-        else
-        {
-            // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition checking for IP address
-            existResource = QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
-                resource, 
-                [](const QnNetworkResourcePtr& res)
-                {
-                    bool hasParent = qnResPool->getResourceById(res->getParentId());
-                    return hasParent && res->getStatus() != Qn::Offline;
-                },
-                true);
-        }
-        return existResource;
-    }
-
     QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr &camera)
     {
         return QnManualResourceSearchEntry(
@@ -66,7 +36,7 @@ namespace {
             , qnResTypePool->getResourceType(camera->getTypeId())->getName()
             , camera->getVendor()
             , camera->getUniqueId()
-            , resourceExistsInPool(camera)
+            , false
             );
     }
 
