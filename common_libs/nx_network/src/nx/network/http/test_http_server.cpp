@@ -66,9 +66,9 @@ private:
     const QByteArray m_response;
 };
 
-void TestHttpServer::setForceConnectionClose(bool value)
+void TestHttpServer::setPersistentConnectionEnabled(bool value)
 {
-    m_httpServer->setForceConnectionClose(value);
+    m_httpServer->setPersistentConnectionEnabled(value);
 }
 
 bool TestHttpServer::registerStaticProcessor(

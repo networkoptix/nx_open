@@ -33,14 +33,13 @@ namespace nx_http
 			base_type(sslRequired, natTraversalSupport),
 			m_authenticationManager(authenticationManager),
 			m_httpMessageDispatcher(httpMessageDispatcher),
-            m_forceConnectionClose(false)
+            m_persistentConnectionEnabled(true)
 		{
 		}
 
-        // for test purpose
-        void setForceConnectionClose(bool value)
+        void setPersistentConnectionEnabled(bool value)
         {
-            m_forceConnectionClose = value;
+            m_persistentConnectionEnabled = value;
         }
 
     protected:
@@ -52,14 +51,14 @@ namespace nx_http
 				std::move(_socket),
 				m_authenticationManager,
 				m_httpMessageDispatcher);
-            result->setForceConnectionClose(m_forceConnectionClose);
+            result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
             return result;
 		}
 
     private:
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
-        bool m_forceConnectionClose; //< force connection close for test purpose
+        bool m_persistentConnectionEnabled;
     };
 }
 

@@ -33,6 +33,7 @@ public:
             path,
             std::move(factoryFunc) );
     }
+
     template<typename RequestHandlerType>
     bool registerRequestProcessor(const QString& path)
     {
@@ -44,7 +45,6 @@ public:
             });
     }
 
-
     bool registerStaticProcessor(
         const QString& path,
         QByteArray msgBody,
@@ -55,7 +55,7 @@ public:
         const nx_http::StringType& mimeType);
 
     // used for test purpose
-    void setForceConnectionClose(bool value);
+    void setPersistentConnectionEnabled(bool value);
 
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
 
