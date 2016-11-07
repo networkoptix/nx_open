@@ -10,6 +10,8 @@
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 
+#include <utils/common/object_companion.h>
+
 void setWarningStyle(QWidget *widget)
 {
     setPaletteColor(widget, QPalette::ButtonText, qnGlobals->errorTextColor());
@@ -40,7 +42,7 @@ void setTabShape(QTabBar* tabBar, style::TabShape tabShape)
 }
 
 template<class Pages>
-void resizePagesToContents_implementation(Pages* pages,
+void autoResizePagesToContents_implementation(Pages* pages,
     QSizePolicy visiblePagePolicy,
     bool resizeToVisible,
     std::function<void()> extraHandler)
@@ -61,13 +63,17 @@ void resizePagesToContents_implementation(Pages* pages,
 
     adjustSizePolicies(pages->currentIndex());
 
+    static const char* kCompanionId = "_qn_resizePagesToContents";
+    auto companion = QnObjectCompanion<QObject>::installNew(pages, kCompanionId);
+    NX_ASSERT(companion);
+
     if (resizeToVisible)
     {
-        pages->connect(pages, &Pages::currentChanged, adjustSizePolicies);
+        companion->connect(pages, &Pages::currentChanged, adjustSizePolicies);
     }
     else
     {
-        pages->connect(pages, &Pages::currentChanged,
+        companion->connect(pages, &Pages::currentChanged,
             [pages, visiblePagePolicy, extraHandler]()
             {
                 pages->currentWidget()->setSizePolicy(visiblePagePolicy);
@@ -77,22 +83,22 @@ void resizePagesToContents_implementation(Pages* pages,
     }
 }
 
-void resizePagesToContents(QStackedWidget* pages,
+void autoResizePagesToContents(QStackedWidget* pages,
     QSizePolicy visiblePagePolicy,
     bool resizeToVisible,
     std::function<void()> extraHandler)
 {
 
-    resizePagesToContents_implementation(pages, visiblePagePolicy,
+    autoResizePagesToContents_implementation(pages, visiblePagePolicy,
         resizeToVisible, extraHandler);
 }
 
-void resizePagesToContents(QTabWidget* pages,
+void autoResizePagesToContents(QTabWidget* pages,
     QSizePolicy visiblePagePolicy,
     bool resizeToVisible,
     std::function<void()> extraHandler)
 {
-    resizePagesToContents_implementation(pages, visiblePagePolicy,
+    autoResizePagesToContents_implementation(pages, visiblePagePolicy,
         resizeToVisible, extraHandler);
 }
 

@@ -18,12 +18,20 @@ void setTabShape(QTabBar* tabBar, style::TabShape tabShape);
 void setMonospaceFont(QWidget* widget);
 QFont monospaceFont(const QFont& font = QFont());
 
-void resizePagesToContents(QStackedWidget* pages,
+/*
+* Improves size hint for stacked widgets and tab widgets.
+* Sets { Ignored, Ignored } size policy for invisible pages initially and
+*  if resizeToVisible is true sets it every time a page becomes invisible.
+* Sets visiblePagePolicy for a page every time it becomes visible.
+* Calls extraHandler, if set, initially and after every page change;
+*  it can be used for extra layout processing (e.g. dialog shrinking to content).
+*/
+void autoResizePagesToContents(QStackedWidget* pages,
     QSizePolicy visiblePagePolicy,
     bool resizeToVisible,
     std::function<void()> extraHandler = std::function<void()>());
 
-void resizePagesToContents(QTabWidget* pages,
+void autoResizePagesToContents(QTabWidget* pages,
     QSizePolicy visiblePagePolicy,
     bool resizeToVisible,
     std::function<void()> extraHandler = std::function<void()>());

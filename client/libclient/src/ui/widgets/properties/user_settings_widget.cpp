@@ -110,9 +110,9 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
             }
         });
 
-    resizePagesToContents(ui->mainStackedWidget,
+    autoResizePagesToContents(ui->mainStackedWidget,
         { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
-    resizePagesToContents(ui->secondaryStackedWidget,
+    autoResizePagesToContents(ui->secondaryStackedWidget,
         { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
 
     setupInputFields();

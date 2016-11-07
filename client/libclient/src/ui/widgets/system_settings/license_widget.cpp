@@ -37,7 +37,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
     /* Workaround for initially hidden tab providing incorrect size hint: */
-    resizePagesToContents(ui->tabWidget, { QSizePolicy::Expanding, QSizePolicy::Preferred }, false);
+    autoResizePagesToContents(ui->tabWidget, { QSizePolicy::Expanding, QSizePolicy::Preferred }, false);
 
     /* Choose monospace font for license input line: */
     setMonospaceFont(ui->onlineKeyEdit);

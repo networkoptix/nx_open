@@ -79,7 +79,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         ui->emailInputField
     });
 
-    resizePagesToContents(ui->stackedWidget,
+    autoResizePagesToContents(ui->stackedWidget,
         { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
 }
 
