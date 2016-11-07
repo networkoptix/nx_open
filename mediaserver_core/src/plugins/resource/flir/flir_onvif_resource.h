@@ -13,6 +13,7 @@ class QnFlirOnvifResource : public QnPlOnvifResource
 
 public:
     QnFlirOnvifResource();
+    virtual ~QnFlirOnvifResource();
 
     virtual CameraDiagnostics::Result initInternal() override;
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
@@ -26,7 +27,7 @@ public:
         unsigned int autoResetTimeoutMS) override;
 
 private:
-    std::unique_ptr<FlirWsIOManager> m_ioManager;
+    FlirWsIOManager* m_ioManager;
 };
 
 typedef QnSharedResourcePointer<QnFlirOnvifResource> QnFlirOnvifResourcePtr;

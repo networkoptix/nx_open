@@ -1,13 +1,26 @@
-#include <QtWebSockets/QWebSocket>
-
 #include "flir_onvif_resource.h"
+#include "flir_io_executor.h"
 
 #include <utils/common/synctime.h>
+#include <nx/utils/log/log.h>
 
 #ifdef ENABLE_ONVIF
 
 QnFlirOnvifResource::QnFlirOnvifResource()
 {
+}
+
+QnFlirOnvifResource::~QnFlirOnvifResource()
+{
+    stopInputPortMonitoringAsync();
+    m_ioManager->terminate();
+    if (m_ioManager)
+    {
+        QMetaObject::invokeMethod(
+            m_ioManager,
+            "deleteLater",
+            Qt::QueuedConnection);
+    }
 }
 
 CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
@@ -17,7 +30,11 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
     if (result != CameraDiagnostics::NoErrorResult())
         return result;
 
-    m_ioManager.reset(new FlirWsIOManager(this));
+    if (!m_ioManager)
+    {
+        m_ioManager = new FlirWsIOManager(this);
+        m_ioManager->moveToThread(FlirIOExecutor::instance()->getThread());
+    }
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
     QnIOPortDataList allPorts = getInputPortList();
@@ -41,6 +58,9 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
 
 bool QnFlirOnvifResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
+    if (!m_ioManager)
+        return false;
+
     if (m_ioManager->isMonitoringInProgress())
         return false;
 
@@ -55,9 +75,14 @@ bool QnFlirOnvifResource::startInputPortMonitoringAsync(std::function<void(bool)
         });
 
     m_ioManager->setNetworkIssueCallback(
-        [](QString reason, bool isFatal)
+        [this](QString reason, bool /*isFatal*/)
         {
-            qDebug () << "Flir, network issue occured during io monitoring";
+            NX_LOG(
+                lm("Flir Onvif resource, %1 (%2), netowk issue detected. Reason: %3")
+                    .arg(getModel())
+                    .arg(getUrl())
+                    .arg(reason), 
+                cl_logWARNING);
         });
 
     m_ioManager->startIOMonitoring();
@@ -66,7 +91,10 @@ bool QnFlirOnvifResource::startInputPortMonitoringAsync(std::function<void(bool)
 
 void QnFlirOnvifResource::stopInputPortMonitoringAsync()
 {
-    if (m_ioManager->isMonitoringInProgress())
+    if (!m_ioManager)
+        return;
+
+    if (!m_ioManager->isMonitoringInProgress())
         return; 
 
     m_ioManager->stopIOMonitoring();
@@ -79,7 +107,6 @@ QnIOPortDataList QnFlirOnvifResource::getInputPortList() const
 
     return QnIOPortDataList();
 }
-
 
 bool QnFlirOnvifResource::setRelayOutputState(
     const QString& outputID,
@@ -95,10 +122,7 @@ bool QnFlirOnvifResource::setRelayOutputState(
 
 QnIOPortDataList QnFlirOnvifResource::getRelayOutputList() const
 {
-    if (m_ioManager)
-        return m_ioManager->getOutputPortList();
-
-    return QnIOPortDataList();
+    return QnPlOnvifResource::getRelayOutputList();
 }
 
 #endif // ENABLE_ONVIF

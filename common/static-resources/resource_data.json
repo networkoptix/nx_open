@@ -124,6 +124,17 @@
 			"adamOutputCount": 6
 		},
         {
+            "keys": ["FLIR|FC*"],
+            "ioSettings": [
+                {
+                    "id": "$DI:0",
+                    "inputName": "Digital Input 1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                }
+            ]
+        },
+        {
             "keys": [
                 "FLIR|AX8"
             ],

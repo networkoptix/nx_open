@@ -94,6 +94,7 @@
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/flir/flir_io_executor.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -2376,6 +2377,7 @@ void MediaServerProcess::run()
 #endif
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
+    std::unique_ptr<FlirIOExecutor> flirExecutor(new FlirIOExecutor());
 
     if (cmdLineArguments.cleanupDb)
     {

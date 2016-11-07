@@ -1,13 +1,17 @@
 #pragma once
 
 #include <map>
+#include <set>
 
 #include <QtWebSockets/QWebSocket>
+
+#include "flir_websocket_proxy.h"
 
 #include <plugins/common_interfaces/abstract_io_manager.h>
 #include <nx/utils/timer_manager.h>
 #include <utils/common/safe_direct_connection.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <core/resource/resource_data.h>
 
 class FlirWsIOManager :
     public QObject,
@@ -31,6 +35,12 @@ class FlirWsIOManager :
         double longitude;
         double altitude;
         int autoacknowledge;
+    };
+
+    struct FlirAlarmEvent
+    {
+        QString alarmId;
+        bool alarmState;
     };
 
     struct FlirServerWhoAmIResponse
@@ -81,14 +91,21 @@ private slots:
 
 private:
 
+    using NexusSettingGroup = std::map<QString, QString>;
+
+    struct NexusServerStatus
+    {
+        std::map<QString, NexusSettingGroup> settings;
+        bool isNexusServerEnabled = true;
+    };
+
     enum class InitState
     {
         initial,
-        settingsRequested,
+        nexusServerStatusRequested,
         nexusServerEnabled,
         controlSocketConnected,
         sessionIdObtained,
-        notificationSocketConnected,
         subscribed,
         error
     };
@@ -96,24 +113,38 @@ private:
     void routeIOMonitoringInitialization(InitState newState);
 
     bool initHttpClient();
+    void resetSocketProxies();
 
-    bool tryToEnableNexusServer();
-    bool tryToGetNexusSettings();
+    QString getResourcesHostAddress() const;
+    QAuthenticator getResourceAuth() const;
+    QnResourceData getResourceData() const;
 
-    void connectWebsocket(const QString& path, QWebSocket* socket);
-    void connectControlWebsocket();
+    void tryToGetNexusServerStatus();
+    NexusServerStatus parseNexusServerStatusResponse(const QString& response) const;
+
+    void tryToEnableNexusServer();
+
+    void connectWebsocket(
+        const QString& path,
+        FlirWebSocketProxy* proxy,
+        std::chrono::milliseconds delay = std::chrono::milliseconds(0));
+
+    void connectControlWebsocket(std::chrono::milliseconds delay = std::chrono::milliseconds(0));
     void connectNotificationWebSocket();
     void requestSessionId();
     FlirServerWhoAmIResponse parseControlMessage(const QString& message);
 
     QString buildNotificationSubscriptionPath() const; 
     QString buildNotificationSubscriptionParamString(const QString& subscriptionType) const;
-
-    void subscribeToNotifications();
+    
     void handleNotification(const QString& message);
-    FlirAlarmNotification parseNotification(const QString& message, bool *outStatus);
+    bool isThgObjectNotificationType(const QString& notificationType) const;
+    FlirAlarmEvent parseNotification(const QString& message, bool *outStatus) const;
+    FlirAlarmEvent parseThgObjectNotification(const QStringList& notificationParts, bool* outStatus) const;    
+    FlirAlarmEvent parseAlarmNotification(const QStringList& notificationParts, bool* outStatus) const; //< maybe it's worth to subscribe to $IO not $ALARM
+
     qint64 parseFlirDateTime(const QString& dateTime, bool* outStatus);
-    void checkAndNotifyIfNeeded(const FlirAlarmNotification& notification);
+    void checkAndNotifyIfNeeded(const FlirAlarmEvent& notification);
 
     void sendKeepAlive();
 
@@ -122,9 +153,12 @@ private:
     InitState m_initializationState;
     qint64 m_nexusSessionId;
     nx::utils::TimerId m_timerId;
+    nx::utils::TimerId m_keepAliveTimerId;
     std::atomic<bool> m_monitoringIsInProgress;
-    std::unique_ptr<QWebSocket> m_controlWebSocket;
-    std::unique_ptr<QWebSocket> m_notificationWebSocket;
+
+    FlirWebSocketProxy* m_controlProxy;
+    FlirWebSocketProxy* m_notificationProxy;
+
     nx_http::AsyncHttpClientPtr m_asyncHttpClient;
 
     InputStateChangeCallback m_stateChangeCallback;
@@ -133,7 +167,8 @@ private:
     mutable std::map<QString, bool> m_alarmStates; //< TODO: #dmishin mutable looks a little bit odd here, remove it.
 
     bool m_isNexusServerEnabled;
+    bool m_nexusServerHasJustBeenEnabled;
     quint16 m_nexusPort;
 
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
