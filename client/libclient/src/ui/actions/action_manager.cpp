@@ -1255,7 +1255,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::DeleteVideoWallItemAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Delete")).
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);

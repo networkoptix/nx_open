@@ -442,14 +442,19 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnVideoWallResourcePtr& videoWall) const
 {
     NX_ASSERT(videoWall);
+    Qn::Permissions result = Qn::NoPermissions;
+    if (!hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+        return result;
 
-    if (hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
-    {
-        if (qnCommon->isReadOnly())
-            return Qn::ReadPermission;
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
-    }
-    return Qn::NoPermissions;
+    result = Qn::ReadPermission | Qn::WritePermission;
+    if (qnCommon->isReadOnly())
+        return result;
+
+    result |= Qn::SavePermission | Qn::WriteNamePermission;
+    if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+        result |= Qn::RemovePermission;
+
+    return result;
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
