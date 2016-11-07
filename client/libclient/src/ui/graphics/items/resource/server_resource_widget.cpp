@@ -490,29 +490,28 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     addOverlays();
 
     /* Setup buttons */
-    QnImageButtonWidget *showLogButton = createStatisticAwareButton(lit("server_widget_show_log"));
+    auto showLogButton = createStatisticAwareButton(lit("server_widget_show_log"));
     showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
     showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
-    connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
+    connect(showLogButton, &QnImageButtonWidget::clicked, this,
+        [this] {menu()->trigger(QnActions::ServerLogsAction, m_resource);});
     buttonsOverlay()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
-    QnImageButtonWidget *checkIssuesButton = createStatisticAwareButton(lit("server_widget_check_issues"));
+    auto checkIssuesButton = createStatisticAwareButton(lit("server_widget_check_issues"));
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
     checkIssuesButton->setToolTip(tr("Check Issues"));
-    connect(checkIssuesButton, SIGNAL(clicked()), this, SLOT(at_checkIssuesButton_clicked()));
+    connect(checkIssuesButton, &QnImageButtonWidget::clicked, this,
+        [this] { menu()->trigger(QnActions::ServerIssuesAction, m_resource); });
     buttonsOverlay()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
-
-//    connect(headerOverlayWidget(), SIGNAL(opacityChanged()), this, SLOT(updateInfoOpacity()));
 
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
-    //updateInfoOpacity();
     updateInfoText();
     at_statistics_received();
 }
@@ -688,13 +687,6 @@ void QnServerResourceWidget::updateGraphVisibility() {
     }
 }
 
-/*
-void QnServerResourceWidget::updateInfoOpacity() {
-    m_infoOpacity = headerOverlayWidget()->opacity();
-    for (int i = 0; i < ButtonBarCount; i++)
-        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
-}*/
-
 void QnServerResourceWidget::updateColors() {
     QHash<Qn::StatisticsDeviceType, int> indexes;
 
@@ -779,8 +771,14 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
 {
     int result = base_type::calculateButtonsVisibility();
     result &= (Qn::CloseButton | Qn::RotateButton | Qn::InfoButton);
-    if (!qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode())
-        result |= (Qn::ShowLogButton | Qn::CheckIssuesButton);
+    if (qnRuntime->isDesktopMode())
+    {
+        if (menu()->canTrigger(QnActions::ServerLogsAction, m_resource))
+            result |= Qn::ShowLogButton;
+
+        if (menu()->canTrigger(QnActions::ServerIssuesAction, m_resource))
+            result |= Qn::CheckIssuesButton;
+    }
     return result;
 }
 
@@ -852,12 +850,3 @@ void QnServerResourceWidget::at_statistics_received() {
 
     updateTitleText();
 }
-
-void QnServerResourceWidget::at_showLogButton_clicked() {
-    menu()->trigger(QnActions::ServerLogsAction, QnActionParameters(m_resource));
-}
-
-void QnServerResourceWidget::at_checkIssuesButton_clicked() {
-    menu()->trigger(QnActions::ServerIssuesAction, QnActionParameters(m_resource));
-}
-

@@ -174,7 +174,7 @@ void CrossNatConnector::issueConnectRequestToMediator(
         api::NatTraversalResultCode::noResponseFromMediator;
 
     api::ConnectRequest connectRequest;
-    connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
+    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().getSelfPeerId();
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();

@@ -58,6 +58,8 @@ private:
     bool beginChecking();
     void endChecking(const QnCheckForUpdateResult& result);
 
+    bool restartClient(const QnSoftwareVersion& version);
+
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
 

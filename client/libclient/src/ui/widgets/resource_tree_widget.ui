@@ -77,6 +77,9 @@
      <property name="sortingEnabled">
       <bool>false</bool>
      </property>
+     <property name="allColumnsShowFocus">
+      <bool>true</bool>
+     </property>
      <property name="headerHidden">
       <bool>true</bool>
      </property>

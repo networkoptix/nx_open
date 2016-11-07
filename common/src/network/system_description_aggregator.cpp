@@ -66,15 +66,25 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
 
     m_systems.insert(priority, system);
 
-    connect(system.data(), &QnBaseSystemDescription::serverAdded,
+    /**
+     * We gather all servers for aggregated systems - for example, we may have
+     * offline cloud system and same discovered local one
+     */
+    connect(system, &QnBaseSystemDescription::serverAdded,
         this, &QnSystemDescriptionAggregator::updateServers);
-    connect(system.data(), &QnBaseSystemDescription::serverRemoved,
+    connect(system, &QnBaseSystemDescription::serverRemoved,
         this, &QnSystemDescriptionAggregator::updateServers);
 
-    connect(system.data(), &QnBaseSystemDescription::serverChanged,
+    connect(system, &QnBaseSystemDescription::hasInternetChanged,
+        this, &QnSystemDescriptionAggregator::hasInternetChanged);
+
+    connect(system, &QnBaseSystemDescription::serverChanged,
         this, &QnSystemDescriptionAggregator::handleServerChanged);
-    connect(system.data(), &QnBaseSystemDescription::systemNameChanged, this,
+    connect(system, &QnBaseSystemDescription::systemNameChanged, this,
         [this, system]() { onSystemNameChanged(system); });
+
+    connect(system, &QnBaseSystemDescription::onlineStateChanged,
+        this, &QnBaseSystemDescription::onlineStateChanged);
 
     updateServers();
     if (headSystemChanged)
@@ -219,6 +229,43 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
 {
     return m_servers;
 }
+
+bool QnSystemDescriptionAggregator::isOnlineServer(const QnUuid& serverId) const
+{
+    const bool emptySystems = m_systems.empty();
+    NX_ASSERT(!emptySystems, "Invalid aggregator");
+    if (emptySystems)
+        return false;
+
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [serverId](const QnSystemDescriptionPtr& system)
+        {
+            return system->isOnlineServer(serverId);
+        });
+}
+
+bool QnSystemDescriptionAggregator::hasInternet() const
+{
+    const bool emptySystems = m_systems.empty();
+    NX_ASSERT(!emptySystems, "Invalid aggregator");
+    if (emptySystems)
+        return false;
+
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system) { return system->hasInternet(); });
+}
+
+bool QnSystemDescriptionAggregator::isOnline() const
+{
+    const bool emptySystems = m_systems.empty();
+    NX_ASSERT(!emptySystems, "Invalid aggregator");
+    if (emptySystems)
+        return false;
+
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system) { return system->isOnline(); });
+}
+
 
 void QnSystemDescriptionAggregator::updateServers()
 {

@@ -471,6 +471,9 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
+        if (m_resource->hasFlags(Qn::server))
+            return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
+
         return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
     }
 
@@ -944,8 +947,10 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case Qn::LayoutsNode:
-        case Qn::AllLayoutsAccessNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
+
+        case Qn::AllLayoutsAccessNode:
+            return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
         case Qn::RecorderNode:
             return qnResIconCache->icon(QnResourceIconCache::Recorder);

@@ -1590,6 +1590,7 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& co
     {
         if (connection->connectionGuid() == connectionGuid)
         {
+            connection->monitorConnectionForClosure();
             connection->setState(QnTransactionTransport::Connected);
             return true;
         }

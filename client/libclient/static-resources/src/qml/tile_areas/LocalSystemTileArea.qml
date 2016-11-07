@@ -96,7 +96,6 @@ Item
 
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
-            visible: control.isOnline;
 
             onAccepted: control.connectRequested();
 
@@ -108,8 +107,15 @@ Item
 
             model: control.recentLocalConnectionsModel;
 
+            Connections
+            {
+                target: userChooseItem.model;
+                ignoreUnknownSignals: true;
+                onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
+            }
+
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections && control.isOnline;
+            visible: control.impl.hasRecentConnections;
 
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";

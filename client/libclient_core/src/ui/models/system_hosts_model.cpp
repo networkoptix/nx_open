@@ -138,7 +138,7 @@ void QnSystemHostsModel::reloadHosts()
             connect(system, &QnBaseSystemDescription::serverChanged, this
                 , [this, system](const QnUuid &id, QnServerFields fields)
         {
-            if (fields.testFlag(QnServerField::HostField))
+            if (fields.testFlag(QnServerField::Host))
                 updateServerHost(system, id);
         });
 

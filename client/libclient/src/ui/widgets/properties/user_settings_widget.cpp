@@ -306,13 +306,54 @@ void QnUserSettingsWidget::applyChanges()
 
 bool QnUserSettingsWidget::canApplyChanges() const
 {
-    if (!validMode())
-        return true;
+    auto checkFields = [](QList<QnInputField*> fields)
+        {
+            return std::all_of(fields.cbegin(), fields.cend(),
+                 [](QnInputField* field)
+                 {
+                     return field->isValid();
+                 });
+        };
 
-    for (auto field : inputFields())
-        if (field->isVisible() && !field->isValid())
-            return false;
+    const QList<QnInputField*> kLocalUserFields{
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->passwordInputField,
+        ui->confirmPasswordInputField,
+        ui->emailInputField
+    };
 
+    const QList<QnInputField*> kCloudUserFields{
+        ui->cloudEmailInputField
+    };
+
+    switch (m_model->mode())
+    {
+        case QnUserSettingsModel::NewUser:
+        {
+            switch (ui->userTypeComboBox->currentIndex())
+            {
+                case kCloudIndex:
+                    return checkFields(kCloudUserFields);
+                case kLocalIndex:
+                    return checkFields(kLocalUserFields);
+                default:
+                    break;
+            }
+            break;
+        }
+        case QnUserSettingsModel::OtherSettings:
+        {
+            if (m_model->user()->isCloud())
+                return true;
+
+            return checkFields(kLocalUserFields);
+        }
+        default:
+            break;
+    }
+
+    NX_ASSERT(false);
     return true;
 }
 
@@ -372,6 +413,9 @@ void QnUserSettingsWidget::setupInputFields()
     ui->cloudEmailInputField->setTitle(tr("Email"));
     ui->cloudEmailInputField->setValidator([this](const QString& text)
     {
+        if (m_model->mode() != QnUserSettingsModel::NewUser)
+            return Qn::kValidResult;
+
         auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
         if (result.state != QValidator::Acceptable)
             return result;
@@ -391,7 +435,7 @@ void QnUserSettingsWidget::setupInputFields()
         result = Qn::defaultEmailValidator()(text);
         return result;
     });
-    connect(ui->cloudEmailInputField, &QnInputField::editingFinished, this,
+    connect(ui->cloudEmailInputField, &QnInputField::textChanged, this,
         [this]
         {
             ui->cloudEmailInputField->setText(processedEmail(ui->cloudEmailInputField->text()));

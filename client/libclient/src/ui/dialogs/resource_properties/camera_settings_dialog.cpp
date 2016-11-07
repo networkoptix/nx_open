@@ -139,10 +139,12 @@ void QnCameraSettingsDialog::retranslateUi()
 
 bool QnCameraSettingsDialog::tryClose(bool force)
 {
-    setCameras(QnVirtualCameraResourceList(), force);
-    if (force)
+    auto result = setCameras(QnVirtualCameraResourceList(), force);
+    result |= force;
+    if (result)
         hide();
-    return true;
+
+    return result;
 }
 
 
@@ -215,7 +217,7 @@ void QnCameraSettingsDialog::updateReadOnly()
     m_settingsWidget->setReadOnly(!permissions.testFlag(Qn::WritePermission));
 }
 
-void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
+bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
     bool askConfirmation =
         !force
@@ -254,13 +256,14 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
                 break;
             default:
                 /* Cancel changes. */
-                return;
+                return false;
         }
 
     }
 
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
+    return true;
 }
 
 Qn::CameraSettingsTab QnCameraSettingsDialog::currentTab() const
@@ -298,20 +301,13 @@ void QnCameraSettingsDialog::submitToResources()
         return;
     }
 
-    //checking if showing Licenses limit exceeded is appropriate
-    if (m_settingsWidget->licensedParametersModified())
-    {
-        QnCamLicenseUsageHelper helper(cameras, m_settingsWidget->isScheduleEnabled());
-        if (!helper.isValid())
-        {
-            QString message = tr("License limit exceeded. Changes have been saved, but will not be applied.");
-            QnMessageBox::warning(this, tr("Could not apply changes."), message);
-            m_settingsWidget->setScheduleEnabled(false);
-        }
-    }
-
     /* Submit and save it. */
     saveCameras(cameras);
+}
+
+void QnCameraSettingsDialog::updateFromResources()
+{
+    m_settingsWidget->updateFromResources();
 }
 
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras)

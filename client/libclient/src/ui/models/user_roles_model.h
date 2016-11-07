@@ -37,6 +37,9 @@ public:
 
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);
 
+    /* If we want to override "Custom" role name and tooltip: */
+    void setCustomRoleStrings(const QString& name, const QString& description);
+
     /* QAbstractItemModel implementation: */
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
@@ -51,3 +54,5 @@ private:
     QScopedPointer<QnUserRolesModelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnUserRolesModel)
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserRolesModel::DisplayRoleFlags);

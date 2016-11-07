@@ -11,6 +11,7 @@
 #include <core/resource/user_resource.h>
 
 #include <cloud/cloud_connection.h>
+#include <cloud/cloud_result_info.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -222,7 +223,6 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 {
     Q_Q(QnConnectToCloudDialog);
 
-    lockUi(true);
     q->ui->invalidCredentialsLabel->hide();
 
     auto serverConnection = getPublicServerConnection();
@@ -232,6 +232,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
         return;
     }
 
+    lockUi(true);
     indicatorButton->setEnabled(false);
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
@@ -262,7 +263,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
 {
     Q_Q(QnConnectToCloudDialog);
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::Success,
         helpTopic(q),
         q->windowTitle(),
         tr("The system is successfully connected to %1").arg(cloudLogin),
@@ -278,7 +279,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnConnectToCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::Warning,
         helpTopic(q),
         tr("Error"),
         tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
@@ -307,7 +308,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             showCredentialsError(true);
             break;
         default:
-            showFailure(QString()); // TODO: #dklychkov More detailed diagnostics
+            showFailure(QnCloudResultInfo(result));
             break;
         }
         lockUi(false);

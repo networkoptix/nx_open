@@ -198,7 +198,15 @@ QnBackupStatusData QnServerStorageManager::backupStatus( const QnMediaServerReso
 
 bool QnServerStorageManager::rebuildServerStorages( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool )
 {
-    return sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Start);
+    if (!sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Start))
+        return false;
+
+    ServerInfo &serverInfo = m_serverInfo[server];
+    ServerPoolInfo &poolInfo = serverInfo.storages[static_cast<int>(pool)];
+    poolInfo.rebuildStatus.state = Qn::RebuildState_FullScan;
+    emit serverRebuildStatusChanged(server, pool, poolInfo.rebuildStatus);
+
+    return true;
 }
 
 bool QnServerStorageManager::cancelServerStoragesRebuild( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool )

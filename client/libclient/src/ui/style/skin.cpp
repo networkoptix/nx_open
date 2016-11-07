@@ -70,6 +70,9 @@ const QStringList& QnSkin::paths() const
 
 QString QnSkin::path(const QString& name) const
 {
+    if (QDir::isAbsolutePath(name))
+        return QFile::exists(name) ? name : QString();
+
     for (int i = m_paths.size() - 1; i >= 0; i--)
     {
         QString path = m_paths[i] + name;

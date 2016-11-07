@@ -116,6 +116,9 @@ namespace nx_api
                 [this, inactivityTimeout]()
                 {
                     setInactivityTimeout(inactivityTimeout);
+                    if (!m_streamSocket->setNonBlockingMode(true))
+                        return onBytesRead(SystemError::getLastOSErrorCode(), (size_t) -1);
+
                     m_streamSocket->readSomeAsync(
                         &m_readBuffer,
                         std::bind( &SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2 ) );

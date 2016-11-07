@@ -24,7 +24,10 @@ public:
 
     virtual bool tryClose(bool force) override;
 
-    void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
+    bool setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
+
+    void submitToResources();
+    void updateFromResources();
 
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
@@ -46,15 +49,6 @@ private slots:
 
 private:
     void updateReadOnly();
-
-    /**
-     * Save modified camera settings to server.
-     * \param checkControls - if set then additional check will occur.
-     * If user modified some of control elements but did not apply changes he will be asked to fix it.
-     * \see Feature #1195
-     */
-    void submitToResources();
-
     void saveCameras(const QnVirtualCameraResourceList &cameras);
 
 private:

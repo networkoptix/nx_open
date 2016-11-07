@@ -42,7 +42,7 @@ describe('Information Page', function () {
 
     it("Health monitoring: canvas is displayed",function(){
         p.helper.getTab('Health monitoring').click();
-
+        browser.sleep(500);
         p.helper.ignoreSyncFor( function() {
             expect(p.graphCanvas.isDisplayed()).toBe(true);
             expect(p.graphCanvas.getAttribute('width')).toBeGreaterThan(100);
@@ -59,25 +59,27 @@ describe('Information Page', function () {
     });
 
     it("Piece of log is displayed in iframe",function(){
-        p.helper.getTab('Logs').click();
+        p.helper.getTab('Log').click();
 
         browser.refresh();
-        p.helper.getTab('Logs').click();
+        p.helper.getTab('Log').click();
         expect(p.logIframe.isDisplayed()).toBe(true);
         expect(p.logIframe.getAttribute("src")).toMatch("/api/showLog");
     });
 
-    it("Log: Button More lines work - opens /static/index.html#/log",function(){
-        p.helper.getTab('Logs').click();
-
-        p.moreLogLinesButton.click();
-        expect(browser.getCurrentUrl()).toContain('/log');
-        expect(p.logIframeMore.isDisplayed()).toBe(true);
-        p.get(); // return back to Info page
+    it("Log: Button Open in new window works - opens /web/api/showLog?lines=1000",function(){
+        p.helper.getTab('Log').click();
+        p.logInNewWindow.click();
+        p.helper.performAtSecondTab(function() {
+            p.helper.ignoreSyncFor( function() {
+                expect(browser.getCurrentUrl()).toContain('/web/api/showLog?lines=1000');
+            });
+            browser.close();
+        });
     });
 
     it("Log can be opened in new window",function(){
-        p.helper.getTab('Logs').click();
+        p.helper.getTab('Log').click();
 
         expect(p.openLogButton.isDisplayed()).toBe(true);
         expect(p.openLogButton.getText()).toEqual("Open in new window");
@@ -86,7 +88,7 @@ describe('Information Page', function () {
     });
 
     it("Refresh link to update iframe works",function(){
-        p.helper.getTab('Logs').click();
+        p.helper.getTab('Log').click();
 
         expect(p.refreshLogButton.isDisplayed()).toBe(true);
         expect(p.refreshLogButton.getText()).toEqual("Refresh");

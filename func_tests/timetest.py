@@ -71,18 +71,22 @@ EMPTY_TIME = dict(
 
 class TimeSyncTest(FuncTestCase):
     #num_serv = _NUM_SERV # override
+    helpStr = "Time synchronization tests (both)"
     _suits = (
         ('SyncTimeNoInetTests', [
             'InitialSynchronization',
             'ChangePrimaryServer',
             'PrimarySystemTimeChange',
             'SecondarySystemTimeChange',
-            'StopPrimary', 'RestartSecondaryWhilePrimaryOff', 'StartPrimary',
+            'StopPrimary',
+            'RestartSecondaryWhilePrimaryOff',
+            'StartPrimary',
             'PrimaryStillSynchronized',
             'MakeSecondaryAlone'
         ]),
         ('InetTimeSyncTests', [
-            'TurnInetOn', 'ChangePrimarySystime',
+            'TurnInetOn',
+            'ChangePrimarySystime',
             'KeepInetTimeAfterIfdown',
             'KeepInetTimeAfterSecondaryOff',
             'KeepInetTimeAfterSecondaryOn',
@@ -383,7 +387,7 @@ class TimeSyncTest(FuncTestCase):
 
     def TurnInetOn(self):
         #raw_input("[Press ENTER to continue with Internet time sync test init...]")
-        self._prepare_test_phase(self._prepare_inet_test, postUp=True)
+        self._prepare_test_phase(self._prepare_inet_test)
         self._check_time_sync()
         #TODO check for primary, make it primary if not bn
         # until that, set it to be sure
@@ -509,11 +513,13 @@ class TimeSyncTest(FuncTestCase):
 
 
 class TimeSyncNoInetTest(TimeSyncTest):
+    helpStr = "Time synchnonization without Internet access test"
     "TimeSyncTest with only SyncTimeNoInetTests suite"
     _suits = TimeSyncTest.filterSuites('SyncTimeNoInetTests')
 
 
 class TimeSyncWithInetTest(TimeSyncTest):
+    helpStr = "Time synchnonization with Internet access test"
     "TimeSyncTest with only InetTimeSyncTests suite"
     _suits = TimeSyncTest.filterSuites('InetTimeSyncTests')
 

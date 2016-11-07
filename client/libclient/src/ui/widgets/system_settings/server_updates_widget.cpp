@@ -353,10 +353,8 @@ bool QnServerUpdatesWidget::hasChanges() const
 bool QnServerUpdatesWidget::canApplyChanges() const
 {
     //TODO: #GDM now this prevents other tabs from saving their changes
-    //QnMessageBox::information(this, tr("Information"), tr("Update is in process now."));
     if (isUpdating())
         return false;
-
     return true;
 }
 
@@ -426,7 +424,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         : result.version;
 
     QString detail;
-    QString versionText(displayVersion.toString());
+    auto versionText = displayVersion.isNull() ? kNoVersionNumberText : displayVersion.toString();
 
     setWarningStyle(ui->errorLabel);
 
@@ -435,13 +433,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         case QnCheckForUpdateResult::UpdateFound:
         {
             if (!result.version.isNull() && result.clientInstallerRequired)
-            {
-#ifdef Q_OS_MAC
-                detail = tr("You will have to update the client manually.");
-#else
                 detail = tr("You will have to update the client manually using an installer.");
-#endif
-            }
             break;
         }
 
@@ -504,6 +496,30 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     ui->targetVersionLabel->setText(versionText);
 
     ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
+}
+
+bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
+{
+    if (!applauncher::checkOnline())
+        return false;
+
+    /* Try to run applauncher if it is not running. */
+    if (!applauncher::checkOnline())
+        return false;
+
+    const auto result = applauncher::restartClient(version);
+    if (result == applauncher::api::ResultType::ok)
+        return true;
+
+    static const int kMaxTries = 5;
+    for (int i = 0; i < kMaxTries; ++i)
+    {
+        QThread::msleep(100);
+        qApp->processEvents();
+        if (applauncher::restartClient(version) == applauncher::api::ResultType::ok)
+            return true;
+    }
+    return false;
 }
 
 void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
@@ -703,11 +719,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     message += lit("\n");
                     if (result.clientInstallerRequired)
                     {
-#ifdef Q_OS_MAC
-                        message += tr("Please update the client manually.");
-#else
                         message += tr("Please update the client manually using an installation package.");
-#endif
                     }
                     else
                     {
@@ -720,7 +732,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                 bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
                 if (clientUpdated && !result.clientInstallerRequired)
                 {
-                    if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok)
+                    if (!restartClient(result.targetVersion))
                     {
                         unholdConnection = true;
                         QnMessageBox::critical(this,

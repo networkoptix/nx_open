@@ -25,14 +25,10 @@
 #include <nx_ec/data/api_webpage_data.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/raii_guard.h>
 
-//#define DEBUG_PERMISSIONS
-#ifdef DEBUG_PERMISSIONS
-#define TRACE(...) qDebug() << "QnResourceAccessManager: " << __VA_ARGS__;
-#else
-#define TRACE(...)
-#endif
+#include <nx/fusion/model_functions.h>
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
@@ -67,15 +63,15 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
         return;
 
     auto isValid = [&]
-    {
-        if (!resource->resourcePool())
-            return false;
+        {
+            if (!resource->resourcePool())
+                return false;
 
-        if (subject.user())
-            return subject.user()->resourcePool() != nullptr;
+            if (subject.user())
+                return subject.user()->resourcePool() != nullptr;
 
-        return qnUserRolesManager->hasRole(subject.role().id);
-    };
+            return qnUserRolesManager->hasRole(subject.role().id);
+        };
 
     PermissionKey key(subject.id(), resource->getId());
     if (isValid())
@@ -94,6 +90,13 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
         if (m_permissionsCache.value(key) == permissions)
             return;
     }
+
+    NX_LOG(QnLog::PERMISSIONS_LOG,
+        lit("QnResourceAccessManager: %1 -> %2: %3")
+        .arg(subject.name())
+        .arg(resource->getName())
+        .arg(QnLexical::serialized(permissions)),
+        cl_logDEBUG1);
     emit permissionsChanged(subject, resource, permissions);
 }
 
@@ -371,7 +374,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject,
     const QnVirtualCameraResourcePtr& camera) const
 {
-    TRACE("Calculate permissions of " << subject << " to camera " << camera->getName());
     NX_ASSERT(camera);
 
     Qn::Permissions result = Qn::NoPermissions;
@@ -404,13 +406,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 {
     NX_ASSERT(server);
 
-    Qn::Permissions result = Qn::NoPermissions;
+    Qn::Permissions result = Qn::ReadPermission;
     if (!qnResourceAccessProvider->hasAccess(subject, server))
         return result;
 
-    result |= Qn::ReadPermission;
+    result |= Qn::ViewContentPermission;
     if (hasGlobalPermission(subject, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
-        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        result |= Qn::FullServerPermissions;
 
     return result;
 }
@@ -472,8 +474,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnLayoutResourcePtr& layout) const
 {
-    TRACE("Calculate permissions of " << subject << " to layout " << layout->getName());
-
     NX_ASSERT(layout);
     if (!subject.isValid() || !layout)
         return Qn::NoPermissions;

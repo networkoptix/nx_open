@@ -9,9 +9,13 @@
 
 module.exports = function (grunt) {
 
+    var proxy = grunt.file.readJSON('proxy.json');
+    var proxy_server_port = proxy.proxy_server_port;
+    var proxy_server_host = proxy.proxy_server_host;
+
     //var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
-    var proxy_server_host = '10.1.5.147';  //Parallels - Burbank
-    var proxy_server_port = 7001;
+    //var proxy_server_host = '10.1.5.147';  //Parallels - Burbank
+    //var proxy_server_port = 7001;
 
     var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
@@ -509,6 +513,12 @@ module.exports = function (grunt) {
             },
             localize:{
                 command: 'cd translation; python localize.py'
+            },
+            run_ffmpeg:{
+                command: './ffmpeg.sh'
+            },
+            close_ffmpeg:{
+                command: 'tmux send-keys -t ffmpeg_buffer q'
             }
         },
 
@@ -601,9 +611,11 @@ module.exports = function (grunt) {
         'connect:test',
         'protractor_webdriver',
         'shell:print_version',
-        'protractor:all'
+        //'shell:run_ffmpeg',
+        'protractor:all',
+        //'shell:close_ffmpeg'
         //'newer:jshint'
-        //'karma'
+        //'karma
     ]);
     grunt.registerTask('code', [
         'newer:jshint'

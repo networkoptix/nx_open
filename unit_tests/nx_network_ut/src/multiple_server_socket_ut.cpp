@@ -12,41 +12,43 @@ namespace nx {
 namespace network {
 namespace test {
 
-class MultipleServerSocketTester
-    : public MultipleServerSocket
+class MultipleServerSocketTester: 
+    public MultipleServerSocket
 {
 public:
-    MultipleServerSocketTester(AddressBinder* addressBinder, size_t count)
-    :
-        m_addressBinder(addressBinder)
+    MultipleServerSocketTester(AddressBinder* addressBinder, size_t count):
+        m_addressManager(addressBinder)
     {
         for (size_t i = 0; i < count; ++i)
             addSocket(std::make_unique<TCPServerSocket>(AF_INET));
     }
 
-    bool bind(const SocketAddress& localAddress) override
+    ~MultipleServerSocketTester()
     {
-        m_boundAddress = m_addressBinder->bind();
+        m_addressManager.wipe();
+    }
+
+    virtual bool bind(const SocketAddress& localAddress) override
+    {
         for(auto& socket : m_serverSockets)
         {
-            if (!socket->bind(SocketAddress()))
+            if (!socket->bind(SocketAddress::anyPrivateAddress))
                 return false;
 
-            m_addressBinder->add(m_boundAddress, socket->getLocalAddress());
+            m_addressManager.add(socket->getLocalAddress());
         }
 
         static_cast<void>(localAddress);
         return true;
     }
 
-    SocketAddress getLocalAddress()
+    virtual SocketAddress getLocalAddress() const override
     {
-        return m_boundAddress;
+        return m_addressManager.key;
     }
 
 private:
-    AddressBinder* m_addressBinder;
-    SocketAddress m_boundAddress;
+    AddressBinder::Manager m_addressManager;
 };
 
 class MultipleServerSocketTest : public ::testing::Test

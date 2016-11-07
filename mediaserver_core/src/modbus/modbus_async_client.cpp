@@ -62,7 +62,7 @@ namespace nx
 
             bool kSslNeeded = false;
             auto connectionSocket = SocketFactory::createStreamSocket(
-                kSslNeeded, SocketFactory::NatTraversalType::nttDisabled);
+                kSslNeeded, nx::network::NatTraversalSupport::disabled);
 
             connectionSocket->bindToAioThread(getAioThread());
 

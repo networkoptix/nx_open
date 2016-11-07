@@ -13,7 +13,7 @@
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_groups_dialog.h>
+#include <ui/dialogs/resource_properties/user_roles_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
 #include <ui/workbench/workbench.h>
@@ -60,7 +60,10 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
     dialogConstructor.setDontFocus(true);
 
-    m_cameraSettingsDialog->setCameras(cameras);
+    if (!m_cameraSettingsDialog->setCameras(cameras))
+        return;
+
+    m_cameraSettingsDialog->updateFromResources();
 
     if (parameters.hasArgument(Qn::FocusTabRole))
     {
@@ -106,6 +109,7 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
    // dialogConstructor.setDontFocus(true);
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
+    m_userSettingsDialog->forcedUpdate();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
@@ -126,6 +130,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     m_userSettingsDialog->setUser(user);
     if (params.hasArgument(Qn::FocusTabRole))
         m_userSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole), true);
+    m_userSettingsDialog->forcedUpdate();
 
     //dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
 }
@@ -135,11 +140,11 @@ void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnUuid groupId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
-    QScopedPointer<QnUserGroupsDialog> groupsDialog(new QnUserGroupsDialog(mainWindow()));
+    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
     if (!groupId.isNull())
-        groupsDialog->selectGroup(groupId);
+        dialog->selectGroup(groupId);
 
-    groupsDialog->exec();
+    dialog->exec();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()

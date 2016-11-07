@@ -1,11 +1,5 @@
 .import com.networkoptix.qml 1.0 as Nx
 
-function extractHost(url)
-{
-    var m = /(?:.*\:\/\/)?([^/]+(\:\d+)?)/.exec(url)
-    return m ? m[1] : url
-}
-
 function connectionErrorText(status, info)
 {
     if (status == Nx.QnConnectionManager.UnauthorizedConnectionResult)

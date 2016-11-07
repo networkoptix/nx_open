@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UserGroupsDialog</class>
- <widget class="QDialog" name="UserGroupsDialog">
+ <class>UserRolesDialog</class>
+ <widget class="QDialog" name="UserRolesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

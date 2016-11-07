@@ -158,6 +158,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             NX_ASSERT(false); // Should never get here
     }
 
+    /* Try to consider model's foreground color override: */
+    QVariant modelColorOverride = index.data(Qt::ForegroundRole);
+    if (modelColorOverride.canConvert<QBrush>())
+        mainColor = modelColorOverride.value<QBrush>().color();
+
     // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
     /* Check indicators in this implementation are handled elsewhere: */
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
@@ -198,11 +203,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
 
-        const int textFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
+        const int textFlags = Qt::TextSingleLine | option.displayAlignment;
         const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
         textRect.adjust(textPadding, 0, -textPadding, 0);
 
-        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width(), textFlags);
+        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width());
 
         QRect actualRect;
         painter->drawText(textRect, textFlags, elidedName, &actualRect);
@@ -216,7 +221,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
             textRect.setLeft(startPos + textPadding * 2);
-            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width(), textFlags);
+            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width());
 
             painter->setFont(option.font);
             painter->setPen(extraColor);
@@ -265,12 +270,14 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
-    /* Let the style calculate text offset: */
-    option.rect.setSize(QSize(10000, 20)); // any nonzero height and some really big width
+    /* Let the style calculate text rect so we can determine side paddings dictated by it: */
+    option.rect.setSize(QSize(10000, 20)); // some really big width and any nonzero height
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
 
+    int paddingsFromStyle = textRect.left() + (option.rect.right() - textRect.right());
+
     /* Initial size: */
-    int width = textRect.left();
+    int width = paddingsFromStyle;
     int height = option.decorationSize.height();
 
     /* Adjust size to text: */
@@ -279,21 +286,20 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         QString extraInfo;
         getDisplayInfo(index, baseName, extraInfo);
 
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
         int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
 
         /* Adjust height to text: */
         height = qMax(height, option.fontMetrics.height());
 
         /* Width of the main text: */
-        width += option.fontMetrics.width(baseName, -1, kTextFlags);
+        width += option.fontMetrics.width(baseName);
 
         if (!extraInfo.isEmpty())
         {
             /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-            width += option.fontMetrics.width(extraInfo, -1, kTextFlags) + leftRightPadding;
+            width += option.fontMetrics.width(extraInfo) + leftRightPadding;
         }
 
         /* Add paddings: */

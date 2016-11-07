@@ -71,7 +71,9 @@ const char* kFilterPropertyName = "_qn_filter";
 const int kNoDataFontPixelSize = 32;
 const int kNoDataFontWeight = QFont::Light;
 
-const auto kHtmlLabelFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelNoInfoFormat = lit("<center><span style='font-weight: 500'>%1</span></center>");
+const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span> &mdash; %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -233,23 +235,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
     connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(forceUpdateFilter()));
 
-    auto dropResource =
-        [this](const QnResourcePtr& resource)
-        {
-            // handle resources that should not be dropped on the scene
-            if (!resource
-                || resource->hasFlags(Qn::user)
-                || resource->hasFlags(Qn::server)
-                )
-            {
-                return;
-            }
-
-            menu()->trigger(QnActions::DropResourcesAction, resource);
-        };
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
-    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this,
+        &QnResourceBrowserWidget::handleItemActivated);
+    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this,
+        &QnResourceBrowserWidget::handleItemActivated);
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SIGNAL(selectionChanged()));
@@ -560,7 +549,15 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF& pos)
         auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
 
-        m_tooltipWidget->setText(kHtmlLabelFormat.arg(toolTipText).arg(extraInfo));
+        QString text;
+        if (extraInfo.isEmpty())
+            text = kHtmlLabelNoInfoFormat.arg(toolTipText);
+        else if (resource && resource->hasFlags(Qn::user))
+            text = kHtmlLabelUserFormat.arg(toolTipText).arg(extraInfo);
+        else
+            text = kHtmlLabelDefaultFormat.arg(toolTipText).arg(extraInfo);
+
+        m_tooltipWidget->setText(text);
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -947,4 +944,20 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
         model->addCriterion(QnResourceCriterion(Qn::user));
         model->addCriterion(QnResourceCriterion(Qn::layout));
     }
+}
+
+void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
+{
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+    /* Do not open users or fake servers. */
+    if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
+        return;
+
+    /* Do not open servers of admin.  */
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
+        return;
+
+    menu()->trigger(QnActions::DropResourcesAction, resource);
 }

@@ -51,7 +51,6 @@ protected:
     void updateControls();
 
     void at_browseLicenseFileButton_clicked();
-    void at_tabWidget_currentChanged();
 
 private:
     Q_DISABLE_COPY(QnLicenseWidget)

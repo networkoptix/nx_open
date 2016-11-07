@@ -740,6 +740,9 @@ Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList
     else
         resource = context()->workbench()->currentLayout()->resource();
 
+    if (!resource)
+        return Qn::InvisibleAction;
+
     if(!accessController()->hasPermissions(resource, Qn::EditLayoutSettingsPermission))
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
@@ -846,6 +849,9 @@ bool QnOpenInLayoutActionCondition::canOpen(const QnResourceList &resources,
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
 
+    if (!layout)
+        return Qn::InvisibleAction;
+
     return canOpen(resources, layout)
         ? Qn::EnabledAction
         : Qn::InvisibleAction;
@@ -890,6 +896,9 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceLis
         return Qn::InvisibleAction;
 
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (!layout)
+        return Qn::InvisibleAction;
+
     if (layout->locked())
         return Qn::DisabledAction;
     return Qn::EnabledAction;
@@ -932,6 +941,8 @@ Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionPara
         return Qn::InvisibleAction;
 
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (!layout)
+        return Qn::InvisibleAction;
 
     if (layout->isFile())
         return Qn::InvisibleAction;
@@ -1009,12 +1020,20 @@ Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceL
 Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourceList layouts;
 
-    if(m_current) {
+    if (m_current)
+    {
+        auto layout = workbench()->currentLayout()->resource();
+        if (!layout)
+            return Qn::InvisibleAction;
+
         if (workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole))
-            layouts << workbench()->currentLayout()->resource();
-    } else {
-        foreach(const QnResourcePtr &resource, resources) {
-            if(!resource->hasFlags(Qn::videowall))
+            layouts << layout;
+    }
+    else
+    {
+        foreach(const QnResourcePtr &resource, resources)
+        {
+            if (!resource->hasFlags(Qn::videowall))
                 continue;
 
             QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -1123,6 +1142,10 @@ Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnAction
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
+
+    if (!layout)
+        return Qn::InvisibleAction;
+
     if (layout->data().contains(Qn::VideoWallResourceRole))
         return Qn::InvisibleAction;
 
@@ -1263,9 +1286,6 @@ Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameter
 
 Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-
-    if (!workbench()->currentLayout())
-        return Qn::InvisibleAction;
 
     int count = workbench()->currentLayout()->items().size();
 

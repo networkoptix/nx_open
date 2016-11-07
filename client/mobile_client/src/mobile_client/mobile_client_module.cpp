@@ -24,6 +24,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/client_recent_connections_manager.h>
+#include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
 #include "mobile_client_message_processor.h"
@@ -32,6 +33,8 @@
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
+#include <utils/common/long_runable_async_stopper.h>
+
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -84,10 +87,11 @@ QnMobileClientModule::QnMobileClientModule(
 
     common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
-
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
+
+    common->store<QnLongRunableAsyncStopper>(new QnLongRunableAsyncStopper());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
@@ -108,6 +112,7 @@ QnMobileClientModule::QnMobileClientModule(
     common->store<QnRouter>(new QnRouter(moduleFinder));
 
     common->store<QnSystemsFinder>(new QnSystemsFinder());
+    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleFinder](Qt::ApplicationState state)

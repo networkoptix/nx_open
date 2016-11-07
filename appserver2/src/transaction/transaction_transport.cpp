@@ -60,8 +60,9 @@ QnTransactionTransport::~QnTransactionTransport()
 
 void QnTransactionTransport::close()
 {
-    setState(State::Closed);    //changing state before freeing socket so that everyone
-                                //stop using socket before it is actually freed
+    // Changing state before freeing socket so that everyone
+    // stop using socket before it is actually freed.
+    setState(State::Closed);
 
     pleaseStopSync();
 

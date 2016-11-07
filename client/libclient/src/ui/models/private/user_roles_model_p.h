@@ -35,6 +35,8 @@ public:
     RoleDescription roleByRow(int row) const;
     int count() const;
 
+    void setCustomRoleStrings(const QString& name, const QString& description);
+
 private:
     void updateStandardRoles();
 
@@ -49,4 +51,7 @@ private:
     QList<Qn::UserRole> m_standardRoles;
     ec2::ApiUserGroupDataList m_userRoles;
     const bool m_customRoleEnabled;
+
+    QString m_customRoleName;
+    QString m_customRoleDescription;
 };

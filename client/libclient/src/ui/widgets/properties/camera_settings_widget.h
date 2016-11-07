@@ -34,16 +34,10 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    void setScheduleEnabled(bool enabled);
-    bool isScheduleEnabled() const;
-
     bool hasDbChanges() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;
-
-    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
-    bool licensedParametersModified() const;
 
     void updateFromResources();
     void submitToResources();

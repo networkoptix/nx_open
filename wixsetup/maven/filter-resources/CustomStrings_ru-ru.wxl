@@ -131,6 +131,7 @@
     <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${display.product.name} по окончании установки.</String>
     <String Id="Product_LaunchNxtool"                               Overridable="yes">Запустить ${nxtool.name} по окончании установки.</String>
     <String Id="Product_ArchMismatch"                               Overridable="yes">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>
+    <String Id="Product_CloudHostMismatch"                          Overridable="yes">Этот продукт работает с другой облачной БД. Установка будет закончена.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Хотя бы один компонент должен быть выбран</String>

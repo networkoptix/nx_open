@@ -320,6 +320,7 @@ public:
     //!Log level of http requests log
     QString msgLogLevel;
     QString ec2TranLogLevel;
+    QString permissionsLogLevel;
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
@@ -646,7 +647,7 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
                     storageType = QnLexical::serialized(it->type);
             }
             storage->setStorageType(
-                    storageType.isEmpty() 
+                    storageType.isEmpty()
                     ? QnLexical::serialized(QnPlatformMonitor::UnknownPartition)
                     : storageType);
             modified = true;
@@ -873,13 +874,13 @@ void initLog(const QString& _logLevel)
     const QString& logFileLocation = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
     if (!QDir().mkpath(logFileLocation))
         NX_LOG(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    const QString& logFileName = logFileLocation + QLatin1String("/log_file");
+    const QString& logFileName = logFileLocation + QLatin1String("log_file");
     if (!cl_log.create(
             logFileName,
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(logLevel)))
-        NX_LOG(lit("Could not create log file") + logFileName, cl_logALWAYS);
+        NX_LOG(lit("Could not create log file ") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
 }
@@ -1558,6 +1559,97 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
+void MediaServerProcess::registerRestHandlers(
+    CloudConnectionManager* const cloud)
+{
+    auto reg =
+        [](const QString& path, QnRestRequestHandler* handler,
+            Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
+        {
+            QnRestProcessorPool::instance()->registerHandler(path, handler, permissions);
+        };
+
+    // TODO: When supported by apidoctool, the comment to these constants should be parsed.
+    const auto kAdmin = Qn::GlobalAdminPermission;
+    const auto kAdvancedViewer = Qn::GlobalAdvancedViewerPermissionSet;
+
+    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
+    reg("api/storageStatus", new QnStorageStatusRestHandler());
+    reg("api/storageSpace", new QnStorageSpaceRestHandler());
+    reg("api/statistics", new QnStatisticsRestHandler());
+    reg("api/getCameraParam", new QnCameraSettingsRestHandler());
+    reg("api/setCameraParam", new QnCameraSettingsRestHandler());
+    reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
+    reg("api/ptz", new QnPtzRestHandler());
+    reg("api/image", new QnImageRestHandler());
+    reg("api/createEvent", new QnExternalBusinessEventRestHandler());
+    reg("api/gettime", new QnTimeRestHandler());
+    reg("api/getNonce", new QnGetNonceRestHandler());
+    reg("api/cookieLogin", new QnCookieLoginRestHandler());
+    reg("api/cookieLogout", new QnCookieLogoutRestHandler());
+    reg("api/getCurrentUser", new QnCurrentUserRestHandler());
+    reg("api/activateLicense", new QnActivateLicenseRestHandler());
+    reg("api/testEmailSettings", new QnTestEmailSettingsHandler());
+    reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
+    reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
+    reg("api/ping", new QnPingRestHandler());
+    reg("api/recStats", new QnRecordingStatsRestHandler());
+    reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
+    reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
+    reg("api/pingSystem", new QnPingSystemRestHandler());
+    reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
+    reg("api/backupControl", new QnBackupControlRestHandler());
+    reg("api/events", new QnBusinessEventLogRestHandler(), kAdvancedViewer); //< deprecated
+    reg("api/getEvents", new QnBusinessLog2RestHandler(), kAdvancedViewer); //< new version
+    reg("api/showLog", new QnLogRestHandler());
+    reg("api/getSystemId", new QnGetSystemIdRestHandler());
+    reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
+    reg("api/installUpdate", new QnUpdateRestHandler());
+    reg("api/restart", new QnRestartRestHandler(), kAdmin);
+    reg("api/connect", new QnOldClientConnectRestHandler());
+    reg("api/moduleInformation", new QnModuleInformationRestHandler() );
+    reg("api/iflist", new QnIfListRestHandler() );
+    reg("api/aggregator", new QnJsonAggregatorRestHandler() );
+    reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
+    reg("api/settime", new QnSetTimeRestHandler(), kAdmin);
+    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
+    reg("api/configure", new QnConfigureRestHandler(), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloud), kAdmin);
+    reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
+    reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), kAdmin);
+    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(*cloud), kAdmin);
+    reg("api/mergeSystems", new QnMergeSystemsRestHandler(), kAdmin);
+    reg("api/backupDatabase", new QnBackupDbRestHandler());
+    reg("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
+    reg("api/logLevel", new QnLogLevelRestHandler());
+    reg("api/execute", new QnExecScript(), kAdmin);
+    reg("api/scriptList", new QnScriptListRestHandler(), kAdmin);
+    reg("api/systemSettings", new QnSystemSettingsHandler());
+
+    reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
+
+    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
+    reg("ec2/cameraHistory", new QnCameraHistoryRestHandler());
+    reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
+    reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
+    reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
+
+    // TODO: #rvasilenko: This url is used in 3 different places. Where can we store it?
+    // Static member of QnThumbnailRequestData? New common module?
+    reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
+    reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
+
+    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(*cloud));
+
+    reg("favicon.ico", new QnFavIconRestHandler());
+    reg("api/dev-mode-key", new QnCrashServerHandler());
+
+    reg("api/startLiteClient", new QnStartLiteClientRestHandler());
+
+#ifdef _DEBUG
+    reg("api/debugEvent", new QnDebugEventsRestHandler());
+#endif
+}
 
 bool MediaServerProcess::initTcpListener(
     CloudConnectionManager* const cloudConnectionManager)
@@ -1570,82 +1662,12 @@ bool MediaServerProcess::initTcpListener(
         m_autoRequestForwarder.get(),
         std::placeholders::_1 ) );
 
+    registerRestHandlers(cloudConnectionManager);
+
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
-    QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/statistics", new QnStatisticsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getCameraParam", new QnCameraSettingsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/setCameraParam", new QnCameraSettingsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/ptz", new QnPtzRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/createEvent", new QnExternalBusinessEventRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getNonce", new QnGetNonceRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/cookieLogin", new QnCookieLoginRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/cookieLogout", new QnCookieLogoutRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getHardwareInfo", new QnGetHardwareInfoHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/backupControl", new QnBackupControlRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // deprecated
-    QnRestProcessorPool::instance()->registerHandler("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // new version
-    QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getSystemId", new QnGetSystemIdRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(*cloudConnectionManager), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
-
-    QnRestProcessorPool::instance()->registerHandler("api/transmitAudio", new QnAudioTransmissionRestHandler());
-
-    QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
-    QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
-    QnRestProcessorPool::instance()->registerHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("ec2/updateInformation", new QnUpdateInformationRestHandler());
-
-    //TODO: #rvasilenko this url is used in 3 different places. Where can we store it? Static member of QnThumbnailRequestData? New common module?
-    QnRestProcessorPool::instance()->registerHandler("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
-    QnRestProcessorPool::instance()->registerHandler("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
-#endif
-    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(*cloudConnectionManager));
-
-    QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
-
-#ifdef _DEBUG
-    QnRestProcessorPool::instance()->registerHandler("api/debugEvent", new QnDebugEventsRestHandler());
 #endif
 
     m_universalTcpListener = new QnUniversalTcpListener(
@@ -1686,8 +1708,6 @@ bool MediaServerProcess::initTcpListener(
 #ifdef ENABLE_DESKTOP_CAMERA
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
 #endif   //ENABLE_DESKTOP_CAMERA
-
-    QnRestProcessorPool::instance()->registerHandler("api/startLiteClient", new QnStartLiteClientRestHandler());
 
     return true;
 }
@@ -2772,26 +2792,15 @@ protected:
             cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
                 nx_ms_conf::EC2_TRAN_LOG_LEVEL,
                 nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
-
-        //on "always" log level only server start messages are logged, so using it instead of disabled
-        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            logDir + QLatin1String("/ec2_tran"),
-            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+        initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
 
         QnLog::instance(QnLog::HWID_LOG)->create(
             logDir + QLatin1String("/hw_log"),
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLogLevel::cl_logINFO );
+
+        initPermissionsLog(logDir, QnLog::logLevelFromString(cmdLineArguments.permissionsLogLevel));
 
         NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
         NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
@@ -2884,6 +2893,36 @@ private:
         if (!obsoleteGuid.isNull()) {
             qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
+    }
+
+    void initTransactionLog(const QString& logDir, QnLogLevel level)
+    {
+        //on "always" log level only server start messages are logged, so using it instead of disabled
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            logDir + lit("ec2_tran"),
+            MSSettings::roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+            MSSettings::roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+            level);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+    }
+
+    void initPermissionsLog(const QString& logDir, QnLogLevel level)
+    {
+        QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
+            logDir + lit("permissions"),
+            MSSettings::roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+            MSSettings::roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+            level);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     }
 
 private:
@@ -2996,6 +3035,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
+        "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
@@ -3028,7 +3069,7 @@ int MediaServerProcess::main(int argc, char* argv[])
             lit("Disables crash signal handler (linux only)"), true);
     #endif
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr);
     if( showVersion )
     {
         std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;

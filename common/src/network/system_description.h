@@ -47,7 +47,11 @@ public: // overrides
 
     bool isNewSystem() const override;
 
+    bool isOnline() const override;
+
     ServersList servers() const override;
+
+    bool isOnlineServer(const QnUuid& serverId) const override;
 
     bool containsServer(const QnUuid& serverId) const override;
 
@@ -57,9 +61,12 @@ public: // overrides
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
+    bool hasInternet() const override;
+
 public:
     enum { kDefaultPriority = 0 };
-    void addServer(const QnModuleInformation& serverInfo, int priority);
+    void addServer(const QnModuleInformation& serverInfo,
+        int priority, bool online = true);
 
     QnServerFields updateServer(const QnModuleInformation& serverInfo);
 
@@ -88,11 +95,20 @@ private:
 
     static QString extractSystemName(const QString& systemName);
 
+    void handleOnlineServerAdded(const QnUuid& serverId);
+
+    void handleServerRemoved(const QnUuid& serverId);
+
+    void updateHasInternetState();
+
+    void init();
+
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
     typedef QHash<QnUuid, QUrl> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
+    typedef QSet<QnUuid> IdsSet;
 
     const QString m_id;
     const QnUuid m_localId;
@@ -105,4 +121,6 @@ private:
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
+    IdsSet m_onlineServers;
+    bool m_hasInternet;
 };

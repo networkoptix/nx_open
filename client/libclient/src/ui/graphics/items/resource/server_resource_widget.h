@@ -59,14 +59,12 @@ protected:
     virtual void at_itemDataChanged(int role) override;
 
     virtual void updateHud(bool animate = true) override;
+
 private slots:
     void at_statistics_received();
-    void at_showLogButton_clicked();
-    void at_checkIssuesButton_clicked();
 
     void updateHoverKey();
     void updateGraphVisibility();
-    //void updateInfoOpacity();
     void updateColors();
 
 private:

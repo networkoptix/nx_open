@@ -3,6 +3,7 @@
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 #include <client_core/local_connection_data.h>
+#include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
 
 class QSettings;
@@ -23,6 +24,9 @@ public:
         CloudLogin,
         CloudPassword,
         RecentCloudSystems,
+        ForgottenSystems,
+        SkipStartupTilesManagement,
+        StartupDiscoveryPeriodMs,
 
         PropertiesCount
     };
@@ -64,6 +68,18 @@ private:
         QN_DECLARE_RW_PROPERTY(QnCloudSystemList,
             recentCloudSystems, setRecentCloudSystems,
             RecentCloudSystems, QnCloudSystemList())
+        QN_END_PROPERTY_STORAGE()
+        QN_DECLARE_RW_PROPERTY(QnStringSet,
+            forgottenSystems, setForgottenSystems,
+            ForgottenSystems, QnStringSet())
+        QN_END_PROPERTY_STORAGE()
+        QN_DECLARE_RW_PROPERTY(int,
+            startupDiscoveryPeriodMs, setStartupDiscoveryPeriodMs,
+            StartupDiscoveryPeriodMs, 2000)
+        QN_END_PROPERTY_STORAGE()
+        QN_DECLARE_RW_PROPERTY(bool,
+            skipStartupTilesManagement, setSkipStartupTilesManagement,
+            SkipStartupTilesManagement, false)
         QN_END_PROPERTY_STORAGE()
 
 private:

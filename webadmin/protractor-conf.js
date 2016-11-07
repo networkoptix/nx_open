@@ -17,8 +17,8 @@ exports.config = {
 
     // Spec patterns are relative to the current working directly when
     // protractor is called.
-    //specs: ['test/e2e/**/*spec.js'],
-    specs: ['test/e2e/setup/*spec.js'],
+    specs: ['test/e2e/**/*spec.js'],
+    //specs: ['test/e2e/info/*spec.js'],
 
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
@@ -37,6 +37,12 @@ exports.config = {
 
         browser.get('/');
         browser.waitForAngular();
+
+        //  If setup wizard is present, complete setup
+        self.helper.setupWizardDialog.isPresent().then( function(isPresent) {
+            if(isPresent) {
+                self.helper.completeSetup(); }
+        });
 
         self.helper.login('admin', 'qweasd123');
     }

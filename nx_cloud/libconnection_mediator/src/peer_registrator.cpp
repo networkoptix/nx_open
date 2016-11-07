@@ -86,7 +86,7 @@ data::ListeningPeers PeerRegistrator::getListeningPeers() const
     QnMutexLocker lk(&m_mutex);
     for (const auto& client: m_boundClients)
     {
-        data::BoundClientInfo info;
+        data::BoundClient info;
         if (const auto connetion = client.second.connection.lock())
             info.connectionEndpoint = connetion->getSourceAddress().toString();
 

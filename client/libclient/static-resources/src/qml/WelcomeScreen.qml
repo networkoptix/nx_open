@@ -214,6 +214,7 @@ Rectangle
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
+                        isOnline: model.isOnline;
 
                         Component.onCompleted:
                         {
@@ -313,8 +314,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to another system")
-                : qsTr("Connect to system")
+                ? qsTr("Connect to Another System")
+                : qsTr("Connect to System")
 
             onClicked: context.connectToAnotherSystem();
         }
@@ -431,7 +432,9 @@ Rectangle
         target: context;
         onIsVisibleChanged:
         {
-            grid.watcher.resetCurrentItem();
+            if (grid.watcher.currentItem)
+                grid.watcher.currentItem.forceCollapsedState();
+
             pageSwitcher.setPage(0);
         }
     }

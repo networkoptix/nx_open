@@ -205,14 +205,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
         QVariant::fromValue(QnIndents(0, 0)));
 
-    auto activate = [this](const QModelIndex& index)
-        {
-            if (auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
-                emit activated(resource);
-        };
-
-    connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this, activate);
-    connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this, activate);
+    connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
+        [this](const QModelIndex& index){emit activated(index, false); });
+    connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,
+        [this](const QModelIndex& index){emit activated(index, true); });
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
         &QnResourceTreeWidget::at_treeView_spacePressed);
@@ -390,6 +386,11 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
         ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() &~Qt::BypassGraphicsProxyWidget);
     }
 
+}
+
+Qn::GraphicsTweaksFlags QnResourceTreeWidget::graphicsTweaks()
+{
+    return m_graphicsTweaksFlags;
 }
 
 void QnResourceTreeWidget::setFilterVisible(bool visible)

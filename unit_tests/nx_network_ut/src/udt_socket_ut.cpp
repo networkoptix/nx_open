@@ -59,14 +59,14 @@ public:
     void setUdtSocketFunctions()
     {
         setCreateStreamSocketFunc(
-            [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
+            [](bool /*sslRequired*/, NatTraversalSupport)
                 -> std::unique_ptr<AbstractStreamSocket>
             {
                 return std::make_unique<UdtStreamSocket>(AF_INET);
             });
 
         setCreateStreamServerSocketFunc(
-            [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
+            [](bool /*sslRequired*/, NatTraversalSupport)
                 -> std::unique_ptr<AbstractStreamServerSocket>
             {
                 return std::make_unique<UdtStreamServerSocket>(AF_INET);

@@ -172,6 +172,7 @@ void QnVideoWallItemAccessProvider::updateByLayoutId(const QnUuid& id)
     if (auto layout = qnResPool->getResourceById<QnLayoutResource>(id))
     {
         updateAccessToResource(layout);
+
         for (const auto& resource: layout->layoutResources())
             updateAccessToResource(resource);
     }

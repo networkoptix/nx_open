@@ -6,11 +6,11 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
             <tabset ng-hide="settings.ecDbReadOnly">
-                <tab heading="Health monitoring">
+                <tab heading="Health monitoring" ng-if="user.hasAllResources">
                     <br>
                     <ng-include src="'views/components/health.html'"></ng-include>
                 </tab>
-                <tab heading="Storage">
+                <tab heading="Storage" ng-if="user.isAdmin">
                     <br>
                     <p>Below is a list of available storage locations currently configured for this server</p>
                     <table class="table">
@@ -40,7 +40,7 @@
                         </tbody>
                     </table>
                 </tab>
-                <tab heading="Log">
+                <tab heading="Log" ng-if="user.isAdmin">
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
                     <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>

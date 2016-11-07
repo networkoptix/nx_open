@@ -16,9 +16,11 @@ import random
 import os.path
 import signal
 import traceback
+import argparse
+from collections import OrderedDict
 
 from functest_util import *
-from testbase import RunTests as RunBoxTests, LegacyTestWrapper, getTestMaster, UnitTestRollback
+from testbase import RunTests, LegacyTestWrapper, getTestMaster, UnitTestRollback, FuncTestError
 testMaster = getTestMaster()
 
 from generator import *
@@ -312,13 +314,13 @@ class MergeTest_AdminPassword(MergeTestBase):
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for entry in pwdlist:
             ManagerAddPassword(passman, entry[0], self._username, entry[1])
-        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+        urllib2.install_opener(urllib2.build_opener(TestDigestAuthHandler(passman)))
 
     def _setUpClusterAuthentication(self, password):
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for s in testMaster.clusterTestServerList:
             ManagerAddPassword(passman, s, self._username, password)
-        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+        urllib2.install_opener(urllib2.build_opener(TestDigestAuthHandler(passman)))
 
     def _restoreAuthentication(self):
         self._setUpClusterAuthentication(self._oldClusterPassword)
@@ -806,25 +808,26 @@ def doClearAll(fake=False):
 
 
 def runMiscFunction(argc, argv):
-    if argc not in (2, 3):
+    print "runMiscFunction(%s, %s)" % (argc, argv)
+    if argc not in (1, 2):
         return (False,"2/1 parameters are needed")
 
-    l = argv[1].split('=')
+    l = argv[0].split('=')
 
     if l[0] != '--add' and l[0] != '--remove':
-        return (False,"Unknown first parameter options")
+        return (False,"Unknown first parameter option %s" % (l[0],))
 
     t = globals()["%sOperation" % (l[1])]
 
     if t == None:
-        return (False,"Unknown target operations:%s" % (l[1]))
+        return (False,"Unknown target operations: %s" % (l[1]))
     else:
         t = t()
 
     if l[0] == '--add':
-        if argc != 3 :
+        if argc != 2:
             return (False,"--add must have --count option")
-        l = argv[2].split('=')
+        l = argv[1].split('=')
         if l[0] == '--count':
             num = int(l[1])
             if num <= 0 :
@@ -834,8 +837,8 @@ def runMiscFunction(argc, argv):
         else:
             return (False,"--add can only have --count options")
     elif l[0] == '--remove':
-        if argc == 3:
-            l = argv[2].split('=')
+        if argc == 2:
+            l = argv[1].split('=')
             if l[0] == '--id':
                 if t.remove(l[1]) == False:
                     return (False,"cannot perform remove UID operation")
@@ -844,7 +847,7 @@ def runMiscFunction(argc, argv):
                     return (False,"cannot perform remove UID operation")
             else:
                 return (False,"--remove can only have --id options")
-        elif argc == 2:
+        elif argc == 1:
             if t.removeAll() == False:
                 return (False,"cannot perform remove all operation")
     else:
@@ -1152,17 +1155,19 @@ class PerfTest:
             print "Resource Remove Fail:    %d" % (value.removeFail)
             print "---------------------------------"
         print "===================================="
+        return True
 
 
 def runPerfTest(argv):
     l = argv[2].split('=')
-    PerfTest().run(l[1])
+    rc = PerfTest().run(l[1])
     doCleanUp()
+    return rc
 
 
 def doCleanUp(reinit=False):
-    selection = '' if testMaster.auto_rollback else 'x'
-    if not testMaster.auto_rollback:
+    selection = '' if testMaster.args.autorollback else 'x'
+    if not testMaster.args.autorollback:
         try :
             selection = raw_input("Press Enter to continue ROLLBACK or press x to SKIP it...")
         except:
@@ -1193,41 +1198,17 @@ def CallTest(testClass):
     ###    testMaster.setUpPassword()
     # this print is used by FunctestParser.parse_timesync_start
     print "%s suites: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
-    return RunBoxTests(testClass, testMaster.getConfig())
+    return RunTests(testClass)
 
 
-SimpleTestKeys = {
-    '--sys-name': SystemNameTest,
-    '--rtsp-test': RtspTestSuit,
-    '--rtsp-perf': RtspPerf,
-    '--rtsp-stream': RtspStreamTest,
-}
-# These are the old legasy tests, just organized a bit
-
-# Tests to be run on the vargant boxes, separately or within the autotest sequence
-BoxTestKeys = {
-    '--timesync': TimeSyncTest,
-    '--ts-noinet': TimeSyncNoInetTest,
-    '--ts-inet': TimeSyncWithInetTest,
-    '--bstorage': BackupStorageTest,
-    '--msarch': MultiserverArchiveTest,
-    '--natcon': NatConnectionTest,
-    '--stream': StreamingTest,
-    '--hlso': HlsOnlyTest,
-    '--dbup': DBTest,
-    '--boxtests': None,
-}
-
-
-def RunByAutotest(arg0):
+def RunByAutotest():
     """
-    Used when this script is called by the autotesting script sauto.py
-    :param arg0: str
-    It is passed to unittest.main() to avoid automatical usage of sys.argv
+    Used when this script is called by the autotesting script auto.py
     """
-    testMaster.auto_rollback = True
+    testMaster.args.autorollback = True
     #config = testMaster.getConfig()
     need_rollback = True
+    title = "functests init"
     try:
         print "" # FIXME add startup message
         ret, reason = testMaster.init(notest=True)
@@ -1236,53 +1217,84 @@ def RunByAutotest(arg0):
             return False
         config = testMaster.getConfig()
         with LegacyTestWrapper(config):
+            title = "connection test"
             if not testMaster.testConnection():
                 print "FAIL: connection test"
                 return False
-            ret, reason = testMaster.initial_tests()
-            if ret == False:
-                print "FAIL: initial cluster test: %s" % (reason)
-                return False
-            print "Basic functional tests start"
-            the_test = unittest.main(module=legacy_main, exit=False, argv=[arg0],
-                                     testRunner=unittest.TextTestRunner(
-                                         stream=sys.stdout,
-                                     ))
-            if the_test.result.wasSuccessful():
-                print "Basic functional tests end"
+            if not testMaster.args.skiplegacy:
+                title = "initial cluster test"
+                ret, reason = testMaster.initial_tests()
+                if ret == False:
+                    print "FAIL: initial cluster test: %s" % (reason)
+                    return False
+                print "Basic functional tests start"
+                title = "basic functional tests"
+                the_test = unittest.main(module=legacy_main, exit=False, argv=[sys.argv[0]],
+                                         testRunner=unittest.TextTestRunner(
+                                             stream=sys.stdout,
+                                         ))
+                if the_test.result.wasSuccessful():
+                    print "Basic functional tests end"
+                    if testMaster.unittestRollback:
+                        doCleanUp(reinit=True)
+                    title = "merge test"
+                    MergeTest().run()
+                    title = "system name test"
+                    SystemNameTest(config).run()
+                else:
+                    print "Basic functional test FAILED"
                 if testMaster.unittestRollback:
-                    doCleanUp(reinit=True)
-                MergeTest().run()
-                SystemNameTest(config).run()
-            else:
-                print "Basic functional test FAILED"
-            if testMaster.unittestRollback:
-                doCleanUp()
-                need_rollback = False
-            time.sleep(4)
+                    doCleanUp()
+                    need_rollback = False
+                time.sleep(4)
+            title = "proxy test"
             ProxyTest(*config.rtget('ServerList')[0:2]).run()
     except Exception as err:
-        print "FAIL: the main functests failed with error: %s" % (err,)
+        print "FAIL: %s failed with error: %s" % (title, err,)
     finally:
         if need_rollback and testMaster.unittestRollback:
             doCleanUp()
-    if not testMaster.do_main_only:
-        if not testMaster.skip_timesync:
+    if not testMaster.args.mainonly:
+        if not testMaster.args.skiptime:
             CallTest(TimeSyncTest)
-        if not testMaster.skip_backup:
+        if not testMaster.args.skipbak:
             CallTest(BackupStorageTest)
-        if not testMaster.skip_mservarc:
+        if not testMaster.args.skipmsa:
             CallTest(MultiserverArchiveTest)
-        if not testMaster.skip_streming:
+        if not testMaster.args.skipstrm:
             CallTest(StreamingTest)
-        if not testMaster.skip_dbup:
+        if not testMaster.args.skipdbup:
             CallTest(DBTest)
+    #FIXME: acureate test result processing required!!!
     print "\nALL AUTOMATIC TEST ARE DONE\n"
+    return True
+
+# These are the old legasy tests, just organized a bit
+SimpleTestKeys = {
+    '--sys-name': SystemNameTest,
+    '--rtsp-test': RtspTestSuit,
+    '--rtsp-perf': RtspPerf,
+    '--rtsp-stream': RtspStreamTest,
+}
+
+# Tests to be run on the vargant boxes, separately or within the autotest sequence
+BoxTestKeys = OrderedDict([
+    ('--timesync', TimeSyncTest),
+    ('--ts-noinet', TimeSyncNoInetTest),
+    ('--ts-inet', TimeSyncWithInetTest),
+    ('--bstorage', BackupStorageTest),
+    ('--msarch', MultiserverArchiveTest),
+    ('--natcon', NatConnectionTest),
+    ('--stream', StreamingTest),
+    ('--hlso', HlsOnlyTest),
+    ('--dbup', DBTest),
+    ('--boxtests', None),
+])
 
 
-def BoxTestsRun(key):
+def BoxTestsRun(name):
     testMaster.init(notest=True)
-    if key == '--boxtests':
+    if name == 'boxtests':
         ok = True
         if not CallTest(TimeSyncTest): ok = False
         if not CallTest(BackupStorageTest): ok = False
@@ -1291,11 +1303,12 @@ def BoxTestsRun(key):
         if not CallTest(DBTest): ok = False
         return ok
     else:
-        return CallTest(BoxTestKeys[key])
+        return CallTest(BoxTestKeys['--' + name])
 
 
-def LegacyTests(only = False):
+def LegacyTests(only = False, argv=[]):
     _argv = argv[:]
+    _argv.insert(0, sys.argv[0])
     del _argv[1:(3 if only else 2)]
     with testMaster.unittestRollback:
         the_test = unittest.main(module=legacy_main, exit=False, argv=_argv)
@@ -1318,36 +1331,32 @@ def DoTests(argv):
 
     argc = len(argv)
 
-    if argc == 2 and argv[1] in BoxTestKeys:
-        # box-tests can run without complete testMaster.init(), since they reinitialize mediaserver
-        return BoxTestsRun(argv[1])
-
     ret, reason = testMaster.init()
     if not ret:
         print "Failed to initialize the cluster test object: %s" % (reason)
         return False
 
-    if argc == 2 and argv[1] in SimpleTestKeys:
-        return SimpleTestKeys[argv[1]](testMaster.getConfig()).run()
+    if argc == 1 and argv[0] in SimpleTestKeys:
+        return SimpleTestKeys[argv[0]](testMaster.getConfig()).run()
 
     ret, reason = testMaster.initial_tests()
     if ret == False:
         print "FAIL: initial cluster test: %s" % (reason)
         return False
 
-    if argc == 2 and argv[1] == '--sync':
+    if argc == 1 and argv[0] == '--sync':
         return True # done here, since we just need to test whether
                # all the servers are on the same page
 
-    if argc == 2 and argv[1] == '--proxy':
+    if argc == 1 and argv[0] == '--proxy':
         ProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
         #FIXME no result code returning!
 
-    if argc >= 2 and argv[1] == '--legacy':
-        LegacyTests(argv[2] == '--only' if argc >= 3 else False)
+    if argc >= 1 and argv[0] == '--legacy':
+        LegacyTests(argv[1] == '--only' if argc >= 2 else False, argv)
         #FIXME no result code returning!
 
-    elif argc == 2 and argv[1] == '--main':
+    elif argc == 1 and argv[0] == '--main':
         rc = LegacyTests()
         time.sleep(3)
         ProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
@@ -1355,45 +1364,122 @@ def DoTests(argv):
         print "\nALL AUTOMATIC TEST ARE DONE\n"
         #FIXME no result code returning!
 
-    elif (argc == 2 or argc == 3) and argv[1] == '--clear':
-        if argc == 3:
-            if argv[2] == '--fake':
+    elif (argc == 1 or argc == 2) and argv[0] == '--clear':
+        if argc == 2:
+            if argv[1] == '--fake':
                 doClearAll(True)
             else:
-                print "Unknown option: %s in --clear" % (argv[2])
+                print "Unknown option: %s in --clear" % (argv[1])
         else:
             doClearAll(False)
         testMaster.unittestRollback.removeRollbackDB()
         #FIXME no result code returning!
 
-    elif argc == 2 and argv[1] == '--perf':
+    elif argc == 1 and argv[0] == '--perf':
         PerfTest().start()
         doCleanUp()
         #FIXME no result code returning!
 
     else:
-        if argv[1] == '--merge-test':
-            MergeTest(True).run()
-        elif argv[1] == '--merge-admin':
-            MergeTest_AdminPassword().test()
+        if argv[0] == '--merge-test':
+            return MergeTest(True).run()
+        elif argv[0] == '--merge-admin':
+            rc = MergeTest_AdminPassword().test()
             testMaster.unittestRollback.removeRollbackDB()
-        elif argc == 3 and argv[1] == '--perf':
-            runPerfTest()
+            return rc
+        elif argc == 2 and argv[0] == '--perf':
+            return runPerfTest()
         else:
-            runMiscFunction(argc, argv)
+            res = runMiscFunction(argc, argv)
+            if not res[0]:
+                print "ERROR: " + res[1]
+            return res[0]
         #FIXME no result code returning!
 
+#class MyArgParser(argparse.ArgumentParser):
+#
+#    def print_help(self, file=None):
+#        super(MyArgParser, self).print_help(file)
+#
+
+class BoxTestAction(argparse.Action):
+    def __init__(self, option_strings, dest, help=None):
+        super(BoxTestAction, self).__init__(
+            option_strings=option_strings, nargs=0, dest=dest, help=help)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        namespace.BoxTest = self.dest
+
+CommonArgs = ('config', 'autorollback', 'log')
+
+def parseArgs():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--help-arg', metavar="ARG", nargs="?", const="", help="Additional help for some (legacy) options. Without argument print the list of that options.")
+    parser.add_argument('-c', '--config', metavar="FILE", help="Use alternative configuration file")
+    parser.add_argument('--recover', action="store_true", help=getHelpDesc('recover'))
+    parser.add_argument('--log', metavar="FILE", nargs="?", const="", help="Suppress direct output, storing it into a file. See '--help-arg log' for details ")
+
+    parser.add_argument('--autorollback', '--arb', action="store_true", help="Automativally rollback changes done by the legacy tests")
+    parser.add_argument('--skiplegacy', action="store_true", help="Skip 'legacy' functional tests")
+    parser.add_argument('--skiptime', action="store_true", help="Skip time synchronization tests")
+    parser.add_argument('--skipbak', action="store_true", help="Skip backup storage tests")
+    parser.add_argument('--skipmsa', action="store_true", help="Skip multi-server archive tests")
+    parser.add_argument('--skipstrm', action="store_true", help="Skip streaming tests")
+    parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
+    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
+    parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
+
+    group = parser.add_argument_group("Functional test selection").add_mutually_exclusive_group()
+    boxKey = None
+    for key, klass in BoxTestKeys.iteritems():
+        if klass is None:
+            if boxKey is not None:
+                raise Exception("Two or more options in BoxTestKeys have 'None' value!")
+            boxKey = key
+        else:
+            group.add_argument(key, action=BoxTestAction, help="Run only: " + klass.helpStr)
+    else:
+        group.add_argument(boxKey, action=BoxTestAction, help="Run all vm-using functional tests")
+
+    #TODO: if I do two steps of argparsing I should think about --help to pring the second step args too!!!
+
+    #parser.add_argument()
+
+    args, other = parser.parse_known_args()
+    args.natcon = '--natcon' in other # we need it as a flag
+    #if args.log is not None and getattr(args, 'BoxTest', None) is None:
+    #    print "WARNING: --log is used only with one of 'Functional test selection' arguments!"
+    return args, other
+
+
+def main(args, other):
+    #print "Args: %s" % (args,)
+    #print "Remaining argv: %s" % (other,)
+    if args.help_arg is not None:
+        showHelp(args.help_arg)
+        return True
+    if args.recover:
+        UnitTestRollback(autorollback=True, nocreate=True)
+        return True
+    testMaster.applyArgs(args)
+    try:
+        if other:
+            return DoTests(other)
+        elif getattr(args, 'BoxTest', False):
+            # box-tests can run without complete testMaster.init(), since they reinitialize mediaserver
+            return BoxTestsRun(args.BoxTest)
+        else: # called from auto.py, using boxes which are created, but servers not started
+            return RunByAutotest()
+    except FuncTestError as err:
+        print "FAIL: functional test failed: %s, %s" % err.args
+        return False
+    finally:
+        if testMaster.log:
+            testMaster.log.unbind()
 
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf8')
-    argv = testMaster.preparseArgs(sys.argv)
-    if len(argv) == 1:  # called from auto.py, using boxes which are created, but servers not started
-        RunByAutotest(argv[0])
-    elif len(argv) >= 2 and argv[1] in ('--help', '-h'):
-        showHelp(argv)
-    elif len(argv) == 2 and argv[1] == '--recover':
-        UnitTestRollback(autorollback=True, nocreate=True)
-    else:
-        if not DoTests(argv):
-            sys.exit(1)
+    if not main(*parseArgs()):
+        sys.exit(1)

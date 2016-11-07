@@ -22,6 +22,8 @@ public:
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
+    void updateFromResources();
+
     Qt::CheckState state() const;
     void setState(Qt::CheckState value);
 

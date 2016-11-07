@@ -248,27 +248,54 @@
                         </configuration>
                     </execution>	
                     <execution>
-                        <id>pack-debug-main-apps</id>
+                        <id>server-update-package</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/assembly-debug-main-apps.xml</descriptor>
+                                <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <finalName>server-update</finalName>							
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pack-debug-client</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                        </configuration>
+                    </execution>                    
+                    <execution>
+                        <id>pack-debug-server</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pack-debug-other-apps.xml</id>
+                        <id>pack-debug-misc.xml</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/assembly-debug-other-apps.xml</descriptor>
+                                <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
                         </configuration>
@@ -287,19 +314,18 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>server-update-package</id>
+                        <id>pack-debug-cloud.xml</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
+                                <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
-                            <finalName>server-update</finalName>							
                         </configuration>
-                    </execution>	                    
+                    </execution>              
                 </executions>				
             </plugin> 	            
         </plugins>

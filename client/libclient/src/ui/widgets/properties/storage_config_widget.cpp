@@ -44,6 +44,8 @@
 #include <utils/common/qtimespan.h>
 #include <utils/common/unused.h>
 
+#include <utils/math/color_transformations.h>
+
 #include <common/common_globals.h>
 
 namespace
@@ -103,8 +105,6 @@ namespace
 
         virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
         {
-            QnScopedPainterOpacityRollback opacityRollback(painter);
-
             QStyleOptionViewItem opt(option);
             initStyleOption(&opt, index);
 
@@ -117,9 +117,11 @@ namespace
 
             auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
-            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
-                opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
+            /* Set disabled style for unchecked rows: */
+            if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
+                opt.state &= ~QStyle::State_Enabled;
 
+            /* Set proper color for links: */
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
             {
                 if (auto style = QnNxStyle::instance())
@@ -135,19 +137,21 @@ namespace
                 }
             }
 
-            if (editableColumn && hovered)
-            {
-                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
-            }
-            else if (index.column() < QnStorageListModel::RemoveActionColumn
-                 && !index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
-            {
-                painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
-            }
+            /* Set warning color for inaccessible storages: */
+            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
+                opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
 
+            /* Set proper color for hovered storage type column: */
+            if (!opt.state.testFlag(QStyle::State_Enabled))
+                opt.palette.setCurrentColorGroup(QPalette::Disabled);
+            if (editableColumn && hovered)
+                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
+
+            /* Draw item: */
             QStyle* style = option.widget ? option.widget->style() : QApplication::style();
             style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, option.widget);
 
+            /* Draw arrow if editable storage type column: */
             if (editableColumn)
             {
                 QStyleOption arrowOption = opt;
@@ -158,7 +162,9 @@ namespace
 
                 arrowOption.rect.setWidth(style::Metrics::kArrowSize);
 
-                auto arrow = beingEdited ? QStyle::PE_IndicatorArrowUp : QStyle::PE_IndicatorArrowDown;
+                auto arrow = beingEdited
+                    ? QStyle::PE_IndicatorArrowUp
+                    : QStyle::PE_IndicatorArrowDown;
 
                 QStyle* style = option.widget ? option.widget->style() : QApplication::style();
                 style->drawPrimitive(arrow, &arrowOption, painter);
@@ -257,8 +263,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
-    ui->storageView->setItemDelegateForColumn(QnStorageListModel::CheckBoxColumn,
-        new QnSwitchItemDelegate(this));
+
+    auto switchItemDelegate = new QnSwitchItemDelegate(this);
+    switchItemDelegate->setHideDisabledItems(true);
+    ui->storageView->setItemDelegateForColumn(
+        QnStorageListModel::CheckBoxColumn, switchItemDelegate);
 
     StoragesSortModel* sortModel = new StoragesSortModel(this);
     sortModel->setSourceModel(m_model.data());
@@ -718,11 +727,6 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
 
     if (!qnServerStorageManager->rebuildServerStorages(m_server, isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
         return;
-
-    if (isMain)
-        ui->rebuildMainButton->setEnabled(false);
-    else
-        ui->rebuildBackupButton->setEnabled(false);
 
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     storagePool.rebuildCancelled = false;

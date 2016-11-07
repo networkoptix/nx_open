@@ -28,6 +28,7 @@
 #include <nx/utils/debug_utils.h>
 
 #include "media_player_quality_chooser.h"
+#include <utils/common/long_runable_async_stopper.h>
 
 namespace nx {
 namespace media {
@@ -85,42 +86,6 @@ static qint64 usecToMsec(qint64 posUsec)
 }
 
 } // namespace
-
-class DataProviderGarbageCollector: public QObject
-{
-public:
-    DataProviderGarbageCollector()
-    {
-        connect(&m_timer, &QTimer::timeout, this, &DataProviderGarbageCollector::cleanup);
-        m_timer.start(1000);
-    }
-
-    static DataProviderGarbageCollector* instance()
-    {
-        static DataProviderGarbageCollector inst;
-        return &inst;
-    }
-
-    void addReader(std::unique_ptr<QnArchiveStreamReader> reader)
-    {
-        m_readersToClose.emplace_back(std::move(reader));
-        cleanup();
-    }
-
-    void cleanup()
-    {
-        for (auto itr = m_readersToClose.begin(); itr != m_readersToClose.end();)
-        {
-            if (!(*itr)->isRunning())
-                itr = m_readersToClose.erase(itr);
-            else
-                ++itr;
-        }
-    }
-private:
-    std::vector<std::unique_ptr<QnArchiveStreamReader>> m_readersToClose;
-    QTimer m_timer;
-};
 
 class PlayerPrivate: public QObject
 {
@@ -224,6 +189,7 @@ private:
     PlayerPrivate(Player* parent);
 
     void at_hurryUp();
+    void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
     void presentNextFrameDelayed();
 
@@ -345,6 +311,20 @@ void PlayerPrivate::at_hurryUp()
     {
         execTimer->stop();
         presentNextFrame();
+    }
+}
+
+void PlayerPrivate::at_jumpOccurred(int sequence)
+{
+    if (!videoFrameToRender)
+        return;
+    FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+    if (sequence && sequence != metadata.sequence)
+    {
+        // Drop deprecate frame
+        execTimer->stop();
+        videoFrameToRender.reset();
+        at_gotVideoFrame();
     }
 }
 
@@ -620,6 +600,7 @@ void PlayerPrivate::applyVideoQuality()
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
             QSize(/*width*/ 0, quality.height())); //< Use "auto" width.
     }
+    at_hurryUp(); //< skip waiting for current frame
 }
 
 bool PlayerPrivate::createArchiveReader()
@@ -676,6 +657,8 @@ bool PlayerPrivate::initDataProvider()
         this, &PlayerPrivate::at_gotVideoFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
         this, &PlayerPrivate::at_hurryUp);
+    connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
+        this, &PlayerPrivate::at_jumpOccurred);
     connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
         [this]()
         {
@@ -822,12 +805,10 @@ void Player::stop()
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
     if (d->dataConsumer)
         d->dataConsumer->pleaseStop();
-    if (d->archiveReader)
-        d->archiveReader->pleaseStop();
 
     d->dataConsumer.reset();
     if (d->archiveReader)
-        DataProviderGarbageCollector::instance()->addReader(std::move(d->archiveReader));
+        QnLongRunableAsyncStopper::instance()->stopAsync(std::move(d->archiveReader));
     d->videoFrameToRender.reset();
 
     d->setState(State::Stopped);

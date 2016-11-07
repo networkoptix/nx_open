@@ -16,7 +16,6 @@
 #include <ui/dialogs/common/dialog.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/workaround/qtbug_workaround.h>
 
 #include <utils/applauncher_utils.h>
 

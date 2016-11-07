@@ -425,15 +425,15 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case NoError:
         return QString();
     case InvalidSignature:
-        return tr("Invalid Signature");
+        return tr("Invalid signature");
     case InvalidHardwareID:
         return tr("Server with matching hardware ID not found");
     case InvalidBrand:
-        return tr("Invalid Customization");
+        return tr("Invalid customization");
     case Expired:
-        return tr("Expired"); // license is out of date
+        return tr("License is expired"); // license is out of date
     case InvalidType:
-        return tr("Invalid Type");
+        return tr("Invalid type");
     case TooManyLicensesPerDevice:
         return tr("Only single license is allowed for this device");
     case FutureLicense:

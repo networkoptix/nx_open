@@ -448,16 +448,6 @@ Socket<InterfaceToImplement>::Socket(
 template<typename InterfaceToImplement>
 SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAddress)
 {
-    // NOTE: blocking dns name resolve may happen here
-    if (!socketAddress.address.isResolved() &&
-        !SocketGlobals::addressResolver().dnsResolver().resolveAddressSync(
-            socketAddress.address.toString(),
-            const_cast<HostAddress*>(&socketAddress.address),
-            m_ipVersion))
-    {
-        return SockAddrPtr();
-    }
-
     if (SocketGlobals::config().isAddressDisabled(socketAddress.address))
     {
         SystemError::setLastErrorCode(SystemError::noPermission);
@@ -632,7 +622,27 @@ CommunicatingSocket<InterfaceToImplement>::~CommunicatingSocket()
 }
 
 template<typename InterfaceToImplement>
-bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& remoteAddress, unsigned int timeoutMs )
+bool CommunicatingSocket<InterfaceToImplement>::connect(
+    const SocketAddress& remoteAddress, unsigned int timeoutMs)
+{
+    if (remoteAddress.address.isIpAddress())
+        return connectToIp(remoteAddress, timeoutMs);
+
+    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
+        remoteAddress.address.toString(), this->m_ipVersion);
+
+    for (auto& ip: ips)
+    {
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+            return true;
+    }
+
+    return false; //< Could not connect by any of addresses.
+}
+
+template<typename InterfaceToImplement>
+bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
+    const SocketAddress& remoteAddress, unsigned int timeoutMs)
 {
     // Get the address of the requested host
     m_connected = false;

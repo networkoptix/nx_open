@@ -6,7 +6,9 @@ Listener::Listener(Events& events)
     : m_events(events)
     , m_socket(SocketFactory::createDatagramSocket())
 {
+    // TODO: Verify return codes.
     m_socket->bind(SocketAddress(HostAddress(), CLIENT_PORT));
+    m_socket->setNonBlockingMode(true);
     m_buffer.reserve(1024);
     readAsync();
 }
@@ -24,7 +26,7 @@ void Listener::readAsync()
     m_socket->readSomeAsync(&m_buffer, std::bind(&Listener::readHandler, this, _1, _2));
 }
 
-void Listener::readHandler(SystemError::ErrorCode result, size_t size)
+void Listener::readHandler(SystemError::ErrorCode /*result*/, size_t /*size*/)
 {
     QDataStream stream(m_buffer);
 

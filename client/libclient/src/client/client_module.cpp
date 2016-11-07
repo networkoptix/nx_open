@@ -24,7 +24,9 @@
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
-
+#include <client/system_weights_manager.h>
+#include <client/forgotten_systems_manager.h>
+#include <client/startup_tile_manager.h>
 #include <client_core/client_core_settings.h>
 
 #include <cloud/cloud_connection.h>
@@ -479,6 +481,10 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     qnCommon->store<QnModuleFinder>(moduleFinder);
 
     qnCommon->store<QnSystemsFinder>(new QnSystemsFinder());
+    qnCommon->store<QnForgottenSystemsManager>(new QnForgottenSystemsManager());
+
+    // Depends on qnSystemsFinder
+    qnCommon->store<QnStartupTileManager>(new QnStartupTileManager());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);
@@ -498,7 +504,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 #else
     Q_UNUSED(startupParams);
     QString customizationPath = lit(":/skin_dark");
-    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+    QScopedPointer<QnSkin> skin(new QnSkin({lit(":/skin"), customizationPath}));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QnCustomization customization;
@@ -514,7 +520,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        QApplication::setWindowIcon(qnSkin->icon("logo.png"));
+        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
@@ -561,4 +567,5 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);
+    qnCommon->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 }

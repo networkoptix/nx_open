@@ -101,8 +101,8 @@ void QnHtmlTextItemPrivate::updatePixmap() {
         td.setTextWidth(maxTextWidth);
 
     td.defaultTextOption().setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
-   
-    static const auto ratio = qApp->desktop()->devicePixelRatio();
+
+    static const auto ratio = qApp->devicePixelRatio();
     const auto width = td.documentLayout()->documentSize().width() + options.horPadding * 2;
     const auto height = td.documentLayout()->documentSize().height() + options.vertPadding * 2;
     const auto baseSize = QSize(width, height);

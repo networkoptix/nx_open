@@ -184,8 +184,10 @@ Qn::GlobalPermissions QnUserRolesManager::userRolePermissions(Qn::UserRole userR
         case Qn::UserRole::LiveViewer:
             return Qn::GlobalLiveViewerPermissionSet;
 
-        case Qn::UserRole::CustomUserGroup:
         case Qn::UserRole::CustomPermissions:
+            return Qn::GlobalCustomUserPermission;
+
+        case Qn::UserRole::CustomUserGroup:
             return Qn::NoGlobalPermissions;
     }
 

@@ -94,8 +94,8 @@ class ProxyTest(object):
             return Result(func, peer, redirectTo, data, json.loads(data), content_len)
         except urllib2.HTTPError as err:
 #        except HTTPException as err:
-            print "Failed: " + action
-            raise FuncTestError("error " + action, err)
+            print "FAIL: %s raised %s" % (action, err)
+            raise FuncTestError("error " + action, str(err))
 
     def run(self):
         print "\n======================================="

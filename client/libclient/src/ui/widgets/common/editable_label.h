@@ -10,8 +10,9 @@ class QnEditableLabel: public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
-    Q_PROPERTY(bool editing READ editing WRITE setEditing)
+    Q_PROPERTY(bool editing READ editing WRITE setEditing DESIGNABLE false)
     Q_PROPERTY(QIcon buttonIcon READ buttonIcon WRITE setButtonIcon)
+    Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
 
     using base_type = QWidget;
 
@@ -27,6 +28,9 @@ public:
 
     QIcon buttonIcon() const;
     void setButtonIcon(const QIcon& icon);
+
+    bool readOnly() const;
+    void setReadOnly(bool readOnly);
 
     using Validator = std::function<bool (QString&)>;
     void setValidator(Validator validator);

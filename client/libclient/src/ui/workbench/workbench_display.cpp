@@ -737,9 +737,11 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
 
                 if (canShowLayoutBackground())
                 {
+                    auto layout = workbench()->currentLayout()->resource();
+
                     ensureRaisedConeItem(newWidget);
                     setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-                    raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+                    raisedConeItem(newWidget)->setEffectEnabled(layout && !layout->backgroundImageFilename().isEmpty());
                 }
 
                 synchronize(newWidget, true);
@@ -1023,6 +1025,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QnResourceWidget *widget = nullptr;
     if (resource->hasFlags(Qn::server))
     {
+        if (!accessController()->hasPermissions(resource, Qn::ViewContentPermission))
+        {
+            qnDeleteLater(item);
+            return false;
+        }
+
         widget = new QnServerResourceWidget(context(), item);
     }
     else if (resource->hasFlags(Qn::videowall))

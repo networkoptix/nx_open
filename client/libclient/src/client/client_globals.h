@@ -196,8 +196,7 @@ namespace Qn
         TimePeriodsRole,
         MergedTimePeriodsRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
-        TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
-        TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
+        TextRole,                                   /**< Role for generic text. Used in several places. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
@@ -231,8 +230,6 @@ namespace Qn
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
         ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
-
-        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 
