@@ -1571,7 +1571,6 @@ void MediaServerProcess::registerRestHandlers(
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
-    const auto kAdvancedViewer = Qn::GlobalAdvancedViewerPermissionSet;
 
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     reg("api/storageStatus", new QnStorageStatusRestHandler());
@@ -1599,8 +1598,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnBusinessEventLogRestHandler(), kAdvancedViewer); //< deprecated
-    reg("api/getEvents", new QnBusinessLog2RestHandler(), kAdvancedViewer); //< new version
+    reg("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalViewLogsPermission); //< deprecated
+    reg("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalViewLogsPermission); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
