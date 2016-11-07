@@ -85,14 +85,8 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
         cl_logDEBUG1);
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
-    tunnel->setStateHandler(
-        [this, tunnelPtr = tunnel.get()](OutgoingTunnel::State state)
-        {
-            if (state != OutgoingTunnel::State::kClosed)
-                return;
-            //tunnel supports deleting in "tunnel closed" handler
-            onTunnelClosed(tunnelPtr);
-        });
+    tunnel->setOnClosedHandler(
+        std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
     iterAndInsertionResult.first->second = std::move(tunnel);
     return iterAndInsertionResult.first->second;
