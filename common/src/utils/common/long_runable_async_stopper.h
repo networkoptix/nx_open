@@ -21,16 +21,18 @@ public:
 
     void stopAsync(std::unique_ptr<QnLongRunnable> thread)
     {
-        NX_ASSERT(qnHasEventLoop(QThread::currentThread()));
-
         QnLongRunnable* ptr = thread.get();
-        connect(
-            ptr,
-            &QThread::finished,
-            this,
-            [this]() { m_threadsToStop.erase((QnLongRunnable*)sender()); }
-        );
-        m_threadsToStop.emplace(ptr, std::move(thread));
+        if (qnHasEventLoop(QThread::currentThread()))
+        {
+            connect(
+                ptr,
+                &QThread::finished,
+                this,
+                [this]() { m_threadsToStop.erase((QnLongRunnable*)sender()); }
+            );
+            if (thread->isRunning())
+                m_threadsToStop.emplace(ptr, std::move(thread));
+        }
         ptr->pleaseStop();
     }
 

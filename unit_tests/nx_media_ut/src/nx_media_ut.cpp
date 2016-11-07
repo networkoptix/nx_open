@@ -16,6 +16,7 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/lexical_enum.h>
+#include <utils/common/long_runable_async_stopper.h>
 
 // Config for debugging the tests.
 static const struct
@@ -286,6 +287,7 @@ public:
         QnResourcePool::instance()->clear(); //< Just in case.
         QnResourcePool::instance()->addResource(m_server);
         QnResourcePool::instance()->addResource(m_camera);
+        m_stopper.reset(new QnLongRunableAsyncStopper());
     }
 
     ~PlayerSetQualityTest()
@@ -382,7 +384,7 @@ private:
             .arg(fastSwitch)
             .arg(resolution.width())
             .arg(resolution.height()));
-            
+
         m_actualQuality = quality;
         m_actualResolution = resolution;
     }
@@ -402,6 +404,7 @@ private:
     // Test results.
     MediaQuality m_actualQuality;
     QSize m_actualResolution;
+    std::unique_ptr<QnLongRunableAsyncStopper> m_stopper;
 };
 
 } // namespace
