@@ -324,6 +324,51 @@ TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 }
 
 /************************************************************************/
+/* Checking videowall-based layouts                                     */
+/************************************************************************/
+/** Admin can do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Videowall-controller can do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Viewer can't do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
+{
+    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/
 

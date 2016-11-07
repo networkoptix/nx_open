@@ -120,6 +120,25 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutRemoved)
+{
+    auto target = addCamera();
+    auto videoWall = addVideoWall();
+    auto layout = addLayout();
+    layout->setParentId(videoWall->getId());
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    qnResPool->removeResource(layout);
+
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
 {
     auto target = addCamera();
@@ -201,4 +220,31 @@ TEST_F(QnVideoWallItemAccessProviderTest, accessProviders)
     accessProvider()->accessibleVia(user, camera, &providers);
     ASSERT_EQ(1, providers.size());
     ASSERT_TRUE(providers.contains(videoWall));
+}
+
+TEST_F(QnVideoWallItemAccessProviderTest, checkByLayoutParentId)
+{
+    auto videoWall = addVideoWall();
+    auto target = addLayout();
+    target->setParentId(videoWall->getId());
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWallByParentId)
+{
+    auto target = addCamera();
+    auto videoWall = addVideoWall();
+    auto layout = addLayout();
+    layout->setParentId(videoWall->getId());
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }

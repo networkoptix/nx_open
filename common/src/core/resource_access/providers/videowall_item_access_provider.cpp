@@ -19,6 +19,14 @@ QSet<QnUuid> videoWallLayouts(const QnVideoWallResourcePtr& videoWall)
             continue;
         result << item.layout;
     }
+
+    for (const auto& layout: qnResPool->getResourcesByParentId(videoWall->getId()))
+    {
+        NX_ASSERT(layout->hasFlags(Qn::layout));
+        if (layout->hasFlags(Qn::layout))
+            result << layout->getId();
+    }
+
     return result;
 }
 
@@ -136,8 +144,16 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
 void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
     base_type::handleResourceRemoved(resource);
-    if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        for (const auto& resource : layout->layoutResources())
+            updateAccessToResource(resource);
+    }
+    else if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
+    {
         updateAccessToVideoWallItems(videoWall);
+    }
 }
 
 void QnVideoWallItemAccessProvider::handleVideoWallItemAdded(
