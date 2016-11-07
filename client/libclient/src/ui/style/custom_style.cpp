@@ -63,7 +63,7 @@ void autoResizePagesToContents_implementation(Pages* pages,
 
     adjustSizePolicies(pages->currentIndex());
 
-    static const char* kCompanionId = "_qn_resizePagesToContents";
+    static const char* kCompanionId = "resizePagesToContents";
     auto companion = QnObjectCompanion<QObject>::install(pages, kCompanionId, false);
     NX_ASSERT(companion);
 
