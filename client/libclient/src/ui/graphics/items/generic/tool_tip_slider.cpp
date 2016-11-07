@@ -132,17 +132,33 @@ void QnToolTipSlider::setAutoHideToolTip(bool autoHideToolTip) {
     updateToolTipVisibility();
 }
 
-void QnToolTipSlider::hideToolTip()
+void QnToolTipSlider::hideToolTip(bool animated)
 {
     //TODO: #GDM we certainly need to find place for these constants
-    const qreal kHidden = 0.0;
-    m_tooltipWidgetVisibilityAnimator->animateTo(kHidden);
+    const qreal kTransparent = 0.0;
+    if (animated)
+    {
+        m_tooltipWidgetVisibilityAnimator->animateTo(kTransparent);
+    }
+    else
+    {
+        m_tooltipWidgetVisibilityAnimator->stop();
+        m_tooltipWidgetVisibility = kTransparent;
+    }
 }
 
-void QnToolTipSlider::showToolTip()
+void QnToolTipSlider::showToolTip(bool animated)
 {
     const qreal kOpaque = 1.0;
-    m_tooltipWidgetVisibilityAnimator->animateTo(kOpaque);
+    if (animated)
+    {
+        m_tooltipWidgetVisibilityAnimator->animateTo(kOpaque);
+    }
+    else
+    {
+        m_tooltipWidgetVisibilityAnimator->stop();
+        m_tooltipWidgetVisibility = kOpaque;
+    }
 }
 
 void QnToolTipSlider::updateToolTipVisibility()
