@@ -808,7 +808,12 @@ void Player::stop()
 
     d->dataConsumer.reset();
     if (d->archiveReader)
-        QnLongRunableAsyncStopper::instance()->stopAsync(std::move(d->archiveReader));
+    {
+        if (QnLongRunableAsyncStopper::instance())
+            QnLongRunableAsyncStopper::instance()->stopAsync(std::move(d->archiveReader));
+        else
+            d->archiveReader.reset();
+    }
     d->videoFrameToRender.reset();
 
     d->setState(State::Stopped);

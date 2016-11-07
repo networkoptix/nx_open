@@ -287,7 +287,6 @@ public:
         QnResourcePool::instance()->clear(); //< Just in case.
         QnResourcePool::instance()->addResource(m_server);
         QnResourcePool::instance()->addResource(m_camera);
-        m_stopper.reset(new QnLongRunableAsyncStopper());
     }
 
     ~PlayerSetQualityTest()
@@ -404,7 +403,6 @@ private:
     // Test results.
     MediaQuality m_actualQuality;
     QSize m_actualResolution;
-    std::unique_ptr<QnLongRunableAsyncStopper> m_stopper;
 };
 
 } // namespace
