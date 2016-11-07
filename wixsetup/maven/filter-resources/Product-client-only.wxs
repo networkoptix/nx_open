@@ -3,6 +3,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+
     <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
         <Package Id="*" InstallerVersion="301" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
@@ -167,13 +168,11 @@
             <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist140" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <?if ${build.configuration} = debug ?>
                 <Merge Id="VCRedist90Debug" SourceFile="MergeModules\Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
                 <Merge Id="VCRedist90PolicyDebug" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
                 <Merge Id="VCRedist100Debug" SourceFile="MergeModules\Microsoft_VC100_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
                 <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist140Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
             <?endif?>
         </DirectoryRef>
 
@@ -197,13 +196,6 @@
             <MergeRef Id="VCRedist110"/>
             <?if ${build.configuration} = debug ?>
                 <MergeRef Id="VCRedist110Debug"/>
-            <?endif?>
-        </Feature>
-
-        <Feature Id="VCRedistVS14" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist140"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist140Debug"/>
             <?endif?>
         </Feature>
 

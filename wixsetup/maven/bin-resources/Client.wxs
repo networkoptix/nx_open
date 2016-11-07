@@ -308,7 +308,6 @@
             <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
-            <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentGroupRef Id="ClientLibs"/>
             <ComponentRef Id="ClientConfiguration" />
             <?if $(var.quicksync) = true ?>

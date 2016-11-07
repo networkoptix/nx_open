@@ -2,19 +2,32 @@ import os, sys, subprocess, shutil
 from os.path import dirname, join, exists, isfile
 
 bin_source_dir = '${libdir}/bin/${build.configuration}'
+
 server_msi_folder = 'bin/msi'
+server_exe_folder = 'bin/exe'
+
 client_msi_folder = 'bin/msi'
+client_exe_folder = 'bin/exe'
+
+full_exe_folder = 'bin/exe'
+
 nxtool_msi_folder = 'bin/msi'
 server_msi_strip_folder = 'bin/strip'
 client_msi_strip_folder = 'bin/strip'
 wix_pdb = 'wixsetup.wixpdb'
 
 server_msi_name = '${finalName}-server-only.msi'
+server_exe_name = '${finalName}-server-only.exe'
+
 client_msi_name = '${finalName}-client-only.msi'
+client_exe_name = '${finalName}-client-only.exe'
+
+full_exe_name = '${finalName}-client-only.exe'
+
 nxtool_msi_name = '${finalName}-servertool.msi'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
-common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning', 'vs2015crt']
+common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
 server_components = ['UninstallOptionsDlg', 'EmptyPasswordDlg', 'MediaServerDlg', 'ServerVox', 'Server', 'traytool', 'DbSync22Files']
 nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls']
@@ -29,18 +42,15 @@ def add_components(command, components):
         command.append('{0}.wxs'.format(component))
 
 def get_candle_command(suffix):
-    install_type = 'client-only'
-    if suffix.startswith('server'):
-        install_type = 'server-only'
-
     command = ['candle']
-    command.append('-dinstalltype="{0}"'.format(install_type))
-    command.append('-dVs2015crtDir=${Vs2015crtDir}')   
     command.append('-dClientVoxSourceDir=${ClientVoxSourceDir}')
     command.append('-arch')
     command.append('${arch}')
     command.append('-out')
     command.append('obj\\${build.configuration}-{0}\\'.format(suffix))
+
+    command.append('-dClientMsiName={}'.format(client_msi_name))
+    command.append('-dServerMsiName={}'.format(server_msi_name))
 
     if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')
@@ -87,13 +97,6 @@ def get_fix_dialog_command(folder, msi):
     command.append('{0}/{1}'.format(folder, msi))
     return command
 
-def get_iss_command():
-    command = [os.path.join(os.getenv('environment'), "is5/ISCC.exe")]
-    command.append('/obin')
-    command.append('/f${finalName}')
-    command.append('Product-full.iss')
-    return command
-    
 def execute_command(command):
     print 'Executing command:\n{0}\n'.format(' '.join(command))
     retcode = subprocess.call(command)
@@ -117,7 +120,10 @@ def rename(folder, old_name, new_name):
 def main():
     commands = []
     commands += create_commands_set('client-only', client_msi_folder, client_msi_name)
+    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name)
     commands += create_commands_set('server-only', server_msi_folder, server_msi_name)
+    commands += create_commands_set('server-exe', server_exe_folder, server_exe_name)
+    commands += create_commands_set('full-exe', full_exe_folder, full_exe_name)
     commands += create_commands_set('client-strip', client_msi_strip_folder, client_msi_name)
     commands += create_commands_set('server-strip', server_msi_strip_folder, server_msi_name)   
     if '${nxtool}' == 'true':
@@ -131,16 +137,6 @@ def main():
 
     assert(len(client_msi_product_code) > 0)
     assert(len(server_msi_product_code) > 0)
-
-    with open('generated_variables.iss', 'w') as f:
-        print >> f, '#define ServerMsiFolder "%s"' % server_msi_strip_folder
-        print >> f, '#define ClientMsiFolder "%s"' % client_msi_strip_folder
-        print >> f, '#define ServerMsiName "%s"' % server_msi_name
-        print >> f, '#define ClientMsiName "%s"' % client_msi_name
-        print >> f, '#define ServerMsiProductCode "%s"' % server_msi_product_code
-        print >> f, '#define ClientMsiProductCode "%s"' % client_msi_product_code
-
-    execute_command(get_iss_command())
 
     #Debug code to make applauncher work from the build_environment/target/bin folder
     rename(bin_source_dir, 'minilauncher.exe', '${minilauncher.binary.name}')

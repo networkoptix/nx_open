@@ -37,6 +37,7 @@
         <?define SystemFolderActual = "System64Folder"?>
     <?endif?>
 
+    <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}" ?>
     <!-- Wix Variables -->
 
     <?ifdef env.CommonProgramFiles(x86) ?>

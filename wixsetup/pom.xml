@@ -24,7 +24,7 @@
         <NxtoolQuickControlsDir>${libdir}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
         <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
-        <Vs2015crtDir>${environment.dir}\wix\vs2015crt\${arch}</Vs2015crtDir>
+        <VSRedistDir>${environment.dir}\wix\Redist</VSRedistDir>
         <rdep.packages>appserver-2.2.1 vcredist-2012 vmaxproxy-2.1</rdep.packages>
     </properties>
 
@@ -63,8 +63,8 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>            
-        </dependency>					
-    </dependencies>		
+        </dependency>                   
+    </dependencies>     
 
     <build>
         <directory>${arch}</directory>
@@ -123,6 +123,25 @@
                             </resources>              
                         </configuration>            
                     </execution>                      
+                    <execution>
+                        <id>copy-vs-redist</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${environment.dir}\wix</directory>    
+                                    <includes>
+                                        <include>Redist/**</include>
+                                    </includes>
+                                </resource>             
+                            </resources>              
+                        </configuration>            
+                    </execution>                      
                 </executions>
             </plugin>
             <plugin>
@@ -149,7 +168,7 @@
                                     </value>
                                 </replacement>           
                             </replacements>
-                        </configuration>								
+                        </configuration>                                
                     </execution>
                 </executions>
             </plugin>                     
@@ -244,9 +263,9 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>client-update</finalName>							
+                            <finalName>client-update</finalName>                            
                         </configuration>
-                    </execution>	
+                    </execution>    
                     <execution>
                         <id>server-update-package</id>
                         <phase>post-integration-test</phase>
@@ -258,7 +277,7 @@
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
-                            <finalName>server-update</finalName>							
+                            <finalName>server-update</finalName>                            
                         </configuration>
                     </execution>
                     <execution>
@@ -326,8 +345,8 @@
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
                         </configuration>
                     </execution>              
-                </executions>				
-            </plugin> 	            
+                </executions>               
+            </plugin>               
         </plugins>
     </build>       
     <profiles>
