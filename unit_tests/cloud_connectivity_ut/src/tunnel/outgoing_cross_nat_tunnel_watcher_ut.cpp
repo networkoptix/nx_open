@@ -1,0 +1,121 @@
+#include <gtest/gtest.h>
+
+#include <nx/network/cloud/tunnel/outgoing_cross_nat_tunnel_watcher.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/future.h>
+
+namespace nx {
+namespace network {
+namespace cloud {
+
+namespace {
+
+class TestTunnelConnection:
+    public AbstractOutgoingTunnelConnection
+{
+public:
+    virtual void stopWhileInAioThread() override
+    {
+    }
+
+    virtual void establishNewConnection(
+        std::chrono::milliseconds /*timeout*/,
+        SocketAttributes /*socketAttributes*/,
+        OnNewConnectionHandler /*handler*/) override
+    {
+    }
+
+    virtual void setControlConnectionClosedHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
+    {
+    }
+};
+
+constexpr auto crossNatTunnelInactivityTimeout = std::chrono::seconds(3);
+constexpr auto allowedTimerError = std::chrono::seconds(5);
+
+class OutgoingCrossNatTunnelWatcherTest:
+    public ::testing::Test
+{
+public:
+    OutgoingCrossNatTunnelWatcherTest()
+    {
+        m_connectionParameters.crossNatTunnelInactivityTimeout =
+            crossNatTunnelInactivityTimeout;
+    }
+    
+    ~OutgoingCrossNatTunnelWatcherTest()
+    {
+    }
+
+protected:
+    void initializeTunnel()
+    {
+        m_tunnel = std::make_unique<OutgoingCrossNatTunnelWatcher>(
+            m_connectionParameters,
+            std::make_unique<TestTunnelConnection>());
+
+        m_tunnel->setControlConnectionClosedHandler(
+            [this](SystemError::ErrorCode reason)
+            {
+                m_tunnelClosedPromise.set_value(reason);
+            });
+    }
+
+    void waitForTunnelToExpire(
+        nx::utils::future<SystemError::ErrorCode>& tunnelClosedFuture)
+    {
+        ASSERT_EQ(
+            std::future_status::ready,
+            tunnelClosedFuture.wait_for(crossNatTunnelInactivityTimeout + allowedTimerError));
+        ASSERT_EQ(SystemError::timedOut, tunnelClosedFuture.get());
+    }
+
+    nx::hpm::api::ConnectionParameters m_connectionParameters;
+    std::unique_ptr<OutgoingCrossNatTunnelWatcher> m_tunnel;
+    nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
+};
+
+} // namespace
+
+TEST_F(OutgoingCrossNatTunnelWatcherTest, unusedTunnel)
+{
+    initializeTunnel();
+
+    auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
+    waitForTunnelToExpire(tunnelClosedFuture);
+}
+
+TEST_F(OutgoingCrossNatTunnelWatcherTest, usingTunnel)
+{
+    initializeTunnel();
+
+    auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
+
+    const auto deadline = 
+        std::chrono::steady_clock::now() +
+        crossNatTunnelInactivityTimeout + allowedTimerError;
+
+    while (std::chrono::steady_clock::now() < deadline)
+    {
+        m_tunnel->establishNewConnection(
+            std::chrono::milliseconds::zero(),
+            SocketAttributes(),
+            [](SystemError::ErrorCode,
+               std::unique_ptr<AbstractStreamSocket>,
+               bool /*stillValid*/)
+            {
+            });
+
+        std::this_thread::sleep_for((deadline - std::chrono::steady_clock::now()) / 10);
+        ASSERT_EQ(
+            std::future_status::timeout,
+            tunnelClosedFuture.wait_for(std::chrono::seconds::zero()));
+    }
+
+    waitForTunnelToExpire(tunnelClosedFuture);
+}
+
+} // namespace cloud
+} // namespace network
+} // namespace nx

@@ -68,6 +68,10 @@ namespace
     constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
         nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 
+    const QLatin1String kCrossNatTunnelInactivityTimeout("cloudConnect/crossNatTunnelInactivityTimeout");
+    constexpr const std::chrono::seconds kDefaultCrossNatTunnelInactivityTimeout =
+        nx::hpm::api::kCrossNatTunnelInactivityTimeoutDefault;
+
     namespace tcp_reverse_retry_policy {
     const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
     const QLatin1String kInitialDelay("cloudConnect/tcpReverseRetryPolicy/initialDelay");
@@ -181,16 +185,21 @@ void Settings::loadConfiguration()
         &m_http.addrToListenList);
 
     m_connectionParameters.rendezvousConnectTimeout =
-        nx::utils::parseTimerDuration(m_settings.value(
-            kRendezvousConnectTimeout,
-            static_cast<qulonglong>(kDefaultRendezvousConnectTimeout.count())).toString());
+        nx::utils::parseTimerDuration(
+            m_settings.value(kRendezvousConnectTimeout).toString(),
+            kDefaultRendezvousConnectTimeout);
     m_connectionParameters.udpTunnelKeepAliveInterval =
-        nx::utils::parseTimerDuration(m_settings.value(
-            kUdpTunnelKeepAliveInterval,
-            static_cast<qulonglong>(kDefaultUdpTunnelKeepAliveInterval.count())).toString());
+        nx::utils::parseTimerDuration(
+            m_settings.value(kUdpTunnelKeepAliveInterval).toString(),
+            kDefaultUdpTunnelKeepAliveInterval);
     m_connectionParameters.udpTunnelKeepAliveRetries = m_settings.value(
         kUdpTunnelKeepAliveRetries,
         kDefaultUdpTunnelKeepAliveRetries).toInt();
+    m_connectionParameters.crossNatTunnelInactivityTimeout = 
+        duration_cast<seconds>(
+            nx::utils::parseTimerDuration(
+                m_settings.value(kCrossNatTunnelInactivityTimeout).toString(),
+                kDefaultCrossNatTunnelInactivityTimeout));
 
     m_connectionParameters.tcpReverseRetryPolicy.setMaxRetryCount(m_settings.value(
         tcp_reverse_retry_policy::kMaxCount,
