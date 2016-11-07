@@ -2,20 +2,20 @@
 #include <QtWebSockets/QWebSocket>
 
 
-FlirIOExecutor::FlirIOExecutor():
+FlirIoExecutor::FlirIoExecutor():
     m_thread(new QThread())
 {
     qRegisterMetaType<QWebSocket*>("QWebSocket*");
-    m_thread->setObjectName(lit("FlirIOExecutor thread"));
+    m_thread->setObjectName(lit("FlirIoExecutor thread"));
 }
 
-FlirIOExecutor::~FlirIOExecutor()
+FlirIoExecutor::~FlirIoExecutor()
 {
     m_thread->exit();
     m_thread->wait();
 }
 
-QThread* FlirIOExecutor::getThread() const
+QThread* FlirIoExecutor::getThread() const
 {
-    return m_thread;
+    return m_thread.get();
 }

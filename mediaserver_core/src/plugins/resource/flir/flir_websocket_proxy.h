@@ -7,7 +7,7 @@ class FlirWebSocketProxy: public QObject
     Q_OBJECT
 
 public:
-    FlirWebSocketProxy();
+    FlirWebSocketProxy(QObject* parent = nullptr);
 
 public:
     QWebSocket* getSocket();
@@ -19,6 +19,5 @@ private slots:
     void sendTextMessageInternal(const QString& message);
 
 private:
-    QObject* m_parent;
     QWebSocket* m_socket;
 };

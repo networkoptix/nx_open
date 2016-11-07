@@ -13,37 +13,20 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <core/resource/resource_data.h>
 
-class FlirWsIOManager :
+class FlirWebSocketIoManager :
     public QObject,
     public Qn::EnableSafeDirectConnection,
     public QnAbstractIOManager
 {
     Q_OBJECT
 
-    struct FlirAlarmNotification
-    {
-        int deviceId;
-        int health;
-        int lastBIT;
-        quint64 timestamp;
-        int deviceType;
-        int sourceIndex;
-        QString sourceName;
-        QString timestamp2;
-        int state;
-        double latitude;
-        double longitude;
-        double altitude;
-        int autoacknowledge;
-    };
-
-    struct FlirAlarmEvent
+    struct AlarmEvent
     {
         QString alarmId;
-        bool alarmState;
+        bool alarmState = 0;
     };
 
-    struct FlirServerWhoAmIResponse
+    struct ServerWhoAmIResponse
     {
         qint64 returnCode;
         QString returnString;
@@ -53,9 +36,9 @@ class FlirWsIOManager :
     };
 
 public:
-    FlirWsIOManager(QnResource* resource);
+    FlirWebSocketIoManager(QnResource* resource);
 
-    virtual ~FlirWsIOManager();
+    virtual ~FlirWebSocketIoManager();
 
     virtual bool startIOMonitoring() override;
 
@@ -132,19 +115,19 @@ private:
     void connectControlWebsocket(std::chrono::milliseconds delay = std::chrono::milliseconds(0));
     void connectNotificationWebSocket();
     void requestSessionId();
-    FlirServerWhoAmIResponse parseControlMessage(const QString& message);
+    ServerWhoAmIResponse parseControlMessage(const QString& message);
 
     QString buildNotificationSubscriptionPath() const; 
     QString buildNotificationSubscriptionParamString(const QString& subscriptionType) const;
     
     void handleNotification(const QString& message);
     bool isThgObjectNotificationType(const QString& notificationType) const;
-    FlirAlarmEvent parseNotification(const QString& message, bool *outStatus) const;
-    FlirAlarmEvent parseThgObjectNotification(const QStringList& notificationParts, bool* outStatus) const;    
-    FlirAlarmEvent parseAlarmNotification(const QStringList& notificationParts, bool* outStatus) const; //< maybe it's worth to subscribe to $IO not $ALARM
+    AlarmEvent parseNotification(const QString& message, bool *outStatus) const;
+    AlarmEvent parseThgObjectNotification(const QStringList& notificationParts, bool* outStatus) const;    
+    AlarmEvent parseAlarmNotification(const QStringList& notificationParts, bool* outStatus) const; //< maybe it's worth to subscribe to $IO not $ALARM
 
     qint64 parseFlirDateTime(const QString& dateTime, bool* outStatus);
-    void checkAndNotifyIfNeeded(const FlirAlarmEvent& notification);
+    void checkAndNotifyIfNeeded(const AlarmEvent& notification);
 
     void sendKeepAlive();
 

@@ -1,9 +1,10 @@
 #include "flir_websocket_proxy.h"
 #include "flir_io_executor.h"
 
-FlirWebSocketProxy::FlirWebSocketProxy()
+FlirWebSocketProxy::FlirWebSocketProxy(QObject* parent):
+    QObject(parent)
 {
-    auto executorThread = FlirIOExecutor::instance()->getThread();
+    auto executorThread = FlirIoExecutor::instance()->getThread();
     executorThread->start();
 
     m_socket = new QWebSocket();

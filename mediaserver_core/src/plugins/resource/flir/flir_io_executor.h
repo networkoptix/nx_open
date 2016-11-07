@@ -7,15 +7,15 @@
 
 #include <nx/utils/singleton.h>
 
-class FlirIOExecutor: 
+class FlirIoExecutor: 
     public QObject,
-    public Singleton<FlirIOExecutor>
+    public Singleton<FlirIoExecutor>
 {
     Q_OBJECT
 public:
-    FlirIOExecutor();
-    virtual ~FlirIOExecutor();
+    FlirIoExecutor();
+    virtual ~FlirIoExecutor();
     QThread* getThread() const;
 private:
-    QThread* m_thread;
+    std::unique_ptr<QThread> m_thread;
 };

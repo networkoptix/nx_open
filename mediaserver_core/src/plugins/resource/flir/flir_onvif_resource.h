@@ -27,7 +27,7 @@ public:
         unsigned int autoResetTimeoutMS) override;
 
 private:
-    FlirWsIOManager* m_ioManager;
+    FlirWebSocketIoManager* m_ioManager;
 };
 
 typedef QnSharedResourcePointer<QnFlirOnvifResource> QnFlirOnvifResourcePtr;
