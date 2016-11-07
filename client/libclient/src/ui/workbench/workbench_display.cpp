@@ -151,7 +151,50 @@ QString dt(qint64 time)
 }
 #endif
 
-} // anonymous namespace
+
+void setWidgetScreen(QWidget* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    const auto window = target->window();
+    if (!window)
+        return;
+
+    if (const auto handle = window->windowHandle())
+        handle->setScreen(screen);
+}
+
+void setScreenRecursive(QWidget* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    for (const auto& child : target->children())
+    {
+        if (const auto widget = qobject_cast<QWidget*>(child))
+            setScreenRecursive(widget, screen);
+    }
+
+    setWidgetScreen(target, screen);
+}
+
+void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    for (const auto& child : target->childItems())
+        setScreenRecursive(child, screen);
+
+    if (!target->isWidget())
+        return;
+
+    if (const auto proxy = dynamic_cast<QGraphicsProxyWidget*>(target))
+        setScreenRecursive(proxy->widget(), screen);
+};
+
+} // namespace
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     base_type(parent),
@@ -470,6 +513,14 @@ void QnWorkbenchDisplay::initSceneView()
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
         QGLWidget *viewport = newGlWidget(m_view);
+
+        auto w = viewport->windowHandle();
+        connect(w, &QWindow::screenChanged, this,
+            [this](QScreen *screen)
+        {
+            for (auto& item: m_view->items())
+                setScreenRecursive(item, screen);
+        });
 
         m_view->setViewport(viewport);
 
