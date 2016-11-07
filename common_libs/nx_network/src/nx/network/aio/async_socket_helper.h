@@ -753,14 +753,22 @@ private:
         if (eventType == aio::etNone)
             nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
+        {
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etRead, true);
+            m_recvHandler = nullptr;
+        }
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etWrite, true);
+            m_connectHandler = nullptr;
+            m_sendHandler = nullptr;
             m_asyncSendIssued = false;
         }
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
+        {
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etTimedOut, true);
+            m_timerHandler = nullptr;
+        }
     }
 };
 
