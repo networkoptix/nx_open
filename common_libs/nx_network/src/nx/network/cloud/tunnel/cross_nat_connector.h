@@ -93,7 +93,7 @@ private:
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
-    hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const;
+    hpm::api::ConnectRequest prepareConnectRequest() const;
 };
 
 } // namespace cloud
