@@ -35,7 +35,7 @@ public:
                 // false positive isRunning may occurred if it's delayed signal from removed object
                 auto itr = m_threadsToStop.find(thread);
                 if (itr != m_threadsToStop.end() && !itr->first->isRunning())
-                    m_threadsToStop.erase(thread);
+                    m_threadsToStop.erase(itr);
             }
         );
         if (ptr->isRunning())
