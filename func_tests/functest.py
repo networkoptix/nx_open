@@ -1290,6 +1290,7 @@ BoxTestKeys = OrderedDict([
     ('--dbup', DBTest),
     ('--boxtests', None),
 ])
+KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
 
 
 def BoxTestsRun(name):
@@ -1419,6 +1420,7 @@ def parseArgs():
     parser.add_argument('-c', '--config', metavar="FILE", help="Use alternative configuration file")
     parser.add_argument('--recover', action="store_true", help=getHelpDesc('recover'))
     parser.add_argument('--log', metavar="FILE", nargs="?", const="", help="Suppress direct output, storing it into a file. See '--help-arg log' for details ")
+    parser.add_argument('--list-auto-test', action="store_true", help="List options for tests, used in auto-testing system" )
 
     parser.add_argument('--autorollback', '--arb', action="store_true", help="Automativally rollback changes done by the legacy tests")
     parser.add_argument('--skiplegacy', action="store_true", help="Skip 'legacy' functional tests")
@@ -1453,6 +1455,13 @@ def parseArgs():
     return args, other
 
 
+def ListAutoTests():
+    print "--mainonly Main minimal functests set"
+    for key, klass in BoxTestKeys.iteritems():
+        if key not in KeysSkipList:
+            print "%s %s" % (key, klass.helpStr)
+
+
 def main(args, other):
     #print "Args: %s" % (args,)
     #print "Remaining argv: %s" % (other,)
@@ -1461,6 +1470,9 @@ def main(args, other):
         return True
     if args.recover:
         UnitTestRollback(autorollback=True, nocreate=True)
+        return True
+    if args.list_auto_test:
+        ListAutoTests()
         return True
     testMaster.applyArgs(args)
     try:
