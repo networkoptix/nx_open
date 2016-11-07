@@ -514,14 +514,15 @@ void QnWorkbenchDisplay::initSceneView()
     {
         QGLWidget *viewport = newGlWidget(m_view);
 
-        auto w = viewport->windowHandle();
-        connect(w, &QWindow::screenChanged, this,
-            [this](QScreen *screen)
+        if (const auto window = viewport->windowHandle())
         {
-            for (auto& item: m_view->items())
-                setScreenRecursive(item, screen);
-        });
-
+            connect(window, &QWindow::screenChanged, this,
+                [this](QScreen *screen)
+                {
+                    for (auto& item : m_view->items())
+                        setScreenRecursive(item, screen);
+                });
+        }
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
