@@ -18,6 +18,16 @@ void setTabShape(QTabBar* tabBar, style::TabShape tabShape);
 void setMonospaceFont(QWidget* widget);
 QFont monospaceFont(const QFont& font = QFont());
 
+void resizePagesToContents(QStackedWidget* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler = std::function<void()>());
+
+void resizePagesToContents(QTabWidget* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler = std::function<void()>());
+
 /*
 * Fade a widget in or out using QGraphicsOpacityEffect.
 * Intended for use in dialogs.

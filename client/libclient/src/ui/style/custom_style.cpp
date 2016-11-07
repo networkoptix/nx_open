@@ -39,6 +39,63 @@ void setTabShape(QTabBar* tabBar, style::TabShape tabShape)
     tabBar->setProperty(style::Properties::kTabShape, QVariant::fromValue(tabShape));
 }
 
+template<class Pages>
+void resizePagesToContents_implementation(Pages* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler)
+{
+    auto adjustSizePolicies =
+        [pages, visiblePagePolicy, extraHandler](int current)
+        {
+            for (int i = 0; i < pages->count(); ++i)
+            {
+                pages->widget(i)->setSizePolicy(i != current
+                    ? QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored)
+                    : visiblePagePolicy);
+            }
+
+            if (extraHandler)
+                extraHandler();
+        };
+
+    adjustSizePolicies(pages->currentIndex());
+
+    if (resizeToVisible)
+    {
+        pages->connect(pages, &Pages::currentChanged, adjustSizePolicies);
+    }
+    else
+    {
+        pages->connect(pages, &Pages::currentChanged,
+            [pages, visiblePagePolicy, extraHandler]()
+            {
+                pages->currentWidget()->setSizePolicy(visiblePagePolicy);
+                if (extraHandler)
+                    extraHandler();
+            });
+    }
+}
+
+void resizePagesToContents(QStackedWidget* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler)
+{
+
+    resizePagesToContents_implementation(pages, visiblePagePolicy,
+        resizeToVisible, extraHandler);
+}
+
+void resizePagesToContents(QTabWidget* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler)
+{
+    resizePagesToContents_implementation(pages, visiblePagePolicy,
+        resizeToVisible, extraHandler);
+}
+
 void fadeWidget(
     QWidget* widget,
     qreal initialOpacity, /* -1 for opacity the widget has at the moment of the call */
