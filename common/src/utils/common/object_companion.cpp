@@ -29,10 +29,10 @@ bool QnObjectCompanionManager::attachUnique(QObject* parent, QObject* companion,
     return true;
 }
 
-void QnObjectCompanionManager::attach(QObject* parent, QObject* companion, const char* id, QObject*& previousCompanion)
+void QnObjectCompanionManager::attach(QObject* parent, QObject* companion, const char* id, QScopedPointer<QObject>& previousCompanion)
 {
     const QByteArray internalId = companionId(id);
-    previousCompanion = getCompanion(parent, internalId);
+    previousCompanion.reset(getCompanion(parent, internalId));
     setCompanion(parent, internalId, companion);
 }
 

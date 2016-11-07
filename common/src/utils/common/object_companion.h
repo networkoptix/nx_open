@@ -19,7 +19,7 @@ public:
     static bool attachUnique(QObject* parent, QObject* companion, const char* id);
 
     /** Attach a companion and return previously attached companion: */
-    static void attach(QObject* parent, QObject* companion, const char* id, QObject*& previousCompanion);
+    static void attach(QObject* parent, QObject* companion, const char* id, QScopedPointer<QObject>& previousCompanion);
 
     /** Detach a companion and return it (nullptr if no companion was attached): */
     static QObject* detach(QObject* parent, const char* id);
@@ -64,10 +64,18 @@ public:
 
     /** Create and attach a companion and return previously attached companion: */
     template<class ParentType>
-    static QnObjectCompanion<Base>* install(ParentType* parent, const char* id, QObject*& previousCompanion)
+    static QnObjectCompanion<Base>* install(ParentType* parent, const char* id, QScopedPointer<QObject>& previousCompanion)
     {
         auto result = new QnObjectCompanion<Base>(parent);
-        QnObjectCompanionManager::attach(parent, id, result, previousCompanion);
+        QnObjectCompanionManager::attach(parent, result, id, previousCompanion);
         return result;
+    }
+
+    /** Create and attach a companion, uninstall and delete previously attached companion: */
+    template<class ParentType>
+    static QnObjectCompanion<Base>* installNew(ParentType* parent, const char* id)
+    {
+        QScopedPointer<QObject> previousCompanion;
+        return install(parent, id, previousCompanion);
     }
 };
