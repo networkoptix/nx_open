@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <atomic>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace network {
 
@@ -95,9 +97,11 @@ static DnsResolver::HostAddresses convertAddrInfo(addrinfo* addressInfo)
 DnsResolver::HostAddresses
     DnsResolver::resolveSync(const QString& hostName, int ipVersion)
 {
+    auto resultCode = SystemError::noError;
+    const auto guard = makeScopedGuard([&](){ SystemError::setLastErrorCode(resultCode); });
     if (hostName.isEmpty())
     {
-        SystemError::setLastErrorCode(SystemError::invalidData);
+        resultCode = SystemError::invalidData;
         return HostAddresses();
     }
 
@@ -125,27 +129,29 @@ DnsResolver::HostAddresses
 
     if (status != 0)
     {
-        SystemError::ErrorCode code;
         switch (status)
         {
-            case EAI_NONAME: code = SystemError::hostNotFound; break;
-            case EAI_AGAIN: code = SystemError::again; break;
-            case EAI_MEMORY: code = SystemError::nomem; break;
+            case EAI_NONAME: resultCode = SystemError::hostNotFound; break;
+            case EAI_AGAIN: resultCode = SystemError::again; break;
+            case EAI_MEMORY: resultCode = SystemError::nomem; break;
 
             #ifdef __linux__
-                case EAI_SYSTEM: return HostAddresses(); //< System error returned in `errno'.
+                case EAI_SYSTEM: resultCode = SystemError::getLastOSErrorCode(); break;
             #endif
 
             // TODO: #mux Translate some other status codes?
-            default: code = SystemError::dnsServerFailure; break;
+            default: resultCode = SystemError::dnsServerFailure; break;
         };
-
-        SystemError::setLastErrorCode( code );
+        
         return HostAddresses();
     }
 
     std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
-    return convertAddrInfo(addressInfo);
+    const auto result = convertAddrInfo(addressInfo);
+    if (result.empty())
+        resultCode = SystemError::hostNotFound;
+    
+    return result;
 }
 
 void DnsResolver::cancel(RequestId requestId, bool waitForRunningHandlerCompletion)
@@ -217,7 +223,7 @@ void DnsResolver::run()
         lk.unlock();
         {
             auto result = resolveSync(task.hostAddress, task.ipVersion);
-            auto code = result.empty() ? SystemError::getLastOSErrorCode() : SystemError::noError;
+            auto code = SystemError::getLastOSErrorCode();
             if (task.requestId)
             {
                 lk.relock();
