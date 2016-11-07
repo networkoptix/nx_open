@@ -15,10 +15,12 @@ public:
     /** Returns an attached companion: */
     static QObject* companion(QObject* parent, const char* id);
 
-    /** Attaches a companion and returns previously attached companion: */
+    /** Attaches a companion to `parent` and returns previously attached companion.
+    * Parent takes ownership of the new companion and releases ownership of the old one. */
     static std::unique_ptr<QObject> attach(QObject* parent, QObject* companion, const char* id);
 
-    /** Detaches a companion and returns it (or null if no companion was attached): */
+    /** Detaches a companion and returns it (or null if no companion was attached).
+    * Parent releases ownership of the companion. */
     static std::unique_ptr<QObject> detach(QObject* parent, const char* id);
 
     /** Detaches and deletes a companion (returns false if no companion was attached): */
@@ -40,6 +42,7 @@ public:
     explicit QnObjectCompanion(ParentType* parent) : Base(parent) {}
 
     /** Creates and attaches a new companion and returns a pointer to it.
+    * Parent takes ownership of the companion.
     * If an old companion exists, deletes it if `unique` is false,
     * or keeps it and returns nullptr if `unique` is true.
     */

@@ -1,13 +1,14 @@
+#include <QtCore/QPointer>
 #include "object_companion.h"
 
 namespace {
 
 static QObject* getCompanion(QObject* parent, const QByteArray& internalId)
 {
-    return parent->property(internalId).value<QObject*>();
+    return parent->property(internalId).value<QPointer<QObject>>();
 }
 
-static void setCompanion(QObject* parent, const QByteArray& internalId, QObject* companion)
+static void setCompanion(QObject* parent, const QByteArray& internalId, QPointer<QObject> companion)
 {
     parent->setProperty(internalId, QVariant::fromValue(companion));
 }
@@ -34,6 +35,9 @@ std::unique_ptr<QObject> QnObjectCompanionManager::detach(QObject* parent, const
 {
     const QByteArray internalId = companionId(id);
     std::unique_ptr<QObject> result(getCompanion(parent, internalId));
+    if (!result)
+        return nullptr;
+    result->setParent(nullptr);
     clearCompanion(parent, internalId);
     return result;
 }
@@ -48,5 +52,6 @@ std::unique_ptr<QObject> QnObjectCompanionManager::attach(QObject* parent, QObje
     const QByteArray internalId = companionId(id);
     std::unique_ptr<QObject> previousCompanion(getCompanion(parent, internalId));
     setCompanion(parent, internalId, companion);
+    companion->setParent(parent);
     return previousCompanion;
 }
