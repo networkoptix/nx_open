@@ -152,6 +152,8 @@ public:
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs;
 
+    bool waitWhileJumpFinished;
+
     // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
     int liveBufferMs;
 
@@ -231,6 +233,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     execTimer(new QTimer(this)),
     miscTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
+    waitWhileJumpFinished(false),
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
@@ -318,6 +321,7 @@ void PlayerPrivate::at_hurryUp()
 
 void PlayerPrivate::at_jumpOccurred(int sequence)
 {
+    waitWhileJumpFinished = false;
     if (!videoFrameToRender)
         return;
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
@@ -460,7 +464,9 @@ void PlayerPrivate::presentNextFrame()
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
-        setPosition(videoFrameToRender->startTime());
+        bool ignoreFrameTime = metadata.noDelay || waitWhileJumpFinished;
+        if (!ignoreFrameTime)
+            setPosition(videoFrameToRender->startTime());
         setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
     videoFrameToRender.reset();
@@ -749,11 +755,12 @@ void Player::setPosition(qint64 value)
     Q_D(Player);
     d->log(lit("setPosition(%1)").arg(value));
 
-    d->lastSeekTimeMs = value;
+    d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
+    {
         d->archiveReader->jumpTo(msecToUsec(value), 0);
-    else
-        d->positionMs = value;
+        d->waitWhileJumpFinished = true;
+    }
 
     d->setLiveMode(value == kLivePosition);
 
