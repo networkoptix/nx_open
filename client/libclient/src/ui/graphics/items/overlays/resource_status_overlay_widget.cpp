@@ -13,13 +13,24 @@
 
 namespace {
 
-const auto kBigStretch = 1000;
+void makeTransparentForMouse(QGraphicsWidget* item)
+{
+    item->setAcceptedMouseButtons(Qt::NoButton);
+    item->setAcceptHoverEvents(false);
+}
 
-QnMaskedProxyWidget* makeMaskedProxy(QWidget* source, QGraphicsItem* parentItem = nullptr)
+QnMaskedProxyWidget* makeMaskedProxy(
+    QWidget* source,
+    QGraphicsItem* parentItem,
+    bool transparent)
 {
     const auto result = new QnMaskedProxyWidget(parentItem);
     result->setWidget(source);
     result->setAcceptDrops(false);
+
+    if (transparent)
+        makeTransparentForMouse(result);
+
     return result;
 }
 
@@ -118,7 +129,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_description(new QnWordWrappedLabel())
 {
     setAutoFillBackground(true);
-    setAcceptedMouseButtons(Qt::NoButton);
+    makeTransparentForMouse(this);
 
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
     connect(this, &GraphicsWidget::scaleChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
@@ -216,7 +227,7 @@ void QnStatusOverlayWidget::setupPreloader()
     layout->addItem(m_preloader);
 
     m_preloaderHolder->setLayout(layout);
-    m_preloaderHolder->setAcceptedMouseButtons(Qt::NoButton);
+    makeTransparentForMouse(m_preloaderHolder);
 }
 
 void QnStatusOverlayWidget::setupCentralControls()
@@ -238,11 +249,11 @@ void QnStatusOverlayWidget::setupCentralControls()
     const auto holderLayout = new QGraphicsLinearLayout(Qt::Vertical, m_centralHolder);
     holderLayout->setContentsMargins(16, 60, 16, 60);
     holderLayout->addStretch(1);
-    holderLayout->addItem(makeMaskedProxy(container, m_centralHolder));
+    holderLayout->addItem(makeMaskedProxy(container, m_centralHolder, true));
     holderLayout->addStretch(1);
 
     m_centralHolder->setOpacity(0.7);
-    m_centralHolder->setAcceptedMouseButtons(Qt::NoButton);
+    makeTransparentForMouse(m_centralHolder);
 }
 
 void QnStatusOverlayWidget::setupExtrasControls()
@@ -256,15 +267,15 @@ void QnStatusOverlayWidget::setupExtrasControls()
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
     layout->setContentsMargins(16, 0, 16, 16);
 
-    const auto buttonProxy = makeMaskedProxy(m_button, m_extrasHolder);
+    const auto buttonProxy = makeMaskedProxy(m_button, m_extrasHolder, false);
     layout->addItem(buttonProxy);
     layout->setAlignment(buttonProxy, Qt::AlignHCenter);
 
-    const auto descriptionProxy = makeMaskedProxy(m_description, m_extrasHolder);
+    const auto descriptionProxy = makeMaskedProxy(m_description, m_extrasHolder, true);
     layout->addItem(descriptionProxy);
     layout->setAlignment(descriptionProxy, Qt::AlignHCenter);
 
-    m_extrasHolder->setAcceptedMouseButtons(Qt::NoButton);
+    makeTransparentForMouse(m_extrasHolder);
 }
 
 void QnStatusOverlayWidget::initializeHandlers()
