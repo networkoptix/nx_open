@@ -1,5 +1,7 @@
 #include "updatable.h"
 
+#include <nx/utils/log/log.h>
+
 QnUpdatable::QnUpdatable()
     : m_updateCount(0)
 {
