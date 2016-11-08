@@ -17,6 +17,7 @@ typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 /* Top-level domains can already be up to 30 symbols length for now, so do not limiting them. */
 const QLatin1String emailPattern("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,255}\\b");
 
+/* RFC5233 (sub-addressing, also known as plus addressing or tagged addressing). */
 const QLatin1String fullNamePattern("(.*)<(.+)>");
 
 const int tlsPort = 587;
@@ -115,6 +116,8 @@ bool QnEmailAddress::isValid() const
 
 QString QnEmailAddress::user() const
 {
+    /* Support for tagged addressing: username+tag@domain.com */
+
     int idx = m_email.indexOf(L'@');
     int idxSuffix = m_email.indexOf(L'+');
     if (idx >= 0)
