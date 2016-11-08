@@ -62,7 +62,7 @@ def compareResults(a, b):
                             (a.func, a.req_str(), b.req_str(), diff.errorInfo(), diffresult))
 
 
-class ProxyTest(object):
+class ServerProxyTest(object):
 
     def __init__(self, mainHost, secHost):
         self.mainHost = mainHost
@@ -140,7 +140,7 @@ if __name__ == '__main__':
         pass
     try:
         _prepareLoader((_MAIN_HOST, _SEC_HOST))
-        ProxyTest(_MAIN_HOST, _SEC_HOST).run()
+        ServerProxyTest(_MAIN_HOST, _SEC_HOST).run()
     except FuncTestError as err:
         print "FAIL: %s" % err.message
 

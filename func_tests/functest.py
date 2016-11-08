@@ -20,7 +20,7 @@ import argparse
 from collections import OrderedDict
 
 from functest_util import *
-from testbase import RunTests, LegacyTestWrapper, getTestMaster, UnitTestRollback, FuncTestError
+from testbase import RunTests, FuncTestCase, getTestMaster, UnitTestRollback, FuncTestError
 testMaster = getTestMaster()
 
 from generator import *
@@ -32,7 +32,7 @@ from stortest import BackupStorageTest, MultiserverArchiveTest
 from streaming_test import StreamingTest, HlsOnlyTest
 from natcon_test import NatConnectionTest
 from dbtest import DBTest
-from proxytest import ProxyTest
+from proxytest import ServerProxyTest
 
 
 #class AuthH(urllib2.HTTPDigestAuthHandler):
@@ -89,12 +89,14 @@ class MergeTestBase:
         return True
 
     def _setSystemName(self,addr,name):
-        print "Connection to http://%s/api/configure" % (addr)
-        response = urllib2.urlopen("http://%s/api/configure?%s" % (addr,urllib.urlencode({"systemName":name})))
-        if response.getcode() != 200 :
-            return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
-        response.close()
-        return (True,"")
+        url = "http://%s/api/configure?%s" % (addr, urllib.urlencode({"systemName":name}))
+        print "Performing " + url
+        try:
+            response = urllib2.urlopen(url)
+            assert response.getcode() == 200, \
+                "Cannot issue changeSystemName with HTTP code: %d on %s" % (response.getcode(), addr)
+        except Exception as err:
+            assert False, "Failed to change system name on %s: %s" % (addr, err.message)
 
     # This function is used to set the system name to random
     def _setClusterSystemRandom(self):
@@ -106,7 +108,7 @@ class MergeTestBase:
 
     def _setClusterToMerge(self):
         for s in testMaster.clusterTestServerList:
-            self._setSystemName(s,self._mergeTestSystemName)
+            self._setSystemName(s, self._mergeTestSystemName)
 
     def _rollbackSystemName(self):
         for i in xrange(len(testMaster.clusterTestServerList)):
@@ -192,13 +194,11 @@ class MergeTest_Resource(MergeTestBase):
 
         # Testing whether all the cluster server has identical system name
         for s in testMaster.clusterTestServerList:
-            print "Connection to http://%s/ec2/testConnection" % (s)
-            response = urllib2.urlopen("http://%s/ec2/testConnection" % (s))
-            if response.getcode() != 200:
-                return False
+            print "Connection to http://%s/ec2/testConnection" % (s,)
+            response = urllib2.urlopen("http://%s/ec2/testConnection" % (s,))
+            assert response.getcode() == 200, "ec2/testConnection failed on " + s
             jobj = SafeJsonLoads(response.read(), s, 'testConnection')
-            if jobj is None:
-                return False
+            assert jobj is not None, "Bad data returned by ec2/testConnection from " + s
             if oldSystemName == None:
                 oldSystemName = jobj["systemName"]
                 oldSystemNameAddr = s
@@ -209,11 +209,9 @@ class MergeTest_Resource(MergeTestBase):
                     print "Server %s - '%s'; server %s - '%s'" % (
                         oldSystemName, oldSystemNameAddr, s, jobj["systemName"])
                     print "Please make all the server has identical system name before running merge test"
-                    return False
+                    assert False, "Different system names before merge"
             response.close()
-
         print "Merge test prolog pass"
-        return True
 
     def _epilog(self):
         print "Merge test epilog, change all servers system name back to its original one"
@@ -232,7 +230,7 @@ class MergeTest_Resource(MergeTestBase):
         worker = ClusterWorker(testMaster.threadNumber, len(testMaster.clusterTestServerList))
 
         for s in testMaster.clusterTestServerList:
-            worker.enqueue(PrepareServerStatus(self).main,(s,))
+            worker.enqueue(PrepareServerStatus(self).main, (s,))
 
         worker.join()
         print "Merge test phase1 done, now sleep %s seconds and wait for sync" % self._mergeTestTimeout
@@ -247,26 +245,17 @@ class MergeTest_Resource(MergeTestBase):
         # Do the status checking of _ALL_ API
         testMaster.checkMethodStatusConsistent(PrepareServerStatus.getterAPI)  # raises on errors
         print "Merge test phase2 done"
-        return (True,"")
 
     def test(self):
-        print "================================\n"
-        print "Server Merge Test: Resource Start\n"
         try:
-            if not self._prolog():
-                print "FAIL: Merge Test: Resource prolog failed!"
-                return False
+            self._prolog()
             self._phase1()
-            ret,reason = self._phase2()
-            if not ret:
-                print "FAIL: %s" % reason
+            self._phase2()
             self._epilog()
+        except AssertionError:
+            raise
         except Exception as err:
-            print "FAIL: %s" % (err,)
-            ret = False
-        print "Server Merge Test: Resource End%s\n" % ('' if ret else ": test FAILED")
-        print "================================\n"
-        return ret
+            assert False, "FAIL: %s" % (err,)
 
 # This merge test is used to test admin's password
 # Steps:
@@ -600,22 +589,26 @@ class MergeTest_AdminPassword(MergeTestBase):
         return True
 
 
-class MergeTest(object):
-
-    def __init__(self, needCleanUp=False):
-        self._CleanUp = needCleanUp
-
-    def run(self):
-        try:
-            if not MergeTest_Resource().test():
-                return False
-            # The following merge test ALWAYS fail and I don't know it is my problem or not
-            # Current it is disabled and you could use a seperate command line to run it
-            #MergeTest_AdminPassword().test()
-            return True
-        finally:
-            if self._CleanUp:
-                doCleanUp()
+def MergeTestRun(needCleanUp=False):
+    cleanUp = needCleanUp
+    ok = False
+    try:
+        print "================================"
+        print "Server Merge Test: Resource Start\n"
+        MergeTest_Resource().test()
+        # The following merge test ALWAYS fail and I don't know it is my problem or not
+        # Current it is disabled and you could use a seperate command line to run it
+        #MergeTest_AdminPassword().test()
+        ok = True
+        return True
+    except AssertionError as err:
+        print "FAIL: " + err.message
+        return False
+    finally:
+        print "Server Merge Test: Resource End%s" % ('' if ok else ": test FAILED")
+        print "================================\n"
+        if cleanUp:
+            doCleanUp()
 
 
 
@@ -1201,10 +1194,125 @@ def CallTest(testClass):
     return RunTests(testClass)
 
 
+class MainFunctests(FuncTestCase):
+    """
+    Provides an object to use virtual box control methods
+    """
+    helpStr = "The main minimal functional tests set"
+    _test_name = "Main functests"
+    _test_key = "legacy"
+    _suits = (("Main", [
+        "ConnectionTest",
+        "InitialClusterTest",
+        "BasicClusterTest",
+        "MergeTest",
+        "SysnameTest",
+        "ProxyTest"
+    ]),)
+    _need_rollback = True
+    _basicTestOk = False
+
+    @classmethod
+    def globalInit(cls, config):
+        super(MainFunctests, cls).globalInit(config)
+        testMaster.args.autorollback = True
+
+    #@classmethod
+    #def tearDownClass(cls):
+    #    if cls._need_rollback and testMaster.unittestRollback:
+    #        doCleanUp()
+    #    super(MainFunctests, cls).tearDownClass()
+
+    ########
+
+    def ConnectionTest(self):
+        self._servers_th_ctl('safe-start')
+        self._wait_servers_up()
+        self.assertTrue(testMaster.testConnection(frame=False), "Connection Test failed")
+
+    def _checkSkipLegacy(self):
+        if testMaster.args.skiplegacy:
+            self.skipTest("Disabled by --skiplegacy option")
+
+    def InitialClusterTest(self):
+        self._checkSkipLegacy()
+        testMaster.initial_tests()
+
+    def BasicClusterTest(self):
+        self._checkSkipLegacy()
+        try:
+            the_test = unittest.main(module=legacy_main, exit=False, argv=[sys.argv[0]],
+                                     testRunner=unittest.TextTestRunner(
+                                         stream=sys.stdout,
+                                     ))
+            assert the_test.result.wasSuccessful(), "Basic functional test FAILED"
+            self._basicTestOk = True
+        finally:
+            if testMaster.unittestRollback:
+                doCleanUp()
+
+    def _skipIfBasicFailed(self):
+        if not self._basicTestOk:
+            self.skipTest("Basic tests failed")
+
+    def MergeTest(self):
+        self._checkSkipLegacy()
+        self._skipIfBasicFailed()
+        if testMaster.unittestRollback:
+            testMaster.init_rollback()
+        MergeTest_Resource().test()
+
+    def SysnameTest(self):
+        self._checkSkipLegacy()
+        self._skipIfBasicFailed()
+        try:
+            assert SystemNameTest(testMaster.getConfig()).run(), "System name test faild"
+        finally:
+            if testMaster.unittestRollback:
+                doCleanUp()
+
+    def ProxyTest(self):
+        ""
+        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
+
+
+"""
+    def _LegacyTests(self):
+        ""
+        try:
+            config = testMaster.getConfig()
+            with LegacyTestWrapperOld(config):
+                if not testMaster.args.skiplegacy:
+
+                    print "Basic functional tests start"
+                    title = "basic functional tests"
+
+                    if the_test.result.wasSuccessful():
+                        print "Basic functional tests end"
+                        if testMaster.unittestRollback:
+                            doCleanUp(reinit=True)
+                        title = "merge test"
+                        MergeTestRun()
+                        title = "system name test"
+                        SystemNameTest(config).run()
+                    else:
+                        print "Basic functional test FAILED"
+                    if testMaster.unittestRollback:
+                        doCleanUp()
+                        need_rollback = False
+                    time.sleep(4)
+                title = "proxy test"
+                ServerProxyTest(*config.rtget('ServerList')[0:2]).run()
+        except Exception as err:
+            print "FAIL: %s failed with error: %s" % (title, err,)
+"""
+
+
 def RunByAutotest():
     """
     Used when this script is called by the autotesting script auto.py
     """
+    """-------------------
     testMaster.args.autorollback = True
     #config = testMaster.getConfig()
     need_rollback = True
@@ -1216,7 +1324,7 @@ def RunByAutotest():
             print "FAIL: can't initialize the cluster test object: %s" % (reason)
             return False
         config = testMaster.getConfig()
-        with LegacyTestWrapper(config):
+        with LegacyTestWrapperOld(config):
             title = "connection test"
             if not testMaster.testConnection():
                 print "FAIL: connection test"
@@ -1238,7 +1346,7 @@ def RunByAutotest():
                     if testMaster.unittestRollback:
                         doCleanUp(reinit=True)
                     title = "merge test"
-                    MergeTest().run()
+                    MergeTestRun()
                     title = "system name test"
                     SystemNameTest(config).run()
                 else:
@@ -1248,12 +1356,14 @@ def RunByAutotest():
                     need_rollback = False
                 time.sleep(4)
             title = "proxy test"
-            ProxyTest(*config.rtget('ServerList')[0:2]).run()
+            ServerProxyTest(*config.rtget('ServerList')[0:2]).run()
     except Exception as err:
         print "FAIL: %s failed with error: %s" % (title, err,)
     finally:
         if need_rollback and testMaster.unittestRollback:
             doCleanUp()
+    """
+    CallTest(MainFunctests)
     if not testMaster.args.mainonly:
         if not testMaster.args.skiptime:
             CallTest(TimeSyncTest)
@@ -1288,6 +1398,7 @@ BoxTestKeys = OrderedDict([
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
     ('--dbup', DBTest),
+    ('--mainonly', MainFunctests),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
@@ -1297,6 +1408,7 @@ def BoxTestsRun(name):
     testMaster.init(notest=True)
     if name == 'boxtests':
         ok = True
+        if not CallTest(MainFunctests): ok = False
         if not CallTest(TimeSyncTest): ok = False
         if not CallTest(BackupStorageTest): ok = False
         if not CallTest(MultiserverArchiveTest): ok = False
@@ -1307,7 +1419,7 @@ def BoxTestsRun(name):
         return CallTest(BoxTestKeys['--' + name])
 
 
-def LegacyTests(only = False, argv=[]):
+def LegacyTestsRun(only = False, argv=[]):
     _argv = argv[:]
     _argv.insert(0, sys.argv[0])
     del _argv[1:(3 if only else 2)]
@@ -1319,7 +1431,7 @@ def LegacyTests(only = False, argv=[]):
         print "Main tests passed OK"
         if (not only):
             with testMaster.unittestRollback:
-                mergeOk = MergeTest().run()
+                mergeOk = MergeTestRun()
             if mergeOk:
                 with testMaster.unittestRollback:
                     SystemNameTest(testMaster.getConfig()).run()
@@ -1340,9 +1452,10 @@ def DoTests(argv):
     if argc == 1 and argv[0] in SimpleTestKeys:
         return SimpleTestKeys[argv[0]](testMaster.getConfig()).run()
 
-    ret, reason = testMaster.initial_tests()
-    if ret == False:
-        print "FAIL: initial cluster test: %s" % (reason)
+    try:
+        testMaster.initial_tests()
+    except AssertionError, err:
+        print "FAIL: initial cluster test: " + err.message
         return False
 
     if argc == 1 and argv[0] == '--sync':
@@ -1350,17 +1463,17 @@ def DoTests(argv):
                # all the servers are on the same page
 
     if argc == 1 and argv[0] == '--proxy':
-        ProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
+        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
         #FIXME no result code returning!
 
     if argc >= 1 and argv[0] == '--legacy':
-        LegacyTests(argv[1] == '--only' if argc >= 2 else False, argv)
+        LegacyTestsRun(argv[1] == '--only' if argc >= 2 else False, argv)
         #FIXME no result code returning!
 
     elif argc == 1 and argv[0] == '--main':
-        rc = LegacyTests()
+        rc = LegacyTestsRun()
         time.sleep(3)
-        ProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
+        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
 
         print "\nALL AUTOMATIC TEST ARE DONE\n"
         #FIXME no result code returning!
@@ -1383,7 +1496,7 @@ def DoTests(argv):
 
     else:
         if argv[0] == '--merge-test':
-            return MergeTest(True).run()
+            return MergeTestRun(needCleanUp=True)
         elif argv[0] == '--merge-admin':
             rc = MergeTest_AdminPassword().test()
             testMaster.unittestRollback.removeRollbackDB()
@@ -1429,7 +1542,7 @@ def parseArgs():
     parser.add_argument('--skipmsa', action="store_true", help="Skip multi-server archive tests")
     parser.add_argument('--skipstrm', action="store_true", help="Skip streaming tests")
     parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
-    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
+#    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
     parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
 
     group = parser.add_argument_group("Functional test selection").add_mutually_exclusive_group()
@@ -1456,7 +1569,7 @@ def parseArgs():
 
 
 def ListAutoTests():
-    print "--mainonly Main minimal functests set"
+    print "--mainonly The main minimal functests set"
     for key, klass in BoxTestKeys.iteritems():
         if key not in KeysSkipList:
             print "%s %s" % (key, klass.helpStr)

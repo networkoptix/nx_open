@@ -11,7 +11,7 @@ import threading
 
 from functest_util import *
 from generator import *
-from testbase import LegacyTestWrapper, FuncTestMaster, getTestMaster
+from testbase import FuncTestMaster, getTestMaster
 
 testMaster = getTestMaster()  # it's a singleton
 
