@@ -119,7 +119,8 @@ class PrepareServerStatus(BasicGenerator):
     """ Represents a single server with an UNIQUE system name.
     After we initialize this server, we will make it executes certain
     type of random data generation, after such generation, the server
-    will have different states with other servers
+    will have different states with other servers.
+    Used in MergeTest_Resource.
     """
     _minData = 10
     _maxData = 20
@@ -144,18 +145,10 @@ class PrepareServerStatus(BasicGenerator):
     # Function to generate method and class matching
     def _generateDataAndAPIList(self,addr):
 
-        def cameraFunc(num):
-            return CameraDataGenerator().generateCameraData(num, addr)
-
-        def userFunc(num):
-            return UserDataGenerator().generateUserData(num)
-
-        def mediaServerFunc(num):
-            return MediaServerGenerator().generateMediaServerData(num)
-
-        return [("saveCameras",cameraFunc),
-                ("saveUser",userFunc),
-                ("saveMediaServer",mediaServerFunc)]
+        return [("saveCameras", lambda num: CameraDataGenerator().generateCameraData(num, addr)),
+                ("saveUser", lambda num: UserDataGenerator().generateUserData(num)),
+#                ("saveMediaServer", lambda num: MediaServerGenerator().generateMediaServerData(num))
+                ]
 
     def _sendRequest(self,addr,method,d):
         url = "http://%s/ec2/%s" % (addr, method)
@@ -166,15 +159,12 @@ class PrepareServerStatus(BasicGenerator):
         return (True,"")
 
     def _generateRandomStates(self,addr):
-        api_list = self._generateDataAndAPIList(addr)
-        for api in api_list:
-            num = random.randint(self._minData,self._maxData)
-            data_list = api[1](num)
-            for data in data_list:
-                ret, reason = self._sendRequest(addr,api[0],data[0])
+        for apiName, apiGen in self._generateDataAndAPIList(addr):
+            for data in apiGen(random.randint(self._minData,self._maxData)):
+                ret, reason = self._sendRequest(addr, apiName, data[0])
                 if ret == False:
                     return (ret, reason)
-                testMaster.unittestRollback.addOperations(api[0], addr, data[1])
+                testMaster.unittestRollback.addOperations(apiName, addr, data[1])
         return (True,"")
 
     def main(self,addr):
@@ -1510,11 +1500,6 @@ def DoTests(argv):
             return res[0]
         #FIXME no result code returning!
 
-#class MyArgParser(argparse.ArgumentParser):
-#
-#    def print_help(self, file=None):
-#        super(MyArgParser, self).print_help(file)
-#
 
 class BoxTestAction(argparse.Action):
     def __init__(self, option_strings, dest, help=None):
@@ -1524,7 +1509,9 @@ class BoxTestAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         namespace.BoxTest = self.dest
 
+
 CommonArgs = ('config', 'autorollback', 'log')
+
 
 def parseArgs():
     parser = argparse.ArgumentParser()
