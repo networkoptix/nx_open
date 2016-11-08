@@ -22,7 +22,7 @@ constexpr static const std::chrono::seconds
     kUdpTunnelKeepAliveIntervalDefault = std::chrono::seconds(15);
 constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
 constexpr static const std::chrono::seconds 
-    kCrossNatTunnelInactivityTimeoutDefault = std::chrono::minutes(8);
+    kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
 /**
  * @note All fields are optional for backwartd compatibility.
@@ -39,7 +39,7 @@ public:
      * received during \a rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
      */
     int udpTunnelKeepAliveRetries;
-    std::chrono::seconds crossNatTunnelInactivityTimeout;
+    std::chrono::seconds tunnelInactivityTimeout;
 
     nx::network::RetryPolicy tcpReverseRetryPolicy;
     nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;

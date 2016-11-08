@@ -54,11 +54,11 @@ void OutgoingCrossNatTunnelWatcher::establishNewConnection(
 
 void OutgoingCrossNatTunnelWatcher::launchInactivityTimer()
 {
-    if (m_connectionParameters.crossNatTunnelInactivityTimeout > std::chrono::seconds::zero())
+    if (m_connectionParameters.tunnelInactivityTimeout > std::chrono::seconds::zero())
     {
         m_inactivityTimer->cancelSync();
         m_inactivityTimer->start(
-            m_connectionParameters.crossNatTunnelInactivityTimeout,
+            m_connectionParameters.tunnelInactivityTimeout,
             std::bind(&OutgoingCrossNatTunnelWatcher::onInactivityTimoutExpired, this));
     }
 }

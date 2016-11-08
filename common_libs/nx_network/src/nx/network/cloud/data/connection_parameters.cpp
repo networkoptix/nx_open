@@ -14,7 +14,7 @@ ConnectionParameters::ConnectionParameters()
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
     udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),
-    crossNatTunnelInactivityTimeout(kCrossNatTunnelInactivityTimeoutDefault)
+    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout)
 {
 }
 
@@ -23,7 +23,7 @@ bool ConnectionParameters::operator==(const ConnectionParameters& rhs) const
     return rendezvousConnectTimeout == rhs.rendezvousConnectTimeout
         && udpTunnelKeepAliveInterval == rhs.udpTunnelKeepAliveInterval
         && udpTunnelKeepAliveRetries == rhs.udpTunnelKeepAliveRetries
-        && crossNatTunnelInactivityTimeout == rhs.crossNatTunnelInactivityTimeout
+        && tunnelInactivityTimeout == rhs.tunnelInactivityTimeout
         && tcpReverseRetryPolicy == rhs.tcpReverseRetryPolicy
         && tcpReverseHttpTimeouts == rhs.tcpReverseHttpTimeouts;
 }
@@ -40,8 +40,8 @@ void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
         stun::cc::attrs::udpTunnelKeepAliveRetries,
         udpTunnelKeepAliveRetries);
     message->addAttribute(
-        stun::cc::attrs::crossNatTunnelInactivityTimeout,
-        crossNatTunnelInactivityTimeout);
+        stun::cc::attrs::tunnelInactivityTimeout,
+        tunnelInactivityTimeout);
 
     message->addAttribute(
         stun::cc::attrs::tcpReverseRetryMaxCount,
@@ -84,9 +84,9 @@ bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
         &udpTunnelKeepAliveRetries,
         (int)kUdpTunnelKeepAliveRetriesDefault);
     readAttributeValue(
-        message, stun::cc::attrs::crossNatTunnelInactivityTimeout,
-        &crossNatTunnelInactivityTimeout,
-        (std::chrono::seconds)kCrossNatTunnelInactivityTimeoutDefault);
+        message, stun::cc::attrs::tunnelInactivityTimeout,
+        &tunnelInactivityTimeout,
+        std::chrono::duration_cast<std::chrono::seconds>(kDefaultTunnelInactivityTimeout));
 
     // TODO: make real support for unsigned int(s) in STUN,
     //  curently unsigned int(s) are represented like simple ints

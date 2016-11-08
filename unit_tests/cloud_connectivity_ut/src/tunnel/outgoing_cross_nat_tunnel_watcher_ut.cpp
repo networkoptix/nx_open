@@ -31,7 +31,7 @@ public:
     }
 };
 
-constexpr auto crossNatTunnelInactivityTimeout = std::chrono::seconds(3);
+constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
 constexpr auto allowedTimerError = std::chrono::seconds(5);
 
 class OutgoingCrossNatTunnelWatcherTest:
@@ -40,8 +40,8 @@ class OutgoingCrossNatTunnelWatcherTest:
 public:
     OutgoingCrossNatTunnelWatcherTest()
     {
-        m_connectionParameters.crossNatTunnelInactivityTimeout =
-            crossNatTunnelInactivityTimeout;
+        m_connectionParameters.tunnelInactivityTimeout =
+            tunnelInactivityTimeout;
     }
     
     ~OutgoingCrossNatTunnelWatcherTest()
@@ -67,7 +67,7 @@ protected:
     {
         ASSERT_EQ(
             std::future_status::ready,
-            tunnelClosedFuture.wait_for(crossNatTunnelInactivityTimeout + allowedTimerError));
+            tunnelClosedFuture.wait_for(tunnelInactivityTimeout + allowedTimerError));
         ASSERT_EQ(SystemError::timedOut, tunnelClosedFuture.get());
     }
 
@@ -94,7 +94,7 @@ TEST_F(OutgoingCrossNatTunnelWatcherTest, usingTunnel)
 
     const auto deadline = 
         std::chrono::steady_clock::now() +
-        crossNatTunnelInactivityTimeout + allowedTimerError;
+        tunnelInactivityTimeout + allowedTimerError;
 
     while (std::chrono::steady_clock::now() < deadline)
     {

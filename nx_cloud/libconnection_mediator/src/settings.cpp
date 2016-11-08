@@ -68,9 +68,9 @@ namespace
     constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
         nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 
-    const QLatin1String kCrossNatTunnelInactivityTimeout("cloudConnect/crossNatTunnelInactivityTimeout");
-    constexpr const std::chrono::seconds kDefaultCrossNatTunnelInactivityTimeout =
-        nx::hpm::api::kCrossNatTunnelInactivityTimeoutDefault;
+    const QLatin1String kTunnelInactivityTimeout("cloudConnect/tunnelInactivityTimeout");
+    constexpr const std::chrono::seconds kDefaultTunnelInactivityTimeout =
+        nx::hpm::api::kDefaultTunnelInactivityTimeout;
 
     namespace tcp_reverse_retry_policy {
     const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
@@ -195,11 +195,11 @@ void Settings::loadConfiguration()
     m_connectionParameters.udpTunnelKeepAliveRetries = m_settings.value(
         kUdpTunnelKeepAliveRetries,
         kDefaultUdpTunnelKeepAliveRetries).toInt();
-    m_connectionParameters.crossNatTunnelInactivityTimeout = 
+    m_connectionParameters.tunnelInactivityTimeout = 
         duration_cast<seconds>(
             nx::utils::parseTimerDuration(
-                m_settings.value(kCrossNatTunnelInactivityTimeout).toString(),
-                kDefaultCrossNatTunnelInactivityTimeout));
+                m_settings.value(kTunnelInactivityTimeout).toString(),
+                kDefaultTunnelInactivityTimeout));
 
     m_connectionParameters.tcpReverseRetryPolicy.setMaxRetryCount(m_settings.value(
         tcp_reverse_retry_policy::kMaxCount,
