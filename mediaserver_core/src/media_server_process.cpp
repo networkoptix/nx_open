@@ -1830,6 +1830,16 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
+void MediaServerProcess::setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
+{
+    m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
+}
+
+void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
+{
+    m_engineVersion = version;
+}
+
 void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
 {
     nx::SystemName systemName;
@@ -1894,6 +1904,12 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 
 void MediaServerProcess::run()
 {
+    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
+
+    if (!m_engineVersion.isNull())
+        qnCommon->setEngineVersion(m_engineVersion);
+
     QnCallCountStart(std::chrono::milliseconds(5000));
 
     ffmpegInit();
@@ -2414,6 +2430,7 @@ void MediaServerProcess::run()
     updateAddressesList();
 
     loadResourcesFromECS(messageProcessor.data());
+
 	qnGlobalSettings->initialize();
     migrateSystemNameFromConfig(cloudConnectionManager);
 
@@ -2695,15 +2712,13 @@ public:
     }
 
 protected:
-    virtual int executeApplication() override {
+    virtual int executeApplication() override
+    {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
-
-        if (!m_overrideVersion.isNull())
-            qnCommon->setEngineVersion(m_overrideVersion);
 
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
+        m_main->setEnforcedMediatorEndpoint(m_enforcedMediatorEndpoint);
+        m_main->setEngineVersion(m_overrideVersion);
 
         int res = application()->exec();
 
