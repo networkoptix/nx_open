@@ -890,19 +890,22 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
                 storagesToScan << storage;
         }
 
-        QString logString;
-        QTextStream logStream(&logString);
+        if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG1)
+        {
+            QString logString;
+            QTextStream logStream(&logString);
 
-        logStream << Q_FUNC_INFO << " rebuildCatalogAsync triggered\n";
-        if (storagesToScan.isEmpty())
-            logStream << "\tNo online storages found";
-        else 
-            logStream << "\tFollowing storages found:\n";
+            logStream << Q_FUNC_INFO << " rebuildCatalogAsync triggered\n";
+            if (storagesToScan.isEmpty())
+                logStream << "\tNo online storages found";
+            else
+                logStream << "\tFollowing storages found:\n";
 
-        for (const auto& s: storagesToScan)
-            logStream << "\t" << s->getUrl() << "\n";
+            for (const auto& s: storagesToScan)
+                logStream << "\t" << s->getUrl() << "\n";
 
-        NX_LOG(logString, cl_logDEBUG1);
+            NX_LOG(logString, cl_logDEBUG1);
+        }
 
         if (storagesToScan.isEmpty())
             return result;

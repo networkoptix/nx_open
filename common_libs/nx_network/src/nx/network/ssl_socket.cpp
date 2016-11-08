@@ -1714,6 +1714,15 @@ bool SslSocket::connect(
     return d->wrappedSocket->connect(remoteAddress, timeoutMillis);
 }
 
+bool SslSocket::connectToIp(
+    const SocketAddress& remoteAddress,
+    unsigned int timeoutMillis)
+{
+    Q_D(SslSocket);
+    d->ecnryptionEnabled = true;
+    return d->wrappedSocket->connectToIp(remoteAddress, timeoutMillis);
+}
+
 SocketAddress SslSocket::getForeignAddress() const
 {
     Q_D(const SslSocket);

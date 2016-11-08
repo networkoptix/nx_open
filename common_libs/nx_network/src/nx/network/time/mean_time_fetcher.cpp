@@ -35,6 +35,13 @@ void MeanTimeFetcher::stopWhileInAioThread()
     m_timeFetchers.clear();
 }
 
+void MeanTimeFetcher::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    AbstractAccurateTimeFetcher::bindToAioThread(aioThread);
+    for (auto& timeFetcherContext: m_timeFetchers)
+        timeFetcherContext->timeFetcher->bindToAioThread(aioThread);
+}
+
 void MeanTimeFetcher::getTimeAsync(
     CompletionHandler completionHandler)
 {

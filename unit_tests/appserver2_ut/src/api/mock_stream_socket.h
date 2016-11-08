@@ -21,6 +21,14 @@ public:
         return true;
     }
 
+    virtual bool connectToIp(
+        const SocketAddress& remoteSocketAddress,
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override
+    {
+        QN_UNUSED(remoteSocketAddress, timeoutMillis);
+        return true;
+    }
+
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override
     {
         QN_UNUSED(buffer, flags);

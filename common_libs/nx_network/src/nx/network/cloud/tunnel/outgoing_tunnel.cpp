@@ -10,7 +10,6 @@
 
 #include "connector_factory.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -23,7 +22,7 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
     m_timer(std::make_unique<aio::Timer>()),
     m_terminated(false),
     m_lastErrorCode(SystemError::noError),
-    m_state(State::kInit)
+    m_state(State::init)
 {
     m_timer->bindToAioThread(getAioThread());
 }
@@ -59,11 +58,11 @@ void OutgoingTunnel::stopWhileInAioThread()
     m_connectHandlers.clear();
 }
 
-void OutgoingTunnel::setStateHandler(nx::utils::MoveOnlyFunc<void(State)> handler)
+void OutgoingTunnel::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(!m_stateHandler, Q_FUNC_INFO, "State handler is already set");
-    m_stateHandler = std::move(handler);
+    NX_ASSERT(!m_onClosedHandler, Q_FUNC_INFO, "State handler is already set");
+    m_onClosedHandler = std::move(handler);
 }
 
 void OutgoingTunnel::establishNewConnection(
@@ -76,7 +75,7 @@ void OutgoingTunnel::establishNewConnection(
 
     switch (m_state)
     {
-        case State::kConnected:
+        case State::connected:
             lk.unlock();
             using namespace std::placeholders;
             m_connection->establishNewConnection(
@@ -95,9 +94,9 @@ void OutgoingTunnel::establishNewConnection(
                 });
             break;
 
-        case State::kClosed:
+        case State::closed:
         {
-            //just saving handler to notify it before tunnel destruction
+            // Just saving handler to notify it before tunnel destruction.
             ConnectionRequestData data;
             data.socketAttributes = std::move(socketAttributes);
             data.handler = std::move(handler);
@@ -115,12 +114,12 @@ void OutgoingTunnel::establishNewConnection(
             break;
         }
 
-        case State::kInit:
+        case State::init:
             startAsyncTunnelConnect(&lk);
 
-        case State::kConnecting:
+        case State::connecting:
         {
-            //saving handler for later use
+            // Saving handler for later use.
             const auto timeoutTimePoint =
                 timeout > std::chrono::milliseconds::zero()
                 ? std::chrono::steady_clock::now() + timeout
@@ -160,10 +159,14 @@ QString OutgoingTunnel::stateToString(State state)
 {
     switch (state)
     {
-        case State::kInit:          return lm("init");
-        case State::kConnecting:    return lm("connecting");
-        case State::kConnected:     return lm("connected");
-        case State::kClosed:        return lm("closed");
+        case State::init:
+            return lm("init");
+        case State::connecting:
+            return lm("connecting");
+        case State::connected:
+            return lm("connected");
+        case State::closed:
+            return lm("closed");
     }
 
     return lm("unknown(%1)").arg(static_cast<int>(state));
@@ -243,15 +246,15 @@ void OutgoingTunnel::onTunnelClosed(SystemError::ErrorCode errorCode)
     dispatch(
         [this, errorCode]()
         {
-            nx::utils::MoveOnlyFunc<void(State)> tunnelClosedHandler;
+            nx::utils::MoveOnlyFunc<void()> tunnelClosedHandler;
             {
                 QnMutexLocker lk(&m_mutex);
-                tunnelClosedHandler = std::move(m_stateHandler);
-                m_state = State::kClosed;
+                std::swap(tunnelClosedHandler, m_onClosedHandler);
+                m_state = State::closed;
                 m_lastErrorCode = errorCode;
             }
             if (tunnelClosedHandler)
-                tunnelClosedHandler(State::kClosed);
+                tunnelClosedHandler();
         });
 }
 
@@ -259,7 +262,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
 {
     using namespace std::placeholders;
 
-    m_state = State::kConnecting;
+    m_state = State::connecting;
     m_connector = ConnectorFactory::createCrossNatConnector(m_targetPeerAddress);
     m_connector->bindToAioThread(getAioThread());
     m_connector->connect(
@@ -278,43 +281,49 @@ void OutgoingTunnel::onConnectorFinished(
 
     if (errorCode == SystemError::noError)
     {
-        m_connection = std::move(connection);
-        m_connection->setControlConnectionClosedHandler(
-            std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
-        m_state = State::kConnected;
-        //we've connected to the host. Requesting client connections
-        for (auto& connectRequest: m_connectHandlers)
-        {
-            using namespace std::placeholders;
-            m_connection->establishNewConnection(
-                connectRequest.second.timeout,   //TODO #ak recalculate timeout
-                std::move(connectRequest.second.socketAttributes),
-                [handler = std::move(connectRequest.second.handler), this](
-                    SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> socket,
-                    bool tunnelStillValid)
-                {
-                    onConnectFinished(
-                        std::move(handler),
-                        errorCode,
-                        std::move(socket),
-                        tunnelStillValid);
-                });
-        }
-
-        m_connectHandlers.clear();
+        setTunnelConnection(std::move(connection));
         return;
     }
 
-    //reporting error to everyone who is waiting
+    // Reporting error to everyone who is waiting.
     auto connectHandlers = std::move(m_connectHandlers);
-    m_state = State::kClosed;
+    m_state = State::closed;
     m_lastErrorCode = errorCode;
     lk.unlock();
     for (auto& connectRequest : connectHandlers)
         connectRequest.second.handler(errorCode, nullptr);
-    //reporting tunnel failure
+    // Reporting tunnel failure.
     onTunnelClosed(errorCode);
+}
+
+void OutgoingTunnel::setTunnelConnection(
+    std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+{
+    m_connection = std::move(connection);
+    m_connection->setControlConnectionClosedHandler(
+        std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
+    m_state = State::connected;
+
+    // We've connected to the host. Requesting client connections.
+    for (auto& connectRequest : m_connectHandlers)
+    {
+        using namespace std::placeholders;
+        m_connection->establishNewConnection(
+            connectRequest.second.timeout,   //< TODO #ak recalculate timeout.
+            std::move(connectRequest.second.socketAttributes),
+            [handler = std::move(connectRequest.second.handler), this](
+                SystemError::ErrorCode errorCode,
+                std::unique_ptr<AbstractStreamSocket> socket,
+                bool tunnelStillValid)
+            {
+                onConnectFinished(
+                    std::move(handler),
+                    errorCode,
+                    std::move(socket),
+                    tunnelStillValid);
+            });
+    }
+    m_connectHandlers.clear();
 }
 
 } // namespace cloud

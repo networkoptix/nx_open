@@ -38,7 +38,6 @@ struct QnModuleInformation
     static QString nxMediaServerId();
     static QString nxECId();
     static QString nxClientId();
-
 };
 
 struct QnModuleInformationWithAddresses : QnModuleInformation

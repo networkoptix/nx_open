@@ -21,10 +21,12 @@ constexpr static const std::chrono::seconds
 constexpr static const std::chrono::seconds
     kUdpTunnelKeepAliveIntervalDefault = std::chrono::seconds(15);
 constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
+constexpr static const std::chrono::seconds 
+    kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
 /**
-    \note All fields are optional for backwartd compatibility
-*/
+ * @note All fields are optional for backwartd compatibility.
+ */
 class NX_NETWORK_API ConnectionParameters
 :
     public StunMessageAttributesData
@@ -32,10 +34,12 @@ class NX_NETWORK_API ConnectionParameters
 public:
     std::chrono::milliseconds rendezvousConnectTimeout;
     std::chrono::milliseconds udpTunnelKeepAliveInterval;
-    /** UDP tunnel should be considered inactive if no keep-alive messages have been 
-        received during \a rendezvousConnectTimeout*udpTunnelKeepAliveRetries period
-    */
+    /**
+     * UDP tunnel should be considered inactive if no keep-alive messages have been 
+     * received during \a rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
+     */
     int udpTunnelKeepAliveRetries;
+    std::chrono::seconds tunnelInactivityTimeout;
 
     nx::network::RetryPolicy tcpReverseRetryPolicy;
     nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
@@ -47,6 +51,6 @@ public:
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

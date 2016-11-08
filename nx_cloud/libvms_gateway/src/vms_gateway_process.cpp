@@ -188,7 +188,7 @@ int VmsGatewayProcess::exec()
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;

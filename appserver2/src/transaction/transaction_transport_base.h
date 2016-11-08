@@ -126,6 +126,7 @@ public:
 
     /** Enables outgoing transaction channel. */
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
+    void monitorConnectionForClosure();
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
     int keepAliveProbeCount() const;
@@ -378,7 +379,7 @@ private:
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
-    void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onMonitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
     QUrl generatePostTranUrl();
     void aggregateOutgoingTransactionsNonSafe();
 

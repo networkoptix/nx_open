@@ -9,12 +9,11 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-ReverseAcceptor::ReverseAcceptor(String selfHostName, ConnectHandler connectHandler):
-    m_selfHostName(std::move(selfHostName)),
+ReverseAcceptor::ReverseAcceptor(ConnectHandler connectHandler):
     m_connectHandler(std::move(connectHandler)),
     m_httpServer(new nx_http::HttpStreamSocketServer(
         nullptr, &m_httpMessageDispatcher, false, // TODO: think about SSL?
-        SocketFactory::NatTraversalType::nttDisabled))
+        NatTraversalSupport::disabled))
 {
 }
 
@@ -23,8 +22,10 @@ ReverseAcceptor::~ReverseAcceptor()
     m_httpServer.reset();
 }
 
-bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread* aioThread)
+bool ReverseAcceptor::start(
+    String selfHostName, const SocketAddress& address, aio::AbstractAioThread* aioThread)
 {
+    m_selfHostName = std::move(selfHostName);
     if (aioThread)
         m_httpServer->bindToAioThread(aioThread);
 

@@ -1046,6 +1046,8 @@ namespace ec2
 
     void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
     {
+        m_timeSynchronizer.reset();
+
         quint64 localTimePriorityBak = 0;
         quint64 newLocalTimePriority = 0;
         {

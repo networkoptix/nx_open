@@ -21,7 +21,7 @@ namespace {
 
 bool needSecondaryStream(MediaQuality q)
 {
-    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
+    return isLowMediaQuality(q);
 }
 
 } // namespace
@@ -220,7 +220,7 @@ void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsa
     if (m_videoChannels == 1)
     {
         for (int i = 0; i < lastIndex; ++i)
-            unsafeQueue.pop_front();
+            unsafeQueue.popFront();
         currentIndex = 0;
         if (lastIndex > 0)
             m_someDataIsDropped = true;

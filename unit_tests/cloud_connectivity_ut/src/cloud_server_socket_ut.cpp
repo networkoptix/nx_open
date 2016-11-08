@@ -385,6 +385,7 @@ protected:
             {
                 ASSERT_EQ(code, SystemError::noError);
                 acceptServerForever();
+                ASSERT_TRUE(socket->setNonBlockingMode(true));
                 socket->sendAsync(
                     network::test::kTestMessage,
                     [this, socket](SystemError::ErrorCode code, size_t size)

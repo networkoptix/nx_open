@@ -118,6 +118,7 @@ namespace attrs
         tcpReverseHttpSendTimeout,
         tcpReverseHttpReadTimeout,
         tcpReverseHttpMsgBodyTimeout,
+        tunnelInactivityTimeout,
 
         systemErrorCode = stun::attrs::userDefined + 0x500,
     };

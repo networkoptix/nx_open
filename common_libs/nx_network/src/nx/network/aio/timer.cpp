@@ -5,7 +5,6 @@
 
 #include "timer.h"
 
-
 namespace nx {
 namespace network {
 namespace aio {
@@ -77,6 +76,6 @@ bool Timer::isInSelfAioThread() const
     return m_internalSocket.isInSelfAioThread();
 }
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx
