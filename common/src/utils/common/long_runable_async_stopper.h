@@ -20,6 +20,13 @@ public:
         qnHasEventLoop(QThread::currentThread());
     }
 
+    virtual ~QnLongRunableAsyncStopper()
+    {
+        decltype(m_threadsToStop) threads;
+        QnMutexLocker lock(&m_mutex);
+        std::swap(threads, m_threadsToStop);
+    }
+
     void stopAsync(std::unique_ptr<QnLongRunnable> thread)
     {
         QnLongRunnable* ptr = thread.get();
