@@ -16,7 +16,6 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/lexical_enum.h>
-#include <utils/common/long_runable_async_stopper.h>
 
 // Config for debugging the tests.
 static const struct
