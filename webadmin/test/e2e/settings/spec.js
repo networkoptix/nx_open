@@ -71,7 +71,7 @@ describe('Settings Page', function () {
         // Check that current server url opens the same setting page
         p.currentMediaServerLink.click();
         p.helper.performAtSecondTab( function() {
-            expect(browser.getCurrentUrl()).toContain('view'); // Check that url is correct
+            expect(browser.getCurrentUrl()).toContain('static'); // Check that url is correct
             browser.close();
         });
     });

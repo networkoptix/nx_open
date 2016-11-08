@@ -18,8 +18,12 @@ var Helper = function () {
 
     this.activeSystem = 'http://10.0.2.15:7001';
     this.incompatibleSystem = 'http://10.0.3.52:7001';
+    this.admin = 'admin';
     this.password = 'qweasd123';
     this.cloudEmail = 'noptixqa+owner@gmail.com';
+
+    this.elementAbsentMessage = 'Element is not present, but this was expected!';
+    this.stringAbsentMessage = 'Element does not contain such string, but this was expected!';
 
     this.checkElementFocusedBy = function(element, attribute) {
         expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
@@ -33,7 +37,7 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
         elem.isPresent().then( function(isPresent) {
             if(isPresent)   deferred.fulfill();
-            else            deferred.reject('(Custom NX message) Element is not present');
+            else            deferred.reject(self.elementAbsentMessage);
         });
 
         return deferred.promise;
@@ -43,7 +47,17 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
         elem.isDisplayed().then( function(isDisplayed) {
             if(isDisplayed)   deferred.fulfill();
-            else            deferred.reject('(Custom NX Message) Element is not displayed');
+            else            deferred.reject(self.elementAbsentMessage);
+        });
+
+        return deferred.promise;
+    };
+
+    this.checkContainsString = function(elem, string) {
+        var deferred = protractor.promise.defer();
+        elem.getText().then( function(text) {
+            if(self.isSubstr(text, string))   deferred.fulfill();
+            else            deferred.reject(self.stringAbsentMessage);
         });
 
         return deferred.promise;

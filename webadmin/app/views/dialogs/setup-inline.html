@@ -139,7 +139,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
     <div class="master-icon"><span class="icon-cloud"></span></div>
 
-    <h2>Login to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
+    <h2>Log in to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
 
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
@@ -285,14 +285,14 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Connecting to cloud ...</h2>
+    <h2>Connecting to {{Config.cloud.productName}} ...</h2>
     <p class="master-description">It may take several moments</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>System is ready for use</h2>
-    <p>Login</p>
+    <p>Log in</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Sharing and account settings</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
