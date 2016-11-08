@@ -62,7 +62,7 @@ def compareResults(a, b):
                             (a.func, a.req_str(), b.req_str(), diff.errorInfo(), diffresult))
 
 
-class ProxyTest(object):
+class ServerProxyTest(object):
 
     def __init__(self, mainHost, secHost):
         self.mainHost = mainHost
@@ -94,8 +94,8 @@ class ProxyTest(object):
             return Result(func, peer, redirectTo, data, json.loads(data), content_len)
         except urllib2.HTTPError as err:
 #        except HTTPException as err:
-            print "Failed: " + action
-            raise FuncTestError("error " + action, err)
+            print "FAIL: %s raised %s" % (action, err)
+            raise FuncTestError("error " + action, str(err))
 
     def run(self):
         print "\n======================================="
@@ -140,7 +140,7 @@ if __name__ == '__main__':
         pass
     try:
         _prepareLoader((_MAIN_HOST, _SEC_HOST))
-        ProxyTest(_MAIN_HOST, _SEC_HOST).run()
+        ServerProxyTest(_MAIN_HOST, _SEC_HOST).run()
     except FuncTestError as err:
         print "FAIL: %s" % err.message
 

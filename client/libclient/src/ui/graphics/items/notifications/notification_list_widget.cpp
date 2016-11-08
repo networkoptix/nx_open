@@ -38,6 +38,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     startListening();
 
     setFlag(QGraphicsItem::ItemHasNoContents);
+    setAcceptedMouseButtons(Qt::NoButton);
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverLeaveDelay(kHoverLeaveTimeoutMs);

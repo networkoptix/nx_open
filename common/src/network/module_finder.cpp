@@ -423,7 +423,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     item.addresses.insert(endpoint);
     m_idByAddress[endpoint] = moduleInformation.id;
     const auto cloudModuleId = moduleInformation.cloudId();
-    if (!cloudModuleId.isEmpty() && endpoint.address.isResolved())
+    if (!cloudModuleId.isEmpty() && endpoint.address.isIpAddress())
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
             cloudModuleId, endpoint);
 

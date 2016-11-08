@@ -20,6 +20,8 @@ struct QnLocalConnectionData
 
     QUrl urlWithPassword() const;
 
+    bool isStoredPassword() const;
+
     QString systemName;
     QnUuid localId;
     QUrl url;

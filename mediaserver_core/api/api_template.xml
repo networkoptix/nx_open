@@ -424,6 +424,7 @@
                 <function proprietary="true">
                     <name>restoreState</name>
                     <description>Restore server state to default. Cleans database and system name.</description>
+                    <permissions>At least Admin.</permissions>
                     <method>POST</method>
                     <params>
                         <param>
@@ -440,8 +441,9 @@
                     <name>detachFromCloud</name>
                     <description>
                         Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
-					              Function can be called either via GET or POST method. POST data should be a json object.
-					          </description>
+                        Function can be called either via GET or POST method. POST data should be a json object.
+                    </description>
+                    <permissions>At least Admin.</permissions>
                     <method>GET, POST</method>
                     <params>
                         <param>
@@ -457,9 +459,10 @@
               <function>
                 <name>setupLocalSystem</name>
                 <description>
-				  Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
-                  This method requires owner permissions.
+                    Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
+                    This method requires owner permissions.
                 </description>
+                <permissions>At least Admin.</permissions>
                 <method>POST</method>
                 <params>
                   <param>
@@ -480,9 +483,10 @@
               <function>
                 <name>setupCloudSystem</name>
                 <description>
-                  Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
-				  This method requires owner permissions.
+                    Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
+                    This method requires owner permissions.
                 </description>
+                <permissions>At least Admin.</permissions>
                 <method>POST</method>
                 <params>
                   <param>
@@ -738,6 +742,7 @@
                 <function>
                     <name>getEvents</name>
                     <description>Returns event log information in the requested format.</description>
+                    <permissions>At least Advanced Viewer.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1147,6 +1152,7 @@
                 <function>
                     <name>restart</name>
                     <description>Restarts the server.</description>
+                    <permissions>At least Admin.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1316,6 +1322,7 @@
                 <function>
                     <name>configure</name>
                     <description>Configure server parameters.</description>
+                    <permissions>At least Admin.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1354,6 +1361,7 @@
                 <function>
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
+                    <permissions>At least Admin.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1520,6 +1528,7 @@
                     <description>Execute any script from subfolder "scripts" of media server. Script name provides directly in a URL path like "/api/execute/script1.sh".
                                  All URL parameters are passed directly to a script as an parameters.
                     </description>
+                    <permissions>At least Admin.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1529,6 +1538,7 @@
                 <function proprietary="true">
                     <name>scriptList</name>
                     <description>Returns list of scripts to execute.</description>
+                    <permissions>At least Admin.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>

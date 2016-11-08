@@ -217,7 +217,7 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     // step 1: check 2 requests in a row via same connection
     for (int i = 0; i < 2; ++i)
     {
-        testHttpServer()->setForceConnectionClose(i == 0);
+        testHttpServer()->setPersistentConnectionEnabled(i != 0);
 
         {
             QnMutexLocker lock(&mutex);
@@ -364,7 +364,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
 TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
 {
     static const char* testPath = "/ReusingExistingConnection";
-    testHttpServer()->setForceConnectionClose(true);
+    testHttpServer()->setPersistentConnectionEnabled(false);
     ASSERT_TRUE(
         testHttpServer()->registerStaticProcessor(
             testPath,

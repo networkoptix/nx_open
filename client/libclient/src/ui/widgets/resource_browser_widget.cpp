@@ -71,7 +71,9 @@ const char* kFilterPropertyName = "_qn_filter";
 const int kNoDataFontPixelSize = 32;
 const int kNoDataFontWeight = QFont::Light;
 
-const auto kHtmlLabelFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelNoInfoFormat = lit("<center><span style='font-weight: 500'>%1</span></center>");
+const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span> &mdash; %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -547,7 +549,15 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF& pos)
         auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
 
-        m_tooltipWidget->setText(kHtmlLabelFormat.arg(toolTipText).arg(extraInfo));
+        QString text;
+        if (extraInfo.isEmpty())
+            text = kHtmlLabelNoInfoFormat.arg(toolTipText);
+        else if (resource && resource->hasFlags(Qn::user))
+            text = kHtmlLabelUserFormat.arg(toolTipText).arg(extraInfo);
+        else
+            text = kHtmlLabelDefaultFormat.arg(toolTipText).arg(extraInfo);
+
+        m_tooltipWidget->setText(text);
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -936,7 +946,7 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
     }
 }
 
-void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
+void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
 {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
@@ -946,7 +956,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
 
     /* Do not open servers of admin.  */
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server))
+    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 
     menu()->trigger(QnActions::DropResourcesAction, resource);

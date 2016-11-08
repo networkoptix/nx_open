@@ -549,6 +549,10 @@ protected:
         return this->item<GraphicsItem>(view, viewPos, detail::AlwaysTrue());
     }
 
+    QList<QGraphicsItem *> items(QGraphicsView *view, const QPoint &viewPos) const;
+    QList<QGraphicsItem *> items(QGraphicsView *view, const QPointF &scenePos) const;
+    QList<QGraphicsItem *> items(const QGraphicsSceneMouseEvent *event) const;
+
     /**
      * For the returned timer to be functional, the instrument must be
      * subscribed to <tt>Animation</tt> viewport event.
@@ -775,10 +779,6 @@ protected:
 
 private:
     void initialize();
-
-    QList<QGraphicsItem *> items(QGraphicsView *view, const QPoint &viewPos) const;
-    QList<QGraphicsItem *> items(QGraphicsView *view, const QPointF &scenePos) const;
-    QList<QGraphicsItem *> items(const QGraphicsSceneMouseEvent *event) const;
 
     template<class Condition>
     QGraphicsItem *item(const QList<QGraphicsItem *> &items, const Condition &condition) const {

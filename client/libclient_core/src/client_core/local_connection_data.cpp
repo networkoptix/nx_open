@@ -20,6 +20,11 @@ QnLocalConnectionData::QnLocalConnectionData(
     this->url.setPassword(QString());
 }
 
+bool QnLocalConnectionData::isStoredPassword() const
+{
+    return !password.isEmpty();
+}
+
 QUrl QnLocalConnectionData::urlWithPassword() const
 {
     auto url = this->url;

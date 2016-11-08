@@ -143,6 +143,7 @@ class UserDataGenerator(BasicGenerator):
         return self._template % (digest, email, hash, id, "true" if admin else "false", username)
 
 
+#TODO: get rid of it
 class MediaServerGenerator(BasicGenerator):
     _template = """
     {
@@ -315,10 +316,10 @@ class MediaServerConflictionDataGenerator(BasicGenerator):
             obj = json.loads(server)
             self._existedMediaServerList.append((obj["apiUrl"],obj["authKey"],obj["id"],
                                                  obj["systemName"],obj["url"]))
-        return True
+        return bool(self._existedMediaServerList)
 
     def __init__(self, dataGen):
-        if self._fetchExistedMediaServer(dataGen) == False:
+        if not self._fetchExistedMediaServer(dataGen):
             raise Exception("Cannot fetch media server list")
 
     def _generateModify(self, server):
@@ -662,8 +663,9 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
             raise Exception("Cannot initialize server list attribute test data")
 
     def _getRandomServer(self):
-        idx = random.randint(0,len(self._existedFakeServerList) - 1)
-        return self._existedFakeServerList[idx]
+        if not self._existedFakeServerList:
+            raise Exception("Empty _existedFakeServerList")
+        return random.choice(self._existedFakeServerList)
 
     def generateServerUserAttributesList(self,number):
         ret = []

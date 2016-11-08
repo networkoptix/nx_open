@@ -60,7 +60,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: LoginUtils.extractHost(hostsModel.firstHost)
+        address: Nx.url(hostsModel.firstHost).address()
         user: connectionsModel.firstUser
     }
 

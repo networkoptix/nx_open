@@ -15,7 +15,7 @@
 #include "settings.h"
 
 namespace nx { namespace stun { class MessageDispatcher; } }
-namespace nx { namespace hpm { namespace data { class ListeningPeersBySystem; } } }
+namespace nx { namespace hpm { namespace data { struct ListeningPeers; } } }
 
 namespace nx {
 namespace hpm {

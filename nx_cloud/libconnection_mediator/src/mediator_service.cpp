@@ -129,7 +129,7 @@ int MediatorProcess::executeApplication()
     MultiAddressServer<stun::SocketServer> tcpStunServer(
         &stunMessageDispatcher,
         false,
-        SocketFactory::NatTraversalType::nttDisabled);
+        nx::network::NatTraversalSupport::disabled);
     if (!tcpStunServer.bind(settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to TCP addresses: %1")
@@ -235,7 +235,7 @@ bool MediatorProcess::launchHttpServerIfNeeded(
             nullptr,    //TODO #ak add authentication 
             httpMessageDispatcher->get(),
             false,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
     if (!(*multiAddressHttpServer)->bind(settings.http().addrToListenList))
     {

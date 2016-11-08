@@ -61,6 +61,8 @@ public: // overrides
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
+    bool hasInternet() const override;
+
 public:
     enum { kDefaultPriority = 0 };
     void addServer(const QnModuleInformation& serverInfo,
@@ -97,6 +99,10 @@ private:
 
     void handleServerRemoved(const QnUuid& serverId);
 
+    void updateHasInternetState();
+
+    void init();
+
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
@@ -116,4 +122,5 @@ private:
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
     IdsSet m_onlineServers;
+    bool m_hasInternet;
 };

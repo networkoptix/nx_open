@@ -77,7 +77,12 @@ void QnLiteClientHandlerPrivate::at_initialResourcesReceived()
 {
     layout = QnLiteClientLayoutHelper::findLayoutForServer(videowallGuid);
     if (!layout)
-        return;
+    {
+        layout = QnLiteClientLayoutHelper::createLayoutForServer(videowallGuid);
+
+        if (!layout)
+            return;
+    }
 
     if (uiController)
         uiController->setLayoutId(layout->getId().toString());

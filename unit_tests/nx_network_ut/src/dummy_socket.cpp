@@ -120,6 +120,14 @@ bool DummySocket::connect(
     return true;
 }
 
+bool DummySocket::connectToIp(
+    const SocketAddress& remoteSocketAddress,
+    unsigned int /*timeoutMillis*/ )
+{
+    m_remotePeerAddress = remoteSocketAddress;
+    return true;
+}
+
 SocketAddress DummySocket::getForeignAddress() const
 {
     return m_remotePeerAddress;
@@ -246,6 +254,18 @@ bool BufferSocket::connect(
     unsigned int timeoutMillis )
 {
     if( !DummySocket::connect( remoteSocketAddress, timeoutMillis ) )
+        return false;
+
+    m_isOpened = true;
+    m_curPos = 0;
+    return true;
+}
+
+bool BufferSocket::connectToIp(
+    const SocketAddress& remoteSocketAddress,
+    unsigned int timeoutMillis )
+{
+    if( !DummySocket::connectToIp( remoteSocketAddress, timeoutMillis ) )
         return false;
 
     m_isOpened = true;

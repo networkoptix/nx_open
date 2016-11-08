@@ -75,6 +75,9 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
     connect(system, &QnBaseSystemDescription::serverRemoved,
         this, &QnSystemDescriptionAggregator::updateServers);
 
+    connect(system, &QnBaseSystemDescription::hasInternetChanged,
+        this, &QnSystemDescriptionAggregator::hasInternetChanged);
+
     connect(system, &QnBaseSystemDescription::serverChanged,
         this, &QnSystemDescriptionAggregator::handleServerChanged);
     connect(system, &QnBaseSystemDescription::systemNameChanged, this,
@@ -239,6 +242,17 @@ bool QnSystemDescriptionAggregator::isOnlineServer(const QnUuid& serverId) const
         {
             return system->isOnlineServer(serverId);
         });
+}
+
+bool QnSystemDescriptionAggregator::hasInternet() const
+{
+    const bool emptySystems = m_systems.empty();
+    NX_ASSERT(!emptySystems, "Invalid aggregator");
+    if (emptySystems)
+        return false;
+
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system) { return system->hasInternet(); });
 }
 
 bool QnSystemDescriptionAggregator::isOnline() const

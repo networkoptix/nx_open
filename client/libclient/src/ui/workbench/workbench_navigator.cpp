@@ -33,7 +33,6 @@ extern "C"
 #include <camera/client_video_camera.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/resource_display.h>
-#include <camera/thumbnails_loader.h>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
@@ -69,11 +68,11 @@ extern "C"
 #include <nx/utils/string.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/threaded_chunks_merge_tool.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
+#include <utils/common/long_runable_cleanup.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -191,7 +190,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
 
         auto chunksMergeTool = new QnThreadedChunksMergeTool();
-        m_threadedChunksMergeTool[timePeriodType] = chunksMergeTool;
+        m_threadedChunksMergeTool[timePeriodType].reset(chunksMergeTool);
 
         connect(chunksMergeTool, &QnThreadedChunksMergeTool::finished, this, [this, timePeriodType](int handle, const QnTimePeriodList &result)
         {
@@ -244,16 +243,22 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource)
     {
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
-            QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
+        {
+            auto itr = m_thumbnailLoaderByResource.find(mediaRes);
+            if (itr != m_thumbnailLoaderByResource.end())
+            {
+                QnLongRunableCleanup::instance()->cleanupAsync(std::move(itr->second));
+                m_thumbnailLoaderByResource.erase(itr);
+            }
+        }
     });
 }
 
 QnWorkbenchNavigator::~QnWorkbenchNavigator()
 {
-    foreach(QnThumbnailsLoader *loader, m_thumbnailLoaderByResource)
-        QnRunnableCleanup::cleanupSync(loader);
-    for (QnThreadedChunksMergeTool* tool : m_threadedChunksMergeTool)
-        QnRunnableCleanup::cleanupSync(tool);
+    m_thumbnailLoaderByResource.clear();
+    for (auto& value: m_threadedChunksMergeTool)
+        value.reset();
 }
 
 QnTimeSlider *QnWorkbenchNavigator::timeSlider() const
@@ -833,11 +838,10 @@ QnThumbnailsLoader *QnWorkbenchNavigator::thumbnailLoader(const QnMediaResourceP
 {
     auto pos = m_thumbnailLoaderByResource.find(resource);
     if (pos != m_thumbnailLoaderByResource.end())
-        return *pos;
+        return pos->second.get();
 
-    QnThumbnailsLoader *loader = new QnThumbnailsLoader(resource);
-
-    m_thumbnailLoaderByResource[resource] = loader;
+    QnThumbnailsLoader* loader = new QnThumbnailsLoader(resource);
+    m_thumbnailLoaderByResource[resource].reset(loader);
     return loader;
 }
 
@@ -867,23 +871,28 @@ void QnWorkbenchNavigator::jumpBackward()
 
         if (!periods.empty())
         {
-            qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
-
-            if (currentTime == DATETIME_NOW)
+            if (m_timeSlider->isLive())
             {
                 pos = periods.last().startTimeMs * 1000;
             }
             else
             {
-                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime / 1000, true);
-                itr = qMax(itr - 1, periods.cbegin());
+                /* We want timeline to jump relatively to current position, not camera frame. */
+                qint64 currentTime = m_timeSlider->value();
+
+                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
+                if (itr != periods.cbegin())
+                    --itr;
+
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && !itr->isInfinite())
                     pos += itr->durationMs * 1000;
             }
         }
     }
+
     reader->jumpTo(pos, pos);
+    updateSliderFromReader(true);
     emit positionChanged();
 }
 
@@ -911,12 +920,14 @@ void QnWorkbenchNavigator::jumpForward()
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
-        qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
+        /* We want timeline to jump relatively to current position, not camera frame. */
+        qint64 currentTime = m_timeSlider->value();
+
         QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
-        if (itr != periods.cend())
+        if (itr != periods.cend() && currentTime >= itr->startTimeMs)
             ++itr;
 
-        if (itr == periods.cend())
+        if (itr == periods.cend() || m_timeSlider->isLive())
         {
             /* Do not make step forward to live if we are playing backward. */
             if (reader->isReverseMode())
@@ -934,7 +945,9 @@ void QnWorkbenchNavigator::jumpForward()
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }
     }
+
     reader->jumpTo(pos, pos);
+    updateSliderFromReader(true);
     emit positionChanged();
 }
 
@@ -949,15 +962,21 @@ void QnWorkbenchNavigator::stepBackward()
 
     m_pausedOverride = false;
 
+    /* Here we want to know real reader time. */
     qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
-    if (!reader->isSkippingFrames() && currentTime > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
+
+    if (!reader->isSkippingFrames()
+        && currentTime > reader->startTime()
+        && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
     {
 
         if (reader->isSingleShotMode())
             m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
 
         reader->previousFrame(currentTime);
+        updateSliderFromReader(true);
     }
+
     emit positionChanged();
 }
 
@@ -973,6 +992,8 @@ void QnWorkbenchNavigator::stepForward()
     m_pausedOverride = false;
 
     reader->nextFrame();
+    updateSliderFromReader(true);
+
     emit positionChanged();
 }
 

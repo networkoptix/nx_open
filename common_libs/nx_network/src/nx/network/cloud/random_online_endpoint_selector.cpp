@@ -49,7 +49,7 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
     for (auto& endpoint: endpoints)
     {
         auto sock = SocketFactory::createStreamSocket(
-                    false, SocketFactory::NatTraversalType::nttDisabled);
+            false, NatTraversalSupport::disabled);
         if (!sock->setNonBlockingMode(true) ||
             !sock->setSendTimeout(CONNECT_TIMEOUT_MS))
         {

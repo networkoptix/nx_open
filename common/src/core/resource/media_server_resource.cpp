@@ -91,6 +91,9 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, co
 
 void QnMediaServerResource::at_cloudSettingsChanged()
 {
+    if (hasFlags(Qn::fake_server))
+        return;
+
     emit auxUrlsChanged(toSharedPointer(this));
 }
 
@@ -211,14 +214,13 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
     return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
 }
 
-
 boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
 {
-    const auto systemId = qnGlobalSettings->cloudSystemId();
-    if (systemId.isEmpty())
+    const auto cloudId = getModuleInformation().cloudId();
+    if (cloudId.isEmpty())
         return boost::none;
-
-    return SocketAddress(getId().toSimpleString() + lit(".") + systemId);
+    else
+        return SocketAddress(cloudId);
 }
 
 quint16 QnMediaServerResource::getPort() const
@@ -230,14 +232,11 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
 {
     auto toAddress = [](const QUrl& url) { return SocketAddress(url.host(), url.port(0)); };
 
-    QSet<SocketAddress> result;
-    if (auto cloudAddress = getCloudAddress()) //< Goes first to be prefered
-        result.insert(std::move(*cloudAddress));
-
     QSet<SocketAddress> ignored;
     for (const QUrl &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
+    QSet<SocketAddress> result;
     for (const auto& address : getNetAddrList())
     {
         if (ignored.contains(address))
@@ -252,6 +251,9 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
             continue;
         result.insert(address);
     }
+
+    if (auto cloudAddress = getCloudAddress())
+        result.insert(std::move(*cloudAddress));
 
     return result.toList();
 }

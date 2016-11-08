@@ -262,6 +262,7 @@ class BackupStorageTest(StorageBasedTest):
     The test for backup storage functionality.
     Creates a backup storage and tries to start the backup procedure both manually and scheduled.
     """
+    helpStr = "Backup storage test"
     _test_name = "Backup Storage"
     _test_key = 'bstorage'
     num_serv = _NUM_SERV_BAK
@@ -400,6 +401,7 @@ class BackupStorageTest(StorageBasedTest):
 
 
 class MultiserverArchiveTest(StorageBasedTest):
+    helpStr = "Multiserver archive test"
     _test_name = "Multiserver Archive"
     _test_key = "msarch"
     num_serv = _NUM_SERV_MSARCH

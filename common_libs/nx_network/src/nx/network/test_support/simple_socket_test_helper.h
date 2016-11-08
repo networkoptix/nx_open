@@ -61,69 +61,30 @@ void syncSocketServerMainFunc(
     nx::utils::promise<SocketAddress>* startedPromise,
     bool ignoreReadWriteError = false)
 {
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    const auto lastError = [](){ return SystemError::getLastOSErrorText().toStdString(); };
+    ASSERT_TRUE(server->setReuseAddrFlag(true)) << lastError();
+    ASSERT_TRUE(server->bind(endpointToBindTo)) << lastError();
+    ASSERT_TRUE(server->listen(clientCount)) << lastError();
+    if (startedPromise)
+    {
+        ASSERT_TRUE(server->setRecvTimeout(100)) << lastError();
+        std::unique_ptr<AbstractStreamSocket> client(server->accept());
+        ASSERT_FALSE(client);
+        ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
 
-    ASSERT_TRUE(server->bind(endpointToBindTo))
-        << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->listen(clientCount))
-        << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->setRecvTimeout(60 * 1000))
-        << SystemError::getLastOSErrorText().toStdString();
+        auto serverAddress = server->getLocalAddress();
+        NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+        startedPromise->set_value(std::move(serverAddress));
+    }
 
+    ASSERT_TRUE(server->setRecvTimeout(60 * 1000)) << lastError();
     for (int i = clientCount; i > 0; --i)
     {
-        std::unique_ptr<AbstractStreamSocket> client;
-        if (startedPromise)
-        {
-            //we must trigger startedPromise after actual accept call: UDT requirement
-            nx::utils::promise<
-                std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
-            > acceptedPromise;
-            ASSERT_TRUE(server->setNonBlockingMode(true));
-            server->acceptAsync(
-                [&server, &acceptedPromise](
-                    SystemError::ErrorCode errorCode,
-                    AbstractStreamSocket* socket)
-                {
-                    server->post(
-                        [&server, &acceptedPromise, errorCode, socket]()
-                        {
-                            ASSERT_TRUE(server->setNonBlockingMode(false));
-                            acceptedPromise.set_value(
-                                std::make_pair(
-                                    errorCode,
-                                    std::unique_ptr<AbstractStreamSocket>(socket)));
-                        });
-                });
-
-            auto serverAddress = server->getLocalAddress();
-            NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-            startedPromise->set_value(std::move(serverAddress));
-            startedPromise = nullptr;
-
-            auto acceptResult = acceptedPromise.get_future().get();
-            client = std::move(acceptResult.second);
-            if (acceptResult.first != SystemError::noError)
-            {
-                SystemError::setLastErrorCode(acceptResult.first);
-            }
-            else
-            {
-                ASSERT_NE(nullptr, client);
-                ASSERT_TRUE(client->setNonBlockingMode(false))
-                    << SystemError::getLastOSErrorText().toStdString();
-            }
-        }
-        else
-        {
-            client.reset(server->accept());
-        }
-
+        std::unique_ptr<AbstractStreamSocket> client(server->accept());
         if (ignoreReadWriteError && !client)
             continue;
 
-        ASSERT_TRUE(client.get())
-            << SystemError::getLastOSErrorText().toStdString() << " on " << i;
+        ASSERT_TRUE(client.get()) << lastError() << " on " << i;
         ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
         ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
 
@@ -133,16 +94,13 @@ void syncSocketServerMainFunc(
         const auto incomingMessage = readNBytes(client.get(), testMessage.size());
         if (!ignoreReadWriteError)
         {
-            ASSERT_TRUE(!incomingMessage.isEmpty())
-                << SystemError::getLastOSErrorText().toStdString();
+            ASSERT_TRUE(!incomingMessage.isEmpty()) << lastError();
             ASSERT_EQ(testMessage, incomingMessage);
         }
 
         const int bytesSent = client->send(testMessage);
         if (!ignoreReadWriteError)
-        {
-            ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
-        }
+            ASSERT_NE(-1, bytesSent) << lastError();
 
         //waiting for connection to be closed by client
         QByteArray buf(64, 0);

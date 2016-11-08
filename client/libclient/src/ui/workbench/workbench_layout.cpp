@@ -649,8 +649,6 @@ void QnWorkbenchLayout::setCellSpacing(qreal spacing) {
         return;
     }
 
-    static const qreal kMaxCellSpacing = 0.15;
-    spacing = std::min(kMaxCellSpacing, spacing);
     if(qFuzzyEquals(m_cellSpacing, spacing))
         return;
 

@@ -293,6 +293,7 @@ void QnResourceWidget::createButtons()
     iconButton->setParent(this);
     iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
     iconButton->setVisible(false);
+    iconButton->setAcceptedMouseButtons(Qt::NoButton);
     buttonsOverlay()->leftButtonsBar()->addButton(Qn::RecordingStatusIconButton, iconButton);
 }
 

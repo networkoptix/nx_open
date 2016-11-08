@@ -40,10 +40,9 @@ namespace {
 
 } // anonymous namespace
 
-QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
-    QObject(parent),
+QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject* parent):
+    base_type(parent),
     m_stage(QnFullUpdateStage::Init),
-    m_updateProcess(NULL),
     m_enableClientUpdates(defaultEnableClientUpdates)
 {
     auto targetsWatcher = [this](const QnResourcePtr &resource) {
@@ -60,10 +59,18 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   targetsWatcher);
 }
 
-QnMediaServerUpdateTool::~QnMediaServerUpdateTool() {
-    if (m_updateProcess) {
+QnMediaServerUpdateTool::~QnMediaServerUpdateTool()
+{
+    if (m_updateProcess)
+    {
         m_updateProcess->stop();
         delete m_updateProcess;
+    }
+
+    if (m_checkUpdatesTask)
+    {
+        m_checkUpdatesTask->cancel();
+        delete m_checkUpdatesTask;
     }
 }
 
@@ -77,6 +84,11 @@ bool QnMediaServerUpdateTool::isUpdating() const {
 
 bool QnMediaServerUpdateTool::idle() const {
     return m_stage == QnFullUpdateStage::Init;
+}
+
+bool QnMediaServerUpdateTool::isCheckingUpdates() const
+{
+    return m_checkUpdatesTask;
 }
 
 void QnMediaServerUpdateTool::setStage(QnFullUpdateStage stage) {
@@ -244,16 +256,42 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     return true;
 }
 
-void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std::function<void(const QnCheckForUpdateResult &result)> func) {
-    QnCheckForUpdatesPeerTask *checkForUpdatesTask = new QnCheckForUpdatesPeerTask(target);
-    if (func)
-        connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,  this,  [this, func](const QnCheckForUpdateResult &result){
-            func(result);
-        });
+bool QnMediaServerUpdateTool::cancelUpdatesCheck()
+{
+    if (!m_checkUpdatesTask)
+        return false;
+
+    m_checkUpdatesTask->cancel();
+    delete m_checkUpdatesTask;
+
+    emit updatesCheckCanceled();
+
+    return true;
+}
+
+void QnMediaServerUpdateTool::checkForUpdates(
+    const QnUpdateTarget& target,
+    std::function<void(const QnCheckForUpdateResult& result)> callback)
+{
+    if (m_checkUpdatesTask)
+        return;
+
+    m_checkUpdatesTask = new QnCheckForUpdatesPeerTask(target);
+
+    if (callback)
+    {
+        connect(m_checkUpdatesTask, &QnCheckForUpdatesPeerTask::checkFinished, this, callback);
+    }
     else
-        connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,  this,  &QnMediaServerUpdateTool::checkForUpdatesFinished);
-    connect(checkForUpdatesTask,  &QnNetworkPeerTask::finished,             checkForUpdatesTask, &QObject::deleteLater);
-    QtConcurrent::run(checkForUpdatesTask, &QnCheckForUpdatesPeerTask::start);
+    {
+        connect(m_checkUpdatesTask, &QnCheckForUpdatesPeerTask::checkFinished,
+            this, &QnMediaServerUpdateTool::checkForUpdatesFinished);
+    }
+
+    connect(m_checkUpdatesTask, &QnNetworkPeerTask::finished,
+        m_checkUpdatesTask, &QObject::deleteLater);
+
+    m_checkUpdatesTask->start();
     setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
 }
 

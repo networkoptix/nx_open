@@ -177,6 +177,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
      * %param id Unique id of the resource.
      * %// AbstractResourceManager::remove
      */
@@ -205,6 +206,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyServerAttributesAccess / ReadServerAttributesAccess
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
@@ -325,6 +327,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
      * %param parentId Should be empty.
      * %param name Storage name.
@@ -468,6 +471,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyCameraAttributesAccess / ReadCameraAttributesAccess
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      * %param cameraName Camera name.
      * %param userDefinedGroupName Name of the user-defined camera group.
@@ -897,6 +901,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator.
      * %param userId User unique id.
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
@@ -909,6 +914,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
@@ -965,6 +971,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions ModifyResourceAccess / ReadResourceAccess
      * %param id User unique id.
      * %// AbstractUserManager::remove
      */
@@ -976,6 +983,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator.
      * %param[opt] id Group unique id. Can be omitted when creating a new object. If such object
      * exists, omitted fields will not be changed.
      * %param name Group name.
@@ -1000,6 +1008,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO RemoveUserGroupAccess
      * %param id User unique id.
      * %// AbstractUserManager::removeUserGroup
      */
@@ -1047,6 +1056,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
      * %param[opt] id Layout unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param parentId Unique id of the user owning the layout.
@@ -1179,6 +1189,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
      * %param id Unique Id of the layout to be deleted.
      * %// AbstractLayoutManager::remove
      */
@@ -1237,7 +1248,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
     /**%apidoc GET /ec2/getCurrentTime
-     * Read current time
+     * Read current time.
+     * %permissions Administrator.
      * %param[default] format
      * %param[opt] folder File name
      * %return Return object in requested format

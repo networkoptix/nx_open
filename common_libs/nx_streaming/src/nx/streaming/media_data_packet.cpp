@@ -461,3 +461,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(/*global namespace*/, MediaQuality,
     (MEDIA_Quality_LowIframesOnly, "low-iframes-only")
     (MEDIA_Quality_None, "")
 )
+
+bool isLowMediaQuality(MediaQuality q)
+{
+    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
+}

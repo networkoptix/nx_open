@@ -2,6 +2,7 @@
 #include "reverse_connection_holder.h"
 
 #include <nx/network/cloud/data/client_bind_data.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
 namespace nx {
@@ -14,7 +15,6 @@ ReverseConnectionPool::ReverseConnectionPool(
 :
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(
-        QnUuid::createUuid().toByteArray(),
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
             NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
@@ -33,10 +33,12 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
 {
     m_publicIp = std::move(publicIp);
     SocketAddress serverAddress(HostAddress::anyHost, port);
-    if (!m_acceptor.start(serverAddress, m_mediatorConnection->getAioThread()))
+    if (!m_acceptor.start(
+        SocketGlobals::outgoingTunnelPool().getSelfPeerId(),
+        serverAddress, m_mediatorConnection->getAioThread()))
     {
-        NX_LOGX(lm("Could not start acceptor %1: %2")
-            .strs(m_acceptor.selfHostName(), SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_LOGX(lm("Could not start acceptor on %1: %2")
+            .strs(serverAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
 
         return false;
     }

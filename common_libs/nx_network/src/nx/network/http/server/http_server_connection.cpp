@@ -23,7 +23,7 @@ namespace nx_http
         m_authenticationManager( authenticationManager ),
         m_httpMessageDispatcher( httpMessageDispatcher ),
         m_isPersistent( false ),
-        m_forceConnectionClose(false)
+        m_persistentConnectionEnabled(true)
     {
     }
 
@@ -356,7 +356,7 @@ namespace nx_http
         const auto& request = *msg.request;
 
         m_isPersistent = false;
-        if (!m_forceConnectionClose)
+        if (m_persistentConnectionEnabled)
         {
             if (request.requestLine.version == nx_http::http_1_1)
                 m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() != "close";
@@ -365,9 +365,9 @@ namespace nx_http
         }
     }
 
-    void HttpServerConnection::setForceConnectionClose(bool value)
+    void HttpServerConnection::setPersistentConnectionEnabled(bool value)
     {
-        m_forceConnectionClose = value;
+        m_persistentConnectionEnabled = value;
     }
 
 }

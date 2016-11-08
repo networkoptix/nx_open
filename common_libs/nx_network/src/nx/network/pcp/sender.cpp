@@ -7,7 +7,9 @@ namespace pcp {
 Sender::Sender(const HostAddress& server)
     : m_socket(SocketFactory::createDatagramSocket())
 {
+    // TODO: Verify return codes.
     m_socket->setDestAddr(SocketAddress(server, SERVER_PORT));
+    m_socket->setNonBlockingMode(true);
 }
 
 Sender::~Sender()

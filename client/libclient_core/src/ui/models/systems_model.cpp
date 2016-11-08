@@ -186,6 +186,13 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case IsCloudSystemRoleId:
             return system->isCloudSystem();
         case IsOnlineRoleId:
+            /**
+             * TODO: #ynikitenkov In 3.0 we can't connect to server
+             * with offline cloud. Remove isCloudSystemCheck in 3.1
+             */
+            if (system->isCloudSystem())
+                return (system->isOnline() && system->hasInternet());
+
             return system->isOnline();
         case IsCompatibleRoleId:
             return d->isCompatibleSystem(system);
@@ -310,6 +317,11 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::onlineStateChanged, this, emitOnlineChanged);
 
+
+    // TODO: #ynikitenkov In 3.0 we can't connect to server with offline cloud. Remove this in 3.1
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::hasInternetChanged, this, emitOnlineChanged);
+
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
     internalData.append(data);
     q->endInsertRows();
@@ -379,14 +391,6 @@ void QnSystemsModelPrivate::at_serverChanged(
 
     Q_Q(QnSystemsModel);
 
-    if (fields.testFlag(QnServerField::FlagsField))
-    {
-        // If NEW_SYSTEM state flag is changed we have to resort systems.
-        // TODO: #ynikitenkov check is exactly NEW_SYSTEM flag is changed
-        removeSystem(systemDescription->id());
-        addSystem(systemDescription);
-    }
-
     const auto dataIt = getInternalDataIt(systemDescription);
     if (dataIt == internalData.end())
         return;
@@ -403,7 +407,7 @@ void QnSystemsModelPrivate::at_serverChanged(
         }
     };
 
-    testFlag(QnServerField::HostField, QnSystemsModel::IsOnlineRoleId);
+    testFlag(QnServerField::Host, QnSystemsModel::IsOnlineRoleId);
 }
 
 void QnSystemsModelPrivate::resetModel()
