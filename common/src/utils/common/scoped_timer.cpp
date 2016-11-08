@@ -33,7 +33,7 @@ void QnScopedTimer::logCurrentElapsedTime()
 
 void QnScopedTimer::logMessage(const char *tag, qint64 time)
 {
-    if (time < m_detailMs)
+    if (time >= 0 && time < m_detailMs)
         return;
 
     if (time >= 0)
