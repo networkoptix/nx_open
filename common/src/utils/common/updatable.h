@@ -11,10 +11,16 @@ public:
 protected:
     bool isUpdating() const;
 
+    /** Called in each beginUpdate(). */
     virtual void beginUpdateInternal();
+
+    /** Called in each endUpdate(). */
     virtual void endUpdateInternal();
 
+    /** Called in first beginUpdate(). */
     virtual void beforeUpdate();
+
+    /** Called in last endUpdate(). */
     virtual void afterUpdate();
 private:
     int m_updateCount;
