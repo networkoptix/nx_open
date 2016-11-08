@@ -174,7 +174,7 @@ private:
     void onGotTransaction(
         const nx::String& connectionId,
         Qn::SerializationFormat tranFormat,
-        const QByteArray& data,
+        QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);
     
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);

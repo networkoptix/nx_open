@@ -445,6 +445,12 @@ SocketAddress QnTransactionTransportBase::remoteSocketAddr() const
     return addr;
 }
 
+int QnTransactionTransportBase::remotePeerProtocolVersion() const
+{
+    // TODO: #ak return real version
+    return nx_ec::EC2_PROTO_VERSION;
+}
+
 nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authData() const
 {
     QnMutexLocker lock( &m_mutex );

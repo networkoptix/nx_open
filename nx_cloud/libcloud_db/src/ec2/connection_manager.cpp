@@ -457,13 +457,13 @@ void ConnectionManager::removeConnection(const nx::String& connectionId)
 void ConnectionManager::onGotTransaction(
     const nx::String& connectionId,
     Qn::SerializationFormat tranFormat,
-    const QByteArray& data,
+    QByteArray serializedTransaction,
     TransactionTransportHeader transportHeader)
 {
     m_transactionDispatcher->dispatchTransaction(
         std::move(transportHeader),
         tranFormat,
-        std::move(data),
+        std::move(serializedTransaction),
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
             api::ResultCode resultCode)
         {

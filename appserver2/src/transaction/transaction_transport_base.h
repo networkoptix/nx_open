@@ -156,6 +156,7 @@ public:
     const ec2::ApiPeerData& remotePeer() const;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
+    int remotePeerProtocolVersion() const;
 
     nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
 

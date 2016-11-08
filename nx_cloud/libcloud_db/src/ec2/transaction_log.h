@@ -19,6 +19,7 @@
 #include "transaction_serializer.h"
 #include "transaction_timestamp_calculator.h"
 #include "transaction_transport_header.h"
+#include "serialization/serializable_transaction.h"
 
 namespace nx {
 
@@ -90,23 +91,24 @@ public:
     nx::db::DBResult checkIfNeededAndSaveToLog(
         nx::db::QueryContext* connection,
         const nx::String& systemId,
-        ::ec2::QnTransaction<TransactionDataType> transaction,
+        const SerializableTransaction<TransactionDataType>& transaction,
         TransactionTransportHeader /*transportHeader*/)
     {
-        const auto transactionHash = calculateTransactionHash(transaction);
+        const auto transactionHash = calculateTransactionHash(transaction.get());
 
         // Checking whether transaction should be saved or not.
         if (isShouldBeIgnored(
                 connection,
                 systemId,
-                transaction,
+            transaction.get(),
                 transactionHash))
         {
             NX_LOGX(
                 QnLog::EC2_TRAN_LOG,
                 lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
-                    .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-                    .str(transaction).arg(calculateTransactionHash(transaction)),
+                    .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.get().command))
+                    .str(transaction.get())
+                    .arg(calculateTransactionHash(transaction.get())),
                 cl_logDEBUG1);
             // Returning nx::db::DBResult::cancelled if transaction should be skipped.
             return nx::db::DBResult::cancelled;
@@ -117,16 +119,15 @@ public:
             QnMutexLocker lk(&m_mutex);
             auto& transactionLogData = m_systemIdToTransactionLog[systemId];
             transactionLogData.timestampCalculator->shiftTimestampIfNeeded(
-                transaction.persistentInfo.timestamp);
+                transaction.get().persistentInfo.timestamp);
         }
 
-        // TODO: #ak: Should not serialize transaction here, but receive already serialized version.
         return saveToDb(
             connection,
             systemId,
-            transaction,
+            transaction.get(),
             transactionHash,
-            QnUbjson::serialized(transaction));
+            transaction.serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION));
     }
 
     /**

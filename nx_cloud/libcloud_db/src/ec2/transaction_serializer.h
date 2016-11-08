@@ -9,6 +9,19 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
+class TransactionUbjsonDataSource
+{
+public:
+    QByteArray serializedTransaction;
+    QnUbjsonReader<QByteArray> stream;
+
+    TransactionUbjsonDataSource(QByteArray serializedTransaction):
+        serializedTransaction(std::move(serializedTransaction)),
+        stream(&serializedTransaction)
+    {
+    }
+};
+
 /**
  * Holds transaction inside and is able to serialize it to a requested format.
  * Can add transport header optionally.
@@ -23,14 +36,16 @@ public:
      * @note Method is re-enterable
      */
     virtual nx::Buffer serialize(
-        Qn::SerializationFormat targetFormat) const = 0;
+        Qn::SerializationFormat targetFormat,
+        int transactionFormatVersion) const = 0;
     /**
      * Serialize transaction into \a targetFormat while adding transport header.
      * @note Method is re-enterable
      */
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader) const = 0;
+        const TransactionTransportHeader& transportHeader,
+        int transactionFormatVersion) const = 0;
 };
 
 template<typename Base>
@@ -38,14 +53,14 @@ class BaseUbjsonTransactionPresentation:
     public Base
 {
 public:
-    BaseUbjsonTransactionPresentation(nx::Buffer ubjsonData)
-        :
+    BaseUbjsonTransactionPresentation(nx::Buffer ubjsonData):
         m_ubjsonData(std::move(ubjsonData))
     {
     }
 
     virtual nx::Buffer serialize(
-        Qn::SerializationFormat targetFormat) const override
+        Qn::SerializationFormat targetFormat,
+        int /*transactionFormatVersion*/) const override
     {
         switch (targetFormat)
         {
@@ -59,7 +74,8 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader) const override
+        const TransactionTransportHeader& transportHeader,
+        int /*transactionFormatVersion*/) const override
     {
         switch (targetFormat)
         {
@@ -113,7 +129,6 @@ public:
     {
         return m_transaction;
     }
-
 
 private:
     const ::ec2::QnTransaction<TransactionDataType> m_transaction;

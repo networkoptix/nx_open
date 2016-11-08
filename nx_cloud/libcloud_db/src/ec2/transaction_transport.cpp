@@ -194,7 +194,8 @@ void TransactionTransport::sendTransaction(
         localPeer().instanceId);
     auto serializedTransaction = transactionSerializer->serialize(
         remotePeer().dataFormat,
-        std::move(transportHeader));
+        std::move(transportHeader),
+        remotePeerProtocolVersion());
 
     post(
         [this, 
@@ -299,6 +300,7 @@ void TransactionTransport::forwardTransactionToProcessor(
     cdbTransportHeader.systemId = m_systemId;
     cdbTransportHeader.connectionId = m_connectionId;
     cdbTransportHeader.vmsTransportHeader = std::move(transportHeader);
+    cdbTransportHeader.transactionFormatVersion = remotePeerProtocolVersion();
     m_gotTransactionEventHandler(
         tranFormat,
         std::move(data),
@@ -372,7 +374,11 @@ void TransactionTransport::onTransactionsReadFromLog(
         transportHeader.vmsTransportHeader.distance = 1;
         transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
 
-        addData(tranData.serializer->serialize(remotePeer().dataFormat, transportHeader));
+        addData(
+            tranData.serializer->serialize(
+                remotePeer().dataFormat,
+                transportHeader,
+                remotePeerProtocolVersion()));
     }
 
     m_remotePeerTranState = readedUpTo;
