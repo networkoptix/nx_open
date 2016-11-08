@@ -62,6 +62,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
     case QnSystemHealth::ArchiveRebuildCanceled:
         return QnNotificationLevel::Value::CommonNotification;
     case QnSystemHealth::UsersEmailIsEmpty:
+    case QnSystemHealth::EmailIsEmpty:
         return QnNotificationLevel::Value::ImportantNotification;
     default:
         break;
