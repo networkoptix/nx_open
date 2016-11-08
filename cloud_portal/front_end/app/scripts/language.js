@@ -18,7 +18,7 @@ var L = {
         template: '{{title}} PRODUCT_NAME',
         default: 'PRODUCT_NAME',
         registerSuccess: 'Welcome to',
-        register: 'Register in',
+        register: 'Create account in',
         changePassword: 'Change password -',
         account: 'Account settings -',
         systems: 'Systems -',
