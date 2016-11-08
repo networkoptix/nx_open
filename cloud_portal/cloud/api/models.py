@@ -13,6 +13,7 @@ class Account(models.Model):
     activated_date = models.DateField(null=True, blank=True)
     last_login = models.DateField(null=True, blank=True)
     subscribe = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']

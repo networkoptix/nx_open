@@ -9,7 +9,7 @@ var L = {
 
     dialogs:{
         okButton: 'Ok',
-        loginTitle: 'Login to PRODUCT_NAME',
+        loginTitle: 'Log in to PRODUCT_NAME',
         logoutConfirmText: "Log out to continue, or cancel to go to your systems",
         logoutConfirmTitle: "You are already logged in to portal.",
         logoutConfirmButton: "Log out"
@@ -18,7 +18,7 @@ var L = {
         template: '{{title}} PRODUCT_NAME',
         default: 'PRODUCT_NAME',
         registerSuccess: 'Welcome to',
-        register: 'Register in',
+        register: 'Create account in',
         changePassword: 'Change password -',
         account: 'Account settings -',
         systems: 'Systems -',
@@ -33,7 +33,7 @@ var L = {
         restorePasswordCode: 'Reset password -',
         contentPage: '',
         debug: 'Debug',
-        login: 'Login -',
+        login: 'Log in -',
         download: 'Download VMS_NAME',
         downloadPlatform: 'Download VMS_NAME for ',
         startPage: '',
