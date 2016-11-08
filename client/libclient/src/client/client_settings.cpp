@@ -178,6 +178,14 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultValue.value<QnPaneSettingsMap>()));
         }
 
+        case WORKBENCH_STATES:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<QnWorkbenchStateList>(asJson,
+                defaultValue.value<QnWorkbenchStateList>()));
+        }
+
         case BACKGROUND_IMAGE:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
@@ -269,6 +277,13 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         case WORKBENCH_PANES:
         {
             QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnPaneSettingsMap>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case WORKBENCH_STATES:
+        {
+            QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnWorkbenchStateList>()));
             base_type::writeValueToSettings(settings, id, asJson);
             break;
         }

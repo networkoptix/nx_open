@@ -520,12 +520,10 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     if (!user)
         return;
 
-    // we should not change state when using "Open in New Window"
+    /* We should not change state when using "Open in New Window". Otherwise workbench will be
+     * cleared here even if no state is saved. */
     if (m_delayedDrops.isEmpty() && qnRuntime->isDesktopMode())
-    {
-        QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
-        workbench()->update(state);
-    }
+        context()->instance<QnWorkbenchStateManager>()->restoreState();
 
     /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
     * Otherwise the user will see uncreated layouts in layout selection menu.
@@ -538,13 +536,6 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 qnResPool->removeResource(layout);
         }
-    }
-
-    /* Close all other layouts. */
-    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
-        QnLayoutResourcePtr resource = layout->resource();
-        if (resource->getParentId() != user->getId())
-            workbench()->removeLayout(layout);
     }
 
     if (workbench()->layouts().empty())

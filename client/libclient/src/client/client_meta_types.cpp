@@ -49,10 +49,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qn::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<QnThumbnail>();
-    qRegisterMetaType<QnWorkbenchState>();
-    qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
-    qRegisterMetaType<QnWorkbenchStateHash>();
-    qRegisterMetaTypeStreamOperators<QnWorkbenchStateHash>();
     qRegisterMetaType<QnLicenseWarningState>();
     qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();
     qRegisterMetaType<QnLicenseWarningStateHash>();
