@@ -32,15 +32,17 @@ bool QnUpdatable::isUpdating() const
 }
 
 void QnUpdatable::beginUpdateInternal()
-{}
+{
+}
 
 void QnUpdatable::endUpdateInternal()
-{}
+{
+}
 
 void QnUpdatable::beforeUpdate()
-{}
+{
+}
 
 void QnUpdatable::afterUpdate()
-{}
-
-
+{
+}

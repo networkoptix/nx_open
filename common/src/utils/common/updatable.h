@@ -1,6 +1,7 @@
 #pragma once
 
-class QnUpdatable {
+class QnUpdatable
+{
 public:
     QnUpdatable();
     virtual ~QnUpdatable();
@@ -27,10 +28,13 @@ private:
 };
 
 
+/** Utility class to implement RAII pattern with Updatable instances (requires QObject). */
 template<typename Updatable>
-class QnUpdatableGuard {
+class QnUpdatableGuard
+{
 public:
-    QnUpdatableGuard(Updatable* source): m_guard(source)
+    QnUpdatableGuard(Updatable* source):
+        m_guard(source)
     {
         if (m_guard)
             m_guard->beginUpdate();
