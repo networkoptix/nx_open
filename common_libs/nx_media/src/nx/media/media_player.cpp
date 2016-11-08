@@ -213,6 +213,8 @@ private:
     void doPeriodicTasks();
 
     void log(const QString& message) const;
+
+    bool isCoarseFrame(const QVideoFramePtr& frame) const;
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -343,7 +345,7 @@ void PlayerPrivate::at_gotVideoFrame()
     if (state == Player::State::Paused)
     {
         FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
-        if (!metadata.noDelay)
+        if (!metadata.noDelay && !isCoarseFrame(videoFrameToRender))
             return; //< Display regular frames only if the player is playing.
     }
 
@@ -547,7 +549,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     if (!lastVideoPtsMs.is_initialized() || //< first time
         !qBetween(*lastVideoPtsMs, ptsMs, *lastVideoPtsMs + kMaxFrameDurationMs) || //< pts discontinuity
         metadata.noDelay || //< jump occurred
-        ptsMs < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
+        isCoarseFrame(frame) || //< 'coarse' frame. Frame time is less than required jump pos.
         frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
         liveBufferUnderflow ||
         liveBufferOverflow //< live buffer overflow
@@ -685,6 +687,11 @@ void PlayerPrivate::log(const QString& message) const
         .arg(message), cl_logDEBUG1);
 }
 
+bool PlayerPrivate::isCoarseFrame(const QVideoFramePtr& frame) const
+{
+    return frame->startTime() < lastSeekTimeMs;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Player
 
@@ -732,7 +739,9 @@ QAbstractVideoSurface* Player::videoSurface(int channel) const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    return d->positionMs;
+    // positionMs is real value from video frame. It coud containt 'coarse' timestamp
+	// a bit less then user requested position (inside of current GOP)
+    return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
 void Player::setPosition(qint64 value)
