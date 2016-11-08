@@ -141,7 +141,6 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid &reso
     result = QnVirtualCameraResourcePtr( new QnDesktopCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString();
     return result;
 }
 
