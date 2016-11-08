@@ -88,7 +88,6 @@ public:
         m_ipVersion( _ipVersion )
     {
         NX_ASSERT( this->m_socket );
-        NX_ASSERT( m_socket );
     }
 
     virtual ~AsyncSocketImplHelper()
@@ -200,9 +199,9 @@ public:
 #ifdef _DEBUG
         bool isNonBlockingModeEnabled = false;
 #endif
-        if (!m_socket->getSendTimeout(&sendTimeout)
+        if (!this->m_socket->getSendTimeout(&sendTimeout)
 #ifdef _DEBUG
-            || !m_socket->getNonBlockingMode(&isNonBlockingModeEnabled)
+            || !this->m_socket->getNonBlockingMode(&isNonBlockingModeEnabled)
 #endif
             )
         {
@@ -375,7 +374,7 @@ private:
     bool isNonBlockingMode() const
     {
         bool value;
-        if (!m_socket->getNonBlockingMode(&value))
+        if (!this->m_socket->getNonBlockingMode(&value))
         {
             // TODO: MUST return FALSE;
             // Currently here is a problem in UDT, getsockopt(...) can not find descriptor by some
@@ -530,14 +529,14 @@ private:
         unsigned int sendTimeout = 0;
 #ifdef _DEBUG
         bool isNonBlockingModeEnabled = false;
-        if( !m_socket->getNonBlockingMode( &isNonBlockingModeEnabled ) )
+        if( !this->m_socket->getNonBlockingMode( &isNonBlockingModeEnabled ) )
             return false;
         NX_ASSERT( isNonBlockingModeEnabled );
 #endif
 
         NX_ASSERT( !m_asyncSendIssued.exchange( true ) );
 
-        if( !m_socket->getSendTimeout( &sendTimeout ) )
+        if( !this->m_socket->getSendTimeout( &sendTimeout ) )
             return false;
 
         QnMutexLocker lk( nx::network::SocketGlobals::aioService().mutex() );
@@ -550,7 +549,7 @@ private:
             boost::none,
             [this, resolvedAddress, sendTimeout]()
             {
-                m_socket->connectToIp( resolvedAddress, sendTimeout );
+                this->m_socket->connectToIp( resolvedAddress, sendTimeout );
             });    //to be called between pollset.add and pollset.polladdress
         return true;
     }
@@ -612,7 +611,7 @@ private:
             //reading to buffer
             const auto bufSizeBak = m_recvBuffer->size();
             m_recvBuffer->resize(m_recvBuffer->capacity());
-            const int bytesRead = m_socket->recv(
+            const int bytesRead = this->m_socket->recv(
                 m_recvBuffer->data() + bufSizeBak,
                 m_recvBuffer->capacity() - bufSizeBak,
                 0);
@@ -677,7 +676,7 @@ private:
                 std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)>
                     cleanupGuard(this, __finally_write);
 
-                const int bytesWritten = m_socket->send(
+                const int bytesWritten = this->m_socket->send(
                     m_sendBuffer->constData() + m_sendBufPos,
                     m_sendBuffer->size() - m_sendBufPos);
                 if (bytesWritten == -1)
