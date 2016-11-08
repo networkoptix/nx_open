@@ -591,7 +591,22 @@ module.exports = function (grunt) {
             },
             settings: {
                 options: {
+                    args: {specs: ['test/e2e/settings/spec.js']} // Target-specific arguments
+                }
+            },
+            settingsAll: {
+                options: {
                     args: {specs: ['test/e2e/settings/*spec.js']} // Target-specific arguments
+                }
+            },
+            settingsCloud: {
+                options: {
+                    args: {specs: ['test/e2e/settings/cloud_spec.js']} // Target-specific arguments
+                }
+            },
+            settingsUncloud: {
+                options: {
+                    args: {specs: ['test/e2e/settings/uncloud_spec.js']} // Target-specific arguments
                 }
             },
             setup: {
@@ -649,7 +664,7 @@ module.exports = function (grunt) {
         'protractor_webdriver',
         'shell:print_version',
         // 'shell:run_ffmpeg',
-        'protractor:all',
+        'protractor:all'
         // 'shell:close_ffmpeg',
         // 'newer:jshint',
         // 'karma'
@@ -723,6 +738,36 @@ module.exports = function (grunt) {
         'protractor_webdriver',
         'shell:print_version',
         'protractor:settings'
+    ]);
+    grunt.registerTask('test-settings-all', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsAll'
+    ]);
+    grunt.registerTask('test-settings-cloud', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsCloud'
+    ]);
+    grunt.registerTask('test-settings-uncloud', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsUncloud'
     ]);
     grunt.registerTask('test-setup', [
         'clean:server',
