@@ -88,6 +88,7 @@ void CrossNatConnector::stopWhileInAioThread()
     m_mediatorUdpClient.reset();
     m_connectors.clear();
     m_connectResultReportSender.reset();
+    m_connection.reset();
 }
 
 void CrossNatConnector::connect(
