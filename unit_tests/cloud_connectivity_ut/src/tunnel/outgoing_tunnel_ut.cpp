@@ -11,6 +11,7 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
@@ -39,6 +40,7 @@ public:
         m_tunnelConnectionInvokedPromise(tunnelConnectionInvokedPromise)
     {
         ++instanceCount;
+        bindToAioThread(SocketGlobals::aioService().getCurrentAioThread());
     }
 
     ~DummyConnection()
@@ -62,7 +64,7 @@ public:
             m_tunnelConnectionInvokedPromise = nullptr;
         }
 
-        m_aioThreadBinder.post(
+        post(
             [this, handler]()
             {
                 if (m_connectionShouldWorkFine)
@@ -88,7 +90,6 @@ public:
     }
 
 private:
-    UDPSocket m_aioThreadBinder;
     bool m_connectionShouldWorkFine;
     const bool m_singleShot;
     nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
