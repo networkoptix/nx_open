@@ -15,35 +15,35 @@ IncomingTunnelConnection::IncomingTunnelConnection(
     m_controlConnection(std::move(controlConnection)),
     m_serverSocket(new UdtStreamServerSocket(AF_INET))
 {
+    auto controlSocket = m_controlConnection->socket();
+    m_serverSocket->bindToAioThread(controlSocket->getAioThread());
+
     m_controlConnection->setErrorHandler(
         [this](SystemError::ErrorCode code)
-    {
-        m_controlConnection.reset();
-        NX_LOGX(lm("Control connection error (%1), closing tunnel...")
-            .arg(SystemError::toString(code)), cl_logDEBUG1);
-
-        m_state = code;
-        if (m_serverSocket)
-            m_serverSocket->pleaseStopSync(false); // we are in IO thread
-
-        if (m_acceptHandler)
         {
-            const auto handler = std::move(m_acceptHandler);
-            m_acceptHandler = nullptr;
-            return handler(code, nullptr);
-        }
-    });
+            m_controlConnection.reset();
+            NX_LOGX(lm("Control connection error (%1), closing tunnel...")
+                .arg(SystemError::toString(code)), cl_logDEBUG1);
 
-    m_serverSocket->bindToAioThread(m_controlConnection->socket()->getAioThread());
-    const auto localAddressToBindTo = SocketAddress(
-        HostAddress::anyHost,
-        m_controlConnection->socket()->getLocalAddress().port);
+            m_state = code;
+            if (m_serverSocket)
+                m_serverSocket->pleaseStopSync(false); //< We are in AIO thread.
+
+            if (m_acceptHandler)
+            {
+                const auto handler = std::move(m_acceptHandler);
+                m_acceptHandler = nullptr;
+                return handler(code, nullptr);
+            }
+        });
+
+    const SocketAddress bindAddress(HostAddress::anyHost, controlSocket->getLocalAddress().port);
     if (!m_serverSocket->setNonBlockingMode(true) ||
-        !m_serverSocket->bind(localAddressToBindTo) ||
+        !m_serverSocket->bind(bindAddress) ||
         !m_serverSocket->listen())
     {
-        NX_LOGX(lm("Can not listen on server socket: ")
-            .arg(SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_LOGX(lm("Can not listen on server socket %1: %2")
+            .strs(bindAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
 
         m_state = SystemError::getLastOSErrorCode();
     }
