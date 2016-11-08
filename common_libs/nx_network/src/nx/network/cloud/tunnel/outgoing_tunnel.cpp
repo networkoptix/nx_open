@@ -282,7 +282,6 @@ void OutgoingTunnel::onConnectorFinished(
     if (errorCode == SystemError::noError)
     {
         setTunnelConnection(std::move(connection));
-        m_connectHandlers.clear();
         return;
     }
 
@@ -304,6 +303,7 @@ void OutgoingTunnel::setTunnelConnection(
     m_connection->setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
     m_state = State::connected;
+
     // We've connected to the host. Requesting client connections.
     for (auto& connectRequest : m_connectHandlers)
     {
@@ -323,6 +323,7 @@ void OutgoingTunnel::setTunnelConnection(
                     tunnelStillValid);
             });
     }
+    m_connectHandlers.clear();
 }
 
 } // namespace cloud
