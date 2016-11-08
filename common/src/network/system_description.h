@@ -63,6 +63,8 @@ public: // overrides
 
     bool hasInternet() const override;
 
+    bool safeMode() const override;
+
 public:
     enum { kDefaultPriority = 0 };
     void addServer(const QnModuleInformation& serverInfo,
@@ -101,6 +103,10 @@ private:
 
     void updateHasInternetState();
 
+    void updateSafeModeState();
+
+    void updateNewSystemState();
+
     void init();
 
 private:
@@ -115,7 +121,7 @@ private:
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     const bool m_isCloudSystem;
-    const bool m_isNewSystem;
+    bool m_isNewSystem;
     QString m_systemName;
     ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;
@@ -123,4 +129,5 @@ private:
     HostsHash m_hosts;
     IdsSet m_onlineServers;
     bool m_hasInternet;
+    bool m_safeMode;
 };

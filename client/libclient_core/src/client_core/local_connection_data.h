@@ -47,3 +47,12 @@ QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq)(json))
 
 typedef QList<QnWeightData> QnWeightDataList;
 Q_DECLARE_METATYPE(QnWeightDataList)
+
+namespace helpers {
+
+QnLocalConnectionData storeLocalSystemConnection(
+    const QString& systemName,
+    const QnUuid& localSystemId,
+    const QUrl& url);
+
+}

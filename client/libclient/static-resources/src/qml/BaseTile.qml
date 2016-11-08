@@ -18,7 +18,8 @@ Item
     property alias titleLabel: systemNameLabel;
     property alias collapseButton: collapseTileButton;
     property alias menuButton: menuButtonControl;
-    property alias indicator: indicatorControl;
+    property alias indicator: primaryIndicator;
+    property alias secondaryIndicator: otherIndicator;
 
     property alias areaLoader: areaLoader;
 
@@ -101,7 +102,13 @@ Item
 
                 PropertyChanges
                 {
-                    target: indicator;
+                    target: primaryIndicator;
+                    opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: otherIndicator;
                     opacity: 1;
                 }
 
@@ -146,7 +153,13 @@ Item
 
                 PropertyChanges
                 {
-                    target: indicator;
+                    target: primaryIndicator;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: otherIndicator;
                     opacity: 0;
                 }
 
@@ -212,7 +225,16 @@ Item
 
                     NumberAnimation
                     {
-                        target: indicator;
+                        target: primaryIndicator;
+                        properties: "opacity";
+                        easing.type: (tileHolder.state == "collapsed" ?
+                              Easing.InCubic : Easing.OutCubic);
+                        duration: control.getDuration(200);
+                    }
+
+                    NumberAnimation
+                    {
+                        target: otherIndicator;
                         properties: "opacity";
                         easing.type: (tileHolder.state == "collapsed" ?
                               Easing.InCubic : Easing.OutCubic);
@@ -403,17 +425,31 @@ Item
                     sourceComponent: control.centralAreaDelegate;
                 }
 
-                Indicator
+
+                Row
                 {
-                    id: indicatorControl;
-
-                    visible: false;
-
                     anchors.right: parent.right;
                     anchors.top: parent.top;
                     anchors.rightMargin: 14;
                     anchors.topMargin: 66;
+
+                    spacing: 2;
+
+                    Indicator
+                    {
+                        id: otherIndicator;
+
+                        visible: false;
+                    }
+
+                    Indicator
+                    {
+                        id: primaryIndicator;
+
+                        visible: false;
+                    }
                 }
+
             }
 
             NxDotPreloader

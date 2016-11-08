@@ -224,6 +224,7 @@ Rectangle
 
                         isFactoryTile: model.isFactorySystem
                         isCloudTile: model.isCloudSystem
+                        safeMode: model.safeMode;
 
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal

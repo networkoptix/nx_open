@@ -2,7 +2,7 @@
 #include "direct_systems_finder.h"
 
 #include <network/module_finder.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
 
 namespace {

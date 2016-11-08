@@ -13,6 +13,7 @@ BaseTile
 
     property bool isFactoryTile: false;
     property bool isCompatibleInternal: false;
+    property bool safeMode: false;
 
     property string wrongVersion;
     property string compatibleVersion;
@@ -54,6 +55,14 @@ BaseTile
 
         return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
                 : Style.colors.custom.systemTile.background);
+    }
+
+    secondaryIndicator
+    {
+        visible: control.safeMode;
+        text: qsTr("SAFE MODE");
+        textColor: Style.colors.shadow;
+        color: Style.colors.yellow_main;
     }
 
     indicator

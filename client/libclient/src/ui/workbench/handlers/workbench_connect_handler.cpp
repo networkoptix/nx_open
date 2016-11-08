@@ -74,7 +74,7 @@
 #include <utils/common/delayed.h>
 #include <network/module_finder.h>
 #include <network/router.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>

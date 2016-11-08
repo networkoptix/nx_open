@@ -4,11 +4,11 @@
 #include <network/module_information.h>
 #include <api/model/connection_info.h>
 #include <utils/common/id.h>
-#include <client_core/client_core_settings.h>
 
 namespace {
 
 static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
+static const auto kMinVersionWithSafeMode = QnSoftwareVersion(2, 4, 1);
 static const auto kMinVersionWithLocalId = QnSoftwareVersion(3, 0);
 
 QnUuid getFactorySystemIdImpl(const QnUuid& serverId)
@@ -88,14 +88,21 @@ QnUuid getLocalSystemId(const QnConnectionInfo& info)
     return getLocalSystemIdImpl(info.systemName, info.localSystemId, info.serverId(), info.version);
 }
 
-
 QString getFactorySystemId(const QnModuleInformation& info)
 {
     return getFactorySystemIdImpl(info.id).toString();
 }
 
+bool isSafeMode(const QnModuleInformation& info)
+{
+    return (info.version < kMinVersionWithSafeMode ? false : info.ecDbReadOnly);
+}
+
 bool isNewSystem(const QnModuleInformation& info)
 {
+    if (isSafeMode(info))
+        return false;
+
     if (info.version < kMinVersionWithLocalId)
         return false; //< No new systems until 3.0
 
@@ -105,31 +112,6 @@ bool isNewSystem(const QnModuleInformation& info)
 bool isNewSystem(const QnCloudSystem& info)
 {
     return info.localId.isNull();
-}
-
-QnLocalConnectionData storeLocalSystemConnection(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    const QUrl& url)
-{
-    // TODO: #ynikitenkov remove outdated connection data
-
-    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
-    const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
-        [localSystemId, userName = url.userName()](const QnLocalConnectionData& connection)
-        {
-            return (connection.localId == localSystemId)
-                && QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0;
-        });
-
-    recentConnections.erase(itEnd, recentConnections.end());
-
-    const QnLocalConnectionData connectionData(systemName, localSystemId, url);
-    recentConnections.prepend(connectionData);
-
-    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
-
-    return connectionData;
 }
 
 } // namespace helpers
