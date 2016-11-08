@@ -1,6 +1,6 @@
 
 <div class="modal-header">
-    <h3 class="modal-title">Login</h3>
+    <h3 class="modal-title">Log in</h3>
 </div>
 <form class="form" name="loginForm" novalidate ng-controller="LoginCtrl">
     <div class="modal-body" collapse="!authorized">
@@ -8,7 +8,7 @@
     </div>
     <div class="modal-body" class="col-sm-12" ng-if="!authorized" collapse="authorized">
         <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
-            <label for="username" class="control-label">Login</label>
+            <label for="username" class="control-label">Log in</label>
             <input type="text" id="username" name="username" class="form-control" ng-model="user.username" required/>
             <p class="help-block" ng-show="loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)">
                 Username is required
