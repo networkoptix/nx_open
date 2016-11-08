@@ -77,8 +77,6 @@ template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::~Socket()
 {
     close();
-    delete m_baseAsyncHelper;
-    m_baseAsyncHelper = nullptr;
 }
 
 template<typename InterfaceToImplement>
@@ -348,13 +346,19 @@ Pollable* Socket<InterfaceToImplement>::pollable()
 template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_baseAsyncHelper->post(std::move(handler));
+    if (impl()->terminated.load(std::memory_order_relaxed) > 0)
+        return;
+
+    nx::network::SocketGlobals::aioService().post(this, std::move(handler));
 }
 
 template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_baseAsyncHelper->dispatch(std::move(handler));
+    if (impl()->terminated.load(std::memory_order_relaxed) > 0)
+        return;
+
+    nx::network::SocketGlobals::aioService().dispatch(this, std::move(handler));
 }
 
 template<typename InterfaceToImplement>
@@ -380,7 +384,6 @@ unsigned short Socket<InterfaceToImplement>::resolveService(
 
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int type,
     int protocol,
     int ipVersion,
@@ -389,40 +392,6 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( asyncHelper.release() ),
-    m_ipVersion( ipVersion ),
-    m_nonBlockingMode( false )
-{
-    createSocket( type, protocol );
-}
-
-template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-    int _sockDesc,
-    int ipVersion,
-    PollableSystemSocketImpl* impl )
-:
-    Pollable(
-        _sockDesc,
-        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( asyncHelper.release() ),
-    m_ipVersion( ipVersion ),
-    m_nonBlockingMode( false )
-{
-}
-
-template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::Socket(
-    int type,
-    int protocol,
-    int ipVersion,
-    PollableSystemSocketImpl* impl )
-:
-    Pollable(
-        INVALID_SOCKET,
-        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
@@ -438,7 +407,6 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
@@ -582,17 +550,13 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     PollableSystemSocketImpl* sockImpl )
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
-            new aio::AsyncSocketImplHelper<Pollable>(
-                this, this, ipVersion)),
         type,
         protocol,
         ipVersion,
         sockImpl),
-    m_aioHelper(nullptr),
+    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
     m_connected(false)
 {
-    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
@@ -602,16 +566,12 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     PollableSystemSocketImpl* sockImpl )
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
-            new aio::AsyncSocketImplHelper<Pollable>(
-                this, this, ipVersion)),
         newConnSD,
         ipVersion,
         sockImpl),
-    m_aioHelper(nullptr),
+    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
     m_connected(true)   // This constructor is used by server socket.
 {
-    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
