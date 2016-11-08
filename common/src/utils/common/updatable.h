@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 class QnUpdatable
 {
 public:
@@ -12,19 +14,19 @@ public:
 protected:
     bool isUpdating() const;
 
-    /** Called in each beginUpdate(). */
+    /** Called in each beginUpdate(). isUpdating() is true.  */
     virtual void beginUpdateInternal();
 
-    /** Called in each endUpdate(). */
+    /** Called in each endUpdate(). isUpdating is true. */
     virtual void endUpdateInternal();
 
-    /** Called in first beginUpdate(). */
+    /** Called in first beginUpdate(). isUpdating is false. */
     virtual void beforeUpdate();
 
-    /** Called in last endUpdate(). */
+    /** Called in last endUpdate(). isUpdating is false. */
     virtual void afterUpdate();
 private:
-    int m_updateCount;
+    std::atomic_int m_updateCount;
 };
 
 

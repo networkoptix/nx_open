@@ -32,6 +32,7 @@
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
+    QnUpdatable(),
     m_mutex(QnMutex::NonRecursive),
     m_permissionsCache()
 {
@@ -123,6 +124,8 @@ bool QnResourceAccessManager::hasGlobalPermission(
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
+    NX_EXPECT(!isUpdating());
+
     if (!subject.isValid() || !resource)
         return Qn::NoPermissions;
 
@@ -163,6 +166,7 @@ bool QnResourceAccessManager::hasPermission(
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
+
     if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources
         && permissions == Qn::ReadPermission)
     {
@@ -181,6 +185,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 {
     NX_ASSERT(subject.isValid());
     NX_ASSERT(target);
+    NX_EXPECT(!isUpdating());
 
     if (!subject.isValid())
         return false;
@@ -211,18 +216,21 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const ec2::ApiStorageData& data) const
 {
+    NX_EXPECT(!isUpdating());
     return canCreateStorage(subject, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const ec2::ApiLayoutData& data) const
 {
+    NX_EXPECT(!isUpdating());
     return canCreateLayout(subject, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const ec2::ApiUserData& data) const
 {
+    NX_EXPECT(!isUpdating());
     if (!data.groupId.isNull() && !qnUserRolesManager->hasRole(data.groupId))
         return false;
 
@@ -230,21 +238,37 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiVideowallData& data) const
+    const ec2::ApiVideowallData& /*data*/) const
 {
-    Q_UNUSED(data);
+    NX_EXPECT(!isUpdating());
     return canCreateVideoWall(subject);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiWebPageData& data) const
+    const ec2::ApiWebPageData& /*data*/) const
 {
-    Q_UNUSED(data);
+    NX_EXPECT(!isUpdating());
     return canCreateWebPage(subject);
+}
+
+void QnResourceAccessManager::beforeUpdate()
+{
+    /* We must clear cache here because otherwise there can stay resources, which were removed
+     * during update. */
+    QnMutexLocker lk(&m_mutex);
+    m_permissionsCache.clear();
+}
+
+void QnResourceAccessManager::afterUpdate()
+{
+    recalculateAllPermissions();
 }
 
 void QnResourceAccessManager::recalculateAllPermissions()
 {
+    if (isUpdating())
+        return;
+
     for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
         updatePermissionsBySubject(subject);
 }
@@ -252,37 +276,52 @@ void QnResourceAccessManager::recalculateAllPermissions()
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& target)
 {
+    if (isUpdating())
+        return;
+
     setPermissionsInternal(subject, target, calculatePermissions(subject, target));
 }
 
 void QnResourceAccessManager::updatePermissionsToResource(const QnResourcePtr& resource)
 {
+    if (isUpdating())
+        return;
+
     for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
         updatePermissions(subject, resource);
 }
 
 void QnResourceAccessManager::updatePermissionsBySubject(const QnResourceAccessSubject& subject)
 {
+    if (isUpdating())
+        return;
+
     for (const QnResourcePtr& resource : qnResPool->getResources())
         updatePermissions(subject, resource);
 }
 
 void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 {
-    updatePermissionsToResource(resource);
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-        updatePermissionsBySubject(user);
-
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
     }
+
+    if (isUpdating())
+        return;
+
+    updatePermissionsToResource(resource);
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        updatePermissionsBySubject(user);
 }
 
 void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
     disconnect(resource, nullptr, this, nullptr);
+
+    if (isUpdating())
+        return;
 
     auto resourceId = resource->getId();
 
@@ -305,6 +344,9 @@ void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resourc
 
 void QnResourceAccessManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    if (isUpdating())
+        return;
+
     auto id = subject.id();
 
     QSet<QnResourcePtr> resorces;

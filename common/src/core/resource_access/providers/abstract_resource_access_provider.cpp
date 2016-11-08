@@ -6,7 +6,8 @@
 #include <core/resource/user_resource.h>
 
 QnAbstractResourceAccessProvider::QnAbstractResourceAccessProvider(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    QnUpdatable()
 {
 }
 

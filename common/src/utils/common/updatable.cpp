@@ -15,15 +15,15 @@ void QnUpdatable::beginUpdate()
 {
     if (m_updateCount == 0)
         beforeUpdate();
-    beginUpdateInternal();
     ++m_updateCount;
+    beginUpdateInternal();
 }
 
 void QnUpdatable::endUpdate()
 {
     NX_ASSERT(m_updateCount > 0, Q_FUNC_INFO, "Invalid begin/end sequence");
-    --m_updateCount;
     endUpdateInternal();
+    --m_updateCount;
     if (m_updateCount == 0)
         afterUpdate();
 }

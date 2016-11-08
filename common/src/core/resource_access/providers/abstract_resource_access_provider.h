@@ -5,9 +5,12 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <utils/common/connective.h>
+#include <utils/common/updatable.h>
 
 /** Public interface for all Resource Access Provider classes. */
-class QnAbstractResourceAccessProvider: public Connective<QObject>
+class QnAbstractResourceAccessProvider:
+    public Connective<QObject>,
+    public QnUpdatable
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

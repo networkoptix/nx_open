@@ -43,11 +43,16 @@
 #include <camera/camera_pool.h>
 
 #include <core/misc/schedule_task.h>
+
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
+
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -2429,7 +2434,17 @@ void MediaServerProcess::run()
     auto upnpPortMapper = initializeUpnpPortMapper();
     updateAddressesList();
 
+    qDebug() << "start loading resources";
+    QElapsedTimer tt;
+    tt.start();
+    qnResourceAccessManager->beginUpdate();
+    qnResourceAccessProvider->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
+    qDebug() << "resources loaded for" << tt.elapsed();
+    qnResourceAccessProvider->endUpdate();
+    qDebug() << "access ready" << tt.elapsed();
+    qnResourceAccessManager->endUpdate();
+    qDebug() << "permissions ready" << tt.elapsed();
 
 	qnGlobalSettings->initialize();
     migrateSystemNameFromConfig(cloudConnectionManager);

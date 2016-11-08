@@ -1,5 +1,7 @@
 #include "resource_access_provider.h"
 
+#include <core/resource_management/resource_pool.h>
+
 #include <nx/utils/log/assert.h>
 
 QnResourceAccessProvider::QnResourceAccessProvider(QObject* parent):
@@ -74,9 +76,37 @@ QList<QnAbstractResourceAccessProvider*> QnResourceAccessProvider::providers() c
     return m_providers;
 }
 
+void QnResourceAccessProvider::beginUpdateInternal()
+{
+    for (auto p: m_providers)
+        p->beginUpdate();
+}
+
+void QnResourceAccessProvider::endUpdateInternal()
+{
+    for (auto p : m_providers)
+        p->endUpdate();
+}
+
+void QnResourceAccessProvider::afterUpdate()
+{
+    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    {
+        for (const QnResourcePtr& resource : qnResPool->getResources())
+        {
+            auto value = accessibleVia(subject, resource);
+            if (value != QnAbstractResourceAccessProvider::Source::none)
+                emit accessChanged(subject, resource, value);
+        }
+    }
+}
+
 void QnResourceAccessProvider::handleBaseProviderAccessChanged(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource, Source value)
 {
+    if (isUpdating())
+        return;
+
     auto source = qobject_cast<QnAbstractResourceAccessProvider*>(sender());
 
     auto sourceIt = std::find(m_providers.cbegin(), m_providers.cend(), source);
