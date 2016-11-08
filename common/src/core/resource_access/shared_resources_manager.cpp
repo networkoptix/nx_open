@@ -2,7 +2,7 @@
 
 #include <nx_ec/data/api_access_rights_data.h>
 
-#include <core/resource_access/providers/abstract_resource_access_provider.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -50,7 +50,7 @@ void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessi
         }
     }
 
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
     {
         auto oldValues = oldValuesMap.value(subject.id());
         auto newValues = sharedResources(subject);
@@ -124,7 +124,7 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupD
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
         setSharedResourcesInternal(subject, kEmpty);
 }
 

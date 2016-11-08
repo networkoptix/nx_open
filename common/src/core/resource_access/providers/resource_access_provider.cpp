@@ -1,5 +1,7 @@
 #include "resource_access_provider.h"
 
+#include <core/resource_access/resource_access_subjects_cache.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/utils/log/assert.h>
@@ -90,7 +92,7 @@ void QnResourceAccessProvider::endUpdateInternal()
 
 void QnResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
     {
         for (const QnResourcePtr& resource : qnResPool->getResources())
         {

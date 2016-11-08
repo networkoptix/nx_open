@@ -15,6 +15,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
@@ -111,6 +112,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     instance<QnResourcePool>();             /*< Depends on nothing. */
     instance<QnUserRolesManager>();         /*< Depends on nothing. */
+    instance<QnResourceAccessSubjectsCache>(); /*< Depends on respool and roles. */
     instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
     instance<QnResourceAccessProvider>();   /*< Depends on respool, roles and shared resources. */
 

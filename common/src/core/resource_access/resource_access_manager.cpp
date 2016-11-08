@@ -7,6 +7,7 @@
 
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -269,7 +270,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
     if (isUpdating())
         return;
 
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updatePermissionsBySubject(subject);
 }
 
@@ -287,7 +288,7 @@ void QnResourceAccessManager::updatePermissionsToResource(const QnResourcePtr& r
     if (isUpdating())
         return;
 
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updatePermissions(subject, resource);
 }
 
@@ -328,7 +329,7 @@ void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resourc
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
     {
         PermissionKey key(subject.id(), resourceId);
         {

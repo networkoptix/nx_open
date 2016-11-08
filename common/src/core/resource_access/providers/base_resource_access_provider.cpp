@@ -2,6 +2,7 @@
 
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -77,9 +78,9 @@ void QnBaseResourceAccessProvider::afterUpdate()
     QElapsedTimer t;
     qDebug() << "access provider" << (int)baseSource() << "starts recalculate";
     t.start();
-    for (const auto& subject : allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updateAccessBySubject(subject);
-    qDebug() << "access provider" << (int)baseSource() << "recalculate finished";
+    qDebug() << "access provider" << (int)baseSource() << "recalculate finished for" << t.elapsed();
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
@@ -103,7 +104,7 @@ void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& r
     if (isUpdating())
         return;
 
-    for (const auto& subject : allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updateAccess(subject, resource);
 }
 
@@ -145,7 +146,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     emit accessChanged(subject, resource, newValue ? baseSource() : Source::none);
 
-    for (const auto& dependent: dependentSubjects(subject))
+    for (const auto& dependent: qnResourceAccessSubjectsCache->dependentSubjects(subject))
         updateAccess(dependent, resource);
 }
 
@@ -186,7 +187,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 
-    for (const auto& subject : allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
     {
         if (subject.id() == resourceId)
             continue;
@@ -218,7 +219,7 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData
         return;
 
     handleSubjectRemoved(userRole);
-    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
         updateAccessBySubject(subject);
 }
 
