@@ -28,7 +28,7 @@
 #include <nx/utils/debug_utils.h>
 
 #include "media_player_quality_chooser.h"
-#include <utils/common/long_runable_async_stopper.h>
+#include <utils/common/long_runable_cleanup.h>
 
 namespace nx {
 namespace media {
@@ -809,8 +809,8 @@ void Player::stop()
     d->dataConsumer.reset();
     if (d->archiveReader)
     {
-        if (QnLongRunableAsyncStopper::instance())
-            QnLongRunableAsyncStopper::instance()->stopAsync(std::move(d->archiveReader));
+        if (QnLongRunableCleanup::instance())
+            QnLongRunableCleanup::instance()->cleanupAsync(std::move(d->archiveReader));
         else
             d->archiveReader.reset();
     }

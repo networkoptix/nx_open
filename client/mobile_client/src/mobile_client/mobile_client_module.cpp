@@ -33,7 +33,6 @@
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
-#include <utils/common/long_runable_async_stopper.h>
 
 
 QnMobileClientModule::QnMobileClientModule(
@@ -90,8 +89,6 @@ QnMobileClientModule::QnMobileClientModule(
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
-
-    common->store<QnLongRunableAsyncStopper>(new QnLongRunableAsyncStopper());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();

@@ -11,6 +11,7 @@ class QnThreadedChunksMergeTool: public QnLongRunnable {
     Q_OBJECT
 public:
     QnThreadedChunksMergeTool();
+    virtual ~QnThreadedChunksMergeTool();
 
     void queueMerge(const std::vector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle);
 signals:
