@@ -208,6 +208,8 @@ private:
     void createButtons();
     void createPtzController();
 
+    qreal calculateVideoAspectRatio(bool* save) const;
+
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();

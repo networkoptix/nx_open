@@ -590,6 +590,32 @@ void QnMediaResourceWidget::createPtzController()
         &QnMediaResourceWidget::at_ptzController_changed);
 }
 
+qreal QnMediaResourceWidget::calculateVideoAspectRatio(bool* save) const
+{
+    qreal baseAspectRatio = resource()->customAspectRatio();
+    if (qFuzzyIsNull(baseAspectRatio) && m_renderer)
+    {
+        const QSize sourceSize = m_renderer->sourceSize();
+        baseAspectRatio = QnGeometry::aspectRatio(sourceSize);
+        if (save)
+            *save = true;
+    }
+
+    if (qFuzzyIsNull(baseAspectRatio))
+    {
+        if (auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+        {
+            const QString resourceId = camera->getPhysicalId();
+            baseAspectRatio = qnSettings->resourceAspectRatios().value(resourceId, 0.0);
+        }
+    }
+
+    if (qFuzzyIsNull(baseAspectRatio))
+        baseAspectRatio = defaultAspectRatio();
+
+    return baseAspectRatio;
+}
+
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const
 {
     return m_resource;
@@ -1716,48 +1742,28 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
 
 void QnMediaResourceWidget::updateAspectRatio()
 {
-    if (!m_renderer)
-        return; /* Not yet initialized. */
-
-    QSize sourceSize = m_renderer->sourceSize();
-
-    qreal dewarpingRatio = item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled
-        ? item()->dewarpingParams().panoFactor
-        : 1.0;
-
-    QString resourceId;
-    if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
-        resourceId = networkResource->getPhysicalId();
-
-    if (sourceSize.isEmpty())
+    if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
     {
-        qreal aspectRatio = resourceId.isEmpty()
-            ? defaultAspectRatio()
-            : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
-        if (dewarpingRatio > 1)
-            setAspectRatio(dewarpingRatio);
-        else
-            setAspectRatio(aspectRatio);
+        setAspectRatio(item()->dewarpingParams().panoFactor);
+        return;
     }
-    else
+
+    bool save = false;
+    qreal baseAspectRatio = calculateVideoAspectRatio(&save);
+    NX_ASSERT(!qFuzzyIsNull(baseAspectRatio));
+    if (save)
     {
-        qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
-            QnGeometry::aspectRatio(channelLayout()->size()) *
-            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
-
-
-        if (dewarpingRatio > 1)
-            setAspectRatio(dewarpingRatio);
-        else
-            setAspectRatio(aspectRatio);
-
-        if (!resourceId.isEmpty())
-        {
-            QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
-            aspectRatios.insert(resourceId, aspectRatio);
-            qnSettings->setResourceAspectRatios(aspectRatios);
-        }
+        auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera);
+        const QString resourceId = camera->getPhysicalId();
+        QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
+        aspectRatios.insert(resourceId, baseAspectRatio);
+        qnSettings->setResourceAspectRatios(aspectRatios);
     }
+    qreal aspectRatio = baseAspectRatio *
+        QnGeometry::aspectRatio(channelLayout()->size()) *
+        (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
+    setAspectRatio(aspectRatio);
 }
 
 void QnMediaResourceWidget::at_camDisplay_liveChanged()

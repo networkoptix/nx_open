@@ -572,14 +572,14 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
 }
 
-void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
-    if (!layout) {
-        qnWarning("No layout provided.");
+    NX_ASSERT(layout, "No layout provided.");
+    if (!layout)
         return;
-    }
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
@@ -590,35 +590,41 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 
     QnResourceWidgetList widgets = parameters.widgets();
-    if (!widgets.empty() && position.isNull() && layout->getItems().empty()) {
+    if (!widgets.empty() && position.isNull() && layout->getItems().empty())
+    {
         QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
-        foreach(const QnResourceWidget *widget, widgets) {
+        for (auto widget: widgets)
+        {
             QnLayoutItemData data = widget->item()->data();
+            data.flags = Qn::PendingGeometryAdjustment;
             itemDataByUuid[data.uuid] = data;
         }
 
         /* Generate new UUIDs. */
-        for (QHash<QnUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
             pos->uuid = QnUuid::createUuid();
 
         /* Update cross-references. */
-        for (QHash<QnUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        {
             if (!pos->zoomTargetUuid.isNull())
                 pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
+        }
 
         /* Add to layout. */
-        foreach(const QnLayoutItemData &data, itemDataByUuid) {
+        for (const auto& data: itemDataByUuid)
+        {
             if (layout->getItems().size() >= maxItems)
                 return;
 
             layout->addItem(data);
         }
     }
-    else {
-        // TODO: #Elric server & media resources only!
-
+    else
+    {
         QnResourceList resources = parameters.resources();
-        if (!resources.isEmpty()) {
+        if (!resources.isEmpty())
+        {
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
@@ -627,25 +633,31 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         }
     }
 
-
-    QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
-    if (adjustAspectRatio && workbenchLayout->resource() == layout) {
+    auto workbenchLayout = workbench()->currentLayout();
+    if (adjustAspectRatio && workbenchLayout->resource() == layout)
+    {
         qreal midAspectRatio = 0.0;
         int count = 0;
 
-        if (!widgets.isEmpty()) {
+        if (!widgets.isEmpty())
+        {
             /* Here we don't take into account already added widgets. It's ok because
             we can get here only if the layout doesn't have cell aspect ratio, that means
             its widgets don't have aspect ratio too. */
-            foreach(QnResourceWidget *widget, widgets) {
-                if (widget->hasAspectRatio()) {
-                    midAspectRatio += widget->aspectRatio();
+
+            for (auto widget: widgets)
+            {
+                if (widget->hasAspectRatio())
+                {
+                    midAspectRatio += widget->visualAspectRatio();
                     ++count;
                 }
             }
         }
-        else {
-            foreach(QnWorkbenchItem *item, workbenchLayout->items()) {
+        else
+        {
+            for (auto item: workbenchLayout->items())
+            {
                 QnResourceWidget *widget = context()->display()->widget(item);
                 if (!widget)
                     continue;
@@ -659,12 +671,14 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             }
         }
 
-        if (count > 0) {
+        if (count > 0)
+        {
             midAspectRatio /= count;
             QnAspectRatio cellAspectRatio = QnAspectRatio::closestStandardRatio(midAspectRatio);
             layout->setCellAspectRatio(cellAspectRatio.toFloat());
         }
-        else if (workbenchLayout->items().size() > 1) {
+        else if (workbenchLayout->items().size() > 1)
+        {
             layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
         }
     }
