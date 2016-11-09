@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Указаны неверные порты</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Предупреждение</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Невозможно назначить один и тот же порт дважды. Пожалуйста, проверьте свои настройки.</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Порт [BUSYPORT] занят.</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Предупреждение</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Указанный порт занят. Нажмите "Далее" если Вы уверены, что хотите его использовать.</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${display.product.name} по окончании установки.</String>

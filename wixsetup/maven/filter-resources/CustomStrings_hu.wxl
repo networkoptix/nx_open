@@ -66,15 +66,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Érvénytelen portok specified</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Figyelmeztetés</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Nem lehet kétszer ugyan azt a portot beállítani. Kérerm ellenőrizze a konfigurációt.</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] foglalt.</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Figyelmeztetés</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">A létrehozott port már foglalt. Kattintson a 'Tovább'-ra, ha tudja mit csinál.</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes"> ${display.product.name} indítása, ha a telepítő végzett.</String>

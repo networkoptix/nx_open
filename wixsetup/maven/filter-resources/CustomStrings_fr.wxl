@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Port spécifié invalide</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Attention</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Vous ne pouvez pas mettre deux fois le même port. S.V.P. vérifier votre configuration à nouveau.</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] est occupé.</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Attention</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Le port spécifié est déjà occupé. Appuyer sur 'Suivant' seulement si vous savez ce que vous faites.</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Lancer ${display.product.name} lorsque l'installation se termine.</String>

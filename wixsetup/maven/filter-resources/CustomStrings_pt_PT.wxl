@@ -70,15 +70,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">As Portas especificadas são inválidas</String>    
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Aviso</String>    
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Não é possível configurar a mesma porta duas vezes. Verifique as configurações.</String>    
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">O Porto [BUSYPORT] está ocupado.</String>    
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Aviso</String>    
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">A porta especificada já está ocupada. Carregue em 'Seguinte' apenas se tem certeza do que está a fazer.</String>    
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Executar ${display.product.name} quando a instalação terminar.</String>

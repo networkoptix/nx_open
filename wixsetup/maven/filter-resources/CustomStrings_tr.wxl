@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Yanlış port</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Uyarı</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Aynı port iki kere ayarlanamaz.Konfigürasyonu kontrol edin</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] atandı.</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Uyarı</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Port zaten atanmış. Eğer eminseniz ileriyi tıklayın.</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">${display.product.name} i yükleme bitince çalıştır .</String>

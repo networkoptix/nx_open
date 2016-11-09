@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">พอร์ตระบุไม่ถูกต้อง</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">การเตือน</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">ไม่สามารถตั้งค่าพอร์ตเดียวกันสองครั้ง กรุณาตรวจสอบการตั้งค่าของคุณ</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">พอร์ต [BUSYPORT] ถูกใช้งาน</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">การเตือน</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">พอร์ตที่คุณระบุถูกใช้งานแล้ว กด &apos;ถัดไป&apos; ถ้าคุณต้องการดำเนินการต่อ</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">เริ่มดำเนินการ ${product.name} เมื่อออกจากการติดตั้ง</String>

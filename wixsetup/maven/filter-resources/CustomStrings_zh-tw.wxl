@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">指定的通訊埠無效</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">警告</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">無法重覆設定此通訊埠. 請檢查您的設定.</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">通訊埠 [BUSYPORT] 已被佔用.</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">警告</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">您指定的通訊埠已被佔用. 若您確定要繼續的話請點擊 '下一步' </String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">退出安裝時執行 ${product.name} </String>

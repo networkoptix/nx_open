@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Ungültige Ports angegeben</String>    
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Warnung</String>    
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Jeden Port nur einmal verwenden. Bitte überprüfen Sie Ihre Konfiguration.</String>    
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] ist belegt.</String>    
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Warnung</String>    
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Der angegebene Port ist bereits belegt. Drücken Sie nur dann auf "Weiter", wenn Sie genau wissen, was Sie tuen.</String>    
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>    

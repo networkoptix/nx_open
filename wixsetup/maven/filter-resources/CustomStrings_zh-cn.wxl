@@ -69,15 +69,7 @@
 
 
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">无效的指定端口</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">警告</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">两个端口不能设置成一致，请检查您的配置。</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">端口[BUSYPORT] 被占用！</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">警告</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">设置的端口已经被占用，请设置正确的端口。</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">当 ${display.product.name} 安装成后自动运行.</String>
