@@ -102,6 +102,7 @@ public:
     //!Returns information of chunk, used by previous \a QnAbstractArchiveDelegate::seek or \a QnAbstractArchiveDelegate::getNextData call
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
 
+    virtual int getSequence() const { return 0;  }
 protected:
     Flags m_flags;
 };

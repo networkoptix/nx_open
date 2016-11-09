@@ -106,7 +106,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 
     setCreateStreamSocketFunc(
         []( bool /*sslRequired*/,
-            SocketFactory::NatTraversalType /*natTraversalRequired*/) ->
+            nx::network::NatTraversalSupport /*natTraversalRequired*/) ->
                 std::unique_ptr< AbstractStreamSocket >
         {
             return std::make_unique<CloudStreamSocket>(AF_INET);
@@ -267,6 +267,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true));
         cloudSocket.connectAsync(
             SocketAddress(tempHostName),
             [](SystemError::ErrorCode /*code*/){});
@@ -283,6 +284,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
             std::chrono::milliseconds(1000).count()));
         QByteArray data;
         data.reserve(bytesToSendThroughConnection);
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true));
         cloudSocket.readSomeAsync(
             &data,
             [](SystemError::ErrorCode /*errorCode*/, size_t /*bytesRead*/) {});
@@ -299,6 +301,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
             std::chrono::milliseconds(1000).count()));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true));
         cloudSocket.sendAsync(
             data,
             [](SystemError::ErrorCode /*errorCode*/, size_t /*bytesSent*/) {});

@@ -205,9 +205,9 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
     return std::move(foundPeers);
 }
 
-data::ListeningPeersBySystems ListeningPeerPool::getListeningPeers() const
+data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
 {
-    data::ListeningPeersBySystems result;
+    data::ListeningPeersBySystem result;
 
     QnMutexLocker lk(&m_mutex);
     for (const auto& peerPair: m_peers)

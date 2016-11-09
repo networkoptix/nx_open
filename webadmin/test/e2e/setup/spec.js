@@ -4,15 +4,7 @@ describe('Setup Wizard', function () {
     var p = new Page();
 
     beforeEach(function() {
-        // This handles unexpected alert 'getCurrentUserData',
-        // which appears randomly
-        browser.switchTo().alert().then(
-            function (alert) { alert.dismiss(); }, // most of the time, there is no alert
-            function () { console.log('Do not pay attention to previous exception') }
-        );
-
         p.get();
-
         //  If setup wizard is present, complete setup
         p.setupDialog.isPresent().then( function(isPresent) {
             if(isPresent) {
@@ -411,7 +403,7 @@ describe('Setup Wizard', function () {
         p.backButton.click();
 
         p.helper.completeSetup();
-    });
+    }, 30000);
 
     // Does not work locally
     xit("Merge: remote system is not accessible, or wrong url was entered",function(){

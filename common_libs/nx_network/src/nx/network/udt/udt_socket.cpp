@@ -281,7 +281,11 @@ bool UdtSocket<InterfaceToImplement>::getNonBlockingMode(bool* val) const
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, val, &len);
 
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    {
+        const auto error = UDT::getlasterror();
+        SystemError::setLastErrorCode(detail::convertToSystemError(error.getErrorCode()));
+    }
+
     *val = !*val;
     return ret == 0;
 }
@@ -520,8 +524,7 @@ template class UdtSocket<AbstractStreamServerSocket>;
 // =====================================================================
 UdtStreamSocket::UdtStreamSocket(int ipVersion)
 :
-    m_aioHelper(
-        new aio::AsyncSocketImplHelper<Pollable>(this, this, AF_INET)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET)),
     m_noDelay(false)
 {
     open();
@@ -533,7 +536,7 @@ UdtStreamSocket::UdtStreamSocket(int ipVersion)
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state)
 :
     UdtSocket(impl, state),
-    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, AF_INET)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET)),
     m_noDelay(false)
 {
 }
@@ -551,9 +554,28 @@ bool UdtStreamSocket::setRendezvous(bool val)
 
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int /*timeoutMillis*/ )
+    unsigned int timeoutMs )
 {
-    //TODO #ak use timeoutMillis
+    if (remoteAddress.address.isIpAddress())
+        return connectToIp(remoteAddress, timeoutMs);
+
+    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
+        remoteAddress.address.toString(), AF_INET);
+
+    for (auto& ip: ips)
+    {
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+            return true;
+    }
+
+    return false; //< Could not connect by any of addresses.
+}
+
+bool UdtStreamSocket::connectToIp(
+    const SocketAddress& remoteAddress,
+    unsigned int /*timeoutMs*/ )
+{
+    //TODO #ak use timeoutMs
 
     NX_ASSERT(m_state == detail::SocketState::open);
     sockaddr_in addr;

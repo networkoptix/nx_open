@@ -75,7 +75,7 @@ bool operator == (const TestFileOperation &lhs, const TestFileOperation &rhs)
 {
     return lhs.startTime == rhs.startTime && lhs.fileSize == rhs.fileSize &&
            lhs.code == rhs.code && lhs.cameraId == rhs.cameraId &&
-           lhs.timeZone == rhs.timeZone && lhs.duration == rhs.duration && 
+           lhs.timeZone == rhs.timeZone && lhs.duration == rhs.duration &&
            lhs.chunksCatalog == rhs.chunksCatalog;
 }
 
@@ -96,7 +96,7 @@ TestFileOperation generateFileOperation(int code)
     tz *= genRandomNumber<0, 1>() == 0 ? 1 : -1;
 
     return{ genRandomNumber<1000, 439804651110LL>(), genRandomNumber<0, 1099511627776LL>(),
-            code, (int)genRandomNumber<0, 65535>(), (int)genRandomNumber<0, 1048575LL>(), 
+            code, (int)genRandomNumber<0, 65535>(), (int)genRandomNumber<0, 1048575LL>(),
             tz, (int)genRandomNumber<0, 1>() };
 }
 
@@ -177,12 +177,12 @@ struct TestDataManager
     TestDataManager(size_t dataSize)
     {
         dataVector.emplace_back(generateFileHeader(), false);
-        for (size_t i = 0; i < dataSize; ++i) 
+        for (size_t i = 0; i < dataSize; ++i)
         {
-            switch (genRandomNumber<0, 1>()) 
+            switch (genRandomNumber<0, 1>())
             {
             case 0:
-                switch (genRandomNumber<0, 1>()) 
+                switch (genRandomNumber<0, 1>())
                 {
                 case 0:
                     dataVector.emplace_back(generateFileOperation(0), false);
@@ -203,7 +203,7 @@ struct TestDataManager
     bool seekAndSet(const Record &record)
     {
         auto it = std::find_if(dataVector.begin(), dataVector.end(),
-                               [&record](const TestData &td) 
+                               [&record](const TestData &td)
                                {
                                    if (const Record* r = boost::get<Record>(&td.data))
                                        return *r == record && !td.visited;
@@ -249,14 +249,14 @@ public:
             generateCameraUid(&camuuid, genRandomNumber<7, 15>());
             Catalog c1 = { camuuid, QnServer::LowQualityCatalog };
             Catalog c2 = { camuuid, QnServer::HiQualityCatalog };
-            
+
             m_catalogs.push_back(c1);
             m_catalogs.push_back(c2);
         }
     }
 
     TestChunk generateAddOperation()
-    {   
+    {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
@@ -362,12 +362,12 @@ std::string dbErrorToString(nx::media_db::Error error)
 class TestDbHelperHandler : public nx::media_db::DbHelperHandler
 {
 public:
-    TestDbHelperHandler(nx::media_db::Error *error, TestDataManager *tdm) 
+    TestDbHelperHandler(nx::media_db::Error *error, TestDataManager *tdm)
         : m_error(error),
           m_tdm(tdm)
     {}
 
-    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp, 
+    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
                         nx::media_db::Error error) override
     {
         if ((*m_error = error) == nx::media_db::Error::ReadError)
@@ -378,12 +378,12 @@ public:
         top.code = (int)cameraOp.getRecordType();
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
-        
+
         if (!m_tdm->seekAndSet(top))
             initErrorString("Camera operation not found in the test data");
     }
 
-    void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp, 
+    void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
                            nx::media_db::Error error) override
     {
         if ((*m_error = error) == nx::media_db::Error::ReadError)
@@ -410,7 +410,7 @@ public:
     void handleRecordWrite(nx::media_db::Error error) override
     {
         *m_error = error;
-        if (error != nx::media_db::Error::NoError && 
+        if (error != nx::media_db::Error::NoError &&
             error != nx::media_db::Error::Eof)
         {
             initErrorString(dbErrorToString(error));
@@ -446,7 +446,7 @@ void initDbFile(QFile *dbFile, const QString &fileName)
     FILE* fd = fopen(fileName.toLatin1().constData(), "w+b");
     ASSERT_TRUE(fd != nullptr) << "DB file open failed: " << strerror(errno);
     dbFile->setFileName(fileName);
-    ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle)) 
+    ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle))
         << strerror(errno);
 }
 
@@ -455,10 +455,10 @@ void reopenDbFile(QFile *dbFile, const QString& fileName)
     ASSERT_TRUE(dbFile->isOpen()) << "Reopen failed. File is not opened";
     dbFile->close();
     FILE* fd = fopen(fileName.toLatin1().constData(), "r+b");
-    ASSERT_TRUE(fd != nullptr) << "DB file " << fileName.toLatin1().constData() 
+    ASSERT_TRUE(fd != nullptr) << "DB file " << fileName.toLatin1().constData()
                                << " open failed: " << strerror(errno);
     dbFile->setFileName(fileName);
-    ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle)) 
+    ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle))
         << strerror(errno);
 }
 
@@ -480,8 +480,8 @@ TEST(MediaDbTest, SimpleFileWriteTest)
     {
         tmp = i;
         stream << tmp;
-        ASSERT_NE(stream.status(), QDataStream::WriteFailed) 
-            << "Stream status: " 
+        ASSERT_NE(stream.status(), QDataStream::WriteFailed)
+            << "Stream status: "
             << stream.status();
     }
 
@@ -489,13 +489,13 @@ TEST(MediaDbTest, SimpleFileWriteTest)
     file.close();
     file.open(QIODevice::ReadWrite);
     stream.setDevice(&file);
-    
+
     for (size_t i = 0; i < kMaxWrites; ++i)
     {
         stream >> tmp;
         ASSERT_EQ(tmp, i);
-        ASSERT_EQ(stream.status(), QDataStream::Ok) 
-            << "Stream status: " 
+        ASSERT_EQ(stream.status(), QDataStream::Ok)
+            << "Stream status: "
             << stream.status();
     }
 }
@@ -579,7 +579,7 @@ TEST(MediaDbTest, ReadWrite_Simple)
     nx::media_db::DbHelper dbHelper(&testHandler);
     dbHelper.setDevice(&dbFile);
 
-    // Wrong mode test 
+    // Wrong mode test
     error = dbHelper.writeFileHeader(
         boost::get<TestFileHeader>(
             tdm.dataVector[0].data).dbVersion);
@@ -624,6 +624,7 @@ TEST(MediaDbTest, DbFileTruncate)
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
+    QFile::remove(fileName);
     int truncateCount = 1000;
 
     while (truncateCount-- >= 0)
@@ -651,8 +652,8 @@ TEST(MediaDbTest, DbFileTruncate)
         QByteArray content = dbFile.readAll();
         ASSERT_NE(content.size(), 0);
         dbFile.close();
-        ASSERT_TRUE(QFile::remove(fileName)) << "DB file " 
-                                     << fileName.toLatin1().constData() 
+        ASSERT_TRUE(QFile::remove(fileName)) << "DB file "
+                                     << fileName.toLatin1().constData()
                                      << " remove failed";
         // truncating randomly last record
         content.truncate(content.size() - genRandomNumber<1, sizeof(qint64) * 2 - 1>());
@@ -817,10 +818,7 @@ TEST(MediaDbTest, StorageDB)
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-
-#ifdef Q_OS_LINUX
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
-#endif
 
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
@@ -843,13 +841,13 @@ TEST(MediaDbTest, StorageDB)
     QnStorageDb sdb(storage, 1);
     result = sdb.open(workDirPath + lit("/test.nxdb"));
     ASSERT_TRUE(result);
-    
+
     sdb.loadFullFileCatalog();
 
     QnMutex mutex;
     std::vector<std::thread> threads;
     TestChunkManager tcm(128);
-    
+
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
         for (int i = 0; i < 1000; ++i)
@@ -913,7 +911,7 @@ TEST(MediaDbTest, StorageDB)
 
     dbChunkCatalogs = sdb.loadFullFileCatalog();
 
-    for (auto catalogIt = dbChunkCatalogs.cbegin(); 
+    for (auto catalogIt = dbChunkCatalogs.cbegin();
          catalogIt != dbChunkCatalogs.cend();
          ++catalogIt)
     {
@@ -921,8 +919,8 @@ TEST(MediaDbTest, StorageDB)
              chunkIt != (*catalogIt)->getChunksUnsafe().cend();
              ++chunkIt)
         {
-            TestChunkManager::TestChunkCont::iterator tcmIt = 
-                std::find_if(tcm.get().begin(), 
+            TestChunkManager::TestChunkCont::iterator tcmIt =
+                std::find_if(tcm.get().begin(),
                              tcm.get().end(),
                              [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
                              {
@@ -937,17 +935,17 @@ TEST(MediaDbTest, StorageDB)
         }
     }
 
-    bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(), 
-                                   [](const TestChunkManager::TestChunk &tc) 
+    bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(),
+                                   [](const TestChunkManager::TestChunk &tc)
                                    {
-                                       return !tc.isDeleted && !tc.isVisited; 
+                                       return !tc.isDeleted && !tc.isVisited;
                                    });
     if (!allVisited)
     {
         size_t notVisited = std::count_if(
-                tcm.get().cbegin(), 
-                tcm.get().cend(), 
-                [](const TestChunkManager::TestChunk &tc) 
+                tcm.get().cbegin(),
+                tcm.get().cend(),
+                [](const TestChunkManager::TestChunk &tc)
                 { return !tc.isDeleted && !tc.isVisited; });
         qWarning() << lit("Not visited count: %1").arg(notVisited);
     }
@@ -969,9 +967,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
                 new QnResourceStatusDictionary);
     }
 
-#ifdef Q_OS_LINUX 
-            auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
-#endif
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
     std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
     if (!propertyDictionary) {
         propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
@@ -990,7 +986,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     auto sqlDb = std::unique_ptr<QSqlDatabase>(
             new QSqlDatabase(
                 QSqlDatabase::addDatabase(
-                    lit("QSQLITE"), 
+                    lit("QSQLITE"),
                     QString("QnStorageManager_%1").arg(fileName))));
 
     sqlDb->setDatabaseName(fileName);
@@ -1071,8 +1067,8 @@ TEST(MediaDbTest, Migration_from_sqlite)
     for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
         auto mergedIt = std::find_if(mergedCatalogs.cbegin(), mergedCatalogs.cend(),
-                                     [&referenceCatalogs, i](const DeviceFileCatalogPtr &c) 
-                                     { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() && 
+                                     [&referenceCatalogs, i](const DeviceFileCatalogPtr &c)
+                                     { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() &&
                                               c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
         ASSERT_TRUE((*mergedIt)->getChunksUnsafe() == referenceCatalogs[i]->getChunksUnsafe());

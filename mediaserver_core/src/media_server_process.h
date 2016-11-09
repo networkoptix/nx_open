@@ -87,6 +87,7 @@ private:
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
+    void registerRestHandlers(CloudConnectionManager* const cloudConnectionManager);
     bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();

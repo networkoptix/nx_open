@@ -71,7 +71,7 @@ MediaServerEmulator::MediaServerEmulator(
         nullptr,
         &m_httpMessageDispatcher,
         false,
-        SocketFactory::NatTraversalType::nttDisabled),
+        nx::network::NatTraversalSupport::disabled),
     m_systemData(std::move(systemData)),
     m_serverId(
         serverName.isEmpty()

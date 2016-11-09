@@ -382,7 +382,7 @@ private:
             .arg(fastSwitch)
             .arg(resolution.width())
             .arg(resolution.height()));
-            
+
         m_actualQuality = quality;
         m_actualResolution = resolution;
     }

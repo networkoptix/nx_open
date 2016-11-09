@@ -54,6 +54,22 @@ void OutgoingTunnelPool::establishNewConnection(
         std::move(handler));
 }
 
+String OutgoingTunnelPool::getSelfPeerId()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_selfPeerId.isEmpty())
+        m_selfPeerId = QnUuid::createUuid().toSimpleString().toUtf8();
+
+    return m_selfPeerId;
+}
+
+void OutgoingTunnelPool::setSelfPeerId(String value)
+{
+    QnMutexLocker lock(&m_mutex);
+    NX_CRITICAL(m_selfPeerId.isEmpty(), "selfPeerId is not supposed to be changed");
+    m_selfPeerId = value;
+}
+
 const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     const AddressEntry& targetHostAddress)
 {
@@ -69,14 +85,8 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
         cl_logDEBUG1);
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
-    tunnel->setStateHandler(
-        [this, tunnelPtr = tunnel.get()](OutgoingTunnel::State state)
-        {
-            if (state != OutgoingTunnel::State::kClosed)
-                return;
-            //tunnel supports deleting in "tunnel closed" handler
-            onTunnelClosed(tunnelPtr);
-        });
+    tunnel->setOnClosedHandler(
+        std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
     iterAndInsertionResult.first->second = std::move(tunnel);
     return iterAndInsertionResult.first->second;

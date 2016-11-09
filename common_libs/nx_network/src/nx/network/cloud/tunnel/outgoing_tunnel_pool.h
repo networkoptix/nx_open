@@ -42,10 +42,17 @@ public:
         SocketAttributes socketAttributes,
         OutgoingTunnel::NewConnectionHandler handler);
 
+    /** Returns designated ID or generates such. */
+    String getSelfPeerId();
+
+    // TODO: #mux Call it somewhere in every module, so this ID is useful for debug.
+    void setSelfPeerId(String value);
+
 private:
     typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
 
     QnMutex m_mutex;
+    String m_selfPeerId;
     TunnelDictionary m_pool;
     bool m_terminated;
     bool m_stopping;

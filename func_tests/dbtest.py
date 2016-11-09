@@ -46,6 +46,7 @@ def _saveDump(name, data, mode = "t"):
 
 class DBTest(StorageBasedTest):
 
+    helpStr = "DB migration on version upgrade test"
     num_serv = NUM_SERV
     _test_name = "Database"
     _test_key = 'db'

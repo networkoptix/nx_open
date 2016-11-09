@@ -32,13 +32,13 @@ protected:
         , server(
             &stunMessageDispatcher,
             false,
-            SocketFactory::NatTraversalType::nttDisabled)
+            nx::network::NatTraversalSupport::disabled)
     {
         EXPECT_TRUE(server.bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server.listen());
 
         EXPECT_TRUE(server.endpoints().size());
-        address = server.endpoints().front();
+        address = SocketAddress(HostAddress::localhost, server.endpoints().front().port);
     }
 
     SocketAddress address;

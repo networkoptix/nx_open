@@ -42,7 +42,7 @@
 
 #include <nx/utils/timer_manager.h>
 #include <api/http_client_pool.h>
-
+#include <utils/common/long_runable_cleanup.h>
 
 namespace
 {
@@ -96,6 +96,8 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     QnCommonMetaTypes::initialize();
 
+    store<QnLongRunableCleanup>(new QnLongRunableCleanup());
+
     /* Init statics. */
     store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
@@ -109,6 +111,8 @@ QnCommonModule::QnCommonModule(QObject *parent):
     instance<QnResourcePropertyDictionary>();
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
+
+    instance<nx_http::ClientPool>();
 
     instance<QnResourcePool>();             /*< Depends on nothing. */
     instance<QnUserRolesManager>();         /*< Depends on nothing. */
@@ -128,7 +132,6 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
 
     instance<QnGlobalSettings>();
-    instance<nx_http::ClientPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();

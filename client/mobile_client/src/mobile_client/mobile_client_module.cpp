@@ -34,6 +34,7 @@
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
 
+
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
     QObject* parent)

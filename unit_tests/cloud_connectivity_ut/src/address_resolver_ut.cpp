@@ -129,7 +129,7 @@ std::map<QString, std::list<SocketAddress>> AddressResolverTest::s_endpoints;
 std::shared_ptr<stun::test::AsyncClientMock> AddressResolverTest::s_stunClient;
 
 static const HostAddress kAddress("ya.ru");
-static const SocketAddress kResult("10.11.12.13:12345");
+static const SocketAddress kResult(*HostAddress::ipV4from(lit("10.11.12.13")), 12345);
 
 /**
  * Usual DNS addresses like "ya.ru" shell be resolved in order:

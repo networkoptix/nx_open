@@ -117,8 +117,8 @@ class UdtSocketProfileServer : public UdtSocketProfile {
 public:
     UdtSocketProfileServer( const ServerConfig& config ) :
         server_socket_(SocketFactory::createStreamServerSocket(
-            false, config.tcp ? SocketFactory::NatTraversalType::nttDisabled
-                              : SocketFactory::NatTraversalType::nttEnabled)),
+            false, config.tcp ? NatTraversalSupport::disabled
+                              : NatTraversalSupport::enabled)),
         address_(config.address),
         port_(config.port),
         current_conn_size_(0),
@@ -440,7 +440,7 @@ void UdtSocketProfileClient::ScheduleConnection() {
     for( std::size_t i = active_conn_sockets_size_ ; (i < maximum_allowed_concurrent_connection_) &&
                                                (connected_socket_size_ < maximum_allowed_concurrent_connection_) ; ++i ) {
         if( random_.Roll( GetConnectionProbability() ) ) {
-            SocketFactory::NatTraversalType type = tcp_ ? SocketFactory::NatTraversalType::nttDisabled : SocketFactory::NatTraversalType::nttEnabled;
+            NatTraversalSupport type = tcp_ ? NatTraversalSupport::disabled : NatTraversalSupport::enabled;
             std::unique_ptr<Connection> conn(  new Connection( SocketFactory::createStreamSocket( false , type ).release() ) );
             conn->socket->setNonBlockingMode(true);
             conn->socket->setReuseAddrFlag(true);

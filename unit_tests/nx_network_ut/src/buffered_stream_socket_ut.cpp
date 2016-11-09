@@ -81,11 +81,12 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
-    accepted->setNonBlockingMode(false);
+    ASSERT_TRUE(accepted->setNonBlockingMode(false));
     ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_WAITALL), buffer.size());
     ASSERT_TRUE(buffer.startsWith(kTestMessage));
     ASSERT_TRUE(buffer.endsWith(kTestMessage));
 
+    ASSERT_TRUE(accepted->setNonBlockingMode(true));
     accepted->catchRecvEvent(acceptedResults.pusher());
     client.reset();
     ASSERT_EQ(acceptedResults.pop(), SystemError::connectionReset);

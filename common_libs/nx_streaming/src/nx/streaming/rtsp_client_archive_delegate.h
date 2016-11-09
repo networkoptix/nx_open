@@ -63,6 +63,8 @@ public:
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
+
+    virtual int getSequence() const override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 

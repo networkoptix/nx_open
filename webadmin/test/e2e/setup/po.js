@@ -68,7 +68,7 @@ var Page = function () {
             }
         });
 
-        this.helper.waitIfNotPresent(this.setupDialog, 10000);
+        this.helper.waitIfNotPresent(this.setupDialog, 15000);
         browser.refresh();
     }
 };
