@@ -140,7 +140,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastMaximalSpeed(0.0),
     m_lastAdjustTimelineToPosition(false),
     m_timelineRelevant(false),
-    m_recordingStartUtcMs(0),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -149,6 +148,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_chunkMergingProcessHandle(0),
     m_hasArchive(false),
     m_isRecording(false),
+    m_recordingStartUtcMs(0),
     m_animatedPosition(0),
     m_previousMediaPosition(0),
     m_positionAnimator(nullptr)
