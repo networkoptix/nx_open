@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Passwörter müssen übereinstimmen und nicht leer sein</String>    
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Klicken Sie auf Weiter, um den Standardordner zu verwenden oder klicken Sie auf Ändern, um einen anderen zu wählen.</String>

@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">비밀번호는 같거나 비어있지 않아야 합니다.</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">기본 폴더를 사용하려면 다음 버튼을, 변경라시려면 변경 버튼을 선택하세요.</String>

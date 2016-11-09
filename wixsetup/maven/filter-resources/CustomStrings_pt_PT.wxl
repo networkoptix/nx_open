@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">As Password deviam ser iguais e não vazias</String>    
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Carregue em 'seguinte' para usar a pasta padrão ou carregue em 'Alterar' para escolher uma pasta diferente.</String>

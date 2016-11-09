@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">şifreler aynı ve boş olmamalıdır</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">varsayılan kayıt yeri için ileri ye tıklayın yada değiştirmek için tıklayın.</String>

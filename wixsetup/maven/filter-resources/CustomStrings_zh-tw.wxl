@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">密碼應相同且不得為空</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">請點擊下一步使用預設路徑或點擊變更以選擇其它路徑</String>

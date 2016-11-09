@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Les mots de passe doivent être identiques et non vide</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Cliquer sur Suivant pour utiliser le dossier par défaut ou sur Modifier pour en choisir un autre.</String>

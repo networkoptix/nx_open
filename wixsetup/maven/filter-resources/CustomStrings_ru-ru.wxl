@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Пароли должны быть заданы и не должны повторяться</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Нажмите "Далее" для использования каталогов по умолчанию или "Выбрать" для указания другого.</String>

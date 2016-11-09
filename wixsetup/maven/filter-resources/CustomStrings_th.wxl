@@ -52,8 +52,6 @@
 
 
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">รหัสผ่านควรจะเหมือนกันและไม่ปล่อยให้ว่าง</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">คลิกถัดไปเพื่อใช้โฟลเดอร์เริ่มต้นหรือคลิกเปลี่ยนเลือกโฟลเดอร์อื่น</String>
