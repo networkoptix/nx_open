@@ -84,7 +84,7 @@ fi
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod -R 755 $BINSTAGE
-chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}
+chmod 755 $SHARESTAGE/dbsync-2.2/bin/dbsync
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin

@@ -144,11 +144,6 @@
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
 
-        <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
-                      Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="check" Impersonate="no" />
-
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -206,17 +201,12 @@
             <Custom Action="CopyHostedFiles" After="CopyHostedFiles_Cmd">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">
-                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="CertGenAction" After="CertGenAction_Cmd">
-                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
-
             <Custom Action="SyncDatabaseAction_Cmd_WithWarning" Before="SyncDatabaseAction">
                 <![CDATA[ $(var.VmsUpgrading) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" Before="SyncDatabaseAction">
                 <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SyncDatabaseAction" After="CertGenAction">
+            <Custom Action="SyncDatabaseAction" After="CopyDatabaseFile">
                 <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" AND $(var.VmsUpgrading) ]]></Custom>
 
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
