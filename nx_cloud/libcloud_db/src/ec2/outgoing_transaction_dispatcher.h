@@ -6,6 +6,7 @@
 #include <transaction/transaction.h>
 #include <utils/common/subscription.h>
 
+#include "serialization/serializable_transaction.h"
 #include "transaction_serializer.h"
 #include "transaction_transport_header.h"
 
@@ -21,14 +22,14 @@ class OutgoingTransactionDispatcher
 public:
     typedef nx::utils::Subscription<
         const nx::String&,
-        std::shared_ptr<const TransactionWithSerializedPresentation>> OnNewTransactionSubscription;
+        std::shared_ptr<const SerializableAbstractTransaction>> OnNewTransactionSubscription;
     typedef OnNewTransactionSubscription::NotificationCallback OnNewTransactionHandler;
 
     OutgoingTransactionDispatcher();
 
     void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     OnNewTransactionSubscription* onNewTransactionSubscription();
 

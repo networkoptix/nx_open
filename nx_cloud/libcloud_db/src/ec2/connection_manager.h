@@ -86,7 +86,7 @@ public:
      */
     void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
     bool isSystemConnected(const std::string& systemId) const;

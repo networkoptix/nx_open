@@ -278,10 +278,11 @@ nx::db::DBResult TransactionLog::fetchTransactions(
         while (fetchTransactionsOfAPeerQuery.next())
         {
             outputData->transactions.push_back(
-                TransactionData{
+                TransactionLogRecord{
                     fetchTransactionsOfAPeerQuery.value("tran_hash").toByteArray(),
-                    std::make_shared<UbjsonTransactionPresentation>(
-                        fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray())
+                    std::make_unique<UbjsonTransactionPresentation>(
+                        fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray(),
+                        nx_ec::EC2_PROTO_VERSION)
                 });
         }
     }

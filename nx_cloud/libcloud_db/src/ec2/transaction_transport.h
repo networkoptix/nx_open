@@ -8,6 +8,7 @@
 
 #include <common/common_globals.h>
 #include <nx_ec/data/api_tran_state_data.h>
+#include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
 #include "transaction_processor.h"
@@ -76,49 +77,7 @@ public:
 
     void sendTransaction(
         TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const TransactionWithSerializedPresentation>& transactionSerializer);
-
-    template<class T>
-    void sendTransaction(
-        ::ec2::QnTransaction<T> transaction,
-        TransactionTransportHeader transportHeader)
-    {
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
-            lm("Sending transaction %1 to %2").str(transaction.command)
-                .str(m_commonTransportHeaderOfRemoteTransaction),
-            cl_logDEBUG1);
-
-        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer;
-        switch (remotePeer().dataFormat)
-        {
-            case Qn::UbjsonFormat:
-            {
-                auto serializedTransaction = QnUbjson::serialized(transaction);
-                transactionSerializer = 
-                    std::make_unique<TransactionWithUbjsonPresentation<T>>(
-                        std::move(transaction),
-                        std::move(serializedTransaction));
-                break;
-            }
-
-            default:
-            {
-                NX_LOGX(QnLog::EC2_TRAN_LOG,
-                    lm("Cannot send transaction in unsupported format %1 to %2")
-                    .arg(QnLexical::serialized(remotePeer().dataFormat))
-                    .str(m_commonTransportHeaderOfRemoteTransaction),
-                    cl_logDEBUG1);
-                // TODO: #ak close connection
-                NX_ASSERT(false);
-                return;
-            }
-        }
-
-        sendTransaction(
-            std::move(transportHeader),
-            transactionSerializer);
-    }
+        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer);
 
     const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const;
 
@@ -165,12 +124,17 @@ private:
 
     void onTransactionsReadFromLog(
         api::ResultCode resultCode,
-        std::vector<TransactionData> serializedTransaction,
+        std::vector<TransactionLogRecord> serializedTransaction,
         ::ec2::QnTranState readedUpTo);
 
     void enableOutputChannel();
 
     void onInactivityTimeout();
+
+    template<class T>
+    void sendTransaction(
+        ::ec2::QnTransaction<T> transaction,
+        TransactionTransportHeader transportHeader);
 };
 
 } // namespace ec2

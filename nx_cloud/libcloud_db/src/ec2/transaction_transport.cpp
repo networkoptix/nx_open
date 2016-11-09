@@ -187,7 +187,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::sendTransaction(
     TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const TransactionWithSerializedPresentation>& transactionSerializer)
+    const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
 {
     transportHeader.vmsTransportHeader.fillSequence(
         localPeer().id,
@@ -341,7 +341,7 @@ void TransactionTransport::forwardStateChangedEvent(
 
 void TransactionTransport::onTransactionsReadFromLog(
     api::ResultCode resultCode,
-    std::vector<TransactionData> serializedTransactions,
+    std::vector<TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo)
 {
     using namespace std::placeholders;
@@ -430,6 +430,49 @@ void TransactionTransport::enableOutputChannel()
 void TransactionTransport::onInactivityTimeout()
 {
     setState(::ec2::QnTransactionTransportBase::Error);
+}
+
+template<class T>
+void TransactionTransport::sendTransaction(
+    ::ec2::QnTransaction<T> transaction,
+    TransactionTransportHeader transportHeader)
+{
+    NX_LOGX(
+        QnLog::EC2_TRAN_LOG,
+        lm("Sending transaction %1 to %2").str(transaction.command)
+        .str(m_commonTransportHeaderOfRemoteTransaction),
+        cl_logDEBUG1);
+
+    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer;
+    switch (remotePeer().dataFormat)
+    {
+        case Qn::UbjsonFormat:
+        {
+            auto serializedTransaction = QnUbjson::serialized(transaction);
+            transactionSerializer =
+                std::make_unique<UbjsonSerializedTransaction<T>>(
+                    std::move(transaction),
+                    std::move(serializedTransaction),
+                    nx_ec::EC2_PROTO_VERSION);
+            break;
+        }
+
+        default:
+        {
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
+                lm("Cannot send transaction in unsupported format %1 to %2")
+                .arg(QnLexical::serialized(remotePeer().dataFormat))
+                .str(m_commonTransportHeaderOfRemoteTransaction),
+                cl_logDEBUG1);
+            // TODO: #ak close connection
+            NX_ASSERT(false);
+            return;
+        }
+    }
+
+    sendTransaction(
+        std::move(transportHeader),
+        transactionSerializer);
 }
 
 } // namespace ec2

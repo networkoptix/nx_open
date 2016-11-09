@@ -88,22 +88,6 @@ public:
             std::move(transportHeader),
             std::move(serializableTransaction),
             std::move(completionHandler));
-        
-        //typedef bool(*DeserializeUbjsonFuncType)(
-        //    QnUbjsonReader<QByteArray>*,
-        //    TransactionDataType*);
-
-        //auto deserializeTransactionFunc = 
-        //    std::bind(
-        //        static_cast<DeserializeUbjsonFuncType>(&QnUbjson::deserialize),
-        //        dataSource.stream,
-        //        std::placeholders::_1);
-
-        //processTransactionInternal(
-        //    std::move(deserializeTransactionFunc),
-        //    std::move(transportHeader),
-        //    std::move(transactionHeader),
-        //    std::move(completionHandler));
     }
 
     virtual void processTransaction(
@@ -127,22 +111,6 @@ public:
             std::move(transportHeader),
             std::move(serializableTransaction),
             std::move(completionHandler));
-
-        //typedef bool(*DeserializeJsonFuncType)(
-        //    const QJsonValue&,
-        //    TransactionDataType*);
-
-        //auto deserializeTransactionFunc = 
-        //    std::bind(
-        //        static_cast<DeserializeJsonFuncType>(&QJson::deserialize),
-        //        serializedTransactionData["params"],
-        //        std::placeholders::_1);
-
-        //processTransactionInternal(
-        //    std::move(deserializeTransactionFunc),
-        //    std::move(transportHeader),
-        //    std::move(transactionHeader),
-        //    std::move(completionHandler));
     }
 
 protected:

@@ -208,7 +208,7 @@ void ConnectionManager::pushTransaction(
 
 void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
-    std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer)
+    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     NX_LOGX(QnLog::EC2_TRAN_LOG, 
         lm("systemId %1. Dispatching transaction %2")
