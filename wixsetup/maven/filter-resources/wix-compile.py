@@ -38,7 +38,7 @@ nxtool_msi_name = '${finalName}-servertool.msi'
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
-server_components = ['UninstallOptionsDlg', 'ServerVox', 'Server', 'traytool']
+server_components = ['ServerVox', 'Server', 'traytool']
 nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls']
 
 def add_wix_extensions(command):

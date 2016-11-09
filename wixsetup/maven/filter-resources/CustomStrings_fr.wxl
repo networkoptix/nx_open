@@ -79,12 +79,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Au moins un composant doit être sélectionné</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Options de désinstallation</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Garder ${display.product.name} Base de donnée</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Supprimer ${display.product.name} Base de donnée</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Actuel</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Version à garder:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Version précédente a été détectée</String>

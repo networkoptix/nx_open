@@ -79,12 +79,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">至少選擇一個元件</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">反安裝選項</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${product.name} 資料庫</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${product.name} 資料庫</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">目前</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">保留的版本:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">移除先前的版本</String>

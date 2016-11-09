@@ -82,8 +82,6 @@
 
         <Property Id="BUSYPORT" Secure="yes"/>
 
-        <Property Id="REMOVE_DATABASE" Secure="yes" Value="1"/>
-
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="$(var.ServerRegPath)"/>
         <Property Id="OLDEC_REGISTRY_PATH" Value="$(var.ECRegPath)"/>
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
@@ -239,10 +237,10 @@
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
             <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">REMOVE_DATABASE=1</Custom>
+            <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">1</Custom>
+            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">1</Custom>
+            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">1</Custom>
+            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">1</Custom>
             <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
@@ -390,7 +388,7 @@
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="ALLOW_CAMERA_CHANGES" Value="{}">ALLOW_CAMERA_CHANGES = "0"</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_S1) AND $(var.VmsRemoving) AND !ServerFeature <> 3 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
@@ -409,19 +407,12 @@
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
 
             <!-- MaintenanceWelcomeDlg -->
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
 
             <!-- MaintenanceTypeDlg -->
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
-            
-            <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
-            
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
         </UI>
     </Product>
 </Wix>

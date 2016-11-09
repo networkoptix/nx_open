@@ -80,12 +80,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">请选择您所需要安装的组件！</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">卸载选项</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${display.product.name} 数据库</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${display.product.name} 数据库</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">当前版本</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">已安装版本:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>

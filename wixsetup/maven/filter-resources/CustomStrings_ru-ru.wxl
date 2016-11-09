@@ -80,12 +80,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Хотя бы один компонент должен быть выбран</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Параметры удаления</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Оставить базу данных ${display.product.name}</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Удалить базу данных ${display.product.name}</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Текущую</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Сохранить:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Обнаружена предыдущая версия</String>

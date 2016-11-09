@@ -79,12 +79,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">하나 이상의 구성 요소를 선택하십시오.</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">삭제 옵션</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">데이터 베이스 ${product.name} 남기기</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">데이터 베이스 ${product.name} 삭제</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">현재</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">버전 유지:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">이전 버전 감지</String>

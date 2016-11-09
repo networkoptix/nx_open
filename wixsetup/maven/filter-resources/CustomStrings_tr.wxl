@@ -79,12 +79,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">En az bir bileşen seçmelisiniz</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Kaldırma seçenekleri</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">${display.product.name} Veritabanını tut</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">${display.product.name} Veritabanını kaldır</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Mevcut</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Saklanılan versiyon:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Önceki bir sürüm yüklü</String>
