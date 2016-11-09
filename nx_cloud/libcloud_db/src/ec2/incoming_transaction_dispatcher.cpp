@@ -59,13 +59,14 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
     TransactionProcessedHandler handler)
 {
     QnAbstractTransaction transactionHeader(m_moduleGuid);
-    TransactionUbjsonDataSource dataSource(std::move(serializedTransaction));
-    if (!QnUbjson::deserialize(&dataSource.stream, &transactionHeader))
+    auto dataSource = 
+        std::make_unique<TransactionUbjsonDataSource>(std::move(serializedTransaction));
+    if (!QnUbjson::deserialize(&dataSource->stream, &transactionHeader))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(dataSource.serializedTransaction.size()), cl_logDEBUG1);
+            .arg(dataSource->serializedTransaction.size()), cl_logDEBUG1);
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
         return;

@@ -37,7 +37,7 @@ public:
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction transaction,
-        TransactionUbjsonDataSource dataSource,
+        std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) = 0;
     /**
      * Parse and process Json-serialized transaction.
@@ -68,20 +68,20 @@ public:
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction transactionHeader,
-        TransactionUbjsonDataSource dataSource,
+        std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) override
     {
         auto transaction = Ec2Transaction(std::move(transactionHeader));
-        if (!QnUbjson::deserialize(&dataSource.stream, &transaction.params))
+        if (!QnUbjson::deserialize(&dataSource->stream, &transaction.params))
         {
             reportTransactionDeserializationFailure(
                 transportHeader, transaction.command, std::move(completionHandler));
             return;
         }
 
-        UbjsonSerializedTransaction<Ec2Transaction> serializableTransaction(
+        UbjsonSerializedTransaction<TransactionDataType> serializableTransaction(
             std::move(transaction),
-            std::move(dataSource.serializedTransaction),
+            std::move(dataSource->serializedTransaction),
             transportHeader.transactionFormatVersion);
 
         this->processTransaction(
@@ -120,7 +120,7 @@ public:
             return;
         }
 
-        SerializableTransaction<Ec2Transaction> serializableTransaction(
+        SerializableTransaction<TransactionDataType> serializableTransaction(
             std::move(transaction));
 
         this->processTransaction(
@@ -150,7 +150,7 @@ protected:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<Ec2Transaction> transaction,
+        SerializableTransaction<TransactionDataType> transaction,
         TransactionProcessedHandler handler) = 0;
 
 private:
@@ -227,7 +227,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        typename SerializableTransaction<BaseType::Ec2Transaction> transaction,
+        SerializableTransaction<TransactionDataType> transaction,
         TransactionProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;
@@ -277,7 +277,7 @@ private:
     struct TransactionContext
     {
         TransactionTransportHeader transportHeader;
-        SerializableTransaction<Ec2Transaction> transaction;
+        SerializableTransaction<TransactionDataType> transaction;
     };
 
     TransactionLog* const m_transactionLog;
@@ -287,7 +287,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<Ec2Transaction> transaction,
+        SerializableTransaction<TransactionDataType> transaction,
         TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;

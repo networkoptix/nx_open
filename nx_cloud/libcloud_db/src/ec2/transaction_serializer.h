@@ -15,11 +15,16 @@ public:
     QByteArray serializedTransaction;
     QnUbjsonReader<QByteArray> stream;
 
-    TransactionUbjsonDataSource(QByteArray serializedTransaction):
-        serializedTransaction(std::move(serializedTransaction)),
+    TransactionUbjsonDataSource(QByteArray serializedTransactionVal):
+        serializedTransaction(std::move(serializedTransactionVal)),
         stream(&serializedTransaction)
     {
     }
+
+    TransactionUbjsonDataSource(const TransactionUbjsonDataSource&) = delete;
+    TransactionUbjsonDataSource& operator=(const TransactionUbjsonDataSource&) = delete;
+    TransactionUbjsonDataSource(TransactionUbjsonDataSource&&) = default;
+    TransactionUbjsonDataSource& operator=(TransactionUbjsonDataSource&&) = default;
 };
 
 /**
