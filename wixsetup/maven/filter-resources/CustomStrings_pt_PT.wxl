@@ -51,13 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Já está instalada uma versão mais actual do [ProductName].</String> 
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Completa</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Apenas Servidor</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Apenas Cliente</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Avançado</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Seleccione um tipo de instalação</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Tipo de Instalação</String>       
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">As Password deviam ser iguais e não vazias</String>    

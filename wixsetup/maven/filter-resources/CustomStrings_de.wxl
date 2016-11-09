@@ -51,12 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String> 
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Schnellinstallation (Installation aller Komponenten)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Nur Client (Ich möchte Videos in anderen Archiven ansehen)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Fortgeschritten</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Bitte wählen Sie den Installationstyp</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Installationstyp</String>       
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Passwörter müssen übereinstimmen und nicht leer sein</String>    

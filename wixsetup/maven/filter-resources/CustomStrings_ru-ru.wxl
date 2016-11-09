@@ -51,12 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Установлена более поздняя версия [ProductName].</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Полная (Все компоненты)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Только клиент(Я хочу смотреть видео, записанное в другом месте)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Выборочная</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Пожалуйста выберите тип установки</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Тип установки</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Пароли должны быть заданы и не должны повторяться</String>

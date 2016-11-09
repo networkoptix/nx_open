@@ -51,12 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已安装 [ProductName]软件的一个版本.</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速全部安装 (安装所有组件)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">安装客户端(可以使用客户端访问视频和录像)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">高级安装</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">请选择安装方式</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">安装方式</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">密码必须一致且不为空</String>

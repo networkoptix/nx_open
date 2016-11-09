@@ -51,12 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">최종 버젼의 [ProductName] 이 이미 설치 되어있습니다.</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">모든 설치 (모든 서버 설치)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">클라이언트만 설치 (별도 서버가 존재 하는 경우)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">상세</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">설치 방식을 선택 하십시오.</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">설치 방식</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">비밀번호는 같거나 비어있지 않아야 합니다.</String>

@@ -47,13 +47,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A [ProductName] egy korábbi verziója már telepítve van.</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Teljes</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Csak szerver</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Csak kliens</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Haladó</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Kérem válasszon a telepítési módok közül</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Telepítési mód</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">A jelszónak egyeznie kell és nem lehet üres</String>

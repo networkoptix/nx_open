@@ -51,13 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes"> [ProductName] ın son versiyonu zaten yüklü.</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Tam yükleme</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Sadece Sunucu</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Sadece İstasyon</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Gelişmiş</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Lütfen yükleme tipini seçiniz</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Yükleme tipi</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">şifreler aynı ve boş olmamalıdır</String>

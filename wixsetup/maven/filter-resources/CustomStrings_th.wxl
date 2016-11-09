@@ -51,12 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">รุ่นที่ใหม่กว่า [ProductName] มีการติดตั้งแล้ว</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">รูปแบบเร็ว (การติดตั้งรวมส่วนประกอบทั้งหมด)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">ไคลเอนต์เท่านั้น (ฉันต้องการที่จะดูวิดีโอที่บันทึกไว้ในที่อื่น)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">ขั้นสูง</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">โปรดเลือกประเภทการติดตั้ง</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">ประเภทการติดตั้ง</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">รหัสผ่านควรจะเหมือนกันและไม่ปล่อยให้ว่าง</String>

@@ -51,12 +51,6 @@
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">更新的版本 [ProductName] 已經安裝</String>
 
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速完整安裝(安裝所有元件)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">僅安裝客戶端軟體(我想要瀏覽錄在其它地方的影像)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">進階</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">請選擇安裝類型</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">安裝類型</String>
 
     <!-- InvalidPasswordDlg -->
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">密碼應相同且不得為空</String>
