@@ -35,18 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">Установка [ProductName]</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Настройка Enterprise Controller'а</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Укажите параметры Enterprise Controller'а</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Порт</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Имя пользователя</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Придумайте пароль</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">Сеть</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Порт прокси</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Подтвердите пароль</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Дополнительные параметры</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Разрешить системе оптимизировать настройки камер (рекомендуется)</String>
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Отправлять разработчикам анонимную статистику использования и сбоев (рекомендуется)</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${display.product.name}</String>
@@ -83,17 +71,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Выберите каталог для видео записей:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Имя пользователя</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Сетевой адрес</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Порт</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Имя пользователя</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Пароль</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Порт Медиа Сервера</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Параметры Медиа Сервера</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Медиа Сервер</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Имя Системы</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Подтверждение пароля</String>
 
     <!-- MyExitDialog -->
 

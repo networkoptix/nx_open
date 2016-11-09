@@ -35,18 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 설정</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">제어 서버 설정</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">제어 서버의 세부 항목을 지정하십시오.</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">포트</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">로그인</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">비밀번호 생성</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">네트워크</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">프록시 포트</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">비밀번호 확인</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">세부항목 추가</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">카메라 최적화 설정 허용 (권장)</String>
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">개발자에 문제점 리포트</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${product.name}</String>
@@ -83,17 +71,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">기본 저장 폴더 선택:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">로그인</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">주소</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">포트</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">로그인</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">비밀번호</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">저장서버 포트</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">제어 서버</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">저장 서버 설정</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">저장 서버</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">시스템 이름</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">비밀번호 확인</String>
 
     <!-- MyExitDialog -->
 

@@ -372,7 +372,6 @@
 
             <!-- WelcomeDlg -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND NOT LICENSE_ALREADY_ACCEPTED ]]></Publish>          
-            <!-- Demo only!!! <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> -->
             
             <!-- Demo only!!! -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> 
@@ -382,7 +381,6 @@
 
             <!-- LicenseAgreementDlg -->
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <!-- Demo only!!! <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">LicenseAccepted = "1"</Publish> -->
             
             <!-- Demo only!!! -->
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">LicenseAccepted = "1"</Publish>

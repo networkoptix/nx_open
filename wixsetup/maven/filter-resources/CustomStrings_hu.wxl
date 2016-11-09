@@ -35,17 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Beállítás</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise Controller konfiguráció</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Kérem adja meg az Enterprise Controller paramétereket</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Belépés</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Jelszó létrehozása</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">Hálózat</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Jelszó megerősítése</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Extra paraméterek</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Engedélyezi a rendszernek a kamera beállítások optimalizálását (ajánlott)</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Lejátszás ${display.product.name} segítségével</String>
@@ -79,17 +68,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Kérem válasszon Media Root könyvtárat:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Belépés</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Kiszolgáló</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Belépés</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Jelszó</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Jelszó megerősítése</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Server Port</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Kapcsolat beállítások</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Server beállítások</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Server</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Rendszer név</String>
 
     <!-- MyExitDialog -->
 

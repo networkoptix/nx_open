@@ -35,18 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安装</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">系统控制器参数配置</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">请设置系统控制器参数</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">端口</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">登录配置</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">创建密码</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">网络配置</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统优化摄像机配置(不推荐)</String>
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">发送匿名使用和异常统计至开发者(推荐)</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>
@@ -83,17 +71,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">请选择媒体根目录文件夹：</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">登录</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">主机</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">端口</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">用户名</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">密码</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒体服务器端口</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">系统控制器</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒体服务器配置</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒体服务器</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系统名称</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">确认密码</String>
 
     <!-- MyExitDialog -->
 

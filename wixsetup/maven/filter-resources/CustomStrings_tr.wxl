@@ -35,18 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Yükleme</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise yönetici konfigürasyonu</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Lütfen parametleri girin</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Giriş</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Şifre oluştur</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">AĞ</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Şİfreyi doğrula</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Ek parametreler</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Sistemin kameraları optimize etmesine izin ver (Önerilir)</String>
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Geliştiriciye hata raporlarını ve istatiklerini gönder</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Oynat ${display.product.name}</String>
@@ -84,17 +72,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">LÜtfen kayıt klasörünü seçin:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Giriş</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Sunucu</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Giriş</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Şİfre</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Şİfreyi onayla</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Sunucu portu</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Bağlantı ayarları</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Sunucu konfigürasyonu</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Sunucu</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Sunucu ismi</String>
 
     <!-- MyExitDialog -->
 

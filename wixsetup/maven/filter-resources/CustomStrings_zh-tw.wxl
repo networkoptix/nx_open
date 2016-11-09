@@ -35,18 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安裝</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">企業控制器設定</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">請設定企業控制器參數</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">通訊埠</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">登入</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">請設定密碼</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">網路</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy通訊埠</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">請確認密碼</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">附加參數</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允許系統優化攝影機設定(建議)</String>
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">匿名寄送使用狀況和故障狀況給軟體開發商(建議)</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">建立關聯 ${product.name}</String>
@@ -83,17 +71,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">諘選擇媒體存放根目錄:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">登入</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">主機地址</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">通訊埠</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">登入</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">密碼</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒體伺服器通訊埠</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">企業控制器</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒體伺服器設定</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒體伺服器</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系統名稱</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">確認密碼</String>
 
     <!-- MyExitDialog -->
 

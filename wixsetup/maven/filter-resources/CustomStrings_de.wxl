@@ -35,18 +35,6 @@
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Konfiguration</String>
 
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise Controller-Konfiguration</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Bitte geben Sie die Parameter für den Enterprise Controller an</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Benutzerkennung</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Passwort erstellen</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">Netzwerk</String>    
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Passwort bestätigen</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Zusätzliche Parameter</String>   
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Dem System die Kamera-Einstellungen zu optimieren (empfohlen)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Senden von anonymen Nutzungs- und Absturzstatistiken an die Software Entwickler (Empfohlen)</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">${product.name} ausprobieren</String>
@@ -83,15 +71,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Bitte wählen den Media-Stammordner:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Benutzerkennung:</String>    
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Host</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Benutzerkennung</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Passwort</String>  
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Media Server Port</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Media Server Konfiguration</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Media Server</String>  
 
     <!-- MyExitDialog -->
 
