@@ -19,13 +19,12 @@
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent),
     m_model(nullptr),
     m_rootNode(),
     m_allNodes(),
@@ -37,6 +36,9 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
 {
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnResourceTreeModelUserNodes::handleUserChanged);
 
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
@@ -87,7 +89,6 @@ QnResourceTreeModel* QnResourceTreeModelUserNodes::model() const
 void QnResourceTreeModelUserNodes::setModel(QnResourceTreeModel* value)
 {
     m_model = value;
-    initializeContext(m_model);
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::rootNode() const
@@ -102,10 +103,7 @@ void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr&
 
 void QnResourceTreeModelUserNodes::rebuild()
 {
-    clean();
-
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
+    NX_ASSERT(m_valid);
 
     for (const auto& role : qnUserRolesManager->userRoles())
         rebuildSubjectTree(role);
@@ -441,7 +439,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRecorderNode(
 
 void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubject& subject)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!m_valid)
         return;
 
     if (subject.user() && !subject.user()->isEnabled())
@@ -548,9 +546,22 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
         removeNode(node);
 }
 
+void QnResourceTreeModelUserNodes::handleUserChanged(const QnUserResourcePtr& user)
+{
+    m_valid = !user.isNull()
+        && qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+
+    clean();
+    if (m_valid)
+        rebuild();
+}
+
 void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
+    if (!m_valid)
+        return;
+
     if (qnResourceAccessProvider->hasAccess(subject, resource))
     {
         auto node = ensureResourceNode(subject, resource);
@@ -577,10 +588,12 @@ void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSub
 void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     const QnResourceAccessSubject& subject)
 {
-    /* Full rebuild on current user permissions change. */
-    if (subject.user() && subject.user() == context()->user())
+    if (!m_valid)
+        return;
+
+    if (subject.user() == context()->user())
     {
-        rebuild();
+        /* Rebuild will occur on context user change. */
         return;
     }
 

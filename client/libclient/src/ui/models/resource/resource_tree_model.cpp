@@ -118,9 +118,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
     if (scope != CamerasScope)
     {
-        m_userNodes.reset(new QnResourceTreeModelUserNodes());
-        m_userNodes->setModel(this);
-        m_userNodes->setRootNode(m_rootNodes[Qn::UsersNode]);
+        auto userNodes = new QnResourceTreeModelUserNodes(this);
+        userNodes->setModel(this);
+        userNodes->setRootNode(m_rootNodes[Qn::UsersNode]);
     }
 
     /* Connect to context. */
@@ -1002,9 +1002,6 @@ void QnResourceTreeModel::rebuildTree()
         updateNodeParent(node);
         node->update();
     }
-
-    if (m_userNodes)
-        m_userNodes->rebuild();
 }
 
 void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)
