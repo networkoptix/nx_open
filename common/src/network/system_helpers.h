@@ -27,6 +27,7 @@ QString getFactorySystemId(const QnModuleInformation& info);
 
 bool isSafeMode(const QnModuleInformation& info);
 
+bool isNewSystem(const QnConnectionInfo& info);
 bool isNewSystem(const QnModuleInformation& info);
 bool isNewSystem(const QnCloudSystem& info);
 

@@ -207,6 +207,7 @@ BaseTile
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
+                currentAreaItem.safeMode = Qt.binding( function() { return control.safeMode; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {

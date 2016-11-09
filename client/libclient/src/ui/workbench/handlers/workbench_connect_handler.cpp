@@ -431,7 +431,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
-            if (connectionInfo.newSystem)
+            if (helpers::isNewSystem(connectionInfo))
             {
                 disconnectFromServer(true);
                 auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
