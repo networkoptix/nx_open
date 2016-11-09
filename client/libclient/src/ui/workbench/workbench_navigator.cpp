@@ -1,5 +1,6 @@
 #include "workbench_navigator.h"
 
+#include <algorithm>
 #include <cassert>
 
 #include <QtCore/QTimer>
@@ -89,6 +90,8 @@ const int kDiscardCacheIntervalMs = 60 * 60 * 1000;
 
 /** Size of timeline window near live when there is no recorded periods on cameras. */
 const int kTimelineWindowNearLive = 10 * 1000;
+
+const int kMaxTimelineCameraNameLength = 30;
 
 const int kUpdateBookmarksInterval = 2000;
 
@@ -218,10 +221,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
             if (timePeriodType == Qn::MotionContent)
             {
-                foreach(QnMediaResourceWidget *widget, m_syncedWidgets)
+                for (auto widget: m_syncedWidgets)
                 {
-                    QnAbstractArchiveStreamReader  *archiveReader = widget->display()->archiveReader();
-                    if (archiveReader)
+                    if (auto archiveReader = widget->display()->archiveReader())
                         archiveReader->setPlaybackMask(result);
                 }
             }
@@ -671,10 +673,10 @@ void QnWorkbenchNavigator::updateFootageState()
 void QnWorkbenchNavigator::updateHasArchive()
 {
     bool newValue = accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
-        && boost::algorithm::any_of(m_syncedWidgets,
-            [](QnMediaResourceWidget* widget)
+        && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
+            [](const QnMediaResourcePtr& resource)
             {
-                auto camera = widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>();
+                auto camera = resource.dynamicCast<QnSecurityCamResource>();
                 return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
             });
 
@@ -688,10 +690,10 @@ void QnWorkbenchNavigator::updateHasArchive()
 void QnWorkbenchNavigator::updateIsRecording(bool forceOn)
 {
     bool newValue = forceOn || (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
-        && boost::algorithm::any_of(m_syncedWidgets,
-            [](QnMediaResourceWidget* widget)
+        && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
+            [](const QnMediaResourcePtr& resource)
             {
-                auto camera = widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>();
+                auto camera = resource.dynamicCast<QnSecurityCamResource>();
                 return camera && camera->getStatus() == Qn::Recording;
             }));
 
@@ -768,7 +770,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     auto syncedResource = widget->resource();
 
     m_syncedWidgets.insert(widget);
-    m_syncedResources.insert(syncedResource, QHashDummyValue());
+    ++m_syncedResources[syncedResource];
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
@@ -799,16 +801,24 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
             updateItemDataFromSlider(widget);
     }
 
-    /* QHash::erase does nothing when called for container's end,
-     * and is therefore perfectly safe. */
-    m_syncedResources.erase(m_syncedResources.find(syncedResource));
+    auto iter = m_syncedResources.find(syncedResource);
+    bool noMoreWidgetsOfThisResource = iter == m_syncedResources.end();
+
+    if (!noMoreWidgetsOfThisResource)
+    {
+        NX_EXPECT(iter.value() > 0);
+        noMoreWidgetsOfThisResource = (--iter.value() <= 0);
+        if (noMoreWidgetsOfThisResource)
+            m_syncedResources.erase(iter);
+    }
+
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnSecurityCamResource>());
 
     if(auto loader = m_cameraDataManager->loader(syncedResource, false))
     {
         loader->setMotionRegions(QList<QRegion>());
-        if (!m_syncedResources.contains(syncedResource))
+        if (noMoreWidgetsOfThisResource)
             loader->setEnabled(false);
     }
 
@@ -1094,7 +1104,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         m_timeSlider->setThumbnailsLoader(NULL, -1);
         if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
         {
-            foreach(QnResourceWidget *widget, m_syncedWidgets)
+            for (auto widget: m_syncedWidgets)
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
         }
         else
@@ -1622,16 +1632,13 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
 
     /* We don't want duplicate loaders. */
     QSet<QnCachingCameraDataLoaderPtr> loaders;
-    foreach(const QnMediaResourceWidget *widget, m_syncedWidgets)
+    for (const auto widget: m_syncedWidgets)
     {
         if (timePeriodType == Qn::MotionContent && !widget->options().testFlag(QnResourceWidget::DisplayMotion))
-        {
-            /* Ignore it. */
-        }
-        else if (auto loader = loaderByWidget(widget))
-        {
+            continue; /* Ignore it. */
+
+        if (auto loader = loaderByWidget(widget))
             loaders.insert(loader);
-        }
     }
 
     std::vector<QnTimePeriodList> periodsList;
@@ -1648,30 +1655,15 @@ void QnWorkbenchNavigator::updateLines()
     if (!m_timeSlider)
         return;
 
-    bool isZoomed = display()->widget(Qn::ZoomedRole) != NULL;
+    bool isZoomed = display()->widget(Qn::ZoomedRole) != nullptr;
 
-    if (m_currentWidgetFlags & WidgetSupportsPeriods)
+    if (m_currentWidgetFlags.testFlag(WidgetSupportsPeriods))
     {
-
-        /* Get the list of all resources, that potentially can be displayed on timeline. */
-        auto syncedCameras = [this]()
-        {
-            QSet<QnResourcePtr> resources; /* Removing duplicates */
-            for (QnResourceWidget* widget : m_syncedWidgets)
-                resources.insert(widget->resource());
-            resources.insert(m_currentWidget->resource());
-            return QnResourceList(resources.toList()).filtered<QnSecurityCamResource>();
-        }();
-
         m_timeSlider->setLineVisible(CurrentLine, true);
-        m_timeSlider->setLineVisible(SyncedLine, !isZoomed && syncedCameras.size() > 1);
+        m_timeSlider->setLineVisible(SyncedLine, !isZoomed && m_syncedResources.size() > 1);
 
-        enum
-        {
-            kMaxNameLength = 30
-        };
-
-        m_timeSlider->setLineComment(CurrentLine, nx::utils::elideString(m_currentWidget->resource()->getName(), kMaxNameLength));
+        m_timeSlider->setLineComment(CurrentLine, nx::utils::elideString(
+            m_currentWidget->resource()->getName(), kMaxTimelineCameraNameLength));
     }
     else
     {
@@ -1680,9 +1672,8 @@ void QnWorkbenchNavigator::updateLines()
     }
 
     QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
-    if (currentLayoutResource &&
-        (currentLayoutResource->isFile() || !currentLayoutResource->getLocalRange().isEmpty())
-        )
+    if (currentLayoutResource
+        && (currentLayoutResource->isFile() || !currentLayoutResource->getLocalRange().isEmpty()))
     {
         m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
@@ -1695,7 +1686,7 @@ void QnWorkbenchNavigator::updateLines()
         bool hasNonLocalResource = !isLocal;
         if (!hasNonLocalResource)
         {
-            foreach(const QnResourceWidget *widget, m_syncedWidgets)
+            for (const QnResourceWidget* widget: m_syncedWidgets)
             {
                 if (widget->resource() && !widget->resource()->flags().testFlag(Qn::local))
                 {
@@ -2324,13 +2315,13 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time)
     }
 }
 
-bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr &camera) const
+bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const
 {
-    QnUuid cameraId = camera->getId();
-    return std::any_of(m_syncedWidgets.cbegin(), m_syncedWidgets.cend(), [cameraId](const QnMediaResourceWidget *widget)
-    {
-        return widget->resource()->toResourcePtr()->getId() == cameraId;
-    });
+    return std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
+        [cameraId = camera->getId()](const QnMediaResourcePtr& resource)
+        {
+            return resource->toResourcePtr()->getId() == cameraId;
+        });
 }
 
 void QnWorkbenchNavigator::updateHistoryForCamera(QnSecurityCamResourcePtr camera)

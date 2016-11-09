@@ -253,7 +253,7 @@ private:
     QnDayTimeWidget *m_dayTimeWidget;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
-    QMultiHash<QnMediaResourcePtr, QHashDummyValue> m_syncedResources;
+    QHash<QnMediaResourcePtr, int> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
