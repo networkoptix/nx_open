@@ -65,10 +65,6 @@
 
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Konfigurációs hiba</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Figyelmeztetés</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">A jelszónak egyeznie kell</String>
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Érvénytelen portok specified</String>

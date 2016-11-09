@@ -68,10 +68,6 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Я хочу вести локальную запись на этом ПК)</String>
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Ошибка настройки</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Предупреждение</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">Пароли должны быть одинаковыми</String>
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Указаны неверные порты</String>

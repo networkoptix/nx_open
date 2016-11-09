@@ -68,10 +68,6 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (현재 PC를 사용하는 경우)</String>
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">설정 오류</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">주의</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">비밀번호는 동일해야 합니다.</String>
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">잘못된 포트 지정</String>

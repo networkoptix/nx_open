@@ -69,10 +69,6 @@
     <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Gestão Base de Dados. Não deve ser instalado mais do que uma vez numa rede)</String>    
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Erro configuração</String>    
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Aviso</String>    
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">As Passwords têm de ser iguais</String>    
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">As Portas especificadas são inválidas</String>    

@@ -68,10 +68,6 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (ฉันต้องการที่จะบันทึกไว้บนเครื่องคอมพิวเตอร์นี้)</String>
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">เกิดข้อผิดพลาดในการกำหนดค่า</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">การเตือน</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">รหัสผ่านควรจะเหมือนกัน</String>
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">พอร์ตระบุไม่ถูกต้อง</String>

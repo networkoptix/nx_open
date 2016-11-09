@@ -68,10 +68,6 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (我想要在本機錄影)</String>
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">設定錯誤</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">警告</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">密碼不符</String>
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">指定的通訊埠無效</String>

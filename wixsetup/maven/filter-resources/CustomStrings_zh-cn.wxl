@@ -68,10 +68,6 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，用于视频流媒体转发及录像存储)</String>
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">设置错误</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">警告</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">请确认密码一致</String>
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">无效的指定端口</String>

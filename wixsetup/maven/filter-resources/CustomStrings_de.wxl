@@ -68,10 +68,6 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Ich möchte auf diesem Rechner lokal aufzeichnen)</String>
 
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Konfigurationsfehler</String>    
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Warnung</String>    
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">Passwörter müssen übereinstimmen</String>    
 
     <!-- PortDuplicateDlg -->
     <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Ungültige Ports angegeben</String>    
