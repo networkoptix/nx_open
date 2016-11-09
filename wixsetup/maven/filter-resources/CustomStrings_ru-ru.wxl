@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Установлена более поздняя версия [ProductName].</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Некорректный пароль</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Пароль не может быть пустым</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Предупреждение</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Полная (Все компоненты)</String>

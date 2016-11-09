@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已安装 [ProductName]软件的一个版本.</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">错误密码</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">密码不能为空</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速全部安装 (安装所有组件)</String>

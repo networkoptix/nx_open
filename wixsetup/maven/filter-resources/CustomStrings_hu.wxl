@@ -46,10 +46,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A [ProductName] egy korábbi verziója már telepítve van.</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Érvénytelen jelszó</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">A jelszó nem lehet üres</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Figyelmeztetés</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_Full"                                Overridable="yes">Teljes</String>

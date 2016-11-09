@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">更新的版本 [ProductName] 已經安裝</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">無效的密碼</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">密碼不能為空</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速完整安裝(安裝所有元件)</String>

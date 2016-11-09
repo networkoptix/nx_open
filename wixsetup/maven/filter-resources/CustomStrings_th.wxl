@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">รุ่นที่ใหม่กว่า [ProductName] มีการติดตั้งแล้ว</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">รหัสผ่านไม่ถูกต้อง</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">รหัสผ่านไม่ควรจะว่างเปล่า</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">การเตือน</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">รูปแบบเร็ว (การติดตั้งรวมส่วนประกอบทั้งหมด)</String>

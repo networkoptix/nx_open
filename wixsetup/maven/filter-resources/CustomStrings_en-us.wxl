@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A latter version of [ProductName] is already installed.</String> 
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Invalid Password</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Password should not be empty</String>     
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Warning</String>     
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_Full"                                Overridable="yes">Full</String>

@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">최종 버젼의 [ProductName] 이 이미 설치 되어있습니다.</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">잘못된 비밀번호</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">비밀번호를 입력 하십시오</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">주의</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">모든 설치 (모든 서버 설치)</String>

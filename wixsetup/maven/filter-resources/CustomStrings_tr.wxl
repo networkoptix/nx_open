@@ -50,10 +50,6 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes"> [ProductName] ın son versiyonu zaten yüklü.</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Geçersiz şifre</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Şifre boş olamaz</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Uyarı</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_Full"                                Overridable="yes">Tam yükleme</String>
