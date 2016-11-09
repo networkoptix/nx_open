@@ -10,7 +10,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 
 static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(7);
 static const std::chrono::milliseconds kCloudServerOutdateTimeout = std::chrono::seconds(10);

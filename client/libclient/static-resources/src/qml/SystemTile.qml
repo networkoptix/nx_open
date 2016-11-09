@@ -11,7 +11,7 @@ BaseTile
     property string systemName;
     property string ownerDescription;
 
-    property bool isFactoryTile: false;
+    property bool factorySystem: false;
     property bool isCompatibleInternal: false;
     property bool safeMode: false;
 
@@ -24,11 +24,11 @@ BaseTile
     onSystemIdChanged: { forceCollapsedState(); }
 
     isConnecting: ((control.systemId == context.connectingToSystem)
-        && context.connectingToSystem.length && !isFactoryTile);
+        && context.connectingToSystem.length && !impl.isFactoryTile);
 
     isAvailable:
     {
-        if (isFactoryTile)
+        if (impl.isFactoryTile)
             return true;
 
         if (wrongVersion.length || !isCompatibleInternal)
@@ -49,11 +49,11 @@ BaseTile
 
         if (control.isHovered)
         {
-            return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
+            return (impl.isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
                 : Style.colors.custom.systemTile.backgroundHovered);
         }
 
-        return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
+        return (impl.isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
                 : Style.colors.custom.systemTile.background);
     }
 
@@ -69,7 +69,7 @@ BaseTile
     {
         visible:
         {
-            if (control.isFactoryTile)
+            if (control.impl.isFactoryTile)
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
@@ -207,7 +207,7 @@ BaseTile
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
-                currentAreaItem.safeMode = Qt.binding( function() { return control.safeMode; });
+                currentAreaItem.factorySystem = Qt.binding( function() { return control.factorySystem; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
@@ -259,9 +259,11 @@ BaseTile
         readonly property int kCloudSystemTileType: 1;
         readonly property int kLocalSystemTileType: 2;
 
+        property bool isFactoryTile: control.factorySystem && !control.safeMode;
+
         property int tileType:
         {
-            if (control.isFactoryTile)
+            if (isFactoryTile)
                 return kFactorySystemTileType;
             else if (control.isCloudTile)
                 return kCloudSystemTileType;
@@ -275,7 +277,7 @@ BaseTile
 
         readonly property bool hasSavedConnection:
         {
-            if (control.isFactoryTile || control.isCloudTile)
+            if (isFactoryTile || control.isCloudTile)
                 return false;
 
             var systemTile = areaLoader.item;

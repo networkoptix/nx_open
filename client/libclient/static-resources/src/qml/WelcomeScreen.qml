@@ -222,7 +222,7 @@ Rectangle
                         systemName: model.systemName
                         ownerDescription: model.ownerDescription
 
-                        isFactoryTile: model.isFactorySystem
+                        factorySystem: model.isFactorySystem
                         isCloudTile: model.isCloudSystem
                         safeMode: model.safeMode;
 

@@ -47,13 +47,6 @@ QnUuid getLocalSystemIdImpl(
     return localSystemId;
 }
 
-bool isSafeModeImpl(
-    const QnSoftwareVersion& version,
-    bool ecDbReadOnly)
-{
-    return (version < kMinVersionWithSafeMode ? false : ecDbReadOnly);
-}
-
 QString getTargetSystemIdImpl(
     const QString& systemName,
     const QString& cloudSystemId,
@@ -104,22 +97,16 @@ QString getFactorySystemId(const QnModuleInformation& info)
 
 bool isSafeMode(const QnModuleInformation& info)
 {
-    return isSafeModeImpl(info.version, info.ecDbReadOnly);
+    return (info.version < kMinVersionWithSafeMode ? false : info.ecDbReadOnly);
 }
 
 bool isNewSystem(const QnConnectionInfo& info)
 {
-    if (isSafeModeImpl(info.version, info.ecDbReadOnly))
-        return false;
-
     return info.localSystemId.isNull();
 }
 
 bool isNewSystem(const QnModuleInformation& info)
 {
-    if (isSafeMode(info))
-        return false;
-
     if (info.version < kMinVersionWithLocalId)
         return false; //< No new systems until 3.0
 

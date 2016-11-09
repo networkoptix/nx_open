@@ -8,7 +8,7 @@ Column
 
     property bool isConnecting: false;
     property bool hasRecentConnections: false;
-    property bool safeMode: false;
+    property bool factorySystem: false;
 
     property alias loginTextField: loginTextItem;
     property alias passwordTextField: passwordTextItem;
@@ -95,7 +95,7 @@ Column
             id: savePasswordCheckBoxControl;
             text: qsTr("Save password");
 
-            enabled: !control.isConnecting && !control.safeMode;
+            enabled: !control.isConnecting && !control.factorySystem;
             onAccepted: control.connectButtonClicked();
 
             onCheckedChanged:
