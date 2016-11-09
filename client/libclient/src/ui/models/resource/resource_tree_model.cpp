@@ -131,7 +131,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
     connect(context(), &QnWorkbenchContext::userChanged, this,
-        &QnResourceTreeModel::rebuildTree, Qt::QueuedConnection);
+        &QnResourceTreeModel::rebuildTree);
     connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
         &QnResourceTreeModel::at_systemNameChanged);
     connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged, this,
@@ -144,9 +144,6 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             Q_UNUSED(value);
             m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
         });
-
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        &QnResourceTreeModel::rebuildTree);
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnResourceTreeModel::handlePermissionsChanged);
