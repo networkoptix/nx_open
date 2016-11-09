@@ -143,6 +143,7 @@ Rectangle
 
                 Connections
                 {
+                    // Handles outer signal that expands tile
                     id: openTileHandler;
 
                     property variant items: [];
@@ -190,8 +191,20 @@ Rectangle
                     filterRole: 257;    // Search text role
                 }
 
+                property bool lockRemoval: false;
+
+                function updateLockRemoval()
+                {
+                    var animatingNow = openTileHandler.items.filter(
+                        function(item) { return item.animating;  });
+
+                    lockRemoval = animatingNow.length;
+                }
+
                 delegate: Item
                 {
+                    GridView.delayRemove: grid.lockRemoval;
+
                     z: tile.z
                     width: grid.cellWidth
                     height: grid.cellHeight
@@ -199,6 +212,7 @@ Rectangle
                     SystemTile
                     {
                         id: tile
+
                         visualParent: screenHolder
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
@@ -225,6 +239,17 @@ Rectangle
                         Component.onDestruction:
                         {
                             openTileHandler.removeItem(this);
+                        }
+
+                        Connections
+                        {
+                            target: tile;
+                            ignoreUnknownSignals: true;
+
+                            onAnimatingChanged:
+                            {
+                                grid.updateLockRemoval();
+                            }
                         }
                     }
                 }

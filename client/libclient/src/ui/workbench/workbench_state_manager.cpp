@@ -1,5 +1,7 @@
 #include "workbench_state_manager.h"
 
+#include <api/global_settings.h>
+
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
@@ -12,6 +14,10 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
+namespace {
+static const int kSavedStatesLimit = 20;
+}
+
 QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/) :
     QObject(parent),
     QnWorkbenchContextAware(parent)
@@ -21,32 +27,85 @@ QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/) :
 
 bool QnWorkbenchStateManager::tryClose(bool force)
 {
+    /*
+    *  We may get here in the disconnect process when all layouts are already closed.
+    *  Marker of an invalid state - 'dummy' layout in the QnWorkbench class.
+    *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
+    */
     bool canSaveState =
         !qnCommon->remoteGUID().isNull()
-        && !qnRuntime->isVideoWallMode()
-        && !qnRuntime->isActiveXMode()
-        && context()->user();
+        && qnRuntime->isDesktopMode()
+        && context()->user()
+        && !qnGlobalSettings->localSystemId().isNull()
+        && workbench()->currentLayoutIndex() != -1;
 
-    QnWorkbenchState state;
     if (canSaveState)
     {
-        workbench()->submit(state);
+        saveState();
         qnStatisticsManager->saveCurrentStatistics();
     }
 
-    for (QnSessionAwareDelegate *d: m_delegates)
+    for (auto d: m_delegates)
+    {
         if (!d->tryClose(force))
             return false;
-
-    /* Server can be stopped while tryClose(false) was in progress because it produces confirmation dialogs. */
-    /* currentLayoutIndex == -1 means we're in the end of disconnection process and all layout resource has already been deleted. Nothing to save now. */
-    if (canSaveState && context()->user() && state.currentLayoutIndex != -1)
-    {
-        QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
-        states[context()->user()->getName()] = state;
-        qnSettings->setUserWorkbenchStates(states);
     }
+
     return true;
+}
+
+void QnWorkbenchStateManager::saveState()
+{
+    auto localId = qnGlobalSettings->localSystemId();
+    auto userId = context()->user()->getId();
+    if (localId.isNull() || userId.isNull())
+    {
+        NX_ASSERT(false, "Invalid connections state");
+        return;
+    }
+
+    QnWorkbenchState state;
+    state.localSystemId = localId;
+    state.userId = userId;
+    workbench()->submit(state);
+
+    auto states = qnSettings->workbenchStates();
+    auto iter = states.begin();
+    while (iter != states.end())
+    {
+        if (iter->localSystemId == localId && iter->userId == userId)
+            iter = states.erase(iter);
+        else
+            ++iter;
+    }
+    states.prepend(state);
+    while (states.size() > kSavedStatesLimit)
+        states.removeLast();
+
+    qnSettings->setWorkbenchStates(states);
+    qnSettings->save();
+}
+
+void QnWorkbenchStateManager::restoreState()
+{
+    auto localId = qnGlobalSettings->localSystemId();
+    auto userId = context()->user()->getId();
+    if (localId.isNull() || userId.isNull())
+    {
+        NX_ASSERT(false, "Invalid connections state");
+        return;
+    }
+
+    auto states = qnSettings->workbenchStates();
+    for (auto state : states)
+    {
+        if (state.localSystemId == localId
+            && state.userId == userId)
+        {
+            workbench()->update(state);
+            break;
+        }
+    }
 }
 
 void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)

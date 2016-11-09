@@ -108,30 +108,38 @@ BaseTile
         if (!control.isAvailable)
             return;
 
-        if (control.isFactoryTile)
+        switch(control.impl.tileType)
         {
-            var factorySystemHost = areaLoader.item.host;
-            console.log("Show wizard for system <", systemName,
-                ">, host <", factorySystemHost, ">");
-            context.setupFactorySystem(factorySystemHost);
-        }
-        else if (isCloudTile)
-        {
-            var cloudHost = control.impl.hostsModel.firstHost;
-            console.log("Connecting to cloud system <", systemName,
-                ">, through the host <", cloudHost, ">");
-            context.connectToCloudSystem(control.systemId, cloudHost);
-        }
-        else // Local system tile
-        {
-            if (impl.hasSavedConnection)
-                control.impl.connectToLocalSystem();
-            else
-                toggle();
+            case control.impl.kFactorySystemTileType:
+                var factorySystemHost = areaLoader.item.host;
+                console.log("Show wizard for system <", systemName,
+                    ">, host <", factorySystemHost, ">");
+                context.setupFactorySystem(factorySystemHost);
+                break;
+
+            case control.impl.kCloudSystemTileType:
+                var cloudHost = control.impl.hostsModel.firstHost;
+                console.log("Connecting to cloud system <", systemName,
+                    ">, through the host <", cloudHost, ">");
+                context.connectToCloudSystem(control.systemId, cloudHost);
+                break;
+
+            case control.impl.kLocalSystemTileType:
+                if (impl.hasSavedConnection)
+                    control.impl.connectToLocalSystem();
+                else
+                    toggle();
+
+                break;
+
+            default:
+                console.error("Unknown tile type: ", control.impl.tileType);
+                break;
         }
     }
 
-    titleLabel.text: (isFactoryTile ? qsTr("New System") : systemName);
+    titleLabel.text: (control.impl.tileType == control.impl.kFactorySystemTileType
+        ? qsTr("New System") : systemName);
 
     menuButton
     {
@@ -152,20 +160,30 @@ BaseTile
 
     areaLoader.source:
     {
-        if (isFactoryTile)
-            return "tile_areas/FactorySystemTileArea.qml";
-        else if (isCloudTile)
-            return "tile_areas/CloudSystemTileArea.qml";
-        else
-            return "tile_areas/LocalSystemTileArea.qml";
+        switch(control.impl.tileType)
+        {
+            case control.impl.kFactorySystemTileType:
+                return "tile_areas/FactorySystemTileArea.qml";
+            case control.impl.kCloudSystemTileType:
+                return "tile_areas/CloudSystemTileArea.qml";
+            case control.impl.kLocalSystemTileType:
+                return "tile_areas/LocalSystemTileArea.qml";
+            default:
+                console.error("Unknown tile type: ", control.impl.tileType);
+                break;
+        }
+        return "";
     }
 
     Connections
     {
         target: areaLoader;
 
-        onItemChanged:
+        onStatusChanged:
         {
+            if (areaLoader.status != Loader.Ready)
+                return;
+
             var currentAreaItem = control.areaLoader.item;
             if (!currentAreaItem)
                 return;

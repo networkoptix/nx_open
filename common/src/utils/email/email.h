@@ -13,7 +13,7 @@ namespace email {
 
 /**
  *  Check is string looks like correct email address.
- *  Supports suffixes ( user+suffix1@domain.com ).
+ *  Supports tags by RFC5233 ( user+tag@domain.com ).
  *  Supports custom names ( Vasya Pupkin <vasya@pupkin.com> )
  *  Domain length is limited to 255 symbols.
  */
@@ -61,6 +61,13 @@ struct QnEmailSettings {
 };
 #define QnEmailSettings_Fields (email)(server)(user)(password)(signature)(supportEmail)(connectionType)(port)(timeout)(simple)
 
+/**
+ * Generic email address class.
+ * Supports user names and tagged addressing by RFC5233.
+ * Examples:
+ * * Vasya Pupkin <vasya@pupkin.com>
+ * * user+tag@domain.com
+ */
 class QnEmailAddress
 {
 public:
@@ -77,7 +84,7 @@ public:
 
     QnEmailSettings settings() const;
 
-    /** Username */
+    /** Username. For tagged addresses returns base part. */
     QString user() const;
 
     /** Smtp domain */

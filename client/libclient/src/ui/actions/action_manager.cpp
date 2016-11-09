@@ -644,7 +644,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::DisconnectAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Logout")).
+        text(tr("Disconnect from Server")).
         autoRepeat(false).
         shortcut(lit("Ctrl+Shift+D")).
         condition(new QnLoggedInCondition(this));
@@ -968,11 +968,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to %1...").arg(QnAppInfo::cloudName()));
+        text(tr("Login to %1...", "Login to Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
-        text(tr("Logout"));
+        text(tr("Logout from %1", "Logout from Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
@@ -1255,7 +1255,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::DeleteVideoWallItemAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Delete")).
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
@@ -1640,7 +1640,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Diagnostics...")).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
             new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

@@ -22,8 +22,8 @@ QnServerField testServerFlag(
     return QnServerField::NoField;
 }
 
-QnServerFields getChanges(const QnModuleInformation &before
-    , const QnModuleInformation &after)
+QnServerFields getChanges(const QnModuleInformation& before
+    , const QnModuleInformation& after)
 {
     const auto fieldsResult =
         (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
@@ -45,7 +45,7 @@ QnSystemDescription::PointerType QnSystemDescription::createFactorySystem(const 
 
 QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
     const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName)
 {
     return PointerType(new QnSystemDescription(systemId, localId, systemName));
@@ -53,7 +53,7 @@ QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
 
 QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
     const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName,
     const QString& ownerAccountEmail,
     const QString& ownerFullName)
@@ -82,7 +82,7 @@ QnSystemDescription::QnSystemDescription(const QString& systemId) :
 }
 
 QnSystemDescription::QnSystemDescription(const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName)
     :
     m_id(systemId),
@@ -104,7 +104,7 @@ QnSystemDescription::QnSystemDescription(const QString& systemId,
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName,
     const QString& cloudOwnerAccountEmail,
     const QString& ownerFullName)
@@ -182,7 +182,7 @@ bool QnSystemDescription::isOnlineServer(const QnUuid& serverId) const
 QnSystemDescription::ServersList QnSystemDescription::servers() const
 {
     ServersList result;
-    for (const auto id: m_prioritized)
+    for (const auto& id: m_prioritized)
     {
         const auto it = m_servers.find(id);
         if (it != m_servers.end())
@@ -278,7 +278,7 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
         return;
 
     handleServerRemoved(serverId);
-    const auto priorityPred = [serverId](const QnUuid &id) { return (serverId == id); };
+    const auto priorityPred = [serverId](const QnUuid& id) { return (serverId == id); };
     const auto it = std::find_if(m_prioritized.begin(), m_prioritized.end(), priorityPred);
     if (it != m_prioritized.end())
         m_prioritized.erase(it);

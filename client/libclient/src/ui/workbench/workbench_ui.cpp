@@ -1310,6 +1310,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
+            updateNotificationsGeometry();
             updateCalendarVisibility(animated);
             updateViewportMargins();
         });

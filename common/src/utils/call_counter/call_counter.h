@@ -1,5 +1,4 @@
-#ifndef __CALL_COUNTER_H__
-#define __CALL_COUNTER_H__
+#pragma once
 
 #include <map>
 #include <cstdint>
@@ -31,7 +30,8 @@ public:
     QnCallCounter(std::chrono::milliseconds reportPeriod);
     ~QnCallCounter();
 
-    void incrementCallCount(QString functionName);
+    void incrementCallCount(const QString& functionName);
+    void incrementCallCount(const char* functionName);
 
 private:
     void startReporter();
@@ -57,10 +57,8 @@ private:
         auto qnCallCounterPtr = std::unique_ptr<QnCallCounter>(new QnCallCounter(val))
 #
 #   define QnIncrementCallCount() \
-        QnCallCounter::instance()->incrementCallCount(Q_FUNC_INFO) 
+        QnCallCounter::instance()->incrementCallCount(Q_FUNC_INFO)
 #else
-#   define QnCallCountStart(val) 
-#   define QnIncrementCallCount() 
+#   define QnCallCountStart(val)
+#   define QnIncrementCallCount()
 #endif
-
-#endif // __CALL_COUNTER_H__

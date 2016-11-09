@@ -11,6 +11,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/camera_resource_stub.h>
 
 #include <nx/fusion/model_functions.h>
@@ -323,6 +324,51 @@ TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 }
 
 /************************************************************************/
+/* Checking videowall-based layouts                                     */
+/************************************************************************/
+/** Admin can do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Videowall-controller can do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Viewer can't do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
+{
+    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/
 
@@ -509,4 +555,77 @@ TEST_F(QnResourceAccessManagerTest, checkAccessibleServerAsViewer)
     forbidden &= ~desired;
 
     checkPermissions(server, desired, forbidden);
+}
+
+
+/************************************************************************/
+/* Checking videowall access rights                                     */
+/************************************************************************/
+
+/* Admin must have full permissions for videowalls. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsAdmin)
+{
+    loginAsOwner();
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+/* Check admin permissions for videowalls in safe mode. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsAdminInSafeMode)
+{
+    loginAsOwner();
+    qnCommon->setReadOnly(true);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadPermission | Qn::WritePermission;
+    Qn::Permissions forbidden = Qn::SavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+
+/* Videowall control user must have almost full permissions for videowalls. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsController)
+{
+    loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+/* Videowall control user in safe mode. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsControllerInSafeMode)
+{
+    loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
+    qnCommon->setReadOnly(true);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadPermission | Qn::WritePermission;
+    Qn::Permissions forbidden = Qn::SavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+/* Videowall is inaccessible for default user. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsViewer)
+{
+    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    checkPermissions(videowall, desired, forbidden);
 }

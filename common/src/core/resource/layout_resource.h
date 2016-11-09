@@ -11,6 +11,14 @@
 #include <utils/common/threadsafe_item_storage.h>
 
 
+/**
+ * QnLayoutResource class describes the set of resources together with their view options.
+ *
+ * There are several types of layouts:
+ * 1) Common layouts. They belong to one of user. Layout's parentId is user's id.
+ * 2) Shared layouts. They can be accessible to several users. ParentId is null.
+ * 3) Service layouts. These can have server id or videowall id as parentId.
+*/
 class QnLayoutResource: public QnResource,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {

@@ -90,7 +90,7 @@ bool doMigration(const QSqlDatabase& database, std::function<int(int)> migrateFu
         migrationQueue.emplace_back(query.value("user_id").toInt(), updated);
     }
 
-    for (const auto& remapData : migrationQueue)
+    for (const auto& remapData: migrationQueue)
     {
         if (!doRemap(database, remapData))
             return false;
@@ -152,9 +152,9 @@ int fixCustomFlag(int oldPermissions)
 
     const bool isPredefined = any_of(QnUserRolesManager::getPredefinedRoles(),
         [result](const ApiPredefinedRoleData& role)
-    {
-        return role.permissions == result;
-    });
+        {
+            return role.permissions == result;
+        });
     if (!isPredefined)
         result |= Qn::GlobalCustomUserPermission;
 

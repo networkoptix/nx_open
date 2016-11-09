@@ -2,6 +2,7 @@
 
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -10,6 +11,7 @@
 
 QnBaseResourceAccessProvider::QnBaseResourceAccessProvider(QObject* parent):
     base_type(parent),
+    m_mutex(QnMutex::NonRecursive),
     m_accessibleResources()
 {
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
@@ -30,6 +32,8 @@ QnBaseResourceAccessProvider::~QnBaseResourceAccessProvider()
 bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
+    NX_EXPECT(!isUpdating());
+
     if (!acceptable(subject, resource))
         return false;
 
@@ -39,6 +43,7 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
      * * access manager recalculates all permissions
      * * access provider checks 'has access' to this user itself
      */
+    QnMutexLocker lk(&m_mutex);
     if (!m_accessibleResources.contains(subject.id()))
         return false;
 
@@ -50,6 +55,8 @@ QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibl
     const QnResourcePtr& resource,
     QnResourceList* providers) const
 {
+    NX_EXPECT(!isUpdating());
+
     if (!hasAccess(subject, resource))
         return Source::none;
 
@@ -57,6 +64,18 @@ QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibl
         fillProviders(subject, resource, *providers);
 
     return baseSource();
+}
+
+void QnBaseResourceAccessProvider::beforeUpdate()
+{
+    QnMutexLocker lk(&m_mutex);
+    m_accessibleResources.clear();
+}
+
+void QnBaseResourceAccessProvider::afterUpdate()
+{
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+        updateAccessBySubject(subject);
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
@@ -69,6 +88,7 @@ bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubjec
 {
     if (!subject.isValid())
         return false;
+
     return subject.user()
         ? subject.user()->isEnabled()
         : true; //< Roles are always enabled (at least for now)
@@ -76,12 +96,18 @@ bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubjec
 
 void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& resource)
 {
-    for (const auto& subject : allSubjects())
+    if (isUpdating())
+        return;
+
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updateAccess(subject, resource);
 }
 
 void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSubject& subject)
 {
+    if (isUpdating())
+        return;
+
     for (const auto& resource : qnResPool->getResources())
         updateAccess(subject, resource);
 }
@@ -89,26 +115,33 @@ void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessS
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
+    if (isUpdating())
+        return;
+
     /* We can get removed auto-generated layout here when switching videowall item control. */
     if (!acceptable(subject, resource))
         return;
 
-    auto& accessible = m_accessibleResources[subject.id()];
-    auto targetId = resource->getId();
+    bool newValue = false;
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto& accessible = m_accessibleResources[subject.id()];
+        auto targetId = resource->getId();
 
-    bool oldValue = accessible.contains(targetId);
-    bool newValue = isSubjectEnabled(subject) && calculateAccess(subject, resource);
-    if (oldValue == newValue)
-        return;
+        bool oldValue = accessible.contains(targetId);
+        newValue = isSubjectEnabled(subject) && calculateAccess(subject, resource);
+        if (oldValue == newValue)
+            return;
 
-    if (newValue)
-        accessible.insert(targetId);
-    else
-        accessible.remove(targetId);
+        if (newValue)
+            accessible.insert(targetId);
+        else
+            accessible.remove(targetId);
+    }
 
     emit accessChanged(subject, resource, newValue ? baseSource() : Source::none);
 
-    for (const auto& dependent: dependentSubjects(subject))
+    for (const auto& dependent: qnResourceAccessSubjectsCache->dependentSubjects(subject))
         updateAccess(dependent, resource);
 }
 
@@ -141,21 +174,27 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 {
     disconnect(resource, nullptr, this, nullptr);
 
+    if (isUpdating())
+        return;
+
     auto resourceId = resource->getId();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 
-    for (const auto& subject : allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
     {
         if (subject.id() == resourceId)
             continue;
 
-        auto& accessible = m_accessibleResources[subject.id()];
-        if (!accessible.contains(resourceId))
-            continue;
+        {
+            QnMutexLocker lk(&m_mutex);
+            auto& accessible = m_accessibleResources[subject.id()];
+            if (!accessible.contains(resourceId))
+                continue;
 
-        accessible.remove(resourceId);
+            accessible.remove(resourceId);
+        }
         emit accessChanged(subject, resource, Source::none);
     }
 }
@@ -163,30 +202,44 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     const ec2::ApiUserGroupData& userRole)
 {
+    if (isUpdating())
+        return;
+
     updateAccessBySubject(userRole);
 }
 
 void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
+    if (isUpdating())
+        return;
+
     handleSubjectRemoved(userRole);
-    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
         updateAccessBySubject(subject);
 }
 
 void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    if (isUpdating())
+        return;
+
     auto id = subject.id();
 
-    NX_ASSERT(m_accessibleResources.contains(id));
+    QSet<QnUuid> resourceIds;
+    {
+        QnMutexLocker lk(&m_mutex);
+        NX_ASSERT(m_accessibleResources.contains(id));
+        resourceIds = m_accessibleResources.take(id);
+    }
 
-    auto resources = qnResPool->getResources(m_accessibleResources[id].values());
-    m_accessibleResources.remove(id);
+    const auto resources = qnResPool->getResources(resourceIds);
     for (const auto& targetResource : resources)
         emit accessChanged(subject, targetResource, Source::none);
 }
 
 QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubject& subject) const
 {
+    QnMutexLocker lk(&m_mutex);
     return m_accessibleResources.value(subject.id());
 }
 

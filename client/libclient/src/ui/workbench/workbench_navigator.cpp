@@ -1372,7 +1372,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
 
     if (brandNewRange)
+    {
         m_timeSlider->finishAnimations();
+        m_timeSlider->invalidateWindow();
+    }
 
     if (m_calendar)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());

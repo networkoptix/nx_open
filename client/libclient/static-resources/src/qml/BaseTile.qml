@@ -30,6 +30,7 @@ Item
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
+    property bool animating: false;
 
     signal collapsedTileClicked();
 
@@ -168,7 +169,7 @@ Item
                 PropertyAction
                 {
                     target: control;
-                    property: "isExpanded";
+                    properties: "isExpanded, animating";
                     value: true;
                 }
 
@@ -224,6 +225,13 @@ Item
                     target: control;
                     property: "isExpanded";
                     value: (tileHolder.state == "expanded");
+                }
+
+                PropertyAction
+                {
+                    target: control;
+                    property: "animating";
+                    value: false;
                 }
             }
         }
