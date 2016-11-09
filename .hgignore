@@ -250,6 +250,10 @@ mobile_client/build-*
 statserver/.venv
 statserver/build
 statserver/dist
+
+*test-tmp.cfg
+func_tests/ssh.*.conf
+
 statserver/statserver.egg-info
 
 common/src/plugins/resource/avi/filetypes.h
