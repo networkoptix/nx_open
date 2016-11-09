@@ -95,6 +95,9 @@ public:
     /** Any of the syncable widgets on the layout has archive. */
     bool hasArchive() const;
 
+    /** Any of the syncable widgets on the layout is recording. */
+    bool isRecording() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
@@ -123,6 +126,7 @@ signals:
     void liveChanged();
     void liveSupportedChanged();
     void hasArchiveChanged();
+    void isRecordingChanged();
     void playingChanged();
     void playingSupportedChanged();
     void speedChanged();
@@ -227,7 +231,9 @@ private:
     void updateHistoryForCamera(QnSecurityCamResourcePtr camera);
     void updateSliderBookmarks();
 
-    void updateHasArchiveState();
+    void updateFootageState();
+    void updateIsRecording(bool forceOn = false);
+    void updateHasArchive();
 
     VariantAnimator* createPositionAnimator();
     void initializePositionAnimations();
@@ -301,6 +307,11 @@ private:
 
     /** At least one of the synced widgets has archive. */
     bool m_hasArchive;
+
+    /** At least one of the synced widgets is recording. */
+    bool m_isRecording;
+    /** When recording was started, 0 if there's no recording in progress. */
+    qint64 m_recordingStartUtcMs;
 
     /** Animated timeline position. */
     qint64 m_animatedPosition;
