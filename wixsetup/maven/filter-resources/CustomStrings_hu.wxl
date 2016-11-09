@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Figyelmeztetés</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Beállítás</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Minden mező kötelető</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise Controller konfiguráció</String>

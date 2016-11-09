@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Aviso</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">Configuração [ProductName]</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Todos os campos são de preenchimento obrigatório</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Configuração de Controlador Enterprise</String>

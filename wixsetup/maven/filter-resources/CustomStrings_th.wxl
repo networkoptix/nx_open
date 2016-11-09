@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">การเตือน</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] ติดตั้ง</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">ทุกฟิลด์มีผลบังคับใช้</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">การตั้งค่าการควบคุมองค์กร</String>

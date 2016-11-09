@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">警告</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安裝</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">所有欄位皆為必填</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">企業控制器設定</String>

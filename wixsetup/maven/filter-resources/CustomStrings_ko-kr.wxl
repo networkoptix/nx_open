@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">주의</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 설정</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">모든 필드는 필수 항목입니다.</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">제어 서버 설정</String>

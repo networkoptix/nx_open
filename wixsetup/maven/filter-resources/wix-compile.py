@@ -38,7 +38,7 @@ nxtool_msi_name = '${finalName}-servertool.msi'
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
-server_components = ['UninstallOptionsDlg', 'EmptyPasswordDlg', 'MediaServerDlg', 'ServerVox', 'Server', 'traytool', 'DbSync22Files']
+server_components = ['UninstallOptionsDlg', 'EmptyPasswordDlg', 'MediaServerDlg', 'ServerVox', 'Server', 'traytool']
 nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls']
 
 def add_wix_extensions(command):
@@ -69,7 +69,6 @@ def get_candle_command(suffix):
         add_components(command, client_components)
 
     if suffix.startswith('server'):
-        command.append('-dDbSync22SourceDir=${DbSync22Dir}')
         add_components(command, server_components)
 
     if suffix.startswith('nxtool'):

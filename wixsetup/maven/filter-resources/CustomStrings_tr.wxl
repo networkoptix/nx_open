@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Uyarı</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Yükleme</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Bütün alanlar zorunludur</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise yönetici konfigürasyonu</String>

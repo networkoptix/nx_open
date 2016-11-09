@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">警告</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安装</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">参数不能为空。</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">系统控制器参数配置</String>

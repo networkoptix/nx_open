@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Attention</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Installation</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Tous les champs sont obligatoires</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Configuration du Contrôleur Entreprise</String>

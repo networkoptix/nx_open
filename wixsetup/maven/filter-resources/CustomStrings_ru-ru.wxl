@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Предупреждение</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">Установка [ProductName]</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Все поля обязательны</String>
 
     <!-- AppServerDlg -->
     <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Настройка Enterprise Controller'а</String>
