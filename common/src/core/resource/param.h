@@ -23,6 +23,7 @@ namespace Qn
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
     static const QString DESIRED_TRANSPORT_PARAM_NAME = lit("desiredTransport");
+    static const QString ONVIF_INPUT_PORT_ALIASES_PARAM_NAME = lit("onvifInputPortAliases");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver

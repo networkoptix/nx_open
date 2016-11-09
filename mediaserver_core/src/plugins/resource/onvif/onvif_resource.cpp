@@ -1024,7 +1024,8 @@ void QnPlOnvifResource::notificationReceived(
 
     if( eventTopic.indexOf( lit("Trigger/Relay") ) == -1 &&
         eventTopic.indexOf( lit("IO/Port") ) == -1 &&
-        eventTopic.indexOf( lit("Trigger/DigitalInput") ) == -1 )
+        eventTopic.indexOf( lit("Trigger/DigitalInput") ) == -1 &&
+        eventTopic.indexOf( lit("Device/IO/VirtualPort") ) == -1)
     {
         NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
@@ -1116,6 +1117,13 @@ void QnPlOnvifResource::notificationReceived(
                     break;
                 }
             }
+        }
+        else
+        {
+            auto portIndex = getInputPortNumberFromString(portSourceIter->value);
+
+            if (!portIndex.isEmpty())
+                portId = portIndex;
         }
 
         currentPortState = newPortState;
@@ -1527,6 +1535,12 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         setCameraCapability( Qn::RelayInputCapability, true );
     }
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    m_portAliases = resData.value<std::vector<QString>>(Qn::ONVIF_INPUT_PORT_ALIASES_PARAM_NAME);
+
+    if (!m_portAliases.empty())
+        return true;
+
     const QAuthenticator& auth = getAuth();
     DeviceIOWrapper soapWrapper(
         m_deviceIOUrl,
@@ -1853,6 +1867,33 @@ CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(MediaSoapWrap
     }
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
+{
+    QString portIndex;
+    bool canBeConvertedToNumber = false;
+
+    if (portName.toLower().startsWith(lit("di")))
+    {
+        portIndex = portName.mid(2);
+
+        auto portNum = portIndex.toInt(&canBeConvertedToNumber);
+
+        if (canBeConvertedToNumber)
+            return QString::number(portNum + 1);
+    }
+    else if (portName.startsWith("AlarmIn"))
+    {
+        portIndex = portName.mid(lit("AlarmIn_").length());
+
+        auto portNum = portIndex.toInt(&canBeConvertedToNumber);
+
+        if (canBeConvertedToNumber)
+            return QString::number(portNum);
+    }
+
+    return QString();
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)

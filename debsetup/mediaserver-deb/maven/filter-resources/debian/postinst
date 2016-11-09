@@ -27,7 +27,6 @@ CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
 
 DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
-CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
 # This is necessary because changed configuration options should take effect
 # immediately.
@@ -215,8 +214,6 @@ case "$1" in
             [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
             mv $EC_DIR/var/hostedfiles $BASE_DIR/var/vms_storedfiles
         fi
-
-        "$CERTGEN" -i
 
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
             [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var

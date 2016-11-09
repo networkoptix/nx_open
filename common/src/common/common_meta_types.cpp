@@ -333,6 +333,7 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
     QnJsonSerializer::registerSerializer<QnBounds>();
+    QnJsonSerializer::registerSerializer<std::vector<QString>>();
 
     qn_commonMetaTypes_initialized = true;
 }
