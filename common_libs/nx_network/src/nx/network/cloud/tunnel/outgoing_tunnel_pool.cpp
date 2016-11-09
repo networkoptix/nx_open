@@ -54,7 +54,7 @@ void OutgoingTunnelPool::establishNewConnection(
         std::move(handler));
 }
 
-String OutgoingTunnelPool::getSelfPeerId()
+String OutgoingTunnelPool::getOrCreateSelfPeerId()
 {
     QnMutexLocker lock(&m_mutex);
     if (m_selfPeerId.isEmpty())
@@ -66,7 +66,7 @@ String OutgoingTunnelPool::getSelfPeerId()
     return m_selfPeerId;
 }
 
-void OutgoingTunnelPool::setSelfPeerId(const String& name, const QnUuid& uuid)
+void OutgoingTunnelPool::designateSelfPeerId(const String& name, const QnUuid& uuid)
 {
     const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
 

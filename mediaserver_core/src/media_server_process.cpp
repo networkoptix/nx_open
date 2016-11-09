@@ -2062,7 +2062,7 @@ void MediaServerProcess::run()
     qnCommon->setAdminPasswordData(passwordData);
 
     qnCommon->setModuleGUID(serverGuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().setSelfPeerId("ms", qnCommon->moduleGUID());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("ms", qnCommon->moduleGUID());
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
