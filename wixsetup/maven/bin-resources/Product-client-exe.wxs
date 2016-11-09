@@ -45,7 +45,13 @@
 
             <RollbackBoundary />
 
-            <MsiPackage Id="ClientPackage" SourceFile="bin/msi/$(var.ClientMsiName)" Vital="yes">
+            <MsiPackage
+                Id="ClientPackage"
+                Name="$(var.ClientMsiName)"
+                SourceFile="bin/msi/$(var.ClientMsiName)"
+                Vital="yes"
+                Cache="no"
+                Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
         </Chain>

@@ -5,7 +5,7 @@
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
 
     <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="301" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>

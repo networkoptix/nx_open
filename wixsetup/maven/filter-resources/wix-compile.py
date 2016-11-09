@@ -1,5 +1,14 @@
-import os, sys, subprocess, shutil
-from os.path import dirname, join, exists, isfile
+import os
+import sys
+import subprocess
+import shutil
+
+from os.path import dirname, join, exists, isfile, abspath
+
+engine_tmp_folder = 'obj'
+
+skip_sign = '${windows.skip.sign}' == 'true'
+build_nxtool = '${nxtool}' == 'true'
 
 bin_source_dir = '${libdir}/bin/${build.configuration}'
 
@@ -22,7 +31,7 @@ server_exe_name = '${finalName}-server-only.exe'
 client_msi_name = '${finalName}-client-only.msi'
 client_exe_name = '${finalName}-client-only.exe'
 
-full_exe_name = '${finalName}-client-only.exe'
+full_exe_name = '${finalName}.exe'
 
 nxtool_msi_name = '${finalName}-servertool.msi'
 
@@ -91,12 +100,49 @@ def get_light_command(folder, msi, suffix):
     add_wix_extensions(command)
     return command
 
-def get_fix_dialog_command(folder, msi):
-    command = ['cscript']
-    command.append('FixExitDialog.js')
+def get_sign_command(folder, msi):
+    command = ['sign.bat']
     command.append('{0}/{1}'.format(folder, msi))
     return command
 
+def create_sign_command_set(folder, msi):
+    return [get_sign_command(folder, msi)]
+
+def get_extract_engine_command(exe, out):
+    command = ['insignia']
+    command.append('-ib')
+    command.append(exe)
+    command.append('-o')
+    command.append(out)
+    return command
+
+def get_bundle_engine_command(engine, out):
+    command = ['insignia']
+    command.append('-ab')
+    command.append(engine)
+    command.append(out)
+    command.append('-o')
+    command.append(out)
+    return command
+
+def get_remove_file_command(file_path):
+    command = ['del']
+    command.append(abspath(file_path))
+    return command
+
+def create_sign_burn_exe_command_set(folder, engine_folder, exe):
+    engine_filename = exe + '.engine.exe'
+
+    exe_path = join(folder, exe)
+    engine_path = join(engine_folder, engine_filename)
+
+    return [
+        get_extract_engine_command(exe_path, engine_path),
+        get_sign_command(engine_folder, engine_filename),
+        get_bundle_engine_command(engine_path, exe_path),
+        get_sign_command(folder, exe)
+    ]
+    
 def execute_command(command):
     print 'Executing command:\n{0}\n'.format(' '.join(command))
     retcode = subprocess.call(command)
@@ -107,8 +153,7 @@ def execute_command(command):
 def create_commands_set(project, folder, msi):
     return [
         get_candle_command(project),
-        get_light_command(folder, msi, project),
-        get_fix_dialog_command(folder, msi),
+        get_light_command(folder, msi, project)
     ]
     
 def rename(folder, old_name, new_name):
@@ -116,29 +161,38 @@ def rename(folder, old_name, new_name):
         os.unlink(join(folder, new_name))
     if os.path.exists(join(folder, old_name)):
         shutil.copy2(join(folder, old_name), join(folder, new_name))
-    
+
 def main():
     commands = []
     commands += create_commands_set('client-only', client_msi_folder, client_msi_name)
-    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name)
     commands += create_commands_set('server-only', server_msi_folder, server_msi_name)
+    commands += create_commands_set('client-strip', client_msi_strip_folder, client_msi_name)
+    commands += create_commands_set('server-strip', server_msi_strip_folder, server_msi_name)
+
+    if not skip_sign:
+        commands += create_sign_command_set(client_msi_folder, client_msi_name)
+        commands += create_sign_command_set(server_msi_folder, server_msi_name)
+        commands += create_sign_command_set(client_msi_strip_folder, client_msi_name)
+        commands += create_sign_command_set(server_msi_strip_folder, server_msi_name)
+
+    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name)
     commands += create_commands_set('server-exe', server_exe_folder, server_exe_name)
     commands += create_commands_set('full-exe', full_exe_folder, full_exe_name)
-    commands += create_commands_set('client-strip', client_msi_strip_folder, client_msi_name)
-    commands += create_commands_set('server-strip', server_msi_strip_folder, server_msi_name)   
-    if '${nxtool}' == 'true':
+
+    if not skip_sign:
+        commands += create_sign_burn_exe_command_set(client_exe_folder, engine_tmp_folder, client_exe_name)
+        commands += create_sign_burn_exe_command_set(server_exe_folder, engine_tmp_folder, server_exe_name)
+        commands += create_sign_burn_exe_command_set(full_exe_folder, engine_tmp_folder, full_exe_name)
+
+    if build_nxtool:
         commands += create_commands_set('nxtool', nxtool_msi_folder, nxtool_msi_name)
+        if not skip_sign:
+            commands += create_sign_command_set(nxtool_msi_folder, nxtool_msi_name)
 
     for command in commands:
         execute_command(command)
 
-    client_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (client_msi_strip_folder, client_msi_name)).strip()
-    server_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (server_msi_strip_folder, server_msi_name)).strip()
-
-    assert(len(client_msi_product_code) > 0)
-    assert(len(server_msi_product_code) > 0)
-
-    #Debug code to make applauncher work from the build_environment/target/bin folder
+    # Debug code to make applauncher work from the build_environment/target/bin folder
     rename(bin_source_dir, 'minilauncher.exe', '${minilauncher.binary.name}')
     rename(bin_source_dir, 'desktop_client.exe', '${client.binary.name}')
 

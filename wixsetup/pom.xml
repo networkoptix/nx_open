@@ -222,19 +222,6 @@
                     </execution>                   
 
                     <execution>
-                        <id>wix-sign</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${project.build.directory}/sign.bat</executable>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <skip>${windows.skip.sign}</skip>
-                        </configuration>
-                    </execution>        
-
-                    <execution>
                         <id>pack</id>
                         <phase>verify</phase>
                         <goals>
