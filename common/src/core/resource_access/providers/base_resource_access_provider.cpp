@@ -72,15 +72,10 @@ void QnBaseResourceAccessProvider::beforeUpdate()
     m_accessibleResources.clear();
 }
 
-#include <QtCore/QElapsedTimer>
 void QnBaseResourceAccessProvider::afterUpdate()
 {
-    QElapsedTimer t;
-    qDebug() << "access provider" << (int)baseSource() << "starts recalculate";
-    t.start();
     for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updateAccessBySubject(subject);
-    qDebug() << "access provider" << (int)baseSource() << "recalculate finished for" << t.elapsed();
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
