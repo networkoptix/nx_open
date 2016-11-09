@@ -37,13 +37,13 @@ IncomingTunnelConnection::IncomingTunnelConnection(
             }
         });
 
-    const SocketAddress bindAddress(HostAddress::anyHost, controlSocket->getLocalAddress().port);
+    const SocketAddress addressToBind(HostAddress::anyHost, controlSocket->getLocalAddress().port);
     if (!m_serverSocket->setNonBlockingMode(true) ||
-        !m_serverSocket->bind(bindAddress) ||
+        !m_serverSocket->bind(addressToBind) ||
         !m_serverSocket->listen())
     {
         NX_LOGX(lm("Can not listen on server socket %1: %2")
-            .strs(bindAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
+            .strs(addressToBind, SystemError::getLastOSErrorText()), cl_logWARNING);
 
         m_state = SystemError::getLastOSErrorCode();
     }
