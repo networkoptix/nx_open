@@ -75,24 +75,28 @@ namespace
 
 // --------------------- RTPIODevice --------------------------
 
-RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
+RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort, quint16 rtcpPort):
     m_owner(owner),
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0),
     ssrc(0),
-    m_rtpTrackNum(0)
+    m_rtpTrackNum(0),
+    m_mediaPort(mediaPort),
+    m_rtcpPort(rtcpPort)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode)
     {
         m_mediaSocket = SocketFactory::createDatagramSocket();
-        m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0/*m_mediaPort*/ ) );
         m_mediaSocket->setRecvTimeout(500);
+        m_mediaSocket->setRecvBufferSize(200000);
 
         m_rtcpSocket = SocketFactory::createDatagramSocket();
-        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0/*m_rtcpPort*/ ) );
         m_rtcpSocket->setRecvTimeout(500);
+        m_mediaSocket->setRecvBufferSize(200000);
     }
 }
 
@@ -114,6 +118,26 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
     if (!m_tcpMode)
         processRtcpData();
     return readed;
+}
+
+void RTPIODevice::init()
+{
+    if (!m_tcpMode)
+    {
+       /* qDebug() << "INIT RTP IO DEVICE" << m_rtcpPort << m_mediaPort << m_rtpTrackNum;
+        m_mediaSocket->close();
+        m_rtcpSocket->close();
+        delete m_mediaSocket;
+        delete m_rtcpSocket;
+
+        m_mediaSocket = SocketFactory::createDatagramSocket();
+        m_mediaSocket->bind( SocketAddress(HostAddress::anyHost, 0 ) );
+        m_mediaSocket->setRecvTimeout(500);
+
+        m_rtcpSocket = SocketFactory::createDatagramSocket();
+        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_rtcpSocket->setRecvTimeout(500);*/
+    }
 }
 
 AbstractCommunicatingSocket* RTPIODevice::getMediaSocket()
@@ -158,6 +182,34 @@ void RTPIODevice::processRtcpData()
             if (outBufSize > 0)
                 m_rtcpSocket->send(sendBuffer, outBufSize);
         }
+    }
+
+    static QElapsedTimer timer;
+    static bool flag = false;
+
+    if (!flag)
+    {
+        timer.start();
+        flag = true;
+    }
+
+    if (timer.elapsed() > 5000)
+    {
+        int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+        if (outBufSize > 0)
+        {
+            if (!m_rtcpSocket->isConnected())
+            {
+                //qDebug() << m_hostAddress.toString() << m_rtcpPort;
+                if (!m_rtcpSocket->setDestAddr(SocketAddress(m_hostAddress, m_rtcpPort)))
+                {
+                    qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << SystemError::getLastOSErrorText();
+                }
+            }
+            m_rtcpSocket->send(sendBuffer, outBufSize);
+        }
+
+        timer.restart();
     }
 }
 
@@ -1128,8 +1180,26 @@ bool RTPSession::sendSetup()
                         }
                     }
                 }
-
+                else if (tmpList[k].startsWith(QLatin1String("server_port"))) {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        tmpParams = tmpParams[1].split(QLatin1String("-"));
+                        if (tmpParams.size() == 2) {
+                            trackInfo->setRtcpPort(tmpParams[1].toInt());
+                        }
+                    }
+                }
+                else if (tmpList[k].startsWith(QLatin1String("client_port"))) {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        tmpParams = tmpParams[1].split(QLatin1String("-"));
+                        if (tmpParams.size() == 2) {
+                            trackInfo->setMediaPort(tmpParams[0].toInt());
+                        }
+                    }
+                } 
             }
+            trackInfo->ioDevice->init();
         }
 
         updateTransportHeader(responce);

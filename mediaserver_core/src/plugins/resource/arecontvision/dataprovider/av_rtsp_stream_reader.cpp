@@ -56,12 +56,12 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     const auto maxResolution = getMaxSensorSize();
     if (getRole() == Qn::CR_SecondaryLiveVideo)
     {
-        requestStr += lit("&FPS=%1").arg((int)params.fps);
+        /*requestStr += lit("&FPS=%1").arg((int)params.fps);*/
         const int desiredBitrateKbps = res->suggestBitrateKbps(
             params.quality,
             QSize(maxResolution.width()/2, maxResolution.height()/2),
             params.fps);
-        requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
+        /*requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);*/
     }
     else
     {

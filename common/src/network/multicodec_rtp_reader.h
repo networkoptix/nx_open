@@ -106,6 +106,8 @@ private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
+    QnAbstractMediaDataPtr getNextDataUDP2();
+
     RTPSession m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
     QVector<TrackInfo> m_tracks;

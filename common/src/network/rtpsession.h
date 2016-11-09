@@ -99,10 +99,12 @@ private:
 class RTPIODevice
 {
 public:
-    explicit RTPIODevice(RTPSession* owner, bool useTCP);
+    explicit RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
     virtual ~RTPIODevice();
     virtual qint64 read(char * data, qint64 maxSize );
-    
+
+    void init();
+
     const RtspStatistic& getStatistic() { return m_statistic;}
     void setStatistic(const RtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
@@ -112,6 +114,9 @@ public:
     quint32 getSSRC() const { return ssrc; }
     
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
+    void setRtcpPort(quint16 rtcpPort) {m_rtcpPort = rtcpPort;}
+    void setMediaPort(quint16 mediaPort) {m_mediaPort = mediaPort;}
+    void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
     quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
@@ -122,6 +127,9 @@ private:
     RtspStatistic m_statistic;
     AbstractDatagramSocket* m_mediaSocket;
     AbstractDatagramSocket* m_rtcpSocket;
+    quint16 m_mediaPort;
+    quint16 m_rtcpPort;
+    HostAddress m_hostAddress;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
 };
@@ -156,8 +164,13 @@ public:
 
             ioDevice = new RTPIODevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
+            ioDevice->setHostAddress(lit("192.168.0.223"));
             interleaved = QPair<int,int>(-1,-1);
         }
+
+        void setRtcpPort(quint16 rtcpPort) {ioDevice->setRtcpPort(rtcpPort);};
+        void setMediaPort(quint16 mediaPort) {ioDevice->setMediaPort(mediaPort);};
+
 
         void setSSRC(quint32 value);
         quint32 getSSRC() const;

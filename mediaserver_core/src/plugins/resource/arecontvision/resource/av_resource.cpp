@@ -546,12 +546,12 @@ QString QnPlAreconVisionResource::generateRequestString(
     if (resolutionFULL)
         request += QLatin1String("full");
     else
-        request += QLatin1String("half");
+        request += QLatin1String("full");
 
-    request += QLatin1String(";x0=") + QString::number(left)
+    /*request += QLatin1String(";x0=") + QString::number(left)
         + QLatin1String(";y0=") + QString::number(top)
         + QLatin1String(";x1=") + QString::number(right)
-        + QLatin1String(";y1=") + QString::number(bottom);
+        + QLatin1String(";y1=") + QString::number(bottom);*/
 
     if (!h264)
         request += QLatin1String(";quality=");

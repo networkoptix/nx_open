@@ -457,11 +457,14 @@ bool CLH264RtpParser::processData(
             NX_LOG("RTP Packet loss detected!!!!", cl_logWARNING);
         }
         clearInternalBuffer();
-        emit packetLostDetected(m_prevSequenceNum, sequenceNum);
+        //emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     };
 
     if (isPacketLost)
+    {
+        qDebug() << "Packet loss detected:" << m_prevSequenceNum << sequenceNum;
         processPacketLost();
+    }
 
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
