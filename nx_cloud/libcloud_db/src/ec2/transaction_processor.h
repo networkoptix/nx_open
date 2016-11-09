@@ -10,9 +10,9 @@
 #include <transaction/transaction.h>
 #include <utils/db/async_sql_query_executor.h>
 
+#include "serialization/transaction_deserializer.h"
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
-
 
 namespace ec2 {
 class QnAbstractTransaction;
@@ -72,7 +72,10 @@ public:
         TransactionProcessedHandler completionHandler) override
     {
         auto transaction = Ec2Transaction(std::move(transactionHeader));
-        if (!QnUbjson::deserialize(&dataSource->stream, &transaction.params))
+        if (!TransactionDeserializer::deserialize(
+                &dataSource->stream,
+                &transaction.params,
+                transportHeader.transactionFormatVersion))
         {
             reportTransactionDeserializationFailure(
                 transportHeader, transaction.command, std::move(completionHandler));

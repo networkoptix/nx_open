@@ -27,8 +27,8 @@ public:
         Qn::SerializationFormat targetFormat,
         int transactionFormatVersion) const override
     {
-        if (targetFormat == Qn::UbjsonFormat &&
-            transactionFormatVersion == m_serializedTransactionVersion)
+        if (targetFormat == Qn::UbjsonFormat /*&&
+            transactionFormatVersion == m_serializedTransactionVersion*/)
         {
             return m_ubjsonData;
         }
@@ -41,8 +41,8 @@ public:
         const TransactionTransportHeader& transportHeader,
         int transactionFormatVersion) const override
     {
-        if (targetFormat == Qn::UbjsonFormat &&
-            transactionFormatVersion == m_serializedTransactionVersion)
+        if (targetFormat == Qn::UbjsonFormat /*&&
+            transactionFormatVersion == m_serializedTransactionVersion*/)
         {
             return QnUbjson::serialized(transportHeader.vmsTransportHeader) + m_ubjsonData;
         }

@@ -97,8 +97,8 @@ private:
 
     template<typename TransactionDataSource>
     void dispatchTransaction(
-        const TransactionTransportHeader& transportHeader,
-        const ::ec2::QnAbstractTransaction& transaction,
+        TransactionTransportHeader transportHeader,
+        ::ec2::QnAbstractTransaction transaction,
         TransactionDataSource dataSource,
         TransactionProcessedHandler completionHandler);
 };

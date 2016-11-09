@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <transaction/transaction.h>
 
+#include "serialization/transaction_deserializer.h"
+
 namespace nx {
 namespace cdb {
 namespace ec2 {
@@ -61,7 +63,10 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
     QnAbstractTransaction transactionHeader(m_moduleGuid);
     auto dataSource = 
         std::make_unique<TransactionUbjsonDataSource>(std::move(serializedTransaction));
-    if (!QnUbjson::deserialize(&dataSource->stream, &transactionHeader))
+    if (!TransactionDeserializer::deserialize(
+            &dataSource->stream,
+            &transactionHeader,
+            transportHeader.transactionFormatVersion))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
@@ -117,18 +122,18 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
 
 template<typename TransactionDataSource>
 void IncomingTransactionDispatcher::dispatchTransaction(
-    const TransactionTransportHeader& transportHeader,
-    const ::ec2::QnAbstractTransaction& transaction,
+    TransactionTransportHeader transportHeader,
+    ::ec2::QnAbstractTransaction transactionHeader,
     TransactionDataSource dataSource,
     TransactionProcessedHandler completionHandler)
 {
-    auto it = m_transactionProcessors.find(transaction.command);
-    if (transaction.command == ::ec2::ApiCommand::updatePersistentSequence)
+    auto it = m_transactionProcessors.find(transactionHeader.command);
+    if (transactionHeader.command == ::ec2::ApiCommand::updatePersistentSequence)
         return; // TODO: #ak Do something.
     if (it == m_transactionProcessors.end())
     {
         NX_LOGX(lm("Received unsupported transaction %1")
-            .arg(::ec2::ApiCommand::toString(transaction.command)), cl_logDEBUG2);
+            .arg(::ec2::ApiCommand::toString(transactionHeader.command)), cl_logDEBUG2);
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -140,8 +145,8 @@ void IncomingTransactionDispatcher::dispatchTransaction(
 
     // TODO: should we always call completionHandler in the same thread?
     return it->second->processTransaction(
-        transportHeader,
-        transaction,
+        std::move(transportHeader),
+        std::move(transactionHeader),
         std::move(dataSource),
         std::move(completionHandler));
 }

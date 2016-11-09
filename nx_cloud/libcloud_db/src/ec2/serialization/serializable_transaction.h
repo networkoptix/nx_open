@@ -27,9 +27,9 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        int transactionFormatVersion) const override
+        int /*transactionFormatVersion*/) const override
     {
-        NX_ASSERT(transactionFormatVersion == nx_ec::EC2_PROTO_VERSION);
+        //NX_ASSERT(transactionFormatVersion == nx_ec::EC2_PROTO_VERSION);
 
         switch (targetFormat)
         {
@@ -45,9 +45,9 @@ public:
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
         const TransactionTransportHeader& transportHeader,
-        int transactionFormatVersion) const override
+        int /*transactionFormatVersion*/) const override
     {
-        NX_ASSERT(transactionFormatVersion == nx_ec::EC2_PROTO_VERSION);
+        //NX_ASSERT(transactionFormatVersion == nx_ec::EC2_PROTO_VERSION);
 
         switch (targetFormat)
         {
