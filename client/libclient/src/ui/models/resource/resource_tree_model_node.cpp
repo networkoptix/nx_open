@@ -240,9 +240,11 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     if (m_resource)
     {
         connect(resource, &QnResource::nameChanged, this, &QnResourceTreeModelNode::update);
-        connect(resource, &QnResource::statusChanged, this, &QnResourceTreeModelNode::update);
         connect(resource, &QnResource::urlChanged, this, &QnResourceTreeModelNode::update);
         connect(resource, &QnResource::flagsChanged, this, &QnResourceTreeModelNode::update);
+
+        connect(resource, &QnResource::statusChanged, this,
+            &QnResourceTreeModelNode::updateResourceStatus);
 
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
@@ -1078,6 +1080,16 @@ void QnResourceTreeModelNode::setName(const QString& name)
     m_displayName = m_name = name;
 }
 
+
+void QnResourceTreeModelNode::updateResourceStatus()
+{
+    NX_ASSERT(m_resource);
+    if (!m_resource)
+        return;
+
+    m_status = m_resource->getStatus();
+    changeInternal();
+}
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)
 {
