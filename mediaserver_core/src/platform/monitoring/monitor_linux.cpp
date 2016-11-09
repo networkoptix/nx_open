@@ -374,7 +374,6 @@ QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
     d_ptr(new QnLinuxMonitorPrivate())
 {
     d_ptr->q_ptr = this;
-    m_pool.setMaxThreadCount(5);
 }
 
 QnLinuxMonitor::~QnLinuxMonitor() {
@@ -586,17 +585,14 @@ public:
 
     virtual void run() override
     {
-        QnMutexLocker lock(&m_mutex);
         m_info = readPartitionsAndSizes();
     }
 
     QList<QnPlatformMonitor::PartitionSpace> getInfo()
     {
-        QnMutexLocker lock(&m_mutex);
         return m_info;
     }
 private:
-    QnMutex m_mutex;
     QList<QnPlatformMonitor::PartitionSpace> m_info;
 };
 }
@@ -604,16 +600,18 @@ private:
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
     const int kExpiryTimeout = 500;
+    QThreadPool pool;
+    PartitionInfoAsyncFetcher infoFetcher;
 
     NX_LOG(lit("%1 Preparing to get partitions info. Timeout is %2 ms.")
            .arg(Q_FUNC_INFO)
            .arg(kExpiryTimeout), cl_logDEBUG2);
 
-    PartitionInfoAsyncFetcher infoFetcher;
+    pool.setMaxThreadCount(1);
     infoFetcher.setAutoDelete(false);
 
-    m_pool.start(&infoFetcher);
-    m_pool.waitForDone(kExpiryTimeout);
+    pool.start(&infoFetcher);
+    pool.waitForDone(kExpiryTimeout);
     auto result = infoFetcher.getInfo();
 
     if (result.isEmpty())

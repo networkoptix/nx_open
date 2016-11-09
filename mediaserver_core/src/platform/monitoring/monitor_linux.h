@@ -27,7 +27,6 @@ public:
 private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor);
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;
-    QThreadPool m_pool;
 };
 
 #endif // QN_LINUX_MONITOR_H
