@@ -41,7 +41,7 @@
 
 #include <nx/utils/timer_manager.h>
 #include <api/http_client_pool.h>
-
+#include <utils/common/long_runable_cleanup.h>
 
 namespace
 {
@@ -94,6 +94,8 @@ QnCommonModule::QnCommonModule(QObject *parent):
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
     QnCommonMetaTypes::initialize();
+
+    store<QnLongRunableCleanup>(new QnLongRunableCleanup());
 
     /* Init statics. */
     store<nx::utils::TimerManager>(new nx::utils::TimerManager());

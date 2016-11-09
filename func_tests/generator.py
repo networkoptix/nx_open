@@ -143,6 +143,7 @@ class UserDataGenerator(BasicGenerator):
         return self._template % (digest, email, hash, id, "true" if admin else "false", username)
 
 
+#TODO: get rid of it
 class MediaServerGenerator(BasicGenerator):
     _template = """
     {

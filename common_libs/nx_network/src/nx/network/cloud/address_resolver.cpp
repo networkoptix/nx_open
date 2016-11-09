@@ -430,7 +430,7 @@ void AddressResolver::dnsResolve(
     }
 
     info->second.dnsProgress();
-    lk->unlock();
+    QnMutexUnlocker ulk(lk);
     m_dnsResolver.resolveAsync(
         info->first.toString(),
         [this, info, needMediator, ipVersion](
@@ -485,18 +485,20 @@ void AddressResolver::mediatorResolve(
         resolveResult = SystemError::hostNotFound;
     }
 
-    const auto guards = grabHandlers(resolveResult, info);
+    {
+        QnMutexUnlocker ulk(lk);
+        grabHandlers(resolveResult, info);
+    }
+
     if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
         return dnsResolve(info, lk, false, ipVersion);
-
-    lk->unlock(); //< Fire guards away from mutex scope.
 }
 
 void AddressResolver::mediatorResolveImpl(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion)
 {
     info->second.mediatorProgress();
-    lk->unlock();
+    QnMutexUnlocker ulk(lk);
     m_mediatorConnection->resolvePeer(
         nx::hpm::api::ResolvePeerRequest(info->first.toString().toUtf8()),
         [this, info, needDns, ipVersion](

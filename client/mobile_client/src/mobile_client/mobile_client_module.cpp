@@ -33,7 +33,7 @@
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
-#include <utils/common/long_runable_async_stopper.h>
+#include <nx/network/socket_global.h>
 
 
 QnMobileClientModule::QnMobileClientModule(
@@ -60,6 +60,7 @@ QnMobileClientModule::QnMobileClientModule(
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().setSelfPeerId("mc", common->moduleGUID());
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
@@ -90,8 +91,6 @@ QnMobileClientModule::QnMobileClientModule(
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
-
-    common->store<QnLongRunableAsyncStopper>(new QnLongRunableAsyncStopper());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();

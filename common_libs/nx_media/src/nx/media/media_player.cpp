@@ -28,7 +28,7 @@
 #include <nx/utils/debug_utils.h>
 
 #include "media_player_quality_chooser.h"
-#include <utils/common/long_runable_async_stopper.h>
+#include <utils/common/long_runable_cleanup.h>
 
 namespace nx {
 namespace media {
@@ -152,6 +152,8 @@ public:
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs;
 
+    bool waitWhileJumpFinished;
+
     // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
     int liveBufferMs;
 
@@ -213,6 +215,8 @@ private:
     void doPeriodicTasks();
 
     void log(const QString& message) const;
+
+    bool isCoarseFrame(const QVideoFramePtr& frame) const;
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -229,6 +233,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     execTimer(new QTimer(this)),
     miscTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
+    waitWhileJumpFinished(false),
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
@@ -316,6 +321,7 @@ void PlayerPrivate::at_hurryUp()
 
 void PlayerPrivate::at_jumpOccurred(int sequence)
 {
+    waitWhileJumpFinished = false;
     if (!videoFrameToRender)
         return;
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
@@ -343,7 +349,7 @@ void PlayerPrivate::at_gotVideoFrame()
     if (state == Player::State::Paused)
     {
         FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
-        if (!metadata.noDelay)
+        if (!metadata.noDelay && !isCoarseFrame(videoFrameToRender))
             return; //< Display regular frames only if the player is playing.
     }
 
@@ -458,7 +464,9 @@ void PlayerPrivate::presentNextFrame()
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
-        setPosition(videoFrameToRender->startTime());
+        bool ignoreFrameTime = metadata.noDelay || waitWhileJumpFinished;
+        if (!ignoreFrameTime)
+            setPosition(videoFrameToRender->startTime());
         setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
     videoFrameToRender.reset();
@@ -547,7 +555,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     if (!lastVideoPtsMs.is_initialized() || //< first time
         !qBetween(*lastVideoPtsMs, ptsMs, *lastVideoPtsMs + kMaxFrameDurationMs) || //< pts discontinuity
         metadata.noDelay || //< jump occurred
-        ptsMs < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
+        isCoarseFrame(frame) || //< 'coarse' frame. Frame time is less than required jump pos.
         frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
         liveBufferUnderflow ||
         liveBufferOverflow //< live buffer overflow
@@ -685,6 +693,11 @@ void PlayerPrivate::log(const QString& message) const
         .arg(message), cl_logDEBUG1);
 }
 
+bool PlayerPrivate::isCoarseFrame(const QVideoFramePtr& frame) const
+{
+    return frame->startTime() < lastSeekTimeMs;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Player
 
@@ -732,7 +745,9 @@ QAbstractVideoSurface* Player::videoSurface(int channel) const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    return d->positionMs;
+    // positionMs is real value from video frame. It coud containt 'coarse' timestamp
+	// a bit less then user requested position (inside of current GOP)
+    return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
 void Player::setPosition(qint64 value)
@@ -740,11 +755,12 @@ void Player::setPosition(qint64 value)
     Q_D(Player);
     d->log(lit("setPosition(%1)").arg(value));
 
-    d->lastSeekTimeMs = value;
+    d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
+    {
         d->archiveReader->jumpTo(msecToUsec(value), 0);
-    else
-        d->positionMs = value;
+        d->waitWhileJumpFinished = true;
+    }
 
     d->setLiveMode(value == kLivePosition);
 
@@ -809,8 +825,8 @@ void Player::stop()
     d->dataConsumer.reset();
     if (d->archiveReader)
     {
-        if (QnLongRunableAsyncStopper::instance())
-            QnLongRunableAsyncStopper::instance()->stopAsync(std::move(d->archiveReader));
+        if (QnLongRunableCleanup::instance())
+            QnLongRunableCleanup::instance()->cleanupAsync(std::move(d->archiveReader));
         else
             d->archiveReader.reset();
     }
