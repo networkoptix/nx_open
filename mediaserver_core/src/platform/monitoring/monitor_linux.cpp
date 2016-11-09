@@ -5,6 +5,7 @@
 #include <memory>
 #include <set>
 #include <chrono>
+#include <thread>
 
 #include <boost/optional.hpp>
 
@@ -373,6 +374,7 @@ QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
     d_ptr(new QnLinuxMonitorPrivate())
 {
     d_ptr->q_ptr = this;
+    m_pool.setMaxThreadCount(5);
 }
 
 QnLinuxMonitor::~QnLinuxMonitor() {
@@ -576,37 +578,54 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
     return result;
 }
 
-QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
+namespace {
+class PartitionInfoAsyncFetcher : public QRunnable
 {
-    QnMutexLocker syncLk(&m_partitionsInfo.syncMutex);
-    std::chrono::milliseconds waitTimeout = m_partitionsInfo.started ?
-                                            std::chrono::milliseconds(200) :
-                                            std::chrono::milliseconds(2000);
+public:
+    PartitionInfoAsyncFetcher() {}
 
-    if (!m_partitionsInfo.started || m_partitionsInfo.done.isFinished())
+    virtual void run() override
     {
-        if (!m_partitionsInfo.started)
-            m_partitionsInfo.started = true;
-
-        m_partitionsInfo.done = QtConcurrent::run([this]
-                                                  {
-                                                      auto partitions = readPartitionsAndSizes();
-                                                      QnMutexLocker lk(&m_partitionsInfo.mutex);
-                                                      m_partitionsInfo.info = std::move(partitions);
-                                                  });
-        auto start = std::chrono::steady_clock::now();
-        while (1)
-        {
-            auto now = std::chrono::steady_clock::now();
-            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - start) > waitTimeout)
-                break;
-
-            if (m_partitionsInfo.done.isFinished())
-                break;
-            QThread::msleep(2);
-        }
+        QnMutexLocker lock(&m_mutex);
+        m_info = readPartitionsAndSizes();
     }
 
-    QnMutexLocker lk(&m_partitionsInfo.mutex);
-    return m_partitionsInfo.info;
+    QList<QnPlatformMonitor::PartitionSpace> getInfo()
+    {
+        QnMutexLocker lock(&m_mutex);
+        return m_info;
+    }
+private:
+    QnMutex m_mutex;
+    QList<QnPlatformMonitor::PartitionSpace> m_info;
+};
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
+{
+    const int kExpiryTimeout = 500;
+
+    NX_LOG(lit("%1 Preparing to get partitions info. Timeout is %2 ms.")
+           .arg(Q_FUNC_INFO)
+           .arg(kExpiryTimeout), cl_logDEBUG2);
+
+    PartitionInfoAsyncFetcher infoFetcher;
+    infoFetcher.setAutoDelete(false);
+
+    m_pool.start(&infoFetcher);
+    m_pool.waitForDone(kExpiryTimeout);
+    auto result = infoFetcher.getInfo();
+
+    if (result.isEmpty())
+    {
+        NX_LOG(lit("%1 Get partitions info result is empty. This might result in serious storage related problems.")
+               .arg(Q_FUNC_INFO)
+               .arg(kExpiryTimeout), cl_logWARNING);
+    }
+    else
+    {
+        NX_LOG(lit("%1 Get partitions info succeeded.").arg(Q_FUNC_INFO), cl_logDEBUG2);
+    }
+
+    return result;
 }
