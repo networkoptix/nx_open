@@ -20,82 +20,81 @@ namespace network {
 namespace cloud {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
-    TEST, CloudStreamSocketTcp,
+    TEST, CloudStreamSocketTcpIp,
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
 
-class CloudStreamSocketTest
-:
+class CloudStreamSocketTester:
+    public TCPServerSocket
+{
+public:
+    CloudStreamSocketTester(HostAddress host):
+        TCPServerSocket(AF_INET),
+        m_host(std::move(host))
+    {
+    }
+
+    ~CloudStreamSocketTester()
+    {
+        if (m_socketAddress)
+            SocketGlobals::addressResolver().removeFixedAddress(m_host, *m_socketAddress);
+    }
+
+    virtual bool bind(const SocketAddress& localAddress) override
+    {
+        if (!TCPServerSocket::bind(localAddress))
+            return false;
+
+        m_socketAddress = TCPServerSocket::getLocalAddress();
+        SocketGlobals::addressResolver().addFixedAddress(m_host, *m_socketAddress);
+        return true;
+    }
+
+    virtual SocketAddress getLocalAddress() const override
+    {
+        return m_socketAddress ? *m_socketAddress : SocketAddress();
+    }
+
+private:
+    const HostAddress m_host;
+    boost::optional<SocketAddress> m_socketAddress;
+};
+
+struct CloudStreamSocketTcpHost:
+    public ::testing::Test
+{
+    const HostAddress testHost;
+    CloudStreamSocketTcpHost(): testHost(id() + lit(".") + id()) {}
+    static QString id() { return QnUuid::createUuid().toSimpleString(); }
+};
+
+NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
+    TEST_F, CloudStreamSocketTcpHost,
+    [&]() { return std::make_unique<CloudStreamSocketTester>(testHost); },
+    [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
+    SocketAddress(testHost));
+
+class CloudStreamSocketTest:
     public ::testing::Test
 {
 public:
     ~CloudStreamSocketTest()
     {
         if (m_oldCreateStreamSocketFunc)
-            SocketFactory::setCreateStreamSocketFunc(
-                std::move(*m_oldCreateStreamSocketFunc));
+            SocketFactory::setCreateStreamSocketFunc(std::move(*m_oldCreateStreamSocketFunc));
     }
 
     void setCreateStreamSocketFunc(
         SocketFactory::CreateStreamSocketFuncType newFactoryFunc)
     {
-        auto oldFunc = 
-            SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
+        auto oldFunc = SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
         if (!m_oldCreateStreamSocketFunc)
             m_oldCreateStreamSocketFunc = std::move(oldFunc);
     }
 
 private:
-    boost::optional<SocketFactory::CreateStreamSocketFuncType> 
-        m_oldCreateStreamSocketFunc;
+    boost::optional<SocketFactory::CreateStreamSocketFuncType> m_oldCreateStreamSocketFunc;
 };
-
-TEST_F(CloudStreamSocketTest, simple)
-{
-    const char* tempHostName = "bla.bla";
-    const size_t bytesToSendThroughConnection = 128*1024;
-    const size_t repeatCount = 100;
-
-    //starting local tcp server
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::outgoing,
-        bytesToSendThroughConnection,
-        test::TestTransmissionMode::spam);
-    ASSERT_TRUE(server.start());
-
-    const auto serverAddress = server.addressBeingListened();
-
-    //registering local server address in AddressResolver
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    for (size_t i = 0; i < repeatCount; ++i)
-    {
-        //connecting with CloudStreamSocket to the local server
-        CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), 0));
-        QByteArray data;
-        data.resize(bytesToSendThroughConnection);
-        const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
-        ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
-    }
-
-    // also try to connect just by system name
-    {
-        CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
-        QByteArray data;
-        data.resize(bytesToSendThroughConnection);
-        const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
-        ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
-    }
-
-    server.pleaseStopSync();
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
 
 TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 {
@@ -155,92 +154,6 @@ const auto createClientSocketFunc =
     {
         return std::make_unique<CloudStreamSocket>(AF_INET);
     };
-
-TEST_F(CloudStreamSocketTest, simple_socket_test)
-{
-    const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(
-        HostAddress::localhost,
-        nx::utils::random::number<quint16>(20000, 50000));
-
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    test::socketSimpleSync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    test::socketSimpleAsync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    test::socketSimpleSync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress("bla"));
-
-    test::socketSimpleAsync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress("bla"));
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
-
-TEST_F(CloudStreamSocketTest, Shutdown)
-{
-    const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(
-        HostAddress::localhost,
-        nx::utils::random::number<quint16>(20000, 50000));
-
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    test::socketShutdown(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        false,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
-
-TEST_F(CloudStreamSocketTest, ShutdownAfterAsync)
-{
-    const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(
-        HostAddress::localhost,
-        nx::utils::random::number<quint16>(20000, 50000));
-
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    test::socketShutdown(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        true,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
 
 TEST_F(CloudStreamSocketTest, cancellation)
 {
