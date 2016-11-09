@@ -351,6 +351,7 @@ private:
     std::unique_ptr<nx::network::aio::Timer> m_timer;
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
+    int m_remotePeerEcProtoVersion;
 
 private:
     QnTransactionTransportBase(
