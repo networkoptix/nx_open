@@ -8,8 +8,8 @@
 #include <utils/common/counter.h>
 
 #include "data/system_data.h"
+#include "ec2/serialization/transaction_serializer.h"
 #include "ec2/transaction_log.h"
-#include "ec2/transaction_serializer.h"
 
 namespace nx {
 namespace cdb {

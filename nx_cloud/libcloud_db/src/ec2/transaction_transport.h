@@ -11,10 +11,10 @@
 #include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
+#include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
 #include "transaction_log_reader.h"
 #include "transaction_transport_header.h"
-#include "transaction_serializer.h"
 
 namespace nx {
 namespace cdb {

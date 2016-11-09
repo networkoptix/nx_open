@@ -2,14 +2,14 @@
 
 #include <transaction/transaction.h>
 
-#include "../transaction_serializer.h"
+#include "transaction_serializer.h"
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
 
 class SerializableAbstractTransaction:
-    public Serializable
+    public TransactionSerializer
 {
 public:
     virtual const ::ec2::QnAbstractTransaction& transactionHeader() const = 0;

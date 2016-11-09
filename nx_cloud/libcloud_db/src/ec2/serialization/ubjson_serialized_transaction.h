@@ -79,7 +79,7 @@ public:
 };
 
 class DummySerializable:
-    public Serializable
+    public TransactionSerializer
 {
 public:
     virtual nx::Buffer serialize(
@@ -116,6 +116,24 @@ public:
         BaseType(std::move(ubjsonData), serializedTransactionVersion)
     {
     }
+};
+
+class TransactionUbjsonDataSource
+{
+public:
+    QByteArray serializedTransaction;
+    QnUbjsonReader<QByteArray> stream;
+
+    TransactionUbjsonDataSource(QByteArray serializedTransactionVal):
+        serializedTransaction(std::move(serializedTransactionVal)),
+        stream(&serializedTransaction)
+    {
+    }
+
+    TransactionUbjsonDataSource(const TransactionUbjsonDataSource&) = delete;
+    TransactionUbjsonDataSource& operator=(const TransactionUbjsonDataSource&) = delete;
+    TransactionUbjsonDataSource(TransactionUbjsonDataSource&&) = default;
+    TransactionUbjsonDataSource& operator=(TransactionUbjsonDataSource&&) = default;
 };
 
 } // namespace ec2

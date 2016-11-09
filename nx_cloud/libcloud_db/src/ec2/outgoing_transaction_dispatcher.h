@@ -7,7 +7,7 @@
 #include <utils/common/subscription.h>
 
 #include "serialization/serializable_transaction.h"
-#include "transaction_serializer.h"
+#include "serialization/transaction_serializer.h"
 #include "transaction_transport_header.h"
 
 namespace nx {

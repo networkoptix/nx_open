@@ -17,10 +17,10 @@
 #include <transaction/transaction.h>
 #include <transaction/transaction_descriptor.h>
 
-#include "transaction_serializer.h"
+#include "serialization/transaction_serializer.h"
+#include "serialization/ubjson_serialized_transaction.h"
 #include "transaction_timestamp_calculator.h"
 #include "transaction_transport_header.h"
-#include "serialization/ubjson_serialized_transaction.h"
 
 namespace nx {
 
@@ -40,7 +40,7 @@ QString toString(const ::ec2::QnAbstractTransaction& tran);
 struct TransactionLogRecord
 {
     nx::Buffer hash;
-    std::unique_ptr<const Serializable> serializer;
+    std::unique_ptr<const TransactionSerializer> serializer;
 };
 
 class TransactionLog
