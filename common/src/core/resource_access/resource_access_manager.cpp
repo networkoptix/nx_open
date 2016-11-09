@@ -31,6 +31,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <utils/common/scoped_timer.h>
+
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
     QnUpdatable(),
@@ -267,6 +269,8 @@ void QnResourceAccessManager::afterUpdate()
 
 void QnResourceAccessManager::recalculateAllPermissions()
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (isUpdating())
         return;
 
