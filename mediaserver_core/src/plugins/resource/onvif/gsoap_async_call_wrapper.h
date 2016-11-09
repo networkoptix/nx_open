@@ -200,6 +200,8 @@ private:
         done
     };
 
+    static const int kMaxMessageLength = 1024 * 200; //< 200 KB should be enough
+
     virtual int onGsoapSendData(const char* data, size_t size) override
     {
         if( m_state == sendingRequest )
@@ -276,7 +278,7 @@ private:
 
         NX_ASSERT( m_state == receivingResponse );
 
-        if( errorCode || bytesRead == 0 )
+        if( errorCode || bytesRead == 0 || m_responseBuffer.size() > kMaxMessageLength)
         {
             m_state = done;
             int resultCode = m_responseBuffer.isEmpty()
