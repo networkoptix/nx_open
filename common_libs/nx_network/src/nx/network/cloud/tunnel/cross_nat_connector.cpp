@@ -88,6 +88,7 @@ void CrossNatConnector::stopWhileInAioThread()
     m_mediatorUdpClient.reset();
     m_connectors.clear();
     m_connectResultReportSender.reset();
+    m_connection.reset();
 }
 
 void CrossNatConnector::connect(
@@ -367,7 +368,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
 {
     api::ConnectRequest connectRequest;
 
-    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().getSelfPeerId();
+    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().getOrCreateSelfPeerId();
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();

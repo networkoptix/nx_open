@@ -69,18 +69,6 @@ class Socket
 {
 public:
     Socket(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-        int type,
-        int protocol,
-        int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
-    Socket(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-        int sockDesc,
-        int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
-    //TODO #ak remove following two constructors
-    Socket(
         int type,
         int protocol,
         int ipVersion,
@@ -155,7 +143,6 @@ public:
     bool createSocket( int type, int protocol );
 
 protected:
-    aio::BaseAsyncSocketImplHelper<Pollable>* m_baseAsyncHelper;
     const int m_ipVersion;
 
 private:
@@ -170,6 +157,8 @@ class CommunicatingSocket
 :
     public Socket<InterfaceToImplement>
 {
+    typedef CommunicatingSocket<InterfaceToImplement> SelfType;
+
 public:
     CommunicatingSocket(
         int type,
@@ -227,7 +216,7 @@ public:
     virtual bool shutdown() override;
 
 private:
-    aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
 };
 

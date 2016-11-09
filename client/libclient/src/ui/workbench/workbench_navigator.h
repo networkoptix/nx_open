@@ -20,6 +20,8 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/long_runnable.h>
+#include <utils/threaded_chunks_merge_tool.h>
+#include <camera/thumbnails_loader.h>
 
 class QAction;
 
@@ -30,7 +32,6 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveStreamReader;
-class QnThumbnailsLoader;
 class QnCachingCameraDataLoader;
 typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
 class QnCameraDataManager;
@@ -39,7 +40,6 @@ class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchQueryStrategy;
-class QnThreadedChunksMergeTool;
 class QnPendingOperation;
 class VariantAnimator;
 
@@ -286,7 +286,7 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
-    QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
+    std::map<QnMediaResourcePtr, std::unique_ptr<QnThumbnailsLoader>> m_thumbnailLoaderByResource;
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
@@ -295,7 +295,7 @@ private:
     QnCameraDataManager* m_cameraDataManager;
 
     int m_chunkMergingProcessHandle;
-    std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
+    std::array<std::unique_ptr<QnThreadedChunksMergeTool>, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnSecurityCamResourcePtr> m_updateHistoryQueue;
 

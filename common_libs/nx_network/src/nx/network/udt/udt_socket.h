@@ -150,7 +150,7 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    std::unique_ptr<aio::AsyncSocketImplHelper<Pollable>> m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay;
 
 private:
