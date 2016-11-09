@@ -27,6 +27,7 @@
 #include <api/global_settings.h>
 
 #include <nx/utils/string.h>
+#include <network/system_helpers.h>
 
 namespace {
 
@@ -249,7 +250,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server && server->getStatus() == Qn::Online
-        && moduleInformation.localSystemId == qnGlobalSettings->localSystemId())
+        && helpers::serverFromCurrentSystem(moduleInformation))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {

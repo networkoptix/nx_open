@@ -31,4 +31,10 @@ bool isNewSystem(const QnConnectionInfo& info);
 bool isNewSystem(const QnModuleInformation& info);
 bool isNewSystem(const QnCloudSystem& info);
 
+QnUuid currentSystemLocalId();
+
+bool currentSystemIsNew();
+
+bool serverFromCurrentSystem(const QnModuleInformation& info);
+
 } // helpers

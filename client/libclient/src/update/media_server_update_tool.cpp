@@ -21,6 +21,7 @@
 #include <utils/common/app_info.h>
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
+#include <network/system_helpers.h>
 
 namespace {
 
@@ -151,7 +152,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
 
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
     {
-        if (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemId() &&
+        if (helpers::serverFromCurrentSystem(server->getModuleInformation()) &&
             server.dynamicCast<QnFakeMediaServerResource>())
         {
             result.append(server);

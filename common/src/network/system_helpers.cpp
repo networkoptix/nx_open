@@ -3,7 +3,9 @@
 #include <network/cloud_system_data.h>
 #include <network/module_information.h>
 #include <api/model/connection_info.h>
+#include <api/global_settings.h>
 #include <utils/common/id.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -127,6 +129,22 @@ bool isNewSystem(const QnModuleInformation& info)
 bool isNewSystem(const QnCloudSystem& info)
 {
     return info.localId.isNull();
+}
+
+QnUuid currentSystemLocalId()
+{
+    const auto localId = qnGlobalSettings->localSystemId();
+    return (localId.isNull() ? qnCommon->remoteGUID() : localId);
+}
+
+bool serverFromCurrentSystem(const QnModuleInformation& info)
+{
+    return (getLocalSystemId(info) == currentSystemLocalId());
+}
+
+bool currentSystemIsNew()
+{
+    return qnGlobalSettings->localSystemId().isNull();
 }
 
 } // namespace helpers

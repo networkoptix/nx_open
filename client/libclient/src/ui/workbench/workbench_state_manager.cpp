@@ -13,6 +13,7 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <network/system_helpers.h>
 
 namespace {
 static const int kSavedStatesLimit = 20;
@@ -36,7 +37,7 @@ bool QnWorkbenchStateManager::tryClose(bool force)
         !qnCommon->remoteGUID().isNull()
         && qnRuntime->isDesktopMode()
         && context()->user()
-        && !qnGlobalSettings->localSystemId().isNull()
+        && !helpers::currentSystemIsNew()
         && workbench()->currentLayoutIndex() != -1;
 
     if (canSaveState)
@@ -56,7 +57,7 @@ bool QnWorkbenchStateManager::tryClose(bool force)
 
 void QnWorkbenchStateManager::saveState()
 {
-    auto localId = qnGlobalSettings->localSystemId();
+    auto localId = helpers::currentSystemLocalId();
     auto userId = context()->user()->getId();
     if (localId.isNull() || userId.isNull())
     {
@@ -88,9 +89,10 @@ void QnWorkbenchStateManager::saveState()
 
 void QnWorkbenchStateManager::restoreState()
 {
-    auto localId = qnGlobalSettings->localSystemId();
+    auto localId = helpers::currentSystemLocalId();
+
     auto userId = context()->user()->getId();
-    if (localId.isNull() || userId.isNull())
+    if (userId.isNull())
     {
         NX_ASSERT(false, "Invalid connections state");
         return;

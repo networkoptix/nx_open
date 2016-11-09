@@ -51,6 +51,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <core/resource/fake_media_server.h>
+#include <network/system_helpers.h>
 
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
@@ -444,8 +445,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return bastardNode;
 
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
-        auto systemId = server->getModuleInformation().localSystemId;
-        if (systemId == qnGlobalSettings->localSystemId())
+        if (helpers::serverFromCurrentSystem(server->getModuleInformation()))
             return m_rootNodes[Qn::ServersNode];
 
         return ensureSystemNode(server->getModuleInformation().systemName);
