@@ -67,13 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (별도 서버가 존재 하는 경우)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (현재 PC를 사용하는 경우)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">관리자 비밀번호를 입력하십시오.</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">관리자 자격 확인</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">관리자 자격 확인</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">로그인</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">비밀번호 생성</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">비밀번호 확인</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">설정 오류</String>

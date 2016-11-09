@@ -67,13 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (我想要瀏覽錄在其它地方的影像)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (我想要在本機錄影)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">請輸入管理者密碼</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">管理者密碼</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">管理者密碼</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">登入</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">建立密碼</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">確認密碼</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">設定錯誤</String>

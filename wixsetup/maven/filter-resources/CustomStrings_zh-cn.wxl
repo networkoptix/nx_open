@@ -67,13 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (客户端，可以使用它访问视频和录像)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，用于视频流媒体转发及录像存储)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">请输入管理员密码</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">管理员认证</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">管理员认证</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">用户名</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">创建密码</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">确认密码</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">设置错误</String>

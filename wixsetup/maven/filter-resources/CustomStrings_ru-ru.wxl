@@ -67,13 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (Я хочу смотреть видео, записанное в другом месте)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Я хочу вести локальную запись на этом ПК)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Введите пароль администратора</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Аутентификация администратора</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Аутентификация администратора</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Имя пользователя</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Придумайте пароль</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Подтвердите пароль</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Ошибка настройки</String>

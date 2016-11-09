@@ -67,13 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (ฉันต้องการที่จะดูวิดีโอที่บันทึกไว้ในที่อื่น)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (ฉันต้องการที่จะบันทึกไว้บนเครื่องคอมพิวเตอร์นี้)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">กรุณาป้อนรหัสผ่านของผู้ดูแลระบบ</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">สิทธิของผู้ดูแล</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">สิทธิของผู้ดูแล</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">เข้าสู่ระบบ</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">สร้างรหัสผ่าน</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">ยืนยันรหัสผ่าน</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">เกิดข้อผิดพลาดในการกำหนดค่า</String>

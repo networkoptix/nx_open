@@ -67,14 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (I want to view video recorded elsewhere)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (I want to record locally on this PC)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Lütfen yönetici şifresini girin</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Yönetici Bilgileri</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Yönetici Bilgileri</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Giriş</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">şifre oluştur</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Şifreyi onayla</String>
-    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">Sunucu adı</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">konfigürasyon hatası</String>

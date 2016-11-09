@@ -67,13 +67,6 @@
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (Je veux voir le vidéo enregistré ailleurs)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Je veux enregistrer localement sur ce PC)</String>
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">S.V.P. Entrer le mot de passe administrateur</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Identification de l'administrateur</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Identification de l'administrateur</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Identifiant</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Créer mot de passe</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Confirmer mot de passe</String>
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Erreur de configuration</String>
