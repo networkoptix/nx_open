@@ -485,10 +485,12 @@ void AddressResolver::mediatorResolve(
         resolveResult = SystemError::hostNotFound;
     }
 
-    {
-        QnMutexUnlocker ulk(lk);
-        grabHandlers(resolveResult, info);
-    }
+    const auto unlockedGuard = makeScopedGuard(
+        [lk, guards = grabHandlers(resolveResult, info)]() mutable
+        {
+            QnMutexUnlocker ulk(lk);
+            guards.clear();
+        });
 
     if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
         return dnsResolve(info, lk, false, ipVersion);
