@@ -1,4 +1,4 @@
-#include "outgoing_cross_nat_tunnel_watcher.h"
+#include "outgoing_tunnel_connection_watcher.h"
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
