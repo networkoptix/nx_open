@@ -7,6 +7,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace test {
 
 namespace {
 
@@ -34,24 +35,24 @@ public:
 constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
 constexpr auto allowedTimerError = std::chrono::seconds(5);
 
-class OutgoingCrossNatTunnelWatcherTest:
+class OutgoingTunnelConnectionWatcher:
     public ::testing::Test
 {
 public:
-    OutgoingCrossNatTunnelWatcherTest()
+    OutgoingTunnelConnectionWatcher()
     {
         m_connectionParameters.tunnelInactivityTimeout =
             tunnelInactivityTimeout;
     }
     
-    ~OutgoingCrossNatTunnelWatcherTest()
+    ~OutgoingTunnelConnectionWatcher()
     {
     }
 
 protected:
     void initializeTunnel()
     {
-        m_tunnel = std::make_unique<OutgoingTunnelConnectionWatcher>(
+        m_tunnel = std::make_unique<cloud::OutgoingTunnelConnectionWatcher>(
             m_connectionParameters,
             std::make_unique<TestTunnelConnection>());
 
@@ -72,13 +73,13 @@ protected:
     }
 
     nx::hpm::api::ConnectionParameters m_connectionParameters;
-    std::unique_ptr<OutgoingTunnelConnectionWatcher> m_tunnel;
+    std::unique_ptr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
 };
 
 } // namespace
 
-TEST_F(OutgoingCrossNatTunnelWatcherTest, unusedTunnel)
+TEST_F(OutgoingTunnelConnectionWatcher, unusedTunnel)
 {
     initializeTunnel();
 
@@ -86,7 +87,7 @@ TEST_F(OutgoingCrossNatTunnelWatcherTest, unusedTunnel)
     waitForTunnelToExpire(tunnelClosedFuture);
 }
 
-TEST_F(OutgoingCrossNatTunnelWatcherTest, usingTunnel)
+TEST_F(OutgoingTunnelConnectionWatcher, usingTunnel)
 {
     initializeTunnel();
 
@@ -116,6 +117,7 @@ TEST_F(OutgoingCrossNatTunnelWatcherTest, usingTunnel)
     waitForTunnelToExpire(tunnelClosedFuture);
 }
 
+} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx
