@@ -22,6 +22,18 @@
 
 namespace ec2 {
 
+template<typename RequestData>
+void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
+{
+}
+
+template<>
+void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
+{
+    if (userData->isCloud && userData->name.isEmpty())
+        userData->name = userData->email;
+}
+
 /**
  * RestAPI request handler for update requests.
  */
@@ -488,18 +500,6 @@ private:
 
         NX_LOG(lm("END merge: new value: %1").arg(QJson::serialize(*existingValue)),
             cl_logDEBUG2);
-    }
-
-    template<typename RequestData>
-    void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
-    {
-    }
-
-    template<>
-    void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
-    {
-        if (userData->isCloud && userData->name.isEmpty())
-            userData->name = userData->email;
     }
 
 private:
