@@ -59,7 +59,7 @@ Pane
         {
             Layout.fillWidth: true
             text: login ? login
-                        : qsTr("Login to %1").arg(applicationInfo.cloudName())
+                        : qsTr("Log in to %1").arg(applicationInfo.cloudName())
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 14
             font.weight: Font.DemiBold
