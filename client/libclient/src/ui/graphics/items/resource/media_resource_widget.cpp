@@ -1753,8 +1753,7 @@ void QnMediaResourceWidget::updateAspectRatio()
     NX_ASSERT(!qFuzzyIsNull(baseAspectRatio));
     if (save)
     {
-        auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        if (camera)
+        if (auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
         {
             const QString resourceId = camera->getPhysicalId();
             QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
