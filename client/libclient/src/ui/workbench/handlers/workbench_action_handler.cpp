@@ -181,7 +181,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     m_tourTimer(new QTimer(this))
 {
     connect(m_tourTimer, SIGNAL(timeout()), this, SLOT(at_tourTimer_timeout()));
-    connect(context(), SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnWorkbenchActionHandler::at_context_userChanged);
 
     connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
@@ -189,9 +190,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
 
     connect(action(QnActions::ShowcaseAction), SIGNAL(triggered()), this, SLOT(at_showcaseAction_triggered()));
     connect(action(QnActions::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
-    /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
-    * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
-    * To make dialogs work we're using queued connection here. */
     connect(action(QnActions::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 

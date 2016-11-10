@@ -89,25 +89,20 @@ void QnWorkbenchStateManager::saveState()
 
 void QnWorkbenchStateManager::restoreState()
 {
-    auto localId = helpers::currentSystemLocalId();
-
-    auto userId = context()->user()->getId();
-    if (userId.isNull())
-    {
-        NX_ASSERT(false, "Invalid connections state");
+    const auto user = context()->user();
+    NX_ASSERT(user, "Invalid connections state");
+    if (!user)
         return;
-    }
 
     auto states = qnSettings->workbenchStates();
-    for (auto state : states)
-    {
-        if (state.localSystemId == localId
-            && state.userId == userId)
+    auto iter = std::find_if(states.cbegin(), states.cend(),
+        [userId = user->getId(), localId = helpers::currentSystemLocalId()]
+        (const QnWorkbenchState& state)
         {
-            workbench()->update(state);
-            break;
-        }
-    }
+            return state.localSystemId == localId && state.userId == userId;
+        });
+    if (iter != states.cend())
+        workbench()->update(*iter);
 }
 
 void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)
