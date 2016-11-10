@@ -356,7 +356,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             if (m_logicalState == LogicalState::disconnected)
                 return;
 
-            /* Check if we need to logout if logged in under this user. */
+            /* Check if we need to log out if logged in under this user. */
             QString currentLogin = QnAppServerConnectionFactory::url().userName();
             NX_ASSERT(!currentLogin.isEmpty());
             if (currentLogin.isEmpty())

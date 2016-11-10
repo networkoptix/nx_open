@@ -972,7 +972,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
-        text(tr("Logout from %1", "Logout from Nx Cloud").arg(QnAppInfo::cloudName()));
+        text(tr("Log out from %1", "Log out from Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
