@@ -801,10 +801,10 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
             updateItemDataFromSlider(widget);
     }
 
-    auto iter = m_syncedResources.find(syncedResource);
-    bool noMoreWidgetsOfThisResource = iter == m_syncedResources.end();
+    bool noMoreWidgetsOfThisResource = true;
 
-    if (!noMoreWidgetsOfThisResource)
+    auto iter = m_syncedResources.find(syncedResource);
+    if (iter != m_syncedResources.end())
     {
         NX_EXPECT(iter.value() > 0);
         noMoreWidgetsOfThisResource = (--iter.value() <= 0);
