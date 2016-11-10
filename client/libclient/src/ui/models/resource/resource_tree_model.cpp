@@ -445,7 +445,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return bastardNode;
 
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
-        if (helpers::serverFromCurrentSystem(server->getModuleInformation()))
+        if (helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
             return m_rootNodes[Qn::ServersNode];
 
         return ensureSystemNode(server->getModuleInformation().systemName);

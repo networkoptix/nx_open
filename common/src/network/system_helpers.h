@@ -35,6 +35,6 @@ QnUuid currentSystemLocalId();
 
 bool currentSystemIsNew();
 
-bool serverFromCurrentSystem(const QnModuleInformation& info);
+bool serverBelongsToCurrentSystem(const QnModuleInformation& info);
 
 } // helpers

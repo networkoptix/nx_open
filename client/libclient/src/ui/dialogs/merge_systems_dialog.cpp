@@ -250,7 +250,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server && server->getStatus() == Qn::Online
-        && helpers::serverFromCurrentSystem(moduleInformation))
+        && helpers::serverBelongsToCurrentSystem(moduleInformation))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {

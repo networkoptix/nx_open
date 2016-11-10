@@ -124,7 +124,7 @@ QnUuid currentSystemLocalId()
     return (localId.isNull() ? qnCommon->remoteGUID() : localId);
 }
 
-bool serverFromCurrentSystem(const QnModuleInformation& info)
+bool serverBelongsToCurrentSystem(const QnModuleInformation& info)
 {
     return (getLocalSystemId(info) == currentSystemLocalId());
 }

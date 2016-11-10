@@ -87,7 +87,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
 {
     return !info.localSystemId.isNull()
-        && helpers::serverFromCurrentSystem(info)
+        && helpers::serverBelongsToCurrentSystem(info)
         && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
