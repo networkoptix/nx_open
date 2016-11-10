@@ -968,11 +968,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to %1...", "Login to Nx Cloud").arg(QnAppInfo::cloudName()));
+        text(tr("Log in to %1...", "Log in to Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
-        text(tr("Logout from %1", "Logout from Nx Cloud").arg(QnAppInfo::cloudName()));
+        text(tr("Log out from %1", "Log out from Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).

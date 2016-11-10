@@ -84,6 +84,16 @@ bool QnResourceAccessSubject::isValid() const
     return d_ptr->isValid();
 }
 
+bool QnResourceAccessSubject::isUser() const
+{
+    return !d_ptr->user.isNull();
+}
+
+bool QnResourceAccessSubject::isRole() const
+{
+    return !d_ptr->role.isNull();
+}
+
 QnUuid QnResourceAccessSubject::id() const
 {
     return d_ptr->id();

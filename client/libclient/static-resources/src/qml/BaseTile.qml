@@ -18,7 +18,8 @@ Item
     property alias titleLabel: systemNameLabel;
     property alias collapseButton: collapseTileButton;
     property alias menuButton: menuButtonControl;
-    property alias indicator: indicatorControl;
+    property alias indicator: primaryIndicator;
+    property alias secondaryIndicator: otherIndicator;
 
     property alias areaLoader: areaLoader;
 
@@ -30,7 +31,6 @@ Item
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
-    property bool animating: false;
 
     signal collapsedTileClicked();
 
@@ -56,6 +56,28 @@ Item
     implicitWidth: 280;
     implicitHeight: 96;
     z: (transition.running ? 100 : 0)
+
+    Connections
+    {
+        /**
+          * Workaround for missing tile.
+          * In case of shrinking tile, When tile parent moves in grid on another position
+          * it can land to the wrong (previous) pos. It is because transition stores initial
+          * values and don't update them until next run.
+          * We restart transition in this case. It fixes bug.
+          */
+        target: parent;
+
+        onXChanged:
+        {
+            if (transition.running && tileHolder.state == "collapsed")
+            {
+                tileHolder.state = "expanded"
+                tileHolder.state = "collapsed"
+            }
+        }
+    }
+
 
     Item
     {
@@ -101,7 +123,13 @@ Item
 
                 PropertyChanges
                 {
-                    target: indicator;
+                    target: primaryIndicator;
+                    opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: otherIndicator;
                     opacity: 1;
                 }
 
@@ -146,7 +174,13 @@ Item
 
                 PropertyChanges
                 {
-                    target: indicator;
+                    target: primaryIndicator;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: otherIndicator;
                     opacity: 0;
                 }
 
@@ -212,7 +246,16 @@ Item
 
                     NumberAnimation
                     {
-                        target: indicator;
+                        target: primaryIndicator;
+                        properties: "opacity";
+                        easing.type: (tileHolder.state == "collapsed" ?
+                              Easing.InCubic : Easing.OutCubic);
+                        duration: control.getDuration(200);
+                    }
+
+                    NumberAnimation
+                    {
+                        target: otherIndicator;
                         properties: "opacity";
                         easing.type: (tileHolder.state == "collapsed" ?
                               Easing.InCubic : Easing.OutCubic);
@@ -313,13 +356,25 @@ Item
 
                     disableable: false;
                     anchors.left: parent.left;
-                    anchors.right: (collapseTileButton.visible ? collapseTileButton.left :
-                        (menuButtonControl.visible ? menuButtonControl.left : parent.right));
+                    anchors.right:
+                    {
+                        if (collapseTileButton.visible)
+                            return collapseTileButton.left;
+
+                        if (menuButtonControl.visible)
+                            menuButtonControl.left;
+
+                        return (hideTileButton.visible ? hideTileButton.left : parent.right);
+                    }
                     anchors.top: parent.top;
 
                     anchors.leftMargin: 16;
-                    anchors.rightMargin: (collapseTileButton.visible || menuButtonControl.visible ?
-                        0 : anchors.leftMargin);
+                    anchors.rightMargin:
+                    {
+                        return (collapseTileButton.visible || menuButtonControl.visible
+                            || hideTileButton.visible ? 0 : anchors.leftMargin);
+                    }
+
                     anchors.topMargin: 12;
 
                     elide: Text.ElideRight;
@@ -403,17 +458,31 @@ Item
                     sourceComponent: control.centralAreaDelegate;
                 }
 
-                Indicator
+
+                Row
                 {
-                    id: indicatorControl;
-
-                    visible: false;
-
                     anchors.right: parent.right;
                     anchors.top: parent.top;
                     anchors.rightMargin: 14;
                     anchors.topMargin: 66;
+
+                    spacing: 2;
+
+                    Indicator
+                    {
+                        id: otherIndicator;
+
+                        visible: false;
+                    }
+
+                    Indicator
+                    {
+                        id: primaryIndicator;
+
+                        visible: false;
+                    }
                 }
+
             }
 
             NxDotPreloader

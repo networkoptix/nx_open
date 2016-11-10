@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>323</width>
-    <height>279</height>
+    <height>305</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Login to Cloud</string>
+   <string>Log in to Cloud</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
@@ -101,7 +101,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Login</string>
+         <string>Log in</string>
         </property>
        </widget>
       </item>
@@ -234,15 +234,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnInputField</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnPanel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/panel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnInputField</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/input_field.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

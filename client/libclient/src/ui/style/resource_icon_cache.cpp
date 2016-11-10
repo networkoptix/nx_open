@@ -14,6 +14,7 @@
 
 #include <ui/style/skin.h>
 #include <api/global_settings.h>
+#include <network/system_helpers.h>
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -210,7 +211,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             case Qn::Incompatible:
                 if (auto server = resource.dynamicCast<QnMediaServerResource>())
                 {
-                    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
+                    if (!helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
                     {
                         status = Online;
                         break;

@@ -193,14 +193,14 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
 void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 

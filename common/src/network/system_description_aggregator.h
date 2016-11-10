@@ -55,6 +55,8 @@ public: // overrides
 
     bool hasInternet() const override;
 
+    bool safeMode() const override;
+
 private:
     void emitHeadChanged();
 
@@ -65,6 +67,8 @@ private:
     void updateServers();
 
     void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
+
+    bool invalidSystem() const;
 
 private:
     typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;

@@ -74,7 +74,7 @@
 #include <utils/common/delayed.h>
 #include <network/module_finder.h>
 #include <network/router.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
@@ -356,7 +356,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             if (m_logicalState == LogicalState::disconnected)
                 return;
 
-            /* Check if we need to logout if logged in under this user. */
+            /* Check if we need to log out if logged in under this user. */
             QString currentLogin = QnAppServerConnectionFactory::url().userName();
             NX_ASSERT(!currentLogin.isEmpty());
             if (currentLogin.isEmpty())
@@ -431,7 +431,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
-            if (connectionInfo.newSystem)
+            if (helpers::isNewSystem(connectionInfo))
             {
                 disconnectFromServer(true);
                 auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();

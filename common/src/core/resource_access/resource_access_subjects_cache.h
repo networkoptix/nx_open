@@ -21,21 +21,23 @@ public:
     QList<QnResourceAccessSubject> allSubjects() const;
 
     /** List of users, belonging to given role. */
-    QList<QnResourceAccessSubject> dependentSubjects(const QnResourceAccessSubject& subject) const;
+    QList<QnResourceAccessSubject> usersInRole(const QnUuid& roleId) const;
 
 private:
     void handleUserAdded(const QnUserResourcePtr& user);
     void handleUserRemoved(const QnUserResourcePtr& user);
-    void updateUserDependency(const QnUserResourcePtr& user);
+    void updateUserRole(const QnUserResourcePtr& user);
 
     void handleRoleAdded(const ec2::ApiUserGroupData& userRole);
     void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
+
+    void removeUserFromRole(const QnUserResourcePtr& user, const QnUuid& roleId);
 private:
     mutable QnMutex m_mutex;
 
     QList<QnResourceAccessSubject> m_subjects;
     QHash<QnUuid, QnUuid> m_roleByUser;
-    QHash<QnUuid, QList<QnResourceAccessSubject>> m_dependent;
+    QHash<QnUuid, QList<QnResourceAccessSubject>> m_usersByRole;
 };
 
 #define qnResourceAccessSubjectsCache QnResourceAccessSubjectsCache::instance()
