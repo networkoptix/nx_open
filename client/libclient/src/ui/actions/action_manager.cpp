@@ -1205,15 +1205,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
-    factory(QnActions::ResetVideoWallLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        text(tr("Update Layout")).
-        autoRepeat(false).
-        condition(new QnConjunctionActionCondition(
-            new QnResetVideoWallLayoutActionCondition(this),
-            new QnForbiddenInSafeModeCondition(this),
-            this));
-
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
