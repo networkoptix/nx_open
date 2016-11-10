@@ -54,11 +54,11 @@ QList<QnResourceAccessSubject> QnResourceAccessSubjectsCache::allSubjects() cons
     return m_subjects;
 }
 
-QList<QnResourceAccessSubject> QnResourceAccessSubjectsCache::dependentSubjects(
-    const QnResourceAccessSubject& subject) const
+QList<QnResourceAccessSubject> QnResourceAccessSubjectsCache::usersInRole(
+    const QnUuid& roleId) const
 {
     QnMutexLocker lk(&m_mutex);
-    return m_dependent.value(subject.id());
+    return m_usersByRole.value(roleId);
 }
 
 void QnResourceAccessSubjectsCache::handleUserAdded(const QnUserResourcePtr& user)
@@ -70,9 +70,9 @@ void QnResourceAccessSubjectsCache::handleUserAdded(const QnUserResourcePtr& use
     }
 
     connect(user, &QnUserResource::userGroupChanged, this,
-        &QnResourceAccessSubjectsCache::updateUserDependency);
+        &QnResourceAccessSubjectsCache::updateUserRole);
 
-    updateUserDependency(user);
+    updateUserRole(user);
 }
 
 void QnResourceAccessSubjectsCache::handleUserRemoved(const QnUserResourcePtr& user)
@@ -83,15 +83,10 @@ void QnResourceAccessSubjectsCache::handleUserRemoved(const QnUserResourcePtr& u
     QnMutexLocker lk(&m_mutex);
     m_subjects.removeOne(subject);
     const auto roleId = m_roleByUser.take(user->getId());
-    if (!roleId.isNull())
-    {
-        m_dependent[roleId].removeOne(subject);
-        if (m_dependent[roleId].isEmpty())
-            m_dependent.remove(roleId);
-    }
+    removeUserFromRole(user, roleId);
 }
 
-void QnResourceAccessSubjectsCache::updateUserDependency(const QnUserResourcePtr& user)
+void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user)
 {
     const auto id = user->getId();
 
@@ -101,17 +96,12 @@ void QnResourceAccessSubjectsCache::updateUserDependency(const QnUserResourcePtr
     if (oldRoleId == newRoleId)
         return;
 
-    if (!oldRoleId.isNull())
-    {
-        m_dependent[oldRoleId].removeOne(user);
-        if (m_dependent[oldRoleId].isEmpty())
-            m_dependent.remove(oldRoleId);
-    }
+    removeUserFromRole(user, oldRoleId);
 
     if (!newRoleId.isNull())
     {
         m_roleByUser[id] = newRoleId;
-        m_dependent[newRoleId].append(user);
+        m_usersByRole[newRoleId].append(user);
     }
 }
 
@@ -126,16 +116,32 @@ void QnResourceAccessSubjectsCache::handleRoleAdded(const ec2::ApiUserGroupData&
         if (subject.user() && subject.user()->userGroup() == userRole.id)
             children << subject;
     }
+
     if (children.isEmpty())
-        m_dependent.remove(userRole.id);
+        m_usersByRole.remove(userRole.id);
     else
-        m_dependent[userRole.id] = children;
+        m_usersByRole[userRole.id] = children;
 }
 
 void QnResourceAccessSubjectsCache::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     QnMutexLocker lk(&m_mutex);
     m_subjects.removeOne(userRole);
-    /* We are intentionally do not clear m_dependent field to make sure users with this role
+    /* We are intentionally do not clear m_usersByRole field to make sure users with this role
      * will be correctly processed later. */
+}
+
+void QnResourceAccessSubjectsCache::removeUserFromRole(const QnUserResourcePtr& user,
+    const QnUuid& roleId)
+{
+    if (roleId.isNull())
+        return;
+
+    auto users = m_usersByRole.find(roleId);
+    if (users == m_usersByRole.end())
+        return;
+
+    users->removeOne(user);
+    if (users->isEmpty())
+        m_usersByRole.erase(users);
 }

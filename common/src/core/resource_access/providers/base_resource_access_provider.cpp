@@ -141,8 +141,11 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     emit accessChanged(subject, resource, newValue ? baseSource() : Source::none);
 
-    for (const auto& dependent: qnResourceAccessSubjectsCache->dependentSubjects(subject))
-        updateAccess(dependent, resource);
+    if (subject.isRole())
+    {
+        for (const auto& dependent: qnResourceAccessSubjectsCache->usersInRole(subject.role().id))
+            updateAccess(dependent, resource);
+    }
 }
 
 void QnBaseResourceAccessProvider::fillProviders(
@@ -214,7 +217,7 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData
         return;
 
     handleSubjectRemoved(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateAccessBySubject(subject);
 }
 

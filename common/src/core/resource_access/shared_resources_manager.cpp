@@ -124,7 +124,7 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupD
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         setSharedResourcesInternal(subject, kEmpty);
 }
 
