@@ -364,7 +364,7 @@ private:
             ErrorCode errorCode = (EXPR); \
             if (errorCode != ErrorCode::ok) \
             { \
-                NX_LOG((MESSAGE), cl_logWARNING); \
+                NX_LOG((MESSAGE) + lit(". ecode: %1").arg(toString(errorCode)), cl_logWARNING); \
                 return errorCode; \
             } \
         } while (0)
