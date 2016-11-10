@@ -21,25 +21,12 @@ namespace ec2 {
 
 namespace detail {
 
-struct SendTransactionFunction
+class ServerQueryProcessor;
+
+struct PostProcessTransactionFunction
 {
     template<class T>
-    void operator()(const QnTransaction<T>& tran) const
-    {
-        // Local transactions (such as setStatus for servers) should only be sent to clients.
-        if (tran.isLocal())
-        {
-            QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
-            // Important check. Empty target means "send to all peers".
-            if (!clients.isEmpty())
-                qnTransactionBus->sendTransaction(tran, clients);
-        }
-        else
-        {
-            // Send transaction to all peers.
-            qnTransactionBus->sendTransaction(tran);
-        }
-    }
+    void operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const;
 };
 
 class ServerQueryProcessor
@@ -76,9 +63,9 @@ public:
             handler,
             [this](
                 QnTransaction<QueryDataType>& tran,
-                std::list<std::function<void()>>* const transactionsToSend) -> ErrorCode
+                std::list<std::function<void()>>* const transactionsPostProcessList) -> ErrorCode
             {
-                return processUpdateSync(tran, transactionsToSend);
+                return processUpdateSync(tran, transactionsPostProcessList);
             });
     }
 
@@ -263,6 +250,23 @@ public:
 
     void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
 
+    template<class DataType>
+    void triggerNotification(
+        const AbstractECConnectionPtr& connection,
+        const QnTransaction<DataType>& tran)
+    {
+        // Add audit record before notification to ensure removed resource is still alive.
+        if (m_auditManager)
+        {
+            m_auditManager->addAuditRecord(
+                tran.command,
+                tran.params,
+                m_authSession);
+        }
+
+        connection->notificationManager()->triggerNotification(tran);
+    }
+
 private:
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
@@ -286,13 +290,13 @@ private:
 
         // Starting transaction.
         std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
-        std::list<std::function<void()>> transactionsToSend;
+        std::list<std::function<void()>> transactionsPostProcessList;
 
         if(ApiCommand::isPersistent(tran.command))
         {
             dbTran.reset(new detail::QnDbManager::QnDbTransactionLocker(
                 dbManager(m_userAccessData).getTransaction()));
-            errorCode = syncFunction(tran, &transactionsToSend);
+            errorCode = syncFunction(tran, &transactionsPostProcessList);
             if(errorCode != ErrorCode::ok)
                 return;
             if (!dbTran->commit())
@@ -303,12 +307,12 @@ private:
         }
         else
         {
-            transactionsToSend.push_back(std::bind(SendTransactionFunction(), tran));
+            transactionsPostProcessList.push_back(std::bind(PostProcessTransactionFunction(), this, tran));
         }
 
         // Sending transactions.
-        for(auto& sendCommand: transactionsToSend)
-            sendCommand();
+        for(auto& postProcessAction : transactionsPostProcessList)
+            postProcessAction();
 
         // Handler is invoked asynchronously.
     }
@@ -329,32 +333,32 @@ private:
     ErrorCode removeHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        std::list<std::function<void()>>* const transactionsToSend,
+        std::list<std::function<void()>>* const transactionsPostProcessList,
         TransactionType::Value transactionType = TransactionType::Regular);
 
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        std::list<std::function<void()>>* const transactionsToSend);
+        std::list<std::function<void()>>* const transactionsPostProcessList);
 
     ErrorCode removeObjParamsHelper(
         const QnTransaction<ApiIdData>& tran,
         const AbstractECConnectionPtr& connection,
-        std::list<std::function<void()>>* const transactionsToSend);
+        std::list<std::function<void()>>* const transactionsPostProcessList);
 
     ErrorCode removeObjAccessRightsHelper(
         const QnUuid& id,
-        std::list<std::function<void()>>* const transactionsToSend);
+        std::list<std::function<void()>>* const transactionsPostProcessList);
 
     ErrorCode removeResourceStatusHelper(
         const QnUuid& id,
-        std::list<std::function<void()>>* const transactionsToSend,
+        std::list<std::function<void()>>* const transactionsPostProcessList,
         TransactionType::Value transactionType = TransactionType::Regular);
 
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
-        std::list<std::function<void()>>* const transactionsToSend)
+        std::list<std::function<void()>>* const transactionsPostProcessList)
     {
         ErrorCode errorCode = ErrorCode::ok;
         auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -364,7 +368,7 @@ private:
             ErrorCode errorCode = (EXPR); \
             if (errorCode != ErrorCode::ok) \
             { \
-                NX_LOG((MESSAGE) + lit(". ecode: %1").arg(toString(errorCode)), cl_logWARNING); \
+                NX_LOG((MESSAGE), cl_logWARNING); \
                 return errorCode; \
             } \
         } while (0)
@@ -377,17 +381,17 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeCameraUserAttributes,
-                        transactionsToSend),
+                        transactionsPostProcessList),
                     lit("Remove camera attributes failed"));
 
                 RUN_AND_CHECK_ERROR(
-                    removeObjParamsHelper(tran, connection, transactionsToSend),
+                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
                     lit("Remove camera params failed"));
 
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsToSend),
+                        transactionsPostProcessList),
                     lit("Remove resource access status failed"));
 
                 break;
@@ -399,11 +403,11 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeServerUserAttributes,
-                        transactionsToSend),
+                        transactionsPostProcessList),
                     lit("Remove server attrs failed"));
 
                 RUN_AND_CHECK_ERROR(
-                    removeObjParamsHelper(tran, connection, transactionsToSend),
+                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
                     lit("Remove server params failed"));
 
                 RUN_AND_CHECK_ERROR(
@@ -413,13 +417,13 @@ private:
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
-                        transactionsToSend),
+                        transactionsPostProcessList),
                     lit("Remove server child resources failed"));
 
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsToSend,
+                        transactionsPostProcessList,
                         TransactionType::Local),
                     lit("Remove resource status failed"));
 
@@ -431,7 +435,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsToSend),
+                        transactionsPostProcessList),
                     lit("Remove resource status failed"));
 
                 break;
@@ -440,7 +444,7 @@ private:
             case ApiObject_User:
             {
                 RUN_AND_CHECK_ERROR(
-                    removeObjParamsHelper(tran, connection, transactionsToSend),
+                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
                     lit("Remove user params failed"));
 
                 RUN_AND_CHECK_ERROR(
@@ -450,7 +454,7 @@ private:
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
-                        transactionsToSend),
+                        transactionsPostProcessList),
                     lit("Remove user child resources failed"));
 
                 break;
@@ -463,7 +467,7 @@ private:
         RUN_AND_CHECK_ERROR(
             removeObjAccessRightsHelper(
                 tran.params.id,
-                transactionsToSend),
+                transactionsPostProcessList),
             lit("Remove resource access rights failed"));
 
         if(errorCode != ErrorCode::ok)
@@ -471,19 +475,19 @@ private:
 
         #undef RUN_AND_CHECK_ERROR
 
-        return processUpdateSync(tran, transactionsToSend, 0);
+        return processUpdateSync(tran, transactionsPostProcessList, 0);
     }
 
     ErrorCode processUpdateSync(
         QnTransaction<ApiResetBusinessRuleData>& tran,
-        std::list<std::function<void()>>* const transactionsToSend,
+        std::list<std::function<void()>>* const transactionsPostProcessList,
         int /*dummy*/ = 0)
     {
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeEventRule,
             tran.transactionType,
             dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
-            transactionsToSend);
+            transactionsPostProcessList);
         if(errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -491,13 +495,13 @@ private:
             ApiCommand::saveEventRule,
             tran.transactionType,
             tran.params.defaultRules,
-            transactionsToSend);
+            transactionsPostProcessList);
     }
 
     template<class QueryDataType>
     ErrorCode processUpdateSync(
         QnTransaction<QueryDataType>& tran,
-        std::list<std::function<void()>>* const transactionsToSend,
+        std::list<std::function<void()>>* const transactionsPostProcessList,
         int /*dummy*/ = 0)
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
@@ -517,25 +521,24 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsToSend->push_back(std::bind(SendTransactionFunction(), tran));
+        transactionsPostProcessList->push_back(std::bind(PostProcessTransactionFunction(), this, tran));
 
         lock.unlock();
-        triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
         return errorCode;
     }
 
     ErrorCode processUpdateSync(
         QnTransaction<ApiIdData>& tran,
-        std::list<std::function<void()>>* const transactionsToSend)
+        std::list<std::function<void()>>* const transactionsPostProcessList)
     {
         switch (tran.command)
         {
             case ApiCommand::removeMediaServer:
-                return removeResourceSync(tran, ApiObject_Server, transactionsToSend);
+                return removeResourceSync(tran, ApiObject_Server, transactionsPostProcessList);
             case ApiCommand::removeUser:
-                return removeResourceSync(tran, ApiObject_User, transactionsToSend);
+                return removeResourceSync(tran, ApiObject_User, transactionsPostProcessList);
             case ApiCommand::removeCamera:
-                return removeResourceSync(tran, ApiObject_Camera, transactionsToSend);
+                return removeResourceSync(tran, ApiObject_Camera, transactionsPostProcessList);
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
@@ -566,12 +569,12 @@ private:
                         updatedTran.command = ApiCommand::removeEventRule;
                         break;
                     default:
-                        return processUpdateSync(tran, transactionsToSend, 0);
+                        return processUpdateSync(tran, transactionsPostProcessList, 0);
                 }
-                return processUpdateSync(updatedTran, transactionsToSend); //< calling recursively
+                return processUpdateSync(updatedTran, transactionsPostProcessList); //< calling recursively
             }
             default:
-                return processUpdateSync(tran, transactionsToSend, 0);
+                return processUpdateSync(tran, transactionsPostProcessList, 0);
         }
     }
 
@@ -580,13 +583,13 @@ private:
         ApiCommand::Value command,
         TransactionType::Value transactionType,
         const std::vector<SubDataType>& nestedList,
-        std::list<std::function<void()>>* const transactionsToSend)
+        std::list<std::function<void()>>* const transactionsPostProcessList)
     {
         for(const SubDataType& data: nestedList)
         {
             QnTransaction<SubDataType> subTran = createTransaction(command, data);
             subTran.transactionType = transactionType;
-            ErrorCode errorCode = processUpdateSync(subTran, transactionsToSend);
+            ErrorCode errorCode = processUpdateSync(subTran, transactionsPostProcessList);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
         }
@@ -606,30 +609,14 @@ private:
             handler,
             [this, subCommand](
                 QnTransaction<QueryDataType>& multiTran,
-                std::list<std::function<void()>>* const transactionsToSend) -> ErrorCode
+                std::list<std::function<void()>>* const transactionsPostProcessList) -> ErrorCode
             {
                 return processMultiUpdateSync(
                     subCommand, multiTran.transactionType, multiTran.params,
-                    transactionsToSend);
+                    transactionsPostProcessList);
             });
     }
 
-    template<class DataType>
-    void triggerNotification(
-        const AbstractECConnectionPtr& connection,
-        const QnTransaction<DataType>& tran)
-    {
-        // Add audit record before notification to ensure removed resource is still alive.
-        if (m_auditManager)
-        {
-            m_auditManager->addAuditRecord(
-                tran.command,
-                tran.params,
-                m_authSession);
-        }
-
-        connection->notificationManager()->triggerNotification(tran);
-    }
 
 private:
     static QnMutex m_updateDataMutex;
@@ -647,6 +634,26 @@ private:
         return transaction;
     }
 };
+
+template<class T>
+void PostProcessTransactionFunction::operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const
+{
+    // Local transactions (such as setStatus for servers) should only be sent to clients.
+    if (tran.isLocal())
+    {
+        QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+        // Important check. Empty target means "send to all peers".
+        if (!clients.isEmpty())
+            qnTransactionBus->sendTransaction(tran, clients);
+    }
+    else
+    {
+        // Send transaction to all peers.
+        qnTransactionBus->sendTransaction(tran);
+    }
+
+    processor->triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
+}
 
 } // namespace detail
 
