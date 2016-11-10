@@ -71,8 +71,6 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         return;
 
     const int lastPriority = (m_systems.isEmpty() ? 0 : m_systems.firstKey());
-    const bool headSystemChanged = ((priority < lastPriority) || m_systems.empty());
-
     m_systems.insert(priority, system);
 
     /**
@@ -100,15 +98,18 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnBaseSystemDescription::onlineStateChanged);
 
     updateServers();
-    if (headSystemChanged)
-        emitHeadChanged();
+    emitSystemChanged();
 }
 
-void QnSystemDescriptionAggregator::emitHeadChanged()
+void QnSystemDescriptionAggregator::emitSystemChanged()
 {
     emit isCloudSystemChanged();
     emit ownerChanged();
     emit systemNameChanged();
+    emit onlineStateChanged();
+    emit hasInternetChanged();
+    emit safeModeStateChanged();
+    emit newSystemStateChanged();
 }
 
 void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
@@ -153,13 +154,13 @@ void QnSystemDescriptionAggregator::removeSystem(int priority)
     const auto oldServers = servers();
     const auto system = m_systems.value(priority);
 
-    const bool headSystemChanged = (priority == m_systems.firstKey());
     disconnect(system.data(), nullptr, this, nullptr);
     m_systems.remove(priority);
 
     updateServers();
-    if (headSystemChanged && !m_systems.isEmpty())
-        emitHeadChanged();
+
+    if (!m_systems.isEmpty())
+        emitSystemChanged();
 }
 
 QString QnSystemDescriptionAggregator::id() const

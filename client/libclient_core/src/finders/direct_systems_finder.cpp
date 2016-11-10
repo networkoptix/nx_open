@@ -71,12 +71,12 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
         system->removeServer(server.id);
 
     m_systems.erase(it);
+    emit systemLostInternal(system->id(), system->localId());
     emit systemLost(system->id());
 }
 
 void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
-    bool checkForSystemRemoval = true;
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
     {

@@ -73,11 +73,8 @@ void QnRecentLocalSystemsFinder::removeFinalSystem(const QString& id)
 void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
 {
     const auto systemId = system->id();
-    auto it = m_filteringSystems.find(systemId);
-    if (it == m_filteringSystems.end())
-        it = m_filteringSystems.insert(systemId, IdCountPair(system->localId(), 0));
-
-    auto& localIdUsageCount = it.value().second;
+    auto& hash = m_filteringSystems[systemId];
+    auto& localIdUsageCount = hash[system->localId()];
     ++localIdUsageCount;
 
     QSet<QString> forRemove;
@@ -92,14 +89,25 @@ void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr
         removeFinalSystem(id);
 }
 
-void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
+void QnRecentLocalSystemsFinder::processSystemRemoved(
+    const QString& systemId,
+    const QnUuid& localSystemId)
 {
     const auto it = m_filteringSystems.find(systemId);
     if (it == m_filteringSystems.end())
         return;
 
-    auto& localIdUsageCount = it.value().second;
+    auto& hash = it.value();
+    const auto itLocalData = hash.find(localSystemId);
+    if (itLocalData == hash.end())
+        return;
+
+    auto& localIdUsageCount = itLocalData.value();
     if (--localIdUsageCount)
+        return;
+
+    hash.erase(itLocalData);
+    if (!hash.isEmpty())
         return;
 
     m_filteringSystems.erase(it);
@@ -117,9 +125,12 @@ QnRecentLocalSystemsFinder::SystemsHash
             for (auto it = m_filteringSystems.begin(); it != m_filteringSystems.end(); ++it)
             {
                 const auto systemId = it.key();
-                const auto localId = it.value().first;
-                if (!isAcceptablePred(system, systemId, localId))
-                    return false;
+                const auto hash = it.value();
+                for (const auto& localId: hash.keys())
+                {
+                    if (!isAcceptablePred(system, systemId, localId))
+                        return false;
+                }
             }
             return true;
         };
