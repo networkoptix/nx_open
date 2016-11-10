@@ -23,10 +23,6 @@ describe('Systems list suite', function () {
         expect(p.systemsList.first().isDisplayed()).toBe(true);
     });
 
-    it("should display menu item 'Systems' as active", function () {
-        expect(p.activeMenuItem.getText()).toContain('Systems');
-    });
-
     it("should show Open in NX client button for every online system", function () {
         p.systemsList.filter(function(elem) {
             // First filter systems that are activated
