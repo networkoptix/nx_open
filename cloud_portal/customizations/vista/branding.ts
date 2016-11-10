@@ -7,6 +7,10 @@
       <translation>Qloud</translation>
     </message>
     <message>
+      <source>CLIENT_PROTOCOL</source>
+      <translation>qulu-vms</translation>
+    </message>        
+    <message>
       <source>VMS_NAME</source>
       <translation>Qulu</translation>
     </message>
@@ -26,6 +30,14 @@
       <source>{{companyUrl}}</source>
       <translation>http://vista-cctv.com</translation>
     </message>
+    <message>
+      <source>{{portalDomain}}</source>
+      <translation>qulu.cloud</translation>
+    </message>
+    <message>
+      <source>{{iOSappID}}</source>
+      <translation>N3KX2CKR5P.com.vista.quluMobile</translation>
+    </message>    
     <message>
       <source>COMPANY_NAME</source>
       <translation>Vista CCTV</translation>

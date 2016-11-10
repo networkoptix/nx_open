@@ -4,43 +4,43 @@
     <name>global</name>
     <message>
       <source>PRODUCT_NAME</source>
-      <translation>DW Cloud</translation>
+      <translation>Cox Business Security Solutions Cloud</translation>
     </message>
     <message>
       <source>CLIENT_PROTOCOL</source>
-      <translation>dw-vms</translation>
-    </message>    
+      <translation>cox-vms</translation>
+    </message>
     <message>
       <source>VMS_NAME</source>
-      <translation>DW Spectrum</translation>
+      <translation>Cox Business Security Solutions</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
-      <translation>http://digital-watchdog.com/dw_spec_landing/</translation>
+      <translation>https://www.cox.com/business/home.html</translation>
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://digital-watchdog.com/contact-tech-support/</translation>
+      <translation>844-601-5890</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>digital-watchdog.com/contact-tech-support</translation>
+      <translation>844-601-5890</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
-      <translation>http://digital-watchdog.com</translation>
+      <translation>https://www.cox.com/</translation>
     </message>
     <message>
       <source>{{portalDomain}}</source>
-      <translation>dwcc.cloud</translation>
+      <translation>cloud-demo.hdw.mx</translation>
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>HW58JB7FUF.tv.dwcc.DwMobile</translation>
-    </message>    
+      <translation>C6ZWGSKK3B.com.cox.cb.hdsec</translation>
+    </message>
     <message>
       <source>COMPANY_NAME</source>
-      <translation>Digital Watchdog</translation>
+      <translation>Cox Communications</translation>
     </message>
   </context>
 </TS>
