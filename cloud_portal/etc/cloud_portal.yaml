@@ -1,20 +1,21 @@
 customization: default
 
 cloud_database:
-    host: '$DB_HOST'
-    port: '$DB_PORT'
-    username: '$DB_USER'
-    password: '$DB_PASSWORD'
-    database: '$DB_NAME'
+    host: '127.0.0.1'
+    port: 3306
+    username: root
+    password: ''
+    database: nx_cloud
 
 cloud_db:
-    url: 'http://$CLOUD_DB_HOST:$CLOUD_DB_PORT/cdb'
+    url: 'http://cloud-test.hdw.mx:3346/cdb'
 
 cloud_portal:
-    url: 'http://$CLOUD_PORTAL_HOST'
+    url: 'http://cloud-test.hdw.mx/'
+
 
 cloud_gateway:
-    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
+    url: 'http://cloud-test.hdw.mx:3347'
 
 mail_from: 'service@networkoptix.com'
 
@@ -29,5 +30,5 @@ smtp:
 
 admins:
     -
-        - 'Evgeny'
-        - 'ebalashov@networkoptix.com'
+        - 'Cloud Portal Admins'
+        - 'cloud-portal-admins@networkoptix.com'

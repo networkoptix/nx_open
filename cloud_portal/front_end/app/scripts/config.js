@@ -12,6 +12,7 @@ var Config = {
 
     alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
     alertsMaxCount: 5,
+    minSystemsToSearch: 9, //We need at least 9 system to enable search
 
     redirectAuthorised:'/systems/default', // Page for redirecting all authorised users
     redirectUnauthorised:'/', // Page for redirecting all unauthorised users by default
