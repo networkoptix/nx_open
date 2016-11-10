@@ -1556,7 +1556,6 @@ def parseArgs():
 
 
 def ListAutoTests():
-    print "--mainonly The main minimal functests set"
     for key, klass in BoxTestKeys.iteritems():
         if key not in KeysSkipList:
             print "%s %s" % (key, klass.helpStr)

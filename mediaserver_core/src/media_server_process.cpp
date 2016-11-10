@@ -455,12 +455,21 @@ void ffmpegInit()
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 {
+    NX_LOG(lit("%1 Attempting to create storage %2")
+            .arg(Q_FUNC_INFO)
+            .arg(path), cl_logDEBUG1);
+
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+
+    NX_LOG(lit("%1 Storage %2 is operational: %3")
+            .arg(Q_FUNC_INFO)
+            .arg(path)
+            .arg(storage->isUsedForWriting()), cl_logDEBUG1);
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     NX_ASSERT(resType);
@@ -575,17 +584,41 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
 {
     QnStorageResourceList storages;
+    QStringList availablePaths;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    for(const QString& folderPath: listRecordFolders())
+
+    availablePaths = listRecordFolders();
+
+    NX_LOG(lit("%1 Available paths count: %2")
+            .arg(Q_FUNC_INFO)
+            .arg(availablePaths.size()), cl_logDEBUG1);
+
+    for(const QString& folderPath: availablePaths)
     {
+        NX_LOG(lit("%1 Available path: %2")
+                .arg(Q_FUNC_INFO)
+                .arg(folderPath), cl_logDEBUG1);
+
         if (!mServer->getStorageByUrl(folderPath).isNull())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 already exists. Won't be added.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(folderPath), cl_logDEBUG1);
             continue;
+        }
         // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
+                    .arg(Q_FUNC_INFO)
+                    .arg(folderPath)
+                    .arg(totalSpace)
+                    .arg(storage->getSpaceLimit()), cl_logDEBUG1);
             continue; // if storage size isn't known do not add it by default
+        }
 
 
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
@@ -2050,6 +2083,7 @@ void MediaServerProcess::run()
     qnCommon->setAdminPasswordData(passwordData);
 
     qnCommon->setModuleGUID(serverGuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("ms", qnCommon->moduleGUID());
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();

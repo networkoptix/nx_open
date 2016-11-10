@@ -262,12 +262,22 @@ TEST_F(CloudStreamSocketTest, cancellation)
         tempHostName,
         serverAddress);
 
+    const auto scopedGuard = makeScopedGuard(
+        [&]()
+        {
+            nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+                tempHostName,
+                serverAddress);
+            server.pleaseStopSync();
+        });
+
     //cancelling connect
     for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true));
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.connectAsync(
             SocketAddress(tempHostName),
             [](SystemError::ErrorCode /*code*/){});
@@ -281,10 +291,12 @@ TEST_F(CloudStreamSocketTest, cancellation)
         CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(
             SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()));
+            std::chrono::milliseconds(1000).count()))
+            << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.reserve(bytesToSendThroughConnection);
-        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true));
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.readSomeAsync(
             &data,
             [](SystemError::ErrorCode /*errorCode*/, size_t /*bytesRead*/) {});
@@ -298,21 +310,17 @@ TEST_F(CloudStreamSocketTest, cancellation)
         CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(
             SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()));
+            std::chrono::milliseconds(1000).count()))
+            << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
-        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true));
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.sendAsync(
             data,
             [](SystemError::ErrorCode /*errorCode*/, size_t /*bytesSent*/) {});
         cloudSocket.cancelIOSync(aio::etNone);
     }
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    server.pleaseStopSync();
 }
 
 TEST_F(CloudStreamSocketTest, syncModeCancellation)

@@ -337,7 +337,13 @@
                 "Axis|AXISQ7404*",
                 "Axis|M7014*",
                 "Axis|M7016*",
-                "Axis|Q7404*"
+                "Axis|Q7404*",
+                "Axis|AXISP7214*",
+                "Axis|AXISM70114*",
+                "Axis|AXISP7016*",
+                "Axis|P7214*",
+                "Axis|M70114*",
+                "Axis|P7016*"
             ],
             "analogEncoder": true
         },
@@ -565,6 +571,33 @@
                     "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
                     "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
                     "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-6716HWI"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA17",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA18",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA19",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA20",
+                    "VideoEncoderConfigurationA05,VideoEncoderConfigurationA21",
+                    "VideoEncoderConfigurationA06,VideoEncoderConfigurationA22",
+                    "VideoEncoderConfigurationA07,VideoEncoderConfigurationA23",
+                    "VideoEncoderConfigurationA08,VideoEncoderConfigurationA24",
+                    "VideoEncoderConfigurationA09,VideoEncoderConfigurationA25",
+                    "VideoEncoderConfigurationA10,VideoEncoderConfigurationA26",
+                    "VideoEncoderConfigurationA11,VideoEncoderConfigurationA27",
+                    "VideoEncoderConfigurationA12,VideoEncoderConfigurationA28",
+                    "VideoEncoderConfigurationA13,VideoEncoderConfigurationA29",
+                    "VideoEncoderConfigurationA14,VideoEncoderConfigurationA30",
+                    "VideoEncoderConfigurationA15,VideoEncoderConfigurationA31",
+                    "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
                 ]
             }
         },
@@ -1297,6 +1330,24 @@
                     "ve7,ve15"
                 ]
             },
+	        "trustToVideoSourceSize": false,
+	        "useExistingOnvifProfies": true,
+		    "controlFpsViaEncodingInterval": true,
+		    "forcedSecondaryStreamResolution": "352x288",
+		    "fpsBase": 25
+        },
+        {
+            "keys": [
+                "Pelco|NET5504*"
+            ],
+            "forcedOnvifParams": {
+                "videoEncoders": [
+                    "ve0,ve4",
+                    "ve1,ve5",
+                    "ve2,ve6",
+                    "ve3,ve7"
+                ]
+            },
 			"trustToVideoSourceSize": false,
 			"useExistingOnvifProfies": true,
 			"controlFpsViaEncodingInterval": true,
@@ -1401,7 +1452,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,4,5,3",
+			"videoLayout": "width=3;height=2;sensors=0,1,2,4,3,5",
 			"defaultAR":"4x3"
 		},
 		{
@@ -1414,7 +1465,7 @@
 					"channelMap": [
 						{
 							"originalChannel": 0,
-							"mappedChannels": [3]
+							"mappedChannels": [2]
 						}
 					]
 				},
@@ -1423,21 +1474,12 @@
 					"channelMap": [
 						{
 							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
 							"mappedChannels": [1]
 						}
 					]
 				},
 				{
-					"resourceChannel": 6,
+					"resourceChannel": 4,
 					"channelMap": [
 						{
 							"originalChannel": 0,
@@ -1448,7 +1490,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=4;height=1;sensors=0,1,2,3"
+			"videoLayout": "width=3;height=1;sensors=0,1,2"
 		},
 		{
 			"keys": [
@@ -1482,8 +1524,43 @@
                 "min": 32,
                 "max": 8000
             }
+        },
+        {
+            "keys": [
+                "*|WH-D5216A" 
+            ],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken017",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken018",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "DW|DWC-MV950TIR","DW|DWC-MB950TIR"
+            ],
+            "forcedDefaultCredentials": {
+                "user": "root",
+                "password": "pass"
+            }
         }
-
     ]
 }
 
