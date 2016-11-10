@@ -1754,11 +1754,13 @@ void QnMediaResourceWidget::updateAspectRatio()
     if (save)
     {
         auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camera);
-        const QString resourceId = camera->getPhysicalId();
-        QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
-        aspectRatios.insert(resourceId, baseAspectRatio);
-        qnSettings->setResourceAspectRatios(aspectRatios);
+        if (camera)
+        {
+            const QString resourceId = camera->getPhysicalId();
+            QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
+            aspectRatios.insert(resourceId, baseAspectRatio);
+            qnSettings->setResourceAspectRatios(aspectRatios);
+        }
     }
     qreal aspectRatio = baseAspectRatio *
         QnGeometry::aspectRatio(channelLayout()->size()) *
