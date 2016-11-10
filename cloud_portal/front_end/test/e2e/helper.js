@@ -48,11 +48,11 @@ var Helper = function () {
 
     this.forms = {
         login: {
-            openLink: element(by.linkText('Login')),
+            openLink: element(by.linkText('Log in')),
             dialog: element(by.css('.modal-dialog')),
             emailInput: element(by.css('.modal-dialog')).element(by.model('auth.email')),
             passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
-            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Login'))
+            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Log in'))
         },
         register: {
             firstNameInput: element(by.model('account.firstName')),
@@ -60,7 +60,7 @@ var Helper = function () {
             emailInput: element(by.model('account.email')),
             passwordGroup: element(by.css('password-input')),
             passwordInput: element(by.css('password-input')).element(by.css('input[type=password]')),
-            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Register'))
+            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account'))
         },
         account: {
             firstNameInput: element(by.model('account.first_name')),
@@ -157,7 +157,7 @@ var Helper = function () {
     };
 
     this.login = function(email, password) {
-        var loginButton = element(by.linkText('Login'));
+        var loginButton = self.forms.login.openLink;
 
         h.get(h.urls.homepage);
         browser.sleep(500);
@@ -353,6 +353,16 @@ var Helper = function () {
         here.submitButton.click();
         expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
         expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassSuccess);
+    };
+
+    this.checkPresent = function(elem) {
+        var deferred = protractor.promise.defer();
+        elem.isPresent().then( function(isPresent) {
+            if(isPresent)   deferred.fulfill();
+            else            deferred.reject("Element was not found, but that's expected.");
+        });
+
+        return deferred.promise;
     };
 
     this.waitIfNotPresent = function(element, timeout) {

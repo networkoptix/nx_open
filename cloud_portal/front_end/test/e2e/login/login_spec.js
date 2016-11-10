@@ -7,6 +7,12 @@ describe('Login dialog', function () {
     beforeAll(function() {
         // Otherwise "window.angular is undefined" appears. See http://git.io/v4gXM for details
         p.get();
+        // Log out if logged in
+        p.helper.checkPresent(p.loginButton).then( function () {
+            p.loginButton.click();
+        }, function() {
+            p.helper.logout();
+        });
     });
 
     beforeEach(function() {

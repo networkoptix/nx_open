@@ -13,10 +13,9 @@ LoginPage = function () {
         browser.get('/');
         browser.waitForAngular();
         browser.sleep(500);
-        this.loginButton.click();
     };
 
-    this.loginButton = element(by.linkText('Login'));
+    this.loginButton = this.helper.forms.login.openLink;
 
     this.loginDialog = element(by.css('.modal-dialog'));
 
@@ -41,7 +40,7 @@ LoginPage = function () {
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
     };
 
-    this.dialogLoginButton = this.loginDialog.element(by.buttonText('Login'));
+    this.dialogLoginButton = this.helper.forms.login.submitButton;
     this.dialogCloseButton = this.loginDialog.all(by.css('button.close')).first();
 
     this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
