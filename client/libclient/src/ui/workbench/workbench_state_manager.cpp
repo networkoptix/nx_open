@@ -38,7 +38,8 @@ bool QnWorkbenchStateManager::tryClose(bool force)
         && qnRuntime->isDesktopMode()
         && context()->user()
         && !helpers::currentSystemIsNew()
-        && workbench()->currentLayoutIndex() != -1;
+        && workbench()->currentLayoutIndex() != -1
+        && !force;
 
     if (canSaveState)
     {
@@ -57,31 +58,29 @@ bool QnWorkbenchStateManager::tryClose(bool force)
 
 void QnWorkbenchStateManager::saveState()
 {
-    auto localId = helpers::currentSystemLocalId();
-    auto userId = context()->user()->getId();
-    if (localId.isNull() || userId.isNull())
+    const auto localSystemId = helpers::currentSystemLocalId();
+    const auto userId = context()->user()->getId();
+    if (localSystemId.isNull() || userId.isNull())
     {
         NX_ASSERT(false, "Invalid connections state");
         return;
     }
 
     QnWorkbenchState state;
-    state.localSystemId = localId;
+    state.localSystemId = localSystemId;
     state.userId = userId;
     workbench()->submit(state);
 
     auto states = qnSettings->workbenchStates();
-    auto iter = states.begin();
-    while (iter != states.end())
-    {
-        if (iter->localSystemId == localId && iter->userId == userId)
-            iter = states.erase(iter);
-        else
-            ++iter;
-    }
+    states.erase(std::remove_if(states.begin(), states.end(),
+        [localSystemId, userId](const QnWorkbenchState& state)
+        {
+            return state.localSystemId == localSystemId && state.userId == userId;
+        }), states.end());
+
     states.prepend(state);
-    while (states.size() > kSavedStatesLimit)
-        states.removeLast();
+    if (states.size() > kSavedStatesLimit)
+        states.erase(states.begin() + kSavedStatesLimit, states.end());
 
     qnSettings->setWorkbenchStates(states);
     qnSettings->save();
