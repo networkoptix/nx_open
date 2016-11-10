@@ -130,6 +130,9 @@ private:
                     lit("Unsupported Content Type: \"%1\".").arg(QString(requestContentType)));
                 return nx_http::StatusCode::unsupportedMediaType;
         }
+
+        fixRequestDataIfNeeded(requestData);
+
         return nx_http::StatusCode::ok;
     }
 
@@ -485,6 +488,18 @@ private:
 
         NX_LOG(lm("END merge: new value: %1").arg(QJson::serialize(*existingValue)),
             cl_logDEBUG2);
+    }
+
+    template<typename RequestData>
+    void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
+    {
+    }
+
+    template<>
+    void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
+    {
+        if (userData->isCloud && userData->name.isEmpty())
+            userData->name = userData->email;
     }
 
 private:
