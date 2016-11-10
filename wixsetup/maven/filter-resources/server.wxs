@@ -26,6 +26,10 @@
                     <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                 </Component>
 
+                <Component Id="ServerVersion">
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='${release.version}.${buildNumber}'/>
+                </Component>
+
                 <Component Id="ServerConfiguration">
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
@@ -201,6 +205,7 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
+            <ComponentRef Id='ServerVersion'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>

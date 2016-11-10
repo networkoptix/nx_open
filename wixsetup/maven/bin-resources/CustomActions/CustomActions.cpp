@@ -433,24 +433,38 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
         versionPath = params.Tokenize(_T(";"), curPos);
         versionName = params.Tokenize(_T(";"), curPos);
 
+		CString localAppDataFolder = GetAppDataLocalFolderPath();
+		fromFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+
+        WcaLog(LOGMSG_STANDARD, "DB file: %S", fromFile);
         CRegKey key;
         static const int MAX_VERSION_SIZE = 50;
         TCHAR szBuffer[MAX_VERSION_SIZE + 1];
-        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ | KEY_WRITE) == ERROR_SUCCESS) {
+        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ) == ERROR_SUCCESS) {
             ULONG chars;
             CAtlString version;
+
+			WcaLog(LOGMSG_STANDARD, "Opened key: %S", versionPath);
 
             if (key.QueryStringValue(versionName, 0, &chars) == ERROR_SUCCESS) {
                 chars = min(chars, MAX_VERSION_SIZE);
                 key.QueryStringValue(versionName, szBuffer, &chars);
                 version = szBuffer;
-            }
+			} else {
+				WcaLog(LOGMSG_STANDARD, "Unable to query value %S", versionName);
+			}
 
-            key.DeleteValue(versionName);
             key.Close();
 
-            if (!version.IsEmpty())
+            if (!version.IsEmpty()) {
+                WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
                 CopyFile(fromFile, fromFile + "." + version, FALSE);
+			}
+			else {
+				WcaLog(LOGMSG_STANDARD, "Version is empty");
+			}
+        } else {
+            WcaLog(LOGMSG_STANDARD, "Couldn't open registry key %S", versionPath);
         }
     }
 

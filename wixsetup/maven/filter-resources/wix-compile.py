@@ -84,6 +84,7 @@ def get_candle_command(suffix):
 
 def get_light_command(folder, msi, suffix):
     command = ['light']
+    command.append('-sice:ICE07')
     command.append('-cultures:${installer.language}')
     command.append('-cc')
     command.append('${libdir}/bin/${build.configuration}/cab')

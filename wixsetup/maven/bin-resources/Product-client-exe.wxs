@@ -4,7 +4,7 @@
     <?include BuildVars.wxi ?>
 
 
-    <Bundle Version="$(var.releaseVersionFull)" UpgradeCode="c9051fe2-c61e-48a4-8d5d-87cb87241729">
+    <Bundle Name="$(var.productName) Client" Version="$(var.releaseVersionFull)" UpgradeCode="c9051fe2-c61e-48a4-8d5d-87cb87241729" DisableModify="yes">
         <!-- Detect existing version of VC ++ 2015 x64 libraries -->
         <util:FileSearch Id="GetVC14X64Exists" Condition="VersionNT64" Variable="vc14x64Exists" Path="[SystemFolder]vcruntime140.dll" Result="exists"/>
         <util:FileSearch Id="GetVC14X64Version" Condition="VersionNT64" Variable="vc14x64Version" Path="[SystemFolder]vcruntime140.dll" Result="version"/>
@@ -33,7 +33,7 @@
                 Vital="yes"
                 DetectCondition="vc14$(var.arch)Exists AND vc14$(var.arch)Version &gt;= v14.0.24215"
                 Name="Redist\vcredist14_$(var.arch).exe"
-                SourceFile="$(var.RedistPath)\VC14\vcredist_24125_$(var.arch).exe"
+                SourceFile="$(var.RedistPath)\VC14\vcredist_24215_$(var.arch).exe"
                 InstallCommand="/install /quiet /norestart">
 
                 <!-- -->

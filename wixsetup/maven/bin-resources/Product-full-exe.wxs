@@ -3,7 +3,7 @@
     <?define RedistPath="Redist"?>
     <?include BuildVars.wxi ?>
 
-    <Bundle Version="$(var.releaseVersionFull)" UpgradeCode="dc6e2659-4718-4996-9d9b-069d627f95f5">
+    <Bundle Name="$(var.productName) Bundle" Version="$(var.releaseVersionFull)" UpgradeCode="dc6e2659-4718-4996-9d9b-069d627f95f5">
         <!-- Detect existing version of VC ++ 2015 x64 libraries -->
         <util:FileSearch Id="GetVC14X64Exists" Condition="VersionNT64" Variable="vc14x64Exists" Path="[SystemFolder]vcruntime140.dll" Result="exists"/>
         <util:FileSearch Id="GetVC14X64Version" Condition="VersionNT64" Variable="vc14x64Version" Path="[SystemFolder]vcruntime140.dll" Result="version"/>
@@ -32,7 +32,7 @@
                 Vital="yes"
                 DetectCondition="vc14$(var.arch)Exists AND vc14$(var.arch)Version &gt;= v14.0.24215"
                 Name="Redist\vcredist14_$(var.arch).exe"
-                SourceFile="$(var.RedistPath)\VC14\vcredist_24125_$(var.arch).exe"
+                SourceFile="$(var.RedistPath)\VC14\vcredist_24215_$(var.arch).exe"
                 InstallCommand="/install /quiet /norestart">
 
                 <!-- -->
@@ -44,11 +44,23 @@
 
             <RollbackBoundary />
 
-            <MsiPackage Id="ClientPackage" SourceFile="bin/msi/$(var.ClientMsiName)" Vital="yes">
+            <MsiPackage
+                Id="ClientPackage"
+                Name="$(var.ClientMsiName)"
+                SourceFile="bin/msi/$(var.ClientMsiName)"
+                Vital="yes"
+                Cache="no"
+                Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
 
-            <MsiPackage Id="ServerPackage" SourceFile="bin/msi/$(var.ServerMsiName)" Vital="yes">
+            <MsiPackage
+                Id="ServerPackage"
+                Name="$(var.ServerMsiName)"
+                SourceFile="bin/msi/$(var.ServerMsiName)"
+                Vital="yes"
+                Cache="no"
+                Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
         </Chain>

@@ -4,16 +4,16 @@
     <?include BuildVars.wxi ?>
 
 
-    <Bundle Version="$(var.releaseVersionFull)" UpgradeCode="fc87995a-f27f-4cf4-afff-73e5da5598d4">
-        <!-- Detect existing version of VC ++ 2015 x64 libraries -->
-        <util:FileSearch Id="GetVC14X64Exists" Condition="VersionNT64" Variable="vc14x64Exists" Path="[SystemFolder]vcruntime140.dll" Result="exists"/>
-        <util:FileSearch Id="GetVC14X64Version" Condition="VersionNT64" Variable="vc14x64Version" Path="[SystemFolder]vcruntime140.dll" Result="version"/>
+    <Bundle Name="$(var.productName) Server" Version="$(var.releaseVersionFull)" UpgradeCode="fc87995a-f27f-4cf4-afff-73e5da5598d4" DisableModify="yes">
+         <util:ProductSearch Id="VCREDIST_140_x86"
+            UpgradeCode="65E5BD06-6392-3027-8C26-853107D3CF1A"
+            Result="version"
+            Variable="VCREDIST_140_x86" />
 
-        <!-- Detect existing version of VC ++ 2015 x86 libraries -->
-        <util:FileSearch Id="GetVC14X86onX64Exists" Condition="VersionNT64" Variable="vc14x86Exists" Path="[System64Folder]vcruntime140.dll" Result="exists"/>
-        <util:FileSearch Id="GetVC14X86onX64Version" Condition="VersionNT64" Variable="vc14x86Version" Path="[System64Folder]vcruntime140.dll" Result="version"/>
-        <util:FileSearch Id="GetVC14X86onX86Exists" Condition="NOT VersionNT64" Variable="vc14x86Exists" Path="[SystemFolder]vcruntime140.dll" Result="exists"/>
-        <util:FileSearch Id="GetVC14X86onX86Version" Condition="NOT VersionNT64" Variable="vc14x86Version" Path="[SystemFolder]vcruntime140.dll" Result="version"/>
+         <util:ProductSearch Id="VCREDIST_140_x64"
+            UpgradeCode="36F68A90-239C-34DF-B58C-64B30153CE35"
+            Result="version"
+            Variable="VCREDIST_140_x64" />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
@@ -23,6 +23,7 @@
             />
         </BootstrapperApplicationRef>
 
+        <!-- For some reason vcredist 24215 installs 24210 -->
         <Chain>
             <ExePackage
                 Cache="no"
@@ -30,9 +31,9 @@
                 PerMachine="yes"
                 Permanent="yes"
                 Vital="yes"
-                DetectCondition="vc14$(var.arch)Exists AND vc14$(var.arch)Version &gt;= v14.0.24215"
+                DetectCondition="VCREDIST_140_$(var.arch) &gt;= v14.0.24210"
                 Name="Redist\vcredist14_$(var.arch).exe"
-                SourceFile="$(var.RedistPath)\VC14\vcredist_24125_$(var.arch).exe"
+                SourceFile="$(var.RedistPath)\VC14\vcredist_24215_$(var.arch).exe"
                 InstallCommand="/install /quiet /norestart">
 
                 <!-- -->
@@ -44,7 +45,13 @@
 
             <RollbackBoundary />
 
-            <MsiPackage Id="ServerPackage" SourceFile="bin/msi/$(var.ServerMsiName)" Vital="yes">
+            <MsiPackage
+                Id="ServerPackage"
+                Name="$(var.ServerMsiName)"
+                SourceFile="bin/msi/$(var.ServerMsiName)"
+                Vital="yes"
+                Cache="no"
+                Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
         </Chain>

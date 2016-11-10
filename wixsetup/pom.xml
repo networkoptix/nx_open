@@ -24,7 +24,7 @@
         <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
         <VSRedistDir>${environment.dir}\wix\Redist</VSRedistDir>
-        <rdep.packages>appserver-2.2.1 vcredist-2012 vmaxproxy-2.1</rdep.packages>
+        <rdep.packages>vcredist-2012 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
