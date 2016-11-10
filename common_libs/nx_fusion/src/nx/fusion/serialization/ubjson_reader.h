@@ -9,6 +9,8 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
 
+#include <nx/utils/log/assert.h>
+
 #include "binary_stream.h"
 #include "ubjson_fwd.h"
 #include "ubjson_marker.h"
