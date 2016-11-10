@@ -12,16 +12,16 @@ namespace cloud {
 /**
  * Closes tunnel if not used for some time.
  */
-class NX_NETWORK_API OutgoingCrossNatTunnelWatcher:
+class NX_NETWORK_API OutgoingTunnelConnectionWatcher:
     public AbstractOutgoingTunnelConnection
 {
     typedef AbstractOutgoingTunnelConnection BaseType;
 
 public:
-    OutgoingCrossNatTunnelWatcher(
+    OutgoingTunnelConnectionWatcher(
         nx::hpm::api::ConnectionParameters connectionParameters,
         std::unique_ptr<AbstractOutgoingTunnelConnection> tunnelConnection);
-    virtual ~OutgoingCrossNatTunnelWatcher();
+    virtual ~OutgoingTunnelConnectionWatcher();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;

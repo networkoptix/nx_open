@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/outgoing_cross_nat_tunnel_watcher.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
@@ -51,7 +51,7 @@ public:
 protected:
     void initializeTunnel()
     {
-        m_tunnel = std::make_unique<OutgoingCrossNatTunnelWatcher>(
+        m_tunnel = std::make_unique<OutgoingTunnelConnectionWatcher>(
             m_connectionParameters,
             std::make_unique<TestTunnelConnection>());
 
@@ -72,7 +72,7 @@ protected:
     }
 
     nx::hpm::api::ConnectionParameters m_connectionParameters;
-    std::unique_ptr<OutgoingCrossNatTunnelWatcher> m_tunnel;
+    std::unique_ptr<OutgoingTunnelConnectionWatcher> m_tunnel;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
 };
 
