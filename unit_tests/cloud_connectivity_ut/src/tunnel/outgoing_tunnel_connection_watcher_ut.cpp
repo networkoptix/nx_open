@@ -66,7 +66,7 @@ protected:
                 m_tunnelClosedPromise.set_value(reason);
             });
 
-        return [this]() { m_tunnel->pleaseStopSync(); };
+        return InitializationGuard([this]() { m_tunnel->pleaseStopSync(); });
     }
 
     void waitForTunnelToExpire(
