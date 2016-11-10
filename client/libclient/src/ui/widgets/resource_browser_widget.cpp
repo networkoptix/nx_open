@@ -100,8 +100,9 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     /* And specify maximum width and height for the widget: */
     m_previewWidget->setMaximumSize(kMaxThumbnailSize);
 
-    m_previewWidget->busyIndicator()->setDotRadius(style::Metrics::kStandardPadding / 2.0);
-    m_previewWidget->busyIndicator()->setDotSpacing(style::Metrics::kStandardPadding);
+    auto dots = m_previewWidget->busyIndicator()->dots();
+    dots->setDotRadius(style::Metrics::kStandardPadding / 2.0);
+    dots->setDotSpacing(style::Metrics::kStandardPadding);
 
     auto layout = new QVBoxLayout(m_embeddedWidget);
     layout->setSizeConstraint(QLayout::SetFixedSize);

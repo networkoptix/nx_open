@@ -220,8 +220,8 @@ void QnStatusOverlayWidget::setupPreloader()
 {
     m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
     m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
-    m_preloader->setDotRadius(8);
-    m_preloader->setDotSpacing(8);
+    m_preloader->dots()->setDotRadius(8);
+    m_preloader->dots()->setDotSpacing(8);
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->addItem(m_preloader);
