@@ -50,13 +50,16 @@ def add_components(command, components):
     for component in components:
         command.append('{0}.wxs'.format(component))
 
-def get_candle_command(suffix):
+def get_candle_command(project, suffix, args):
     command = ['candle']
     command.append('-dClientVoxSourceDir=${ClientVoxSourceDir}')
     command.append('-arch')
     command.append('${arch}')
     command.append('-out')
     command.append('obj\\${build.configuration}-{0}\\'.format(suffix))
+
+    if args:
+        command += args
 
     command.append('-dClientMsiName={}'.format(client_msi_name))
     command.append('-dServerMsiName={}'.format(server_msi_name))
@@ -78,7 +81,7 @@ def get_candle_command(suffix):
         
     add_wix_extensions(command)
     add_components(command, common_components)
-    command.append('Product-{0}.wxs'.format(suffix))
+    command.append('Product-{0}.wxs'.format(project))
 
     return command
 
@@ -150,10 +153,13 @@ def execute_command(command):
     if retcode != 0 and retcode != 204:
         sys.exit(1)
     
-def create_commands_set(project, folder, msi):
+def create_commands_set(project, folder, msi, suffix=None, candle_args=None):
+    if suffix is None:
+        suffix = project
+
     return [
-        get_candle_command(project),
-        get_light_command(folder, msi, project)
+        get_candle_command(project, suffix, candle_args),
+        get_light_command(folder, msi, suffix)
     ]
     
 def rename(folder, old_name, new_name):
@@ -164,10 +170,10 @@ def rename(folder, old_name, new_name):
 
 def main():
     commands = []
-    commands += create_commands_set('client-only', client_msi_folder, client_msi_name)
-    commands += create_commands_set('server-only', server_msi_folder, server_msi_name)
-    commands += create_commands_set('client-strip', client_msi_strip_folder, client_msi_name)
-    commands += create_commands_set('server-strip', server_msi_strip_folder, server_msi_name)
+    commands += create_commands_set('client-only', client_msi_folder, client_msi_name, candle_args=['-dNoStrip=yes'])
+    commands += create_commands_set('server-only', server_msi_folder, server_msi_name, candle_args=['-dNoStrip=yes'])
+    commands += create_commands_set('client-only', client_msi_strip_folder, client_msi_name, suffix='client-strip', candle_args=['-dNoStrip=no'])
+    commands += create_commands_set('server-only', server_msi_strip_folder, server_msi_name, suffix='server-strip', candle_args=['-dNoStrip=no'])
 
     if not skip_sign:
         commands += create_sign_command_set(client_msi_folder, client_msi_name)
