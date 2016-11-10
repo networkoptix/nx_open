@@ -10,7 +10,7 @@ import unittest
 
 import urllib2 # FIXME remove it
 
-from functest_util import checkResultsEqual #, HttpRequest
+from functest_util import checkResultsEqual, generateKey #, HttpRequest
 from testbase import *
 from stortest import StorageBasedTest, TEST_CAMERA_ATTR, TEST_CAMERA_DATA, STORAGE_INIT_TIMEOUT
 from rtsptests import SingleServerRtspPerf, RtspStreamTest, SingleServerHlsTest, HlsStreamingTest #, Camera
@@ -86,16 +86,32 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
     def isFailFast(cls, suit_name=""):
         return False
 
+    def _prepareKeys(self, srv_index):
+        passwd = self.config.get("General","password")
+        user = self.config.get("General","username")
+        answer = self._server_request(HOST_BEHIND_NAT, "api/getNonce")
+        if answer is not None and answer.get("error", '') not in ['', '0', 0]:
+            self.fail("api/getNonce request returned API error %s: %s" % \
+                      (answer["error"], answer.get("errorString","")))
+        nonce = answer["reply"]["nonce"]
+        realm = answer["reply"]["realm"]
+        getKey =  generateKey('GET', user, passwd, nonce, realm)
+        postKey =  generateKey('POST', user, passwd, nonce, realm)
+        return getKey, postKey
+
+
+
     ################################################################
 
     def VMPreparation(self):
         "Join servers into one system"
+        print "Server list: %s" % self.sl
         self._prepare_test_phase(self._stop_and_init)
-        passwd = self.config.get("General","password")
+        getKey, postKey = self._prepareKeys(HOST_BEHIND_NAT)
         func = ("api/mergeSystems?url=http://%s&"
-               "password=%s&currentPassword=%s&takeRemoteSetting=false&"
+               "getKey=%s&postKey=%s&takeRemoteSetting=false&"
                "oneServer=false&ignoreIncompatible=false" %
-                (self.sl[0], passwd, passwd))
+                (self.sl[0], getKey, postKey))
         answer = self._server_request(HOST_BEHIND_NAT, func)
         #print "Answer: %s" % (answer,)
         if answer is not None and answer.get("error", '') not in ['', '0', 0]:
