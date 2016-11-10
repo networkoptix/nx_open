@@ -203,7 +203,7 @@ Item
                 PropertyAction
                 {
                     target: control;
-                    properties: "isExpanded, animating";
+                    properties: "isExpanded";
                     value: true;
                 }
 
@@ -268,13 +268,6 @@ Item
                     target: control;
                     property: "isExpanded";
                     value: (tileHolder.state == "expanded");
-                }
-
-                PropertyAction
-                {
-                    target: control;
-                    property: "animating";
-                    value: false;
                 }
             }
         }
