@@ -638,8 +638,6 @@ private:
 template<class T>
 void PostProcessTransactionFunction::operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const
 {
-    processor->triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
-
     // Local transactions (such as setStatus for servers) should only be sent to clients.
     if (tran.isLocal())
     {
@@ -653,6 +651,8 @@ void PostProcessTransactionFunction::operator()(ServerQueryProcessor* processor,
         // Send transaction to all peers.
         qnTransactionBus->sendTransaction(tran);
     }
+
+    processor->triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
 }
 
 } // namespace detail
