@@ -62,8 +62,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<QnActions::IDType>();
     qRegisterMetaType<QnActionParameters>();
-    qRegisterMetaType<QnAspectRatioHash>();
-    qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
     qRegisterMetaType<QnUpdateInfo>();
     qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 

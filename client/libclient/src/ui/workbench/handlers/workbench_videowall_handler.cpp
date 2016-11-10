@@ -1289,7 +1289,8 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
             {
                 cameras << camera;
-                ar = qnSettings->resourceAspectRatios().value(camera->getPhysicalId(), defaultAr);
+                const auto cameraAr = camera->aspectRatio();
+                ar = cameraAr.isValid() ? cameraAr.toFloat() : defaultAr;
             }
             aspectRatios[ar] = aspectRatios[ar] + 1;
         };

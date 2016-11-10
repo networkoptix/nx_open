@@ -52,7 +52,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
-#include <utils/aspect_ratio.h>
+#include <utils/common/aspect_ratio.h>
 #include <utils/license_usage_helper.h>
 #include <nx/utils/string.h>
 
@@ -383,10 +383,13 @@ float QnResourceWidget::visualAspectRatio() const
 
 float QnResourceWidget::defaultVisualAspectRatio() const
 {
-    if (m_enclosingGeometry.isNull())
-        return defaultAspectRatio();
+    if (!m_enclosingGeometry.isNull())
+        return m_enclosingGeometry.width() / m_enclosingGeometry.height();
 
-    return m_enclosingGeometry.width() / m_enclosingGeometry.height();
+    if (m_item && m_item->layout() && m_item->layout()->hasCellAspectRatio())
+        return m_item->layout()->cellAspectRatio();
+
+    return qnGlobals->defaultLayoutCellAspectRatio();
 }
 
 float QnResourceWidget::visualChannelAspectRatio() const

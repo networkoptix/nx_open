@@ -1,5 +1,7 @@
 #include "aspect_ratio.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace
 {
     const QList<QnAspectRatio> standardRatios =
@@ -38,6 +40,9 @@ int QnAspectRatio::height() const
 
 float QnAspectRatio::toFloat() const
 {
+    NX_ASSERT(isValid());
+    if (!isValid())
+        return kInvalidAspectRatio;
     return static_cast<float>(m_width) / m_height;
 }
 

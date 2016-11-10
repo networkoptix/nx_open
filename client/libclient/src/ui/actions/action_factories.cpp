@@ -4,7 +4,6 @@
 
 #include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>
-#include <utils/aspect_ratio.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
