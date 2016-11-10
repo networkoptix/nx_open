@@ -4,6 +4,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -39,6 +41,8 @@ class OutgoingTunnelConnectionWatcher:
     public ::testing::Test
 {
 public:
+    typedef ScopedGuard<std::function<void()>> InitializationGuard;
+
     OutgoingTunnelConnectionWatcher()
     {
         m_connectionParameters.tunnelInactivityTimeout =
@@ -50,7 +54,7 @@ public:
     }
 
 protected:
-    void initializeTunnel()
+    InitializationGuard initializeTunnel()
     {
         m_tunnel = std::make_unique<cloud::OutgoingTunnelConnectionWatcher>(
             m_connectionParameters,
@@ -61,6 +65,8 @@ protected:
             {
                 m_tunnelClosedPromise.set_value(reason);
             });
+
+        return [this]() { m_tunnel->pleaseStopSync(); };
     }
 
     void waitForTunnelToExpire(
@@ -81,7 +87,7 @@ protected:
 
 TEST_F(OutgoingTunnelConnectionWatcher, unusedTunnel)
 {
-    initializeTunnel();
+    const auto initializationGuard = initializeTunnel();
 
     auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
     waitForTunnelToExpire(tunnelClosedFuture);
@@ -89,7 +95,7 @@ TEST_F(OutgoingTunnelConnectionWatcher, unusedTunnel)
 
 TEST_F(OutgoingTunnelConnectionWatcher, usingTunnel)
 {
-    initializeTunnel();
+    const auto initializationGuard = initializeTunnel();
 
     auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
 
