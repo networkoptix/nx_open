@@ -10,30 +10,24 @@
 
 namespace {
 
-auto itemIsAffectedWidget = [](QGraphicsItem* item)
+bool itemIsResizableWidget(QGraphicsItem* item)
 {
     if (!item->isWidget())
-        return false;
-
-    return true;
-};
-
-auto itemIsResizableWidget = [](QGraphicsItem* item)
-{
-    if (!itemIsAffectedWidget(item))
         return false;
 
     if (!item->acceptedMouseButtons().testFlag(Qt::LeftButton))
         return false;
 
-    auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(item);
+    const auto widget = static_cast<QGraphicsWidget*>(item);
+
+    auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
     if (mediaWidget && mediaWidget->options().testFlag(
         QnMediaResourceWidget::WindowResizingForbidden))
     {
         return false;
     }
 
-    if (auto webView = dynamic_cast<QnGraphicsWebView*>(item))
+    if (auto webView = qobject_cast<QnGraphicsWebView*>(widget))
         return false;
 
     return true;
@@ -187,7 +181,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     bool needUnsetCursor = !widget || oldTargetWidget != widget || section == Qt::NoSection;
     if (needUnsetCursor)
     {
-        for (auto w : m_affectedWidgets)
+        for (auto w: m_affectedWidgets)
         {
             if (w)
                 w->unsetCursor();
@@ -212,7 +206,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
 
     m_affectedWidgets = getAffectedWidgets(viewport, correctedPos);
     NX_ASSERT(m_affectedWidgets.last() == widget);
-    for (auto w : m_affectedWidgets)
+    for (auto w: m_affectedWidgets)
     {
         NX_ASSERT(w);
         if (w)
@@ -369,7 +363,7 @@ void ResizingInstrument::getWidgetAndFrameSection(
     };
 
     QGraphicsWidget* widgetNearby = nullptr;
-    for (const auto& pos : locationsNearby)
+    for (const auto& pos: locationsNearby)
     {
         auto w = resizableWidgetAtPos(view, pos);
         if (!w)
@@ -440,9 +434,9 @@ QList<ResizingInstrument::QGraphicsWidgetPtr> ResizingInstrument::getAffectedWid
     if (!view->isInteractive())
         return result;
 
-    for (auto item : this->items(view, pos))
+    for (auto item: this->items(view, pos))
     {
-        if (!itemIsAffectedWidget(item))
+        if (!item->isWidget())
             continue;
 
         result.append(static_cast<QGraphicsWidget*>(item));
@@ -452,5 +446,4 @@ QList<ResizingInstrument::QGraphicsWidgetPtr> ResizingInstrument::getAffectedWid
     }
 
     return result;
-
 }
