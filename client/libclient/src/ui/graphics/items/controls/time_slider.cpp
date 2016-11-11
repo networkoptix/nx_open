@@ -2827,26 +2827,32 @@ void QnTimeSlider::sliderChange(SliderChange change)
             qint64 windowStart = m_windowStart;
             qint64 windowEnd = m_windowEnd;
 
-            bool stickToMinimum = m_options.testFlag(StickToMinimum) && windowStart == m_oldMinimum;
-            bool stickToMaximum = m_options.testFlag(StickToMaximum) && windowEnd == m_oldMaximum;
+            bool wasAtMinimum = windowStart == m_oldMinimum;
+            bool wasAtMaximum = windowEnd == m_oldMaximum;
 
-            /* Preserve window size only if it wasn't entire range: */
-            bool preserveWindow = (stickToMinimum != stickToMaximum) && m_options.testFlag(PreserveWindowSize);
-
-            if (stickToMaximum)
+            /* Always keep full range window: */
+            if (wasAtMinimum && wasAtMaximum)
             {
-                if (preserveWindow)
-                    windowStart += maximum() - windowEnd;
-
+                windowStart = minimum();
                 windowEnd = maximum();
             }
-
-            if (stickToMinimum)
+            else
             {
-                if (preserveWindow)
-                    windowEnd += minimum() - windowStart;
+                if (wasAtMaximum && m_options.testFlag(StickToMaximum))
+                {
+                    if (m_options.testFlag(PreserveWindowSize))
+                        windowStart += maximum() - windowEnd;
 
-                windowStart = minimum();
+                    windowEnd = maximum();
+                }
+
+                if (wasAtMinimum && m_options.testFlag(StickToMinimum))
+                {
+                    if (m_options.testFlag(PreserveWindowSize))
+                        windowEnd += minimum() - windowStart;
+
+                    windowStart = minimum();
+                }
             }
 
             /* Stick zoom anchor. */
