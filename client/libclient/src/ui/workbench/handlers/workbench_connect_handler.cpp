@@ -783,7 +783,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
     /* In several seconds after connect show warnings. */
-    executeDelayed([this] { showWarnMessagesOnce(); }, kMessagesDelayMs);
+    executeDelayedParented([this] { showWarnMessagesOnce(); }, kMessagesDelayMs, this);
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()

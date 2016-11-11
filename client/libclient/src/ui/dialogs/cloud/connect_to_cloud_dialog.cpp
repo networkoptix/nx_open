@@ -244,20 +244,24 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
-    cloudConnection->systemManager()->bindSystem(
-                sysRegistrationData,
-                [this, serverConnection](api::ResultCode result, api::SystemData systemData)
-    {
-        Q_Q(QnConnectToCloudDialog);
+    const auto guard = QPointer<QObject>(q);
+    const auto completionHandler =
+        [this, serverConnection, guard](api::ResultCode result, api::SystemData systemData)
+        {
+            if (!guard)
+                return;
 
-        executeDelayed(
-                [this, result, systemData, serverConnection]()
+            const auto timerCallback =
+                [this, guard, result, systemData, serverConnection]()
                 {
-                    at_bindFinished(result, systemData, serverConnection);
-                },
-                0, q->thread()
-        );
-    });
+                    if (!guard)
+                        at_bindFinished(result, systemData, serverConnection);
+                };
+
+            executeDelayed(timerCallback, 0, guard->thread());
+        };
+
+    cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
 }
 
 void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)

@@ -3233,15 +3233,22 @@ void QnTimeSlider::dragMove(DragInfo* info)
         else
             right += m_dragDelta.x();
 
+        const auto redrag =
+            [this]()
+            {
+                const auto redragCallback = [this]() { dragProcessor()->redrag(); };
+                executeDelayedParented(redragCallback, kDefaultDelay, this);
+            };
+
         if (left < 0)
         {
             ensureWindowContains(valueFromPosition(QPointF(left, 0), false));
-            executeDelayed([this]() { dragProcessor()->redrag(); });
+            redrag();
         }
         else if (right > rect().right())
         {
             ensureWindowContains(valueFromPosition(QPointF(right, 0), false));
-            executeDelayed([this]() { dragProcessor()->redrag(); });
+            redrag();
         }
     }
 

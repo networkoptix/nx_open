@@ -548,13 +548,24 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
             Q_Q(QnCloudStatusWatcher);
             q->setEffectiveUserName(value);
         };
-    auto targetThread = QThread::currentThread();
 
-    cloudConnection->accountManager()->getAccount(
-        [callback, targetThread](api::ResultCode result, api::AccountData accountData)
-    {
-        executeDelayed([callback, result, accountData] { callback(result, accountData); }, 0, targetThread);
-    });
+    const auto guard = QPointer<QObject>(this);
+    const auto completionHandler =
+        [callback, guard](api::ResultCode result, api::AccountData accountData)
+        {
+            if (!guard)
+                return;
+
+            const auto timerCallback =
+                [callback, result, accountData, guard]()
+                {
+                    if (guard)
+                        callback(result, accountData);
+                };
+            executeDelayed(timerCallback, 0, guard->thread());
+        };
+
+    cloudConnection->accountManager()->getAccount(completionHandler);
 }
 
 void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
@@ -584,13 +595,25 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
             m_pingTimer->setInterval(keepAliveMs);
             m_pingTimer->start();
         };
-    auto targetThread = QThread::currentThread();
 
-    cloudConnection->accountManager()->createTemporaryCredentials(params,
-        [callback, targetThread](api::ResultCode result, api::TemporaryCredentials credentials)
+
+    const auto guard = QPointer<QObject>(this);
+    const auto completionHandler =
+        [callback, guard](api::ResultCode result, api::TemporaryCredentials credentials)
         {
-            executeDelayed([callback, result, credentials]{ callback(result, credentials); }, 0, targetThread);
-        });
+            if (!guard)
+                return;
+
+            const auto timerCallback =
+                [callback, result, credentials, guard]
+                {
+                    if (guard)
+                        callback(result, credentials);
+                };
+            executeDelayed(timerCallback, 0, guard->thread());
+        };
+
+    cloudConnection->accountManager()->createTemporaryCredentials(params, completionHandler);
 }
 
 void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
@@ -622,13 +645,24 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
                 createTemporaryCredentials();
             }
         };
-    auto targetThread = QThread::currentThread();
 
     TRACE("Ping...");
-    temporaryConnection->ping(
-        [callback, targetThread](api::ResultCode result, api::ModuleInfo info)
+    const auto guard = QPointer<QObject>(this);
+    const auto completionHandler =
+        [callback, guard](api::ResultCode result, api::ModuleInfo info)
         {
             Q_UNUSED(info);
-            executeDelayed([callback, result]{ callback(result); }, 0, targetThread);
-        });
+            if (!guard)
+                return;
+
+            const auto timerCallback =
+                [callback, result, guard]()
+                {
+                    if (guard)
+                        callback(result);
+                };
+            executeDelayed(timerCallback, 0, guard->thread());
+        };
+
+    temporaryConnection->ping(completionHandler);
 }

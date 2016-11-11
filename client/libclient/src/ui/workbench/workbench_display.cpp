@@ -2413,11 +2413,14 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
 
     for (const QnResourcePtr &resource : targetResources)
     {
+        const auto callback =
+            [this, resource, businessAction]
+            {
+                showSplashOnResource(resource, businessAction);
+            };
+
         for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
-            executeDelayed([this, resource, businessAction]
-        {
-            showSplashOnResource(resource, businessAction);
-        }, timeMs);
+            executeDelayedParented(callback, timeMs, this);
     }
 }
 

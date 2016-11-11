@@ -1158,13 +1158,15 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentMediaWidget)
     {
-        executeDelayed(
+        const auto callback =
             [this]()
-        {
-            //TODO: #rvasilenko why should we make these delayed calls at all?
-            updatePlaying();
-            updateSpeed();
-        });
+            {
+                //TODO: #rvasilenko why should we make these delayed calls at all?
+                updatePlaying();
+                updateSpeed();
+            };
+
+        executeDelayedParented(callback, kDefaultDelay, this);
     }
 
     updateLocalOffset();
