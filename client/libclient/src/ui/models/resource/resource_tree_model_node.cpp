@@ -115,7 +115,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         setName(tr("Web Pages"));
         break;
     case Qn::UserResourcesNode:
-        setName(tr("Cameras && Resources"));
+        setName(tr("Cameras & Resources"));
         break;
     case Qn::LayoutsNode:
         setName(tr("Layouts"));
@@ -127,7 +127,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::AllCamerasAccessNode:
-        setName(tr("All Cameras && Resources"));
+        setName(tr("All Cameras & Resources"));
         m_state = Invalid;
         break;
     case Qn::AllLayoutsAccessNode:
@@ -135,7 +135,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::SharedResourcesNode:
-        setName(tr("Cameras && Resources"));
+        setName(tr("Cameras & Resources"));
         m_state = Invalid;
         break;
     case Qn::RoleUsersNode:
