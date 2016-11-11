@@ -485,7 +485,7 @@ private:
                     assert( m_sendHandler );
                     if( !isNonBlockingMode() )
                     {
-                        recvHandlerLocal( SystemError::invalidData, (size_t) -1 );
+                        sendHandlerLocal( SystemError::invalidData, (size_t) -1 );
                         break;
                     }
 
