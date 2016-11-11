@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='windows-1252'?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Fragment Id='FragmentServerPackage'>
         <PackageGroup Id="ServerPackageGroup">
             <MsiPackage
@@ -13,4 +13,37 @@
             </MsiPackage>
         </PackageGroup>
     </Fragment>
+
+    <Fragment Id='FragmentConditions'>
+        <?include BuildVars.wxi ?>
+
+        <?define CloudHostIsDifferent="(CLOUD_HOST <> "" AND CLOUD_HOST <> "$(var.cloudHost)")" ?>
+
+        <util:RegistrySearch
+          Id='SearchForIsConnectedToCloud' 
+          Variable="IsConnectedToCloud" 
+          Result="value"
+          Root="HKLM"
+          Key="$(var.ServerRegPath)" 
+          Value="isConnectedToCloud"
+          Format="raw"
+          Win64="yes"/>
+
+        <util:ProductSearch Id="ServerMsiSearch"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="state"
+            Variable="ServerInstalled" />
+
+        <?if $(var.arch) = x86 ?>
+        <bal:Condition Message="!(loc.Product_ArchMismatch)">
+            <![CDATA[ NOT VersionNT64 ]]>
+        </bal:Condition>
+        <?endif?>
+
+        <!-- Exit if upgrading and cloud hosts differ -->
+        <bal:Condition Message="!(loc.Product_CloudHostMismatch)">
+            <![CDATA[ NOT (ServerInstalled = 5 AND IsConnectedToCloud = "yes" AND $(var.CloudHostIsDifferent)) ]]>
+        </bal:Condition>
+    </Fragment>
+
 </Wix>

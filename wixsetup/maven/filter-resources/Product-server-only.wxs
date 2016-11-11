@@ -9,7 +9,6 @@
         <?include ControlPanel.wxi ?>
         
         <?define ProductName="${display.product.name}"?>
-        <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />

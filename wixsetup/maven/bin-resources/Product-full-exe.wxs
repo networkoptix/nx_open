@@ -3,20 +3,13 @@
     <?include BuildVars.wxi ?>
 
     <Bundle Name="$(var.productName) Bundle" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.fullBundleUpgradeCode)" DisableModify="yes">
-        <!-- Detect existing version of VC ++ 2015 x64 libraries -->
-        <util:FileSearch Id="GetVC14X64Exists" Condition="VersionNT64" Variable="vc14x64Exists" Path="[SystemFolder]vcruntime140.dll" Result="exists"/>
-        <util:FileSearch Id="GetVC14X64Version" Condition="VersionNT64" Variable="vc14x64Version" Path="[SystemFolder]vcruntime140.dll" Result="version"/>
-
-        <!-- Detect existing version of VC ++ 2015 x86 libraries -->
-        <util:FileSearch Id="GetVC14X86onX64Exists" Condition="VersionNT64" Variable="vc14x86Exists" Path="[System64Folder]vcruntime140.dll" Result="exists"/>
-        <util:FileSearch Id="GetVC14X86onX64Version" Condition="VersionNT64" Variable="vc14x86Version" Path="[System64Folder]vcruntime140.dll" Result="version"/>
-        <util:FileSearch Id="GetVC14X86onX86Exists" Condition="NOT VersionNT64" Variable="vc14x86Exists" Path="[SystemFolder]vcruntime140.dll" Result="exists"/>
-        <util:FileSearch Id="GetVC14X86onX86Version" Condition="NOT VersionNT64" Variable="vc14x86Version" Path="[SystemFolder]vcruntime140.dll" Result="version"/>
+        <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="License.rtf"
                 LogoFile="logo-64x64.png"
+                SuppressRepair="yes"
                 SuppressOptionsUI="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />

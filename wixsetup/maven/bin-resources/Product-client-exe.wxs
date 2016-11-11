@@ -7,6 +7,7 @@
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="License.rtf"
                 LogoFile="logo-64x64.png"
+                SuppressRepair="yes"
                 SuppressOptionsUI="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />
