@@ -33,9 +33,9 @@ public:
 
     /**
      * Establish new connection for user needs.
-     * @param timeout zero - no timeout.
-     * @param socketAttributes attribute values to apply to a newly-created socket.
-     * @note This method is re-enterable. So, it can be called indifferent threads simultaneously.
+     * @param timeout Zero means no timeout.
+     * @param socketAttributes Attribute values to apply to a newly-created socket.
+     * @note This method can be called from different threads simultaneously.
      */
     void establishNewConnection(
         const AddressEntry& targetHostAddress,
@@ -48,7 +48,7 @@ public:
 
     /**
      * Sould be called somewhere in every module, so this Id is useful for debug.
-     * @param name Short module name, usefull for debug.
+     * @param name Short module name, useful for debug.
      * @param uuid Unique instance Id, e.g. Hardware Id.
      */
     void designateSelfPeerId(const String& name, const QnUuid& uuid);
