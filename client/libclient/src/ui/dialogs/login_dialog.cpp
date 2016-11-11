@@ -471,7 +471,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
             item->setData(url, Qn::UrlRole);
 
             if (!isCompatible)
-                item->setData(QBrush(QColor(qnGlobals->errorTextColor())), Qt::TextColorRole);
+                item->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
             m_autoFoundItem->appendRow(item);
         }
     }
