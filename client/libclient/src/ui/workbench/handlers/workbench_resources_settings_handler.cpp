@@ -87,7 +87,8 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     QnMediaServerResourcePtr server = servers.first();
 
-    bool hasAccess = accessController()->hasPermissions(server, Qn::ReadPermission);
+    bool hasAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;
 
@@ -120,6 +121,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
         return;
 
     bool hasAccess = accessController()->hasPermissions(user, Qn::ReadPermission);
+    NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition");
     if (!hasAccess)
         return;
 

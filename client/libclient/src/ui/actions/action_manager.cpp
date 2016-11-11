@@ -1512,6 +1512,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
+        requiredTargetPermissions(Qn::ReadPermission).
         condition(hasFlags(Qn::user));
 
     factory(QnActions::UserRolesAction).

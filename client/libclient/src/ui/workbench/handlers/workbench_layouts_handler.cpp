@@ -587,7 +587,7 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
+            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ViewContentPermission);
         };
     QnResourceList toShare = change.added.filtered(inaccessible); //TODO: #GDM code duplication
 
@@ -687,7 +687,7 @@ void QnWorkbenchLayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
+            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ViewContentPermission);
         };
 
     auto accessible = qnSharedResourcesManager->sharedResources(user);

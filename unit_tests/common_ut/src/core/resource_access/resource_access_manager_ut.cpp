@@ -10,6 +10,7 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/camera_resource_stub.h>
@@ -425,6 +426,7 @@ TEST_F(QnResourceAccessManagerTest, checkUserGroupChange)
 
     user->setUserGroup(role.id);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
@@ -433,9 +435,11 @@ TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     user->setEnabled(false);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
@@ -448,11 +452,13 @@ TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
 
     user->setUserGroup(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     role.permissions = Qn::GlobalAccessAllMediaPermission;
     qnUserRolesManager->addOrUpdateUserRole(role);
 
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkEditAccessChange)
@@ -476,9 +482,11 @@ TEST_F(QnResourceAccessManagerTest, checkRoleRemoved)
 
     user->setUserGroup(role.id);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     qnUserRolesManager->removeUserRole(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkParentChanged)
@@ -557,6 +565,41 @@ TEST_F(QnResourceAccessManagerTest, checkAccessibleServerAsViewer)
     checkPermissions(server, desired, forbidden);
 }
 
+/************************************************************************/
+/* Checking storages access rights                                       */
+/************************************************************************/
+
+/* Admin must have full permissions for storages. */
+TEST_F(QnResourceAccessManagerTest, checkStoragesAsAdmin)
+{
+    loginAsOwner();
+
+    auto server = addServer();
+    auto storage = addStorage(server);
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(storage, desired, forbidden);
+}
+
+/* Non-admin users should not have access to storages. */
+TEST_F(QnResourceAccessManagerTest, checkStoragesAsCustom)
+{
+    loginAs(Qn::GlobalCustomUserPermission);
+
+    auto server = addServer();
+    auto storage = addStorage(server);
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+
+    /* We do have access to server. */
+    checkPermissions(server, Qn::ReadPermission, 0);
+
+    /* But no access to its storages. */
+    checkPermissions(storage, desired, forbidden);
+}
 
 /************************************************************************/
 /* Checking videowall access rights                                     */
@@ -629,3 +672,4 @@ TEST_F(QnResourceAccessManagerTest, checkVideowallAsViewer)
 
     checkPermissions(videowall, desired, forbidden);
 }
+

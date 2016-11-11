@@ -41,6 +41,8 @@
 #include "connection_testing_dialog.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
+#include <ui/style/globals.h>
+
 #include <utils/connection_diagnostics_helper.h>
 
 #include <utils/common/app_info.h>
@@ -469,7 +471,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
             item->setData(url, Qn::UrlRole);
 
             if (!isCompatible)
-                item->setData(QColor(Qt::red), Qt::TextColorRole);
+                item->setData(QBrush(QColor(qnGlobals->errorTextColor())), Qt::TextColorRole);
             m_autoFoundItem->appendRow(item);
         }
     }
