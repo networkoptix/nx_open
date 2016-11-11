@@ -425,6 +425,7 @@ TEST_F(QnResourceAccessManagerTest, checkUserGroupChange)
 
     user->setUserGroup(role.id);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
@@ -433,9 +434,11 @@ TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     user->setEnabled(false);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
@@ -448,11 +451,13 @@ TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
 
     user->setUserGroup(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     role.permissions = Qn::GlobalAccessAllMediaPermission;
     qnUserRolesManager->addOrUpdateUserRole(role);
 
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkEditAccessChange)
@@ -476,9 +481,11 @@ TEST_F(QnResourceAccessManagerTest, checkRoleRemoved)
 
     user->setUserGroup(role.id);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     qnUserRolesManager->removeUserRole(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkParentChanged)

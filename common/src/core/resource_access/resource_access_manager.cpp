@@ -432,7 +432,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (!qnResourceAccessProvider->hasAccess(subject, camera))
         return result;
 
-    result |= Qn::ReadPermission;
+    result |= Qn::ReadPermission | Qn::ViewContentPermission;
     if (hasGlobalPermission(subject, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
@@ -512,7 +512,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (!qnResourceAccessProvider->hasAccess(subject, webPage))
         return Qn::NoPermissions;
 
-    Qn::Permissions result = Qn::ReadPermission;
+    Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
     if (qnCommon->isReadOnly())
         return result;
 
