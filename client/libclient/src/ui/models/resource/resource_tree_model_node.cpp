@@ -668,6 +668,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     {
         switch(m_type)
         {
+        case Qn::SharedResourceNode:
         case Qn::ResourceNode:
         case Qn::EdgeNode:
             m_editable.value = menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource));
