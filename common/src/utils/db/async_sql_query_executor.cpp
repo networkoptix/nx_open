@@ -9,7 +9,6 @@
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace db {
 
@@ -18,7 +17,8 @@ static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
-    m_connectionOptions(connectionOptions)
+    m_connectionOptions(connectionOptions),
+    m_terminated(false)
 {
     m_dropConnectionThread =
         nx::utils::thread(
@@ -39,64 +39,53 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     m_connectionsToDropQueue.push(nullptr);
     m_dropConnectionThread.join();
 
-    for (auto& dbConnection: m_dbThreadPool)
+    std::vector<std::unique_ptr<DbRequestExecutionThread>> dbThreadPool;
+    {
+        QnMutexLocker lk(&m_mutex);
+        std::swap(m_dbThreadPool, dbThreadPool);
+        m_terminated = true;
+    }
+
+    for (auto& dbConnection: dbThreadPool)
         dbConnection->pleaseStop();
-    m_dbThreadPool.clear();
+    dbThreadPool.clear();
 }
 
 bool AsyncSqlQueryExecutor::init()
 {
-    return openOneMoreConnectionIfNeeded();
-}
-
-bool AsyncSqlQueryExecutor::openOneMoreConnectionIfNeeded()
-{
     QnMutexLocker lk(&m_mutex);
+    openNewConnection(lk);
+    // TODO: Waiting for connection to change state
 
-    dropClosedConnections(&lk);
-
-    //checking whether we really need a new connection
-    const auto effectiveDBConnectionCount = m_dbThreadPool.size();
-    const auto queueSize = static_cast< size_t >(m_requestQueue.size());
-    const auto maxDesiredQueueSize = 
-        effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
-    if (queueSize < maxDesiredQueueSize)
-        return true;    //< Task number is not too high.
-    if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
-        return true;    //< Pool size is already at maximum.
-
-    //adding another connection
-    auto executorThread = std::make_unique<DbRequestExecutionThread>(
-        m_connectionOptions,
-        &m_requestQueue);
-    executorThread->start();
-
-    m_dbThreadPool.push_back(std::move(executorThread));
     return true;
 }
 
-void AsyncSqlQueryExecutor::dropClosedConnections(QnMutexLockerBase* const /*lk*/)
+bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const
 {
-    //dropping expired/failed connections
-    const auto firstConnectionToDropIter = std::remove_if(
-        m_dbThreadPool.begin(), m_dbThreadPool.end(),
-        [](const std::unique_ptr<DbRequestExecutionThread>& dbConnectionThread)
-        {
-            return dbConnectionThread->state() == ConnectionState::closed;
-        });
-    if (firstConnectionToDropIter == m_dbThreadPool.end())
-        return;
+    const auto effectiveDBConnectionCount = m_dbThreadPool.size();
+    const auto queueSize = static_cast< size_t >(m_requestQueue.size());
+    const auto maxDesiredQueueSize =
+        effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
+    if (queueSize < maxDesiredQueueSize)
+        return false;    //< Task number is not too high.
+    if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
+        return false;    //< Pool size is already at maximum.
 
-    NX_LOGX(lm("Dropping %1 closed connections")
-        .arg(std::distance(firstConnectionToDropIter, m_dbThreadPool.end())),
-        cl_logDEBUG2);
+    return true;
+}
 
-    //dropping connections in a separate thread since current thread can be aio thread 
-    //    and connection drop is a blocking operation
-    for (auto it = firstConnectionToDropIter; it != m_dbThreadPool.end(); ++it)
-        m_connectionsToDropQueue.push(std::move(*it));
+void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& /*lk*/)
+{
+    auto executorThread = std::make_unique<DbRequestExecutionThread>(
+        m_connectionOptions,
+        &m_requestQueue);
+    auto executorThreadPtr = executorThread.get();
 
-    m_dbThreadPool.erase(firstConnectionToDropIter, m_dbThreadPool.end());
+    m_dbThreadPool.push_back(std::move(executorThread));
+
+    executorThreadPtr->setOnClosedHandler(
+        std::bind(&AsyncSqlQueryExecutor::onConnectionClosed, this, executorThreadPtr));
+    executorThreadPtr->start();
 }
 
 void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
@@ -118,6 +107,33 @@ void AsyncSqlQueryExecutor::reportQueryCancellation(
 {
     // We are in a random db request execution thread.
     expiredQuery->reportErrorWithoutExecution(DBResult::cancelled);
+}
+
+void AsyncSqlQueryExecutor::onConnectionClosed(
+    DbRequestExecutionThread* const executorThreadPtr)
+{
+    QnMutexLocker lk(&m_mutex);
+    dropConnectionAsync(lk, executorThreadPtr);
+    if (m_dbThreadPool.empty() && !m_terminated)
+        openNewConnection(lk);
+}
+
+void AsyncSqlQueryExecutor::dropConnectionAsync(
+    const QnMutexLockerBase& /*lk*/,
+    DbRequestExecutionThread* const executorThreadPtr)
+{
+    auto it = std::find_if(
+        m_dbThreadPool.begin(),
+        m_dbThreadPool.end(),
+        [executorThreadPtr](std::unique_ptr<DbRequestExecutionThread>& val)
+        {
+            return val.get() == executorThreadPtr;
+        });
+
+    if (it == m_dbThreadPool.end())
+        return; //< This can happen during AsyncSqlQueryExecutor destruction.
+    m_connectionsToDropQueue.push(std::move(*it));
+    m_dbThreadPool.erase(it);
 }
 
 } // namespace db

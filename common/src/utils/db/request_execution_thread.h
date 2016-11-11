@@ -4,6 +4,8 @@
 #include <memory>
 
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
+#include <nx/utils/move_only_func.h>
+
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 
@@ -46,6 +48,8 @@ public:
 
     ConnectionState state() const;
 
+    void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+
 protected:
     /** Implementation of QnLongRunnable::run. */
     virtual void run() override;
@@ -55,6 +59,7 @@ private:
     QSqlDatabase m_dbConnection;
     QueryExecutorQueue* const m_queryExecutorQueue;
     ConnectionState m_state;
+    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
 
     bool tuneConnection();
     bool tuneMySqlConnection();

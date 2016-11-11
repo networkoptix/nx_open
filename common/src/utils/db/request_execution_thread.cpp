@@ -7,6 +7,8 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace db {
 
@@ -61,9 +63,21 @@ ConnectionState DbRequestExecutionThread::state() const
     return m_state;
 }
 
+void DbRequestExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_onClosedHandler = std::move(handler);
+}
+
 void DbRequestExecutionThread::run()
 {
     constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
+
+    auto invokeOnClosedHandlerGuard = makeScopedGuard(
+        [onClosedHandler = std::move(m_onClosedHandler)]()
+        {
+            if (onClosedHandler)
+                onClosedHandler();
+        });
 
     if (!open())
     {

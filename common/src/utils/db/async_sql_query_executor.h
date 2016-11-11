@@ -126,15 +126,16 @@ private:
     std::vector<std::unique_ptr<DbRequestExecutionThread>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
     QnSafeQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
+    bool m_terminated;
 
-    /**
-     * @return \a true if no new connection is required or new connection has been opened.
-     *         \a false in case of failure to open connection when required.
-     */
-    bool openOneMoreConnectionIfNeeded();
-    void dropClosedConnections(QnMutexLockerBase* const lk);
+    bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
+    void openNewConnection(const QnMutexLockerBase& /*lk*/);
     void dropExpiredConnectionsThreadFunc();
     void reportQueryCancellation(std::unique_ptr<AbstractExecutor>);
+    void onConnectionClosed(DbRequestExecutionThread* const executorThreadPtr);
+    void dropConnectionAsync(
+        const QnMutexLockerBase& /*lk*/,
+        DbRequestExecutionThread* const executorThreadPtr);
 
     template<
         typename Executor, typename UpdateFunc,
@@ -144,14 +145,16 @@ private:
         CompletionHandler completionHandler,
         Input ... input)
     {
-        openOneMoreConnectionIfNeeded();
+        QnMutexLocker lk(&m_mutex);
+
+        if (isNewConnectionNeeded(lk))
+            openNewConnection(lk);
 
         auto ctx = std::make_unique<Executor>(
             std::move(updateFunc),
             std::move(input)...,
             std::move(completionHandler));
 
-        QnMutexLocker lk(&m_mutex);
         m_requestQueue.push(std::move(ctx));
     }
 };
