@@ -205,7 +205,7 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
     case Qt::DecorationRole:
         return isRoleValid(userRole)
             ? qnResIconCache->icon(QnResourceIconCache::Users)
-            : qnSkin->icon("tree/offline.png"); //TODO: #GDM #3.0 waiting for an icon from #apats
+            : qnSkin->icon("tree/role_error.png");
 
     case Qn::UuidRole:
         return qVariantFromValue(userRole.id);
