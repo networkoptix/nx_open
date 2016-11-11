@@ -1,5 +1,6 @@
 #pragma once
 
+#include <queue>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 
@@ -20,6 +21,36 @@
 namespace ec2 {
 
 namespace detail {
+
+class TransactionPostProcessor
+{
+public:
+    void push(std::function<void()> task)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_tasks.push(task);
+    }
+
+    void process()
+    {
+        std::function<void()> task;
+        while (true)
+        {
+            {
+                QnMutexLocker lock(&m_mutex);
+                if (m_tasks.empty())
+                    return;
+                task = m_tasks.front();
+                m_tasks.pop();
+            }
+            task();
+        }
+    }
+
+private:
+    QnMutex m_mutex;
+    std::queue<std::function<void()>> m_tasks;
+};
 
 class ServerQueryProcessor;
 
@@ -63,9 +94,9 @@ public:
             handler,
             [this](
                 QnTransaction<QueryDataType>& tran,
-                std::list<std::function<void()>>* const transactionsPostProcessList) -> ErrorCode
+                TransactionPostProcessor* const postProcessor) -> ErrorCode
             {
-                return processUpdateSync(tran, transactionsPostProcessList);
+                return processUpdateSync(tran, postProcessor);
             });
     }
 
@@ -270,7 +301,7 @@ public:
 private:
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
-     *     std::list<std::function<void()>>*)
+     *     TransactionPostProcessor*)
      */
     template<class QueryDataType, class CompletionHandlerType, class SyncFunctionType>
     void doAsyncExecuteTranCall(
@@ -290,13 +321,13 @@ private:
 
         // Starting transaction.
         std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
-        std::list<std::function<void()>> transactionsPostProcessList;
+        static TransactionPostProcessor postProcessor;
 
         if(ApiCommand::isPersistent(tran.command))
         {
             dbTran.reset(new detail::QnDbManager::QnDbTransactionLocker(
                 dbManager(m_userAccessData).getTransaction()));
-            errorCode = syncFunction(tran, &transactionsPostProcessList);
+            errorCode = syncFunction(tran, &postProcessor);
             if(errorCode != ErrorCode::ok)
                 return;
             if (!dbTran->commit())
@@ -307,12 +338,11 @@ private:
         }
         else
         {
-            transactionsPostProcessList.push_back(std::bind(PostProcessTransactionFunction(), this, tran));
+            postProcessor.push(std::bind(PostProcessTransactionFunction(), this, tran));
         }
 
-        // Sending transactions.
-        for(auto& postProcessAction : transactionsPostProcessList)
-            postProcessAction();
+        // Post processing transactions.
+        postProcessor.process();
 
         // Handler is invoked asynchronously.
     }
@@ -333,32 +363,32 @@ private:
     ErrorCode removeHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        std::list<std::function<void()>>* const transactionsPostProcessList,
+        TransactionPostProcessor* const postProcessor,
         TransactionType::Value transactionType = TransactionType::Regular);
 
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        std::list<std::function<void()>>* const transactionsPostProcessList);
+        TransactionPostProcessor* const postProcessor);
 
     ErrorCode removeObjParamsHelper(
         const QnTransaction<ApiIdData>& tran,
         const AbstractECConnectionPtr& connection,
-        std::list<std::function<void()>>* const transactionsPostProcessList);
+        TransactionPostProcessor* const postProcessor);
 
     ErrorCode removeObjAccessRightsHelper(
         const QnUuid& id,
-        std::list<std::function<void()>>* const transactionsPostProcessList);
+        TransactionPostProcessor* const postProcessor);
 
     ErrorCode removeResourceStatusHelper(
         const QnUuid& id,
-        std::list<std::function<void()>>* const transactionsPostProcessList,
+        TransactionPostProcessor* const postProcessor,
         TransactionType::Value transactionType = TransactionType::Regular);
 
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
-        std::list<std::function<void()>>* const transactionsPostProcessList)
+        TransactionPostProcessor* const postProcessor)
     {
         ErrorCode errorCode = ErrorCode::ok;
         auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -381,17 +411,17 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeCameraUserAttributes,
-                        transactionsPostProcessList),
+                        postProcessor),
                     lit("Remove camera attributes failed"));
 
                 RUN_AND_CHECK_ERROR(
-                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
+                    removeObjParamsHelper(tran, connection, postProcessor),
                     lit("Remove camera params failed"));
 
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList),
+                        postProcessor),
                     lit("Remove resource access status failed"));
 
                 break;
@@ -403,11 +433,11 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeServerUserAttributes,
-                        transactionsPostProcessList),
+                        postProcessor),
                     lit("Remove server attrs failed"));
 
                 RUN_AND_CHECK_ERROR(
-                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
+                    removeObjParamsHelper(tran, connection, postProcessor),
                     lit("Remove server params failed"));
 
                 RUN_AND_CHECK_ERROR(
@@ -417,13 +447,13 @@ private:
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
-                        transactionsPostProcessList),
+                        postProcessor),
                     lit("Remove server child resources failed"));
 
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList,
+                        postProcessor,
                         TransactionType::Local),
                     lit("Remove resource status failed"));
 
@@ -435,7 +465,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList),
+                        postProcessor),
                     lit("Remove resource status failed"));
 
                 break;
@@ -444,7 +474,7 @@ private:
             case ApiObject_User:
             {
                 RUN_AND_CHECK_ERROR(
-                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
+                    removeObjParamsHelper(tran, connection, postProcessor),
                     lit("Remove user params failed"));
 
                 RUN_AND_CHECK_ERROR(
@@ -454,7 +484,7 @@ private:
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
-                        transactionsPostProcessList),
+                        postProcessor),
                     lit("Remove user child resources failed"));
 
                 break;
@@ -467,7 +497,7 @@ private:
         RUN_AND_CHECK_ERROR(
             removeObjAccessRightsHelper(
                 tran.params.id,
-                transactionsPostProcessList),
+                postProcessor),
             lit("Remove resource access rights failed"));
 
         if(errorCode != ErrorCode::ok)
@@ -475,19 +505,19 @@ private:
 
         #undef RUN_AND_CHECK_ERROR
 
-        return processUpdateSync(tran, transactionsPostProcessList, 0);
+        return processUpdateSync(tran, postProcessor, 0);
     }
 
     ErrorCode processUpdateSync(
         QnTransaction<ApiResetBusinessRuleData>& tran,
-        std::list<std::function<void()>>* const transactionsPostProcessList,
+        TransactionPostProcessor* const postProcessor,
         int /*dummy*/ = 0)
     {
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeEventRule,
             tran.transactionType,
             dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
-            transactionsPostProcessList);
+            postProcessor);
         if(errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -495,13 +525,13 @@ private:
             ApiCommand::saveEventRule,
             tran.transactionType,
             tran.params.defaultRules,
-            transactionsPostProcessList);
+            postProcessor);
     }
 
     template<class QueryDataType>
     ErrorCode processUpdateSync(
         QnTransaction<QueryDataType>& tran,
-        std::list<std::function<void()>>* const transactionsPostProcessList,
+        TransactionPostProcessor* const postProcessor,
         int /*dummy*/ = 0)
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
@@ -510,7 +540,6 @@ private:
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 
-        QnMutexLocker lock(&m_updateDataMutex);
         transactionLog->fillPersistentInfo(tran);
         QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
 
@@ -521,24 +550,23 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push_back(std::bind(PostProcessTransactionFunction(), this, tran));
+        postProcessor->push(std::bind(PostProcessTransactionFunction(), this, tran));
 
-        lock.unlock();
         return errorCode;
     }
 
     ErrorCode processUpdateSync(
         QnTransaction<ApiIdData>& tran,
-        std::list<std::function<void()>>* const transactionsPostProcessList)
+        TransactionPostProcessor* const postProcessor)
     {
         switch (tran.command)
         {
             case ApiCommand::removeMediaServer:
-                return removeResourceSync(tran, ApiObject_Server, transactionsPostProcessList);
+                return removeResourceSync(tran, ApiObject_Server, postProcessor);
             case ApiCommand::removeUser:
-                return removeResourceSync(tran, ApiObject_User, transactionsPostProcessList);
+                return removeResourceSync(tran, ApiObject_User, postProcessor);
             case ApiCommand::removeCamera:
-                return removeResourceSync(tran, ApiObject_Camera, transactionsPostProcessList);
+                return removeResourceSync(tran, ApiObject_Camera, postProcessor);
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
@@ -569,12 +597,12 @@ private:
                         updatedTran.command = ApiCommand::removeEventRule;
                         break;
                     default:
-                        return processUpdateSync(tran, transactionsPostProcessList, 0);
+                        return processUpdateSync(tran, postProcessor, 0);
                 }
-                return processUpdateSync(updatedTran, transactionsPostProcessList); //< calling recursively
+                return processUpdateSync(updatedTran, postProcessor); //< calling recursively
             }
             default:
-                return processUpdateSync(tran, transactionsPostProcessList, 0);
+                return processUpdateSync(tran, postProcessor, 0);
         }
     }
 
@@ -583,13 +611,13 @@ private:
         ApiCommand::Value command,
         TransactionType::Value transactionType,
         const std::vector<SubDataType>& nestedList,
-        std::list<std::function<void()>>* const transactionsPostProcessList)
+        TransactionPostProcessor* const postProcessor)
     {
         for(const SubDataType& data: nestedList)
         {
             QnTransaction<SubDataType> subTran = createTransaction(command, data);
             subTran.transactionType = transactionType;
-            ErrorCode errorCode = processUpdateSync(subTran, transactionsPostProcessList);
+            ErrorCode errorCode = processUpdateSync(subTran, postProcessor);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
         }
@@ -609,17 +637,16 @@ private:
             handler,
             [this, subCommand](
                 QnTransaction<QueryDataType>& multiTran,
-                std::list<std::function<void()>>* const transactionsPostProcessList) -> ErrorCode
+                TransactionPostProcessor* const postProcessor) -> ErrorCode
             {
                 return processMultiUpdateSync(
                     subCommand, multiTran.transactionType, multiTran.params,
-                    transactionsPostProcessList);
+                    postProcessor);
             });
     }
 
 
 private:
-    static QnMutex m_updateDataMutex;
     Qn::UserAccessData m_userAccessData;
     ECConnectionAuditManager* m_auditManager;
     QnAuthSession m_authSession;
