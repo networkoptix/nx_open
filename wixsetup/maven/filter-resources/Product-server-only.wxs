@@ -148,7 +148,6 @@
         
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
-
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"

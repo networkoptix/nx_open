@@ -22,6 +22,7 @@ public:
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
         registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<QnCredentials>(Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
         registerKey<QList<QnResourceChannelMapping>>(
             Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
         registerKey<QnHttpConfigureRequestList>(Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);

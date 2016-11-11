@@ -31,6 +31,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
+const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
@@ -103,6 +104,7 @@ public:
 
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
+    int auditTrailPeriodDays() const;
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -217,6 +219,7 @@ signals:
     void localSystemIdChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
+    void auditTrailPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
@@ -243,6 +246,8 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
+    QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
+
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;

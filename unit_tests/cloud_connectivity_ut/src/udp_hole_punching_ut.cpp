@@ -78,23 +78,11 @@ private:
     }
 };
 
-TEST_F(UdpHolePunching, simpleSync)
-{
-    test::socketSimpleSync(
-        [&](){ return cloudServerSocket(); },
-        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(HostAddress::localhost, 0),
-        SocketAddress(m_server->fullName()));
-}
-
-TEST_F(UdpHolePunching, simpleAsync)
-{
-    test::socketSimpleAsync(
-        [&](){ return cloudServerSocket(); },
-        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(HostAddress::localhost, 0),
-        SocketAddress(m_server->fullName()));
-}
+NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE_EX(
+    TEST_F, UdpHolePunching,
+    [&](){ return cloudServerSocket(); },
+    [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
+    SocketAddress(m_server->fullName()));
 
 TEST_F(UdpHolePunching, loadTest)
 {

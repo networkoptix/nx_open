@@ -1,12 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/outgoing_cross_nat_tunnel_watcher.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
+namespace test {
 
 namespace {
 
@@ -34,24 +37,26 @@ public:
 constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
 constexpr auto allowedTimerError = std::chrono::seconds(5);
 
-class OutgoingCrossNatTunnelWatcherTest:
+class OutgoingTunnelConnectionWatcher:
     public ::testing::Test
 {
 public:
-    OutgoingCrossNatTunnelWatcherTest()
+    typedef ScopedGuard<std::function<void()>> InitializationGuard;
+
+    OutgoingTunnelConnectionWatcher()
     {
         m_connectionParameters.tunnelInactivityTimeout =
             tunnelInactivityTimeout;
     }
     
-    ~OutgoingCrossNatTunnelWatcherTest()
+    ~OutgoingTunnelConnectionWatcher()
     {
     }
 
 protected:
-    void initializeTunnel()
+    InitializationGuard initializeTunnel()
     {
-        m_tunnel = std::make_unique<OutgoingCrossNatTunnelWatcher>(
+        m_tunnel = std::make_unique<cloud::OutgoingTunnelConnectionWatcher>(
             m_connectionParameters,
             std::make_unique<TestTunnelConnection>());
 
@@ -60,6 +65,8 @@ protected:
             {
                 m_tunnelClosedPromise.set_value(reason);
             });
+
+        return InitializationGuard([this]() { m_tunnel->pleaseStopSync(); });
     }
 
     void waitForTunnelToExpire(
@@ -72,23 +79,23 @@ protected:
     }
 
     nx::hpm::api::ConnectionParameters m_connectionParameters;
-    std::unique_ptr<OutgoingCrossNatTunnelWatcher> m_tunnel;
+    std::unique_ptr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
 };
 
 } // namespace
 
-TEST_F(OutgoingCrossNatTunnelWatcherTest, unusedTunnel)
+TEST_F(OutgoingTunnelConnectionWatcher, unusedTunnel)
 {
-    initializeTunnel();
+    const auto initializationGuard = initializeTunnel();
 
     auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
     waitForTunnelToExpire(tunnelClosedFuture);
 }
 
-TEST_F(OutgoingCrossNatTunnelWatcherTest, usingTunnel)
+TEST_F(OutgoingTunnelConnectionWatcher, usingTunnel)
 {
-    initializeTunnel();
+    const auto initializationGuard = initializeTunnel();
 
     auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
 
@@ -116,6 +123,7 @@ TEST_F(OutgoingCrossNatTunnelWatcherTest, usingTunnel)
     waitForTunnelToExpire(tunnelClosedFuture);
 }
 
+} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx

@@ -97,7 +97,7 @@ cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
 #copying qt libs
-QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
+QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia Qt5MultimediaQuick_p Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
 if [ '${arch}' == 'arm' ]
 then
   QTLIBS+=( Sensors )

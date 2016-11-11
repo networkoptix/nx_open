@@ -329,7 +329,10 @@ class FuncTestCase(unittest.TestCase):
         self._mediaserver_ctl(box, 'safe-stop')
         time.sleep(0)
         if self._init_script:
-            self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
+            #self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
+            cmd = ('/vagrant/' + self._init_script,  self._test_key, 'init') + self._init_script_args(num)
+            out = self._call_box(box, *cmd)
+            print "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out)
         sys.stdout.write("Box %s is ready\n" % box)
 
     def _prepare_test_phase(self, method):
@@ -728,7 +731,7 @@ class FuncTestMaster(object):
     def _loadConfig(self):
         parser = self.getConfig()
 
-        _section = "Nat" if self.args.natcon else "General" # Fixme: ugly hack :(
+        _section = "Nat" if self.args.BoxTest == 'natcon' else "General" # Fixme: ugly hack :(
         self.clusterTestServerList = parser.get(_section,"serverList").split(",")
 
         parser.rtset('ServerList', self.clusterTestServerList)

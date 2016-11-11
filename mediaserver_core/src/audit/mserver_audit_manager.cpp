@@ -18,8 +18,23 @@ QnAuditRecord filteredRecord(QnAuditRecord record)
 }
 
 
-QnMServerAuditManager::QnMServerAuditManager(): QnAuditManager()
+QnMServerAuditManager::QnMServerAuditManager(): QnAuditManager(), m_internalId(-1)
 {
+    m_internalId = qnServerDb->auditRecordMaxId();
+    connect (&m_timer, &QTimer::timeout, this,
+        [this]()
+        {
+            decltype(m_recordsToAdd) records;
+            {
+                QnMutexLocker lock(&m_mutex);
+                if (m_recordsToAdd.empty())
+                    return;
+                std::swap(records, m_recordsToAdd);
+            }
+            if (!qnServerDb->addAuditRecords(records))
+                qWarning() << "Failed to add" << records.size() << "audit trail records";
+        });
+    m_timer.start(1000 * 5);
 }
 
 QnMServerAuditManager::~QnMServerAuditManager()
@@ -28,16 +43,27 @@ QnMServerAuditManager::~QnMServerAuditManager()
 
 int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 {
+    if (m_internalId < 0)
+        return -1; //< error writing to server database
+
     if (record.isLoginType())
         NX_ASSERT(record.resources.empty());
 
-    return qnServerDb->addAuditRecord(filteredRecord(record));
+    QnMutexLocker lock(&m_mutex);
+    auto internalId = ++m_internalId;
+    m_recordsToAdd[internalId] = filteredRecord(record);
+    return internalId;
 }
 
 int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAuditRecord& record)
 {
+    if (m_internalId < 0)
+        return -1; //< error writing to server database
+
     if (record.isLoginType())
         NX_ASSERT(record.resources.empty());
 
-    return qnServerDb->updateAuditRecord(internalId, filteredRecord(record));
+    QnMutexLocker lock(&m_mutex);
+    m_recordsToAdd[internalId] = filteredRecord(record);
+    return internalId;
 }

@@ -175,6 +175,7 @@ void QnConnectionManager::connectToServer(const QUrl& url)
     QUrl actualUrl = url;
     if (actualUrl.port() == -1)
         actualUrl.setPort(defaultServerPort());
+    actualUrl.setUserName(actualUrl.userName().toLower());
     d->setUrl(actualUrl);
     d->doConnect();
 }

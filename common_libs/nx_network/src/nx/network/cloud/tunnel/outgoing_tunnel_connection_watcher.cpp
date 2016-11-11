@@ -1,4 +1,4 @@
-#include "outgoing_cross_nat_tunnel_watcher.h"
+#include "outgoing_tunnel_connection_watcher.h"
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
@@ -7,7 +7,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-OutgoingCrossNatTunnelWatcher::OutgoingCrossNatTunnelWatcher(
+OutgoingTunnelConnectionWatcher::OutgoingTunnelConnectionWatcher(
     nx::hpm::api::ConnectionParameters connectionParameters,
     std::unique_ptr<AbstractOutgoingTunnelConnection> tunnelConnection)
     :
@@ -19,12 +19,12 @@ OutgoingCrossNatTunnelWatcher::OutgoingCrossNatTunnelWatcher(
     launchInactivityTimer();
 }
 
-OutgoingCrossNatTunnelWatcher::~OutgoingCrossNatTunnelWatcher()
+OutgoingTunnelConnectionWatcher::~OutgoingTunnelConnectionWatcher()
 {
     stopWhileInAioThread();
 }
 
-void OutgoingCrossNatTunnelWatcher::bindToAioThread(
+void OutgoingTunnelConnectionWatcher::bindToAioThread(
     aio::AbstractAioThread* aioThread)
 {
     BaseType::bindToAioThread(aioThread);
@@ -33,53 +33,58 @@ void OutgoingCrossNatTunnelWatcher::bindToAioThread(
     m_inactivityTimer->bindToAioThread(getAioThread());
 }
 
-void OutgoingCrossNatTunnelWatcher::stopWhileInAioThread()
+void OutgoingTunnelConnectionWatcher::stopWhileInAioThread()
 {
     m_tunnelConnection.reset();
     m_inactivityTimer.reset();
 }
 
-void OutgoingCrossNatTunnelWatcher::establishNewConnection(
+void OutgoingTunnelConnectionWatcher::establishNewConnection(
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
 {
-    launchInactivityTimer();
+    m_inactivityTimer->post(
+        [this, timeout, socketAttributes = std::move(socketAttributes),
+            handler = std::move(handler)]()
+        {
+            launchInactivityTimer();
+            m_tunnelConnection->establishNewConnection(
+                timeout,
+                std::move(socketAttributes),
+                std::move(handler));
+        });
 
-    m_tunnelConnection->establishNewConnection(
-        timeout,
-        std::move(socketAttributes),
-        std::move(handler));
 }
 
-void OutgoingCrossNatTunnelWatcher::launchInactivityTimer()
+void OutgoingTunnelConnectionWatcher::launchInactivityTimer()
 {
     if (m_connectionParameters.tunnelInactivityTimeout > std::chrono::seconds::zero())
     {
         m_inactivityTimer->cancelSync();
         m_inactivityTimer->start(
             m_connectionParameters.tunnelInactivityTimeout,
-            std::bind(&OutgoingCrossNatTunnelWatcher::onInactivityTimoutExpired, this));
+            std::bind(&OutgoingTunnelConnectionWatcher::onInactivityTimoutExpired, this));
     }
 }
 
-void OutgoingCrossNatTunnelWatcher::setControlConnectionClosedHandler(
+void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     using namespace std::placeholders;
 
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
-        std::bind(&OutgoingCrossNatTunnelWatcher::onTunnelClosed, this, _1));
+        std::bind(&OutgoingTunnelConnectionWatcher::onTunnelClosed, this, _1));
 }
 
-void OutgoingCrossNatTunnelWatcher::onInactivityTimoutExpired()
+void OutgoingTunnelConnectionWatcher::onInactivityTimoutExpired()
 {
     onTunnelClosed(SystemError::timedOut);
     m_tunnelConnection.reset();
 }
 
-void OutgoingCrossNatTunnelWatcher::onTunnelClosed(SystemError::ErrorCode reason)
+void OutgoingTunnelConnectionWatcher::onTunnelClosed(SystemError::ErrorCode reason)
 {
     NX_ASSERT(isInSelfAioThread());
 

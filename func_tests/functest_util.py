@@ -838,3 +838,25 @@ def sendRequest(lock, url, data, notify=False):
     response.close()
 
 
+# Create keys for api/mergeSystems call
+
+import hashlib, base64, urllib
+def generateMehodKey(method, user, digest, nonce):
+    m = hashlib.md5()
+    nedoHa2 = m.update("%s:" % method)
+    nedoHa2 = m.hexdigest()
+    m = hashlib.md5()
+    m.update(digest)
+    m.update(':')
+    m.update(nonce)
+    m.update(':')
+    m.update(nedoHa2)
+    authDigest = m.hexdigest()
+    return urllib.quote(base64.urlsafe_b64encode("%s:%s:%s" % (user.lower(), nonce, authDigest)))
+
+def generateKey(method, user, password, nonce, realm):
+    print "GEN KEY:", method, user, password, nonce, realm
+    m = hashlib.md5()
+    m.update("%s:%s:%s" % (user.lower(), realm, password) )
+    digest = m.hexdigest()
+    return generateMehodKey(method, user, digest, nonce)

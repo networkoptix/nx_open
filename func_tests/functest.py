@@ -147,7 +147,7 @@ class PrepareServerStatus(BasicGenerator):
 
         return [("saveCameras", lambda num: CameraDataGenerator().generateCameraData(num, addr)),
                 ("saveUser", lambda num: UserDataGenerator().generateUserData(num)),
-#                ("saveMediaServer", lambda num: MediaServerGenerator().generateMediaServerData(num))
+                ("saveMediaServer", lambda num: MediaServerGenerator().generateMediaServerData(num))
                 ]
 
     def _sendRequest(self,addr,method,d):
@@ -1236,7 +1236,7 @@ class MainFunctests(FuncTestCase):
                                          stream=sys.stdout,
                                      ))
             assert the_test.result.wasSuccessful(), "Basic functional test FAILED"
-            self._basicTestOk = True
+            type(self)._basicTestOk = True
         finally:
             if testMaster.unittestRollback:
                 doCleanUp()

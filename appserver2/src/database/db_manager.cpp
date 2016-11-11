@@ -600,7 +600,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
     } // end of DB update
 
     if (!execSQLScript("vacuum;", m_sdb))
-        qWarning() << "failed to vacuum database" << Q_FUNC_INFO;
+        qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
     m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
     emit initialized();
