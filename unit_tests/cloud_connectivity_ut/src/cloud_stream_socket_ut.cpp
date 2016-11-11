@@ -96,6 +96,53 @@ private:
     boost::optional<SocketFactory::CreateStreamSocketFuncType> m_oldCreateStreamSocketFunc;
 };
 
+TEST_F(CloudStreamSocketTest, simple)
+{
+    const char* tempHostName = "bla.bla";
+    const size_t bytesToSendThroughConnection = 128*1024;
+    const size_t repeatCount = 100;
+
+    //starting local tcp server
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
+    ASSERT_TRUE(server.start());
+
+    const auto serverAddress = server.addressBeingListened();
+
+    //registering local server address in AddressResolver
+    nx::network::SocketGlobals::addressResolver().addFixedAddress(
+        tempHostName,
+        serverAddress);
+
+    for (size_t i = 0; i < repeatCount; ++i)
+    {
+        //connecting with CloudStreamSocket to the local server
+        CloudStreamSocket cloudSocket(AF_INET);
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), 0));
+        QByteArray data;
+        data.resize(bytesToSendThroughConnection);
+        const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
+        ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
+    }
+
+    // also try to connect just by system name
+    {
+        CloudStreamSocket cloudSocket(AF_INET);
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
+        QByteArray data;
+        data.resize(bytesToSendThroughConnection);
+        const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
+        ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
+    }
+
+    server.pleaseStopSync();
+    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+        tempHostName,
+        serverAddress);
+}
+
 TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 {
     const char* tempHostName = "bla.bla";

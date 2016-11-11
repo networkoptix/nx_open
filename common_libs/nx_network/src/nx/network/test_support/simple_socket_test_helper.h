@@ -977,9 +977,9 @@ typedef nx::network::test::StopType StopType;
     Type(Name, SingleAioThread) \
         { nx::network::test::socketSingleAioThread(mkClient); } \
     Type(Name, Shutdown) \
-        { nx::network::test::socketShutdown(mkServer, mkClient, false); } \
+        { nx::network::test::socketShutdown(mkServer, mkClient, false, enpointToConnect); } \
     Type(Name, ShutdownAfterAsync) \
-        { nx::network::test::socketShutdown(mkServer, mkClient, true); } \
+        { nx::network::test::socketShutdown(mkServer, mkClient, true, enpointToConnect); } \
     Type(Name, ConnectToBadAddress) \
         { nx::network::test::socketConnectToBadAddress(mkClient, false); } \
     Type(Name, ConnectToBadAddressIoDelete) \
