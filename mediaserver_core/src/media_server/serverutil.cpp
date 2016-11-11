@@ -231,6 +231,15 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
         }
     }
 
+    // add foreign resource params
+    ec2::ApiResourceParamWithRefDataList dummyData;
+    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams, &dummyData) != ec2::ErrorCode::ok)
+    {
+        if (!data.wholeSystem)
+            resumeConnectionsToRemotePeers();
+        return false;
+    }
+
     // apply remove settings
     const auto& settings = QnGlobalSettings::instance()->allSettings();
     for(const auto& foreignSetting: data.foreignSettings)

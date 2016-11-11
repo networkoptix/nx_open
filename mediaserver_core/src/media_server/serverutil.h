@@ -102,6 +102,7 @@ struct ConfigureSystemData : public PasswordData
     ec2::ApiMediaServerData foreignServer;
     std::vector<ec2::ApiUserData> foreignUsers;
     ec2::ApiResourceParamDataList foreignSettings;
+    ec2::ApiResourceParamWithRefDataList additionParams;
 };
 
 /*
@@ -117,7 +118,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data);
 bool resetSystemToStateNew();
 
 
-#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)
+#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (ConfigureSystemData),

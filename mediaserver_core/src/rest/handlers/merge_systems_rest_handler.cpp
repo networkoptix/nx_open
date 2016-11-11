@@ -44,6 +44,7 @@
 #include "api/model/password_data.h"
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
+#include <core/resource_management/resource_properties.h>
 
 namespace {
 
@@ -396,6 +397,9 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
             ec2::ApiUserData apiUser;
             fromResourceToApi(user, apiUser);
             data.foreignUsers.push_back(apiUser);
+
+            for (const auto& param: user->params())
+                data.additionParams.push_back(param);
         }
     }
 
