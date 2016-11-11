@@ -18,7 +18,8 @@ DbRequestExecutionThread::DbRequestExecutionThread(
 :
     BaseRequestExecutor(connectionOptions, queryExecutorQueue),
     m_state(ConnectionState::initializing),
-    m_terminated(false)
+    m_terminated(false),
+    m_numberOfFailedRequestsInARow(0)
 {
 }
 
@@ -105,7 +106,7 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
 
     auto previousActivityTime = std::chrono::steady_clock::now();
 
-    while (!m_terminated)
+    while (!m_terminated && m_state == ConnectionState::opened)
     {
         boost::optional<std::unique_ptr<AbstractExecutor>> task = 
             queryExecutorQueue()->pop(kTaskWaitTimeout);
@@ -117,30 +118,15 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
                 // Dropping connection by timeout.
                 NX_LOGX(lm("Closing DB connection by timeout (%1)")
                     .arg(connectionOptions().inactivityTimeout), cl_logDEBUG2);
-                m_dbConnection.close();
-                m_state = ConnectionState::closed;
-                return;
+                closeConnection();
+                break;
             }
             continue;
         }
 
-        const auto result = (*task)->execute(&m_dbConnection);
-        if (result != DBResult::ok && 
-            result != DBResult::cancelled)
-        {
-            NX_LOGX(lit("DB query failed with error %1. Db text %2")
-                .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
-                cl_logWARNING);
-            if (!isDbErrorRecoverable(result))
-            {
-                NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
-                    cl_logWARNING);
-                m_dbConnection.close();
-                m_state = ConnectionState::closed;
-                return;
-            }
-        }
+        processTask(std::move(*task));
+        if (m_state == ConnectionState::closed)
+            break;
 
         previousActivityTime = std::chrono::steady_clock::now();
     }
@@ -173,6 +159,48 @@ bool DbRequestExecutionThread::tuneMySqlConnection()
     }
 
     return true;
+}
+
+void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
+{
+    const auto result = task->execute(&m_dbConnection);
+    switch (result)
+    {
+        case DBResult::ok:
+        case DBResult::cancelled:
+            m_numberOfFailedRequestsInARow = 0;
+            break;
+
+        default:
+        {
+            NX_LOGX(lit("DB query failed with error %1. Db text %2")
+                .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                cl_logWARNING);
+            ++m_numberOfFailedRequestsInARow;
+            if (!isDbErrorRecoverable(result))
+            {
+                NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
+                    .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                    cl_logWARNING);
+                closeConnection();
+                break;
+            }
+            if (m_numberOfFailedRequestsInARow >= 
+                connectionOptions().maxErrorsInARowBeforeClosingConnection)
+            {
+                NX_LOGX(lit("Dropping DB connection due to %1 errors in a row. Db text %2")
+                    .arg(QnLexical::serialized(result)), cl_logWARNING);
+                closeConnection();
+                break;
+            }
+        }
+    }
+}
+
+void DbRequestExecutionThread::closeConnection()
+{
+    m_dbConnection.close();
+    m_state = ConnectionState::closed;
 }
 
 bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)

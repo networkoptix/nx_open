@@ -62,6 +62,7 @@ public:
 // AsyncSqlQueryExecutorTest
 
 constexpr static auto kQueryCompletionTimeout = std::chrono::seconds(10);
+constexpr static auto kDefaultMaxConnectionCount = 10;
 
 class AsyncSqlQueryExecutorTest:
     public ::testing::Test
@@ -73,6 +74,8 @@ public:
         using namespace std::placeholders;
         RequestExecutorFactory::setFactoryFunc(
             std::bind(&AsyncSqlQueryExecutorTest::createConnection, this, _1, _2));
+
+        m_connectionOptions.maxConnectionCount = kDefaultMaxConnectionCount;
 
         init();
     }
@@ -93,6 +96,11 @@ protected:
         return m_connectionOptions;
     }
 
+    ConnectionOptions& connectionOptions()
+    {
+        return m_connectionOptions;
+    }
+
     const std::unique_ptr<AsyncSqlQueryExecutor>& asyncSqlQueryExecutor()
     {
         return m_asyncSqlQueryExecutor;
@@ -100,7 +108,6 @@ protected:
 
     void initializeDatabase()
     {
-        m_connectionOptions.maxConnectionCount = 10;
         m_connectionOptions.driverType = RdbmsDriverType::sqlite;
         m_connectionOptions.dbName = m_tmpDir + "/db.sqlite";
 
@@ -287,6 +294,27 @@ TEST_F(AsyncSqlQueryExecutorTest, db_connection_does_not_reopen_after_recoverabl
     initializeDatabase();
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Microsoft', 1975)");
     emulateRecoverableQueryError();
+    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
+
+    const auto companies = executeSelect<Company>("SELECT * FROM company");
+    ASSERT_EQ(2, companies.size());
+
+    closeDatabase();
+}
+
+TEST_F(AsyncSqlQueryExecutorTest, many_recoverable_errors_in_a_row_cause_reconnect)
+{
+    connectionOptions().maxErrorsInARowBeforeClosingConnection = 10;
+
+    DbConnectionEventsReceiver connectionEventsReceiver;
+    setConnectionEventsReceiver(&connectionEventsReceiver);
+    EXPECT_CALL(connectionEventsReceiver, onConnectionCreated()).Times(2);
+    EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(2);
+
+    initializeDatabase();
+    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Microsoft', 1975)");
+    for (int i = 0; i < connectionOptions().maxErrorsInARowBeforeClosingConnection + 1; ++i)
+        emulateRecoverableQueryError();
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");

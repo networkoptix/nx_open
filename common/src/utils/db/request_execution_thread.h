@@ -42,14 +42,17 @@ public:
 
 private:
     QSqlDatabase m_dbConnection;
-    ConnectionState m_state;
+    std::atomic<ConnectionState> m_state;
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
     nx::utils::thread m_queryExecutionThread;
     std::atomic<bool> m_terminated;
+    int m_numberOfFailedRequestsInARow;
 
     void queryExecutionThreadMain();
     bool tuneConnection();
     bool tuneMySqlConnection();
+    void processTask(std::unique_ptr<AbstractExecutor> task);
+    void closeConnection();
 
     static bool isDbErrorRecoverable(DBResult dbResult);
 };
