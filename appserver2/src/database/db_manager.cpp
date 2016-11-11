@@ -4192,10 +4192,16 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     DB_LOAD(QnUuid(), data->layouts);
     if (user) // Remove layouts belonging to other users.
     {
+        QSet<QnUuid> serverIds;
+        for (const auto& server: data->servers)
+            serverIds.insert(server.id);
+
         data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
-            [user](const ApiLayoutData& layout)
+            [user, &serverIds](const ApiLayoutData& layout)
             {
-                return layout.parentId != user->id;
+                return !layout.parentId.isNull()
+                    && layout.parentId != user->id
+                    && !serverIds.contains(layout.parentId);
             }),
             data->layouts.end());
     }
