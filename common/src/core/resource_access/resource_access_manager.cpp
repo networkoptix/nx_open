@@ -479,9 +479,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (serverPermissions.testFlag(Qn::SavePermission))
         return Qn::ReadWriteSavePermission;
 
-    if (serverPermissions.testFlag(Qn::ReadPermission))
-        return Qn::ReadPermission;
-
     return Qn::NoPermissions;
 }
 

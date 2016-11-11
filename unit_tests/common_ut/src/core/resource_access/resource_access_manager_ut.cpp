@@ -10,6 +10,7 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/camera_resource_stub.h>
@@ -564,6 +565,41 @@ TEST_F(QnResourceAccessManagerTest, checkAccessibleServerAsViewer)
     checkPermissions(server, desired, forbidden);
 }
 
+/************************************************************************/
+/* Checking storages access rights                                       */
+/************************************************************************/
+
+/* Admin must have full permissions for storages. */
+TEST_F(QnResourceAccessManagerTest, checkStoragesAsAdmin)
+{
+    loginAsOwner();
+
+    auto server = addServer();
+    auto storage = addStorage(server);
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(storage, desired, forbidden);
+}
+
+/* Non-admin users should not have access to storages. */
+TEST_F(QnResourceAccessManagerTest, checkStoragesAsCustom)
+{
+    loginAs(Qn::GlobalCustomUserPermission);
+
+    auto server = addServer();
+    auto storage = addStorage(server);
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+
+    /* We do have access to server. */
+    checkPermissions(server, Qn::ReadPermission, 0);
+
+    /* But no access to its storages. */
+    checkPermissions(storage, desired, forbidden);
+}
 
 /************************************************************************/
 /* Checking videowall access rights                                     */
@@ -636,3 +672,4 @@ TEST_F(QnResourceAccessManagerTest, checkVideowallAsViewer)
 
     checkPermissions(videowall, desired, forbidden);
 }
+

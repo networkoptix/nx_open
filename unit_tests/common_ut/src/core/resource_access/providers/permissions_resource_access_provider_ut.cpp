@@ -104,7 +104,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessServer)
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessStorage)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
-    auto target = addStorage();
+    auto server = addServer();
+    auto target = addStorage(server);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -170,7 +171,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkServerAccess)
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
 {
-    auto target = addStorage();
+    auto server = addServer();
+    auto target = addStorage(server);
 
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
