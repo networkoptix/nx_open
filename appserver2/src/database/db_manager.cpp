@@ -2972,7 +2972,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
                 getMultiObjectsInfoSelectString(
                       QStringList() << getObjectInfoSelectString(lit("cameraObjType"), lit("vms_camera"))
                                     << getObjectInfoSelectString(lit("storageObjType"), lit("vms_storage"))
-                                    << getObjectInfoSelectString(lit("layoutObjType"), lit("vms_camera"))));
+                                    << getObjectInfoSelectString(lit("layoutObjType"), lit("vms_layout"))));
             query.bindValue(":cameraObjType", (int)ApiObject_Camera);
             query.bindValue(":storageObjType", (int)ApiObject_Storage);
             query.bindValue(":layoutObjType", (int)ApiObject_Layout);
