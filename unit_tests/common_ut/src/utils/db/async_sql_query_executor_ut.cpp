@@ -14,12 +14,16 @@
 namespace nx {
 namespace db {
 
+namespace {
+
+constexpr auto kQueryCompletionTimeout = std::chrono::seconds(10);
+
+} // namespace
+
 class AsyncSqlQueryExecutorTest:
     public ::testing::Test
 {
 public:
-    constexpr static const auto kQueryCompletionTimeout = std::chrono::seconds(10);
-
     AsyncSqlQueryExecutorTest()
     {
         init();
