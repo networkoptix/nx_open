@@ -313,8 +313,12 @@ private:
         }
 
         // Sending transactions.
-        for(auto& postProcessAction : transactionsPostProcessList)
+        while (!transactionsPostProcessList.empty())
+        {
+            auto postProcessAction = transactionsPostProcessList.front();
+            transactionsPostProcessList.pop_front();
             postProcessAction();
+        }
 
         // Handler is invoked asynchronously.
     }
