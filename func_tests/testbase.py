@@ -731,7 +731,7 @@ class FuncTestMaster(object):
     def _loadConfig(self):
         parser = self.getConfig()
 
-        _section = "Nat" if self.args.BoxTest == 'natcon' else "General" # Fixme: ugly hack :(
+        _section = "Nat" if getattr(self.args, 'BoxTest', '') == 'natcon' else "General" # Fixme: ugly hack :(
         self.clusterTestServerList = parser.get(_section,"serverList").split(",")
 
         parser.rtset('ServerList', self.clusterTestServerList)

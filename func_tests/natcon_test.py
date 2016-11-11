@@ -99,9 +99,22 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
         postKey =  generateKey('POST', user, passwd, nonce, realm)
         return getKey, postKey
 
-
-
     ################################################################
+    # 10.11.2016, from Roman:
+    #
+    # 2. Параметры запроса mergeSystem
+    #
+    #        url(params.value(lit("url"))),
+    #        getKey(params.value(lit("getKey"))),
+    #        postKey(params.value(lit("postKey"))),
+    #        takeRemoteSettings(params.value(lit("takeRemoteSettings"), lit("false")) != lit("false")),
+    #        mergeOneServer(params.value(lit("oneServer"), lit("false")) != lit("false")),
+    #        ignoreIncompatible(params.value(lit("ignoreIncompatible"), lit("false")) != lit("false"))
+    #
+    # Параметры ignoreIncompatible и mergeOneServer тебе не нужны (будут значения по-умолчанию).
+    # Из используемых тобой поменялся только пароль.
+    # takeRemoteSettings - если в системах разные системные настройки, влияет на той,
+    # с какой стороны их значения будут в приоритете. На тест равенства данных не влияет.
 
     def VMPreparation(self):
         "Join servers into one system"

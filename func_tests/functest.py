@@ -26,7 +26,7 @@ testMaster = getTestMaster()
 from generator import *
 import legacy_main
 from rtsptests import RtspPerf, RtspTestSuit, RtspStreamTest
-from sysname_test import SystemNameTest
+from sysname_test import SystemIdTest
 from timetest import TimeSyncTest, TimeSyncNoInetTest, TimeSyncWithInetTest
 from stortest import BackupStorageTest, MultiserverArchiveTest
 from streaming_test import StreamingTest, HlsOnlyTest
@@ -1256,7 +1256,7 @@ class MainFunctests(FuncTestCase):
         self._checkSkipLegacy()
         self._skipIfBasicFailed()
         try:
-            assert SystemNameTest(testMaster.getConfig()).run(), "System name test faild"
+            SystemIdTest(testMaster.getConfig()).run()
         finally:
             if testMaster.unittestRollback:
                 doCleanUp()
@@ -1371,7 +1371,8 @@ def RunByAutotest():
 
 # These are the old legasy tests, just organized a bit
 SimpleTestKeys = {
-    '--sys-name': SystemNameTest,
+    '--sys-id': SystemIdTest,
+    '--sysid': SystemIdTest,
     '--rtsp-test': RtspTestSuit,
     '--rtsp-perf': RtspPerf,
     '--rtsp-stream': RtspStreamTest,
@@ -1424,7 +1425,10 @@ def LegacyTestsRun(only = False, argv=[]):
                 mergeOk = MergeTestRun()
             if mergeOk:
                 with testMaster.unittestRollback:
-                    SystemNameTest(testMaster.getConfig()).run()
+                    try:
+                        SystemIdTest(testMaster.getConfig()).run()
+                    except AssertionError as err:
+                        print "SystemNIdTest FAILED: " + err.message
     #doCleanUp()
 
 
@@ -1440,7 +1444,11 @@ def DoTests(argv):
         return False
 
     if argc == 1 and argv[0] in SimpleTestKeys:
-        return SimpleTestKeys[argv[0]](testMaster.getConfig()).run()
+        try:
+            return SimpleTestKeys[argv[0]](testMaster.getConfig()).run()
+        except AssertionError as err:
+            print "%s FAILED: %s" % (argv[0], err.message)
+            return False
 
     try:
         testMaster.initial_tests()
