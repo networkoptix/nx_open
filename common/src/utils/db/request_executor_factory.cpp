@@ -7,8 +7,6 @@
 namespace nx {
 namespace db {
 
-const RequestExecutorFactory::FactoryFunc RequestExecutorFactory::defaultFactory;
-
 static RequestExecutorFactory::FactoryFunc actualFactory;
 
 std::unique_ptr<BaseRequestExecutor> RequestExecutorFactory::create(

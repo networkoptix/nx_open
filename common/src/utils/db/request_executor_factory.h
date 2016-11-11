@@ -15,8 +15,6 @@ public:
             const ConnectionOptions& connectionOptions,
             QueryExecutorQueue* const queryExecutorQueue)> FactoryFunc;
 
-    static const FactoryFunc defaultFactory;
-
     static std::unique_ptr<BaseRequestExecutor> create(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
