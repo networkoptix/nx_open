@@ -50,7 +50,7 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
         {
             launchInactivityTimer();
             m_tunnelConnection->establishNewConnection(
-                timeout,
+                std::move(timeout),
                 std::move(socketAttributes),
                 std::move(handler));
         });
