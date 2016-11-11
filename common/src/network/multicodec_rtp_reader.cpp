@@ -7,6 +7,9 @@
 
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <api/global_settings.h>
 
 #include "network/h264_rtp_parser.h"
 #include "network/rtp_stream_parser.h"
@@ -68,6 +71,9 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx_http::header::AuthScheme::basic)
 {
+    auto globalSettings = QnGlobalSettings::instance();
+    m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
+
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
@@ -255,7 +261,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             {
                 clearKeyData(parser->logicalChannelNum());
                 m_demuxedData[rtpChannelNum]->clear();
-                if (++errorRetryCnt > RTSP_RETRY_COUNT) {
+                if (++errorRetryCnt > m_maxRtpRetryCount) {
                     qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
@@ -309,6 +315,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
         int nfds = 0;
         std::vector<int> fdToRtpIndex(m_tracks.size());
+        fdToRtpIndex.clear();
 
         for (int i = 0; i < m_tracks.size(); ++i)
         {
@@ -344,9 +351,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 {
                     clearKeyData(track.parser->logicalChannelNum());
                     m_demuxedData[rtpChannelNum]->clear();
-                    if (++errorRetryCount > RTSP_RETRY_COUNT) {
+                    if (++errorRetryCount > m_maxRtpRetryCount) {
                         qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
-                        //closeStream();
+                        closeStream();
                         return QnAbstractMediaDataPtr(0);
                     }
                 }
@@ -547,6 +554,16 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
                 m_tracks[i].parser->setSDPInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
                 m_tracks[i].ioDevice = trackInfo[i]->ioDevice;
+                
+                auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
+                if (secResource)
+                {
+                    auto resData = qnCommon->dataPool()->data(secResource);
+                    auto forceRtcpReports = resData.value<bool>(lit("forceRtcpReports"), false);
+
+                    if (m_tracks[i].ioDevice)
+                        m_tracks[i].ioDevice->setForceRtcpReports(forceRtcpReports);
+                }
 
                 QnRtpAudioStreamParser* audioParser = dynamic_cast<QnRtpAudioStreamParser*> (m_tracks[i].parser);
                 if (audioParser)

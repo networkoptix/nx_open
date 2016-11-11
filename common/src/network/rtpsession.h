@@ -114,9 +114,9 @@ public:
     quint32 getSSRC() const { return ssrc; }
     
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
-    void setRtcpPort(quint16 rtcpPort) {m_rtcpPort = rtcpPort;}
-    void setMediaPort(quint16 mediaPort) {m_mediaPort = mediaPort;}
+    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
     void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
+    void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
     quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
     quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
@@ -128,10 +128,13 @@ private:
     AbstractDatagramSocket* m_mediaSocket;
     AbstractDatagramSocket* m_rtcpSocket;
     quint16 m_mediaPort;
-    quint16 m_rtcpPort;
+    quint16 m_remoteEndpointRtcpPort;
     HostAddress m_hostAddress;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
+    QElapsedTimer m_reportTimer;
+    bool m_reportTimerStarted;
+    bool m_forceRtcpReports;
 };
 
 class RTPSession: public QObject
@@ -164,13 +167,11 @@ public:
 
             ioDevice = new RTPIODevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
-            ioDevice->setHostAddress(lit("192.168.0.223"));
+            ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
             interleaved = QPair<int,int>(-1,-1);
         }
 
-        void setRtcpPort(quint16 rtcpPort) {ioDevice->setRtcpPort(rtcpPort);};
-        void setMediaPort(quint16 mediaPort) {ioDevice->setMediaPort(mediaPort);};
-
+        void setRemoteEndpointRtcpPort(quint16 rtcpPort) {ioDevice->setRemoteEndpointRtcpPort(rtcpPort);};
 
         void setSSRC(quint32 value);
         quint32 getSSRC() const;
@@ -254,6 +255,8 @@ public:
     */
     void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
+
+    QUrl getUrl() const;
 
     void setProxyAddr(const QString& addr, int port);
 

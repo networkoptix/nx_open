@@ -546,12 +546,12 @@ QString QnPlAreconVisionResource::generateRequestString(
     if (resolutionFULL)
         request += QLatin1String("full");
     else
-        request += QLatin1String("full");
+        request += QLatin1String("half");
 
-    /*request += QLatin1String(";x0=") + QString::number(left)
+    request += QLatin1String(";x0=") + QString::number(left)
         + QLatin1String(";y0=") + QString::number(top)
         + QLatin1String(";x1=") + QString::number(right)
-        + QLatin1String(";y1=") + QString::number(bottom);*/
+        + QLatin1String(";y1=") + QString::number(bottom);
 
     if (!h264)
         request += QLatin1String(";quality=");
@@ -780,11 +780,15 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 }
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
-{
-    return isH264() &&
-           QnGlobalSettings::instance()->arecontRtspEnabled() &&
-           qnCommon->dataPool()->data(toSharedPointer(this)).
-               value<bool>(lit("isRTSPSupported"), true);
+{   
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto arecontRtspIsAllowed = QnGlobalSettings::instance()->arecontRtspEnabled();
+    auto cameraSupportsH264 = isH264();
+    auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
+    auto rtspIsForcedOnCamera = resData.value<bool>(lit("forceRtspSupport"), false);
+
+    return arecontRtspIsAllowed 
+        && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
 }
 
 bool QnPlAreconVisionResource::isAbstractResource() const
