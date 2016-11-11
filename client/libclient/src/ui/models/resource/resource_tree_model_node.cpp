@@ -235,7 +235,8 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     );
 
     if (m_resource)
-        disconnect(m_resource, nullptr, this, nullptr);
+        m_resource->disconnect(this);
+
     m_resource = resource;
 
     if (m_resource)
