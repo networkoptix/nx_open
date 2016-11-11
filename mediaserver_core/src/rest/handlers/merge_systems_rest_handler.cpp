@@ -44,6 +44,7 @@
 #include "api/model/password_data.h"
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
+#include <core/resource_management/resource_properties.h>
 
 namespace {
 
@@ -371,10 +372,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return false;
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
-        return false;
-
+    Q_ASSERT(!server->getAuthKey().isEmpty());
 
     ConfigureSystemData data;
     data.localSystemId = qnGlobalSettings->localSystemId();
@@ -390,9 +388,20 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     fromResourceToApi(server, data.foreignServer);
 
     /**
-    * Save current user to the foreign system
-    */
-    fromResourceToApi(admin, data.foreignUser);
+     * Save current admin and cloud users to the foreign system
+     */
+    for (const auto& user: qnResPool->getResources<QnUserResource>())
+    {
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            ec2::ApiUserData apiUser;
+            fromResourceToApi(user, apiUser);
+            data.foreignUsers.push_back(apiUser);
+
+            for (const auto& param: user->params())
+                data.additionParams.push_back(param);
+        }
+    }
 
     /**
      * Save current system settings to the foreign system.

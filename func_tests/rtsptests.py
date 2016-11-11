@@ -389,7 +389,7 @@ class SingleServerRtspTestBase(object):
         self._cameraList = []
         self._allCameraList = []
         self._cameraInfoTable = dict()
-        obj = HttpRequest(self._serverAddr, 'ec2/getCamerasEx', params={'id': self._serverGUID.strip('{}')}, printHttpError=Exception)
+        obj = HttpRequest(self._serverAddr, 'ec2/getCamerasEx', params={'parentId': self._serverGUID.strip('{}')}, printHttpError=Exception)
         print "\nDEBUG: server %s (use guid %s), getCamerasEx:\n%s" % (self._serverAddr, self._serverGUID, "\n".join(str(c) for c in obj))
         for c in obj:
             #print "Camera found: %s" % (pprint.pformat(c))
