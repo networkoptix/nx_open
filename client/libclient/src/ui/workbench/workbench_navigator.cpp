@@ -1430,12 +1430,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         }
     }
 
-    bool fullRangeWindow = m_timeSlider->minimum() == m_timeSlider->windowStart()
-        && m_timeSlider->maximum() == m_timeSlider->windowEnd();
-
     bool brandNewRange = m_timeSlider->minimum() != startTimeMSec;
 
-    if (brandNewRange || fullRangeWindow)
+    if (brandNewRange)
     {
         m_timeSlider->finishAnimations();
         m_timeSlider->invalidateWindow();
