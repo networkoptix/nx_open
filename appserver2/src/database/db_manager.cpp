@@ -2934,6 +2934,30 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
     }
 }
 
+namespace {
+QString getObjectInfoSelectString(const QString& objType, const QString& objTable)
+{
+    return lit("SELECT :%1, r.guid \
+                FROM %2 o JOIN vms_resource r  \
+                    on r.id = o.resource_ptr_id WHERE r.parent_guid = :guid")
+                .arg(objType)
+                .arg(objTable); 
+}
+
+QString getMultiObjectsInfoSelectString(const QStringList& selectStrings)
+{
+    QString result;
+    for (int i = 0; i < selectStrings.size(); ++i)
+    {
+        result.append(selectStrings[i]);
+        if (i != selectStrings.size() - 1)
+            result.append(lit(" UNION "));
+    }
+
+    return result;
+}
+}
+
 ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& parentObject)
 {
     ApiObjectInfoList result;
@@ -2944,17 +2968,18 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
     switch(parentObject.type)
     {
         case ApiObject_Server:
-            query.prepare("\
-                SELECT :cameraObjType, r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = :guid \
-                UNION \
-                SELECT :storageObjType, r.guid from vms_storage s JOIN vms_resource r on r.id = s.resource_ptr_id WHERE r.parent_guid = :guid \
-            ");
+            query.prepare(
+                getMultiObjectsInfoSelectString(
+                      QStringList() << getObjectInfoSelectString(lit("cameraObjType"), lit("vms_camera"))
+                                    << getObjectInfoSelectString(lit("storageObjType"), lit("vms_storage"))
+                                    << getObjectInfoSelectString(lit("layoutObjType"), lit("vms_camera"))));
             query.bindValue(":cameraObjType", (int)ApiObject_Camera);
             query.bindValue(":storageObjType", (int)ApiObject_Storage);
+            query.bindValue(":layoutObjType", (int)ApiObject_Layout);
             break;
         case ApiObject_Videowall:
         case ApiObject_User:
-            query.prepare( "SELECT :objType, r.guid FROM vms_resource r, vms_layout WHERE r.parent_guid = :guid AND r.id = vms_layout.resource_ptr_id" );
+            query.prepare(getObjectInfoSelectString(lit("objType"), lit("vms_layout")));
             query.bindValue(":objType", (int)ApiObject_Layout);
             break;
         default:
