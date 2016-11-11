@@ -84,16 +84,16 @@ QnDirectoryBackupPtr copyApplauncherInstance(const QDir& from, const QDir& to)
 
     // Copy launcher executable
     backup->addDirectoryBackup(QnDirectoryBackupPtr(new QnDirectoryBackup(
-        from.absolutePath() + QnClientAppInfo::binDirSuffix(),
+        from.absoluteFilePath(QnClientAppInfo::binDirSuffix()),
         QStringList{QnClientAppInfo::applauncherBinaryName(), lit("*.dll")},
-        to.absolutePath() + QnClientAppInfo::binDirSuffix())));
+        to.absoluteFilePath(QnClientAppInfo::binDirSuffix()))));
 
     // Copy libs
     if (QnAppInfo::applicationPlatform() != lit("windows"))
     {
         backup->addDirectoryBackup(QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
-            from.absolutePath() + QnClientAppInfo::libDirSuffix(),
-            to.absolutePath() + QnClientAppInfo::libDirSuffix())));
+            from.absoluteFilePath(QnClientAppInfo::libDirSuffix()),
+            to.absoluteFilePath(QnClientAppInfo::libDirSuffix()))));
     }
 
     return QnDirectoryBackupPtr(backup);
