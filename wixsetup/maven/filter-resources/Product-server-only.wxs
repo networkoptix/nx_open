@@ -154,11 +154,11 @@
         <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
         <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
         
-        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="no"
+        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" 
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite"/>
         <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
-        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" Impersonate="no"
+        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" 
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\vms_storedfiles"/>
         <CustomAction Id="CopyHostedFiles" BinaryKey="CustomActions.dll" DllEntry="CopyHostedFiles" Execute="deferred" Impersonate="no"/>
 
@@ -178,10 +178,10 @@
         <CustomAction Id="CloseTrayToolAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
-        <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate" Impersonate="no"
+        <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate"
                       Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite;Software\[Manufacturer]\version;"/>
 
-        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="no"
+        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate"
                       Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}"/>
 
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
@@ -274,7 +274,7 @@
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="${company.name}">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
-                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
+                        <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
                     </Component>
                 </Directory>

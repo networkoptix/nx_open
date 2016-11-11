@@ -19,6 +19,7 @@ client_msi_folder = 'bin/msi'
 client_exe_folder = 'bin/exe'
 
 full_exe_folder = 'bin/exe'
+nxtool_exe_folder = 'bin/exe'
 
 nxtool_msi_folder = 'bin/msi'
 server_msi_strip_folder = 'bin/strip'
@@ -34,12 +35,18 @@ client_exe_name = '${finalName}-client-only.exe'
 full_exe_name = '${finalName}.exe'
 
 nxtool_msi_name = '${finalName}-servertool.msi'
+nxtool_exe_name = '${finalName}-servertool.exe'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
 server_components = ['ServerVox', 'Server', 'traytool']
 nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls']
+
+client_exe_components = ['VC14RedistPackage', 'ClientPackage']
+server_exe_components = ['VC14RedistPackage', 'ServerPackage']
+full_exe_components = ['VC14RedistPackage', 'ClientPackage', 'ServerPackage']
+nxtool_exe_components = ['VC14RedistPackage', 'NxtoolPackage']
 
 def add_wix_extensions(command):
     for ext in wix_extensions:
@@ -50,7 +57,7 @@ def add_components(command, components):
     for component in components:
         command.append('{0}.wxs'.format(component))
 
-def get_candle_command(project, suffix, args):
+def get_candle_command(project, suffix, args, components):
     command = ['candle']
     command.append('-dClientVoxSourceDir=${ClientVoxSourceDir}')
     command.append('-arch')
@@ -63,21 +70,19 @@ def get_candle_command(project, suffix, args):
 
     command.append('-dClientMsiName={}'.format(client_msi_name))
     command.append('-dServerMsiName={}'.format(server_msi_name))
+    command.append('-dNxtoolMsiName={}'.format(nxtool_msi_name))
+
+    add_components(command, components)
 
     if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')
         command.append('-dClientHelpSourceDir=${ClientHelpSourceDir}')
         command.append('-dClientFontsDir=${ClientFontsDir}')
         command.append('-dClientBgSourceDir=${ClientBgSourceDir}')
-        add_components(command, client_components)
-
-    if suffix.startswith('server'):
-        add_components(command, server_components)
 
     if suffix.startswith('nxtool'):
         command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
         command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
-        add_components(command, nxtool_components)
         
     add_wix_extensions(command)
     add_components(command, common_components)
@@ -88,6 +93,9 @@ def get_candle_command(project, suffix, args):
 def get_light_command(folder, msi, suffix):
     command = ['light']
     command.append('-sice:ICE07')
+    command.append('-sice:ICE60')
+    command.append('-sice:ICE69')
+    command.append('-sice:ICE91')
     command.append('-cultures:${installer.language}')
     command.append('-cc')
     command.append('${libdir}/bin/${build.configuration}/cab')
@@ -153,12 +161,12 @@ def execute_command(command):
     if retcode != 0 and retcode != 204:
         sys.exit(1)
     
-def create_commands_set(project, folder, msi, suffix=None, candle_args=None):
+def create_commands_set(project, folder, msi, suffix=None, candle_args=None, components=None):
     if suffix is None:
         suffix = project
 
     return [
-        get_candle_command(project, suffix, candle_args),
+        get_candle_command(project, suffix, candle_args, components),
         get_light_command(folder, msi, suffix)
     ]
     
@@ -170,30 +178,33 @@ def rename(folder, old_name, new_name):
 
 def main():
     commands = []
-    commands += create_commands_set('client-only', client_msi_folder, client_msi_name, candle_args=['-dNoStrip=yes'])
-    commands += create_commands_set('server-only', server_msi_folder, server_msi_name, candle_args=['-dNoStrip=yes'])
-    commands += create_commands_set('client-only', client_msi_strip_folder, client_msi_name, suffix='client-strip', candle_args=['-dNoStrip=no'])
-    commands += create_commands_set('server-only', server_msi_strip_folder, server_msi_name, suffix='server-strip', candle_args=['-dNoStrip=no'])
+#    commands += create_commands_set('client-only', client_msi_folder, client_msi_name, candle_args=['-dNoStrip=yes'], components=client_components)
+#    commands += create_commands_set('server-only', server_msi_folder, server_msi_name, candle_args=['-dNoStrip=yes'], components=server_components)
+#    commands += create_commands_set('client-only', client_msi_strip_folder, client_msi_name, suffix='client-strip', candle_args=['-dNoStrip=no'], components=client_components)
+#    commands += create_commands_set('server-only', server_msi_strip_folder, server_msi_name, suffix='server-strip', candle_args=['-dNoStrip=no'], components=server_components)
 
-    if not skip_sign:
-        commands += create_sign_command_set(client_msi_folder, client_msi_name)
-        commands += create_sign_command_set(server_msi_folder, server_msi_name)
-        commands += create_sign_command_set(client_msi_strip_folder, client_msi_name)
-        commands += create_sign_command_set(server_msi_strip_folder, server_msi_name)
+#    if not skip_sign:
+#        commands += create_sign_command_set(client_msi_folder, client_msi_name)
+#        commands += create_sign_command_set(server_msi_folder, server_msi_name)
+#        commands += create_sign_command_set(client_msi_strip_folder, client_msi_name)
+#        commands += create_sign_command_set(server_msi_strip_folder, server_msi_name)
 
-    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name)
-    commands += create_commands_set('server-exe', server_exe_folder, server_exe_name)
-    commands += create_commands_set('full-exe', full_exe_folder, full_exe_name)
+#    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name, components=client_exe_components)
+#    commands += create_commands_set('server-exe', server_exe_folder, server_exe_name, components=server_exe_components)
+#    commands += create_commands_set('full-exe', full_exe_folder, full_exe_name, components=full_exe_components)
 
-    if not skip_sign:
-        commands += create_sign_burn_exe_command_set(client_exe_folder, engine_tmp_folder, client_exe_name)
-        commands += create_sign_burn_exe_command_set(server_exe_folder, engine_tmp_folder, server_exe_name)
-        commands += create_sign_burn_exe_command_set(full_exe_folder, engine_tmp_folder, full_exe_name)
+#    if not skip_sign:
+#        commands += create_sign_burn_exe_command_set(client_exe_folder, engine_tmp_folder, client_exe_name)
+#        commands += create_sign_burn_exe_command_set(server_exe_folder, engine_tmp_folder, server_exe_name)
+#        commands += create_sign_burn_exe_command_set(full_exe_folder, engine_tmp_folder, full_exe_name)
 
     if build_nxtool:
-        commands += create_commands_set('nxtool', nxtool_msi_folder, nxtool_msi_name)
+        commands += create_commands_set('nxtool', nxtool_msi_folder, nxtool_msi_name, components=nxtool_components)
         if not skip_sign:
             commands += create_sign_command_set(nxtool_msi_folder, nxtool_msi_name)
+        commands += create_commands_set('nxtool-exe', nxtool_exe_folder, nxtool_exe_name, components=nxtool_exe_components)
+        if not skip_sign:
+            commands += create_sign_burn_exe_command_set(nxtool_exe_folder, engine_tmp_folder, nxtool_exe_name)
 
     for command in commands:
         execute_command(command)
