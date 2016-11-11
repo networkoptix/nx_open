@@ -225,11 +225,7 @@
                                             <value>
                                                 <![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
                                         </replacement>
-                                        <replacement>
-                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
-                                            <value>${project.artifactId}</value>
-                                        </replacement>
-
+  
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
                                         <replacement>
                                             <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
