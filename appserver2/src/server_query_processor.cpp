@@ -5,6 +5,7 @@
 
 namespace ec2
 {
+QnMutex detail::ServerQueryProcessor::m_updateDataMutex(QnMutex::Recursive);
 
 void detail::ServerQueryProcessor::setAuditData(
     ECConnectionAuditManager* auditManager,
@@ -17,12 +18,12 @@ void detail::ServerQueryProcessor::setAuditData(
 ErrorCode detail::ServerQueryProcessor::removeHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    TransactionPostProcessor* const postProcessor,
+    std::list<std::function<void()>>* const transactionsToSend,
     TransactionType::Value transactionType)
 {
     QnTransaction<ApiIdData> removeTran = createTransaction(command, ApiIdData(id));
     removeTran.transactionType = transactionType;
-    ErrorCode errorCode = processUpdateSync(removeTran, postProcessor, 0);
+    ErrorCode errorCode = processUpdateSync(removeTran, transactionsToSend, 0);
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
@@ -32,15 +33,15 @@ ErrorCode detail::ServerQueryProcessor::removeHelper(
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    TransactionPostProcessor* const postProcessor)
+    std::list<std::function<void()>>* const transactionsToSend)
 {
-    return removeHelper(id, command, postProcessor);
+    return removeHelper(id, command, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const QnTransaction<ApiIdData>& tran,
     const AbstractECConnectionPtr& connection,
-    TransactionPostProcessor* const postProcessor)
+    std::list<std::function<void()>>* const transactionsToSend)
 {
     ApiResourceParamWithRefDataList resourceParams;
     dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
@@ -49,7 +50,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
         ApiCommand::removeResourceParam,
         tran.transactionType,
         resourceParams,
-        postProcessor);
+        transactionsToSend);
 
     if (errorCode != ErrorCode::ok)
         return errorCode;
@@ -68,20 +69,20 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
     const QnUuid& id,
-    TransactionPostProcessor* const postProcessor)
+    std::list<std::function<void()>>* const transactionsToSend)
 {
-    return removeHelper(id, ApiCommand::removeAccessRights, postProcessor);
+    return removeHelper(id, ApiCommand::removeAccessRights, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    TransactionPostProcessor* const postProcessor,
+    std::list<std::function<void()>>* const transactionsToSend,
     TransactionType::Value transactionType)
 {
     return removeHelper(
         id,
         ApiCommand::removeResourceStatus,
-        postProcessor,
+        transactionsToSend,
         transactionType);
 }
 
