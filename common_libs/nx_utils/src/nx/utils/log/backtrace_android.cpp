@@ -1,5 +1,4 @@
 #include "backtrace_android.h"
-#if defined(ANDROID) || defined(__ANDROID__)
 
 #include <iostream>
 #include <iomanip>
@@ -70,5 +69,3 @@ std::string buildBacktrace()
 
 } // namespace utils
 } // namespace nx
-
-#endif // defined(ANDROID) || defined(__ANDROID__)

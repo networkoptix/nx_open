@@ -25,7 +25,7 @@ namespace {
 
 const QByteArray kTestMessage("Ping");
 const int kClientCount(10);
-const std::chrono::milliseconds kTestTimeout(3000);
+const std::chrono::milliseconds kTestTimeout(5000);
 std::string lastError() { return SystemError::getLastOSErrorText().toStdString(); }
 
 } // namespace
@@ -76,7 +76,7 @@ void syncSocketServerMainFunc(
         startedPromise->set_value(std::move(serverAddress));
     }
 
-    ASSERT_TRUE(server->setRecvTimeout(60 * 1000)) << lastError();
+    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 20)) << lastError();
     for (int i = clientCount; i > 0; --i)
     {
         std::unique_ptr<AbstractStreamSocket> client(server->accept());
@@ -274,7 +274,7 @@ void socketSimpleAsync(
 
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(5000));
+    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
     ASSERT_TRUE(server->listen(clientCount)) << lastError();
 
@@ -310,8 +310,8 @@ void socketSimpleAsync(
 
         clients.emplace_back(socket);
         auto& client = clients.back();
-        ASSERT_TRUE(client->setSendTimeout(3000));
-        ASSERT_TRUE(client->setRecvTimeout(3000));
+        ASSERT_TRUE(client->setSendTimeout(kTestTimeout));
+        ASSERT_TRUE(client->setRecvTimeout(kTestTimeout));
         ASSERT_TRUE(client->setNonBlockingMode(true));
         client->readAsyncAtLeast(
             &serverBuffer, testMessage.size(),
@@ -386,8 +386,8 @@ void socketSimpleAsync(
             });
 
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
-        ASSERT_TRUE(testClient->setSendTimeout(3000));
-        ASSERT_TRUE(testClient->setRecvTimeout(3000));
+        ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
+        ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
@@ -619,7 +619,7 @@ void socketShutdown(
             endpointToBindTo = std::move(serverAddress);
 
         auto client = clientMaker();
-        ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
+        ASSERT_TRUE(client->setRecvTimeout(2 * kTestTimeout.count()));
 
         nx::utils::promise<void> testReadyPromise;
         nx::utils::promise<void> recvExitedPromise;
@@ -767,7 +767,7 @@ void socketSimpleAcceptMixed(
     }
 
     auto client = clientMaker();
-    ASSERT_TRUE(client->setSendTimeout(1000));
+    ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->setNonBlockingMode(true));
     nx::utils::promise<SystemError::ErrorCode> connectionEstablishedPromise;
     client->connectAsync(
