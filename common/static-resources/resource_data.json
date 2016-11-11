@@ -1555,6 +1555,11 @@
                 "user": "root",
                 "password": "pass"
             }
+        },
+        {
+            "keys": ["DW|DWC-MV950TIR"],
+            "forceOnvifAdvancedParameters": true
+
         }
     ]
 }

@@ -38,6 +38,12 @@ bool QnDigitalWatchdogResource::isCproChipset() const
     return getFirmware().startsWith("A");
 }
 
+bool QnDigitalWatchdogResource::useOnvifAdvancedParameterProviders() const
+{
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    return isCproChipset() || resData.value<bool>(lit("forceOnvifAdvancedParameters"));
+}
+
 CLSimpleHTTPClient QnDigitalWatchdogResource::httpClient() const
 {
     return CLSimpleHTTPClient(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
@@ -153,8 +159,8 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
 bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    if (isCproChipset())
-        return base_type::loadAdvancedParametersTemplate(params); //< dw-cpro chipset
+    if (useOnvifAdvancedParameterProviders())
+        return base_type::loadAdvancedParametersTemplate(params); //< dw-cpro chipset (or something else that has uncompatible cgi interface)
     else if (resourceData.value<bool>(lit("dw-pravis-chipset")))
         return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml"));
     else
@@ -163,11 +169,13 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedP
 
 void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
 {
-    base_type::initAdvancedParametersProviders(params);
-    if (isCproChipset())
-        return;
-
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    if (useOnvifAdvancedParameterProviders())
+    {
+        base_type::initAdvancedParametersProviders(params);
+        return;
+    }
+    
     if (resourceData.value<bool>(lit("dw-pravis-chipset")))
         m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
     else
@@ -177,7 +185,7 @@ void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvanced
 
 QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const
 {
-    if (isCproChipset())
+    if (useOnvifAdvancedParameterProviders())
         return base_type::calculateSupportedAdvancedParameters();
 
     QSet<QString> result = base_type::calculateSupportedAdvancedParameters();
@@ -188,7 +196,7 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
 
 void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
     base_type::fetchAndSetAdvancedParameters();
-    if (isCproChipset())
+    if (useOnvifAdvancedParameterProviders())
         return;
 
     QString cameraModel = fetchCameraModel();
@@ -241,7 +249,7 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdva
 
 bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
 {
-    if (isCproChipset())
+    if (useOnvifAdvancedParameterProviders())
         return base_type::setAdvancedParametersUnderLock(values, result);
 
     bool success = true;
