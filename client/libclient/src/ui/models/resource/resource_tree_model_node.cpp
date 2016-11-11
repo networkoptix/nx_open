@@ -237,6 +237,7 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     if (m_resource)
         disconnect(m_resource, nullptr, this, nullptr);
     m_resource = resource;
+
     if (m_resource)
     {
         connect(resource, &QnResource::nameChanged, this, &QnResourceTreeModelNode::update);
@@ -1085,6 +1086,7 @@ void QnResourceTreeModelNode::updateResourceStatus()
         return;
 
     m_status = m_resource->getStatus();
+    m_icon = calculateIcon();
     changeInternal();
 }
 
