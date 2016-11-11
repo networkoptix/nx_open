@@ -17,60 +17,6 @@ UINT __stdcall CopyAppServerNotificationFiles(MSIHANDLE hInstall) {
     return CopyProfile(hInstall, "CopyAppServerNotificationFiles", FALSE);
 }
 
-UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    DWORD   dwValue = 0;
-    CRegKey RegKey;
-
-    CAtlString registryPath;
-    CAtlString arch;
-
-    hr = WcaInitialize(hInstall, "FindConfiguredStorages");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    arch = GetProperty(hInstall, L"ARCHITECTURE");
-
-    registryPath = GetProperty(hInstall, L"MEDIASERVER_REGISTRY_PATH");
-    registryPath += L"\\storages";
-
-    int flags = KEY_READ;
-    if (arch == "x86") {
-        flags |= KEY_WOW64_32KEY;
-    } else {
-        flags |= KEY_WOW64_64KEY;
-    }
-
-    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, flags) != ERROR_SUCCESS) {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
-        goto LExit;
-    }
-
-    DWORD dwType;
-    ULONG nBytes = 4;
-    DWORD count = 0;
-
-    RegKey.QueryValue(L"size", &dwType, &count, &nBytes);
-
-    {
-        CAtlString countString;
-        countString.Format(L"%d", count);
-        // TODO: no need for NUMBER_OF_STORAGES. save all storages instead.
-        MsiSetProperty(hInstall, L"NUMBER_OF_STORAGES", countString);
-    }
-
-    RegKey.Close();
-
-LExit:
-
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
 UINT __stdcall DetectIfSystemIsStandalone(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -433,8 +379,8 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
         versionPath = params.Tokenize(_T(";"), curPos);
         versionName = params.Tokenize(_T(";"), curPos);
 
-		CString localAppDataFolder = GetAppDataLocalFolderPath();
-		fromFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+        CString localAppDataFolder = GetAppDataLocalFolderPath();
+        fromFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
 
         WcaLog(LOGMSG_STANDARD, "DB file: %S", fromFile);
         CRegKey key;
@@ -444,25 +390,25 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
             ULONG chars;
             CAtlString version;
 
-			WcaLog(LOGMSG_STANDARD, "Opened key: %S", versionPath);
+            WcaLog(LOGMSG_STANDARD, "Opened key: %S", versionPath);
 
             if (key.QueryStringValue(versionName, 0, &chars) == ERROR_SUCCESS) {
                 chars = min(chars, MAX_VERSION_SIZE);
                 key.QueryStringValue(versionName, szBuffer, &chars);
                 version = szBuffer;
-			} else {
-				WcaLog(LOGMSG_STANDARD, "Unable to query value %S", versionName);
-			}
+            } else {
+                WcaLog(LOGMSG_STANDARD, "Unable to query value %S", versionName);
+            }
 
             key.Close();
 
             if (!version.IsEmpty()) {
                 WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
                 CopyFile(fromFile, fromFile + "." + version, FALSE);
-			}
-			else {
-				WcaLog(LOGMSG_STANDARD, "Version is empty");
-			}
+            }
+            else {
+                WcaLog(LOGMSG_STANDARD, "Version is empty");
+            }
         } else {
             WcaLog(LOGMSG_STANDARD, "Couldn't open registry key %S", versionPath);
         }

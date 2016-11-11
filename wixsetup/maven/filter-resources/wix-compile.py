@@ -176,35 +176,60 @@ def rename(folder, old_name, new_name):
     if os.path.exists(join(folder, old_name)):
         shutil.copy2(join(folder, old_name), join(folder, new_name))
 
+def add_build_commands_msi_generic(commands, name, msi_folder, msi_name, candle_args, components, suffix=None):
+    commands += create_commands_set(name, msi_folder, msi_name, suffix=suffix, candle_args=candle_args, components=components)
+    if not skip_sign:
+        commands += create_sign_command_set(msi_folder, msi_name)
+
+def add_build_commands_exe_generic(commands, name, exe_folder, exe_name, exe_components, engine_tmp_folder):
+    commands += create_commands_set(name, exe_folder, exe_name, components=exe_components)
+    if not skip_sign:
+        commands += create_sign_burn_exe_command_set(exe_folder, engine_tmp_folder, exe_name)
+
+def add_build_commands_msi_exe_generic(commands, name, name_exe, msi_folder, msi_name, exe_folder, exe_name, candle_args, components, exe_components, engine_tmp_folder, suffix=None):
+    add_build_commands_msi_generic(commands, name, msi_folder, msi_name, candle_args, components, suffix)
+    add_build_commands_exe_generic(commands, name_exe, exe_folder, exe_name, exe_components, engine_tmp_folder)
+
+
+def add_build_strip_client_commands(commands):
+    add_build_commands_msi_exe_generic(commands,
+                'client-only', 'client-exe',
+                client_msi_strip_folder, client_msi_name,
+                client_exe_folder, client_exe_name, 
+                ['-dNoStrip=no'], 
+                client_components, client_exe_components, 
+                engine_tmp_folder,
+                suffix='client-strip')
+
+def add_build_strip_server_commands(commands):
+    add_build_commands_msi_exe_generic(commands, 'server-only', 'server-exe',
+                server_msi_strip_folder, server_msi_name,
+                server_exe_folder, server_exe_name, 
+                ['-dNoStrip=no'], 
+                server_components, server_exe_components, 
+                engine_tmp_folder,
+                suffix='server-strip')
+
+def add_build_full_commands(commands):
+    add_build_commands_exe_generic(commands, 'full-exe', full_exe_folder, full_exe_name, full_exe_components, engine_tmp_folder)
+
+def add_build_nxtool_commands(commands):
+    add_build_commands_msi_exe_generic(commands, 'nxtool', 'nxtool-exe',
+                nxtool_msi_folder, nxtool_msi_name,
+                nxtool_exe_folder, nxtool_exe_name, 
+                None, 
+                nxtool_components, nxtool_exe_components, 
+                engine_tmp_folder)
+
 def main():
     commands = []
-    commands += create_commands_set('client-only', client_msi_folder, client_msi_name, candle_args=['-dNoStrip=yes'], components=client_components)
-    commands += create_commands_set('server-only', server_msi_folder, server_msi_name, candle_args=['-dNoStrip=yes'], components=server_components)
-    commands += create_commands_set('client-only', client_msi_strip_folder, client_msi_name, suffix='client-strip', candle_args=['-dNoStrip=no'], components=client_components)
-    commands += create_commands_set('server-only', server_msi_strip_folder, server_msi_name, suffix='server-strip', candle_args=['-dNoStrip=no'], components=server_components)
 
-    if not skip_sign:
-        commands += create_sign_command_set(client_msi_folder, client_msi_name)
-        commands += create_sign_command_set(server_msi_folder, server_msi_name)
-        commands += create_sign_command_set(client_msi_strip_folder, client_msi_name)
-        commands += create_sign_command_set(server_msi_strip_folder, server_msi_name)
-
-    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name, components=client_exe_components)
-    commands += create_commands_set('server-exe', server_exe_folder, server_exe_name, components=server_exe_components)
-    commands += create_commands_set('full-exe', full_exe_folder, full_exe_name, components=full_exe_components)
-
-    if not skip_sign:
-        commands += create_sign_burn_exe_command_set(client_exe_folder, engine_tmp_folder, client_exe_name)
-        commands += create_sign_burn_exe_command_set(server_exe_folder, engine_tmp_folder, server_exe_name)
-        commands += create_sign_burn_exe_command_set(full_exe_folder, engine_tmp_folder, full_exe_name)
+    add_build_strip_client_commands(commands)
+    add_build_strip_server_commands(commands)
+    add_build_full_commands(commands)
 
     if build_nxtool:
-        commands += create_commands_set('nxtool', nxtool_msi_folder, nxtool_msi_name, components=nxtool_components)
-        if not skip_sign:
-            commands += create_sign_command_set(nxtool_msi_folder, nxtool_msi_name)
-        commands += create_commands_set('nxtool-exe', nxtool_exe_folder, nxtool_exe_name, components=nxtool_exe_components)
-        if not skip_sign:
-            commands += create_sign_burn_exe_command_set(nxtool_exe_folder, engine_tmp_folder, nxtool_exe_name)
+        add_build_nxtool_commands(commands)
 
     for command in commands:
         execute_command(command)

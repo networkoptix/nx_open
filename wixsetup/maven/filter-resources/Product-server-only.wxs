@@ -23,20 +23,10 @@
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
 
-        <?define Remove_S1="(INSTALL_SERVER <> 1 AND !ServerFeature = 3)"?>
-
         <?define InstallServer="&ServerFeature = 3 AND !ServerFeature <> 3"?>
 
         <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
-        <?define Inst_S0="(NOT $(var.Inst_S1))"?>
 
-        <?define Changing_S1="NOT $(var.VmsInstalling) AND $(var.Inst_S1)"?>
-        <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0)"?>
-
-        <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
-        <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
-        <?define IsSettingsCorrect=$(var.IsSettingsFilled) AND $(var.PasswordsEqual)?>
-        <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual) AND NOT BUSYPORT)"?>
         <?define CloudHostIsDifferent="(CLOUD_HOST <> "" AND CLOUD_HOST <> "$(var.cloudHost)")" ?>
 
         <?if $(var.arch) = x86 ?>
@@ -52,9 +42,6 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
-
-        <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
-        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="[FREEPORT1]" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
 
@@ -110,10 +97,6 @@
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property> -->
 
-        <Property Id="SERVER_PORT_EC" Secure="yes">
-            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
-        </Property>
-
         <Property Id="ALLOW_CAMERA_CHANGES" Value="1" Secure="yes"/>
         <Property Id="STATISTICS_REPORT_ALLOWED" Value="1" Secure="yes"/>
    
@@ -135,7 +118,6 @@
         <SetProperty Action="SetStatisticsReportAllowed1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
-        <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="BackupDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="BackupDatabaseFile" Execute="deferred" Impersonate="no"/>
 
@@ -197,15 +179,18 @@
         <InstallUISequence>
             <Custom Action="SetPreviousServerInstalled" Before="MigrateFeatureStates">(NOT Installed) AND (NOT (REMOVE="ALL"))</Custom>
             <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
+
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="SetServerPort1"/>
-            <Custom Action="AssignServerPort" After="SetServerPort2">NOT SERVER_PORT</Custom>
-            <Custom Action="FindConfiguredStorages" After="AssignServerPort"/> 
+            <Custom Action="FindFreePorts" Before="AssignServerPort">NOT SERVER_PORT</Custom>
+            <Custom Action="AssignServerPort" Before="CostInitialize">NOT SERVER_PORT</Custom>
         </InstallUISequence>
 
         <InstallExecuteSequence>
+            <Custom Action="FindFreePorts" Before="AssignServerPort">NOT SERVER_PORT</Custom>
+            <Custom Action="AssignServerPort" Before="CostInitialize">NOT SERVER_PORT</Custom>
+
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
