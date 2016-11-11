@@ -461,10 +461,7 @@ bool CLH264RtpParser::processData(
     };
 
     if (isPacketLost)
-    {
-        qDebug() << "Packet loss detected:" << m_prevSequenceNum << sequenceNum;
         processPacketLost();
-    }
 
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
