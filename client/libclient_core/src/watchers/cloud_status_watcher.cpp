@@ -324,17 +324,8 @@ void QnCloudStatusWatcher::updateSystems()
             if (!guard)
                 return;
 
-            Q_D(QnCloudStatusWatcher);
-            if (!d->cloudConnection)
-                return;
-
-            QnCloudSystemList cloudSystems;
-
-            if (result == api::ResultCode::ok)
-                cloudSystems = getCloudSystemList(systemsList);
-
             const auto handler =
-                [this, guard, result, cloudSystems]()
+                [this, guard, result, systemsList]()
                 {
                     if (!guard)
                         return;
@@ -342,6 +333,10 @@ void QnCloudStatusWatcher::updateSystems()
                     Q_D(QnCloudStatusWatcher);
                     if (!d->cloudConnection)
                         return;
+
+                    QnCloudSystemList cloudSystems;
+                    if (result == api::ResultCode::ok)
+                        cloudSystems = getCloudSystemList(systemsList);
 
                     d->setCloudEnabled((result != api::ResultCode::networkError)
                         && (result != api::ResultCode::serviceUnavailable));
@@ -550,8 +545,9 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
         };
 
     const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
     const auto completionHandler =
-        [callback, guard](api::ResultCode result, api::AccountData accountData)
+        [callback, guard, thread](api::ResultCode result, api::AccountData accountData)
         {
             if (!guard)
                 return;
@@ -562,7 +558,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
                     if (guard)
                         callback(result, accountData);
                 };
-            executeDelayed(timerCallback, 0, guard->thread());
+            executeDelayed(timerCallback, 0, thread);
         };
 
     cloudConnection->accountManager()->getAccount(completionHandler);
@@ -598,8 +594,9 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
 
 
     const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
     const auto completionHandler =
-        [callback, guard](api::ResultCode result, api::TemporaryCredentials credentials)
+        [callback, guard, thread](api::ResultCode result, api::TemporaryCredentials credentials)
         {
             if (!guard)
                 return;
@@ -610,7 +607,7 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
                     if (guard)
                         callback(result, credentials);
                 };
-            executeDelayed(timerCallback, 0, guard->thread());
+            executeDelayed(timerCallback, 0, thread);
         };
 
     cloudConnection->accountManager()->createTemporaryCredentials(params, completionHandler);
@@ -648,8 +645,9 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
     TRACE("Ping...");
     const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
     const auto completionHandler =
-        [callback, guard](api::ResultCode result, api::ModuleInfo info)
+        [callback, guard, thread](api::ResultCode result, api::ModuleInfo info)
         {
             Q_UNUSED(info);
             if (!guard)
@@ -661,7 +659,7 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
                     if (guard)
                         callback(result);
                 };
-            executeDelayed(timerCallback, 0, guard->thread());
+            executeDelayed(timerCallback, 0, thread);
         };
 
     temporaryConnection->ping(completionHandler);

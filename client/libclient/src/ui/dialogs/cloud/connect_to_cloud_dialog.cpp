@@ -244,9 +244,10 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
-    const auto guard = QPointer<QObject>(q);
+    const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
     const auto completionHandler =
-        [this, serverConnection, guard](api::ResultCode result, api::SystemData systemData)
+        [this, serverConnection, guard, thread](api::ResultCode result, api::SystemData systemData)
         {
             if (!guard)
                 return;
@@ -254,11 +255,11 @@ void QnConnectToCloudDialogPrivate::bindSystem()
             const auto timerCallback =
                 [this, guard, result, systemData, serverConnection]()
                 {
-                    if (!guard)
+                    if (guard)
                         at_bindFinished(result, systemData, serverConnection);
                 };
 
-            executeDelayed(timerCallback, 0, guard->thread());
+            executeDelayed(timerCallback, 0, thread);
         };
 
     cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
