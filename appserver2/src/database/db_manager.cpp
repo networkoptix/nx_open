@@ -2952,6 +2952,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
             query.bindValue(":cameraObjType", (int)ApiObject_Camera);
             query.bindValue(":storageObjType", (int)ApiObject_Storage);
             break;
+        case ApiObject_Videowall:
         case ApiObject_User:
             query.prepare( "SELECT :objType, r.guid FROM vms_resource r, vms_layout WHERE r.parent_guid = :guid AND r.id = vms_layout.resource_ptr_id" );
             query.bindValue(":objType", (int)ApiObject_Layout);

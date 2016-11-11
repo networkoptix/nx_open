@@ -462,6 +462,19 @@ private:
                 break;
             }
 
+            case ApiObject_Videowall:
+            {
+                RUN_AND_CHECK_ERROR(
+                    processMultiUpdateSync(
+                        ApiCommand::removeLayout,
+                        tran.transactionType,
+                        dbManager(m_userAccessData)
+                            .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
+                            .toIdList(),
+                        transactionsPostProcessList),
+                    lit("Remove videowall child resources failed"));
+            }
+
             default:
                 NX_ASSERT(0);
         }
