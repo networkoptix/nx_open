@@ -10,6 +10,8 @@
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 
+#include <utils/common/object_companion.h>
+
 void setWarningStyle(QWidget *widget)
 {
     setPaletteColor(widget, QPalette::ButtonText, qnGlobals->errorTextColor());
@@ -37,6 +39,67 @@ void setAccentStyle(QAbstractButton *button, bool accent)
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape)
 {
     tabBar->setProperty(style::Properties::kTabShape, QVariant::fromValue(tabShape));
+}
+
+template<class Pages>
+void autoResizePagesToContents_implementation(Pages* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler)
+{
+    auto adjustSizePolicies =
+        [pages, visiblePagePolicy, extraHandler](int current)
+        {
+            for (int i = 0; i < pages->count(); ++i)
+            {
+                pages->widget(i)->setSizePolicy(i != current
+                    ? QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored)
+                    : visiblePagePolicy);
+            }
+
+            if (extraHandler)
+                extraHandler();
+        };
+
+    adjustSizePolicies(pages->currentIndex());
+
+    static const char* kCompanionId = "resizePagesToContents";
+    auto companion = QnObjectCompanion<QObject>::install(pages, kCompanionId, false);
+    NX_ASSERT(companion);
+
+    if (resizeToVisible)
+    {
+        companion->connect(pages, &Pages::currentChanged, adjustSizePolicies);
+    }
+    else
+    {
+        companion->connect(pages, &Pages::currentChanged,
+            [pages, visiblePagePolicy, extraHandler]()
+            {
+                pages->currentWidget()->setSizePolicy(visiblePagePolicy);
+                if (extraHandler)
+                    extraHandler();
+            });
+    }
+}
+
+void autoResizePagesToContents(QStackedWidget* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler)
+{
+
+    autoResizePagesToContents_implementation(pages, visiblePagePolicy,
+        resizeToVisible, extraHandler);
+}
+
+void autoResizePagesToContents(QTabWidget* pages,
+    QSizePolicy visiblePagePolicy,
+    bool resizeToVisible,
+    std::function<void()> extraHandler)
+{
+    autoResizePagesToContents_implementation(pages, visiblePagePolicy,
+        resizeToVisible, extraHandler);
 }
 
 void fadeWidget(

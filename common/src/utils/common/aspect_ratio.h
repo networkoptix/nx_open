@@ -17,6 +17,7 @@ public:
 
     static QList<QnAspectRatio> standardRatios();
     static QnAspectRatio closestStandardRatio(float aspectRatio);
+    static const int kInvalidAspectRatio = -1;
 
     static bool isRotated90(qreal angle);
 

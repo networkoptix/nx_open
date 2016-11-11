@@ -42,6 +42,7 @@
                 <include>Qt5LabsTemplates.dll</include>
                 <include>Qt5Multimedia.dll</include>
                 <include>Qt5MultimediaWidgets.dll</include>
+                <include>Qt5MultimediaQuick_p.dll</include>
                 <include>Qt5Network.dll</include>
                 <include>Qt5OpenGL.dll</include>
                 <include>Qt5PrintSupport.dll</include>

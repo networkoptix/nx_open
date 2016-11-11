@@ -17,7 +17,6 @@ public:
         SettingsVersion,
 
         LastUsedConnection,
-        CamerasAspectRatios,
         LastUsedQuality,
         LiteMode,
         MaxFfmpegResolution,
@@ -60,7 +59,6 @@ private:
 
         QN_DECLARE_RW_PROPERTY(QnLocalConnectionData,       lastUsedConnection,         setLastUsedConnection,      LastUsedConnection,         QnLocalConnectionData())
         QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
-        QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
         QN_DECLARE_RW_PROPERTY(int,                         liteMode,                   setLiteMode,                LiteMode,                   (int)LiteModeType::LiteModeAuto)
         QN_DECLARE_RW_PROPERTY(QSize,                       maxFfmpegResolution,        setMaxFfmpegResolution,     MaxFfmpegResolution,        QSize())

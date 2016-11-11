@@ -644,7 +644,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::DisconnectAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Logout")).
+        text(tr("Disconnect from Server")).
         autoRepeat(false).
         shortcut(lit("Ctrl+Shift+D")).
         condition(new QnLoggedInCondition(this));
@@ -968,11 +968,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to %1...").arg(QnAppInfo::cloudName()));
+        text(tr("Log in to %1...", "Log in to Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
-        text(tr("Logout"));
+        text(tr("Log out from %1", "Log out from Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
@@ -1205,15 +1205,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
-    factory(QnActions::ResetVideoWallLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        text(tr("Update Layout")).
-        autoRepeat(false).
-        condition(new QnConjunctionActionCondition(
-            new QnResetVideoWallLayoutActionCondition(this),
-            new QnForbiddenInSafeModeCondition(this),
-            this));
-
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
@@ -1255,7 +1246,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::DeleteVideoWallItemAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Delete")).
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
@@ -1521,6 +1512,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
+        requiredTargetPermissions(Qn::ReadPermission).
         condition(hasFlags(Qn::user));
 
     factory(QnActions::UserRolesAction).
@@ -1640,7 +1632,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Diagnostics...")).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
             new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <client_core/local_connection_data.h>
 
 class QUrl;
 
@@ -26,12 +25,16 @@ QnUuid getLocalSystemId(const QnConnectionInfo& info);
 
 QString getFactorySystemId(const QnModuleInformation& info);
 
+bool isSafeMode(const QnModuleInformation& info);
+
+bool isNewSystem(const QnConnectionInfo& info);
 bool isNewSystem(const QnModuleInformation& info);
 bool isNewSystem(const QnCloudSystem& info);
 
-QnLocalConnectionData storeLocalSystemConnection(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    const QUrl& url);
+QnUuid currentSystemLocalId();
 
-} // namespace helpers
+bool currentSystemIsNew();
+
+bool serverBelongsToCurrentSystem(const QnModuleInformation& info);
+
+} // helpers

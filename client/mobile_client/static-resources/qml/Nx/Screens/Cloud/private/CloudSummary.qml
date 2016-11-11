@@ -24,7 +24,7 @@ Item
         Button
         {
             id: logoutButton
-            text: qsTr("Logout")
+            text: qsTr("Log out")
             width: parent.width
 
             onClicked: setCloudCredentials("", "")

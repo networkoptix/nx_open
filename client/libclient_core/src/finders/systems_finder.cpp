@@ -33,10 +33,10 @@ QnSystemsFinder::QnSystemsFinder(QObject *parent)
         {
             connect(finder, &QnAbstractSystemsFinder::systemDiscovered,
                 recentLocalSystemsFinder, &QnRecentLocalSystemsFinder::processSystemAdded);
-            connect(finder, &QnAbstractSystemsFinder::systemLost,
+            connect(finder, &QnAbstractSystemsFinder::systemLostInternal,
                 recentLocalSystemsFinder, &QnRecentLocalSystemsFinder::processSystemRemoved);
 
-            for (const auto system : finder->systems())
+            for (const auto& system: finder->systems())
                 recentLocalSystemsFinder->processSystemAdded(system);
         };
 
@@ -66,7 +66,7 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder,
     *connectionHolder << discovered << lostConnection << destroyedConnection;
 
     m_finders.insert(finder, connectionHolder);
-    for (const auto system : finder->systems())
+    for (const auto& system: finder->systems())
         onSystemDiscovered(system, priority);
 }
 

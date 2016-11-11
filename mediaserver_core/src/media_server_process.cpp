@@ -43,11 +43,16 @@
 #include <camera/camera_pool.h>
 
 #include <core/misc/schedule_task.h>
+
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
+
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -1881,6 +1886,16 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
+void MediaServerProcess::setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
+{
+    m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
+}
+
+void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
+{
+    m_engineVersion = version;
+}
+
 void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
 {
     nx::SystemName systemName;
@@ -1945,6 +1960,12 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 
 void MediaServerProcess::run()
 {
+    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
+
+    if (!m_engineVersion.isNull())
+        qnCommon->setEngineVersion(m_engineVersion);
+
     QnCallCountStart(std::chrono::milliseconds(5000));
 
     ffmpegInit();
@@ -2465,7 +2486,18 @@ void MediaServerProcess::run()
     auto upnpPortMapper = initializeUpnpPortMapper();
     updateAddressesList();
 
+    qDebug() << "start loading resources";
+    QElapsedTimer tt;
+    tt.start();
+    qnResourceAccessManager->beginUpdate();
+    qnResourceAccessProvider->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
+    qDebug() << "resources loaded for" << tt.elapsed();
+    qnResourceAccessProvider->endUpdate();
+    qDebug() << "access ready" << tt.elapsed();
+    qnResourceAccessManager->endUpdate();
+    qDebug() << "permissions ready" << tt.elapsed();
+
 	qnGlobalSettings->initialize();
     migrateSystemNameFromConfig(cloudConnectionManager);
 
@@ -2747,15 +2779,13 @@ public:
     }
 
 protected:
-    virtual int executeApplication() override {
+    virtual int executeApplication() override
+    {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
-
-        if (!m_overrideVersion.isNull())
-            qnCommon->setEngineVersion(m_overrideVersion);
 
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
+        m_main->setEnforcedMediatorEndpoint(m_enforcedMediatorEndpoint);
+        m_main->setEngineVersion(m_overrideVersion);
 
         int res = application()->exec();
 

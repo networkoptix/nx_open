@@ -48,7 +48,7 @@ CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
 CLIENT_HELP_PATH=${ClientHelpSourceDir}
-ICONS_PATH=${customization.dir}/icons/hicolor
+ICONS_PATH=${customization.dir}/icons/linux/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
 #. $CLIENT_BIN_PATH/env.sh

@@ -20,6 +20,7 @@
 #include <nx/utils/string.h>
 #include <network/module_finder.h>
 #include <api/global_settings.h>
+#include <network/system_helpers.h>
 
 namespace {
 
@@ -176,7 +177,8 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id)
     if (iter == boost::end(modules))
         return;
 
-    if (iter->localSystemId != qnGlobalSettings->localSystemId()) {
+    if (!helpers::serverBelongsToCurrentSystem(*iter))
+    {
         printLog("Server has another system ID: " + iter->localSystemId.toByteArray());
         for (InterfaceInfo &item: interfaces)
             item.ignored = true;

@@ -4,8 +4,10 @@
 
 #include <common/common_globals.h>
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/user_access_data.h>
+
+#include <core/resource/resource_fwd.h>
 
 #include <nx_ec/data/api_fwd.h>
 
@@ -13,10 +15,11 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
-#include "user_access_data.h"
+#include <utils/common/updatable.h>
 
 class QnResourceAccessManager:
     public Connective<QObject>,
+    public QnUpdatable,
     public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT
@@ -127,6 +130,10 @@ public:
 signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Qn::Permissions permissions);
+
+protected:
+    virtual void beforeUpdate() override;
+    virtual void afterUpdate() override;
 
 private:
     void recalculateAllPermissions();

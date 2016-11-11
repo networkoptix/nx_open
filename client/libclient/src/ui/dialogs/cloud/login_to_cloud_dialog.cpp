@@ -52,6 +52,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
+    setWindowTitle(tr("Log in to %1").arg(QnAppInfo::cloudName()));
+
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
 
