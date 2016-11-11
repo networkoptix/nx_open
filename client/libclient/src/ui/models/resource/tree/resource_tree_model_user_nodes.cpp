@@ -50,15 +50,26 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
             {
                 connect(user, &QnUserResource::enabledChanged, this,
                     &QnResourceTreeModelUserNodes::rebuildSubjectTree);
+
+                connect(user, &QnUserResource::userGroupChanged, this,
+                    [this](const QnUserResourcePtr& user)
+                    {
+                        removeUserNode(user);
+                        rebuildSubjectTree(user);
+                    });
+
+                rebuildSubjectTree(user);
             }
         });
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            disconnect(resource, nullptr, this, nullptr);
             if (auto user = resource.dynamicCast<QnUserResource>())
+            {
+                user->disconnect(this);
                 removeUserNode(user);
+            }
         });
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,

@@ -837,11 +837,6 @@ enum IDType
     DetachFromVideoWallAction,
 
     /**
-     * Update selected videowall item(s) with the current layout.
-     */
-    ResetVideoWallLayoutAction,
-
-    /**
      * Deletes selected videowall item(s).
      */
     DeleteVideoWallItemAction,

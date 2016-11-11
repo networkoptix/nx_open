@@ -429,7 +429,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(QnActions::NewVideoWallAction),              &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
         connect(action(QnActions::AttachToVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
         connect(action(QnActions::DetachFromVideoWallAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
-        connect(action(QnActions::ResetVideoWallLayoutAction),      &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered);
         connect(action(QnActions::DeleteVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
         connect(action(QnActions::StartVideoWallAction),            &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
         connect(action(QnActions::StopVideoWallAction),             &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
@@ -1289,7 +1288,8 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
             {
                 cameras << camera;
-                ar = qnSettings->resourceAspectRatios().value(camera->getPhysicalId(), defaultAr);
+                const auto cameraAr = camera->aspectRatio();
+                ar = cameraAr.isValid() ? cameraAr.toFloat() : defaultAr;
             }
             aspectRatios[ar] = aspectRatios[ar] + 1;
         };
@@ -1514,20 +1514,6 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
 
     saveVideowalls(videoWalls);
     cleanupUnusedLayouts();
-}
-
-void QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered()
-{
-    QnActionParameters parameters = menu()->currentParameters(sender());
-
-    QnVideoWallItemIndexList items = parameters.videoWallItems();
-    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
-        workbench()->currentLayout()->resource());
-
-    if (!layout)
-        return;
-
-    resetLayout(items, layout);
 }
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()

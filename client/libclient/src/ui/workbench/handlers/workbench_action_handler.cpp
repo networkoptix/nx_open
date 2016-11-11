@@ -143,7 +143,6 @@
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
 

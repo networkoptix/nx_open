@@ -106,7 +106,8 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
 
     const auto newIds = updatedSystems.keys().toSet();
 
-    IdsSet removedTargetIds;
+    QHash<QString, QnUuid> removedTargetIds;
+
     {
         const QnMutexLocker lock(&m_mutex);
 
@@ -126,13 +127,17 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         for (const auto removedCloudId : removedCloudIds)
         {
             const auto system = m_systems[removedCloudId];
-            removedTargetIds.insert(system->id());
+            removedTargetIds.insert(system->id(), system->localId());
             m_systems.remove(removedCloudId);
         }
     }
 
-    for (const auto removedId : removedTargetIds)
-        emit systemLost(removedId);
+    for (const auto id: removedTargetIds.keys())
+    {
+        const auto localId = removedTargetIds[id];
+        emit systemLostInternal(id, localId);
+        emit systemLost(id);
+    }
 }
 
 void QnCloudSystemsFinder::updateSystemInternal(
@@ -262,7 +267,11 @@ void QnCloudSystemsFinder::checkOutdatedServersInternal(
 
             // Removes factory systems. Note: factory id is just id of server
             if (system->servers().isEmpty() && m_factorySystems.remove(system->id()))
-                emit systemLost(system->id());
+            {
+                const auto id = system->id();
+                emit systemLostInternal(id, system->localId());
+                emit systemLost(id);
+            }
         }
     }
 

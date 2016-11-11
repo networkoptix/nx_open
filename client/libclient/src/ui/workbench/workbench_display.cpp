@@ -16,7 +16,7 @@
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
-#include <utils/aspect_ratio.h>
+#include <utils/common/aspect_ratio.h>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>

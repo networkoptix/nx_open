@@ -41,8 +41,6 @@ void QnMobileClientMetaTypes::initialize() {
 }
 
 void QnMobileClientMetaTypes::registerMetaTypes() {
-    qRegisterMetaType<QnAspectRatioHash>();
-    qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {

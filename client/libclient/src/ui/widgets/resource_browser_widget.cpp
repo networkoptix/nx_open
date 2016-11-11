@@ -104,6 +104,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     m_previewWidget->busyIndicator()->setDotSpacing(style::Metrics::kStandardPadding);
 
     auto layout = new QVBoxLayout(m_embeddedWidget);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_previewWidget);
     layout->addWidget(m_textLabel);
@@ -118,7 +119,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
 
-    updateTailPos();
+    setThumbnailVisible(false);
 }
 
 bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
@@ -133,9 +134,15 @@ bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QE
     return base_type::sceneEventFilter(watched, event);
 }
 
+void QnResourceBrowserToolTipWidget::forceLayoutUpdate()
+{
+    m_embeddedWidget->layout()->activate();
+}
+
 void QnResourceBrowserToolTipWidget::setText(const QString& text)
 {
     m_textLabel->setText(text);
+    forceLayoutUpdate();
 }
 
 void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
@@ -143,8 +150,16 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
     if (m_previewWidget->isHidden() != visible)
         return;
 
+    m_textLabel->setSizePolicy(
+        visible ? QSizePolicy::Ignored : QSizePolicy::Preferred,
+        QSizePolicy::Preferred);
+
+    m_textLabel->setWordWrapMode(visible
+        ? QTextOption::WrapAtWordBoundaryOrAnywhere
+        : QTextOption::ManualWrap);
+
     m_previewWidget->setVisible(visible);
-    m_embeddedWidget->layout()->activate();
+    forceLayoutUpdate();
 
     updateTailPos();
 }
@@ -155,7 +170,7 @@ void QnResourceBrowserToolTipWidget::setResource(const QnResourcePtr& resource)
         return;
 
     m_previewWidget->setTargetResource(resource);
-    m_embeddedWidget->layout()->activate();
+    forceLayoutUpdate();
 }
 
 const QnResourcePtr& QnResourceBrowserToolTipWidget::resource() const

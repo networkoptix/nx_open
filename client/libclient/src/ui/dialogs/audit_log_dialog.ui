@@ -301,7 +301,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Log in/log out</string>
+             <string>Login/logout</string>
             </property>
             <property name="checked">
              <bool>true</bool>

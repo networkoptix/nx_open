@@ -58,7 +58,7 @@ public: // overrides
     bool safeMode() const override;
 
 private:
-    void emitHeadChanged();
+    void emitSystemChanged();
 
     void onSystemNameChanged(const QnSystemDescriptionPtr& system);
 

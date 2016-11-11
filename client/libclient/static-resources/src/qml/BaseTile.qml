@@ -61,7 +61,7 @@ Item
     {
         /**
           * Workaround for missing tile.
-          * In case of shrinking tile, When tile parent moves in grid on another position
+          * In case of shrinking tile, when tile parent moves in grid on another position
           * it can land to the wrong (previous) pos. It is because transition stores initial
           * values and don't update them until next run.
           * We restart transition in this case. It fixes bug.
@@ -203,7 +203,7 @@ Item
                 PropertyAction
                 {
                     target: control;
-                    properties: "isExpanded, animating";
+                    properties: "isExpanded";
                     value: true;
                 }
 
@@ -268,13 +268,6 @@ Item
                     target: control;
                     property: "isExpanded";
                     value: (tileHolder.state == "expanded");
-                }
-
-                PropertyAction
-                {
-                    target: control;
-                    property: "animating";
-                    value: false;
                 }
             }
         }

@@ -16,7 +16,7 @@ public:
 
     void processSystemAdded(const QnSystemDescriptionPtr& system);
 
-    void processSystemRemoved(const QString& systemId);
+    void processSystemRemoved(const QString& systemId, const QnUuid& localSystemId);
 
 public: // overrides
     virtual SystemDescriptionList systems() const override;
@@ -33,8 +33,8 @@ public: // overrides
     void removeFinalSystem(const QString& id);
 
 private:
-    typedef QPair<QnUuid, int> IdCountPair;
-    typedef QHash<QString, IdCountPair> IdsDataHash;
+    typedef QHash<QnUuid, int> IdCountHash;
+    typedef QHash<QString, IdCountHash> IdsDataHash;
 
     // We don't allow to discover recent systems if we have online ones
     IdsDataHash m_filteringSystems;

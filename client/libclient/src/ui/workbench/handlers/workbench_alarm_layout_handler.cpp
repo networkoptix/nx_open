@@ -3,7 +3,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <utils/aspect_ratio.h>
 
 #include <business/actions/abstract_business_action.h>
 
@@ -39,7 +38,6 @@
 #include <nx/streaming/archive_stream_reader.h>
 
 #include <nx/streaming/archive_stream_reader.h>
-#include <utils/aspect_ratio.h>
 #include <utils/common/delayed.h>
 
 namespace {

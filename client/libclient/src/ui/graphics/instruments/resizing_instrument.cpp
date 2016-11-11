@@ -362,10 +362,10 @@ void ResizingInstrument::getWidgetAndFrameSection(
     }
 
     QList<QPoint> locationsNearby{
-        pos - QPoint(m_outerEffectRadius, m_outerEffectRadius),
-        pos - QPoint(-m_outerEffectRadius, m_outerEffectRadius),
-        pos - QPoint(-m_outerEffectRadius, -m_outerEffectRadius),
-        pos - QPoint(m_outerEffectRadius, -m_outerEffectRadius)
+        pos + QPoint(m_outerEffectRadius, m_outerEffectRadius),
+        pos + QPoint(-m_outerEffectRadius, m_outerEffectRadius),
+        pos + QPoint(-m_outerEffectRadius, -m_outerEffectRadius),
+        pos + QPoint(m_outerEffectRadius, -m_outerEffectRadius)
     };
 
     QGraphicsWidget* widgetNearby = nullptr;

@@ -96,14 +96,6 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
 QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
 
-
-/**
- * Mapping from resource physical id to aspect ratio.
- */
-typedef QHash<QString, qreal> QnAspectRatioHash;
-Q_DECLARE_METATYPE(QnAspectRatioHash)
-
-
 // -------------------------------------------------------------------------- //
 // QnPtzHotkey
 // -------------------------------------------------------------------------- //

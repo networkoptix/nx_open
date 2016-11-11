@@ -543,7 +543,23 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
+QnAspectRatio QnVirtualCameraResource::aspectRatio() const
+{
+    qreal customAr = customAspectRatio();
+    if (!qFuzzyIsNull(customAr))
+        return QnAspectRatio::closestStandardRatio(customAr);
+
+    const auto s = mediaStreams();
+    if (!s.streams.empty())
+    {
+        const QSize size = s.streams[0].getResolution();
+        return QnAspectRatio::closestStandardRatio(static_cast<qreal>(size.width()) / size.height());
+    }
+
+    return QnAspectRatio();
+}
+
+const QLatin1String CameraMediaStreamInfo::anyResolution("*");
 
 QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
 {

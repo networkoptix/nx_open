@@ -10,8 +10,6 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/aspect_ratio.h>
-
 namespace {
     /** We are allowing to set fixed rotation to any value with this step. */
     const int rotationDegreesStep = 90;

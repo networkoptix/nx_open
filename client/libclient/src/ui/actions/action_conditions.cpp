@@ -1133,28 +1133,6 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
     return Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {
-    if (!context()->user() || parameters.videoWallItems().isEmpty())
-        return Qn::InvisibleAction;
-
-    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
-                                                                          workbench()->currentLayout()->resource());
-
-    if (!layout)
-        return Qn::InvisibleAction;
-
-    if (layout->data().contains(Qn::VideoWallResourceRole))
-        return Qn::InvisibleAction;
-
-    if (layout->isFile())
-        return Qn::InvisibleAction;
-
-    if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
-        return Qn::EnabledAction;
-
-    return Qn::InvisibleAction;
-}
-
 Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionParameters &parameters) {
     if (!context()->user() || parameters.videoWallItems().isEmpty())
         return Qn::InvisibleAction;
