@@ -9,6 +9,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include "request_executor_factory.h"
+
 namespace nx {
 namespace db {
 
@@ -39,7 +41,7 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     m_connectionsToDropQueue.push(nullptr);
     m_dropConnectionThread.join();
 
-    std::vector<std::unique_ptr<DbRequestExecutionThread>> dbThreadPool;
+    std::vector<std::unique_ptr<BaseRequestExecutor>> dbThreadPool;
     {
         QnMutexLocker lk(&m_mutex);
         std::swap(m_dbThreadPool, dbThreadPool);
@@ -76,7 +78,7 @@ bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*
 
 void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& /*lk*/)
 {
-    auto executorThread = std::make_unique<DbRequestExecutionThread>(
+    auto executorThread = RequestExecutorFactory::create(
         m_connectionOptions,
         &m_requestQueue);
     auto executorThreadPtr = executorThread.get();
@@ -92,12 +94,12 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
 {
     for (;;)
     {
-        std::unique_ptr<DbRequestExecutionThread> dbConnection;
+        std::unique_ptr<BaseRequestExecutor> dbConnection;
         m_connectionsToDropQueue.pop(dbConnection);
         if (!dbConnection)
             return; //null is used as a termination mark
 
-        dbConnection->wait();
+        dbConnection->join();
         dbConnection.reset();
     }
 }
@@ -110,7 +112,7 @@ void AsyncSqlQueryExecutor::reportQueryCancellation(
 }
 
 void AsyncSqlQueryExecutor::onConnectionClosed(
-    DbRequestExecutionThread* const executorThreadPtr)
+    BaseRequestExecutor* const executorThreadPtr)
 {
     QnMutexLocker lk(&m_mutex);
     dropConnectionAsync(lk, executorThreadPtr);
@@ -120,12 +122,12 @@ void AsyncSqlQueryExecutor::onConnectionClosed(
 
 void AsyncSqlQueryExecutor::dropConnectionAsync(
     const QnMutexLockerBase& /*lk*/,
-    DbRequestExecutionThread* const executorThreadPtr)
+    BaseRequestExecutor* const executorThreadPtr)
 {
     auto it = std::find_if(
         m_dbThreadPool.begin(),
         m_dbThreadPool.end(),
-        [executorThreadPtr](std::unique_ptr<DbRequestExecutionThread>& val)
+        [executorThreadPtr](std::unique_ptr<BaseRequestExecutor>& val)
         {
             return val.get() == executorThreadPtr;
         });

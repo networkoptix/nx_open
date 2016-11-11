@@ -1,37 +1,90 @@
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/utils.h>
 
 #include <utils/db/async_sql_query_executor.h>
+#include <utils/db/request_executor_factory.h>
+#include <utils/db/request_execution_thread.h>
 
 #include "test_setup.h"
 
 namespace nx {
 namespace db {
 
-namespace {
+//-------------------------------------------------------------------------------------------------
+// DbRequestExecutionThreadTestWrapper
 
-constexpr auto kQueryCompletionTimeout = std::chrono::seconds(10);
+class DbRequestExecutionThreadTestWrapper:
+    public DbRequestExecutionThread
+{
+public:
+    DbRequestExecutionThreadTestWrapper(
+        const ConnectionOptions& connectionOptions,
+        QueryExecutorQueue* const queryExecutorQueue)
+        :
+        DbRequestExecutionThread(connectionOptions, queryExecutorQueue)
+    {
+    }
 
-} // namespace
+    ~DbRequestExecutionThreadTestWrapper()
+    {
+        if (m_onDestructionHandler)
+            m_onDestructionHandler();
+    }
+
+    void setOnDestructionHandler(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        m_onDestructionHandler = std::move(handler);
+    }
+
+private:
+    nx::utils::MoveOnlyFunc<void()> m_onDestructionHandler;
+};
+
+//-------------------------------------------------------------------------------------------------
+// AsyncSqlQueryExecutorTest
+
+class DbConnectionEventsReceiver
+{
+public:
+    MOCK_METHOD0(onConnectionCreated, void());
+    MOCK_METHOD0(onConnectionDestroyed, void());
+};
+
+//-------------------------------------------------------------------------------------------------
+// AsyncSqlQueryExecutorTest
+
+constexpr static auto kQueryCompletionTimeout = std::chrono::seconds(10);
 
 class AsyncSqlQueryExecutorTest:
     public ::testing::Test
 {
 public:
-    AsyncSqlQueryExecutorTest()
+    AsyncSqlQueryExecutorTest():
+        m_eventsReceiver(nullptr)
     {
+        using namespace std::placeholders;
+        RequestExecutorFactory::setFactoryFunc(
+            std::bind(&AsyncSqlQueryExecutorTest::createConnection, this, _1, _2));
+
         init();
     }
 
     ~AsyncSqlQueryExecutorTest()
     {
         QDir(m_tmpDir).removeRecursively();
+    }
+
+    void setConnectionEventsReceiver(DbConnectionEventsReceiver* const eventsReceiver)
+    {
+        m_eventsReceiver = eventsReceiver;
     }
 
 protected:
@@ -56,6 +109,11 @@ protected:
         ASSERT_TRUE(m_asyncSqlQueryExecutor->init());
         
         executeUpdate("CREATE TABLE company(name VARCHAR(256), yearFounded INTEGER)");
+    }
+
+    void closeDatabase()
+    {
+        m_asyncSqlQueryExecutor.reset();
     }
 
     void executeUpdate(const QString& queryText)
@@ -112,10 +170,16 @@ protected:
         emulateQueryError(DBResult::connectionError);
     }
 
+    void emulateRecoverableQueryError()
+    {
+        emulateQueryError(DBResult::uniqueConstraintViolation);
+    }
+
 private:
     ConnectionOptions m_connectionOptions;
     std::unique_ptr<AsyncSqlQueryExecutor> m_asyncSqlQueryExecutor;
     QString m_tmpDir;
+    DbConnectionEventsReceiver* m_eventsReceiver;
 
     void init()
     {
@@ -153,6 +217,22 @@ private:
             });
         NX_GTEST_ASSERT_EQ(dbResultToEmulate, dbResult);
     }
+
+    std::unique_ptr<BaseRequestExecutor> createConnection(
+        const ConnectionOptions& connectionOptions,
+        QueryExecutorQueue* const queryExecutorQueue)
+    {
+        auto connection = std::make_unique<DbRequestExecutionThreadTestWrapper>(
+            connectionOptions,
+            queryExecutorQueue);
+        if (m_eventsReceiver)
+        {
+            m_eventsReceiver->onConnectionCreated();
+            connection->setOnDestructionHandler(
+                std::bind(&DbConnectionEventsReceiver::onConnectionDestroyed, m_eventsReceiver));
+        }
+        return std::move(connection);
+    }
 };
 
 struct Company
@@ -181,7 +261,10 @@ TEST_F(AsyncSqlQueryExecutorTest, able_to_execute_query)
 
 TEST_F(AsyncSqlQueryExecutorTest, db_connection_reopens_after_error)
 {
-    // mock: two connections created, one closed
+    DbConnectionEventsReceiver connectionEventsReceiver;
+    setConnectionEventsReceiver(&connectionEventsReceiver);
+    EXPECT_CALL(connectionEventsReceiver, onConnectionCreated()).Times(2);
+    EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(2);
 
     initializeDatabase();
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Microsoft', 1975)");
@@ -190,6 +273,26 @@ TEST_F(AsyncSqlQueryExecutorTest, db_connection_reopens_after_error)
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
     ASSERT_EQ(2, companies.size());
+
+    closeDatabase();
+}
+
+TEST_F(AsyncSqlQueryExecutorTest, db_connection_does_not_reopen_after_recoverable_error)
+{
+    DbConnectionEventsReceiver connectionEventsReceiver;
+    setConnectionEventsReceiver(&connectionEventsReceiver);
+    EXPECT_CALL(connectionEventsReceiver, onConnectionCreated()).Times(1);
+    EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(1);
+
+    initializeDatabase();
+    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Microsoft', 1975)");
+    emulateRecoverableQueryError();
+    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
+
+    const auto companies = executeSelect<Company>("SELECT * FROM company");
+    ASSERT_EQ(2, companies.size());
+
+    closeDatabase();
 }
 
 } // namespace db

@@ -15,7 +15,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
-#include "request_execution_thread.h"
+#include "base_request_executor.h"
 #include "request_executor.h"
 #include "types.h"
 #include "query_context.h"
@@ -123,19 +123,19 @@ private:
     mutable QnMutex m_mutex;
     nx::utils::SyncQueueWithItemStayTimeout<std::unique_ptr<AbstractExecutor>>
         m_requestQueue;
-    std::vector<std::unique_ptr<DbRequestExecutionThread>> m_dbThreadPool;
+    std::vector<std::unique_ptr<BaseRequestExecutor>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
-    QnSafeQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
+    QnSafeQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
 
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
     void openNewConnection(const QnMutexLockerBase& /*lk*/);
     void dropExpiredConnectionsThreadFunc();
     void reportQueryCancellation(std::unique_ptr<AbstractExecutor>);
-    void onConnectionClosed(DbRequestExecutionThread* const executorThreadPtr);
+    void onConnectionClosed(BaseRequestExecutor* const executorThreadPtr);
     void dropConnectionAsync(
         const QnMutexLockerBase& /*lk*/,
-        DbRequestExecutionThread* const executorThreadPtr);
+        BaseRequestExecutor* const executorThreadPtr);
 
     template<
         typename Executor, typename UpdateFunc,
