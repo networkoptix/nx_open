@@ -220,10 +220,10 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
 
-    // add foreign user
-    if (!data.foreignUser.id.isNull())
+    // add foreign users
+    for (const auto& user: data.foreignUsers)
     {
-        if (connection->getUserManager(Qn::kSystemAccess)->saveSync(data.foreignUser) != ec2::ErrorCode::ok)
+        if (connection->getUserManager(Qn::kSystemAccess)->saveSync(user) != ec2::ErrorCode::ok)
         {
             if (!data.wholeSystem)
                 resumeConnectionsToRemotePeers();
