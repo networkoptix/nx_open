@@ -289,6 +289,7 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
             return;
         }
 
+        m_socket->setNonBlockingMode(true);
         m_connected = true;
     }
 
