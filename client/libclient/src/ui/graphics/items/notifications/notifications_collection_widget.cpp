@@ -256,11 +256,14 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         if (alarmCameras.isEmpty())
             return;
 
-        if (findItem(ruleId, [timestampMs](QnNotificationWidget* item)
-        {
-            return item->property(kItemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction
-                && item->property(kItemTimeStampPropertyName)  == timestampMs;
-        }))
+        auto findItemPredicate =
+            [timestampMs](QnNotificationWidget* item)
+            {
+                return item->property(kItemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction
+                    && item->property(kItemTimeStampPropertyName) == timestampMs;
+            };
+
+        if (findItem(ruleId, findItemPredicate))
             return; /* Show 'Alarm Layout' notifications only once for each event of one rule. */
 
         title = tr("Alarm: %1").arg(title);
