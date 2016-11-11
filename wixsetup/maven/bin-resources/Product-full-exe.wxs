@@ -16,7 +16,7 @@
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="License.rtf"
-                LogoFile="logo.png"
+                LogoFile="logo-64x64.png"
                 SuppressOptionsUI="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />

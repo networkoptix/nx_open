@@ -178,25 +178,25 @@ def rename(folder, old_name, new_name):
 
 def main():
     commands = []
-#    commands += create_commands_set('client-only', client_msi_folder, client_msi_name, candle_args=['-dNoStrip=yes'], components=client_components)
-#    commands += create_commands_set('server-only', server_msi_folder, server_msi_name, candle_args=['-dNoStrip=yes'], components=server_components)
-#    commands += create_commands_set('client-only', client_msi_strip_folder, client_msi_name, suffix='client-strip', candle_args=['-dNoStrip=no'], components=client_components)
-#    commands += create_commands_set('server-only', server_msi_strip_folder, server_msi_name, suffix='server-strip', candle_args=['-dNoStrip=no'], components=server_components)
+    commands += create_commands_set('client-only', client_msi_folder, client_msi_name, candle_args=['-dNoStrip=yes'], components=client_components)
+    commands += create_commands_set('server-only', server_msi_folder, server_msi_name, candle_args=['-dNoStrip=yes'], components=server_components)
+    commands += create_commands_set('client-only', client_msi_strip_folder, client_msi_name, suffix='client-strip', candle_args=['-dNoStrip=no'], components=client_components)
+    commands += create_commands_set('server-only', server_msi_strip_folder, server_msi_name, suffix='server-strip', candle_args=['-dNoStrip=no'], components=server_components)
 
-#    if not skip_sign:
-#        commands += create_sign_command_set(client_msi_folder, client_msi_name)
-#        commands += create_sign_command_set(server_msi_folder, server_msi_name)
-#        commands += create_sign_command_set(client_msi_strip_folder, client_msi_name)
-#        commands += create_sign_command_set(server_msi_strip_folder, server_msi_name)
+    if not skip_sign:
+        commands += create_sign_command_set(client_msi_folder, client_msi_name)
+        commands += create_sign_command_set(server_msi_folder, server_msi_name)
+        commands += create_sign_command_set(client_msi_strip_folder, client_msi_name)
+        commands += create_sign_command_set(server_msi_strip_folder, server_msi_name)
 
-#    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name, components=client_exe_components)
-#    commands += create_commands_set('server-exe', server_exe_folder, server_exe_name, components=server_exe_components)
-#    commands += create_commands_set('full-exe', full_exe_folder, full_exe_name, components=full_exe_components)
+    commands += create_commands_set('client-exe', client_exe_folder, client_exe_name, components=client_exe_components)
+    commands += create_commands_set('server-exe', server_exe_folder, server_exe_name, components=server_exe_components)
+    commands += create_commands_set('full-exe', full_exe_folder, full_exe_name, components=full_exe_components)
 
-#    if not skip_sign:
-#        commands += create_sign_burn_exe_command_set(client_exe_folder, engine_tmp_folder, client_exe_name)
-#        commands += create_sign_burn_exe_command_set(server_exe_folder, engine_tmp_folder, server_exe_name)
-#        commands += create_sign_burn_exe_command_set(full_exe_folder, engine_tmp_folder, full_exe_name)
+    if not skip_sign:
+        commands += create_sign_burn_exe_command_set(client_exe_folder, engine_tmp_folder, client_exe_name)
+        commands += create_sign_burn_exe_command_set(server_exe_folder, engine_tmp_folder, server_exe_name)
+        commands += create_sign_burn_exe_command_set(full_exe_folder, engine_tmp_folder, full_exe_name)
 
     if build_nxtool:
         commands += create_commands_set('nxtool', nxtool_msi_folder, nxtool_msi_name, components=nxtool_components)
