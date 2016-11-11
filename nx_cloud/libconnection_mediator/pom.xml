@@ -20,7 +20,6 @@
         <product.title>${company.name} Mediator Lib</product.title>
         <product.display.title>${company.name} Mediator Lib</product.display.title>
         <template>lib</template>
-        <targetName>connection_mediator</targetName>
 
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>

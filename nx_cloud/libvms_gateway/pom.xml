@@ -20,7 +20,6 @@
         <product.title>${company.name} libvms_gateway</product.title>
         <product.display.title>${company.name} VMS Gateway</product.display.title>
         <template>lib</template>
-        <targetName>vms_gateway</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>

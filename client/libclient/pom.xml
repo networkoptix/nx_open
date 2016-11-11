@@ -20,7 +20,6 @@
         <product.display.title>${client.display.name}</product.display.title>
         <template>lib</template>
         <root.dir>${basedir}/../..</root.dir>
-        <targetName>client</targetName>
 
         <qt.libs>core gui gui-private widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
