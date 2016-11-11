@@ -2830,7 +2830,7 @@ void QnTimeSlider::sliderChange(SliderChange change)
             bool wasAtMinimum = windowStart == m_oldMinimum;
             bool wasAtMaximum = windowEnd == m_oldMaximum;
 
-            /* Always keep full range window: */
+            /* If a window is full range it should always be preserved: */
             if (wasAtMinimum && wasAtMaximum)
             {
                 windowStart = minimum();
