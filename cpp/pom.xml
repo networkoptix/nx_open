@@ -245,13 +245,6 @@
                                             <value>None</value>
                                         </replacement>
 
-                                        <!-- Replacing GUIDs to predefined ones -->
-                                        <replacement>
-                                            <xpath>//Project/PropertyGroup</xpath>
-                                            <token><![CDATA[<ProjectGuid>\{(.*)}]]></token>
-                                            <value><![CDATA[<ProjectGuid>\${guid}]]></value>
-                                        </replacement>
-
                                         <!-- Adding target machine for x86 -->
                                         <replacement>
                                             <xpath>//Project/ItemDefinitionGroup</xpath>
@@ -260,9 +253,6 @@
       <TargetMachine>Machine${machine.type}</TargetMachine>
     </Lib>]]></value>
                                         </replacement>
-
-
-
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
