@@ -4,10 +4,9 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${short.company.name} Server Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
-        <Package Id="*" InstallerVersion="301" Compressed="yes" Keywords="Installer" Comments="${short.company.name} Server Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${short.company.name} Server Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
-        <?include BuildVars.wxi ?>
 
         <Property Id="REINSTALLMODE" Value="dmus"/>
 
@@ -119,51 +118,6 @@
             <Directory Id="StartupFolder" Name="Startup"/>            
         </Directory>
 
-        <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist90" SourceFile="MergeModules\Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist140" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <?if ${build.configuration} = debug ?>
-                <Merge Id="VCRedist90Debug" SourceFile="MergeModules\Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist90PolicyDebug" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>                
-                <Merge Id="VCRedist100Debug" SourceFile="MergeModules\Microsoft_VC100_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist140Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-            <?endif?>
-        </DirectoryRef>
-
-        <Feature Id="VCRedistVS9" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist90"/>
-            <MergeRef Id="VCRedist90Policy"/>
-            <?if ${build.configuration} = Debug ?>
-                <MergeRef Id="VCRedist90Debug"/>
-                <MergeRef Id="VCRedist90PolicyDebug"/>
-            <?endif?>
-        </Feature>
-
-        <Feature Id="VCRedistVS10" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist100"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist100Debug"/>
-            <?endif?>            
-        </Feature>
-
-        <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist110"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist110Debug"/>
-            <?endif?>
-        </Feature>
-
-        <Feature Id="VCRedistVS14" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist140"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist140Debug"/>
-            <?endif?>
-        </Feature>
-
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
@@ -218,8 +172,7 @@
             <Publish Dialog="NxtoolDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="NxtoolDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="NxtoolDlg">NOT $(var.VmsRemoving)</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" Order="2">$(var.VmsRemoving)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="NxtoolDlg">1</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="NxtoolFeature">INSTALL_NXTOOL</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="NxtoolFeature">NOT INSTALL_NXTOOL</Publish>
@@ -234,10 +187,6 @@
             <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="NxtoolFeature">NOT INSTALL_NXTOOL</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchNxtoolChecBoxText)">1</Publish>
-
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
         </UI>
     </Product>
 </Wix>
