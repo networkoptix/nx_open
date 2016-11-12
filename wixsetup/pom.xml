@@ -122,25 +122,6 @@
                             </resources>              
                         </configuration>            
                     </execution>                      
-                    <execution>
-                        <id>copy-vs-redist</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>          
-                                <resource>
-                                    <directory>${environment.dir}\wix</directory>    
-                                    <includes>
-                                        <include>Redist/**</include>
-                                    </includes>
-                                </resource>             
-                            </resources>              
-                        </configuration>            
-                    </execution>                      
                 </executions>
             </plugin>
             <plugin>
