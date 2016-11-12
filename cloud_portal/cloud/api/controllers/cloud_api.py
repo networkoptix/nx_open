@@ -5,6 +5,10 @@ import base64
 from cloud import settings
 from api.helpers.exceptions import validate_response, ErrorCodes, APIRequestException
 
+import logging
+
+log = logging.getLogger(__name__)
+
 CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 
 
@@ -17,8 +21,11 @@ def lower_case_email(func):
 
 @validate_response
 def ping():
-    request = CLOUD_DB_URL + "/ping"
-    return requests.get(request)
+    url = CLOUD_DB_URL + "/ping"
+    log.info('Making ping request to {}'.format(url))
+    response = requests.get(url)
+    log.info('Ping request finished')
+    return response
 
 
 class System(object):
