@@ -10,7 +10,7 @@
 			<outputDirectory>../</outputDirectory>
 			<includes>
 				<include>**/mediaserver.pdb</include>
-			</includes>           
+			</includes>
 		</fileSet>			
 	</fileSets>
 </assembly>

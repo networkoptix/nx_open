@@ -10,7 +10,7 @@
 			<outputDirectory>../</outputDirectory>
 			<includes>
 				<include>**/desktop_client.pdb</include>
-			</includes>           
+			</includes>
 		</fileSet>			
 	</fileSets>
 </assembly>

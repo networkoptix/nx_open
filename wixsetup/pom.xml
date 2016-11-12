@@ -32,7 +32,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mediaserver</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>
         </dependency>
@@ -41,29 +41,29 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>desktop_client</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/desktop_client/pom.xml</systemPath>            
+            <systemPath>${root.dir}/client/desktop_client/pom.xml</systemPath>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nxtool</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>            
+            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>axclient</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>            
-        </dependency>                   
-    </dependencies>     
+            <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
     <build>
         <directory>${arch}</directory>
@@ -84,7 +84,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>        
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -99,13 +99,13 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <overwrite>true</overwrite>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>${environment.dir}/customization/${parent.customization}/wixsetup</directory>
-                                </resource>          
-                            </resources>              
-                        </configuration>            
-                    </execution>          
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>copy-certificates</id>
                         <phase>generate-sources</phase>
@@ -115,13 +115,13 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <overwrite>true</overwrite>
-                            <resources>          
+                            <resources>
                                 <resource>
-                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>    
-                                </resource>             
-                            </resources>              
-                        </configuration>            
-                    </execution>                      
+                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -137,7 +137,7 @@
                         <configuration>
                             <encoding>utf-8</encoding>
                             <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
-                            <ignoreMissingFile>true</ignoreMissingFile>                                    
+                            <ignoreMissingFile>true</ignoreMissingFile>
                             <replacements>
                                 <replacement>
                                     <token>
@@ -146,12 +146,12 @@
                                     <value>
                                         <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]>
                                     </value>
-                                </replacement>           
+                                </replacement>
                             </replacements>
-                        </configuration>                                
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>                     
+            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -167,7 +167,7 @@
                         </goals>
                         <configuration>
                             <executable>${project.build.directory}/build.bat</executable>
-                            <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
+                            <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>
                         </configuration>
                     </execution>
 
@@ -183,7 +183,7 @@
                                 <argument>wix-gen.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>                    
+                        </configuration>
                     </execution>
 
                     <execution>
@@ -198,8 +198,8 @@
                                 <argument>wix-compile.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>                    
-                    </execution>                   
+                        </configuration>
+                    </execution>
 
                     <execution>
                         <id>pack</id>
@@ -210,10 +210,10 @@
                         <configuration>
                             <executable>${project.build.directory}/pack.bat</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>    
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>        
+            </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -230,9 +230,9 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>client-update</finalName>                            
+                            <finalName>client-update</finalName>
                         </configuration>
-                    </execution>    
+                    </execution>
                     <execution>
                         <id>server-update-package</id>
                         <phase>post-integration-test</phase>
@@ -243,8 +243,8 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
-                            <finalName>server-update</finalName>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+                            <finalName>server-update</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -257,9 +257,9 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                         </configuration>
-                    </execution>                    
+                    </execution>
                     <execution>
                         <id>pack-debug-server</id>
                         <phase>post-integration-test</phase>
@@ -270,7 +270,7 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -283,7 +283,7 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -296,7 +296,7 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -309,13 +309,13 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                         </configuration>
-                    </execution>              
-                </executions>               
-            </plugin>               
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-    </build>       
+    </build>
     <profiles>
         <profile>
             <id>nxtool-installer</id>
@@ -329,7 +329,7 @@
             </activation>
             <properties>
                 <nxtool>true</nxtool>
-            </properties>            
-        </profile>    
-    </profiles>    
+            </properties>
+        </profile>
+    </profiles>
 </project>

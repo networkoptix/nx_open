@@ -46,9 +46,9 @@
     <!-- NxtoolDlg -->
     <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Verknüpfungen</String>
     <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Verknüpfung auf dem Desktop platzieren</String>
-    
+
     <!-- DowngradeWarningDlg -->
-    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String> 
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String>
 
 
 
@@ -57,7 +57,7 @@
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Klicken Sie auf Weiter, um den Standardordner zu verwenden oder klicken Sie auf Ändern, um einen anderen zu wählen.</String>
     <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Media-Stammordner</String>
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Bitte wählen den Media-Stammordner:</String>
-    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Benutzerkennung:</String>    
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Benutzerkennung:</String>
 
 
     <!-- MyExitDialog -->
@@ -72,27 +72,27 @@
 
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>    
-    <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie ${nxtool.name} nachdem Setup beendet ist.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie ${nxtool.name} nachdem Setup beendet ist.</String>
     <String Id="Product_ArchMismatch"                               Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
 
     <!-- SelectionWarningDlg -->
-    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Sie müssen mindestens eine Komponente auswählen</String>    
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Sie müssen mindestens eine Komponente auswählen</String>
 
-    
+
     <!-- UpgradeDlg -->
-    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Ältere Version gefunden</String>    
-    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installationstyp</String>    
-    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Update wird eingespielt</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "admin". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>    
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Ältere Version gefunden</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installationstyp</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Update wird eingespielt</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "admin". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>
 
     <!-- WixSchedFirewallExceptions -->
-    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Verbindung zur Windows-Firewall kann nicht aufgebaut werden.  ([2]   [3]   [4]   [5])</String>    
-    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Konfigurieren der Windows-Firewall</String>    
-    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Konfigurieren der Windows-Firewall</String>    
-    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>    
-    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Installieren der Windows-Firewall-Konfiguration</String>    
-    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>    
-    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Deinstallieren der Windows-Firewall-Konfiguration</String>    
-    
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Verbindung zur Windows-Firewall kann nicht aufgebaut werden.  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Konfigurieren der Windows-Firewall</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Konfigurieren der Windows-Firewall</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Installieren der Windows-Firewall-Konfiguration</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Deinstallieren der Windows-Firewall-Konfiguration</String>
+
 </WixLocalization>

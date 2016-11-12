@@ -19,6 +19,6 @@ for wxs in generated_items:
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
     print out
     p.wait()
-    if p.returncode:  
-        print "failed with code: %s" % str(p.returncode) 
+    if p.returncode:
+        print "failed with code: %s" % str(p.returncode)
         sys.exit(1)
