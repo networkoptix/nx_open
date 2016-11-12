@@ -37,7 +37,7 @@ full_exe_name = '${finalName}.exe'
 nxtool_msi_name = '${finalName}-servertool.msi'
 nxtool_exe_name = '${finalName}-servertool.exe'
 
-wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
+wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
 server_components = ['ServerVox', 'Server', 'traytool']
