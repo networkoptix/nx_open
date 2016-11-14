@@ -186,7 +186,7 @@ private:
     QnResourceTreeModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
-    QScopedPointer<QnMultiEventSignalizer> m_scrollbarSignalizer;
+    QnMultiEventSignalizer* m_scrollbarSignalizer;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
 };
