@@ -434,25 +434,13 @@ void QnEventLogDialog::at_filterAction_triggered()
 
 void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
-    auto hasAccess = [this](const QnResourcePtr& resource)
-    {
-        if (!resource)
-            return false;
-
-        if (resource.dynamicCast<QnMediaResource>())
-            return accessController()->hasPermissions(resource, Qn::ReadPermission);
-
-        /* Only admins should see context menu on servers and users. */
-        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    };
-
     QScopedPointer<QMenu> menu;
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
-        if (resource && hasAccess(resource))
+        if (resource)
         {
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);

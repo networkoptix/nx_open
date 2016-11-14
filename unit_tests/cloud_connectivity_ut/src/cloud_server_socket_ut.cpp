@@ -36,7 +36,7 @@ public:
         m_server->bindToAioThread(thread);
         NX_CRITICAL(m_server->setNonBlockingMode(true));
         NX_CRITICAL(m_server->setReuseAddrFlag(true));
-        NX_CRITICAL(m_server->bind(network::test::kAnyPrivateAddress));
+        NX_CRITICAL(m_server->bind(SocketAddress::anyPrivateAddress));
         NX_CRITICAL(m_server->listen());
 
         auto address = m_server->getLocalAddress();
@@ -346,7 +346,6 @@ protected:
         SocketGlobals::mediatorConnector().setSystemCredentials(
             std::move(systemCredentials));
 
-        const auto addr = network::test::kAnyPrivateAddress;
         for (size_t i = 0; i < kPeerCount; i++)
             m_boundPeers.insert(m_addressBinder.bind());
 
@@ -385,6 +384,7 @@ protected:
             {
                 ASSERT_EQ(code, SystemError::noError);
                 acceptServerForever();
+                ASSERT_TRUE(socket->setNonBlockingMode(true));
                 socket->sendAsync(
                     network::test::kTestMessage,
                     [this, socket](SystemError::ErrorCode code, size_t size)

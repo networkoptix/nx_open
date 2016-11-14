@@ -178,12 +178,39 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultValue.value<QnPaneSettingsMap>()));
         }
 
+        case WORKBENCH_STATES:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<QnWorkbenchStateList>(asJson,
+                defaultValue.value<QnWorkbenchStateList>()));
+        }
+
         case BACKGROUND_IMAGE:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
                 .value<QString>().toUtf8();
             return QVariant::fromValue(QJson::deserialized<QnBackgroundImage>(asJson,
                 defaultValue.value<QnBackgroundImage>()));
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel defaultLevel = defaultValue.value<Qn::ResourceInfoLevel>();
+
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+
+            if (asJson.isEmpty())
+            {
+                /* Compatibility with 2.5 and older versions. */
+                bool result = settings->value(lit("isIpShownInTree"), false).toBool();
+                if (result)
+                    return QVariant::fromValue(Qn::RI_FullInfo);
+            }
+
+            return QVariant::fromValue(QJson::deserialized<Qn::ResourceInfoLevel>(asJson,
+                defaultLevel));
         }
 
         default:
@@ -254,10 +281,26 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             break;
         }
 
+        case WORKBENCH_STATES:
+        {
+            QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnWorkbenchStateList>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
         case BACKGROUND_IMAGE:
         {
             QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnBackgroundImage>()));
             base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel level = value.value<Qn::ResourceInfoLevel>();
+            QString asJson = QString::fromUtf8(QJson::serialized(level));
+            base_type::writeValueToSettings(settings, id, asJson);
+            settings->setValue(lit("isIpShownInTree"), (level != Qn::RI_NameOnly));
             break;
         }
 

@@ -78,6 +78,10 @@ bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr
     if (!QnResourceAccessFilter::isShareableMedia(resource))
         return false;
 
+    /* Web pages are displayed under separate node. */
+    if (resource->hasFlags(Qn::web_page))
+        return false;
+
     if (!qnResourceAccessProvider->hasAccess(context()->user(), resource))
         return false;
 

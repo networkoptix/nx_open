@@ -17,7 +17,7 @@ var Page = function () {
     this.logIframe = element(by.css("iframe.log-frame"));
     this.logIframeMore = element(by.css("iframe.log-frame-big"));
     this.refreshLogButton = element(by.id("refresh-log"));
-    this.moreLogLinesButton = element(by.linkText('More lines'));
+    this.logInNewWindow = element(by.linkText('Open in new window'));
     this.openLogButton = element(by.id("open-log"));
 
     this.offlineAlert = element(by.css('.alert-danger')).$('b');

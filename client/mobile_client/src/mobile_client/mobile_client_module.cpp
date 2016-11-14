@@ -33,6 +33,8 @@
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
+#include <nx/network/socket_global.h>
+
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -58,6 +60,7 @@ QnMobileClientModule::QnMobileClientModule(
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("mc", common->moduleGUID());
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());

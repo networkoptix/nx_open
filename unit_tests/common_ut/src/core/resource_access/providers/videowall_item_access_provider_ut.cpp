@@ -20,17 +20,21 @@ protected:
     {
         return new QnVideoWallItemAccessProvider();
     }
+
+    QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)
+    {
+        auto layout = createLayout();
+        layout->setParentId(videoWall->getId());
+        qnResPool->addResource(layout);
+        return layout;
+    }
 };
 
 TEST_F(QnVideoWallItemAccessProviderTest, checkSource)
 {
-    auto target = addLayout();
     auto videoWall = addVideoWall();
+    auto target = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
-
-    QnVideoWallItem item;
-    item.layout = target->getId();
-    videoWall->items()->addItem(item);
 
     ASSERT_EQ(accessProvider()->accessibleVia(user, target),
         QnAbstractResourceAccessProvider::Source::videowall);
@@ -75,12 +79,8 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkByAccessRights)
 
 TEST_F(QnVideoWallItemAccessProviderTest, checkAccessRightsChange)
 {
-    auto target = addLayout();
     auto videoWall = addVideoWall();
-
-    QnVideoWallItem item;
-    item.layout = target->getId();
-    videoWall->items()->addItem(item);
+    auto target = addLayoutForVideoWall(videoWall);
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
@@ -91,13 +91,9 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkAccessRightsChange)
 
 TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
 {
-    auto target = addLayout();
     auto videoWall = addVideoWall();
+    auto target = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
-
-    QnVideoWallItem item;
-    item.layout = target->getId();
-    videoWall->items()->addItem(item);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
@@ -105,31 +101,42 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
 TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
 {
     auto target = addCamera();
-    auto layout = addLayout();
     auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();
     layout->addItem(layoutItem);
 
-    QnVideoWallItem item;
-    item.layout = layout->getId();
-    videoWall->items()->addItem(item);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutRemoved)
+{
+    auto target = addCamera();
+    auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
+
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    qnResPool->removeResource(layout);
+
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
 {
     auto target = addCamera();
-    auto layout = addLayout();
     auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
-
-    QnVideoWallItem item;
-    item.layout = layout->getId();
-    videoWall->items()->addItem(item);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();
@@ -141,13 +148,9 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
 TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallAdded)
 {
     auto camera = addCamera();
-    auto layout = addLayout();
     auto videoWall = createVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
-
-    QnVideoWallItem item;
-    item.layout = layout->getId();
-    videoWall->items()->addItem(item);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = camera->getId();
@@ -163,13 +166,9 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallAdded)
 TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallRemoved)
 {
     auto camera = addCamera();
-    auto layout = addLayout();
     auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
-
-    QnVideoWallItem item;
-    item.layout = layout->getId();
-    videoWall->items()->addItem(item);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = camera->getId();
@@ -185,20 +184,41 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallRemoved)
 TEST_F(QnVideoWallItemAccessProviderTest, accessProviders)
 {
     auto camera = addCamera();
-    auto layout = addLayout();
     auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = camera->getId();
     layout->addItem(layoutItem);
 
-    QnVideoWallItem item;
-    item.layout = layout->getId();
-    videoWall->items()->addItem(item);
-
     QnResourceList providers;
     accessProvider()->accessibleVia(user, camera, &providers);
     ASSERT_EQ(1, providers.size());
     ASSERT_TRUE(providers.contains(videoWall));
+}
+
+TEST_F(QnVideoWallItemAccessProviderTest, checkByLayoutParentId)
+{
+    auto videoWall = addVideoWall();
+    auto target = addLayoutForVideoWall(videoWall);
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWallByParentId)
+{
+    auto target = addCamera();
+    auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }

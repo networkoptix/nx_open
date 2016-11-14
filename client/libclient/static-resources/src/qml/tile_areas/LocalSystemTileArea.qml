@@ -9,6 +9,7 @@ Item
     property bool isOnline: false;
     property bool isExpandedTile: false;
     property real expandedOpacity: 0;
+    property alias factorySystem: expandedArea.factorySystem;
 
     property string selectedHost: hostChooseItem.value;
     property string selectedUser: (control.impl.hasRecentConnections ?
@@ -106,6 +107,13 @@ Item
             id: userChooseItem;
 
             model: control.recentLocalConnectionsModel;
+
+            Connections
+            {
+                target: userChooseItem.model;
+                ignoreUnknownSignals: true;
+                onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
+            }
 
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;

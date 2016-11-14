@@ -96,6 +96,9 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
+    if (!m_media)
+        return false;
+
     sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
 
     if (!m_codecCtxData.isEmpty())

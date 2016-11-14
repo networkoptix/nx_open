@@ -89,7 +89,7 @@ Item
         LoginButton
         {
             id: loginButton
-            text: "Login"
+            text: "Log in"
             width: parent.width
             showProgress: d.connecting
             onClicked: login()

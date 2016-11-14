@@ -1,94 +1,87 @@
-/**********************************************************
-* 30 aug 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SOCKET_FACTORY_H
-#define SOCKET_FACTORY_H
+#pragma once
 
 #include <atomic>
 
+#include "socket_common.h"
 #include "abstract_socket.h"
-//!Contains factory methods for creating sockets
-/*!
-    All factory methods return object created new operator \a new
-*/
+
+/**
+ * Contains factory methods for creating sockets.
+ * All factory methods return objects created with operator new.
+ */
 class NX_NETWORK_API SocketFactory
 {
 public:
     enum class SocketType
     {
-        cloud,    ///< production mode
-        tcp,        ///< \class TcpSocket and \class TcpServerSocket
-        udt,        ///< \class UdtSocket and \class UdtServerSocket
+        cloud,  //< Production mode.
+        tcp,    //< \class TcpSocket and \class TcpServerSocket.
+        udt,    //< \class UdtSocket and \class UdtServerSocket.
     };
 
-    enum class NatTraversalType
-    {
-        nttAuto,
-        nttEnabled,
-        nttDisabled
-    };
-
-    typedef std::function<std::unique_ptr< AbstractStreamSocket >(
+    typedef std::function<std::unique_ptr<AbstractStreamSocket>(
         bool /*sslRequired*/,
-        NatTraversalType /*natTraversalRequired*/)> CreateStreamSocketFuncType;
-    typedef std::function<std::unique_ptr< AbstractStreamServerSocket >(
+        nx::network::NatTraversalSupport /*natTraversalRequired*/)> CreateStreamSocketFuncType;
+    typedef std::function<std::unique_ptr<AbstractStreamServerSocket>(
         bool /*sslRequired*/,
-        NatTraversalType /*natTraversalRequired*/)> CreateStreamServerSocketFuncType;
+        nx::network::NatTraversalSupport /*natTraversalRequired*/)> CreateStreamServerSocketFuncType;
 
 
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
 
-    /*!
-        \param sslRequired If \a true than it is guaranteed that returned object can be safely cast to \a AbstractEncryptedStreamSocket
-    */
+    /**
+     * @param sslRequired If true than it is guaranteed that returned object 
+     * can be safely cast to AbstractEncryptedStreamSocket.
+     */
     static std::unique_ptr< AbstractStreamSocket > createStreamSocket(
         bool sslRequired = false,
-        NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
+        nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled);
 
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
-        NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
+        nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled);
 
-    static QString toString( SocketType type );
-    static SocketType stringToSocketType( QString type );
+    static QString toString(SocketType type);
+    static SocketType stringToSocketType(QString type);
 
-    /*! Enforces factory to produce certain sockets
-     *  \note DEBUG use ONLY! */
-    static void enforceStreamSocketType( SocketType type );
-    static void enforceStreamSocketType( QString type );
+    /**
+     * Enforces factory to produce certain sockets
+     * @note DEBUG use ONLY!
+     */
+    static void enforceStreamSocketType(SocketType type);
+    static void enforceStreamSocketType(QString type);
     static bool isStreamSocketTypeEnforced();
-    static void enforceSsl( bool isEnforced = true );
+    static void enforceSsl(bool isEnforced = true);
     static bool isSslEnforced();
 
-    /** Sets new factory. Returns old one */
-    static CreateStreamSocketFuncType 
+    /**
+     * Set new factory.
+     * @return old factory.
+     */
+    static CreateStreamSocketFuncType
         setCreateStreamSocketFunc(CreateStreamSocketFuncType newFactoryFunc);
     static CreateStreamServerSocketFuncType
         setCreateStreamServerSocketFunc(CreateStreamServerSocketFuncType newFactoryFunc);
 
-    static void setIpVersion( const QString& ipVersion );
+    static void setIpVersion(const QString& ipVersion);
 
 private:
     SocketFactory();
-    SocketFactory( const SocketFactory& );
-    SocketFactory& operator=( const SocketFactory& );
+    SocketFactory(const SocketFactory&);
+    SocketFactory& operator=(const SocketFactory&);
 
     ~SocketFactory();
 
     static std::atomic<SocketType> s_enforcedStreamSocketType;
     static std::atomic<bool> s_isSslEnforced;
-	
-	static std::atomic<int> s_udpIpVersion;
+
+    static std::atomic<int> s_udpIpVersion;
     static std::atomic<int> s_tcpClientIpVersion;
     static std::atomic<int> s_tcpServerIpVersion;
 
     static std::unique_ptr<AbstractStreamSocket> defaultStreamSocketFactoryFunc(
-        NatTraversalType nttType, SocketType forcedSocketType);
+        nx::network::NatTraversalSupport nttType, SocketType forcedSocketType);
 
     static std::unique_ptr<AbstractStreamServerSocket> defaultStreamServerSocketFactoryFunc(
-        NatTraversalType nttType, SocketType socketType);
+        nx::network::NatTraversalSupport nttType, SocketType socketType);
 };
-
-#endif  //SOCKET_FACTORY_H

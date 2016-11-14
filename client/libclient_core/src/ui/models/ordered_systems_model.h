@@ -3,7 +3,7 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <client/system_weights_manager.h>
 
-class QnOrderedSystemsModel : public QSortFilterProxyModel
+class QnOrderedSystemsModel: public QSortFilterProxyModel
 {
     Q_OBJECT
     Q_PROPERTY(QString minimalVersion READ minimalVersion WRITE setMinimalVersion NOTIFY minimalVersionChanged)

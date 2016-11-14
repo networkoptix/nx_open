@@ -1,26 +1,35 @@
 'use strict';
 
 var SettingsPage = require('./po.js');
-xdescribe('Cloud disconnect', function () {
+describe('Cloud disconnect', function () {
 
     var p = new SettingsPage();
 
     beforeAll(function() {
         p.get();
-        // if button Disconnect from Cloud is not present (system is not in Cloud),
-        // then connect to Cloud
-        p.helper.checkPresent(p.disconnectFromCloudButton).then( null, function(err) {
-            console.log(err);
-            p.connectToCloud();
-        });
+        p.helper.getTab("System").click();
     });
 
     beforeEach(function(){
-        p.disconnectFromCloudButton.click();
+        p.helper.getTab("System").click();
+        // if button Disconnect from Cloud is not present (system is not in Cloud),
+        // then connect to Cloud
+
+        p.helper.checkPresent(p.disconnectFromCloudButton).then(
+            p.disconnectFromCloudButton.click(),
+            function() {
+                console.log('Disconnect from Cloud Button not found, so logging into Cloud');
+                p.connectToCloud();
+                p.getSysTab(); // to end all pending requests
+                p.disconnectFromCloudButton.click();
+            });
     });
 
     afterEach(function(){
-        p.cloudDialogCloseButton.click();
+        // if dialog is opened, close it
+        p.helper.checkPresent(p.dialogCancelButton).then(function () {
+            p.dialogCancelButton.click();
+        }, function() {}); // skip if absent
     });
 
     afterAll(function() {
@@ -28,46 +37,36 @@ xdescribe('Cloud disconnect', function () {
     });
 
     it("System is in cloud - we see cloud account and Disconnect button ",function(){
-        p.cloudDialogCloseButton.click();
-        expect(p.cloudSection.getText()).toContain('This system is linked to Nx Cloud account');
-        expect(p.goToCloudAccButton.getAttribute('href')).toContain('http://');
+        p.dialogCancelButton.click();
+        expect(p.cloudSection.getText()).toContain('This system is linked to Nx Cloud');
+        expect(p.goToCloudAccButton.getAttribute('href')).toContain('https://');
         expect(p.goToCloudAccButton.getAttribute('href')).toContain('?from=webadmin&context=settings');
-        p.disconnectFromCloudButton.click();
-    });
-
-    it("dialog: email input is locked",function(){
-        expect(p.cloudEmailInput.getAttribute('readonly')).toBe('true');
     });
 
     it("dialog: wrong password triggers error message",function(){
-        p.cloudPasswordInput.sendKeys('wrongpassword');
+        p.oldCloudPasswordInput.sendKeys('wrongpassword');
         p.dialogDisconnectButton.click();
-        expect(p.dialogMessage.getText()).toContain('Login or password are incorrect');
+        expect(p.dialog.getText()).toContain('Wrong password');
+        p.dialogButtonClose.click();
     });
 
     it("dialog: button Disconnect system is disabled while password field is empty",function(){
-        p.cloudPasswordInput.clear();
+        p.oldCloudPasswordInput.clear();
         expect(p.dialogDisconnectButton.isEnabled()).toBe(false);
 
-        p.cloudPasswordInput.sendKeys(p.password);
+        p.oldCloudPasswordInput.sendKeys(p.password);
         expect(p.dialogDisconnectButton.isEnabled()).toBe(true);
     });
 
+    // Fails, because empty field is not highlighted
     it("dialog: empty password field is highlighted with red",function(){
-        p.cloudPasswordInput.clear()
+        p.oldCloudPasswordInput.clear()
             .sendKeys(protractor.Key.TAB); // blur
-        expect(p.cloudPasswordInput.element(by.xpath('..')).getAttribute('class')).toContain('has-error');
-    });
-
-    it("dialog: can be closed with close button",function(){
-        p.cloudDialogCloseButton.click();
-        expect(p.dialog.isPresent()).toBe(false);
-        p.disconnectFromCloudButton.click();
+        expect(p.oldCloudPasswordInput.element(by.xpath('..')).getAttribute('class')).toContain('has-error');
     });
 
     it("dialog: can be closed with cancel button",function(){
         p.dialogCancelButton.click();
         expect(p.dialog.isPresent()).toBe(false);
-        p.disconnectFromCloudButton.click();
     });
 });

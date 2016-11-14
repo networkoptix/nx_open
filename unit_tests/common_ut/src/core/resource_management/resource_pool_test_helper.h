@@ -33,7 +33,7 @@ public:
 
     QnMediaServerResourcePtr addServer();
 
-    QnStorageResourcePtr addStorage();
+    QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
     ec2::ApiUserGroupData createRole(Qn::GlobalPermissions permissions);
 };

@@ -39,7 +39,6 @@
 #include <utils/common/app_info.h>
 #include <utils/common/scoped_value_rollback.h>
 
-
 namespace {
 
     const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
@@ -78,9 +77,9 @@ namespace {
 
 } // anonymous namespace
 
-QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
+QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnSessionAwareDelegate(parent),
     ui(new Ui::QnServerUpdatesWidget),
     m_latestVersion(),
     m_checking(false),
@@ -134,10 +133,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
             m_updateTool->startUpdate(m_localFileName);
     });
 
-    connect(ui->refreshButton, &QPushButton::clicked, this, [this]()
-    {
-        checkForUpdates(m_localFileName.isEmpty());
-    });
+    connect(ui->refreshButton, &QPushButton::clicked, this, &QnServerUpdatesWidget::refresh);
 
     connect(ui->updatesNotificationCheckbox, &QCheckBox::stateChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -148,6 +144,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
             QDesktopServices::openUrl(m_releaseNotesUrl);
     });
 
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &QnServerUpdatesWidget::refresh);
+
     connect(m_updateTool, &QnMediaServerUpdateTool::stageChanged,
         this, &QnServerUpdatesWidget::at_tool_stageChanged);
     connect(m_updateTool, &QnMediaServerUpdateTool::stageProgressChanged,
@@ -156,6 +155,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
         this, &QnServerUpdatesWidget::at_updateFinished);
     connect(m_updateTool, &QnMediaServerUpdateTool::lowFreeSpaceWarning,
         this, &QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning, Qt::DirectConnection);
+    connect(m_updateTool, &QnMediaServerUpdateTool::updatesCheckCanceled,
+        this, &QnServerUpdatesWidget::at_tool_updatesCheckCanceled);
 
     setWarningStyle(ui->errorLabel);
     setWarningStyle(ui->longUpdateWarning);
@@ -192,6 +193,17 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
     initDownloadActions();
 
     initDropdownActions();
+}
+
+bool QnServerUpdatesWidget::tryClose(bool /*force*/)
+{
+    m_updateTool->cancelUpdatesCheck();
+    return true;
+}
+
+void QnServerUpdatesWidget::forcedUpdate()
+{
+    refresh();
 }
 
 void QnServerUpdatesWidget::initDropdownActions()
@@ -410,6 +422,8 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     m_checking = false;
 
+    m_lastUpdateCheckResult = result;
+
     ui->selectUpdateTypeButton->setEnabled(true);
     ui->updateButton->setEnabled(
         result.result == QnCheckForUpdateResult::UpdateFound
@@ -424,7 +438,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         : result.version;
 
     QString detail;
-    QString versionText(displayVersion.toString());
+    auto versionText = displayVersion.isNull() ? kNoVersionNumberText : displayVersion.toString();
 
     setWarningStyle(ui->errorLabel);
 
@@ -563,6 +577,11 @@ void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
     }
 }
 
+void QnServerUpdatesWidget::refresh()
+{
+    checkForUpdates(m_localFileName.isEmpty());
+}
+
 void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage)
 {
     if (stage != QnFullUpdateStage::Init)
@@ -683,6 +702,11 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
 
     if (result == QDialogButtonBox::Cancel)
         m_updateTool->cancelUpdate();
+}
+
+void QnServerUpdatesWidget::at_tool_updatesCheckCanceled()
+{
+    endChecking(m_lastUpdateCheckResult);
 }
 
 QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList& servers)

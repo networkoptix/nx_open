@@ -3,7 +3,7 @@
 #exec > build.log
 #exec 2>&1
 
-DOXYCHECK=`dpkg -l | grep doxygen`
+DOXYCHECK=`command -v doxygen`
 
 SDK_NAME=nx_sdk
 TARGET_DIR=$SDK_NAME

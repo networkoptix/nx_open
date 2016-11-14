@@ -11,7 +11,53 @@
 namespace {
 
 static const int kLabelFontPixelSize = 15;
-static const int kLabelFontWeight = QFont::Normal;
+static const int kLabelFontWeight = QFont::Bold;
+
+auto licenseSortPriority =
+    [](const QnLicensePtr& license) -> int
+    {
+        QnLicense::ErrorCode code;
+        license->isValid(&code);
+
+        switch (code)
+        {
+            case QnLicense::NoError:
+                return 2; /* Active licenses at the end. */
+            case QnLicense::Expired:
+                return 1; /* Expired licenses in the middle. */
+            default:
+                return 0; /* Erroneous licenses at the beginning. */
+        }
+    };
+
+class QnLicenseNotificationSortProxyModel : public QSortFilterProxyModel
+{
+    using base_type = QSortFilterProxyModel;
+
+public:
+    QnLicenseNotificationSortProxyModel(QObject* parent = nullptr) :
+        base_type(parent)
+    {
+    }
+
+protected:
+    virtual bool lessThan(const QModelIndex& leftIndex, const QModelIndex& rightIndex) const
+    {
+        QnLicensePtr left = leftIndex.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+        QnLicensePtr right = rightIndex.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+
+        if (!left || !right)
+            return left < right;
+
+        auto leftPriority = licenseSortPriority(left);
+        auto rightPriority = licenseSortPriority(right);
+
+        if (leftPriority != rightPriority)
+            return leftPriority < rightPriority;
+
+        return left->expirationTime() < right->expirationTime();
+    }
+};
 
 } // namespace
 
@@ -33,7 +79,13 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget* parent, Qt::Wi
     ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     m_model = new QnLicenseListModel(this);
-    ui->treeView->setModel(m_model);
+    m_model->setExtendedStatus(true);
+
+    auto sortModel = new QnLicenseNotificationSortProxyModel(this);
+    sortModel->setSourceModel(m_model);
+    sortModel->sort(0/*unused*/);
+
+    ui->treeView->setModel(sortModel);
     ui->treeView->setItemDelegate(new QnLicenseListItemDelegate(this, false));
     ui->treeView->setColumnHidden(QnLicenseListModel::ExpirationDateColumn, true);
     ui->treeView->setColumnHidden(QnLicenseListModel::ServerColumn, true);
@@ -51,16 +103,5 @@ QnLicenseNotificationDialog::~QnLicenseNotificationDialog()
 void QnLicenseNotificationDialog::setLicenses(const QnLicenseList& licenses)
 {
     m_model->updateLicenses(licenses);
-
-    bool hasInvalidLicenses = std::any_of(licenses.cbegin(), licenses.cend(),
-        [](const QnLicensePtr& license)
-        {
-            return !license->isValid();
-        });
-
-    ui->label->setText(hasInvalidLicenses
-        ? tr("Some of your licenses are unavailable:")
-        : tr("Some of your licenses will soon expire:"));
-
     adjustSize();
 }

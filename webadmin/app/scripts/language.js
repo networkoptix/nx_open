@@ -33,7 +33,15 @@ var L = {
         confirmDisconnectFromCloudTitle:'Do you want to disconnect your system? It will be unreachable from the internet then.',
         confirmDisconnectFromCloudAction: 'Disconnect',
         createLocalOwner:null,
-        createLocalOwnerTitle:'Create local administrator'
+        createLocalOwnerTitle:'Create local administrator',
+
+
+        confirmChangePassword: 'Change admin\'s password',
+        confirmChangePasswordTitle:'Are you sure you want to change system password? It will affect admin user and root password for some servers',
+        confirmChangePasswordAction: 'Save new password',
+
+        nx1ControlHint: 'Client application was started. Use a keyboard or mobile application to control it.'
+
     },
     join:{
         systemIsUnreacheble: 'System is unreachable or doesn\'t exist.',

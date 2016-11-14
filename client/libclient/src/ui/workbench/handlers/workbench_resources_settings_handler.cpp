@@ -13,7 +13,7 @@
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_groups_dialog.h>
+#include <ui/dialogs/resource_properties/user_roles_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
 #include <ui/workbench/workbench.h>
@@ -87,7 +87,8 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     QnMediaServerResourcePtr server = servers.first();
 
-    bool hasAccess = accessController()->hasPermissions(server, Qn::ReadPermission);
+    bool hasAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;
 
@@ -120,6 +121,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
         return;
 
     bool hasAccess = accessController()->hasPermissions(user, Qn::ReadPermission);
+    NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition");
     if (!hasAccess)
         return;
 
@@ -140,11 +142,11 @@ void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnUuid groupId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
-    QScopedPointer<QnUserGroupsDialog> groupsDialog(new QnUserGroupsDialog(mainWindow()));
+    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
     if (!groupId.isNull())
-        groupsDialog->selectGroup(groupId);
+        dialog->selectGroup(groupId);
 
-    groupsDialog->exec();
+    dialog->exec();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()

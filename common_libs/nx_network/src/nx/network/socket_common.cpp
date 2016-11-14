@@ -4,8 +4,8 @@
 
 #include "socket_global.h"
 
-const HostAddress HostAddress::localhost( "127.0.0.1" );
-const HostAddress HostAddress::anyHost( "0.0.0.0" );
+const HostAddress HostAddress::localhost(*ipV4from(lit("127.0.0.1")));
+const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
 
 HostAddress::HostAddress( const in_addr& addr )
 :
@@ -31,9 +31,90 @@ HostAddress::HostAddress( const char* addrStr )
 {
 }
 
-bool HostAddress::isResolved() const
+bool HostAddress::operator==( const HostAddress& rhs ) const
 {
-    return ipV4() || ipV6();
+    return isIpAddress() == rhs.isIpAddress() && toString() == rhs.toString();
+}
+
+bool HostAddress::operator!=( const HostAddress& rhs ) const
+{
+    return !(*this == rhs);
+}
+
+bool HostAddress::operator<( const HostAddress& rhs ) const
+{
+    if (isIpAddress() != rhs.isIpAddress())
+        return isIpAddress();
+
+    return toString() < rhs.toString();
+}
+
+static const QString kIpVersionConvertPart = QLatin1String("::ffff:");
+static const QByteArray kIpVersionMapPrefix = QByteArray::fromHex("00000000000000000000FFFF");
+
+const QString& HostAddress::toString() const
+{
+    if (m_string)
+        return *m_string;
+
+    // TODO: Remove this hack when IPv6 is properly supported!
+    //  Try to map it from IPv4 as v4 format is preferable
+    auto ipV4 = m_ipV4;
+    if (!ipV4)
+        ipV4 = ipV4from(*m_ipV6);
+
+    if (ipV4)
+        m_string = ipToString(*ipV4);
+    else
+        m_string = ipToString(*m_ipV6);
+
+    return *m_string;
+}
+
+boost::optional<in_addr> HostAddress::ipV4() const
+{
+    if (m_ipV4)
+        return m_ipV4;
+
+    // TODO: Remove this hack when IPv6 is properly supported!
+    //  Try to map it from IPv4 as v4 format is preferable
+    if (m_ipV6)
+    {
+        if (const auto ipV4 = ipV4from(*m_ipV6))
+            return ipV4;
+    }
+
+    if (m_string)
+    {
+        if (const auto ipV4 = ipV4from(*m_string))
+            return ipV4;
+
+        const auto ipV6 = ipV6from(*m_string);
+        if (ipV6)
+        {
+            if (const auto ipV4 = ipV4from(*ipV6))
+                return ipV4;
+        }
+    }
+
+    return boost::none;
+}
+
+boost::optional<in6_addr> HostAddress::ipV6() const
+{
+    if (m_ipV6)
+        return m_ipV6;
+
+    if (m_ipV4)
+        return ipV6from(*m_ipV4);
+
+    if (const auto ipV6 = ipV6from(*m_string))
+        return ipV6;
+
+    if (const auto ipV4 = ipV4from(*m_string))
+        return ipV6from(*ipV4);
+
+    return boost::none;
 }
 
 bool HostAddress::isLocal() const
@@ -57,90 +138,9 @@ bool HostAddress::isLocal() const
     return false; // not even IP address
 }
 
-bool HostAddress::operator==( const HostAddress& rhs ) const
+bool HostAddress::isIpAddress() const
 {
-    if (isResolved() != rhs.isResolved())
-        return false;
-
-    if (!isResolved())
-        return toString() == rhs.toString();
-
-    if (ipV4() && rhs.ipV4())
-        return memcmp(m_ipV4.get_ptr(), rhs.m_ipV4.get_ptr(), sizeof(*m_ipV4)) == 0;
-
-    if (ipV6() && rhs.ipV6())
-        return memcmp(m_ipV6.get_ptr(), rhs.m_ipV6.get_ptr(), sizeof(*m_ipV6)) == 0;
-
-    return false;
-}
-
-bool HostAddress::operator!=( const HostAddress& rhs ) const
-{
-    return !(*this == rhs);
-}
-
-bool HostAddress::operator<( const HostAddress& rhs ) const
-{
-    return toString() < rhs.toString();
-}
-
-static const QString kIpVersionConvertPart = QLatin1String("::ffff:");
-static const QByteArray kIpVersionMapPrefix = QByteArray::fromHex("00000000000000000000FFFF");
-
-const QString& HostAddress::toString() const
-{
-    if (m_string)
-        return *m_string;
-
-    // TODO: Remove this hack when IPv6 is properly supported!
-    //  Try to map it from IPv4 as v4 format is preferable
-    if (!m_ipV4)
-        m_ipV4 = ipV4from(*m_ipV6);
-
-    if (m_ipV4)
-        m_string = ipToString(*m_ipV4);
-    else
-        m_string = ipToString(*m_ipV6);
-
-    return *m_string;
-}
-
-const boost::optional<in_addr>& HostAddress::ipV4() const
-{
-    if (m_ipV4)
-        return m_ipV4;
-
-    if (m_string)
-    {
-        m_ipV4 = ipV4from(*m_string);
-        if (m_ipV4)
-            return m_ipV4;
-
-        m_ipV6 = ipV6from(*m_string);
-    }
-
-    if (m_ipV6)
-        m_ipV4 = ipV4from(*m_ipV6);
-
-    return m_ipV4;
-}
-
-const boost::optional<in6_addr>& HostAddress::ipV6() const
-{
-    if (m_ipV6)
-        return m_ipV6;
-
-    if (m_string && !m_ipV4)
-        m_ipV4 = ipV4from(*m_string);
-
-    if (m_ipV4)
-    {
-        m_ipV6 = ipV6from(*m_ipV4);
-        return m_ipV6;
-    }
-
-    m_ipV6 = ipV6from(*m_string);
-    return m_ipV6;
+    return m_ipV4 || m_ipV6;
 }
 
 boost::optional<QString> HostAddress::ipToString(const in_addr& addr)

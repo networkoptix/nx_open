@@ -71,7 +71,9 @@ const char* kFilterPropertyName = "_qn_filter";
 const int kNoDataFontPixelSize = 32;
 const int kNoDataFontWeight = QFont::Light;
 
-const auto kHtmlLabelFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelNoInfoFormat = lit("<center><span style='font-weight: 500'>%1</span></center>");
+const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span> &mdash; %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -102,6 +104,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     m_previewWidget->busyIndicator()->setDotSpacing(style::Metrics::kStandardPadding);
 
     auto layout = new QVBoxLayout(m_embeddedWidget);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_previewWidget);
     layout->addWidget(m_textLabel);
@@ -116,7 +119,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
 
-    updateTailPos();
+    setThumbnailVisible(false);
 }
 
 bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
@@ -131,9 +134,15 @@ bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QE
     return base_type::sceneEventFilter(watched, event);
 }
 
+void QnResourceBrowserToolTipWidget::forceLayoutUpdate()
+{
+    m_embeddedWidget->layout()->activate();
+}
+
 void QnResourceBrowserToolTipWidget::setText(const QString& text)
 {
     m_textLabel->setText(text);
+    forceLayoutUpdate();
 }
 
 void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
@@ -141,8 +150,16 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
     if (m_previewWidget->isHidden() != visible)
         return;
 
+    m_textLabel->setSizePolicy(
+        visible ? QSizePolicy::Ignored : QSizePolicy::Preferred,
+        QSizePolicy::Preferred);
+
+    m_textLabel->setWordWrapMode(visible
+        ? QTextOption::WrapAtWordBoundaryOrAnywhere
+        : QTextOption::ManualWrap);
+
     m_previewWidget->setVisible(visible);
-    m_embeddedWidget->layout()->activate();
+    forceLayoutUpdate();
 
     updateTailPos();
 }
@@ -153,7 +170,7 @@ void QnResourceBrowserToolTipWidget::setResource(const QnResourcePtr& resource)
         return;
 
     m_previewWidget->setTargetResource(resource);
-    m_embeddedWidget->layout()->activate();
+    forceLayoutUpdate();
 }
 
 const QnResourcePtr& QnResourceBrowserToolTipWidget::resource() const
@@ -547,7 +564,15 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF& pos)
         auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
 
-        m_tooltipWidget->setText(kHtmlLabelFormat.arg(toolTipText).arg(extraInfo));
+        QString text;
+        if (extraInfo.isEmpty())
+            text = kHtmlLabelNoInfoFormat.arg(toolTipText);
+        else if (resource && resource->hasFlags(Qn::user))
+            text = kHtmlLabelUserFormat.arg(toolTipText).arg(extraInfo);
+        else
+            text = kHtmlLabelDefaultFormat.arg(toolTipText).arg(extraInfo);
+
+        m_tooltipWidget->setText(text);
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -936,7 +961,7 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
     }
 }
 
-void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
+void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
 {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
@@ -946,7 +971,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index)
 
     /* Do not open servers of admin.  */
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server))
+    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 
     menu()->trigger(QnActions::DropResourcesAction, resource);

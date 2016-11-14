@@ -305,7 +305,7 @@ QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() c
     return qnResPool->getAllCameras(QnResourcePtr(), true).filtered(
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            return accessController()->hasPermissions(camera, Qn::ReadPermission);
+            return accessController()->hasPermissions(camera, Qn::ViewContentPermission);
         }
     );
 }

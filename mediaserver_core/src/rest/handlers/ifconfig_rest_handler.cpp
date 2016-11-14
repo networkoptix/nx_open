@@ -96,6 +96,7 @@ namespace
     {
         static const char ENDL = '\n';
     #ifdef Q_OS_WIN
+        // On Windows, this method can only be called for debug by manually modifying the code.
         QFile netSettingsFile(lit("c:/etc/network/interfaces"));
         QFile resolveConfFile(lit("c:/etc/resolv.conf"));
     #else

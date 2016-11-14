@@ -143,6 +143,7 @@ Rectangle
 
                 Connections
                 {
+                    // Handles outer signal that expands tile
                     id: openTileHandler;
 
                     property variant items: [];
@@ -199,6 +200,7 @@ Rectangle
                     SystemTile
                     {
                         id: tile
+
                         visualParent: screenHolder
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
@@ -208,8 +210,9 @@ Rectangle
                         systemName: model.systemName
                         ownerDescription: model.ownerDescription
 
-                        isFactoryTile: model.isFactorySystem
+                        factorySystem: model.isFactorySystem
                         isCloudTile: model.isCloudSystem
+                        safeMode: model.safeMode;
 
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
@@ -314,8 +317,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to another system")
-                : qsTr("Connect to system")
+                ? qsTr("Connect to Another System")
+                : qsTr("Connect to System")
 
             onClicked: context.connectToAnotherSystem();
         }

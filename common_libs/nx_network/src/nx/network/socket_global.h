@@ -38,7 +38,7 @@ public:
         Config(): nx::utils::FlagConfig("nx_network") { reload(); }
 
         NX_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
-        NX_STRING_PARAM("", disableAddresses, "Comma separated list of forbidden IP and damains");
+        NX_STRING_PARAM("", disableAddresses, "Comma separated list of forbidden IP and domains");
 
         bool isAddressDisabled(const HostAddress& address) const;
     };

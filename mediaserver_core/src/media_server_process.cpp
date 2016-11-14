@@ -43,11 +43,16 @@
 #include <camera/camera_pool.h>
 
 #include <core/misc/schedule_task.h>
+
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
+
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -450,12 +455,21 @@ void ffmpegInit()
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 {
+    NX_LOG(lit("%1 Attempting to create storage %2")
+            .arg(Q_FUNC_INFO)
+            .arg(path), cl_logDEBUG1);
+
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+
+    NX_LOG(lit("%1 Storage %2 is operational: %3")
+            .arg(Q_FUNC_INFO)
+            .arg(path)
+            .arg(storage->isUsedForWriting()), cl_logDEBUG1);
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     NX_ASSERT(resType);
@@ -570,17 +584,41 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
 {
     QnStorageResourceList storages;
+    QStringList availablePaths;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    for(const QString& folderPath: listRecordFolders())
+
+    availablePaths = listRecordFolders();
+
+    NX_LOG(lit("%1 Available paths count: %2")
+            .arg(Q_FUNC_INFO)
+            .arg(availablePaths.size()), cl_logDEBUG1);
+
+    for(const QString& folderPath: availablePaths)
     {
+        NX_LOG(lit("%1 Available path: %2")
+                .arg(Q_FUNC_INFO)
+                .arg(folderPath), cl_logDEBUG1);
+
         if (!mServer->getStorageByUrl(folderPath).isNull())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 already exists. Won't be added.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(folderPath), cl_logDEBUG1);
             continue;
+        }
         // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
+                    .arg(Q_FUNC_INFO)
+                    .arg(folderPath)
+                    .arg(totalSpace)
+                    .arg(storage->getSpaceLimit()), cl_logDEBUG1);
             continue; // if storage size isn't known do not add it by default
+        }
 
 
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
@@ -1571,7 +1609,6 @@ void MediaServerProcess::registerRestHandlers(
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
-    const auto kAdvancedViewer = Qn::GlobalAdvancedViewerPermissionSet;
 
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     reg("api/storageStatus", new QnStorageStatusRestHandler());
@@ -1599,8 +1636,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnBusinessEventLogRestHandler(), kAdvancedViewer); //< deprecated
-    reg("api/getEvents", new QnBusinessLog2RestHandler(), kAdvancedViewer); //< new version
+    reg("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalViewLogsPermission); //< deprecated
+    reg("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalViewLogsPermission); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -1849,6 +1886,16 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
+void MediaServerProcess::setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
+{
+    m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
+}
+
+void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
+{
+    m_engineVersion = version;
+}
+
 void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
 {
     nx::SystemName systemName;
@@ -1913,6 +1960,12 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 
 void MediaServerProcess::run()
 {
+    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
+
+    if (!m_engineVersion.isNull())
+        qnCommon->setEngineVersion(m_engineVersion);
+
     QnCallCountStart(std::chrono::milliseconds(5000));
 
     ffmpegInit();
@@ -1944,6 +1997,7 @@ void MediaServerProcess::run()
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
     QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher());
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
+    std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
@@ -1968,7 +2022,6 @@ void MediaServerProcess::run()
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
 
-    std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
@@ -2030,6 +2083,7 @@ void MediaServerProcess::run()
     qnCommon->setAdminPasswordData(passwordData);
 
     qnCommon->setModuleGUID(serverGuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("ms", qnCommon->moduleGUID());
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
@@ -2432,7 +2486,18 @@ void MediaServerProcess::run()
     auto upnpPortMapper = initializeUpnpPortMapper();
     updateAddressesList();
 
+    qDebug() << "start loading resources";
+    QElapsedTimer tt;
+    tt.start();
+    qnResourceAccessManager->beginUpdate();
+    qnResourceAccessProvider->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
+    qDebug() << "resources loaded for" << tt.elapsed();
+    qnResourceAccessProvider->endUpdate();
+    qDebug() << "access ready" << tt.elapsed();
+    qnResourceAccessManager->endUpdate();
+    qDebug() << "permissions ready" << tt.elapsed();
+
 	qnGlobalSettings->initialize();
     migrateSystemNameFromConfig(cloudConnectionManager);
 
@@ -2714,15 +2779,13 @@ public:
     }
 
 protected:
-    virtual int executeApplication() override {
+    virtual int executeApplication() override
+    {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
-
-        if (!m_overrideVersion.isNull())
-            qnCommon->setEngineVersion(m_overrideVersion);
 
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
+        m_main->setEnforcedMediatorEndpoint(m_enforcedMediatorEndpoint);
+        m_main->setEngineVersion(m_overrideVersion);
 
         int res = application()->exec();
 

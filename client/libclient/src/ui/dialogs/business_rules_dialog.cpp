@@ -180,7 +180,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    m_resetDefaultsButton = new QPushButton(tr("Reset Default Rules"));
+    m_resetDefaultsButton = new QPushButton(tr("Restore all Rules to Default"));
     m_resetDefaultsButton->setEnabled(false);
     ui->buttonBox->addButton(m_resetDefaultsButton, QDialogButtonBox::ResetRole);
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);

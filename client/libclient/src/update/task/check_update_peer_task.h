@@ -28,6 +28,7 @@ signals:
 
 protected:
     virtual void doStart() override;
+    virtual void doCancel() override;
 
 private:
     bool isUpdateNeed(

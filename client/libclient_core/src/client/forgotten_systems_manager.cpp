@@ -50,7 +50,6 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
 void QnForgottenSystemsManager::forgetSystem(const QString& id)
 {
     const bool contains = m_systems.contains(id);
-    NX_ASSERT(!contains, "System is forgotten already");
     if (contains)
         return;
 

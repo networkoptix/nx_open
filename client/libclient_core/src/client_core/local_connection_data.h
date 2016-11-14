@@ -20,6 +20,8 @@ struct QnLocalConnectionData
 
     QUrl urlWithPassword() const;
 
+    bool isStoredPassword() const;
+
     QString systemName;
     QnUuid localId;
     QUrl url;
@@ -45,3 +47,12 @@ QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq)(json))
 
 typedef QList<QnWeightData> QnWeightDataList;
 Q_DECLARE_METATYPE(QnWeightDataList)
+
+namespace helpers {
+
+QnLocalConnectionData storeLocalSystemConnection(
+    const QString& systemName,
+    const QnUuid& localSystemId,
+    const QUrl& url);
+
+}

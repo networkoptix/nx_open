@@ -26,7 +26,7 @@
 #include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
 #include <client/forgotten_systems_manager.h>
-
+#include <client/startup_tile_manager.h>
 #include <client_core/client_core_settings.h>
 
 #include <cloud/cloud_connection.h>
@@ -268,6 +268,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
     common->store<QnClientInstanceManager>(clientInstanceManager);
     common->setModuleGUID(clientInstanceManager->instanceGuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("dc", common->moduleGUID());
 
     common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
@@ -482,6 +483,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     qnCommon->store<QnSystemsFinder>(new QnSystemsFinder());
     qnCommon->store<QnForgottenSystemsManager>(new QnForgottenSystemsManager());
+
+    // Depends on qnSystemsFinder
+    qnCommon->store<QnStartupTileManager>(new QnStartupTileManager());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);

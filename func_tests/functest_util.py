@@ -515,7 +515,13 @@ _helpMenu = {
         "This command will perform system name test for each server.\n"
         "The system name test is , change each server in cluster to another system name,\n"
         "and check each server that whether all the other server is offline and only this server is online.\n"
-        ))
+        )),
+    "log": ("Log redirection option", (
+        "With --log FILE all tests' output is redirected into a file.\n"
+        "Only short test result message is sent to stdout.\n"
+        "Using --log without a  FILE name makes it print all output in the end of test\n"
+        "only if the test fails.\n"
+        )),
     }
 
 def showHelp(arg):
@@ -832,3 +838,25 @@ def sendRequest(lock, url, data, notify=False):
     response.close()
 
 
+# Create keys for api/mergeSystems call
+
+import hashlib, base64, urllib
+def generateMehodKey(method, user, digest, nonce):
+    m = hashlib.md5()
+    nedoHa2 = m.update("%s:" % method)
+    nedoHa2 = m.hexdigest()
+    m = hashlib.md5()
+    m.update(digest)
+    m.update(':')
+    m.update(nonce)
+    m.update(':')
+    m.update(nedoHa2)
+    authDigest = m.hexdigest()
+    return urllib.quote(base64.urlsafe_b64encode("%s:%s:%s" % (user.lower(), nonce, authDigest)))
+
+def generateKey(method, user, password, nonce, realm):
+    print "GEN KEY:", method, user, password, nonce, realm
+    m = hashlib.md5()
+    m.update("%s:%s:%s" % (user.lower(), realm, password) )
+    digest = m.hexdigest()
+    return generateMehodKey(method, user, digest, nonce)

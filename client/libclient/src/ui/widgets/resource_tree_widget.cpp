@@ -206,9 +206,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         QVariant::fromValue(QnIndents(0, 0)));
 
     connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
-        &QnResourceTreeWidget::activated);
+        [this](const QModelIndex& index){emit activated(index, false); });
     connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,
-        &QnResourceTreeWidget::activated);
+        [this](const QModelIndex& index){emit activated(index, true); });
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
         &QnResourceTreeWidget::at_treeView_spacePressed);
@@ -577,7 +577,11 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if ((resource && resource->hasFlags(Qn::server)) || nodeType == Qn::ServersNode)
+    if ((resource && resource->hasFlags(Qn::server))
+        || nodeType == Qn::ServersNode
+        || nodeType == Qn::UserResourcesNode)
+    {
         ui->resourcesTreeView->expand(index);
+    }
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

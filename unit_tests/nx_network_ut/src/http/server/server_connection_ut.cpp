@@ -259,13 +259,13 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
 
     nx::network::TCPSocket sock(AF_INET);
     ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
-    ASSERT_EQ(sock.send(kQuery.data(), kQuery.size()), kQuery.size());
+    ASSERT_EQ(kQuery.size(), sock.send(kQuery.data(), kQuery.size()));
 
     nx::Buffer buffer(1024, Qt::Uninitialized);
     ASSERT_GT(sock.recv(buffer.data(), buffer.size(), 0), 0);
 
     const auto start = std::chrono::steady_clock::now();
-    ASSERT_EQ(sock.recv(buffer.data(), buffer.size(), 0), 0);
+    ASSERT_EQ(0, sock.recv(buffer.data(), buffer.size(), 0));
     ASSERT_LT(std::chrono::steady_clock::now() - start, kTimeout * 2);
 }
 

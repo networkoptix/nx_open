@@ -72,6 +72,9 @@ protected:
     virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
 
 private:
+    void forceLayoutUpdate();
+
+private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
     QnTextEditLabel* m_textLabel;
@@ -147,7 +150,7 @@ private:
 
     void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
 
-    void handleItemActivated(const QModelIndex& index);
+    void handleItemActivated(const QModelIndex& index, bool withMouse);
 
 private slots:
     void updateFilter(bool force = false);

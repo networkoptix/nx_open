@@ -2,7 +2,7 @@
 #include "direct_systems_finder.h"
 
 #include <network/module_finder.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
 
 namespace {
@@ -71,12 +71,12 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
         system->removeServer(server.id);
 
     m_systems.erase(it);
+    emit systemLostInternal(system->id(), system->localId());
     emit systemLost(system->id());
 }
 
 void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
-    bool checkForSystemRemoval = true;
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
     {
@@ -167,8 +167,8 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(moduleInformation);
-    if (!changes.testFlag(QnServerField::SystemNameField)
-        && !changes.testFlag(QnServerField::CloudIdField))
+    if (!changes.testFlag(QnServerField::SystemName)
+        && !changes.testFlag(QnServerField::CloudId))
     {
         return;
     }

@@ -123,7 +123,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
 
 signals:
-    void activated(const QModelIndex& index);
+    void activated(const QModelIndex& index, bool withMouse);
 
     /**
      * This signal is emitted when the tree prepares to start a recursive operation

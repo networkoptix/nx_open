@@ -5,7 +5,7 @@
 
 namespace ec2
 {
-QnMutex detail::ServerQueryProcessor::m_updateDataMutex;
+QnMutex detail::ServerQueryProcessor::m_updateDataMutex(QnMutex::Recursive);
 
 void detail::ServerQueryProcessor::setAuditData(
     ECConnectionAuditManager* auditManager,

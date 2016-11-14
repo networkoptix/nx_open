@@ -2,15 +2,13 @@
 Including FuncTestCase - the base class for all mediaserver functional test classes.
 """
 __author__ = 'Danil Lavrentyuk'
-from collections import OrderedDict
+import os, random, sys, time, traceback
 import json
 import pprint
-import random
-import sys, os
-from subprocess import CalledProcessError, check_output, STDOUT
-import time
-import traceback
 import unittest
+from collections import OrderedDict
+from StringIO import StringIO
+from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
@@ -23,7 +21,7 @@ NUM_SERV=2
 SERVER_UP_TIMEOUT = 20 # seconds, timeout for server to start to respond requests
 
 __all__ = ['boxssh', 'FuncTestCase', 'FuncTestError', 'RunTests',
-           'LegacyTestWrapper', 'UnitTestRollback', 'FuncTestMaster', 'getTestMaster']
+           'LegacyTestWrapperOld', 'UnitTestRollback', 'FuncTestMaster', 'getTestMaster']
 
 
 _testMaster = None  # type: FuncTestMaster
@@ -52,44 +50,75 @@ class TestLoader(unittest.TestLoader):
             print "ERROR: No test set '%s' found!" % testset
 
 
-def _reportResult(resData, resType, name):
-    if resData:
-        print "%s: %d" % (resType.capitalize(), len(resData))
-        for res in resData:
-            where = res[0]
-            print "%s.%s (%s)" % (type(where).__name__, where._testMethodName, where._testMethodDoc)
-            trace = res[1].split('\n')
-            if len(trace) > 1:
-                print res[1].split('\n')[-2]
-            else:
-                print "((%s))" % res[1]
-            if len(res) > 2:
-                print "Other data: %s" % (res,)
+def _addResult(textList, resData, resType, name):
+    if not resData:
+        return
+    textList.append(
+    ("\t%s: %d\n" % (resType.capitalize(), len(resData))) +
+    ''.join(
+#        "%s.%s (%s)\n" % (type(res[0]).__name__, res[0]._testMethodName, res[0]._testMethodDoc)
+        "\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
+        for res in resData
+    ))
+            #trace = res[1].split('\n')
+            #if len(trace) > 1:
+            #    print res[1].split('\n')[-2]
+            #else:
+            #    print "((%s))" % res[1]
+            #if len(res) > 2:
+            #    print "Other data: %s" % (res,)
 
 
+def _testResNum(result):
+    d = {
+        "all": result.testsRun,
+        "error": len(result.errors),
+        "fail": len(result.failures),
+        "e_fail": len(result.expectedFailures),
+        "u_ok": len(result.unexpectedSuccesses),
+        "skip": len(result.skipped),
+    }
+    d['bad'] = d['error'] + d['fail'] + d['u_ok']
+    if not d['bad']:
+        d['status'] = "OK"
+    elif d['fail']:
+        d['status'] = "FAIL"
+    elif d['error']:
+        d['status'] = "ERROR"
+    elif d['u_ok']:
+        d['status'] = "UNEXPECTED-OK"
+    return d
 
-def _singleSuiteName(testclass, suite_name, config, args):
+
+def _singleSuiteRun(testclass, suite_name, config, args):
     result = unittest.TextTestRunner(
-            stream=sys.stdout, verbosity=2, failfast=testclass.isFailFast(suite_name)
+            stream=_testMaster.log or sys.stdout,
+            verbosity=2,
+            failfast=testclass.isFailFast(suite_name)
         ).run(
             TestLoader().load(testclass, suite_name, config, *args)
         )
-    print "[%s] Total test run: %s" % (suite_name, result.testsRun)
-    _reportResult(result.errors, "errors", suite_name)
-    _reportResult(result.failures, "failures", suite_name)
-    _reportResult(result.expectedFailures, "expected failures", suite_name)
-    _reportResult(result.unexpectedSuccesses, "unexpected successes", suite_name)
-    _reportResult(result.skipped, "skipped cases", suite_name)
-    return result.wasSuccessful()
+    resNum = _testResNum(result)
+    resTexts = ["[%s] %s Total tests run: %s\n" % (suite_name, resNum['status'], result.testsRun)]
+    #sys.__stdout__.write(resText+"\n")
+    _addResult(resTexts, result.errors, "errors", suite_name)
+    _addResult(resTexts, result.failures, "failures", suite_name)
+    _addResult(resTexts, result.expectedFailures, "expected failures", suite_name)
+    _addResult(resTexts, result.unexpectedSuccesses, "unexpected successes", suite_name)
+    _addResult(resTexts, result.skipped, "skipped cases", suite_name)
+    #ok = result.wasSuccessful()
+    _testMaster.logResult(''.join(resTexts), not resNum['bad'])
+    return resNum['bad'] == 0
 
 
-def RunTests(testclass, config, *args):
+def RunTests(testclass, *args):
     """
     Runs all test suits from the testclass which is derived from FuncTestCase
     :type testclass: FuncTestCase
     :type config: FtConfigParser
     """
     #print "DEBUG: run test class %s" % testclass
+    config = _testMaster.getConfig()
     try:
         try:
             testclass.globalInit(config)
@@ -97,9 +126,9 @@ def RunTests(testclass, config, *args):
             print "FAIL: %s initialization failed: %s!" % (testclass.__name__, err)
             return
         return all([
-                _singleSuiteName(testclass, suite_name, config, args)
-                for suite_name in testclass.iter_suites()
-            ])
+                    _singleSuiteRun(testclass, suite_name, config, args)
+                    for suite_name in testclass.iter_suites()
+                   ])
     finally:
         testclass.globalFinalise()
 
@@ -190,6 +219,8 @@ class FuncTestCase(unittest.TestCase):
             cls._worker.stopWork()
             cls._worker = None
 
+    ################################################################################
+
     @classmethod
     def setUpClass(cls):
         print "========================================="
@@ -204,9 +235,9 @@ class FuncTestCase(unittest.TestCase):
         # and test if they work in parallel!
         if cls._clear_script:
             cls._clear_box(cls._clear_script, cls._clear_script_args)
-        for host in cls._stopped:  # do we need it?
-            print "Restoring mediaserver on %s" % host
-            cls.class_call_box(host, '/vagrant/safestart.sh', 'networkoptix-mediaserver')
+        #for host in cls._stopped:  # do we need it?
+        #    print "Restoring mediaserver on %s" % host
+        #    cls.class_call_box(host, '/vagrant/safestart.sh', 'networkoptix-mediaserver')
         cls._stopped.clear()
         print "%s Test End" % cls._test_name
         print "========================================="
@@ -221,7 +252,7 @@ class FuncTestCase(unittest.TestCase):
     @classmethod
     def _check_suites(cls):
         if not cls._suits:
-            raise RuntimeError("%s's test suits list is empty!" % cls.__name__)
+            raise RuntimeError("%s's test suites list is empty!" % cls.__name__)
 
     @classmethod
     def iter_suites(cls):
@@ -298,7 +329,10 @@ class FuncTestCase(unittest.TestCase):
         self._mediaserver_ctl(box, 'safe-stop')
         time.sleep(0)
         if self._init_script:
-            self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
+            #self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
+            cmd = ('/vagrant/' + self._init_script,  self._test_key, 'init') + self._init_script_args(num)
+            out = self._call_box(box, *cmd)
+            print "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out)
         sys.stdout.write("Box %s is ready\n" % box)
 
     def _prepare_test_phase(self, method):
@@ -460,39 +494,6 @@ class FuncTestCase(unittest.TestCase):
         return tuple(sw for sw in cls._suits if sw[0] in names)
 
 
-class LegacyTestWrapper(FuncTestCase):
-    """
-    Provides an object to use virtual box control methods
-    """
-    _suits = "dummy"
-    _test_key = "legacy"
-
-    def __init__(self, config):
-        self.globalInit(config)
-
-    def __enter__(self):
-        print "Entering TestBoxHandler"
-        self._servers_th_ctl('safe-start')
-        self._wait_servers_up()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        print "Exitting TestBoxHandler"
-        try:
-            self._servers_th_ctl('safe-stop')
-            self.globalFinalise()
-        except Exception as err:
-            print "Error finalizing tests: $s" % (err,)
-
-    def __del__(self):
-        if self._worker:
-            self._worker.stopWork()
-
-    @classmethod
-    def init_suites(cls):
-        "A dummy method since the original one will fail in globalInit()"
-        pass
-
 # Rollback support
 class UnitTestRollback(object):
     """Legacy: Now it only removes resources, recorded in the rollback file.
@@ -637,10 +638,43 @@ class UnitTestRollback(object):
         print "Recover done..."
 
     def removeRollbackDB(self):
-        self._rollbackFile.close()
-        self._rollbackFile = None
-        os.remove(".rollback")
+        if self._rollbackFile is not None:
+            self._rollbackFile.close()
+            self._rollbackFile = None
+        if os.path.isfile(".rollback"):
+            os.remove(".rollback")
         self._savedIds.clear()
+
+
+class LogCatcher(StringIO):
+
+    def __init__(self, fname=""):
+        StringIO.__init__(self)
+        self.outFile = open(fname, "wt") if fname != "" else None
+        self.saved = sys.stdout  # so it can re-substitute
+        sys.stdout = self
+
+    def write(self, s):
+        if self.outFile is None:
+            StringIO.write(self, s)
+        else:
+            self.outFile.write(s)
+
+    def flush(self):
+        if self.outFile is None:
+            StringIO.flush(self)
+        else:
+            self.outFile.flush()
+
+    def close(self):
+        if self.outFile is not None:
+            self.outFile.close()
+        StringIO.close(self)
+
+    def unbind(self):
+        if not self.closed:
+            self.close()
+        sys.stdout = self.saved
 
 
 class FuncTestMaster(object):
@@ -662,6 +696,7 @@ class FuncTestMaster(object):
     #CHUNK_SIZE=4*1024*1024 # 4 MB
     #TRANSACTION_LOG="__transaction.log"
     api = ServerApi
+    log = None
 
     _getterAPIList = ["getResourceParams",
         "getMediaServersEx",
@@ -696,7 +731,7 @@ class FuncTestMaster(object):
     def _loadConfig(self):
         parser = self.getConfig()
 
-        _section = "Nat" if self.args.natcon else "General" # Fixme: ugly hack :(
+        _section = "Nat" if getattr(self.args, 'BoxTest', '') == 'natcon' else "General" # Fixme: ugly hack :(
         self.clusterTestServerList = parser.get(_section,"serverList").split(",")
 
         parser.rtset('ServerList', self.clusterTestServerList)
@@ -705,6 +740,27 @@ class FuncTestMaster(object):
         self.threadNumber = parser.getint("General","threadNumber")
         self.testCaseSize = parser.getint_safe("General","testCaseSize", 2)
         parser.rtset('need_dump', self.args.dump)
+
+    def applyArgs(self, args):
+        if args.config:
+            self.configFname = args.config
+            print "Use config", self.configFname
+        if args.log is not None:
+            self.log = LogCatcher(args.log)
+        self.args = args
+        return
+
+    def logResult(self, text, testOk):
+        (sys.stdout if self.log is None else self.log.saved).write(text)
+        if not testOk and  self.log is not None:
+            if self.log.outFile is None:
+                self.log.saved.write(
+                    "\nFailed test accumulated log:\n============================\n")
+                self.log.saved.write(self.log.getvalue())
+                self.log.truncate()
+            else:
+                self.log.flush()
+
 
     def setUpPassword(self):
         config = self.getConfig()
@@ -720,13 +776,6 @@ class FuncTestMaster(object):
         self.openerReady = True
 #        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
 
-    def preparseArgs(self, args):
-        if args.config:
-            self.configFname = args.config
-            print "Use config", self.configFname
-        self.args = args
-        return
-
     def _callAllGetters(self):
         print "======================================"
         print "Test all ec2 get request status"
@@ -734,12 +783,11 @@ class FuncTestMaster(object):
             for reqName in self._ec2GetRequests:
                 print "Connection to http://%s/ec2/%s" % (s,reqName)
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
-                if response.getcode() != 200:
-                    return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
+                assert response.getcode() == 200, \
+                    "%s failed with statusCode %d" % (reqName,response.getcode(),)
                 response.close()
         print "All ec2 get requests work well"
         print "======================================"
-        return (True,"Server:%s test for all getter pass" % (s))
 
     def getRandomServer(self):
         return random.choice(self.clusterTestServerList)
@@ -772,22 +820,18 @@ class FuncTestMaster(object):
 
         response = urllib2.urlopen("http://%s/ec2/getMediaServersEx?format=json" % (self.clusterTestServerList[0]))
 
-        if response.getcode() != 200:
-            return (False,"getMediaServersEx returned error code: %d" % (response.getcode()))
+        assert response.getcode() == 200, \
+            "getMediaServersEx returned error code: %d" % (response.getcode(),)
 
         json_obj = SafeJsonLoads(response.read(), self.clusterTestServerList[0], 'getMediaServersEx')
-        if json_obj is None:
-            return (False, "Wrong response")
+        assert json_obj is not None, "Wrong response"
 
         for u in self.clusterTestServerUUIDList:
             n = self._getServerName(json_obj,u[0])
-            if n == None:
-                return (False,"Cannot fetch server name with UUID:%s" % (u[0]))
-            else:
-                u[1] = n
+            assert n is not None, "Cannot fetch server name with UUID:%s" % (u[0],)
+            u[1] = n
 
         response.close()
-        return (True,"")
 
     def _dumpDiffStr(self,str,i):
         if len(str) == 0:
@@ -818,9 +862,10 @@ class FuncTestMaster(object):
                 print "The first different character is at position %d" % (i + 1+offset)
                 return
 
-    def testConnection(self):
-        print "=================================================="
-        print "Test connection with each server in the server list "
+    def testConnection(self, frame=True):
+        if frame:
+            print "=================================================="
+            print "Test connection with each server in the server list "
         timeout = 5
         failed = False
         for s in self.clusterTestServerList:
@@ -853,8 +898,9 @@ class FuncTestMaster(object):
             self.config.rtset('ServerObjs', self.clusterTestServerObjs)
             self.config.rtset('ServerUUIDList', self.clusterTestServerUUIDList)
             failed = self._checkVersions()
-        print "Connection Test %s" % ("FAILED" if failed else "passed.")
-        print "=================================================="
+        if frame:
+            print "Connection Test %s" % ("FAILED" if failed else "passed.")
+            print "=================================================="
         return not failed
 
     def _checkVersions(self):
@@ -874,11 +920,6 @@ class FuncTestMaster(object):
             if name.startswith('.'):
                 self._ec2GetRequests[i] = getattr(self.api, name[1:])
                 #print "*** DEBUG0: substituted %s with %s" % (name, self._ec2GetRequests[i])
-
-
-    # This checkResultEqual function will categorize the return value from each
-    # server
-    # and report the difference status of this
 
     def _reportDetailDiff(self,key_list):
         for i in xrange(len(key_list)):
@@ -907,6 +948,7 @@ class FuncTestMaster(object):
         print "\n**************************************************\n"
 
     def _checkResultEqual(self,responseList,methodName):
+        " categorize the return value from each  server and report the difference status of this "
         statusDict = dict()
 
         for entry in responseList:
@@ -1008,18 +1050,15 @@ class FuncTestMaster(object):
         try:  # FIXME: all methods should raise exceptions and they must be cought outside!
             self._ensureServerListStates(self.clusterTestSleepTime)
         except Exception as err:
-            traceback.print_exc()
-            return (False, str(err))
+            traceback.print_exc(file=sys.stdout)
+            assert False, str(err)
 
-        ret,reason = self._fetchClusterTestServerNames()
-        if not ret: return (ret,reason)
+        self._fetchClusterTestServerNames()
 
-        ret,reason = self._callAllGetters()
-        if not ret:return (ret,reason)
+        self._callAllGetters()
 
         # do the rollback here
         self.init_rollback()
-        return (True,"")
 
 
 def getTestMaster():  # type: FuncTestMaster
@@ -1027,3 +1066,40 @@ def getTestMaster():  # type: FuncTestMaster
     if _testMaster is None:
         _testMaster = FuncTestMaster()
     return _testMaster
+
+
+# TODO: remove it!
+class LegacyTestWrapperOld(FuncTestCase):
+    """
+    Provides an object to use virtual box control methods
+    """
+    _suits = "dummy"
+    _test_key = "legacy"
+
+    def __init__(self, config):
+        self.globalInit(config)
+
+    def __enter__(self):
+        print "Entering TestBoxHandler"
+        self._servers_th_ctl('safe-start')
+        self._wait_servers_up()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print "Exitting TestBoxHandler"
+        try:
+            self._servers_th_ctl('safe-stop')
+            self.globalFinalise()
+        except Exception as err:
+            print "Error finalizing tests: $s" % (err,)
+
+    def __del__(self):
+        if self._worker:
+            self._worker.stopWork()
+
+    @classmethod
+    def init_suites(cls):
+        "A dummy method since the original one will fail in globalInit()"
+        pass
+
+

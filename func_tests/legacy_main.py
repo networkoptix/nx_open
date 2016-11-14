@@ -11,7 +11,7 @@ import threading
 
 from functest_util import *
 from generator import *
-from testbase import RunTests as RunBoxTests, LegacyTestWrapper, FuncTestMaster, getTestMaster
+from testbase import FuncTestMaster, getTestMaster
 
 testMaster = getTestMaster()  # it's a singleton
 
@@ -180,7 +180,6 @@ class UserTest(_pvt.LegacyFuncTestBase):
         return ["getUsers"]
 
 
-""" temporary turned of because of special rights for /ec2/saveMediaServer request
 class MediaServerTest(_pvt.LegacyFuncTestBase):
     _gen = None
     _testCase = testMaster.testCaseSize
@@ -200,7 +199,6 @@ class MediaServerTest(_pvt.LegacyFuncTestBase):
 
     def _getObserverNames(self):
         return ["getMediaServersEx"]
-"""
 
 
 class ResourceParamTest(_pvt.LegacyFuncTestBase):
@@ -320,7 +318,7 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
         print "Confilication data generation done"
 
         self._testCase = testMaster.testCaseSize
-        self._conflictList = [("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
+        self._conflictList = [ ("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
             ("removeResource","saveUser",UserConflictionDataGenerator(dataGen)),
             ("removeResource","saveCameras",CameraConflictionDataGenerator(dataGen))]
 
@@ -351,9 +349,8 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
             data = conf[2].generateData()
 
             # modify the resource
-            workerQueue.enqueue(self._sendRequest , (conf[1],data[0][0],s1,))
-            # remove the resource
-            workerQueue.enqueue(self._sendRequest , (conf[0],data[0][1],s2,))
+            workerQueue.enqueue(self._sendRequest, (conf[1],data[0][0],s1,))
+            workerQueue.enqueue(self._sendRequest, (conf[0],data[0][1],s2,))
 
         workerQueue.join()
 

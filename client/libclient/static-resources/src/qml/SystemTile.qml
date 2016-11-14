@@ -11,8 +11,9 @@ BaseTile
     property string systemName;
     property string ownerDescription;
 
-    property bool isFactoryTile: false;
+    property bool factorySystem: false;
     property bool isCompatibleInternal: false;
+    property bool safeMode: false;
 
     property string wrongVersion;
     property string compatibleVersion;
@@ -20,14 +21,14 @@ BaseTile
     // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
     readonly property bool offlineCloudConnectionsDisabled: true;
 
-    onSystemIdChanged: { forceCollapsedState();}
+    onSystemIdChanged: { forceCollapsedState(); }
 
     isConnecting: ((control.systemId == context.connectingToSystem)
-        && context.connectingToSystem.length && !isFactoryTile);
+        && context.connectingToSystem.length && !impl.isFactoryTile);
 
     isAvailable:
     {
-        if (isFactoryTile)
+        if (impl.isFactoryTile)
             return true;
 
         if (wrongVersion.length || !isCompatibleInternal)
@@ -48,19 +49,27 @@ BaseTile
 
         if (control.isHovered)
         {
-            return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
+            return (impl.isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
                 : Style.colors.custom.systemTile.backgroundHovered);
         }
 
-        return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
+        return (impl.isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
                 : Style.colors.custom.systemTile.background);
+    }
+
+    secondaryIndicator
+    {
+        visible: control.safeMode;
+        text: qsTr("SAFE MODE");
+        textColor: Style.colors.shadow;
+        color: Style.colors.yellow_main;
     }
 
     indicator
     {
         visible:
         {
-            if (control.isFactoryTile)
+            if (control.impl.isFactoryTile)
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
@@ -108,30 +117,38 @@ BaseTile
         if (!control.isAvailable)
             return;
 
-        if (control.isFactoryTile)
+        switch(control.impl.tileType)
         {
-            var factorySystemHost = areaLoader.item.host;
-            console.log("Show wizard for system <", systemName,
-                ">, host <", factorySystemHost, ">");
-            context.setupFactorySystem(factorySystemHost);
-        }
-        else if (isCloudTile)
-        {
-            var cloudHost = control.impl.hostsModel.firstHost;
-            console.log("Connecting to cloud system <", systemName,
-                ">, through the host <", cloudHost, ">");
-            context.connectToCloudSystem(control.systemId, cloudHost);
-        }
-        else // Local system tile
-        {
-            if (impl.hasSavedConnection)
-                control.impl.connectToLocalSystem();
-            else
-                toggle();
+            case control.impl.kFactorySystemTileType:
+                var factorySystemHost = areaLoader.item.host;
+                console.log("Show wizard for system <", systemName,
+                    ">, host <", factorySystemHost, ">");
+                context.setupFactorySystem(factorySystemHost);
+                break;
+
+            case control.impl.kCloudSystemTileType:
+                var cloudHost = control.impl.hostsModel.firstHost;
+                console.log("Connecting to cloud system <", systemName,
+                    ">, through the host <", cloudHost, ">");
+                context.connectToCloudSystem(control.systemId, cloudHost);
+                break;
+
+            case control.impl.kLocalSystemTileType:
+                if (impl.hasSavedConnection)
+                    control.impl.connectToLocalSystem();
+                else
+                    toggle();
+
+                break;
+
+            default:
+                console.error("Unknown tile type: ", control.impl.tileType);
+                break;
         }
     }
 
-    titleLabel.text: (isFactoryTile ? qsTr("New System") : systemName);
+    titleLabel.text: (control.impl.tileType == control.impl.kFactorySystemTileType
+        ? qsTr("New System") : systemName);
 
     menuButton
     {
@@ -152,20 +169,30 @@ BaseTile
 
     areaLoader.source:
     {
-        if (isFactoryTile)
-            return "tile_areas/FactorySystemTileArea.qml";
-        else if (isCloudTile)
-            return "tile_areas/CloudSystemTileArea.qml";
-        else
-            return "tile_areas/LocalSystemTileArea.qml";
+        switch(control.impl.tileType)
+        {
+            case control.impl.kFactorySystemTileType:
+                return "tile_areas/FactorySystemTileArea.qml";
+            case control.impl.kCloudSystemTileType:
+                return "tile_areas/CloudSystemTileArea.qml";
+            case control.impl.kLocalSystemTileType:
+                return "tile_areas/LocalSystemTileArea.qml";
+            default:
+                console.error("Unknown tile type: ", control.impl.tileType);
+                break;
+        }
+        return "";
     }
 
     Connections
     {
         target: areaLoader;
 
-        onItemChanged:
+        onStatusChanged:
         {
+            if (areaLoader.status != Loader.Ready)
+                return;
+
             var currentAreaItem = control.areaLoader.item;
             if (!currentAreaItem)
                 return;
@@ -180,6 +207,7 @@ BaseTile
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
+                currentAreaItem.factorySystem = Qt.binding( function() { return control.factorySystem; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
@@ -231,9 +259,11 @@ BaseTile
         readonly property int kCloudSystemTileType: 1;
         readonly property int kLocalSystemTileType: 2;
 
+        property bool isFactoryTile: control.factorySystem && !control.safeMode;
+
         property int tileType:
         {
-            if (control.isFactoryTile)
+            if (isFactoryTile)
                 return kFactorySystemTileType;
             else if (control.isCloudTile)
                 return kCloudSystemTileType;
@@ -247,7 +277,7 @@ BaseTile
 
         readonly property bool hasSavedConnection:
         {
-            if (control.isFactoryTile || control.isCloudTile)
+            if (isFactoryTile || control.isCloudTile)
                 return false;
 
             var systemTile = areaLoader.item;

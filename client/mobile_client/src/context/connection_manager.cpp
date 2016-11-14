@@ -20,7 +20,7 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
 #include <nx/network/socket_global.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
 
 namespace {
@@ -175,6 +175,7 @@ void QnConnectionManager::connectToServer(const QUrl& url)
     QUrl actualUrl = url;
     if (actualUrl.port() == -1)
         actualUrl.setPort(defaultServerPort());
+    actualUrl.setUserName(actualUrl.userName().toLower());
     d->setUrl(actualUrl);
     d->doConnect();
 }

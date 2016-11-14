@@ -32,10 +32,8 @@ public:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
-    void updateSyncButtonChecked();
-    void updateSyncButtonEnabled();
-    void updateLiveButtonChecked();
-    void updateLiveButtonEnabled();
+    void updateSyncButtonState();
+    void updateLiveButtonState();
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();
     void updateVolumeButtonsEnabled();

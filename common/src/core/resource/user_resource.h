@@ -80,6 +80,8 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
+    ec2::ApiResourceParamWithRefDataList params() const;
+
     virtual Qn::ResourceStatus getStatus() const override;
 
     //!Millis since epoch (1970-01-01, UTC)

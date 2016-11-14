@@ -13,7 +13,7 @@ ReverseAcceptor::ReverseAcceptor(ConnectHandler connectHandler):
     m_connectHandler(std::move(connectHandler)),
     m_httpServer(new nx_http::HttpStreamSocketServer(
         nullptr, &m_httpMessageDispatcher, false, // TODO: think about SSL?
-        SocketFactory::NatTraversalType::nttDisabled))
+        NatTraversalSupport::disabled))
 {
 }
 

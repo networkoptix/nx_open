@@ -112,6 +112,7 @@ public:
     QnMutex* mutex() const;
     aio::AIOThread* getSocketAioThread(Pollable* sock);
     AbstractAioThread* getRandomAioThread() const;
+    AbstractAioThread* getCurrentAioThread() const;
     bool isInAnyAioThread() const;
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
 

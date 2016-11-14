@@ -13,9 +13,11 @@ void testHostAddress(
     HostAddress host,
     boost::optional<in_addr_t> ipv4,
     boost::optional<in6_addr> ipv6,
-    const char* string)
+    const char* string,
+    bool isIpAddress)
 {
-    ASSERT_EQ(host.toString(), QString(string));
+    ASSERT_EQ(isIpAddress, host.isIpAddress());
+    ASSERT_EQ(QString(string), host.toString());
 
     if (ipv4)
     {
@@ -32,7 +34,7 @@ void testHostAddress(
     {
         const auto ip =  host.ipV6();
         ASSERT_TRUE((bool)ip);
-        ASSERT_EQ(memcmp(&ip.get(), &ipv6.get(), sizeof(in6_addr)), 0);
+        ASSERT_EQ(0, memcmp(&ip.get(), &ipv6.get(), sizeof(in6_addr)));
     }
     else
     {
@@ -47,9 +49,9 @@ void testHostAddress(
     boost::optional<in6_addr> ipv6)
 {
     if (string4)
-        testHostAddress(string4, ipv4, ipv6, string4);
+        testHostAddress(string4, ipv4, ipv6, string4, false);
 
-    testHostAddress(string6, ipv4, ipv6, string6);
+    testHostAddress(string6, ipv4, ipv6, string6, false);
 
     if (ipv4)
     {
@@ -57,11 +59,11 @@ void testHostAddress(
 
         memset(&addr, 0, sizeof(addr));
         addr.s_addr = *ipv4;
-        testHostAddress(addr, ipv4, ipv6, string4);
+        testHostAddress(addr, ipv4, ipv6, string4, true);
     }
 
     if (ipv6)
-        testHostAddress(*ipv6, ipv4, ipv6, ipv4 ? string4 : string6);
+        testHostAddress(*ipv6, ipv4, ipv6, ipv4 ? string4 : string6, true);
 }
 
 TEST(HostAddressTest, Base)

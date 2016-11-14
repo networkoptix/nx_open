@@ -1,4 +1,3 @@
-
 #include "ordered_systems_model.h"
 
 #include <ui/models/systems_model.h>
@@ -13,8 +12,7 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     m_unknownSystemsWeight(0.0)
 {
     NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
-    NX_ASSERT(qnForgottenSystemsManager, "QnForgottenSystemsManager is not available");
-    if (!qnSystemWeightsManager || !qnForgottenSystemsManager)
+    if (!qnSystemWeightsManager)
         return;
 
     auto systemsModel = new QnSystemsModel(this);
@@ -28,8 +26,11 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
         this, &QnOrderedSystemsModel::handleWeightsChanged);
 
-    connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemsChanged,
-        this, &QnOrderedSystemsModel::softInvalidate);
+    if (qnForgottenSystemsManager)
+    {
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemsChanged,
+            this, &QnOrderedSystemsModel::softInvalidate);
+    }
 
     handleWeightsChanged();
 }
@@ -51,8 +52,9 @@ bool QnOrderedSystemsModel::getWeightFromData(
         };
 
     // Searching for maximum weight
-    static const QVector<int> kIdRoles =
-        { QnSystemsModel::SystemIdRoleId, QnSystemsModel::LocalIdRoleId };
+    static const QVector<int> kIdRoles{
+        QnSystemsModel::SystemIdRoleId,
+        QnSystemsModel::LocalIdRoleId};
 
     weight = 0.0;
     bool result = false;
@@ -134,7 +136,7 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
         return true;    //< Skips every online system
 
     const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
-    if (qnForgottenSystemsManager->isForgotten(id))
+    if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
         return false;
 
     if (index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())

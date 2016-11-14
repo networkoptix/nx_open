@@ -18,7 +18,7 @@ namespace test {
 
 static const size_t kTestConnections = 10;
 static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
-static const std::chrono::milliseconds kSocketTimeout(1000);
+static const std::chrono::milliseconds kSocketTimeout(3000);
 static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
 
 class IncomingTunnelConnectionTest

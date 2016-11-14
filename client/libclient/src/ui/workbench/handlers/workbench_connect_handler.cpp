@@ -74,7 +74,7 @@
 #include <utils/common/delayed.h>
 #include <network/module_finder.h>
 #include <network/router.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
@@ -122,9 +122,9 @@ void removeCustomConnection(const QnLocalConnectionData& data)
 
     auto customConnections = qnSettings->customConnections();
     const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [localId = data.localId](const QnConnectionData& value)
+        [localId = data.localId, user = data.url.userName()](const QnConnectionData& value)
         {
-            return (localId == value.localId);
+            return ((localId == value.localId) && (value.url.userName() == user));
         });
 
     if (itSameSystem == customConnections.end())
@@ -171,10 +171,10 @@ void storeCustomConnection(const QnLocalConnectionData& data)
     ///
 
     const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [id = data.localId](const QnConnectionData& value)
-    {
-        return (id == value.localId);
-    });
+        [id = data.localId, user = data.url.userName()](const QnConnectionData& value)
+        {
+            return ((id == value.localId) && (value.url.userName() == user));
+        });
 
     const bool sameSystemFound = (itSameSystem != customConnections.end());
     if (sameSystemFound)
@@ -356,7 +356,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             if (m_logicalState == LogicalState::disconnected)
                 return;
 
-            /* Check if we need to logout if logged in under this user. */
+            /* Check if we need to log out if logged in under this user. */
             QString currentLogin = QnAppServerConnectionFactory::url().userName();
             NX_ASSERT(!currentLogin.isEmpty());
             if (currentLogin.isEmpty())
@@ -431,7 +431,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
-            if (connectionInfo.newSystem)
+            if (helpers::isNewSystem(connectionInfo))
             {
                 disconnectFromServer(true);
                 auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
@@ -860,9 +860,15 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
     bool force = parameters.hasArgument(Qn::ForceRole)
         ? parameters.argument(Qn::ForceRole).toBool()
         : false;
-    disconnectFromServer(force);
+
+    if (!disconnectFromServer(force))
+        return;
+
     qnSettings->setAutoLogin(false);
     qnSettings->save();
+
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setVisible(true);
 }
 
 QnWorkbenchConnectHandler::ConnectionSettingsPtr

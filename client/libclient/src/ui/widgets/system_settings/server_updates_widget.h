@@ -4,7 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui_server_updates_widget.h>
 
@@ -17,13 +17,16 @@ class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 struct QnLowFreeSpaceWarning;
 
-class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnServerUpdatesWidget: public QnAbstractPreferencesWidget, public QnSessionAwareDelegate
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
     QnServerUpdatesWidget(QWidget* parent = nullptr);
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
     bool cancelUpdate();
     bool canCancelUpdate() const;
@@ -45,6 +48,7 @@ private slots:
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
     void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
+    void at_tool_updatesCheckCanceled();
 
 private:
     void initDropdownActions();
@@ -52,6 +56,7 @@ private:
 
     void autoCheckForUpdates();
     void checkForUpdates(bool fromInternet);
+    void refresh();
 
     QString serverNamesString(const QnMediaServerResourceList& servers);
 
@@ -70,6 +75,7 @@ private:
     QnSoftwareVersion m_latestVersion;
     QString m_localFileName;
     bool m_checking;
+    QnCheckForUpdateResult m_lastUpdateCheckResult;
 
     QUrl m_releaseNotesUrl;
 

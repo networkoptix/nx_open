@@ -28,6 +28,12 @@ set (android.keypass "31O2zNNy")
 set (customization.upgradeCode "{CE572797-45BF-4f1c-A783-369EA79C597E}")
 set (customization.clientUpgradeCode "{6AE0699E-AF9D-4cc1-85A3-9BF8819563AF}")
 set (customization.serverUpgradeCode "{B4582E3D-C6E1-4f51-806B-AD69417A2584}")
+
+set (customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34}")
+set (customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
+set (customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")
+set (customization.nxtoolBundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
+
 set (deb.customization.company.name "networkoptix")
 
 set (ax.className "NxWitnes")

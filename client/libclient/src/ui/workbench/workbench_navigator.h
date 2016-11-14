@@ -20,6 +20,8 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/long_runnable.h>
+#include <utils/threaded_chunks_merge_tool.h>
+#include <camera/thumbnails_loader.h>
 
 class QAction;
 
@@ -30,7 +32,6 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveStreamReader;
-class QnThumbnailsLoader;
 class QnCachingCameraDataLoader;
 typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
 class QnCameraDataManager;
@@ -39,7 +40,6 @@ class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchQueryStrategy;
-class QnThreadedChunksMergeTool;
 class QnPendingOperation;
 class VariantAnimator;
 
@@ -95,6 +95,9 @@ public:
     /** Any of the syncable widgets on the layout has archive. */
     bool hasArchive() const;
 
+    /** Any of the syncable widgets on the layout is recording. */
+    bool isRecording() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
@@ -123,6 +126,7 @@ signals:
     void liveChanged();
     void liveSupportedChanged();
     void hasArchiveChanged();
+    void isRecordingChanged();
     void playingChanged();
     void playingSupportedChanged();
     void speedChanged();
@@ -227,7 +231,9 @@ private:
     void updateHistoryForCamera(QnSecurityCamResourcePtr camera);
     void updateSliderBookmarks();
 
-    void updateHasArchiveState();
+    void updateFootageState();
+    void updateIsRecording(bool forceOn = false);
+    void updateHasArchive();
 
     VariantAnimator* createPositionAnimator();
     void initializePositionAnimations();
@@ -247,7 +253,7 @@ private:
     QnDayTimeWidget *m_dayTimeWidget;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
-    QMultiHash<QnMediaResourcePtr, QHashDummyValue> m_syncedResources;
+    QHash<QnMediaResourcePtr, int> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
@@ -286,7 +292,7 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
-    QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
+    std::map<QnMediaResourcePtr, std::unique_ptr<QnThumbnailsLoader>> m_thumbnailLoaderByResource;
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
@@ -295,12 +301,17 @@ private:
     QnCameraDataManager* m_cameraDataManager;
 
     int m_chunkMergingProcessHandle;
-    std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
+    std::array<std::unique_ptr<QnThreadedChunksMergeTool>, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnSecurityCamResourcePtr> m_updateHistoryQueue;
 
     /** At least one of the synced widgets has archive. */
     bool m_hasArchive;
+
+    /** At least one of the synced widgets is recording. */
+    bool m_isRecording;
+    /** When recording was started, 0 if there's no recording in progress. */
+    qint64 m_recordingStartUtcMs;
 
     /** Animated timeline position. */
     qint64 m_animatedPosition;

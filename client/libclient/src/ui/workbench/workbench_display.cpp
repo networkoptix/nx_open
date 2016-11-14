@@ -16,11 +16,13 @@
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
-#include <utils/aspect_ratio.h>
+#include <utils/common/aspect_ratio.h>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
+
+#include <core/resource_access/resource_access_filter.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -151,7 +153,50 @@ QString dt(qint64 time)
 }
 #endif
 
-} // anonymous namespace
+
+void setWidgetScreen(QWidget* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    const auto window = target->window();
+    if (!window)
+        return;
+
+    if (const auto handle = window->windowHandle())
+        handle->setScreen(screen);
+}
+
+void setScreenRecursive(QWidget* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    for (const auto& child : target->children())
+    {
+        if (const auto widget = qobject_cast<QWidget*>(child))
+            setScreenRecursive(widget, screen);
+    }
+
+    setWidgetScreen(target, screen);
+}
+
+void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    for (const auto& child : target->childItems())
+        setScreenRecursive(child, screen);
+
+    if (!target->isWidget())
+        return;
+
+    if (const auto proxy = dynamic_cast<QGraphicsProxyWidget*>(target))
+        setScreenRecursive(proxy->widget(), screen);
+};
+
+} // namespace
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     base_type(parent),
@@ -471,6 +516,15 @@ void QnWorkbenchDisplay::initSceneView()
     {
         QGLWidget *viewport = newGlWidget(m_view);
 
+        if (const auto window = viewport->windowHandle())
+        {
+            connect(window, &QWindow::screenChanged, this,
+                [this](QScreen *screen)
+                {
+                    for (auto& item : m_view->items())
+                        setScreenRecursive(item, screen);
+                });
+        }
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
@@ -1016,7 +1070,17 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
 
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    if (!resource || !accessController()->hasPermissions(resource, Qn::ReadPermission))
+    if (!resource)
+    {
+        qnDeleteLater(item);
+        return false;
+    }
+
+    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+        ? Qn::ViewContentPermission
+        : Qn::ReadPermission;
+
+    if (!accessController()->hasPermissions(resource, requiredPermission))
     {
         qnDeleteLater(item);
         return false;
@@ -1025,12 +1089,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QnResourceWidget *widget = nullptr;
     if (resource->hasFlags(Qn::server))
     {
-        if (!accessController()->hasPermissions(resource, Qn::ViewContentPermission))
-        {
-            qnDeleteLater(item);
-            return false;
-        }
-
         widget = new QnServerResourceWidget(context(), item);
     }
     else if (resource->hasFlags(Qn::videowall))
@@ -2280,6 +2338,10 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)
 {
+    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+        ? Qn::ViewContentPermission
+        : Qn::ReadPermission;
+
     if (QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
     {
         if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource))
@@ -2289,7 +2351,7 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
         }
     }
 
-    if (accessController()->hasPermissions(resource, Qn::ReadPermission))
+    if (accessController()->hasPermissions(resource, requiredPermission))
         return;
 
     /* Here aboutToBeDestroyed will be called with corresponding handling. */

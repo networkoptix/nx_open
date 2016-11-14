@@ -40,7 +40,6 @@
 
 #include <nx/utils/string.h>
 #include <utils/common/warnings.h>
-#include <utils/aspect_ratio.h>
 
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"

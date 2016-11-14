@@ -311,12 +311,12 @@ QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParame
     int count = qMax(aggregationCount, 1);
     if (count == 1)
         return tr("%2 <b>%1</b>", "%1 means time, %2 means date")
-            .arg(time.time().toString())
-            .arg(time.date().toString());
+            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
+            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
     else
         return tr("%n times, first: %2 <b>%1</b>", "%1 means time, %2 means date", count)
-            .arg(time.time().toString())
-            .arg(time.date().toString());
+            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
+            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
 }
 
 QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
@@ -327,23 +327,23 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
     int count = qMax(aggregationCount, 1);
     if (count == 1)
         return tr("Time: %1 on %2", "%1 means time, %2 means date")
-            .arg(time.time().toString())
-            .arg(time.date().toString());
+            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
+            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
     else
         return tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
-            .arg(time.time().toString())
-            .arg(time.date().toString());
+            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
+            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
 }
 
 QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) {
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.date().toString();
+	return time.date().toString(Qt::DefaultLocaleShortDate);
 }
 QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) {
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.time().toString();
+	return time.time().toString(Qt::DefaultLocaleShortDate);
 }
 
 QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params)

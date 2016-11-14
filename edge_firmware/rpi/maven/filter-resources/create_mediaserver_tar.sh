@@ -167,7 +167,7 @@ cp -R ./opt $BUILD_DIR
 
 if [[ "${box}" == "bpi" ]]; then
   #copying ffmpeg 3.0.2 libs
-  #cp -av $LIBS_DIR/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
+  cp -av $LIBS_DIR/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
   #copying lite client bin
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
   mkdir -p $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/

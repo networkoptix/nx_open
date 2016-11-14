@@ -143,7 +143,6 @@
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
 
@@ -181,7 +180,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     m_tourTimer(new QTimer(this))
 {
     connect(m_tourTimer, SIGNAL(timeout()), this, SLOT(at_tourTimer_timeout()));
-    connect(context(), SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnWorkbenchActionHandler::at_context_userChanged);
 
     connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
@@ -189,9 +189,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
 
     connect(action(QnActions::ShowcaseAction), SIGNAL(triggered()), this, SLOT(at_showcaseAction_triggered()));
     connect(action(QnActions::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
-    /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
-    * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
-    * To make dialogs work we're using queued connection here. */
     connect(action(QnActions::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
@@ -520,12 +517,10 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     if (!user)
         return;
 
-    // we should not change state when using "Open in New Window"
+    /* We should not change state when using "Open in New Window". Otherwise workbench will be
+     * cleared here even if no state is saved. */
     if (m_delayedDrops.isEmpty() && qnRuntime->isDesktopMode())
-    {
-        QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
-        workbench()->update(state);
-    }
+        context()->instance<QnWorkbenchStateManager>()->restoreState();
 
     /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
     * Otherwise the user will see uncreated layouts in layout selection menu.
@@ -540,13 +535,6 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         }
     }
 
-    /* Close all other layouts. */
-    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
-        QnLayoutResourcePtr resource = layout->resource();
-        if (resource->getParentId() != user->getId())
-            workbench()->removeLayout(layout);
-    }
-
     if (workbench()->layouts().empty())
         menu()->trigger(QnActions::OpenNewTabAction);
 
@@ -559,9 +547,9 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
 
     if (qFuzzyCompare(0.0, value))
         action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
-    else if (qFuzzyCompare(0.2, value))
+    else if (qFuzzyCompare(0.1, value))
         action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
-    else if (qFuzzyCompare(0.3, value))
+    else if (qFuzzyCompare(0.15, value))
         action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     else
         action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
@@ -581,14 +569,14 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
 }
 
-void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
-    if (!layout) {
-        qnWarning("No layout provided.");
+    NX_ASSERT(layout, "No layout provided.");
+    if (!layout)
         return;
-    }
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
@@ -599,35 +587,41 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 
     QnResourceWidgetList widgets = parameters.widgets();
-    if (!widgets.empty() && position.isNull() && layout->getItems().empty()) {
+    if (!widgets.empty() && position.isNull() && layout->getItems().empty())
+    {
         QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
-        foreach(const QnResourceWidget *widget, widgets) {
+        for (auto widget: widgets)
+        {
             QnLayoutItemData data = widget->item()->data();
+            data.flags = Qn::PendingGeometryAdjustment;
             itemDataByUuid[data.uuid] = data;
         }
 
         /* Generate new UUIDs. */
-        for (QHash<QnUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
             pos->uuid = QnUuid::createUuid();
 
         /* Update cross-references. */
-        for (QHash<QnUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        {
             if (!pos->zoomTargetUuid.isNull())
                 pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
+        }
 
         /* Add to layout. */
-        foreach(const QnLayoutItemData &data, itemDataByUuid) {
+        for (const auto& data: itemDataByUuid)
+        {
             if (layout->getItems().size() >= maxItems)
                 return;
 
             layout->addItem(data);
         }
     }
-    else {
-        // TODO: #Elric server & media resources only!
-
+    else
+    {
         QnResourceList resources = parameters.resources();
-        if (!resources.isEmpty()) {
+        if (!resources.isEmpty())
+        {
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
@@ -636,25 +630,31 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         }
     }
 
-
-    QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
-    if (adjustAspectRatio && workbenchLayout->resource() == layout) {
+    auto workbenchLayout = workbench()->currentLayout();
+    if (adjustAspectRatio && workbenchLayout->resource() == layout)
+    {
         qreal midAspectRatio = 0.0;
         int count = 0;
 
-        if (!widgets.isEmpty()) {
+        if (!widgets.isEmpty())
+        {
             /* Here we don't take into account already added widgets. It's ok because
             we can get here only if the layout doesn't have cell aspect ratio, that means
             its widgets don't have aspect ratio too. */
-            foreach(QnResourceWidget *widget, widgets) {
-                if (widget->hasAspectRatio()) {
-                    midAspectRatio += widget->aspectRatio();
+
+            for (auto widget: widgets)
+            {
+                if (widget->hasAspectRatio())
+                {
+                    midAspectRatio += widget->visualAspectRatio();
                     ++count;
                 }
             }
         }
-        else {
-            foreach(QnWorkbenchItem *item, workbenchLayout->items()) {
+        else
+        {
+            for (auto item: workbenchLayout->items())
+            {
                 QnResourceWidget *widget = context()->display()->widget(item);
                 if (!widget)
                     continue;
@@ -668,12 +668,14 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             }
         }
 
-        if (count > 0) {
+        if (count > 0)
+        {
             midAspectRatio /= count;
             QnAspectRatio cellAspectRatio = QnAspectRatio::closestStandardRatio(midAspectRatio);
             layout->setCellAspectRatio(cellAspectRatio.toFloat());
         }
-        else if (workbenchLayout->items().size() > 1) {
+        else if (workbenchLayout->items().size() > 1)
+        {
             layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
         }
     }
@@ -1764,7 +1766,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered(
 {
     if (auto layout = workbench()->currentLayout()->resource())
     {
-        layout->setCellSpacing(0.1);
+        layout->setCellSpacing(0.05);
         action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
     }
 }
@@ -1773,7 +1775,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered(
 {
     if (auto layout = workbench()->currentLayout()->resource())
     {
-        layout->setCellSpacing(0.2);
+        layout->setCellSpacing(0.1);
         action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
     }
 }
@@ -1782,7 +1784,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 {
     if (auto layout = workbench()->currentLayout()->resource())
     {
-        layout->setCellSpacing(0.3);
+        layout->setCellSpacing(0.15);
         action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     }
 }
