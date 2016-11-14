@@ -1,10 +1,9 @@
 #pragma once
 
-#include <stdio.h>
+#include <atomic>
+#include <cstdio>
+#include "third_party_storage.h"
 
-#include "plugins/storage/third_party/third_party_storage.h"
-
-namespace {
 template <typename P>
 class PluginRefCounter
 {
@@ -26,15 +25,15 @@ public:
 private:
     std::atomic<int> m_count;
 }; // class PluginRefCounter
-}
 
 class TestIODevice 
     : public nx_spl::IODevice,
       private PluginRefCounter<TestIODevice>
 {
+    friend class PluginRefCounter<TestIODevice>;
     ~TestIODevice();
 public:
-    TestIODevice(const char *path, ns_spl::io::mode_t mode);
+    TestIODevice(const char *path, nx_spl::io::mode_t mode);
 public:
     virtual uint32_t STORAGE_METHOD_CALL write(
         const void*     src,
@@ -75,7 +74,7 @@ class TestFileInfoIterator
 public:
     TestFileInfoIterator(const char *path);
 public:
-    virtual FileInfo* STORAGE_METHOD_CALL next(int* ecode) override;
+    virtual nx_spl::FileInfo* STORAGE_METHOD_CALL next(int* ecode) const override;
 private:
     nx_spl::FileInfo m_fInfo;
 };

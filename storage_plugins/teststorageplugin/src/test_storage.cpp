@@ -1,25 +1,9 @@
+#include <cstdlib>
+#include <cstring>
 #include "test_storage.h"
 
-#define FILL_ECODE(ec) \
-    do { \
-        if (ecode) \
-            *ecode = ec; \
-    } while (0)
-
-#define IF_FILE(yesAction, noAction, noError) \
-    do { \
-        if (m_file) \
-        { \
-            FILL_ECODE(error::NoError); \
-            yesAction; \
-        } \
- \
-        FILL_ECODE(noError); \
-        noAction; \
-    } while (0)
-
 // IODevice
-TestIODevice::TestIODevice(const char *path, io::mode_t mode)
+TestIODevice::TestIODevice(const char *path, nx_spl::io::mode_t mode)
     : m_mode(mode)
 {
     m_file = fopen(path, "rb");
@@ -36,8 +20,7 @@ uint32_t STORAGE_METHOD_CALL TestIODevice::write(
     const uint32_t  size,
     int*            ecode) 
 {
-    FILL_ECODE(error::NoError);
-    return size;
+    return 0;
 }
 
 uint32_t STORAGE_METHOD_CALL TestIODevice::read(
@@ -45,10 +28,7 @@ uint32_t STORAGE_METHOD_CALL TestIODevice::read(
     const uint32_t  size,
     int*            ecode) const
 {
-    IF_FILE(
-        return (unit32_t)fread(dst, 1, size, m_file),
-        return 0,
-        error::ReadNotSupported);
+    return 0;
 }
 
 
@@ -59,30 +39,24 @@ int STORAGE_METHOD_CALL TestIODevice::getMode() const
 
 uint32_t STORAGE_METHOD_CALL TestIODevice::size(int* ecode) const
 {
-    IF_FILE(
-        return m_size,
-        return 0,
-        error::SpaceInfoNotAvailable);
+    return 0;
 }
 
 int STORAGE_METHOD_CALL TestIODevice::seek(
     uint64_t    pos, 
     int*        ecode) 
 {
-    IF_FILE(
-        return fseek(m_file, pos, SEEK_SET),
-        return -1,
-        error::ReadNotSupported);
+    return 0;
 }
 
 void* TestIODevice::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
     if (std::memcmp(&interfaceID, 
-                    &IID_FileInfoIterator, 
+                    &nx_spl::IID_IODevice,
                     sizeof(nxpl::NX_GUID)) == 0) 
     {
         addRef();
-        return static_cast<nx_spl::FileInfoIterator*>(this);
+        return static_cast<nx_spl::IODevice*>(this);
     } 
     else if (std::memcmp(&interfaceID, 
                          &nxpl::IID_PluginInterface, 
@@ -105,6 +79,7 @@ unsigned int TestIODevice::releaseRef()
 }
 
 // FileInfoIterator
-FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator next(int* ecode) const
+nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) const
 {
+    return NULL;
 }
