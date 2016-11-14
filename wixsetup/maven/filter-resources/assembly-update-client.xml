@@ -16,7 +16,7 @@
                 <include>qml/**</include>
                 <include>vox/**</include>
                 <include>av*.dll</include>
-                <include>${applauncher.binary.name}</include>                
+                <include>${applauncher.binary.name}</include>
                 <include>${client.binary.name}</include>
                 <include>${minilauncher.binary.name}</include>
                 <include>lib*.dll</include>
@@ -29,8 +29,8 @@
                 <include>swresample-2.dll</include>
                 <include>swscale-4.dll</include>
                 <include>udt.dll</include>
-            </includes>     
-        </fileSet>  
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${qt.dir}/bin</directory>
             <outputDirectory>..</outputDirectory>
@@ -56,25 +56,25 @@
                 <include>Qt5Widgets.dll</include>
                 <include>Qt5Xml.dll</include>
                 <include>Qt5XmlPatterns.dll</include>
-            </includes>     
-        </fileSet>              
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${project.build.directory}/client</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
                 <include>update.json</include>
-            </includes>     
-        </fileSet>  
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${VSRedistDir}</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
                 <include>*.*</include>
-            </includes>     
-        </fileSet>      
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${environment.dir}/help/${release.version}/${customization}</directory>
-            <outputDirectory>../help</outputDirectory>  
-        </fileSet>      
+            <outputDirectory>../help</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>

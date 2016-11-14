@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
-     xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 
     <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
         <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     out, err = p.communicate()
     print out
     p.wait()
-    if p.returncode:  
-        print "failed with code: %s" % str(p.returncode) 
+    if p.returncode:
+        print "failed with code: %s" % str(p.returncode)
         sys.exit(1)
     fixasfiles()

@@ -6,7 +6,7 @@
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="License.rtf"
-                LogoFile="logo-64x64.png"
+                LogoFile="nxtool-logo-64x64.png"
                 SuppressRepair="yes"
                 SuppressOptionsUI="yes"
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"
@@ -14,6 +14,7 @@
         </BootstrapperApplicationRef>
 
         <Chain>
+            <PackageGroupRef Id="VC12RedistPackageGroup"/>
             <PackageGroupRef Id="VC14RedistPackageGroup"/>
 
             <RollbackBoundary />

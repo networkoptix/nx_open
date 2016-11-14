@@ -46,9 +46,9 @@
     <!-- NxtoolDlg -->
     <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Shortcuts</String>
     <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Colocar Shortcut no Desktop</String>
-    
+
     <!-- DowngradeWarningDlg -->
-    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Já está instalada uma versão mais actual do [ProductName].</String> 
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Já está instalada uma versão mais actual do [ProductName].</String>
 
 
 
@@ -57,7 +57,7 @@
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Carregue em 'seguinte' para usar a pasta padrão ou carregue em 'Alterar' para escolher uma pasta diferente.</String>
     <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Raíz da Pasta do Media</String>
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Seleccione a pasta do Media:</String>
-    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Login</String>    
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Login</String>
 
 
     <!-- MyExitDialog -->
@@ -66,7 +66,7 @@
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Componentes</String>
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (Quero consultar vídeo gravado noutro servidor)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Quero gravar localmente neste PC)</String>
-    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Gestão Base de Dados. Não deve ser instalado mais do que uma vez numa rede)</String>    
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Gestão Base de Dados. Não deve ser instalado mais do que uma vez numa rede)</String>
 
 
 
@@ -78,28 +78,28 @@
     <String Id="Product_ArchMismatch"                               Overridable="yes">Este 'release' foi desenhado para um Sistema Operativo 32-bit. O instalador vai ser interrompido.</String>
 
     <!-- SelectionWarningDlg -->
-    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Seleccione pelo menos um componente</String>    
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Seleccione pelo menos um componente</String>
 
-    
+
     <!-- UpgradeDlg -->
-    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Detectada versão anterior</String>    
-    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Tipo de instalação</String>    
-    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Será feito um upgrade ao seu sistema</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">A sua base de dados está corrompida e não pode ser recuperar. Foi instalada uma base de dados limpa. Para aceder ao sistema utilize o login "admin" e a password "123". Deve alterar as credenciais após o primeiro login.</String>    
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Detectada versão anterior</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Tipo de instalação</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Será feito um upgrade ao seu sistema</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">A sua base de dados está corrompida e não pode ser recuperar. Foi instalada uma base de dados limpa. Para aceder ao sistema utilize o login "admin" e a password "123". Deve alterar as credenciais após o primeiro login.</String>
 
     <!-- WixSchedFirewallExceptions -->
-    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Não consigo ligar à Firewall do Windows.  ([2]   [3]   [4]   [5])</String>    
-    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">A configurar a Firewall do Windows</String>    
-    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">A configurar a Firewall do Windows</String>    
-    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">A repor as configurações da Firewall do Windows</String>    
-    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">A instalar configuração da Firewall do Windows</String>    
-    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">A repor as configurações da Firewall do Windows</String>    
-    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">A desinstalar configuração da Firewall do Windows</String>    
-    
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Não consigo ligar à Firewall do Windows.  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">A configurar a Firewall do Windows</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">A configurar a Firewall do Windows</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">A repor as configurações da Firewall do Windows</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">A instalar configuração da Firewall do Windows</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">A repor as configurações da Firewall do Windows</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">A desinstalar configuração da Firewall do Windows</String>
+
     <!-- WixInstallDirDlgTitle -->
     <String Id="InstallDirDlg_Title"                                Overridable="yes">Configuração do [ProductName]</String>
     <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Alterar...</String>
     <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Pasta destino</String>
     <String Id="InstallDirDlgDescription"                           Overridable="yes">Carregue em 'Seguinte' para instalar por padrão ou 'Alterar' para escolher outro.</String>
-    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Instalar [ProductName] em:</String>    
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Instalar [ProductName] em:</String>
 </WixLocalization>

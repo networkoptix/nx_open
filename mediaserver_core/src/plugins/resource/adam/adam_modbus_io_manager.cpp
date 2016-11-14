@@ -97,7 +97,16 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 void QnAdamModbusIOManager::stopIOMonitoring()
 {
     m_monitoringIsInProgress = false;
-    nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
+
+    nx::utils::TimerId timerId = 0;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        timerId = m_inputMonitorTimerId;
+    }
+
+    if (timerId)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 
 bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isActive)
@@ -416,10 +425,10 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
     {
         m_inputMonitorTimerId = nx::utils::TimerManager::instance()->addTimer(
             [this](quint64 timerId)
-        {
-            if (timerId == m_inputMonitorTimerId)
-                fetchAllPortStates();
-        },
+            {
+                if (timerId == m_inputMonitorTimerId)
+                    fetchAllPortStates();
+            },
             std::chrono::milliseconds(kInputPollingIntervalMs));
     }
 }

@@ -797,6 +797,10 @@ namespace nx_hls
             ? nx_http::StringType()
             : acceptEncodingHeaderIter->second);
 
+        //in case of hls enabling caching of full chunk since it may be required by hls client
+        if (requestIsAPartOfHlsSession)
+            m_currentChunk->disableInternalBufferLimit();
+
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
         if( acceptEncoding.encodingIsAllowed("chunked")
             || (acceptEncodingHeaderIter == request.headers.end() 
@@ -808,10 +812,6 @@ namespace nx_hls
         }
         else if( acceptEncoding.encodingIsAllowed("identity") )
         {
-            //in case of hls enabling caching of full chunk since it may be required by hls client
-            if (requestIsAPartOfHlsSession)
-                m_currentChunk->disableInternalBufferLimit();
-
             //if chunk exceeds maximum allowed size then proving 
             //  it in streaming mode. That means no Content-Length in response
             const bool chunkCompleted = m_currentChunk->waitForChunkReadyOrInternalBufferFilled();

@@ -14,7 +14,7 @@
 				<include>**/connection_mediator.pdb</include>
 				<include>**/media_db_util.pdb</include>
 				<include>**/vms_gateway.pdb</include>
-			</includes>           
+			</includes>
 		</fileSet>			
 	</fileSets>
 </assembly>

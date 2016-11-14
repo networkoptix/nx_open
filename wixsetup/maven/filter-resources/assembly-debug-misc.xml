@@ -10,13 +10,13 @@
 			<outputDirectory>../</outputDirectory>
 			<includes>
 				<include>**/applauncher.pdb</include>
-				<include>**/traytool.pdb</include>                
+				<include>**/traytool.pdb</include>
                 <include>**/minilauncher.pdb</include>
 				<include>**/mobile_client.pdb</include>
 				<include>**/nxtool.pdb</include>
 				<include>**/testcamera.pdb</include>
-				<include>**/AxNxWitness*.pdb</include>                
-			</includes>           
+				<include>**/AxNxWitness*.pdb</include>
+			</includes>
 		</fileSet>			
 	</fileSets>
 </assembly>
