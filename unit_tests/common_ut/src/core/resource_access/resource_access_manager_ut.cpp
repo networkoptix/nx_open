@@ -327,11 +327,12 @@ TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 /** Check permissions for new shared layout when the user is logged in as admin. */
 TEST_F(QnResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
 {
+    loginAs(Qn::GlobalAdminPermission);
+
     auto owner = createUser(Qn::GlobalAdminPermission);
     owner->setOwner(true);
     qnResPool->addResource(owner);
 
-    loginAs(Qn::GlobalAdminPermission);
     auto layout = createLayout(Qn::remote, false, owner->getId());
     qnResPool->addResource(layout);
 
