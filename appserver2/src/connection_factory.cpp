@@ -938,6 +938,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      *     %value GlobalCustomUserPermission Flag: this user has custom permissions
+     * %param[opt] groupId User group unique identifier.
      * %param email User's email.
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
