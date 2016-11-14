@@ -1,7 +1,7 @@
-#ifndef NX_CC_DNS_TABLE_H
-#define NX_CC_DNS_TABLE_H
+#pragma once
 
 #include <set>
+#include <deque>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
@@ -122,10 +122,10 @@ public:
      */
     void resolveDomain(
         const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler );
+        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler);
 
     typedef utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode, std::vector<AddressEntry>)> ResolveHandler;
+        SystemError::ErrorCode, std::deque<AddressEntry>)> ResolveHandler;
 
     //!Resolves hostName like DNS server does
     /*!
@@ -146,7 +146,7 @@ public:
         int ipVersion,
         void* requestId = nullptr);
 
-    std::vector<AddressEntry> resolveSync(
+    std::deque<AddressEntry> resolveSync(
         const HostAddress& hostName,
         NatTraversalSupport natTraversalSupport,
         int ipVersion);
@@ -197,7 +197,7 @@ protected:
 
         void checkExpirations();
         bool isResolved(NatTraversalSupport natTraversalSupport) const;
-        std::vector<AddressEntry> getAll() const;
+        std::deque<AddressEntry> getAll() const;
 
     private:
         State m_dnsState;
@@ -276,5 +276,3 @@ protected:
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif // NX_CC_DNS_TABLE_H

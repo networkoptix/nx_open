@@ -82,7 +82,7 @@ private:
         SocketResultPrimisePtr;
 
     void connectToEntriesAsync(
-        std::queue<AddressEntry> dnsEntries, int port,
+        std::deque<AddressEntry> dnsEntries, int port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     void connectToEntryAsync(

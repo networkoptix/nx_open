@@ -591,8 +591,10 @@ bool CommunicatingSocket<InterfaceToImplement>::connect(
     auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
         remoteAddress.address.toString(), this->m_ipVersion);
 
-    for (auto& ip: ips)
+    while (!ips.empty())
     {
+        auto ip = std::move(ips.front());
+        ips.pop_front();
         if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
             return true;
     }

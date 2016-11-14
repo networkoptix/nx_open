@@ -94,7 +94,7 @@ public:
         {
             resolveAsync(
                 address,
-                [&](SystemError::ErrorCode, std::vector<AddressEntry>)
+                [&](SystemError::ErrorCode /*code*/, std::deque<AddressEntry> /*enries*/)
                 {
                     {
                         QnMutexLocker lk(&m_mutex);
@@ -332,7 +332,7 @@ TEST_F(AddressResolverTest, DnsVsMediator)
 
 TEST(AddressResolverRealTest, Cancel)
 {
-    const auto doNone = [&](SystemError::ErrorCode, std::vector<AddressEntry>) {};
+    const auto doNone = [&](SystemError::ErrorCode, std::deque<AddressEntry>) {};
 
     const std::vector<HostAddress> kTestAddresses =
     {
