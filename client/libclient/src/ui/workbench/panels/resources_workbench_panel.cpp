@@ -268,7 +268,7 @@ void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 
     qreal offset = kResizerWidth;
     if (widget->isScrollBarVisible())
-        offset += kResizerWidth;
+        offset += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
     resizerGeometry.moveLeft(resizerGeometry.left() - offset);
     resizerGeometry.setWidth(kResizerWidth);

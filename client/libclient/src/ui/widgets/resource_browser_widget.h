@@ -13,6 +13,8 @@
 
 #include <client/client_globals.h>
 
+#include <utils/common/event_processors.h>
+
 class QComboBox;
 class QLineEdit;
 class QTabWidget;
@@ -184,6 +186,7 @@ private:
     QnResourceTreeModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
+    QScopedPointer<QnMultiEventSignalizer> m_scrollbarSignalizer;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
 };
