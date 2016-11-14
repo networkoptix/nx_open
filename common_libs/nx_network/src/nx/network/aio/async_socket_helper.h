@@ -221,7 +221,7 @@ public:
         if (!startAsyncConnect(addr))
         {
             this->post(
-                [handler = move(m_connectHandler),
+                [handler = std::move(m_connectHandler),
                     code = SystemError::getLastOSErrorCode()]() mutable
                 {
                     handler(code);
@@ -549,7 +549,7 @@ private:
             boost::none,
             [this, resolvedAddress, sendTimeout]()
             {
-                this->m_socket->connectToIp( resolvedAddress, sendTimeout );
+                connectToIp( resolvedAddress, sendTimeout );
             });    //to be called between pollset.add and pollset.polladdress
         return true;
     }
@@ -794,6 +794,11 @@ private:
                 this->m_socket, aio::etTimedOut, true);
             m_timerHandler = nullptr;
         }
+    }
+
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis)
+    {
+        return this->m_socket->connectToIp(remoteAddress, timeoutMillis);
     }
 };
 

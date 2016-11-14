@@ -601,119 +601,6 @@ bool CommunicatingSocket<InterfaceToImplement>::connect(
 }
 
 template<typename InterfaceToImplement>
-bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
-    const SocketAddress& remoteAddress, unsigned int timeoutMs)
-{
-    // Get the address of the requested host
-    m_connected = false;
-
-    const auto addr = this->makeAddr(remoteAddress);
-    if (!addr.ptr)
-        return false;
-
-    //switching to non-blocking mode to connect with timeout
-    bool isNonBlockingModeBak = false;
-    if( !this->getNonBlockingMode( &isNonBlockingModeBak ) )
-        return false;
-    if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
-        return false;
-
-    int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
-
-    if( connectResult != 0 )
-    {
-        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
-            return false;
-        if( isNonBlockingModeBak )
-            return true;        //async connect started
-    }
-
-    int iSelRet = 0;
-
-#ifdef _WIN32
-    timeval timeVal;
-    fd_set wrtFDS;
-
-    /* monitor for incomming connections */
-    FD_ZERO(&wrtFDS);
-    FD_SET(m_fd, &wrtFDS);
-
-    /* set timeout values */
-    timeVal.tv_sec  = timeoutMs/1000;
-    timeVal.tv_usec = timeoutMs%1000;
-    iSelRet = ::select(
-        m_fd + 1,
-        NULL,
-        &wrtFDS,
-        NULL,
-        timeoutMs >= 0 ? &timeVal : NULL );
-#else
-    //handling interruption by a signal
-    //struct timespec waitStartTime;
-    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
-    QElapsedTimer et;
-    et.start();
-    bool waitStartTimeActual = false;
-    if( timeoutMs > 0 )
-        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
-    for( ;; )
-    {
-        struct pollfd sockPollfd;
-        memset( &sockPollfd, 0, sizeof(sockPollfd) );
-        sockPollfd.fd = this->m_fd;
-        sockPollfd.events = POLLOUT;
-#ifdef _GNU_SOURCE
-        sockPollfd.events |= POLLRDHUP;
-#endif
-        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
-
-
-        //timeVal.tv_sec  = timeoutMs/1000;
-        //timeVal.tv_usec = timeoutMs%1000;
-
-        //iSelRet = ::select( m_fd + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
-        if( iSelRet == -1 && errno == EINTR )
-        {
-            //modifying timeout for time we've already spent in select
-            if( timeoutMs == 0 ||  //no timeout
-                !waitStartTimeActual )
-            {
-                //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
-                continue;
-            }
-            //struct timespec waitStopTime;
-            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
-            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-            //    continue;   //not updating timeout value
-            const int millisAlreadySlept = et.elapsed();
-            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
-            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-            if( millisAlreadySlept >= (int)timeoutMs )
-                break;
-            timeoutMs -= millisAlreadySlept;
-            continue;
-        }
-
-        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
-            iSelRet = 0;
-
-        int result;
-        socklen_t result_len = sizeof(result);
-        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
-            iSelRet = 0;
-
-        break;
-    }
-#endif
-
-    m_connected = iSelRet > 0;
-
-    //restoring original mode
-    this->setNonBlockingMode( isNonBlockingModeBak );
-    return m_connected;
-}
-
-template<typename InterfaceToImplement>
 int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int bufferLen, int flags )
 {
 #ifdef _WIN32
@@ -890,6 +777,118 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
 }
 
+template<typename InterfaceToImplement>
+bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
+    const SocketAddress& remoteAddress, unsigned int timeoutMs)
+{
+    // Get the address of the requested host
+    m_connected = false;
+
+    const auto addr = this->makeAddr(remoteAddress);
+    if (!addr.ptr)
+        return false;
+
+    //switching to non-blocking mode to connect with timeout
+    bool isNonBlockingModeBak = false;
+    if( !this->getNonBlockingMode( &isNonBlockingModeBak ) )
+        return false;
+    if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
+        return false;
+
+    int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
+
+    if( connectResult != 0 )
+    {
+        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
+            return false;
+        if( isNonBlockingModeBak )
+            return true;        //async connect started
+    }
+
+    int iSelRet = 0;
+
+#ifdef _WIN32
+    timeval timeVal;
+    fd_set wrtFDS;
+
+    /* monitor for incomming connections */
+    FD_ZERO(&wrtFDS);
+    FD_SET(m_fd, &wrtFDS);
+
+    /* set timeout values */
+    timeVal.tv_sec  = timeoutMs/1000;
+    timeVal.tv_usec = timeoutMs%1000;
+    iSelRet = ::select(
+        m_fd + 1,
+        NULL,
+        &wrtFDS,
+        NULL,
+        timeoutMs >= 0 ? &timeVal : NULL );
+#else
+    //handling interruption by a signal
+    //struct timespec waitStartTime;
+    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    QElapsedTimer et;
+    et.start();
+    bool waitStartTimeActual = false;
+    if( timeoutMs > 0 )
+        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+    for( ;; )
+    {
+        struct pollfd sockPollfd;
+        memset( &sockPollfd, 0, sizeof(sockPollfd) );
+        sockPollfd.fd = this->m_fd;
+        sockPollfd.events = POLLOUT;
+#ifdef _GNU_SOURCE
+        sockPollfd.events |= POLLRDHUP;
+#endif
+        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
+
+
+        //timeVal.tv_sec  = timeoutMs/1000;
+        //timeVal.tv_usec = timeoutMs%1000;
+
+        //iSelRet = ::select( m_fd + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
+        if( iSelRet == -1 && errno == EINTR )
+        {
+            //modifying timeout for time we've already spent in select
+            if( timeoutMs == 0 ||  //no timeout
+                !waitStartTimeActual )
+            {
+                //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
+                continue;
+            }
+            //struct timespec waitStopTime;
+            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
+            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+            //    continue;   //not updating timeout value
+            const int millisAlreadySlept = et.elapsed();
+            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
+            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+            if( millisAlreadySlept >= (int)timeoutMs )
+                break;
+            timeoutMs -= millisAlreadySlept;
+            continue;
+        }
+
+        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
+            iSelRet = 0;
+
+        int result;
+        socklen_t result_len = sizeof(result);
+        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
+            iSelRet = 0;
+
+        break;
+    }
+#endif
+
+    m_connected = iSelRet > 0;
+
+    //restoring original mode
+    this->setNonBlockingMode( isNonBlockingModeBak );
+    return m_connected;
+}
 
 //////////////////////////////////////////////////////////
 ///////// class TCPSocket
