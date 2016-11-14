@@ -71,7 +71,8 @@ private:
     /// according to specified settings.
     void testConnectionToServer(
         const QUrl& url,
-        const ConnectionSettingsPtr& storeSettings);
+        const ConnectionSettingsPtr& storeSettings,
+        bool force);
 
     void connectToServer(const QUrl& url);
 
@@ -82,7 +83,8 @@ private:
         const QUrl& url,
         ec2::ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
-        const ConnectionSettingsPtr& storeSettings);
+        const ConnectionSettingsPtr& storeSettings,
+        bool force);
 
     void handleConnectReply(
         int handle,
@@ -121,6 +123,8 @@ private:
     void at_connectAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
+
+    void showPreloader();
 
 private:
     int m_connectingHandle;

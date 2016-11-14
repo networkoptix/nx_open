@@ -145,8 +145,15 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
             context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
         });
 
-    setVisible(true);
+    connect(this, &QnWorkbenchWelcomeScreen::globalPreloaderVisibleChanged, this,
+        [this]()
+        {
+            if (globalPreloaderVisible())
+                setVisibleControls(true);
+        });
 
+    setVisible(true);
+    setVisibleControls(false);
     connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
     {
         if (valueId == QnClientSettings::AUTO_LOGIN)

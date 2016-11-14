@@ -302,6 +302,7 @@ void QnLoginDialog::accept()
                     params.setArgument(Qn::UrlRole, url);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
                     params.setArgument(Qn::StorePasswordRole, storePassword);
+                    params.setArgument(Qn::ForceRole, true);
                     menu()->trigger(QnActions::ConnectAction, params);
                     break;
                 }

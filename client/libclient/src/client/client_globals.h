@@ -203,7 +203,7 @@ namespace Qn
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
 
-        ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction. */
+        ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
