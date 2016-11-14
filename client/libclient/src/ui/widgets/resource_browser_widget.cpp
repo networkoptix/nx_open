@@ -59,6 +59,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -273,6 +274,14 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         &QnResourceBrowserWidget::updateIcons);
+
+    auto signalizer = new QnMultiEventSignalizer(this);
+    signalizer->addEventType(QEvent::Show);
+    signalizer->addEventType(QEvent::Hide);
+    ui->resourceTreeWidget->treeView()->verticalScrollBar()->installEventFilter(signalizer);
+    ui->searchTreeWidget->treeView()->verticalScrollBar()->installEventFilter(signalizer);
+    connect(signalizer, &QnMultiEventSignalizer::activated, this,
+        &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
     /* Run handlers. */
     updateFilter();
@@ -613,6 +622,11 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     updateToolTipPosition();
 }
 
+bool QnResourceBrowserWidget::isScrollBarVisible() const
+{
+    return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
+}
+
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
 {
     if (scope != Qn::TreeScope)
@@ -935,6 +949,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
     }
 
     emit currentTabChanged();
+    emit scrollBarVisibleChanged();
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked()
