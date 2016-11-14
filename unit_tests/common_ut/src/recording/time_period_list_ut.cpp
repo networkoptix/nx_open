@@ -1,4 +1,3 @@
-#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
