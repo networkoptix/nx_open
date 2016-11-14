@@ -2,7 +2,7 @@
 # Server list is a comma separated ip:port address list, eg : 123.123.123.123:12345,124.124.124.124:12345
 #serverList=127.0.0.1:7001
 serverList=%(serverList)s
-clusterTestSleepTime=5
+clusterTestSleepTime=20
 mergeTestTimeout=10
 threadNumber=32
 username=%(username)s
