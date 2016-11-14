@@ -135,6 +135,11 @@ bool QnUserRolesDialog::selectGroup(const QnUuid& groupId)
     return true;
 }
 
+bool QnUserRolesDialog::canApplyChanges() const
+{
+    return m_model->isValid() && base_type::canApplyChanges();
+}
+
 bool QnUserRolesDialog::hasChanges() const
 {
     /* Quick check */
@@ -157,7 +162,11 @@ bool QnUserRolesDialog::hasChanges() const
 
 void QnUserRolesDialog::applyChanges()
 {
+    /* Here all changes are submitted to model. */
     base_type::applyChanges();
+
+    if (!canApplyChanges())
+        return;
 
     QSet<QnUuid> groupsLeft;
     for (const auto& group : m_model->roles())

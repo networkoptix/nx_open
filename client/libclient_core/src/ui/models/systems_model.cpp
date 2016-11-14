@@ -22,9 +22,9 @@ namespace
         result.insert(QnSystemsModel::SystemIdRoleId, "systemId");
         result.insert(QnSystemsModel::LocalIdRoleId, "localId");
         result.insert(QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription");
-        result.insert(QnSystemsModel::LastPasswordRoleId, "lastPassword");
 
         result.insert(QnSystemsModel::IsFactorySystemRoleId, "isFactorySystem");
+        result.insert(QnSystemsModel::SafeModeRoleId, "safeMode");
 
         result.insert(QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem");
         result.insert(QnSystemsModel::IsOnlineRoleId, "isOnline");
@@ -34,8 +34,6 @@ namespace
 
         result.insert(QnSystemsModel::WrongVersionRoleId, "wrongVersion");
         result.insert(QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion");
-
-        result.insert(QnSystemsModel::LastPasswordsModelRoleId, "lastPasswordsModel");
 
         return result;
     }();
@@ -73,8 +71,12 @@ public:
             const QnUuid &serverId,
             QnServerFields fields);
 
+    void emitDataChanged(
+        const QnSystemDescriptionPtr& systemDescription,
+        QnSystemsModel::RoleId role);
+
     void emitDataChanged(const QnSystemDescriptionPtr& systemDescription
-        , QVector<int> roles);
+        , QVector<int> roles = QVector<int>());
 
     void resetModel();
 
@@ -179,10 +181,10 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return (fullName.isEmpty() ? system->ownerAccountEmail()
                 : tr("%1's system", "%1 is a user name").arg(fullName));
         }
-        case LastPasswordsModelRoleId:
-            return QVariant();  // TODO
         case IsFactorySystemRoleId:
             return system->isNewSystem();
+        case SafeModeRoleId:
+            return system->safeMode();
         case IsCloudSystemRoleId:
             return system->isCloudSystem();
         case IsOnlineRoleId:
@@ -275,7 +277,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     data->connections << connect(systemDescription, &QnBaseSystemDescription::systemNameChanged, this,
         [this, systemDescription]()
         {
-            emitDataChanged(systemDescription, QVector<int>() << QnSystemsModel::SystemNameRoleId);
+            emitDataChanged(systemDescription, QnSystemsModel::SystemNameRoleId);
         });
 
     data->connections << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
@@ -298,8 +300,8 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     const auto serverAction = [this, systemDescription](const QnUuid& id)
     {
         Q_UNUSED(id);
-        /* Alot of roles depend on server adding/removing. */
-        emitDataChanged(systemDescription, QVector<int>());
+        /* A lot of roles depend on server adding/removing. */
+        emitDataChanged(systemDescription);
     };
 
     data->connections
@@ -310,8 +312,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     const auto emitOnlineChanged =
         [this, systemDescription]()
         {
-            const auto roles = QVector<int>() << QnSystemsModel::IsOnlineRoleId;
-            emitDataChanged(systemDescription, roles);
+            emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
         };
 
     data->connections
@@ -321,6 +322,18 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     // TODO: #ynikitenkov In 3.0 we can't connect to server with offline cloud. Remove this in 3.1
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::hasInternetChanged, this, emitOnlineChanged);
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::newSystemStateChanged, this,
+        [this, systemDescription]()
+        {
+            emitDataChanged(systemDescription, QnSystemsModel::IsFactorySystemRoleId);
+        });
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::safeModeStateChanged, this,
+        [this, systemDescription]()
+        {
+            emitDataChanged(systemDescription, QnSystemsModel::SafeModeRoleId);
+        });
 
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
     internalData.append(data);
@@ -360,6 +373,13 @@ QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternal
         });
 
     return it;
+}
+
+void QnSystemsModelPrivate::emitDataChanged(
+    const QnSystemDescriptionPtr& systemDescription,
+    QnSystemsModel::RoleId role)
+{
+    emitDataChanged(systemDescription, QVector<int>() << role);
 }
 
 void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& systemDescription

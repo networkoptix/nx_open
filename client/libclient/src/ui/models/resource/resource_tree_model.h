@@ -146,8 +146,6 @@ private:
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
 
-    QScopedPointer<QnResourceTreeModelUserNodes> m_userNodes;
-
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;
 };

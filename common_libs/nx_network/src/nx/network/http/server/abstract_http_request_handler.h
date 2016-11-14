@@ -11,7 +11,7 @@
 
 namespace nx_http {
 
-class NX_NETWORK_API RequestResult
+struct NX_NETWORK_API RequestResult
 {
 public:
     nx_http::StatusCode::Value statusCode;

@@ -90,9 +90,10 @@ QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
     return server;
 }
 
-QnStorageResourcePtr QnResourcePoolTestHelper::addStorage()
+QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerResourcePtr& server)
 {
     QnStorageResourcePtr storage(new QnStorageResourceStub());
+    storage->setParentId(server->getId());
     qnResPool->addResource(storage);
     return storage;
 }

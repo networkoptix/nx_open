@@ -115,9 +115,6 @@ public:
     QnMediaDewarpingParams dewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams &params);
 
-    virtual float visualAspectRatio() const;
-    virtual float defaultVisualAspectRatio() const override;
-
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
 
@@ -207,6 +204,8 @@ private:
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
     void createPtzController();
+
+    qreal calculateVideoAspectRatio() const;
 
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();

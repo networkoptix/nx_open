@@ -17,6 +17,7 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/..</root.dir>
+        <targetName>${project.artifactId}</targetName>
         <buildLib/>
         <libtype/>
         <!--<product.title>${project.name}</product.title>      -->

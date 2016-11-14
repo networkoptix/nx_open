@@ -70,7 +70,6 @@
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include "ui/workbench/workbench_item.h"
 
-#include <utils/aspect_ratio.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
@@ -588,6 +587,29 @@ void QnMediaResourceWidget::createPtzController()
 
     connect(m_ptzController, &QnAbstractPtzController::changed, this,
         &QnMediaResourceWidget::at_ptzController_changed);
+}
+
+qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
+{
+    /* Here we get 0.0 if no custom aspect ratio set. */
+    qreal result = resource()->customAspectRatio();
+    if (!qFuzzyIsNull(result))
+        return result;
+
+    if (m_renderer && !m_renderer->sourceSize().isEmpty())
+    {
+        const QSize sourceSize = m_renderer->sourceSize();
+        return QnGeometry::aspectRatio(sourceSize);
+    }
+
+    if (const auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+    {
+        const auto cameraAr = camera->aspectRatio();
+        if (cameraAr.isValid())
+            return cameraAr.toFloat();
+    }
+
+    return defaultAspectRatio(); /*< Here we can get -1.0 if there are no predefined AR set */
 }
 
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const
@@ -1303,34 +1325,6 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     emit dewarpingParamsChanged();
 }
 
-float QnMediaResourceWidget::visualAspectRatio() const
-{
-    if (!resource())
-        return base_type::visualAspectRatio();
-
-    qreal customAspectRatio = resource()->customAspectRatio();
-    if (qFuzzyIsNull(customAspectRatio))
-        return base_type::visualAspectRatio();
-
-    qreal aspectRatio = customAspectRatio;
-    if (zoomRect().isNull())
-        aspectRatio *= QnGeometry::aspectRatio(channelLayout()->size());
-
-    return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
-}
-
-float QnMediaResourceWidget::defaultVisualAspectRatio() const
-{
-    if (!item())
-        return base_type::defaultVisualAspectRatio();
-
-    if (item()->layout() && item()->layout()->hasCellAspectRatio())
-        return item()->layout()->cellAspectRatio();
-
-    return qnGlobals->defaultLayoutCellAspectRatio();
-}
-
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -1716,48 +1710,25 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
 
 void QnMediaResourceWidget::updateAspectRatio()
 {
-    if (!m_renderer)
-        return; /* Not yet initialized. */
-
-    QSize sourceSize = m_renderer->sourceSize();
-
-    qreal dewarpingRatio = item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled
-        ? item()->dewarpingParams().panoFactor
-        : 1.0;
-
-    QString resourceId;
-    if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
-        resourceId = networkResource->getPhysicalId();
-
-    if (sourceSize.isEmpty())
+    if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
     {
-        qreal aspectRatio = resourceId.isEmpty()
-            ? defaultAspectRatio()
-            : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
-        if (dewarpingRatio > 1)
-            setAspectRatio(dewarpingRatio);
-        else
-            setAspectRatio(aspectRatio);
+        setAspectRatio(item()->dewarpingParams().panoFactor);
+        return;
     }
-    else
+
+    qreal baseAspectRatio = calculateVideoAspectRatio();
+    NX_ASSERT(!qFuzzyIsNull(baseAspectRatio));
+    if (baseAspectRatio <= 0.0)
     {
-        qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
-            QnGeometry::aspectRatio(channelLayout()->size()) *
-            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
-
-
-        if (dewarpingRatio > 1)
-            setAspectRatio(dewarpingRatio);
-        else
-            setAspectRatio(aspectRatio);
-
-        if (!resourceId.isEmpty())
-        {
-            QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
-            aspectRatios.insert(resourceId, aspectRatio);
-            qnSettings->setResourceAspectRatios(aspectRatios);
-        }
+        setAspectRatio(baseAspectRatio); /* No aspect ratio. */
+        return;
     }
+
+    qreal aspectRatio = baseAspectRatio *
+        QnGeometry::aspectRatio(channelLayout()->size()) *
+        (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
+
+    setAspectRatio(aspectRatio);
 }
 
 void QnMediaResourceWidget::at_camDisplay_liveChanged()

@@ -161,7 +161,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     NX_ASSERT(resource);
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
-        return Qn::ReadPermission | Qn::ExportPermission;
+        return Qn::ReadPermission | Qn::ViewContentPermission | Qn::ExportPermission;
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return calculatePermissionsInternal(layout);

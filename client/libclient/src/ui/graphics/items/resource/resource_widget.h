@@ -81,6 +81,14 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option)
 
+    enum AspectRatioFlag
+    {
+        SingleChannel           = 0x0,
+        WithRotation            = 0x01,
+        WithChannelLayout       = 0x02
+    };
+    Q_DECLARE_FLAGS(AspectRatioFlags, AspectRatioFlag)
+
     /**
      * Constructor.
      *

@@ -47,6 +47,11 @@ public:
 
     QList<QnAbstractResourceAccessProvider*> providers() const;
 
+protected:
+    virtual void beginUpdateInternal() override;
+    virtual void endUpdateInternal() override;
+    virtual void afterUpdate() override;
+
 private:
     void handleBaseProviderAccessChanged(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource, Source value);

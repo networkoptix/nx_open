@@ -6,7 +6,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <utils/aspect_ratio.h>
+#include <utils/common/aspect_ratio.h>
 
 QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(QObject *parent) :
     QObject(parent),

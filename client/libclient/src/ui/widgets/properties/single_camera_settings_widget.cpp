@@ -47,7 +47,6 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/license_usage_helper.h>
-#include <utils/aspect_ratio.h>
 #include <utils/common/delayed.h>
 
 #include "client/client_settings.h"

@@ -4,8 +4,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/updatable.h>
 
 class QnLicenseUsageHelper;
 

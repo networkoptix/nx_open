@@ -1,12 +1,13 @@
 'use strict';
 
 var SettingsPage = require('./po.js');
-xdescribe('Cloud connect', function () {
+describe('Cloud connect', function () {
 
     var p = new SettingsPage();
 
     beforeAll(function(){
         p.get();
+        p.helper.getTab("System").click();
         // if button Connect to Cloud is not present (system is in Cloud),
         // then disconnect from Cloud
         p.helper.checkPresent(p.connectToCloudButton).then( null, function(err) {
@@ -24,8 +25,8 @@ xdescribe('Cloud connect', function () {
     });
 
     it("button Create account is an external link",function(){
-        expect(p.createCloudAccButton.getAttribute('href')).toContain('http://');
-        expect(p.createCloudAccButton.getAttribute('href')).toContain('#/register?from=webadmin&context=settings');
+        expect(p.createCloudAccButton.getAttribute('href')).toContain('https://');
+        expect(p.createCloudAccButton.getAttribute('href')).toContain('/register?from=webadmin&context=settings');
     });
 
     it("button Connect to Cloud opens dialog",function(){
@@ -63,6 +64,7 @@ xdescribe('Cloud connect', function () {
         p.cloudDialogCloseButton.click();
     });
 
+    // Fails, because empty fields are not highlighted with red
     it("Connect dialog: empty fields are highlighted with red",function(){
         p.connectToCloudButton.click();
         p.cloudEmailInput.clear();
@@ -74,6 +76,7 @@ xdescribe('Cloud connect', function () {
         p.cloudDialogCloseButton.click();
     });
 
+    // Fails, because wrong fields are not highlighted with red
     it("Connect dialog: wrong format fields are highlighted with red",function(){
         p.connectToCloudButton.click();
         p.cloudEmailInput.clear()
@@ -89,7 +92,7 @@ xdescribe('Cloud connect', function () {
         p.cloudEmailInput.sendKeys('noptixqa+owner@gmail.com');
         p.cloudPasswordInput.sendKeys('wrongpassword');
         p.dialogConnectButton.click();
-        expect(p.dialogMessage.getText()).toContain('Login or password are incorrect');
+        expect(p.dialog.getText()).toContain('Login or password are incorrect');
 
         p.cloudDialogCloseButton.click();
     });
@@ -104,25 +107,27 @@ xdescribe('Cloud connect', function () {
         p.dialogCancelButton.click();
     });
 
+    // Fails, because no success message is visible
     it("dialog: after connect success message appears", function() {
         p.connectToCloudButton.click();
         p.cloudEmailInput.sendKeys('noptixqa+owner@gmail.com');
         p.cloudPasswordInput.sendKeys(p.password);
         p.dialogConnectButton.click();
-        expect(p.dialogMessage.getText()).toContain('System is connected to ');
+        expect(p.dialog.getText()).toContain('System is connected to ');
         p.cloudDialogCloseButton.click();
         p.disconnectFromCloud();
     });
 
+    // Fails, because no success message is visible
     it("dialog: after connect click Connect again - error appears", function(){
         p.connectToCloudButton.click();
         p.cloudEmailInput.sendKeys('noptixqa+owner@gmail.com');
         p.cloudPasswordInput.sendKeys(p.password);
         p.dialogConnectButton.click();
-        expect(p.dialogMessage.getText()).toContain('System is connected to ');
+        expect(p.dialog.getText()).toContain('System is connected to ');
         // Click Connect button again
         p.dialogConnectButton.click();
-        expect(p.dialogMessage.getText()).toContain('Can\'t connect: some error happened: System already bound to cloud ');
+        expect(p.dialog.getText()).toContain('Can\'t connect: some error happened: System already bound to cloud ');
         p.cloudDialogCloseButton.click();
         p.disconnectFromCloud();
     });

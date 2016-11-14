@@ -8,119 +8,164 @@ system with the others.
 import sys
 import time, traceback
 import urllib, urllib2
+import pprint
+import uuid
+import json
 
 from functest_util import SafeJsonLoads
 from generator import BasicGenerator
 
-class SystemNameTest:
-    _oldSystemName = None
+class SystemIdTest(object):
+    _oldSystemId = None
     _syncTime = 2
 
     def __init__(self, config):
-        self._namesUsed = set()
+        self._idsUsed = set()
         self._guidDict = dict()
         self._serverList = []
         self._config = config
+        self._idsChanged = False
         self._serverList = self._config.rtget("ServerList")
         self._syncTime = self._config.rtget("SleepTime")
 
-    def _doGet(self,addr,methodName):
-        print "Connection to http://%s/ec2/%s" % (addr,methodName)
+    def _doGet(self, addr, methodName):
+        url = "http://%s/ec2/%s" % (addr,methodName)
+        print "Connection to " + url
         try:
-            response = urllib2.urlopen("http://%s/ec2/%s" % (addr,methodName))
-            return response.read() if response.getcode() == 200 else None
+            response = urllib2.urlopen(url)
+            assert response.getcode() == 200, "Failed request to %s: HTTP Error %s" % (
+                url, response.getcode()
+            )
+            return response.read()
         except Exception as err:
-            print "Exception: %s, %s" % sys.exc_info()[0:2]
-            return None
+            assert False, "Failed request %s: exception: %s, %s" % (url,) + sys.exc_info()[0:2]
 
-    def _changeSystemName(self,addr,name):
+    """def _changeSystemName(self,addr,name):
         url = "http://%s/api/configure?%s" % (addr,urllib.urlencode({"systemName":name}))
         print "Request:", url
         response = urllib2.urlopen(url)
-        return response.getcode() == 200
+        return response.getcode() == 200"""
 
-    def _ensureServerSystemName(self):
-        systemName = None
+    def _changeSystemId(self, addr, _id):
+        url = "http://%s/api/configure?%s" % (addr,urllib.urlencode({"localSystemId": _id}))
+        print "Request:", url
+        try:
+            response = urllib2.urlopen(url)
+            assert response.getcode() == 200, "Failed to set localSysteId: HTTP Error %s" % response.getcode()
+        except Exception as err:
+            assert False, "Failed to set localSysteId: %s" % (err,)
 
+    def _ensureServerSystemId(self, end=False):
+        systemId = self._oldSystemId if end else None
         for s in self._serverList:
             obj = self._config.rtget("ServerObjs")[s]
-            if systemName != None:
-                if systemName != obj["systemName"]:
-                    return (False,"Server: %s has systemName: %s which is different with others: %s" % (s,obj["systemName"],systemName))
+            #print "Server %s, obj: %s" % (s, pprint.pformat(obj))
+            if systemId is None:
+                systemId = obj["localSystemId"]
             else:
-                systemName = obj["systemName"]
+                assert systemId == obj["localSystemId"], (
+                    "%s%s has localSystemId %s different from others: %s"
+                     % (("After rollback " if end else ""), s, obj["localSystemId"], systemId))
 
             self._guidDict[s] = obj["ecsGuid"]
-        self._oldSystemName = systemName
-        return (True,"")
+        if not end:
+            self._oldSystemId = systemId
+            self._idsUsed.add(systemId)
 
-    def _doSingleTest(self,s):
-        thisGUID = self._guidDict[s]
+    """def _newRandomName(self):
         while True: # ensure the name is unique
             newName = BasicGenerator.generateRandomString(20)
             if newName not in self._namesUsed:
                 self._namesUsed.add(newName)
-                break
-        self._changeSystemName(s, newName)
+                return newName"""
+
+    def _newSystemId(self):
+        while True:
+            newId = '{%s}' % uuid.uuid4()
+            if newId not in self._idsUsed:
+                self._idsUsed.add(newId)
+                return newId
+
+    def _ensureSystemIdsDiffer(self, serverId, newSysId):
+        for s in self._serverList:
+            anser = self._doGet(s, 'testConnection')
+            try:
+                data = json.loads(anser)
+            except ValueError as err:
+                assert False, "%s returned wrong answer on ec2/testConnection request: '%s'" % (s, anser)
+            if data['ecsGuid'] == serverId:
+                assert data['localSystemId'] == newSysId, (
+                    "%s reported localSystemId %s different from assigned in test (%s)" %
+                    (s, data['localSystemId'], newSysId)
+                )
+            else:
+                assert data['localSystemId'] != newSysId, (
+                    "%s reported localSystemId %s which was assigned to different server" %
+                    (s, data['localSystemId'])
+                )
+
+    def _doSingleTest(self, s):
+        thisGUID = self._guidDict[s]
+        newId = self._newSystemId()
+        self._changeSystemId(s, newId)
+        self._idsChanged = True
         # wait for the time to sync
         time.sleep(self._syncTime)
         # issue a getMediaServerEx request to test whether all the servers in
         # the list has the expected offline/online status
         ret = self._doGet(s, "getMediaServersEx")
-        if ret is None:
-            return (False,"doGet failed on server %s with getMediaServersEx" % (s))
-        obj = SafeJsonLoads(ret, s, "getMediaServersEx")
-        if obj is None:
-            return (False, "The server %s sends wrong response to getMediaServersEx" % (s,))
+        try:
+            obj = json.loads(ret)
+        except ValueError as err:
+            assert False, "The server %s sends wrong response to getMediaServersEx: %s" % (s, ret)
         # After changing system name the server shouldn't forget of the another, but should think
         # the another server is offline (since they aren't in the same system).
         for ele in obj:
+            #pprint.pprint(obj)
             if ele["id"] == thisGUID:
-                if ele["status"] == "Offline":
-                    return (False,"The server %s with GUID %s should be Online" % (s,thisGUID))
-                if ele["systemName"] != newName:
-                    return (False,"The server %s with GUID %s hasn't changed its systemName!" % (s,thisGUID))
+                assert ele["status"] == "Online", (
+                    "The server %s with GUID %s should be Online" % (s,thisGUID))
+                #if ele["systemName"] != newName:
+                #    return (False,"The server %s with GUID %s hasn't changed its systemName!" % (s,thisGUID))
             else:
-                if ele["status"] == "Online":
-                    return (False,"The server with IP %s and GUID %s should be Offline when login on Server: %s" %
-                            (ele["networkAddresses"],ele["id"],s))
-                if ele["systemName"] == newName:
-                    return (False,"The server with IP %s and GUID %s shouldn't change it's systemName with %s!" %
-                            (ele["networkAddresses"],ele["id"],s))
-        return (True,"")
+                assert ele["status"] == "Offline", (
+                    "The server %s with GUID %s should be Offline when checked on Server: %s" %
+                    (ele["networkAddresses"], ele["id"], s))
+                #if ele["systemName"] == newName:
+                #    return (False,"The server with IP %s and GUID %s shouldn't change it's systemName with %s!" %
+                #            (ele["networkAddresses"],ele["id"],s))
+        self._ensureSystemIdsDiffer(thisGUID, newId)
 
     def _doTest(self):
         for s in self._serverList:
-            ret, reason = self._doSingleTest(s)
-            if not ret:
-                return (ret,reason)
-        return (True,"")
+            self._doSingleTest(s)
 
     def _doRollback(self):
-        print "Rolling back system names"
+        print "Rolling back system ids"
         for s in self._serverList:
-            self._changeSystemName(s,self._oldSystemName)
+            self._changeSystemId(s, self._oldSystemId)
+        self._idsChanged = False
 
     def run(self):
         print "========================================="
-        print "SystemName Test Start"
-        ret,reason = self._ensureServerSystemName()
+        print "LocalSystemId Test Start"
+        self._ensureServerSystemId()
+        ok = False
 
-        if ret:
-            print "-----------------------------------------"
-            print "Start to test SystemName for server lists"
-            try:
-                ret,reason = self._doTest()
-                if not ret:
-                    print "FAIL: %s" % reason
-            except Exception:
-                print "FAIL: exception occured: %s" % traceback.format_exc()
-                ret = False
-
-            print "SystemName test finished"
+        print "-----------------------------------------"
+        try:
+            self._doTest()
             self._doRollback()
-        else:
-            print "FAIL: %s" % reason
-
-        print "========================================="
-        return ret
+            self._ensureServerSystemId(end=True)
+            ok = True
+        except AssertionError:
+            raise
+        except Exception:
+            print "FAIL: exception occured: %s" % traceback.format_exc()
+            ret = False
+        finally:
+            if ok:
+                print "LocalSystemId test finished"
+            if self._idsChanged:
+                self._doRollback()
+            print "========================================="

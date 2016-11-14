@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>447</width>
-    <height>251</height>
+    <height>266</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout_5" stretch="10000,1,100">
    <property name="spacing">
     <number>16</number>
    </property>
@@ -58,16 +58,10 @@
       </property>
       <item row="0" column="0" colspan="4">
        <widget class="QnTreeView" name="gridLicenses">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>16777215</width>
-          <height>500</height>
+          <width>400</width>
+          <height>100</height>
          </size>
         </property>
         <property name="frameShape">

@@ -110,21 +110,10 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
             }
         });
 
-    auto stackedWidgetCurrentChanged = [this](int index)
-    {
-        auto stackedWidget = static_cast<QStackedWidget*>(sender());
-        for (int i = 0; i < stackedWidget->count(); ++i)
-        {
-            auto policy = i == index ? QSizePolicy::Maximum : QSizePolicy::Ignored;
-            stackedWidget->widget(i)->setSizePolicy(QSizePolicy::Expanding, policy);
-            stackedWidget->widget(i)->adjustSize();
-        }
-
-        stackedWidget->adjustSize();
-    };
-
-    connect(ui->mainStackedWidget,      &QStackedWidget::currentChanged, this, stackedWidgetCurrentChanged);
-    connect(ui->secondaryStackedWidget, &QStackedWidget::currentChanged, this, stackedWidgetCurrentChanged);
+    autoResizePagesToContents(ui->mainStackedWidget,
+        { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
+    autoResizePagesToContents(ui->secondaryStackedWidget,
+        { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
 
     setupInputFields();
 

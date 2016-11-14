@@ -13,4 +13,12 @@ class QnTextEditLabel : public QTextEdit
 
 public:
     QnTextEditLabel(QWidget* parent = nullptr);
+
+    virtual QSize sizeHint() const override;
+    virtual QSize minimumSizeHint() const override;
+
+    bool isAutoWrapped() const;
+
+private:
+    QSize m_documentSize;
 };

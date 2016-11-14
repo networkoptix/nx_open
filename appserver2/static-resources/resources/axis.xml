@@ -215,5 +215,12 @@
         <resource name = "AXISQ8632" public = "AXISM1124"/>    
         <resource name = "AXISQ8631" public = "AXISM1124"/>        
         <resource name = "AXISP12/M20" public = "AXISP1224"/>
+        <resource name = "AXISC3003E" public = "AXIS_COMMON">
+            <params>
+                <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "forcedAudioStream" default_value ="1"/>
+            </params>
+        </resource>
+        <resource name = "AXISA8004VE" public = "AXIS_COMMON"/>
     </oem>
 </resources>

@@ -1,14 +1,10 @@
-/**********************************************************
-* June 7, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/cpp14.h>
-
+#include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace network {
@@ -32,7 +28,7 @@ void onBytesRead(
     ctx->readPromise.set_value();
 }
 
-}
+} // namespace
 
 TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
 {
@@ -77,6 +73,69 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     }
 }
 
-}   //namespace test
-}   //namespace network
-}   //namespace nx
+TEST(UdpSocket, DISABLED_Performance)
+{
+    const uint64_t kBufferSize = 1500;
+    const uint64_t kTransferSize = uint64_t(10) * 1024 * 1024 * 1024;
+
+    UDPSocket server(AF_INET);
+    server.bind(SocketAddress::anyPrivateAddress);
+    const auto address = server.getLocalAddress();
+    NX_LOG(lm("%1").str(address), cl_logINFO);
+    std::thread serverThread(
+        [&]()
+        {
+            const auto startTime = std::chrono::steady_clock::now();
+            Buffer buffer((int) kBufferSize, Qt::Uninitialized);
+
+            int recv = 0;
+            uint64_t transferSize = 0;
+            uint64_t transferCount = 0;
+            while (transferSize < kTransferSize)
+            {
+                recv = server.recv(buffer.data(), buffer.size(), 0);
+                if (recv <= 0)
+                    break;
+
+                transferSize += (uint64_t) recv;
+                transferCount += 1;
+            }
+
+            const auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - startTime);
+
+            NX_LOG(lm("Resieve ended (%1): %2")
+                .strs(recv, SystemError::getLastOSErrorText()), cl_logINFO);
+
+            const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
+            NX_LOG(lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
+                .strs(nx::utils::bytesToString(transferSize), transferCount,
+                    nx::utils::bytesToString(transferSize / transferCount),
+                    durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
+        });
+
+    std::thread clientThread(
+        [&]()
+        {
+            UDPSocket client(AF_INET);
+            client.setDestAddr(address);
+            Buffer buffer((int) kBufferSize, 'X');
+            int send = 0;
+            uint64_t transferSize = 0;
+            while (transferSize < kTransferSize + kTransferSize / 10)
+            {
+                send = client.send(buffer.data(), buffer.size());
+                if (send <= 0)
+                    break;
+
+                transferSize += (uint64_t) send;
+            }
+        });
+
+    serverThread.join();
+    clientThread.join();
+}
+
+} // namespace test
+} // namespace network
+} // namespace nx

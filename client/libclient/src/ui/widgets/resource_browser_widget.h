@@ -72,6 +72,9 @@ protected:
     virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
 
 private:
+    void forceLayoutUpdate();
+
+private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
     QnTextEditLabel* m_textLabel;

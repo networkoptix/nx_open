@@ -424,7 +424,7 @@ APPLY(401, saveMediaServer, ApiMediaServerData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       [](const Qn::UserAccessData& accessData, const ApiMediaServerData&) { return accessData == Qn::kSystemAccess; }, /* save permission checker */ \
+                       AdminOnlyAccess(), \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

@@ -8,13 +8,13 @@
 		<fileSet>
 			<directory>${libdir}/bin/${build.configuration}</directory>
 			<outputDirectory>../</outputDirectory>
-			<includes>             
+			<includes>
 				<include>**/cloud_connect_test_util.pdb</include>
 				<include>**/cloud_db.pdb</include>
 				<include>**/connection_mediator.pdb</include>
 				<include>**/media_db_util.pdb</include>
-				<include>**/vms_gateway.pdb</include>  
-			</includes>           
+				<include>**/vms_gateway.pdb</include>
+			</includes>
 		</fileSet>			
 	</fileSets>
 </assembly>

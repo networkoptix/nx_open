@@ -45,7 +45,7 @@ static const int kCloseTimelineTimeoutMs = 250;
 static const int kMinThumbnailsHeight = 48;
 static const int kMaxThumbnailsHeight = 196;
 
-static const int kResizerHeight = 16;
+static const int kResizerHeight = 8;
 
 static const int kShowWidgetHeight = 50;
 static const int kShowWidgetHiddenHeight = 12;
@@ -523,7 +523,6 @@ void TimelineWorkbenchPanel::updateResizerGeometry()
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topLeft()),
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topRight()));
 
-    resizerGeometry.moveTo(resizerGeometry.topLeft() - QPointF(0, kResizerHeight / 2));
     resizerGeometry.setHeight(kResizerHeight);
 
     if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))

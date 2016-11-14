@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Fragment Id='FragmentVC12Redist'>
+        <?include BuildVars.wxi ?>
+
+        <util:ProductSearch Id="VCREDIST_120_x86"
+            UpgradeCode="4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7"
+            Result="version"
+            Variable="VCREDIST_120_x86" />
+
+        <util:ProductSearch Id="VCREDIST_120_x64"
+            UpgradeCode="EFA6AFA1-738E-3E00-8101-FD03B86B29D1"
+            Result="version"
+            Variable="VCREDIST_120_x64" />
+
+        <PackageGroup Id="VC12RedistPackageGroup">
+            <ExePackage
+                Cache="no"
+                Compressed="yes"
+                PerMachine="yes"
+                Permanent="yes"
+                Vital="yes"
+                DetectCondition="VCREDIST_120_$(var.arch) &gt;= v11.0.61030"
+                Name="Redist\vcredist12_$(var.arch).exe"
+                SourceFile="$(var.VC12RedistPath)\vcredist_$(var.arch).exe"
+                InstallCommand="/install /quiet /norestart">
+
+                <!-- -->
+                <ExitCode Value="3010" Behavior="forceReboot"/>
+
+                <!-- Ignore "Newer version installed" error -->
+                <ExitCode Value="1638" Behavior="success"/>
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

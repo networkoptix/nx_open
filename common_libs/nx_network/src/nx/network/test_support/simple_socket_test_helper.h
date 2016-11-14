@@ -21,14 +21,14 @@ namespace nx {
 namespace network {
 namespace test {
 
-namespace /* anonimous */ {
+namespace {
 
-const SocketAddress kAnyPrivateAddress("127.0.0.1:0");
 const QByteArray kTestMessage("Ping");
 const int kClientCount(10);
-const std::chrono::milliseconds kTestTimeout(3000);
+const std::chrono::milliseconds kTestTimeout(5000);
+std::string lastError() { return SystemError::getLastOSErrorText().toStdString(); }
 
-}
+} // namespace
 
 template<typename SocketType>
 QByteArray readNBytes(SocketType* clientSocket, int count)
@@ -54,16 +54,15 @@ QByteArray readNBytes(SocketType* clientSocket, int count)
 
 template<typename ServerSocketType>
 void syncSocketServerMainFunc(
-    const SocketAddress& endpointToBindTo,
+    const SocketAddress& endpointToBind,
     Buffer testMessage,
     int clientCount,
     ServerSocketType server,
     nx::utils::promise<SocketAddress>* startedPromise,
     bool ignoreReadWriteError = false)
 {
-    const auto lastError = [](){ return SystemError::getLastOSErrorText().toStdString(); };
     ASSERT_TRUE(server->setReuseAddrFlag(true)) << lastError();
-    ASSERT_TRUE(server->bind(endpointToBindTo)) << lastError();
+    ASSERT_TRUE(server->bind(endpointToBind)) << lastError();
     ASSERT_TRUE(server->listen(clientCount)) << lastError();
     if (startedPromise)
     {
@@ -77,7 +76,7 @@ void syncSocketServerMainFunc(
         startedPromise->set_value(std::move(serverAddress));
     }
 
-    ASSERT_TRUE(server->setRecvTimeout(60 * 1000)) << lastError();
+    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 20)) << lastError();
     for (int i = clientCount; i > 0; --i)
     {
         std::unique_ptr<AbstractStreamSocket> client(server->accept());
@@ -124,8 +123,7 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& endpointToBindTo = kAnyPrivateAddress,
-    SocketAddress endpointToConnectTo = kAnyPrivateAddress,
+    boost::optional<SocketAddress> enpointToConnect = boost::none,
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
@@ -134,7 +132,7 @@ void socketSimpleSync(
     nx::utils::promise<SocketAddress> promise;
     nx::utils::thread serverThread(
         &syncSocketServerMainFunc<decltype(server)>,
-        endpointToBindTo,
+        SocketAddress::anyPrivateAddress,
         testMessage,
         clientCount,
         std::move(server),
@@ -143,33 +141,29 @@ void socketSimpleSync(
 
     auto serverAddress = promise.get_future().get();
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    if (endpointToConnectTo == kAnyPrivateAddress)
-        endpointToConnectTo = std::move(serverAddress);
+    if (!enpointToConnect)
+        enpointToConnect = std::move(serverAddress);
 
     nx::utils::thread clientThread(
-        [endpointToConnectTo, &testMessage, clientCount, &clientMaker]()
+        [enpointToConnect, &testMessage, clientCount, &clientMaker]()
         {
             for (size_t i = 0; i != clientCount; ++i)
             {
                 auto client = clientMaker();
-                EXPECT_TRUE(client->connect(
-                    endpointToConnectTo, kTestTimeout.count())) << i << ": "
-                        << SystemError::getLastOSErrorText().toStdString();
+                EXPECT_TRUE(client->connect(*enpointToConnect, kTestTimeout.count()))
+                    << i << ": " << lastError();
 
                 ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
                 ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
 
                 EXPECT_EQ(
                     testMessage.size(),
-                    client->send(testMessage.constData(), testMessage.size()))
-                        << SystemError::getLastOSErrorText().toStdString();
+                    client->send(testMessage.constData(), testMessage.size())) << lastError();
 
                 const auto incomingMessage = readNBytes(
                     client.get(), testMessage.size());
 
-                ASSERT_TRUE(!incomingMessage.isEmpty()) << i << ": "
-                    << SystemError::getLastOSErrorText().toStdString();
-
+                ASSERT_TRUE(!incomingMessage.isEmpty()) << i << ": " << lastError();
                 ASSERT_EQ(testMessage, incomingMessage);
                 client.reset();
             }
@@ -190,16 +184,15 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSyncFlags(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& endpointToBindTo = kAnyPrivateAddress,
-    SocketAddress endpointToConnectTo = kAnyPrivateAddress,
+    boost::optional<SocketAddress> enpointToConnect = boost::none,
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
     auto server = serverMaker();
-    ASSERT_TRUE(server->bind(endpointToBindTo)) << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
-    if (endpointToConnectTo == kAnyPrivateAddress)
-        endpointToConnectTo = server->getLocalAddress();
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))<< lastError();
+    ASSERT_TRUE(server->listen(clientCount)) << lastError();
+    if (!enpointToConnect)
+        enpointToConnect = server->getLocalAddress();
 
     Buffer buffer(kTestMessage.size() * 2, Qt::Uninitialized);
     for (size_t i = 0; i != clientCount; ++i)
@@ -214,9 +207,9 @@ void socketSimpleSyncFlags(
             });
 
         auto client = clientMaker();
-        ASSERT_TRUE(client->connect(endpointToConnectTo, kTestTimeout.count()));
+        ASSERT_TRUE(client->connect(*enpointToConnect, kTestTimeout.count()));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size())
-            << SystemError::getLastOSErrorText().toStdString();
+            << lastError();
         acceptThread.join();
 
         // MSG_DONTWAIT does not block on server and client:
@@ -235,7 +228,7 @@ void socketSimpleSyncFlags(
                 if (ret == buffer.size())
                     EXPECT_EQ(buffer, (kTestMessage + kTestMessage).left(buffer.size()));
                 else
-                    EXPECT_EQ(ret, buffer.size()) << SystemError::getLastOSErrorText().toStdString();
+                    EXPECT_EQ(ret, buffer.size()) << lastError();
             };
 
         // Send 1st part of message and start ot recv:
@@ -262,8 +255,7 @@ template<typename ServerSocketMaker, typename ClientSocketMaker,
 void socketSimpleAsync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& endpointToBindTo,
-    SocketAddress endpointToConnectTo,
+    boost::optional<SocketAddress> enpointToConnect,
     const QByteArray& testMessage,
     int clientCount,
     StopSocketFunc stopSocket)
@@ -282,14 +274,14 @@ void socketSimpleAsync(
 
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(5000));
-    ASSERT_TRUE(server->bind(endpointToBindTo)) << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen(clientCount)) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-    if (endpointToConnectTo == kAnyPrivateAddress)
-        endpointToConnectTo = std::move(serverAddress);
+    if (!enpointToConnect)
+        enpointToConnect = std::move(serverAddress);
 
 #ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
     static const auto t0 = std::chrono::steady_clock::now();
@@ -318,8 +310,8 @@ void socketSimpleAsync(
 
         clients.emplace_back(socket);
         auto& client = clients.back();
-        ASSERT_TRUE(client->setSendTimeout(3000));
-        ASSERT_TRUE(client->setRecvTimeout(3000));
+        ASSERT_TRUE(client->setSendTimeout(kTestTimeout));
+        ASSERT_TRUE(client->setRecvTimeout(kTestTimeout));
         ASSERT_TRUE(client->setNonBlockingMode(true));
         client->readAsyncAtLeast(
             &serverBuffer, testMessage.size(),
@@ -394,8 +386,8 @@ void socketSimpleAsync(
             });
 
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
-        ASSERT_TRUE(testClient->setSendTimeout(3000));
-        ASSERT_TRUE(testClient->setRecvTimeout(3000));
+        ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
+        ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
@@ -408,7 +400,7 @@ void socketSimpleAsync(
                 << std::endl;
         }
 #endif
-        testClient->connectAsync(endpointToConnectTo, [&](SystemError::ErrorCode code)
+        testClient->connectAsync(*enpointToConnect, [&](SystemError::ErrorCode code)
         {
 #ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
             {
@@ -496,7 +488,7 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketMultiConnect(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    SocketAddress endpoint = kAnyPrivateAddress,
+    boost::optional<SocketAddress> enpointToConnect = boost::none,
     int clientCount = kClientCount)
 {
     static const std::chrono::milliseconds timeout(1500);
@@ -511,13 +503,13 @@ void socketMultiConnect(
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(endpoint)) << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen(clientCount)) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-    if (endpoint == kAnyPrivateAddress)
-        endpoint = std::move(serverAddress);
+    if (!enpointToConnect)
+        enpointToConnect = std::move(serverAddress);
 
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor = 
         [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
@@ -545,7 +537,7 @@ void socketMultiConnect(
 
             connectedSockets.push_back(std::move(testClient));
             connectedSockets.back()->connectAsync(
-                endpoint, 
+                *enpointToConnect,
                 [&, clientsToConnect, connectNewClients]
                     (SystemError::ErrorCode code)
                 {
@@ -596,9 +588,10 @@ void socketShutdown(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
     bool useAsyncPriorSync,
-    SocketAddress endpointToBindTo = kAnyPrivateAddress,
-    SocketAddress endpointToConnectTo = kAnyPrivateAddress)
+    boost::optional<SocketAddress> enpointToConnect = boost::none)
 {
+    SocketAddress endpointToBindTo = SocketAddress::anyPrivateAddress;
+
     // Taks amazingly long with UdtSocket
     const auto repeatCount = useAsyncPriorSync ? 5 : 14;
     for (int i = 0; i < repeatCount; ++i)
@@ -618,15 +611,15 @@ void socketShutdown(
 
         auto serverAddress = promise.get_future().get();
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        if (endpointToConnectTo == kAnyPrivateAddress)
-            endpointToConnectTo = std::move(serverAddress);
+        if (!enpointToConnect)
+            enpointToConnect = std::move(serverAddress);
 
         // TODO: #mux Figure out why it fails on UdtSocket when address changes
-        if (endpointToBindTo == kAnyPrivateAddress)
+        if (endpointToBindTo == SocketAddress::anyPrivateAddress)
             endpointToBindTo = std::move(serverAddress);
 
         auto client = clientMaker();
-        ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
+        ASSERT_TRUE(client->setRecvTimeout(2 * kTestTimeout.count()));
 
         nx::utils::promise<void> testReadyPromise;
         nx::utils::promise<void> recvExitedPromise;
@@ -638,7 +631,7 @@ void socketShutdown(
                     nx::utils::promise<void> asyncDone;
                     ASSERT_TRUE(client->setNonBlockingMode(true));
                     client->connectAsync(
-                        endpointToConnectTo,
+                        *enpointToConnect,
                         [&](SystemError::ErrorCode code)
                         {
                             ASSERT_EQ(code, SystemError::noError);
@@ -658,7 +651,7 @@ void socketShutdown(
                 }
                 else
                 {
-                    client->connect(endpointToConnectTo, kTestTimeout.count());
+                    client->connect(*enpointToConnect, kTestTimeout.count());
                 }
 
                 nx::Buffer readBuffer;
@@ -712,16 +705,14 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleAsync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& endpointToBindTo = kAnyPrivateAddress,
-    const SocketAddress& endpointToConnectTo = kAnyPrivateAddress,
+    boost::optional<SocketAddress> enpointToConnect = boost::none,
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
     socketSimpleAsync(
         serverMaker,
         clientMaker,
-        endpointToBindTo,
-        endpointToConnectTo,
+        enpointToConnect,
         testMessage,
         clientCount,
         pleaseStopSync);
@@ -731,13 +722,13 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleTrueAsync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& serverAddress = kAnyPrivateAddress,
+    boost::optional<SocketAddress> enpointToConnect = boost::none,
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
     nx::utils::TestSyncQueue<bool> stopQueue;
     socketSimpleAsync<ServerSocketMaker, ClientSocketMaker>(
-        serverMaker, clientMaker, serverAddress, serverAddress, testMessage, clientCount,
+        serverMaker, clientMaker, enpointToConnect, testMessage, clientCount,
         [&](std::unique_ptr<QnStoppableAsync> socket)
         {
             QnStoppableAsync::pleaseStop([&](){ stopQueue.push(true); },
@@ -754,18 +745,18 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleAcceptMixed(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    SocketAddress endpoint = kAnyPrivateAddress)
+    boost::optional<SocketAddress> enpointToConnect = boost::none)
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->bind(endpoint));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(server->listen(kClientCount));
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-    if (endpoint == kAnyPrivateAddress)
-        endpoint = std::move(serverAddress);
+    if (!enpointToConnect)
+        enpointToConnect = std::move(serverAddress);
 
     // no clients yet
     {
@@ -776,11 +767,11 @@ void socketSimpleAcceptMixed(
     }
 
     auto client = clientMaker();
-    ASSERT_TRUE(client->setSendTimeout(1000));
+    ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->setNonBlockingMode(true));
     nx::utils::promise<SystemError::ErrorCode> connectionEstablishedPromise;
     client->connectAsync(
-        endpoint,
+        *enpointToConnect,
         [&connectionEstablishedPromise](SystemError::ErrorCode code)
         {
             connectionEstablishedPromise.set_value(code);
@@ -797,7 +788,7 @@ void socketSimpleAcceptMixed(
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
-    ASSERT_NE(accepted, nullptr) << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_NE(accepted, nullptr) << lastError();
 
     pleaseStopSync(std::move(client));
     pleaseStopSync(std::move(server));
@@ -903,13 +894,12 @@ void socketConnectCancel(
 template<typename ServerSocketMaker>
 void socketAcceptTimeoutSync(
     const ServerSocketMaker& serverMaker,
-    const SocketAddress& serverAddress = kAnyPrivateAddress,
     std::chrono::milliseconds timeout = kTestTimeout)
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(serverAddress));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(server->listen(5));
 
     const auto start = std::chrono::system_clock::now();
@@ -922,14 +912,13 @@ template<typename ServerSocketMaker>
 void socketAcceptTimeoutAsync(
     const ServerSocketMaker& serverMaker,
     bool deleteInIoThread,
-    const SocketAddress& serverAddress = kAnyPrivateAddress,
     std::chrono::milliseconds timeout = kTestTimeout)
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(serverAddress));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(server->listen(5));
 
     nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
@@ -950,13 +939,12 @@ void socketAcceptTimeoutAsync(
 
 template<typename ServerSocketMaker>
 void socketAcceptCancel(
-    const ServerSocketMaker& serverMaker, StopType stopType,
-    const SocketAddress& serverAddress = kAnyPrivateAddress)
+    const ServerSocketMaker& serverMaker, StopType stopType)
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->bind(serverAddress));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(server->listen(5));
 
     for (auto i = 0; i < kClientCount; ++i)
@@ -985,13 +973,13 @@ void socketAcceptCancel(
 
 typedef nx::network::test::StopType StopType;
 
-#define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+#define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, enpointToConnect) \
     Type(Name, SingleAioThread) \
         { nx::network::test::socketSingleAioThread(mkClient); } \
     Type(Name, Shutdown) \
-        { nx::network::test::socketShutdown(mkServer, mkClient, false); } \
+        { nx::network::test::socketShutdown(mkServer, mkClient, false, enpointToConnect); } \
     Type(Name, ShutdownAfterAsync) \
-        { nx::network::test::socketShutdown(mkServer, mkClient, true); } \
+        { nx::network::test::socketShutdown(mkServer, mkClient, true, enpointToConnect); } \
     Type(Name, ConnectToBadAddress) \
         { nx::network::test::socketConnectToBadAddress(mkClient, false); } \
     Type(Name, ConnectToBadAddressIoDelete) \
@@ -1001,9 +989,9 @@ typedef nx::network::test::StopType StopType;
     Type(Name, ConnectPleaseStop) \
         { nx::network::test::socketConnectCancel(mkClient, StopType::pleaseStop); } \
 
-#define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+#define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, enpointToConnect) \
     Type(Name, SimpleAcceptMixed) \
-        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient); } \
+        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient, enpointToConnect); } \
     Type(Name, AcceptTimeoutSync) \
         { nx::network::test::socketAcceptTimeoutSync(mkServer); } \
     Type(Name, AcceptTimeoutAsync) \
@@ -1015,30 +1003,38 @@ typedef nx::network::test::StopType StopType;
     Type(Name, AcceptPleaseStop) \
         { nx::network::test::socketAcceptCancel(mkServer, StopType::pleaseStop); } \
 
-#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
+#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, enpointToConnect) \
     Type(Name, SimpleSync) \
-        { nx::network::test::socketSimpleSync(mkServer, mkClient); } \
+        { nx::network::test::socketSimpleSync(mkServer, mkClient, enpointToConnect); } \
     Type(Name, SimpleSyncFlags) \
-        { nx::network::test::socketSimpleSyncFlags(mkServer, mkClient); } \
+        { nx::network::test::socketSimpleSyncFlags(mkServer, mkClient, enpointToConnect); } \
     Type(Name, SimpleAsync) \
-        { nx::network::test::socketSimpleAsync(mkServer, mkClient); } \
+        { nx::network::test::socketSimpleAsync(mkServer, mkClient, enpointToConnect); } \
     Type(Name, SimpleTrueAsync) \
-        { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient); } \
+        { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient, enpointToConnect); } \
     Type(Name, SimpleMultiConnect) \
-        { nx::network::test::socketMultiConnect(mkServer, mkClient); } \
+        { nx::network::test::socketMultiConnect(mkServer, mkClient, enpointToConnect); } \
 
-#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP
+#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none)
+
+#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE_EX(Type, Name, mkServer, mkClient, enpointToConnect) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, enpointToConnect)
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+
+#define NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(Type, Name, mkServer, mkClient, enpointToConnect) \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, enpointToConnect) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, enpointToConnect) \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
 
 #define NX_NETWORK_BOTH_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
 

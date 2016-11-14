@@ -34,6 +34,15 @@ QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(int priority,
     mergeSystem(priority, systemDescription);
 }
 
+bool QnSystemDescriptionAggregator::invalidSystem() const
+{
+    if (!m_systems.empty())
+        return false;
+
+    NX_ASSERT(true, "Invalid aggregator");
+    return true;
+}
+
 bool QnSystemDescriptionAggregator::isAggregator() const
 {
     return (m_systems.size() > 1);
@@ -62,8 +71,6 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         return;
 
     const int lastPriority = (m_systems.isEmpty() ? 0 : m_systems.firstKey());
-    const bool headSystemChanged = ((priority < lastPriority) || m_systems.empty());
-
     m_systems.insert(priority, system);
 
     /**
@@ -77,6 +84,10 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
 
     connect(system, &QnBaseSystemDescription::hasInternetChanged,
         this, &QnSystemDescriptionAggregator::hasInternetChanged);
+    connect(system, &QnBaseSystemDescription::safeModeStateChanged,
+        this, &QnSystemDescriptionAggregator::safeModeStateChanged);
+    connect(system, &QnBaseSystemDescription::newSystemStateChanged,
+        this, &QnSystemDescriptionAggregator::newSystemStateChanged);
 
     connect(system, &QnBaseSystemDescription::serverChanged,
         this, &QnSystemDescriptionAggregator::handleServerChanged);
@@ -87,15 +98,18 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnBaseSystemDescription::onlineStateChanged);
 
     updateServers();
-    if (headSystemChanged)
-        emitHeadChanged();
+    emitSystemChanged();
 }
 
-void QnSystemDescriptionAggregator::emitHeadChanged()
+void QnSystemDescriptionAggregator::emitSystemChanged()
 {
     emit isCloudSystemChanged();
     emit ownerChanged();
     emit systemNameChanged();
+    emit onlineStateChanged();
+    emit hasInternetChanged();
+    emit safeModeStateChanged();
+    emit newSystemStateChanged();
 }
 
 void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
@@ -140,89 +154,53 @@ void QnSystemDescriptionAggregator::removeSystem(int priority)
     const auto oldServers = servers();
     const auto system = m_systems.value(priority);
 
-    const bool headSystemChanged = (priority == m_systems.firstKey());
     disconnect(system.data(), nullptr, this, nullptr);
     m_systems.remove(priority);
 
     updateServers();
-    if (headSystemChanged && !m_systems.isEmpty())
-        emitHeadChanged();
+
+    if (!m_systems.isEmpty())
+        emitSystemChanged();
 }
 
 QString QnSystemDescriptionAggregator::id() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
-        return QString();
-
-    return m_systems.first()->id();
+    return (invalidSystem() ? QString() : m_systems.first()->id());
 }
 
 QnUuid QnSystemDescriptionAggregator::localId() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
-        return QnUuid();
-
-    return m_systems.first()->localId();
+    return (invalidSystem() ? QnUuid() : m_systems.first()->localId());
 }
 
 QString QnSystemDescriptionAggregator::name() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
-        return QString();
-
-    return m_systems.first()->name();
+    return (invalidSystem() ? QString() : m_systems.first()->name());
 }
 
 bool QnSystemDescriptionAggregator::isCloudSystem() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
-        return false;
-
-    return m_systems.first()->isCloudSystem();
+    return (invalidSystem() ? false : m_systems.first()->isCloudSystem());
 }
 
 bool QnSystemDescriptionAggregator::isNewSystem() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
+    if (invalidSystem())
         return false;
 
-    for (const auto system : m_systems)
-    {
-        if (system->isNewSystem())
-            return true;
-    }
-    return false;
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system) { return system->isNewSystem(); });
 }
 
 
 QString QnSystemDescriptionAggregator::ownerAccountEmail() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
-        return QString();
-
-    return m_systems.first()->ownerAccountEmail();
+    return (invalidSystem() ? QString() : m_systems.first()->ownerAccountEmail());
 }
 
 QString QnSystemDescriptionAggregator::ownerFullName() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
-        return QString();
-
-    return m_systems.first()->ownerFullName();
+    return (invalidSystem() ? QString() : m_systems.first()->ownerFullName());
 }
 
 QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() const
@@ -232,9 +210,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
 
 bool QnSystemDescriptionAggregator::isOnlineServer(const QnUuid& serverId) const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
+    if (invalidSystem())
         return false;
 
     return std::any_of(m_systems.begin(), m_systems.end(),
@@ -246,20 +222,25 @@ bool QnSystemDescriptionAggregator::isOnlineServer(const QnUuid& serverId) const
 
 bool QnSystemDescriptionAggregator::hasInternet() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
+    if (invalidSystem())
         return false;
 
     return std::any_of(m_systems.begin(), m_systems.end(),
         [](const QnSystemDescriptionPtr& system) { return system->hasInternet(); });
 }
 
+bool QnSystemDescriptionAggregator::safeMode() const
+{
+    if (invalidSystem())
+        return false;
+
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system) { return system->safeMode(); });
+}
+
 bool QnSystemDescriptionAggregator::isOnline() const
 {
-    const bool emptySystems = m_systems.empty();
-    NX_ASSERT(!emptySystems, "Invalid aggregator");
-    if (emptySystems)
+    if (invalidSystem())
         return false;
 
     return std::any_of(m_systems.begin(), m_systems.end(),

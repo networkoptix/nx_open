@@ -1,17 +1,20 @@
 #include "workbench.h"
 
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/util.h>
-
 #include <core/resource_management/resource_pool.h>
+
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/style/globals.h>
 
-#include "workbench_layout.h"
-#include "workbench_grid_mapper.h"
-#include "workbench_item.h"
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_item.h>
+
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/util.h>
 
 namespace {
     QnWorkbenchItem *bestItemForRole(QnWorkbenchItem **itemByRole, Qn::ItemRole role) {
@@ -303,28 +306,37 @@ void QnWorkbench::updateCentralRoleItem() {
 void QnWorkbench::update(const QnWorkbenchState &state) {
     clear();
 
-    for(int i = 0; i < state.layoutUuids.size(); i++) {
-        QnLayoutResourcePtr resource = qnResPool->getResourceById<QnLayoutResource>(state.layoutUuids[i]);
-        if(!resource)
+    for (int i = 0; i < state.layoutUuids.size(); i++)
+    {
+        auto resource = qnResPool->getResourceById<QnLayoutResource>(state.layoutUuids[i]);
+        if (!resource)
             continue;
 
-        QnWorkbenchLayout *layout = new QnWorkbenchLayout(resource, this);
+        auto layout = new QnWorkbenchLayout(resource, this);
         addLayout(layout);
-        if(i == state.currentLayoutIndex)
+        if (resource->getId() == state.currentLayoutId)
             setCurrentLayout(layout);
     }
 
-    if(currentLayoutIndex() == -1 && !layouts().isEmpty())
+    if (currentLayoutIndex() == -1 && !layouts().isEmpty())
         setCurrentLayoutIndex(layouts().size() - 1);
 }
 
-void QnWorkbench::submit(QnWorkbenchState &state) {
-    state = QnWorkbenchState();
+void QnWorkbench::submit(QnWorkbenchState& state)
+{
+    auto currentResource = currentLayout()->resource();
+    if (currentResource && !currentResource->hasFlags(Qn::local))
+        state.currentLayoutId = currentResource->getId();
 
-    state.currentLayoutIndex = currentLayoutIndex();
-    foreach(QnWorkbenchLayout *layout, m_layouts)
-        if(layout->resource())
-            state.layoutUuids.push_back(layout->resource()->getId());
+    for (auto layout: m_layouts)
+    {
+        auto resource = layout->resource();
+        if (!resource)
+            continue;
+        if (resource->hasFlags(Qn::local))
+            continue;
+        state.layoutUuids.push_back(resource->getId());
+    }
 }
 
 

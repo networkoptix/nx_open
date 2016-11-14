@@ -711,13 +711,6 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnResetVideoWallLayoutActionCondition: public QnActionCondition
-{
-public:
-    QnResetVideoWallLayoutActionCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnDetachFromVideoWallActionCondition: public QnActionCondition
 {
 public:

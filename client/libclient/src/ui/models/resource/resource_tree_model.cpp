@@ -51,6 +51,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <core/resource/fake_media_server.h>
+#include <network/system_helpers.h>
 
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
@@ -118,9 +119,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
     if (scope != CamerasScope)
     {
-        m_userNodes.reset(new QnResourceTreeModelUserNodes());
-        m_userNodes->setModel(this);
-        m_userNodes->setRootNode(m_rootNodes[Qn::UsersNode]);
+        auto userNodes = new QnResourceTreeModelUserNodes(this);
+        userNodes->setModel(this);
+        userNodes->setRootNode(m_rootNodes[Qn::UsersNode]);
     }
 
     /* Connect to context. */
@@ -131,7 +132,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
     connect(context(), &QnWorkbenchContext::userChanged, this,
-        &QnResourceTreeModel::rebuildTree, Qt::QueuedConnection);
+        &QnResourceTreeModel::rebuildTree);
     connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
         &QnResourceTreeModel::at_systemNameChanged);
     connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged, this,
@@ -144,9 +145,6 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             Q_UNUSED(value);
             m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
         });
-
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        &QnResourceTreeModel::rebuildTree);
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnResourceTreeModel::handlePermissionsChanged);
@@ -447,8 +445,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return bastardNode;
 
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
-        auto systemId = server->getModuleInformation().localSystemId;
-        if (systemId == qnGlobalSettings->localSystemId())
+        if (helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
             return m_rootNodes[Qn::ServersNode];
 
         return ensureSystemNode(server->getModuleInformation().systemName);
@@ -1005,9 +1002,6 @@ void QnResourceTreeModel::rebuildTree()
         updateNodeParent(node);
         node->update();
     }
-
-    if (m_userNodes)
-        m_userNodes->rebuild();
 }
 
 void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)

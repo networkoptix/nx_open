@@ -3,38 +3,47 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "plugins/resource/avi/avi_resource.h"
-
-#include <utils/common/warnings.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 QnWorkbenchLayoutWatcher::QnWorkbenchLayoutWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded);
+
+    for (const auto& resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
 
-QnWorkbenchLayoutWatcher::~QnWorkbenchLayoutWatcher() {
+QnWorkbenchLayoutWatcher::~QnWorkbenchLayoutWatcher()
+{
 }
 
 void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
 {
-    QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-    if(!layout)
+    /* Quick check. */
+    if (!resource->hasFlags(Qn::layout))
         return;
 
-    for (QnLayoutItemData data: layout->getItems())
+    QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+    NX_ASSERT(layout);
+    if (!layout)
+        return;
+
+    for (QnLayoutItemData data : layout->getItems())
     {
         QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
 
         if (!resource && !data.resource.uniqueId.isEmpty())
         {
+            if (QDir::isAbsolutePath(data.resource.uniqueId))
+            {
                 /* Try to load local resource. */
-            resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
-            qnResPool->addResource(resource);
+                resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
+                qnResPool->addResource(resource);
+            }
         }
 
         if (resource)
@@ -45,7 +54,6 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
         }
         else
         {
-            qnWarning("Invalid item with empty id and invalid path in layout '%1', item path %2.", layout->getName(), data.resource.uniqueId);
             layout->removeItem(data.uuid);
         }
     }
