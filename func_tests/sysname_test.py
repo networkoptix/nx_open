@@ -40,12 +40,6 @@ class SystemIdTest(object):
         except Exception as err:
             assert False, "Failed request %s: exception: %s, %s" % (url,) + sys.exc_info()[0:2]
 
-    """def _changeSystemName(self,addr,name):
-        url = "http://%s/api/configure?%s" % (addr,urllib.urlencode({"systemName":name}))
-        print "Request:", url
-        response = urllib2.urlopen(url)
-        return response.getcode() == 200"""
-
     def _changeSystemId(self, addr, _id):
         url = "http://%s/api/configure?%s" % (addr,urllib.urlencode({"localSystemId": _id}))
         print "Request:", url
@@ -71,13 +65,6 @@ class SystemIdTest(object):
         if not end:
             self._oldSystemId = systemId
             self._idsUsed.add(systemId)
-
-    """def _newRandomName(self):
-        while True: # ensure the name is unique
-            newName = BasicGenerator.generateRandomString(20)
-            if newName not in self._namesUsed:
-                self._namesUsed.add(newName)
-                return newName"""
 
     def _newSystemId(self):
         while True:

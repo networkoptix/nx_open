@@ -1464,7 +1464,7 @@ def DoTests(argv):
         ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
         #FIXME no result code returning!
 
-    if argc >= 1 and argv[0] == '--legacy':
+    elif argc >= 1 and argv[0] == '--legacy':
         LegacyTestsRun(argv[1] == '--only' if argc >= 2 else False, argv)
         #FIXME no result code returning!
 

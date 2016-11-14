@@ -106,7 +106,7 @@ class TimeSyncTest(FuncTestCase):
     def setUpClass(cls):
         if cls.testset == 'InetTimeSyncTests':
             if not check_inet_time():
-                raise unittest.SkipTest("Internet time servers aren't sccessible")
+                raise AssertionError("Internet time servers aren't accessible")
         super(TimeSyncTest, cls).setUpClass()
         if not cls._init_time:
             t = int(time.time())

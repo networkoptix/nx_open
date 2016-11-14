@@ -57,7 +57,8 @@ def _addResult(textList, resData, resType, name):
     ("\t%s: %d\n" % (resType.capitalize(), len(resData))) +
     ''.join(
 #        "%s.%s (%s)\n" % (type(res[0]).__name__, res[0]._testMethodName, res[0]._testMethodDoc)
-        "\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
+        #"\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
+        "\t\t%s\n" % (res[0],)
         for res in resData
     ))
             #trace = res[1].split('\n')
@@ -1047,7 +1048,7 @@ class FuncTestMaster(object):
 
     def initial_tests(self):
         # ensure all the server are on the same page
-        try:  # FIXME: all methods should raise exceptions and they must be cought outside!
+        try:
             self._ensureServerListStates(self.clusterTestSleepTime)
         except Exception as err:
             traceback.print_exc(file=sys.stdout)
