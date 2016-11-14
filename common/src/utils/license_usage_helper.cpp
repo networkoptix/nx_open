@@ -440,12 +440,8 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
 
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>())
+    for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
     {
-        QnResourcePtr server = camera->getParentResource();
-        if (!server || server->getStatus() != Qn::Online)
-            continue;
-
         Qn::LicenseType lt = camera->licenseType();
         bool requiresLicense = camera->isLicenseUsed();
         if (requiresLicense)
