@@ -26,5 +26,5 @@ void QnResizerWidget::setEnabled(bool enabled)
 void QnResizerWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     QWidget* /*widget*/)
 {
-    painter->fillRect(option->rect, Qt::red);
+    painter->fillRect(option->rect, Qt::darkMagenta);
 }

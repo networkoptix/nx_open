@@ -90,6 +90,8 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     item->setZValue(ContentItemZOrder);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::updateControlsGeometry);
+    connect(item->timeSlider(), &QGraphicsWidget::geometryChanged, this,
+        &TimelineWorkbenchPanel::updateControlsGeometry);
 
     action(QnActions::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
     {
