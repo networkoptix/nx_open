@@ -46,10 +46,6 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis) override;
 
-    virtual bool connectToIp(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis) override;
-
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual SocketAddress getForeignAddress() const override;

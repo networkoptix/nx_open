@@ -161,14 +161,6 @@ bool CloudStreamSocket::connect(
     return true;
 }
 
-bool CloudStreamSocket::connectToIp(
-    const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
-{
-    NX_CRITICAL(remoteAddress.address.isIpAddress());
-    return connect(remoteAddress, timeoutMillis);
-}
-
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
