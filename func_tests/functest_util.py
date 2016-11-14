@@ -855,7 +855,6 @@ def generateMehodKey(method, user, digest, nonce):
     return urllib.quote(base64.urlsafe_b64encode("%s:%s:%s" % (user.lower(), nonce, authDigest)))
 
 def generateKey(method, user, password, nonce, realm):
-    print "GEN KEY:", method, user, password, nonce, realm
     m = hashlib.md5()
     m.update("%s:%s:%s" % (user.lower(), realm, password) )
     digest = m.hexdigest()
