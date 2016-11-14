@@ -46,25 +46,11 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     ApiResourceParamWithRefDataList resourceParams;
     dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
 
-    ErrorCode errorCode = processMultiUpdateSync(
+    return processMultiUpdateSync(
         ApiCommand::removeResourceParam,
         tran.transactionType,
         resourceParams,
         transactionsToSend);
-
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    for (const auto& param : resourceParams)
-    {
-        QnTransaction<ApiResourceParamWithRefData> removeParamTran = 
-            createTransaction(
-                ApiCommand::Value::removeResourceParam,
-                param);
-        triggerNotification(connection, removeParamTran);
-    }
-
-    return errorCode;
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
