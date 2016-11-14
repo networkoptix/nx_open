@@ -368,7 +368,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
 {
     api::ConnectRequest connectRequest;
 
-    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().getOrCreateSelfPeerId();
+    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().selfPeerId();
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();
