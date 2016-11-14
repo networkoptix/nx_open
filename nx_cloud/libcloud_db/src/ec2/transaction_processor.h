@@ -10,9 +10,9 @@
 #include <transaction/transaction.h>
 #include <utils/db/async_sql_query_executor.h>
 
+#include "serialization/transaction_deserializer.h"
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
-
 
 namespace ec2 {
 class QnAbstractTransaction;
@@ -37,7 +37,7 @@ public:
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction transaction,
-        QnUbjsonReader<QByteArray>* const stream,
+        std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) = 0;
     /**
      * Parse and process Json-serialized transaction.
@@ -45,7 +45,7 @@ public:
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction transaction,
-        const QJsonObject& serializedTransactionData,
+        QJsonObject serializedTransactionData,
         TransactionProcessedHandler completionHandler) = 0;
 };
 
@@ -54,64 +54,65 @@ public:
  * Specific transaction logic is implemented by specific manager.
  */
 template<int TransactionCommandValue, typename TransactionDataType>
-class BaseTransactionProcessor
-    :
+class BaseTransactionProcessor:
     public AbstractTransactionProcessor
 {
 public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
 
+    virtual ~BaseTransactionProcessor()
+    {
+        m_aioTimer.pleaseStopSync();
+    }
+
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction abstractTransaction,
-        QnUbjsonReader<QByteArray>* const stream,
+        ::ec2::QnAbstractTransaction transactionHeader,
+        std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) override
     {
-        auto transaction = Ec2Transaction(std::move(abstractTransaction));
-        if (!QnUbjson::deserialize(stream, &transaction.params))
+        auto transaction = Ec2Transaction(std::move(transactionHeader));
+        if (!TransactionDeserializer::deserialize(
+                &dataSource->stream,
+                &transaction.params,
+                transportHeader.transactionFormatVersion))
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG, 
-                lm("Failed to deserialize ubjson transaction %1 received from %2")
-                .arg(::ec2::ApiCommand::toString(transaction.command)).str(transportHeader),
-                cl_logWARNING);
-            m_aioTimer.post(
-                [completionHandler = std::move(completionHandler)]
-                {
-                    completionHandler(api::ResultCode::badRequest);
-                });
+            reportTransactionDeserializationFailure(
+                transportHeader, transaction.command, std::move(completionHandler));
             return;
         }
 
+        UbjsonSerializedTransaction<TransactionDataType> serializableTransaction(
+            std::move(transaction),
+            std::move(dataSource->serializedTransaction),
+            transportHeader.transactionFormatVersion);
+
         this->processTransaction(
             std::move(transportHeader),
-            std::move(transaction),
+            std::move(serializableTransaction),
             std::move(completionHandler));
     }
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction abstractTransaction,
-        const QJsonObject& serializedTransactionData,
+        ::ec2::QnAbstractTransaction transactionHeader,
+        QJsonObject serializedTransactionData,
         TransactionProcessedHandler completionHandler) override
     {
-        auto transaction = Ec2Transaction(std::move(abstractTransaction));
+        auto transaction = Ec2Transaction(std::move(transactionHeader));
         if (!QJson::deserialize(serializedTransactionData["params"], &transaction.params))
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG, 
-                lm("Failed to deserialize json transaction %1 received from %2")
-                .arg(::ec2::ApiCommand::toString(transaction.command)).str(transportHeader),
-                cl_logWARNING);
-            m_aioTimer.post(
-                [completionHandler = std::move(completionHandler)]
-                {
-                    completionHandler(api::ResultCode::badRequest);
-                });
+            reportTransactionDeserializationFailure(
+                transportHeader, transaction.command, std::move(completionHandler));
             return;
         }
 
+        SerializableTransaction<TransactionDataType> serializableTransaction(
+            std::move(transaction));
+
         this->processTransaction(
             std::move(transportHeader),
-            std::move(transaction),
+            std::move(serializableTransaction),
             std::move(completionHandler));
     }
 
@@ -120,18 +121,61 @@ protected:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        Ec2Transaction transaction,
+        SerializableTransaction<TransactionDataType> transaction,
         TransactionProcessedHandler handler) = 0;
-};
 
+private:
+    template<typename DeserializeTransactionDataFunc>
+    void processTransactionInternal(
+        DeserializeTransactionDataFunc deserializeTransactionDataFunc,
+        TransactionTransportHeader transportHeader,
+        ::ec2::QnAbstractTransaction transactionHeader,
+        TransactionProcessedHandler completionHandler)
+    {
+        auto transaction = Ec2Transaction(std::move(transactionHeader));
+        if (!deserializeTransactionDataFunc(&transaction.params))
+        {
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
+                lm("Failed to deserialize transaction %1 received from %2")
+                .arg(::ec2::ApiCommand::toString(transaction.command)).str(transportHeader),
+                cl_logWARNING);
+            m_aioTimer.post(
+                [completionHandler = std::move(completionHandler)]
+                {
+                    completionHandler(api::ResultCode::badRequest);
+                });
+            return;
+        }
+
+        this->processTransaction(
+            std::move(transportHeader),
+            std::move(transaction),
+            std::move(completionHandler));
+    }
+
+    void reportTransactionDeserializationFailure(
+        const TransactionTransportHeader& transportHeader,
+        ::ec2::ApiCommand::Value transactionType,
+        TransactionProcessedHandler completionHandler)
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Failed to deserialize transaction %1 received from %2")
+            .arg(::ec2::ApiCommand::toString(transactionType)).str(transportHeader),
+            cl_logWARNING);
+        m_aioTimer.post(
+            [completionHandler = std::move(completionHandler)]
+            {
+                completionHandler(api::ResultCode::badRequest);
+            });
+    }
+};
 
 /**
  * Processes special transactions.
  * Those are usually transactions that does not modify business data help in data synchronization.
-*/
+ */
 template<int TransactionCommandValue, typename TransactionDataType>
-class SpecialCommandProcessor
-:
+class SpecialCommandProcessor:
     public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
 {
     typedef BaseTransactionProcessor<TransactionCommandValue, TransactionDataType> BaseType;
@@ -154,14 +198,14 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        typename BaseType::Ec2Transaction transaction,
+        SerializableTransaction<TransactionDataType> transaction,
         TransactionProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;
         m_processorFunc(
             std::move(systemId),
             std::move(transportHeader),
-            std::move(transaction),
+            std::move(transaction.take()),
             std::move(handler));
     }
 };
@@ -171,16 +215,17 @@ private:
  * Specific transaction logic is implemented by specific manager
  */
 template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
-class TransactionProcessor
-:
+class TransactionProcessor:
     public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
 {
 public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
+
     typedef nx::utils::MoveOnlyFunc<
         nx::db::DBResult(
             nx::db::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
+
     typedef nx::utils::MoveOnlyFunc<
         void(nx::db::QueryContext*, nx::db::DBResult, AuxiliaryArgType)
     > OnTranProcessedFunc;
@@ -203,7 +248,7 @@ private:
     struct TransactionContext
     {
         TransactionTransportHeader transportHeader;
-        Ec2Transaction transaction;
+        SerializableTransaction<TransactionDataType> transaction;
     };
 
     TransactionLog* const m_transactionLog;
@@ -213,7 +258,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        Ec2Transaction transaction,
+        SerializableTransaction<TransactionDataType> transaction,
         TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;
@@ -252,8 +297,6 @@ private:
         TransactionContext transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
-        //DB transaction is created down the stack.
-
         auto dbResultCode =
             m_transactionLog->checkIfNeededAndSaveToLog(
                 queryContext,
@@ -261,11 +304,14 @@ private:
                 transactionContext.transaction,
                 transactionContext.transportHeader);
 
+        const auto transactionCommand = 
+            transactionContext.transaction.get().command;
+
         if (dbResultCode == nx::db::DBResult::cancelled)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
                 .str(transactionContext.transportHeader.endpoint),
                 cl_logDEBUG1);
@@ -275,7 +321,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
                 .str(transactionContext.transportHeader.endpoint)
                 .arg(queryContext->connection()->lastError().text()),
@@ -283,11 +329,10 @@ private:
             return dbResultCode;
         }
 
-        const auto transactionCommand = transactionContext.transaction.command;
         dbResultCode = m_processTranFunc(
             queryContext,
             transactionContext.transportHeader.systemId,
-            std::move(transactionContext.transaction),
+            std::move(transactionContext.transaction.take()),
             auxiliaryArg);
         if (dbResultCode != nx::db::DBResult::ok)
         {
