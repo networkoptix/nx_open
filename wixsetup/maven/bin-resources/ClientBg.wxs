@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <?include BuildVars.wxi ?>
+
+        <DirectoryRef Id="defaultBgDir">
+            <Component Id="Cafe.jpg" Guid="{0581d992-b6d6-4c52-ba8b-db50143cc6c1}">
+                <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.clientName)\Components"
+                     Name="Cafe.jpg"
+                     Value=""
+                     Type="string"/>
+                <File Id="Cafe.jpg" Source="$(var.ClientBgSourceDir)\Cafe.jpg" />
+            </Component>
+            <Component Id="School_2.jpg" Guid="{5abc8b25-48e0-442f-bd31-2b816791af09}">
+                <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.clientName)\Components"
+                     Name="School_2.jpg"
+                     Value=""
+                     Type="string"/>
+                <File Id="School_2.jpg" Source="$(var.ClientBgSourceDir)\School 2.jpg" />
+            </Component>
+            <Component Id="School.jpg" Guid="{4388aaed-f84b-442b-9b89-4b81808f6185}">
+                <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.clientName)\Components"
+                     Name="School.jpg"
+                     Value=""
+                     Type="string" />
+                <File Id="School.jpg" Source="$(var.ClientBgSourceDir)\School.jpg" />
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="ClientBgComponent">
+            <ComponentRef Id="Cafe.jpg" />
+            <ComponentRef Id="School_2.jpg" />
+            <ComponentRef Id="School.jpg" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>

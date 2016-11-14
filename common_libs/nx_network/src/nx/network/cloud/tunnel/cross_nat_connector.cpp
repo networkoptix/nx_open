@@ -9,7 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "outgoing_cross_nat_tunnel_watcher.h"
+#include "outgoing_tunnel_connection_watcher.h"
 #include "tcp/outgoing_reverse_tunnel_connection.h"
 #include "udp/connector.h"
 
@@ -271,7 +271,7 @@ void CrossNatConnector::onConnectorFinished(
     m_connectors.clear();   // Cancelling other connectors.
     if (connection)
     {
-        m_connection = std::make_unique<OutgoingCrossNatTunnelWatcher>(
+        m_connection = std::make_unique<OutgoingTunnelConnectionWatcher>(
             std::move(m_connectionParameters),
             std::move(connection));
         m_connection->bindToAioThread(getAioThread());

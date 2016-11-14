@@ -34,21 +34,7 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Aviso</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">Configuração [ProductName]</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Todos os campos são de preenchimento obrigatório</String>
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Configuração de Controlador Enterprise</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Especifique os parâmetros do Controlador Enterprise</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Porto</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Login</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Criar Password</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">Rede</String>    
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Porto da Proxy</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Confirmar Password</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Parâmetros Extra</String>   
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Permitir que o sistema optimize as definições das câmaras (Recomendado)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Enviar estatísticas anónimas de uso e de 'crash' para os programadores do software</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Reproduzir com ${display.product.name}</String>
@@ -64,21 +50,8 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Já está instalada uma versão mais actual do [ProductName].</String> 
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Password Inválida</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">A Password não deve estar vazia</String>     
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Aviso</String>     
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Completa</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Apenas Servidor</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Apenas Cliente</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Avançado</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Seleccione um tipo de instalação</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Tipo de Instalação</String>       
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">As Password deviam ser iguais e não vazias</String>    
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Carregue em 'seguinte' para usar a pasta padrão ou carregue em 'Alterar' para escolher uma pasta diferente.</String>
@@ -86,17 +59,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Seleccione a pasta do Media:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Login</String>    
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Host/Anfitrião</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Porto</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Login</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Password</String>  
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Confirmar Password</String>  
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Porto do Servidor</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Definições da ligação</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Configuração do Servidor</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Servidor</String>  
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Nome do Sistema</String>  
 
     <!-- MyExitDialog -->
 
@@ -106,29 +68,9 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Quero gravar localmente neste PC)</String>
     <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Gestão Base de Dados. Não deve ser instalado mais do que uma vez numa rede)</String>    
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Introduza a password de administrador</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Credenciais de administrador</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Credenciais de administrador</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Login</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Criar Password</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Confirmar Password</String>    
-    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">Nome do Sistema</String>    
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Erro configuração</String>    
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Aviso</String>    
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">As Passwords têm de ser iguais</String>    
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">As Portas especificadas são inválidas</String>    
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Aviso</String>    
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Não é possível configurar a mesma porta duas vezes. Verifique as configurações.</String>    
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">O Porto [BUSYPORT] está ocupado.</String>    
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Aviso</String>    
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">A porta especificada já está ocupada. Carregue em 'Seguinte' apenas se tem certeza do que está a fazer.</String>    
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Executar ${display.product.name} quando a instalação terminar.</String>
@@ -138,12 +80,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Seleccione pelo menos um componente</String>    
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Opções para desinstalar</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Manter a base de dados de ${display.product.name}</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Remover a base de dados de ${display.product.name}</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Actual</String>  
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Versão a manter:</String>   
     
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Detectada versão anterior</String>    

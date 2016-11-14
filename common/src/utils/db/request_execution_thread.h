@@ -1,23 +1,16 @@
 #pragma once
 
 #include <atomic>
-#include <memory>
 
-#include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
+#include <nx/utils/std/thread.h>
+
 #include <utils/common/long_runnable.h>
-#include <utils/common/threadqueue.h>
 
+#include "base_request_executor.h"
 #include "request_executor.h"
 
 namespace nx {
 namespace db {
-
-enum class ConnectionState
-{
-    initializing,
-    opened,
-    closed
-};
 
 /**
  * Connection can be closed by timeout or due to error. 
@@ -25,17 +18,20 @@ enum class ConnectionState
  */
 class DbRequestExecutionThread
 :
-    public QnLongRunnable
+    public BaseRequestExecutor
 {
 public:
-    typedef nx::utils::SyncQueueWithItemStayTimeout<
-        std::unique_ptr<AbstractExecutor>
-    > QueryExecutorQueue;
-
     DbRequestExecutionThread(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
     virtual ~DbRequestExecutionThread();
+
+    virtual void pleaseStop() override;
+    virtual void join() override;
+
+    virtual ConnectionState state() const override;
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void start() override;
 
     /**
      * Establishes connection to DB.
@@ -44,20 +40,19 @@ public:
      */
     bool open();
 
-    ConnectionState state() const;
-
-protected:
-    /** Implementation of QnLongRunnable::run. */
-    virtual void run() override;
-
 private:
-    ConnectionOptions m_connectionOptions;
     QSqlDatabase m_dbConnection;
-    QueryExecutorQueue* const m_queryExecutorQueue;
-    ConnectionState m_state;
+    std::atomic<ConnectionState> m_state;
+    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
+    nx::utils::thread m_queryExecutionThread;
+    std::atomic<bool> m_terminated;
+    int m_numberOfFailedRequestsInARow;
 
+    void queryExecutionThreadMain();
     bool tuneConnection();
     bool tuneMySqlConnection();
+    void processTask(std::unique_ptr<AbstractExecutor> task);
+    void closeConnection();
 
     static bool isDbErrorRecoverable(DBResult dbResult);
 };

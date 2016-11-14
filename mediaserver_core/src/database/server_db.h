@@ -54,8 +54,8 @@ public:
 
 
     QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
-    int addAuditRecord(const QnAuditRecord& data);
-    int updateAuditRecord(int internalId, const QnAuditRecord& data);
+    int auditRecordMaxId() const;
+    bool addAuditRecords(const std::map<int, QnAuditRecord>& records);
 
     /* Bookmarks API */
 

@@ -376,7 +376,7 @@
                 </function>
                 <function proprietary="true">
                     <name>execAction</name>
-                    <description>Execute an action. Action data should be in a internal
+                    <description>Execute an action. Action data should be in the internal
                         binary format. This method is going to be refactored in the next
                         version.</description>
                     <method>POST</method>
@@ -1478,15 +1478,6 @@
                     <result/>
                 </function>
                 <function>
-                    <name>iflist</name>
-                    <description>Returns detail information about server network interfaces</description>
-                    <method>GET</method>
-                    <params/>
-                    <result>
-                        <caption>JSON data.</caption>
-                    </result>
-                </function>
-                <function>
                     <name>aggregator</name>
                     <description>This function allows to execute several requests with json content type and returns result as a single JSON object</description>
                     <method>GET</method>
@@ -1645,6 +1636,132 @@ http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=Cre
                     <result>
                         <caption>JSON result with error code.</caption>
                     </result>
+                </function>
+                <function>
+                    <name>iflist</name>
+                    <description>Get network settings (list of interfaces) for the server.
+                        Can be called only if server flags include "SF_IfListCtrl"
+                        (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+                    </description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>List of objects with interface parameters.</caption>
+                        <params>
+                          <param>
+                            <name>name</name>
+                            <description>Interface name.</description>
+                          </param>
+                          <param>
+                            <name>ipAddr</name>
+                            <description>IP address with dot-separated decimal components.</description>
+                          </param>
+                          <param>
+                            <name>netMask</name>
+                            <description>Network mask with dot-separated decimal components.</description>
+                          </param>
+                          <param>
+                            <name>mac</name>
+                            <description>MAC address with colon-separated upper-case hex components.</description>
+                          </param>
+                          <param>
+                            <name>gateway</name>
+                            <description>IP address of the gateway with dot-separated decimal components. Can be empty.</description>
+                          </param>
+                          <param>
+                            <name>dhcp</name>
+                            <description></description>
+                            <values>
+                                <value>
+                                    <name>false</name>
+                                    <description>DHCP is not used, IP address and other parameters
+should be specified in the respective JSON fields.</description>
+                                </value>
+                                <value>
+                                    <name>true</name>
+                                    <description>IP address and other parameters assigned via DHCP,
+the respective JSON fields can be empty.</description>
+                                </value>
+                            </values>
+                          </param>
+                          <param>
+                            <name>extraParams</name>
+                            <description>JSON object with data in the internal format.</description>
+                          </param>
+                          <param>
+                            <name>dns_servers</name>
+                            <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
+                          </param>
+                        </params>
+                    </result>
+                </function>
+                <function>
+                    <name>ifconfig</name>
+                    <description>Set new network settings (list of interfaces) for the server.
+                        Can be called only if server flags include "SF_IfListCtrl"
+                        (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+<p>
+Parameters should be passed as a JSON array of objects in POST message body with
+content type "application/json". Example of such object can be seen in
+the result of /api/iflist GET function.
+</p>
+                    </description>
+                    <permissions>At least Admin.</permissions>
+                    <method>POST</method>
+                        <params>
+                          <param>
+                            <name>name</name>
+                            <description>Interface name.</description>
+                            <optional>false</optional>
+                          </param>
+                          <param>
+                            <name>ipAddr</name>
+                            <description>IP address with dot-separated decimal components.</description>
+                            <optional>false</optional>
+                          </param>
+                          <param>
+                            <name>netMask</name>
+                            <description>Network mask with dot-separated decimal components.</description>
+                            <optional>false</optional>
+                          </param>
+                          <param>
+                            <name>mac</name>
+                            <description>MAC address with colon-separated upper-case hex components.</description>
+                            <optional>false</optional>
+                          </param>
+                          <param>
+                            <name>gateway</name>
+                            <description>IP address of the gateway with dot-separated decimal components. Can be empty.</description>
+                            <optional>false</optional>
+                          </param>
+                          <param>
+                            <name>dhcp</name>
+                            <description></description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>false</name>
+                                    <description>DHCP is not used, IP address and other parameters
+should be specified in the respective JSON fields.</description>
+                                </value>
+                                <value>
+                                    <name>true</name>
+                                    <description>IP address and other parameters assigned via DHCP,
+the respective JSON fields can be empty.</description>
+                                </value>
+                            </values>
+                          </param>
+                          <param>
+                            <name>extraParams</name>
+                            <description>JSON object with data in the internal format.</description>
+                            <optional>false</optional>
+                          </param>
+                          <param>
+                            <name>dns_servers</name>
+                            <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
+                            <optional>false</optional>
+                          </param>
+                        </params>
                 </function>
             </functions>
         </group>

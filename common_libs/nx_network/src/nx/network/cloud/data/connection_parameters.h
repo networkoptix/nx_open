@@ -25,7 +25,7 @@ constexpr static const std::chrono::seconds
     kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
 /**
- * @note All fields are optional for backwartd compatibility.
+ * @note All fields are optional for backward compatibility.
  */
 class NX_NETWORK_API ConnectionParameters
 :

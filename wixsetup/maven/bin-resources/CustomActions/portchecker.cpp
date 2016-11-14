@@ -27,11 +27,6 @@ int PortChecker::fillBusyPorts()
     DWORD dwSize = 0;
     DWORD dwRetVal = 0;
 
-    char szLocalAddr[128];
-    char szRemoteAddr[128];
-
-    struct in_addr IpAddr;
-
     int i;
 
     pTcpTable = (MIB_TCPTABLE *) MALLOC(sizeof (MIB_TCPTABLE));
