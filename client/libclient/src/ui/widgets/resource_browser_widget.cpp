@@ -274,7 +274,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         &QnResourceBrowserWidget::updateIcons);
 
-    auto m_scrollbarSignalizer = new QnMultiEventSignalizer();
+    m_scrollbarSignalizer = new QnMultiEventSignalizer();
     m_scrollbarSignalizer->addEventType(QEvent::Show);
     m_scrollbarSignalizer->addEventType(QEvent::Hide);
     ui->resourceTreeWidget->treeView()->verticalScrollBar()->installEventFilter(m_scrollbarSignalizer);
