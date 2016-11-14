@@ -12,9 +12,10 @@ import pprint
 import uuid
 import json
 
-from functest_util import SafeJsonLoads
-from generator import BasicGenerator
+#from functest_util import SafeJsonLoads
+#from generator import BasicGenerator
 
+# It was SystemNameTest earlier ...
 class SystemIdTest(object):
     _oldSystemId = None
     _syncTime = 2
@@ -131,6 +132,7 @@ class SystemIdTest(object):
         print "Rolling back system ids"
         for s in self._serverList:
             self._changeSystemId(s, self._oldSystemId)
+        self._ensureServerSystemId(end=True)
         self._idsChanged = False
 
     def run(self):
@@ -143,7 +145,6 @@ class SystemIdTest(object):
         try:
             self._doTest()
             self._doRollback()
-            self._ensureServerSystemId(end=True)
             ok = True
         except AssertionError:
             raise

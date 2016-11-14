@@ -821,7 +821,7 @@ def real_caps(str):
 
 def textdiff(data0, data1, src0, src1):
     ud = difflib.unified_diff(data0.splitlines(True), data1.splitlines(True), src0, src1, n=5)
-    return ''.join(ud)
+    return ''.join(line if line.endswith('\n') else line+'\n' for line in ud)
 
 
 def sendRequest(lock, url, data, notify=False):

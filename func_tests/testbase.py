@@ -1046,18 +1046,28 @@ class FuncTestMaster(object):
     def init_rollback(self):
         self.unittestRollback = UnitTestRollback()
 
-    def initial_tests(self):
+    def checkServerListStates(self):
         # ensure all the server are on the same page
-        try:
-            self._ensureServerListStates(self.clusterTestSleepTime)
-        except Exception as err:
-            traceback.print_exc(file=sys.stdout)
-            assert False, str(err)
+        count = 5
+        while True:
+            try:
+                self._ensureServerListStates(self.clusterTestSleepTime)
+            except ServerCompareFailure as err:
+                count -= 1
+                if count > 0:
+                    print "DEBUG: initial_tests: %s (%s attempts left)" % (err, count)
+                else:
+                    raise
+#            except Exception as err:
+#                #traceback.print_exc(file=sys.stdout)
+#                assert False, str(err)
+            else:
+                break
 
+    def initial_tests(self):
+        self.checkServerListStates()
         self._fetchClusterTestServerNames()
-
         self._callAllGetters()
-
         # do the rollback here
         self.init_rollback()
 

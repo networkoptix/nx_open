@@ -1250,16 +1250,17 @@ class MainFunctests(FuncTestCase):
         self._skipIfBasicFailed()
         if testMaster.unittestRollback:
             testMaster.init_rollback()
-        MergeTest_Resource().test()
+        try:
+            MergeTest_Resource().test()
+        finally:
+            if testMaster.unittestRollback:
+                doCleanUp()
 
     def SysnameTest(self):
         self._checkSkipLegacy()
         self._skipIfBasicFailed()
-        try:
-            SystemIdTest(testMaster.getConfig()).run()
-        finally:
-            if testMaster.unittestRollback:
-                doCleanUp()
+        SystemIdTest(testMaster.getConfig()).run()
+        testMaster.checkServerListStates()
 
     def ProxyTest(self):
         ""
