@@ -1426,9 +1426,7 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         }
 
         template<typename U>
-        QnTransaction(
-            const QnTransaction<U>& /*otherTran*/,
-            typename std::enable_if<!std::is_same<U, T>::value>::type* = nullptr)
+        QnTransaction(const QnTransaction<U>& /*otherTran*/)
         {
             NX_ASSERT(0, "Constructing from transaction with another Params type is disallowed");
         }
