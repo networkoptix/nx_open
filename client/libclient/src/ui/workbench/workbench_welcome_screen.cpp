@@ -490,7 +490,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
                 qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
                 qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
 
-                qnCloudStatusWatcher->setCloudCredentials(cloudCredentials, true);
+                qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
                 connectToSystemInternal(QString(), serverUrl, cloudCredentials,
                     false, false, controlsGuard);
             }

@@ -347,7 +347,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             {
                 qnClientCoreSettings->setCloudLogin(cloudLogin);
                 qnClientCoreSettings->setCloudPassword(cloudPassword);
-                qnCloudStatusWatcher->setCloudCredentials(QnCredentials(cloudLogin, cloudPassword));
+                qnCloudStatusWatcher->setCredentials(QnCredentials(cloudLogin, cloudPassword));
             }
 
             if (guard && parentGuard)

@@ -236,7 +236,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         {
             case SystemUri::ClientCommand::LoginToCloud:
             {
-                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
+                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
                 break;
             }
             case SystemUri::ClientCommand::ConnectToSystem:
@@ -249,7 +249,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
                 systemUrl.setPassword(auth.password);
 
                 if (systemIsCloud)
-                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
 
                 const auto resourceModeAction = action(QnActions::ResourcesModeAction);
                 const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();

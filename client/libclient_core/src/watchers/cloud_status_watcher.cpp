@@ -159,7 +159,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         });
 
     //TODO: #GDM store temporary credentials
-    setCloudCredentials(QnCredentials(
+    setCredentials(QnCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -180,24 +180,6 @@ QnCredentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
     return d->credentials;
-}
-
-void QnCloudStatusWatcher::setCredentials(const QnCredentials& value)
-{
-    Q_D(QnCloudStatusWatcher);
-    if (d->credentials == value)
-        return;
-
-    bool isUserChanged = d->credentials.user != value.user;
-    bool isPasswordChanged = d->credentials.password != value.password;
-
-    d->credentials = value;
-    d->updateConnection();
-
-    if (isUserChanged)
-        emit loginChanged();
-    if (isPasswordChanged)
-        emit passwordChanged();
 }
 
 QString QnCloudStatusWatcher::cloudLogin() const
@@ -262,12 +244,12 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
         });
 }
 
-void QnCloudStatusWatcher::resetCloudCredentials()
+void QnCloudStatusWatcher::resetCredentials()
 {
-    setCloudCredentials(QnCredentials());
+    setCredentials(QnCredentials());
 }
 
-void QnCloudStatusWatcher::setCloudCredentials(const QnCredentials& credentials, bool initial)
+void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
@@ -277,11 +259,19 @@ void QnCloudStatusWatcher::setCloudCredentials(const QnCredentials& credentials,
     if (d->credentials == loweredCredentials)
         return;
 
+    const bool userChanged = (d->credentials.user != loweredCredentials.user);
+    const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
+
     d->credentials = loweredCredentials;
 
     d->updateConnection(initial);
-    emit loginChanged();
-    emit passwordChanged();
+
+    emit credentialsChanged();
+
+    if (userChanged)
+        emit this->loginChanged();
+    if (passwordChanged)
+        emit this->passwordChanged();
 }
 
 QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const

@@ -175,14 +175,14 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     showCredentialsError(false);
 
-    qnCloudStatusWatcher->resetCloudCredentials();
+    qnCloudStatusWatcher->resetCredentials();
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
 
-    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+    qnCloudStatusWatcher->setCredentials(QnCredentials(
         q->ui->loginInputField->text().trimmed(),
         q->ui->passwordInputField->text().trimmed()));
 }
