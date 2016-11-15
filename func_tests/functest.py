@@ -1267,92 +1267,9 @@ class MainFunctests(FuncTestCase):
         ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
 
 
-"""
-    def _LegacyTests(self):
-        ""
-        try:
-            config = testMaster.getConfig()
-            with LegacyTestWrapperOld(config):
-                if not testMaster.args.skiplegacy:
-
-                    print "Basic functional tests start"
-                    title = "basic functional tests"
-
-                    if the_test.result.wasSuccessful():
-                        print "Basic functional tests end"
-                        if testMaster.unittestRollback:
-                            doCleanUp(reinit=True)
-                        title = "merge test"
-                        MergeTestRun()
-                        title = "system name test"
-                        SystemNameTest(config).run()
-                    else:
-                        print "Basic functional test FAILED"
-                    if testMaster.unittestRollback:
-                        doCleanUp()
-                        need_rollback = False
-                    time.sleep(4)
-                title = "proxy test"
-                ServerProxyTest(*config.rtget('ServerList')[0:2]).run()
-        except Exception as err:
-            print "FAIL: %s failed with error: %s" % (title, err,)
-"""
-
-
 def RunByAutotest():
     """
     Used when this script is called by the autotesting script auto.py
-    """
-    """-------------------
-    testMaster.args.autorollback = True
-    #config = testMaster.getConfig()
-    need_rollback = True
-    title = "functests init"
-    try:
-        print "" # FIXME add startup message
-        ret, reason = testMaster.init(notest=True)
-        if not ret:
-            print "FAIL: can't initialize the cluster test object: %s" % (reason)
-            return False
-        config = testMaster.getConfig()
-        with LegacyTestWrapperOld(config):
-            title = "connection test"
-            if not testMaster.testConnection():
-                print "FAIL: connection test"
-                return False
-            if not testMaster.args.skiplegacy:
-                title = "initial cluster test"
-                ret, reason = testMaster.initial_tests()
-                if ret == False:
-                    print "FAIL: initial cluster test: %s" % (reason)
-                    return False
-                print "Basic functional tests start"
-                title = "basic functional tests"
-                the_test = unittest.main(module=legacy_main, exit=False, argv=[sys.argv[0]],
-                                         testRunner=unittest.TextTestRunner(
-                                             stream=sys.stdout,
-                                         ))
-                if the_test.result.wasSuccessful():
-                    print "Basic functional tests end"
-                    if testMaster.unittestRollback:
-                        doCleanUp(reinit=True)
-                    title = "merge test"
-                    MergeTestRun()
-                    title = "system name test"
-                    SystemNameTest(config).run()
-                else:
-                    print "Basic functional test FAILED"
-                if testMaster.unittestRollback:
-                    doCleanUp()
-                    need_rollback = False
-                time.sleep(4)
-            title = "proxy test"
-            ServerProxyTest(*config.rtget('ServerList')[0:2]).run()
-    except Exception as err:
-        print "FAIL: %s failed with error: %s" % (title, err,)
-    finally:
-        if need_rollback and testMaster.unittestRollback:
-            doCleanUp()
     """
     CallTest(MainFunctests)
     if not testMaster.args.mainonly:
@@ -1381,16 +1298,16 @@ SimpleTestKeys = {
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
 BoxTestKeys = OrderedDict([
+    ('--mainonly', MainFunctests),
     ('--timesync', TimeSyncTest),
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
     ('--bstorage', BackupStorageTest),
     ('--msarch', MultiserverArchiveTest),
-    ('--natcon', NatConnectionTest),
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
     ('--dbup', DBTest),
-    ('--mainonly', MainFunctests),
+    ('--natcon', NatConnectionTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
