@@ -360,8 +360,8 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
-        ? Animations::Id::TimelineShow
-        : Animations::Id::TimelineHide);
+        ? Animations::Id::TimelineExpand
+        : Animations::Id::TimelineCollapse);
 
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()
@@ -419,12 +419,23 @@ qreal TimelineWorkbenchPanel::opacity() const
 void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 {
     ensureAnimationAllowed(&animate);
+    bool visible = !qFuzzyIsNull(opacity);
 
     if (animate)
     {
         m_opacityAnimatorGroup->pause();
-        opacityAnimator(item)->setTargetValue(opacity);
-        opacityAnimator(m_showButton)->setTargetValue(opacity);
+        for (auto abstractAnimator: m_opacityAnimatorGroup->animators())
+        {
+            auto animator = qobject_cast<VariantAnimator*>(abstractAnimator);
+            NX_ASSERT(animator);
+            if (!animator)
+                continue;
+
+            animator->setTargetValue(opacity);
+            qnWorkbenchAnimations->setupAnimator(animator, visible
+                ? Animations::Id::TimelineShow
+                : Animations::Id::TimelineHide);
+        }
         m_opacityAnimatorGroup->start();
     }
     else
@@ -434,7 +445,7 @@ void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         m_showButton->setOpacity(opacity);
     }
 
-    m_resizerWidget->setVisible(!qFuzzyIsNull(opacity));
+    m_resizerWidget->setVisible(visible);
 }
 
 void TimelineWorkbenchPanel::updateOpacity(bool animate)

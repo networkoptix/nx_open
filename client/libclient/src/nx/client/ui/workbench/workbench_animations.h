@@ -22,20 +22,26 @@ class Animations: public QObject, public Singleton<Animations>
 public:
     enum class Id
     {
+        /** Timeline show/hide by button */
+        TimelineExpand,
+        TimelineCollapse,
+
+        /** Timeline show/hide by opacity change (e.g. in videowall mode). */
         TimelineShow,
         TimelineHide,
+
         TimelineTooltipShow,
         TimelineTooltipHide,
         TimelineButtonsShow,
         TimelineButtonsHide,
 
-        ResourcesPanelShow,
-        ResourcesPanelHide,
+        ResourcesPanelExpand,
+        ResourcesPanelCollapse,
         ResourcesPanelTooltipShow,
         ResourcesPanelTooltipHide,
 
-        NotificationsPanelShow,
-        NotificationsPanelHide,
+        NotificationsPanelExpand,
+        NotificationsPanelCollapse,
         CalendarShow,
         CalendarHide,
 

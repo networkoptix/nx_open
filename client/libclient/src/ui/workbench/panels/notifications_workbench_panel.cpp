@@ -145,8 +145,8 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
-        ? Animations::Id::NotificationsPanelShow
-        : Animations::Id::NotificationsPanelHide);
+        ? Animations::Id::NotificationsPanelExpand
+        : Animations::Id::NotificationsPanelCollapse);
 
     qreal width = item->size().width();
     qreal newX = m_parentWidget->rect().right()

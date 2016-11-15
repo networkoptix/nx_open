@@ -32,20 +32,23 @@ Animations::Animations(QObject* parent):
             m_timeLimit[idx(id)] = timeLimit;
         };
 
-    setup(Id::TimelineShow, QEasingCurve::InOutQuad, 240);
-    setup(Id::TimelineHide, QEasingCurve::OutQuad, 240);
+    setup(Id::TimelineExpand, QEasingCurve::InOutQuad, 240);
+    setup(Id::TimelineCollapse, QEasingCurve::OutQuad, 240);
+    setup(Id::TimelineShow, QEasingCurve::InOutQuad, 200);
+    setup(Id::TimelineHide, QEasingCurve::OutQuad, 200);
+
     setup(Id::TimelineTooltipShow, QEasingCurve::InOutQuad, 160);
     setup(Id::TimelineTooltipHide, QEasingCurve::InOutQuad, 160);
     setup(Id::TimelineButtonsShow, QEasingCurve::InOutQuad, 200);
     setup(Id::TimelineButtonsHide, QEasingCurve::InOutQuad, 200);
 
-    setup(Id::ResourcesPanelShow, QEasingCurve::InOutQuad, 300);
-    setup(Id::ResourcesPanelHide, QEasingCurve::OutQuad, 300);
+    setup(Id::ResourcesPanelExpand, QEasingCurve::InOutQuad, 300);
+    setup(Id::ResourcesPanelCollapse, QEasingCurve::OutQuad, 300);
     setup(Id::ResourcesPanelTooltipShow, QEasingCurve::InOutQuad, 200);
     setup(Id::ResourcesPanelTooltipHide, QEasingCurve::OutQuad, 200);
 
-    setup(Id::NotificationsPanelShow, QEasingCurve::InOutQuad, 300);
-    setup(Id::NotificationsPanelHide, QEasingCurve::OutQuad, 300);
+    setup(Id::NotificationsPanelExpand, QEasingCurve::InOutQuad, 300);
+    setup(Id::NotificationsPanelCollapse, QEasingCurve::OutQuad, 300);
     setup(Id::CalendarShow, QEasingCurve::OutQuad, 50);
     setup(Id::CalendarHide, QEasingCurve::InQuad, 50);
 
