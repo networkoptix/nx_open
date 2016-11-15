@@ -49,11 +49,6 @@ GraphicsWidget* open(QGraphicsWidget* widget)
     return static_cast<GraphicsWidget*>(widget);
 }
 
-uint qHash(const QPointer<QGraphicsWidget>& widget)
-{
-    return ::qHash(static_cast<void *>(widget.data()));
-}
-
 void safeUnsetCursor(QGraphicsWidget* widget)
 {
     if (widget)
@@ -61,6 +56,11 @@ void safeUnsetCursor(QGraphicsWidget* widget)
 }
 
 } // anonymous namespace
+
+uint qHash(const QPointer<QGraphicsWidget>& widget)
+{
+    return ::qHash(widget.data());
+}
 
 // -------------------------------------------------------------------------- //
 // ResizingInfo
