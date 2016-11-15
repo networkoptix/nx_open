@@ -10,6 +10,7 @@
 #include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
+#include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters;
 
@@ -81,6 +82,10 @@ signals:
 
 private:
     void initWorkarounds();
+
+    bool connectUsingCustomUri(const nx::vms::utils::SystemUri& uri);
+
+    bool connectUsingCommandLineAuth(const QnStartupParameters& startupParams);
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;

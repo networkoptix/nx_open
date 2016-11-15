@@ -47,7 +47,6 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/license_usage_helper.h>
-#include <utils/aspect_ratio.h>
 #include <utils/common/delayed.h>
 
 #include "client/client_settings.h"
@@ -502,10 +501,10 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     {
         /* Check if schedule was changed during load, e.g. limited by max fps. */
         if (!silent)
-            executeDelayed([this]
         {
-            showMaxFpsWarningIfNeeded();
-        });
+            const auto callback = [this]() { showMaxFpsWarningIfNeeded(); };
+            executeDelayedParented(callback, kDefaultDelay, this);
+        }
     }
 
     // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm

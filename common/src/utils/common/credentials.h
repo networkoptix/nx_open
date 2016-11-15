@@ -5,29 +5,37 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-struct QnCredentials{
+struct QnCredentials
+{
+private:
+    Q_GADGET
+    Q_PROPERTY(QString user MEMBER user CONSTANT)
+    Q_PROPERTY(QString password MEMBER password CONSTANT)
 
-    QnCredentials() {};
-    QnCredentials(const QString& usr, const QString& pwd) :
+public:
+    QnCredentials() {}
+    QnCredentials(const QString& usr, const QString& pwd):
         user(usr),
-        password(pwd) {};
+        password(pwd)
+    {}
     QnCredentials(const QAuthenticator& auth):
         user(auth.user()),
-        password(auth.password()) {};
+        password(auth.password())
+    {}
 
     QAuthenticator toAuthenticator() const;
 
     QString user;
     QString password;
 
-    bool isNull() const;
-    bool isEmpty() const;
+    Q_INVOKABLE bool isNull() const;
+    Q_INVOKABLE bool isEmpty() const;
 
     /**
      * Check both user and password are filled.
      * @param allowEmptyPassword    Disable password check
      */
-    bool isValid(bool allowEmptyPassword = false) const;
+    Q_INVOKABLE bool isValid(bool allowEmptyPassword = false) const;
 
     bool operator<(const QnCredentials& other) const;
 };

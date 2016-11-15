@@ -1,8 +1,10 @@
 #include "user_role_settings_widget.h"
 #include "ui_user_role_settings_widget.h"
 
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource/user_resource.h>
 
 #include <ui/common/indents.h>
 #include <ui/dialogs/common/message_box.h>
@@ -318,6 +320,16 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* mod
                 return Qn::ValidationResult(tr("Role with same name already exists."));
             }
 
+            auto predefined = qnUserRolesManager->predefinedRoles();
+            predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserGroup;
+            for (auto role: predefined)
+            {
+                if (qnUserRolesManager->userRoleName(role).trimmed().toLower() != name)
+                    continue;
+
+                return Qn::ValidationResult(tr("Role with same name already exists."));
+            }
+
             return Qn::kValidResult;
         });
 
@@ -325,10 +337,7 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* mod
         [this]
         {
             ui->nameInputField->validate();
-            if (canApplyChanges())
-                applyChanges();
-            else
-                emit hasChangesChanged();
+            applyChanges();
         });
 
     connect(ui->deleteGroupButton, &QPushButton::clicked, d,
@@ -341,8 +350,7 @@ QnUserRoleSettingsWidget::~QnUserRoleSettingsWidget()
 
 bool QnUserRoleSettingsWidget::hasChanges() const
 {
-    Q_D(const QnUserRoleSettingsWidget);
-    return ui->nameInputField->text() != d->model->roleName();
+    return false;
 }
 
 void QnUserRoleSettingsWidget::loadDataToUi()
@@ -357,15 +365,7 @@ void QnUserRoleSettingsWidget::loadDataToUi()
 
 void QnUserRoleSettingsWidget::applyChanges()
 {
-    if (!canApplyChanges())
-        return;
-
     Q_D(QnUserRoleSettingsWidget);
     d->model->setRoleName(ui->nameInputField->text());
     emit hasChangesChanged();
-}
-
-bool QnUserRoleSettingsWidget::canApplyChanges() const
-{
-    return ui->nameInputField->isValid();
 }

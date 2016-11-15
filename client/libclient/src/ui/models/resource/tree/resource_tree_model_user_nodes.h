@@ -24,7 +24,6 @@ public:
     QnResourceTreeModelNodePtr rootNode() const;
     void setRootNode(const QnResourceTreeModelNodePtr& node);
 
-    void rebuild();
 private:
     /** Calculate real children as node's children() method does not return bastard nodes. */
     QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
@@ -69,6 +68,8 @@ private:
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
         const QnVirtualCameraResourcePtr& camera);
 
+    void rebuild();
+
     void rebuildSubjectTree(const QnResourceAccessSubject& subject);
 
     void removeUserNode(const QnUserResourcePtr& user);
@@ -82,10 +83,14 @@ private:
     /** Remove recorder nodes that are not in use. */
     void cleanupRecorders();
 
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void handleUserChanged(const QnUserResourcePtr& user);
     void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
     void handleGlobalPermissionsChanged(const QnResourceAccessSubject& subject);
 
 private:
+    bool m_valid = false;
+
     QnResourceTreeModel* m_model;
 
     /** Root node for all users and roles. */

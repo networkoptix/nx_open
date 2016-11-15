@@ -69,7 +69,11 @@ void VariantAnimator::setConverter(AbstractConverter *converter) {
     setInternalTypeInternal(currentValue().userType());
 }
 
-void VariantAnimator::setEasingCurve(const QEasingCurve &easingCurve) {
+void VariantAnimator::setEasingCurve(const QEasingCurve &easingCurve)
+{
+    if (m_easingCurve == easingCurve)
+        return;
+
     if(isRunning()) {
         qnWarning("Cannot change easing curve of a running animator.");
         return;

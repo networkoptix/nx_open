@@ -230,6 +230,10 @@ void TimerManager::deleteTimer(const TimerId& timerID)
 
 void TimerManager::joinAndDeleteTimer(const TimerId& timerID)
 {
+    NX_ASSERT(timerID, lm("Timer id should be a positive number, 0 given."));
+    if (timerID == 0)
+        return;
+
     QnMutexLocker lk(&m_mtx);
     //having locked \a m_mtx we garantee, that execution of timer timerID will not start
 

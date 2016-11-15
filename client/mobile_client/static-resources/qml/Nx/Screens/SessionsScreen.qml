@@ -18,7 +18,7 @@ Page
     [
         Button
         {
-            text: qsTr("Login to %1").arg(applicationInfo.cloudName())
+            text: qsTr("Log in to %1").arg(applicationInfo.cloudName())
             textColor: ColorTheme.base16
             flat: true
             leftPadding: 0

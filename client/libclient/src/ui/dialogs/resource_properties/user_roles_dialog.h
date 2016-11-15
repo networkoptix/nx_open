@@ -34,6 +34,7 @@ public:
     bool selectGroup(const QnUuid& groupId);
 
 protected:
+    virtual bool canApplyChanges() const override;
     virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 

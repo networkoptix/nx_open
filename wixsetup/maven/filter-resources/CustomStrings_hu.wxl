@@ -34,20 +34,7 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Figyelmeztetés</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Beállítás</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Minden mező kötelető</String>
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise Controller konfiguráció</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Kérem adja meg az Enterprise Controller paramétereket</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Belépés</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Jelszó létrehozása</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">Hálózat</String>
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Jelszó megerősítése</String>
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Extra paraméterek</String>
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Engedélyezi a rendszernek a kamera beállítások optimalizálását (ajánlott)</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Lejátszás ${display.product.name} segítségével</String>
@@ -59,21 +46,8 @@
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A [ProductName] egy korábbi verziója már telepítve van.</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Érvénytelen jelszó</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">A jelszó nem lehet üres</String>
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Figyelmeztetés</String>
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Teljes</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Csak szerver</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Csak kliens</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Haladó</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Kérem válasszon a telepítési módok közül</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Telepítési mód</String>
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">A jelszónak egyeznie kell és nem lehet üres</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Kattintson a Tovább gombra az alapértelmezett könyvtár használatához vagy kattintson a Csere gombra és válasszon másikat.</String>
@@ -81,17 +55,6 @@
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Kérem válasszon Media Root könyvtárat:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Belépés</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Kiszolgáló</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Belépés</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Jelszó</String>
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Jelszó megerősítése</String>
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Server Port</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Kapcsolat beállítások</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Server beállítások</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Server</String>
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Rendszer név</String>
 
     <!-- MyExitDialog -->
 
@@ -101,29 +64,9 @@
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Helyben, ezen a PC-n szeretném rögzíteni a felvételeket)</String>
 
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Kérem adja meg az adminisztrátor jelszót</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Adminisztrátor hitelesítő adatok</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Adminisztrátor hitelesítő adatok</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Belépés</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Jelszó létrehozása</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Jelszó megerősítése</String>
-    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">Rendszer név</String>
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Konfigurációs hiba</String>
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Figyelmeztetés</String>
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">A jelszónak egyeznie kell</String>
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Érvénytelen portok specified</String>
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Figyelmeztetés</String>
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Nem lehet kétszer ugyan azt a portot beállítani. Kérerm ellenőrizze a konfigurációt.</String>
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] foglalt.</String>
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Figyelmeztetés</String>
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">A létrehozott port már foglalt. Kattintson a 'Tovább'-ra, ha tudja mit csinál.</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes"> ${display.product.name} indítása, ha a telepítő végzett.</String>
@@ -132,12 +75,6 @@
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Legalább egy összetevőt kell választani</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Program eltávolítása opciók</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">${display.product.name} adatbázis megtartása</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">${display.product.name} adatbázis eltávolítása</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Jelenlegi</String>
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Megtartott verzió:</String>
 
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Korábbi verzió észlelve</String>

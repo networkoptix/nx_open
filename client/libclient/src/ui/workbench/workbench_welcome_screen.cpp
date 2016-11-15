@@ -30,66 +30,78 @@
 #include <finders/systems_finder.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/util.h>
 
 namespace
 {
-    typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
+typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
 
-    QWidget* createMainView(QObject* context, QQuickView* quickView)
-    {
-        static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
-        static const auto kContextVariableName = lit("context");
+QWidget* createMainView(QObject* context, QQuickView* quickView)
+{
+    static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
+    static const auto kContextVariableName = lit("context");
 
-        qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
-        qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
-        qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
+    qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
+    qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
+    qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
 
-        auto holder = new QStackedWidget();
-        holder->addWidget(new QWidget());
-        holder->addWidget(QWidget::createWindowContainer(quickView));
+    auto holder = new QStackedWidget();
+    holder->addWidget(new QWidget());
+    holder->addWidget(QWidget::createWindowContainer(quickView));
 
-        const auto loadQmlData = [quickView, context, holder]()
-            {
-                const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
-                    {
-                        if (status != QQuickView::Ready)
-                            return false;
+    const auto loadQmlData = [quickView, context, holder]()
+        {
+            const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
+                {
+                    if (status != QQuickView::Ready)
+                        return false;
 
-                        enum { kQmlViewIndex = 1 };
-                        holder->setCurrentIndex(kQmlViewIndex);
-                        return true;
-                    };
+                    enum { kQmlViewIndex = 1 };
+                    holder->setCurrentIndex(kQmlViewIndex);
+                    return true;
+                };
 
-                QObject::connect(quickView, &QQuickView::statusChanged,
-                    quickView, updateQmlViewVisibility);
+            QObject::connect(quickView, &QQuickView::statusChanged,
+                quickView, updateQmlViewVisibility);
 
-                quickView->rootContext()->setContextProperty(
-                    kContextVariableName, context);
-                quickView->setSource(kWelcomeScreenSource);
-            };
+            quickView->rootContext()->setContextProperty(
+                kContextVariableName, context);
+            quickView->setSource(kWelcomeScreenSource);
+        };
 
-        // Async load of qml data
-        executeDelayedParented(loadQmlData, 0, quickView);
-        return holder;
-    }
-
-    QnGenericPalette extractPalette()
-    {
-        const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
-        NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
-        const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
-        NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
-        return (style ? style->genericPalette() : QnGenericPalette());
-    }
-
-
-    QnResourceList extractResources(const UrlsList& urls)
-    {
-        QMimeData data;
-        data.setUrls(urls);
-        return QnWorkbenchResource::deserializeResources(&data);
-    }
+    // Async load of qml data
+    executeDelayedParented(loadQmlData, 0, quickView);
+    return holder;
 }
+
+QnGenericPalette extractPalette()
+{
+    const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
+    NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
+    const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
+    NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
+    return (style ? style->genericPalette() : QnGenericPalette());
+}
+
+
+QnResourceList extractResources(const UrlsList& urls)
+{
+    QMimeData data;
+    data.setUrls(urls);
+    return QnWorkbenchResource::deserializeResources(&data);
+}
+
+// Extracts url from string and changes port to default if it is invalid
+QUrl urlFromUserInput(const QString& value)
+{
+    auto result = QUrl::fromUserInput(value);
+    if (result.port() <= 0)
+        result.setPort(DEFAULT_APPSERVER_PORT);
+
+    return result;
+}
+
+} // namespace
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     :
@@ -133,8 +145,15 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
             context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
         });
 
-    setVisible(true);
+    connect(this, &QnWorkbenchWelcomeScreen::globalPreloaderVisibleChanged, this,
+        [this]()
+        {
+            if (globalPreloaderVisible())
+                setVisibleControls(true);
+        });
 
+    setVisible(true);
+    setVisibleControls(false);
     connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
     {
         if (valueId == QnClientSettings::AUTO_LOGIN)
@@ -385,7 +404,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
 {
     connectToSystemInternal(
         systemId,
-        QUrl::fromUserInput(serverUrl),
+        urlFromUserInput(serverUrl),
         QnCredentials(userName, password),
         storePassword,
         autoLogin);
@@ -478,7 +497,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
                 qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
                 qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
 
-                qnCloudStatusWatcher->setCloudCredentials(cloudCredentials, true);
+                qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
                 connectToSystemInternal(QString(), serverUrl, cloudCredentials,
                     false, false, controlsGuard);
             }

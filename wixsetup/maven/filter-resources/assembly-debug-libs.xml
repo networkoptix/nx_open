@@ -10,7 +10,7 @@
 			<outputDirectory>../</outputDirectory>
 			<includes>
 				<include>**/nx_network.pdb</include>
-				<include>**/nx_utils.pdb</include>                
+				<include>**/nx_utils.pdb</include>
                 <include>**/nx_vms_utils.pdb</include>
 				<include>**/udt.pdb</include>
 			</includes>

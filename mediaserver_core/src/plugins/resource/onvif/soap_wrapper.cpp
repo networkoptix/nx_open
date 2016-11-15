@@ -430,9 +430,29 @@ std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
     return credentials.toStdList();
 }
 
+QnCredentials DeviceSoapWrapper::getForcedCredentials(
+    const QString& manufacturer,
+    const QString& model)
+{
+    QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
+    auto credentials = resData.value<QnCredentials>(
+        Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    return credentials;
+}
+
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
     calcTimeDrift();
+
+    auto forcedCredentials = getForcedCredentials(manufacturer, model);
+
+    if (!forcedCredentials.user.isEmpty())
+    {
+        setLogin(forcedCredentials.user);
+        setPassword(forcedCredentials.password);
+        return true;
+    }
 
     std::list<QnCredentials> possibleCredentials;
     const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);

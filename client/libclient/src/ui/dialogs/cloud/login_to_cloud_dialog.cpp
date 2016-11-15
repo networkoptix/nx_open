@@ -52,6 +52,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
+    setWindowTitle(tr("Log in to %1").arg(QnAppInfo::cloudName()));
+
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
 
@@ -173,14 +175,14 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     showCredentialsError(false);
 
-    qnCloudStatusWatcher->resetCloudCredentials();
+    qnCloudStatusWatcher->resetCredentials();
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
 
-    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+    qnCloudStatusWatcher->setCredentials(QnCredentials(
         q->ui->loginInputField->text().trimmed(),
         q->ui->passwordInputField->text().trimmed()));
 }

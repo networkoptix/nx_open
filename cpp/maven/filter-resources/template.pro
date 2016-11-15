@@ -4,10 +4,12 @@ NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 LIBTYPE = ${libtype}
 TEMPLATE = ${template}
-TARGET = ${project.artifactId}
+TARGET = ${targetName}
+GUID = ${guid}
 VERSION = ${release.version}
 QT = ${qt.libs}
 BOX = ${box}
+ROOT_DIR = $$clean_path("${root.dir}")
 
 CONFIG += unversioned_soname unversioned_libname
 
@@ -74,7 +76,7 @@ else {
   }
 }
 
-OUTPUT_PATH = ${libdir}
+OUTPUT_PATH = $$clean_path("${libdir}")
 
 isEmpty(BUILDLIB) {
   DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
@@ -104,21 +106,21 @@ RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 
 LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
-    LIBS += -Wl,-rpath-link,${qt.dir}/lib
+    LIBS += -Wl,-rpath-link,$$clean_path("${qt.dir}")/lib
     LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
-                ${root.dir}/common/src \
-                ${root.dir}/common_libs/nx_network/src \
-                ${root.dir}/common_libs/nx_fusion/src \
-                ${root.dir}/common_libs/nx_utils/src \
-                ${root.dir}/common_libs/nx_streaming/src \
-                ${root.dir}/common_libs/nx_media/src \
-                ${root.dir}/common_libs/nx_audio/src \
-                ${libdir}/include \
+                $$ROOT_DIR/common/src \
+                $$ROOT_DIR/common_libs/nx_network/src \
+                $$ROOT_DIR/common_libs/nx_fusion/src \
+                $$ROOT_DIR/common_libs/nx_utils/src \
+                $$ROOT_DIR/common_libs/nx_streaming/src \
+                $$ROOT_DIR/common_libs/nx_media/src \
+                $$ROOT_DIR/common_libs/nx_audio/src \
+                $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
 
 win* {

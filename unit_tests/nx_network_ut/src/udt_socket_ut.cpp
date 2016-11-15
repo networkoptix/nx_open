@@ -1,8 +1,3 @@
-/**********************************************************
-* Nov 24, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include <atomic>
 #include <thread>
 
@@ -17,7 +12,7 @@
 #include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
 #include <nx/utils/string.h>
-
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx {
 namespace network {
@@ -470,6 +465,184 @@ TEST_F(SocketUdt, /*DISABLED_*/allDataReadAfterFin)
     }
 }
 
-}   //test
-}   //network
-}   //nx
+class UdtSocketPerformance:
+    public ::testing::Test
+{
+protected:
+    const uint64_t kBufferSize = 4 * 1024;
+    const uint64_t kTransferSize = 100 * 1024 * 1024;
+    const uint64_t kConcurentCount = 10;
+
+    static uint64_t selectTransferSize()
+    {
+        switch (utils::TestOptions::getLoadMode())
+        {
+            case utils::TestOptions::LoadMode::light: return 100 * 1024 * 1024;
+            case utils::TestOptions::LoadMode::normal: return uint64_t(1) * 1024 * 1024 * 1024;
+            case utils::TestOptions::LoadMode::stress: return uint64_t(10) * 1024 * 1024 * 1024;
+        };
+
+        EXPECT_TRUE(false);
+        return 0;
+    }
+
+    UdtSocketPerformance()
+        : kTransferSize(selectTransferSize())
+    {
+    }
+
+    void SetUp() override
+    {
+        server = std::make_unique<UdtStreamServerSocket>(AF_INET);
+        //auto udp = udpSocket();
+        //ASSERT_TRUE(server->bindToUdpSocket(std::move(*udp)));
+        ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(server->listen(10));
+
+        address = server->getLocalAddress();
+        NX_LOGX(lm("Server address=%1, transferSize=%2b")
+            .strs(address, nx::utils::bytesToString(kTransferSize)), cl_logINFO);
+
+        ASSERT_TRUE(server->setRecvTimeout(100));
+        ASSERT_EQ(nullptr, server->accept());
+        ASSERT_TRUE(server->setRecvTimeout(0));
+    }
+
+    std::unique_ptr<UdtStreamSocket> connect() const
+    {
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
+        //auto udp = udpSocket();
+        //EXPECT_TRUE(socket->bindToUdpSocket(std::move(*udp)));
+        socketConfig(socket.get());
+        EXPECT_TRUE((bool) socket->connect(address));
+        return std::move(socket);
+    }
+
+    std::unique_ptr<AbstractStreamSocket> accept() const
+    {
+        std::unique_ptr<AbstractStreamSocket> socket(server->accept());
+        EXPECT_NE(nullptr, socket);
+        socketConfig(socket.get());
+        return socket;
+    }
+
+    std::unique_ptr<UDPSocket> udpSocket() const
+    {
+        auto socket = std::make_unique<UDPSocket>(AF_INET);
+        EXPECT_TRUE(socket->bind(SocketAddress::anyPrivateAddress));
+        EXPECT_TRUE(socket->setSendBufferSize(4 * 1024 * 1024));
+        EXPECT_TRUE(socket->setRecvBufferSize(4 * 1024 * 1024));
+        return std::move(socket);
+    }
+
+    void socketConfig(AbstractSocket* /*socket*/) const
+    {
+        //EXPECT_TRUE(socket->setSendBufferSize(100 * 1024 * 1024));
+        //EXPECT_TRUE(socket->setRecvBufferSize(100 * 1024 * 1024));
+    }
+
+    void sendSync(AbstractStreamSocket* socket) const
+    {
+        Buffer buffer((int) kBufferSize, 'X');
+        int send = 0;
+        uint64_t transferSize = 0;
+        while (transferSize < kTransferSize)
+        {
+            send = socket->send(buffer.data(), buffer.size());
+            if (send <= 0)
+                break;
+
+            transferSize += (uint64_t) send;
+        }
+    }
+
+    void recvSync(AbstractStreamSocket* socket)
+    {
+        const auto startTime = std::chrono::steady_clock::now();
+        Buffer buffer((int) kBufferSize, Qt::Uninitialized);
+
+        int recv = 0;
+        uint64_t transferSize = 0;
+        uint64_t transferCount = 0;
+        while (transferSize < kTransferSize)
+        {
+            recv = socket->recv(buffer.data(), buffer.size());
+            if (recv <= 0)
+                break;
+
+            transferSize += (uint64_t) recv;
+            transferCount += 1;
+        }
+
+        recvLog(recv, std::chrono::steady_clock::now() - startTime, transferSize, transferCount);
+    }
+
+    void recvLog(int lastRecv, std::chrono::steady_clock::duration duration,
+        uint64_t transferSize, uint64_t transferCount) const
+    {
+        const auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+        NX_LOGX(lm("Resieve ended (%1): %2")
+            .strs(lastRecv, SystemError::getLastOSErrorText()), cl_logINFO);
+
+        const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
+        NX_LOGX(lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
+            .strs(nx::utils::bytesToString(transferSize), transferCount,
+                nx::utils::bytesToString(transferSize / transferCount),
+                durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
+
+        // TODO: some assertions about speed?
+    }
+
+    std::unique_ptr<UdtStreamServerSocket> server;
+    SocketAddress address;
+};
+
+TEST_F(UdtSocketPerformance, DISABLED_SimplexSync)
+{
+    std::thread acceptThread(
+        [&]()
+        {
+            const auto client = accept();
+            recvSync(client.get());
+            sendSync(client.get());
+        });
+
+    std::thread clientThread(
+        [&]()
+        {
+            const auto client = connect();
+            sendSync(client.get());
+            recvSync(client.get());
+        });
+
+    acceptThread.join();
+    clientThread.join();
+}
+
+TEST_F(UdtSocketPerformance, DISABLED_DuplexSync)
+{
+    std::thread acceptThread(
+        [&]()
+        {
+            const auto client = accept();
+            std::thread t([&](){ recvSync(client.get()); });
+            sendSync(client.get());
+            t.join();
+        });
+
+    std::thread clientThread(
+        [&]()
+        {
+            const auto client = connect();
+            std::thread t([&](){ sendSync(client.get()); });
+            recvSync(client.get());
+            t.join();
+        });
+
+    acceptThread.join();
+    clientThread.join();
+}
+
+} // namespace test
+} // namespace network
+} // namespace nx

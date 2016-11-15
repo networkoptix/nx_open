@@ -15,7 +15,8 @@ enum class QnServerField
     SystemName = 0x02,
     Host = 0x04,
     HasInternet = 0x08,
-    CloudId = 0x10
+    SafeMode = 0x10,
+    CloudId = 0x20
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -64,6 +65,8 @@ public:
 
     virtual bool hasInternet() const = 0;
 
+    virtual bool safeMode() const = 0;
+
 signals:
     void isCloudSystemChanged();
 
@@ -78,6 +81,10 @@ signals:
     void onlineStateChanged();
 
     void hasInternetChanged();
+
+    void safeModeStateChanged();
+
+    void newSystemStateChanged();
 
     void serverChanged(const QnUuid& serverId, QnServerFields flags);
 };

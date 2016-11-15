@@ -11,13 +11,13 @@
 #include <network/cloud_system_data.h>
 
 namespace {
-    /*!
-    This string represents client during search with NetworkOptixModuleFinder class.
-    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
-    */
-    const QString nxClientId = lit("client.exe");
-    const QString nxECId = lit("Enterprise Controller");
-    const QString nxMediaServerId = lit("Media Server");
+/*!
+This string represents client during search with NetworkOptixModuleFinder class.
+It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
+*/
+const QString nxClientId = lit("client.exe");
+const QString nxECId = lit("Enterprise Controller");
+const QString nxMediaServerId = lit("Media Server");
 } // namespace
 
 QnModuleInformation::QnModuleInformation():

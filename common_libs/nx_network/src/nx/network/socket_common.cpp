@@ -33,7 +33,7 @@ HostAddress::HostAddress( const char* addrStr )
 
 bool HostAddress::operator==( const HostAddress& rhs ) const
 {
-    return toString() == rhs.toString();
+    return isIpAddress() == rhs.isIpAddress() && toString() == rhs.toString();
 }
 
 bool HostAddress::operator!=( const HostAddress& rhs ) const
@@ -43,6 +43,9 @@ bool HostAddress::operator!=( const HostAddress& rhs ) const
 
 bool HostAddress::operator<( const HostAddress& rhs ) const
 {
+    if (isIpAddress() != rhs.isIpAddress())
+        return isIpAddress();
+
     return toString() < rhs.toString();
 }
 

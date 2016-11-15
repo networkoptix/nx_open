@@ -280,11 +280,11 @@ void QnAccessibleResourcesWidget::initControlsModel()
         return;
 
     QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
-    dummy->setName(tr("All Cameras && Resources"));
+    dummy->setName(tr("All Cameras & Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
     qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
-    m_controlsModel->setResources(QnResourceList() << dummy);
+    m_controlsModel->setResources(QnResourceList({ dummy }));
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
     m_controlsModel->setSimplified(true);

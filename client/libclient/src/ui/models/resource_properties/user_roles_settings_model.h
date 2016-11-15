@@ -49,6 +49,9 @@ public:
     QString roleName() const;
     void setRoleName(const QString& value);
 
+    bool isRoleValid(const ec2::ApiUserGroupData& role) const;
+    bool isValid() const;
+
     virtual Qn::GlobalPermissions rawPermissions() const override;
     virtual void setRawPermissions(Qn::GlobalPermissions value) override;
 
@@ -79,4 +82,5 @@ private:
     ec2::ApiUserGroupDataList m_roles;
     QHash<QnUuid, QSet<QnUuid>> m_accessibleResources;
     QHash<QnUuid, RoleReplacement> m_replacements;
+    QSet<QString> m_predefinedNames;
 };

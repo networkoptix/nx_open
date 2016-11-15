@@ -49,6 +49,9 @@ public:
     void forcedUpdate();
 
     bool tryClose(bool force);
+
+    void saveState();
+    void restoreState();
 private:
     friend class QnSessionAwareDelegate;
 

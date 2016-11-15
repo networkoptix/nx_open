@@ -13,6 +13,8 @@
 
 #include <client/client_globals.h>
 
+#include <utils/common/event_processors.h>
+
 class QComboBox;
 class QLineEdit;
 class QTabWidget;
@@ -72,6 +74,9 @@ protected:
     virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
 
 private:
+    void forceLayoutUpdate();
+
+private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
     QnTextEditLabel* m_textLabel;
@@ -114,9 +119,12 @@ public:
 
     void setToolTipParent(QGraphicsWidget* widget);
 
+    bool isScrollBarVisible() const;
+
 signals:
     void currentTabChanged();
     void selectionChanged();
+    void scrollBarVisibleChanged();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* ) override;
@@ -178,6 +186,7 @@ private:
     QnResourceTreeModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
+    QnMultiEventSignalizer* m_scrollbarSignalizer;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
 };

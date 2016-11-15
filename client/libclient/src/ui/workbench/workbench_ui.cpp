@@ -26,7 +26,6 @@
 #include <ui/graphics/instruments/fps_counting_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
@@ -43,23 +42,14 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/processors/hover_processor.h>
-
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
-#include <ui/widgets/main_window_title_bar_widget.h>
-
-#include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/counter.h>
 
 #include "watchers/workbench_render_watcher.h"
 #include <ui/workbench/workbench_ui_globals.h>
-#include <ui/workbench/panels/buttons.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -72,6 +62,7 @@
 #include <ui/workbench/panels/notifications_workbench_panel.h>
 #include <ui/workbench/panels/timeline_workbench_panel.h>
 #include <ui/workbench/panels/calendar_workbench_panel.h>
+#include <ui/workbench/panels/title_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -113,9 +104,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_instrumentManager(display()->instrumentManager()),
     m_flags(0),
-    m_titleUsed(false),
-    m_titleVisible(false),
-    m_ignoreClickEvent(false),
     m_inactive(false),
     m_inFreespace(false)
 {
@@ -389,11 +377,6 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
     updateCalendarVisibility(animate);
 }
 
-void QnWorkbenchUi::updateTitleOpacityAnimated()
-{
-    updateTitleOpacity(true);
-}
-
 void QnWorkbenchUi::updateCalendarVisibilityAnimated()
 {
     updateCalendarVisibility(true);
@@ -405,16 +388,16 @@ void QnWorkbenchUi::updateControlsVisibilityAnimated()
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(
-    QRectF treeGeometry,
-    qreal titleY, qreal titleH,
-    QRectF timelineGeometry,
-    QRectF notificationsGeometry)
+    const QRectF& treeGeometry,
+    const QRectF& titleGeometry,
+    const QRectF& timelineGeometry,
+    const QRectF& notificationsGeometry)
 {
     using namespace std;
     QMargins result;
     if (treeGeometry.isValid())
         result.setLeft(max(0.0, floor(treeGeometry.left() + treeGeometry.width())));
-    result.setTop(max(0.0, floor(titleY + titleH)));
+    result.setTop(max(0.0, floor(titleGeometry.bottom())));
 
     if (notificationsGeometry.isValid())
         result.setRight(max(0.0, floor(m_controlsWidgetRect.right() - notificationsGeometry.left())));
@@ -444,7 +427,7 @@ void QnWorkbenchUi::setFlags(Flags flags)
 
 bool QnWorkbenchUi::isTitleUsed() const
 {
-    return m_titleUsed;
+    return m_title && m_title->isUsed();
 }
 
 void QnWorkbenchUi::updateViewportMargins()
@@ -475,8 +458,7 @@ void QnWorkbenchUi::updateViewportMargins()
     {
         newMargins = calculateViewportMargins(
             panelEffectiveGeometry(m_tree),
-            m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
-            m_titleItem ? m_titleItem->size().height() : 0.0,
+            panelEffectiveGeometry(m_title),
             timelineEffectiveGeometry,
             panelEffectiveGeometry(m_notifications)
         );
@@ -499,7 +481,7 @@ bool QnWorkbenchUi::isHovered() const
     return
         (m_timeline->isHovered())
         || (m_tree && m_tree->isHovered())
-        || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
+        || (m_title && m_title->isHovered())
         || (m_notifications && m_notifications->isHovered())
         || (m_calendar && m_calendar->isHovered());
 }
@@ -716,13 +698,13 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     m_timeline->updateGeometry();
 
-    if (m_titleItem)
+    if (m_title)
     {
-        m_titleItem->setGeometry(QRectF(
+        m_title->item->setGeometry(QRectF(
             0.0,
-            m_titleItem->pos().y(),
+            m_title->item->pos().y(),
             rect.width(),
-            m_titleItem->size().height()));
+            m_title->item->size().height()));
     }
 
     if (m_notifications)
@@ -789,15 +771,12 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
 {
-    QPointF pos(
-        treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && isTreeVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
+    QPointF pos(treeGeometry.x(), qMax(titleGeometry.bottom(), 0.0));
+    qreal bottom = isTimelineVisible()
+        ? qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())
+        : m_controlsWidgetRect.bottom();
 
-    QSizeF size(
-        treeGeometry.width(),
-        ((!m_timeline->isVisible() && isTreeVisible())
-            ? m_controlsWidgetRect.bottom()
-            : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y());
+    QSizeF size(treeGeometry.width(), bottom - pos.y());
 
     return QRectF(pos, size);
 }
@@ -807,8 +786,12 @@ void QnWorkbenchUi::updateTreeGeometry()
     if (!m_tree)
         return;
 
+    QRectF titleGeometry = (m_title && m_title->isVisible())
+        ? m_title->item->geometry()
+        : QRectF();
+
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedTreeGeometry(m_tree->item->geometry(), m_titleItem->geometry(), m_timeline->item->geometry());
+    QRectF geometry = updatedTreeGeometry(m_tree->item->geometry(), titleGeometry, m_timeline->item->geometry());
     m_tree->item->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
@@ -830,23 +813,15 @@ void QnWorkbenchUi::updateTreeGeometry()
     }
 
     /* Calculate title target position. */
-    QPointF titlePos;
-    if ((!m_titleVisible || !m_titleUsed) && isTreeVisible())
-    {
-        titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
-    }
-    else if (m_titleYAnimator->isRunning())
-    {
-        titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        defer |= !qFuzzyEquals(titlePos, m_titleItem->pos());
-    }
-    else
-    {
-        titlePos = m_titleItem->pos();
-    }
+    QRectF titleEffectiveGeometry = (m_title && m_title->isVisible())
+        ? m_title->effectiveGeometry()
+        : QRectF();
+
+    /* If animation is running, then geometry sync should be deferred. */
+    defer |= !qFuzzyEquals(titleGeometry, titleEffectiveGeometry);
 
     /* Calculate target geometry. */
-    geometry = updatedTreeGeometry(m_tree->item->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_timeline->item->size()));
+    geometry = updatedTreeGeometry(m_tree->item->geometry(), titleEffectiveGeometry, QRectF(sliderPos, m_timeline->item->size()));
     if (qFuzzyEquals(geometry, m_tree->item->geometry()))
         return;
 
@@ -886,164 +861,64 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 
 bool QnWorkbenchUi::isTitleVisible() const
 {
-    return m_titleVisible;
+    return m_title && m_title->isVisible();
 }
 
 void QnWorkbenchUi::setTitleUsed(bool used)
 {
-    if (!m_titleItem)
-        return;
-
-    m_titleItem->setVisible(used);
-    m_titleShowButton->setVisible(used);
-
-    if (used)
-    {
-        m_titleUsed = used;
-        setTitleOpened(isTitleOpened(), false);
-        at_titleItem_geometryChanged();
-    }
-    else
-    {
-        m_titleItem->setPos(0.0, -m_titleItem->size().height() - 1.0);
-        m_titleUsed = used;
-    }
+    if (m_title)
+        m_title->setUsed(used);
 }
 
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate)
 {
-    ensureAnimationAllowed(animate);
-
-    m_inFreespace &= !opened;
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleTitleBarAction)->setChecked(opened);
-
-    if (!m_titleUsed)
-        return;
-
-    qreal newY = opened ? 0.0 : -m_titleItem->size().height() - 1.0;
-    if (animate)
-    {
-        m_titleYAnimator->animateTo(newY);
-    }
-    else
-    {
-        m_titleYAnimator->stop();
-        m_titleItem->setY(newY);
-    }
+    if (m_title)
+        m_title->setOpened(opened, animate);
 }
 
 void QnWorkbenchUi::setTitleVisible(bool visible, bool animate)
 {
-    ensureAnimationAllowed(animate);
-
-    bool changed = m_titleVisible != visible;
-
-    m_titleVisible = visible;
-
-    updateTitleOpacity(animate);
-    if (changed)
-    {
-        updateTreeGeometry();
-        updateNotificationsGeometry();
-    }
+    if (m_title)
+        m_title->setVisible(visible, animate);
 }
 
 bool QnWorkbenchUi::isTitleOpened() const
 {
-    return action(QnActions::ToggleTitleBarAction)->isChecked();
-}
-
-void QnWorkbenchUi::setTitleOpacity(qreal opacity, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    if (!m_titleItem)
-        return;
-
-    if (animate)
-    {
-        m_titleOpacityAnimatorGroup->pause();
-        opacityAnimator(m_titleItem)->setTargetValue(opacity);
-        opacityAnimator(m_titleShowButton)->setTargetValue(opacity);
-        m_titleOpacityAnimatorGroup->start();
-    }
-    else
-    {
-        m_titleOpacityAnimatorGroup->stop();
-        m_titleItem->setOpacity(opacity);
-        m_titleShowButton->setOpacity(opacity);
-    }
-}
-
-void QnWorkbenchUi::updateTitleOpacity(bool animate)
-{
-    const qreal opacity = m_titleVisible ? NxUi::kOpaque : NxUi::kHidden;
-    setTitleOpacity(opacity, animate);
-}
-
-void QnWorkbenchUi::at_titleItem_geometryChanged()
-{
-    if (!m_titleUsed)
-        return;
-
-    updateTreeGeometry();
-    updateNotificationsGeometry();
-    updateFpsGeometry();
-
-    QRectF geometry = m_titleItem->geometry();
-
-    m_titleShowButton->setPos(QPointF(
-        (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
-        qMax(m_controlsWidget->rect().top(), geometry.bottom())));
+    return m_title && m_title->isOpened();
 }
 
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_titleItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_titleItem->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
-    m_titleItem->setPos(0.0, 0.0);
-    m_titleItem->setZValue(10.0);
+    m_title = new NxUi::TitleWorkbenchPanel(settings, m_controlsWidget, this);
+    connect(m_title, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+        [this](bool opened)
+        {
+            if (opened)
+                m_inFreespace = false;
+        });
 
-    const auto toggleTitleBarAction = action(QnActions::ToggleTitleBarAction);
-    m_titleShowButton = NxUi::newShowHideButton(m_controlsWidget, context(), toggleTitleBarAction);
-    {
-        QTransform transform;
-        transform.rotate(-90);
-        transform.scale(-1, 1);
-        m_titleShowButton->setTransform(transform);
-    }
-    m_titleShowButton->setFocusProxy(m_titleItem);
+    connect(m_title, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
+        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_title, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
+        &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_titleOpacityProcessor->addTargetItem(m_titleItem);
-    m_titleOpacityProcessor->addTargetItem(m_titleShowButton);
+    connect(m_title, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
+        [this]
+        {
+            updateTreeGeometry();
+            updateNotificationsGeometry();
+            updateFpsGeometry();
+            updateViewportMargins();
+        });
 
-    m_titleYAnimator = new VariantAnimator(this);
-    m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_titleYAnimator->setTargetObject(m_titleItem);
-    m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_titleYAnimator->setSpeed(1.0);
-    m_titleYAnimator->setTimeLimit(500);
-
-    m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_titleOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleItem));
-    m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
-
-    connect(m_titleOpacityProcessor, &HoverFocusProcessor::hoverEntered, this, &QnWorkbenchUi::updateTitleOpacityAnimated);
-    connect(m_titleOpacityProcessor, &HoverFocusProcessor::hoverLeft, this, &QnWorkbenchUi::updateTitleOpacityAnimated);
-    connect(m_titleOpacityProcessor, &HoverFocusProcessor::hoverEntered, this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_titleOpacityProcessor, &HoverFocusProcessor::hoverLeft, this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_titleItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::at_titleItem_geometryChanged);
-    connect(action(QnActions::ToggleTitleBarAction), &QAction::toggled, this, [this](bool checked) { if (!m_ignoreClickEvent) setTitleOpened(checked); });
-
-    toggleTitleBarAction->setChecked(settings.state == Qn::PaneState::Opened);
-
-    /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(m_titleItem, Qt::BottomEdge, NxUi::kShadowThickness);
-    shadow->setZValue(NxUi::ShadowItemZOrder);
+    connect(m_title, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        [this]
+        {
+            updateTreeGeometry();
+            updateNotificationsGeometry();
+            updateFpsGeometry();
+            updateViewportMargins();
+        });
 }
 
 #pragma endregion Title methods
@@ -1079,9 +954,7 @@ void QnWorkbenchUi::setNotificationsVisible(bool visible, bool animate)
 
 QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry)
 {
-    QPointF pos(
-        notificationsGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
+    QPointF pos(notificationsGeometry.x(), qMax(titleGeometry.bottom(), 0.0));
 
     qreal top = m_controlsWidgetRect.bottom();
     if (m_calendar && m_calendar->isOpened() && m_calendar->isEnabled())
@@ -1101,8 +974,13 @@ void QnWorkbenchUi::updateNotificationsGeometry()
         return;
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
-        m_titleItem->geometry());
+    QRectF titleGeometry = (m_title && m_title->isVisible())
+        ? m_title->item->geometry()
+        : QRectF();
+
+    QRectF geometry = updatedNotificationsGeometry(
+        m_notifications->item->geometry(),
+        titleGeometry);
 
     /* Always change position. */
     m_notifications->item->setPos(geometry.topLeft());
@@ -1123,24 +1001,16 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     }
 
     /* Calculate title target position. */
-    QPointF titlePos;
-    if ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible())
-    {
-        titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
-    }
-    else if (m_titleYAnimator->isRunning())
-    {
-        titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        defer |= !qFuzzyEquals(titlePos, m_titleItem->pos());
-    }
-    else
-    {
-        titlePos = m_titleItem->pos();
-    }
+    QRectF titleEffectiveGeometry = (m_title && m_title->isVisible())
+        ? m_title->effectiveGeometry()
+        : QRectF();
+
+    /* If animation is running, then geometry sync should be deferred. */
+    defer |= !qFuzzyEquals(titleGeometry, titleEffectiveGeometry);
 
     /* Calculate target geometry. */
     geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
-        QRectF(titlePos, m_titleItem->size()));
+        titleEffectiveGeometry);
 
     if (qFuzzyEquals(geometry, m_notifications->item->geometry()))
         return;
@@ -1310,6 +1180,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
+            updateNotificationsGeometry();
             updateCalendarVisibility(animated);
             updateViewportMargins();
         });
@@ -1409,9 +1280,13 @@ void QnWorkbenchUi::updateFpsGeometry()
         ? m_notifications->backgroundItem->geometry().left()
         : m_controlsWidgetRect.right();
 
+    QRectF titleEffectiveGeometry = (m_title && m_title->isVisible())
+        ? m_title->effectiveGeometry()
+        : QRectF();
+
     QPointF pos = QPointF(
         right - m_fpsItem->size().width(),
-        m_titleItem ? m_titleItem->geometry().bottom() : 0.0);
+        titleEffectiveGeometry.bottom());
 
     if (qFuzzyEquals(pos, m_fpsItem->pos()))
         return;

@@ -41,6 +41,8 @@
 #include "connection_testing_dialog.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
+#include <ui/style/globals.h>
+
 #include <utils/connection_diagnostics_helper.h>
 
 #include <utils/common/app_info.h>
@@ -300,6 +302,7 @@ void QnLoginDialog::accept()
                     params.setArgument(Qn::UrlRole, url);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
                     params.setArgument(Qn::StorePasswordRole, storePassword);
+                    params.setArgument(Qn::ForceRole, true);
                     menu()->trigger(QnActions::ConnectAction, params);
                     break;
                 }
@@ -469,7 +472,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
             item->setData(url, Qn::UrlRole);
 
             if (!isCompatible)
-                item->setData(QColor(Qt::red), Qt::TextColorRole);
+                item->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
             m_autoFoundItem->appendRow(item);
         }
     }

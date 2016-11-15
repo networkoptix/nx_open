@@ -732,7 +732,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /**
          * Permission to view resource content.
-         * Currently used for server's health monitor access check only.
+         * Currently used for server's health monitor access.
+         * Automatically granted for cameras and web pages if user has ReadPermission for them.
          */
         ViewContentPermission           = 0x0020,
 
@@ -763,7 +764,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission,
+        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
 
         AllPermissions = 0xFFFFFFFF
     };

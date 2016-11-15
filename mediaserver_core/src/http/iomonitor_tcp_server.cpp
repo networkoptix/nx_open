@@ -71,6 +71,7 @@ void QnIOMonitorConnectionProcessor::run()
         static const int KEEPALIVE_INTERVAL = 1000 * 5;
         d->requestBuffer.reserve(REQUEST_BUFFER_SIZE);
         d->socket->setRecvTimeout(KEEPALIVE_INTERVAL);
+        d->socket->setNonBlockingMode(true);
 
         using namespace std::placeholders;
         d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );

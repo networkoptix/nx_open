@@ -19,13 +19,12 @@
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent),
     m_model(nullptr),
     m_rootNode(),
     m_allNodes(),
@@ -38,25 +37,23 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
 
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnResourceTreeModelUserNodes::handleUserChanged);
+
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (auto user = resource.dynamicCast<QnUserResource>())
-            {
-                connect(user, &QnUserResource::enabledChanged, this,
-                    &QnResourceTreeModelUserNodes::rebuildSubjectTree);
-            }
-        });
+        &QnResourceTreeModelUserNodes::handleResourceAdded);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            disconnect(resource, nullptr, this, nullptr);
+            resource->disconnect(this);
             if (auto user = resource.dynamicCast<QnUserResource>())
+            {
                 removeUserNode(user);
+            }
         });
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
@@ -87,7 +84,6 @@ QnResourceTreeModel* QnResourceTreeModelUserNodes::model() const
 void QnResourceTreeModelUserNodes::setModel(QnResourceTreeModel* value)
 {
     m_model = value;
-    initializeContext(m_model);
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::rootNode() const
@@ -102,10 +98,7 @@ void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr&
 
 void QnResourceTreeModelUserNodes::rebuild()
 {
-    clean();
-
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
+    NX_ASSERT(m_valid);
 
     for (const auto& role : qnUserRolesManager->userRoles())
         rebuildSubjectTree(role);
@@ -441,7 +434,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRecorderNode(
 
 void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubject& subject)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!m_valid)
         return;
 
     if (subject.user() && !subject.user()->isEnabled())
@@ -548,39 +541,90 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
         removeNode(node);
 }
 
+void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (auto user = resource.dynamicCast<QnUserResource>())
+    {
+        connect(user, &QnUserResource::enabledChanged, this,
+            &QnResourceTreeModelUserNodes::rebuildSubjectTree);
+
+        connect(user, &QnUserResource::userGroupChanged, this,
+            [this](const QnUserResourcePtr& user)
+        {
+            removeUserNode(user);
+            rebuildSubjectTree(user);
+        });
+
+        rebuildSubjectTree(user);
+    }
+    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        /* Here we must handle if common user's layout become shared. */
+        auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
+        if (!owner)
+            return;
+
+        connect(layout, &QnResource::parentIdChanged, this,
+            [this, layout, owner]
+            {
+                handleAccessChanged(owner, layout);
+            });
+    }
+}
+
+void QnResourceTreeModelUserNodes::handleUserChanged(const QnUserResourcePtr& user)
+{
+    m_valid = !user.isNull()
+        && qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+
+    clean();
+    if (m_valid)
+        rebuild();
+}
+
 void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
+    if (!m_valid)
+        return;
+
     if (qnResourceAccessProvider->hasAccess(subject, resource))
     {
-        auto node = ensureResourceNode(subject, resource);
-        if (node)
-            node->update();
-    }
-    else
-    {
-        auto id = subject.id();
-        if (!m_shared.contains(id))
-            return;
-        for (auto node : m_shared[id])
+        if (auto node = ensureResourceNode(subject, resource))
         {
-            if (node->resource() != resource)
-                continue;
-
-            removeNode(node);
-            cleanupRecorders();
-            break;
+            node->update();
+            return;
         }
     }
+
+    /* In some cases we should remove nodes under user even if he has access. For example, when
+     * user's own layout become shared. */
+
+    auto id = subject.id();
+    if (!m_shared.contains(id))
+        return;
+
+    for (auto node : m_shared[id])
+    {
+        if (node->resource() != resource)
+            continue;
+
+        removeNode(node);
+        cleanupRecorders();
+        break;
+    }
+
 }
 
 void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     const QnResourceAccessSubject& subject)
 {
-    /* Full rebuild on current user permissions change. */
-    if (subject.user() && subject.user() == context()->user())
+    if (!m_valid)
+        return;
+
+    if (subject.user() == context()->user())
     {
-        rebuild();
+        /* Rebuild will occur on context user change. */
         return;
     }
 

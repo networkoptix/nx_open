@@ -115,7 +115,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         setName(tr("Web Pages"));
         break;
     case Qn::UserResourcesNode:
-        setName(tr("Cameras && Resources"));
+        setName(tr("Cameras & Resources"));
         break;
     case Qn::LayoutsNode:
         setName(tr("Layouts"));
@@ -127,7 +127,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::AllCamerasAccessNode:
-        setName(tr("All Cameras && Resources"));
+        setName(tr("All Cameras & Resources"));
         m_state = Invalid;
         break;
     case Qn::AllLayoutsAccessNode:
@@ -135,7 +135,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::SharedResourcesNode:
-        setName(tr("Cameras && Resources"));
+        setName(tr("Cameras & Resources"));
         m_state = Invalid;
         break;
     case Qn::RoleUsersNode:
@@ -235,14 +235,18 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     );
 
     if (m_resource)
-        disconnect(m_resource, nullptr, this, nullptr);
+        m_resource->disconnect(this);
+
     m_resource = resource;
+
     if (m_resource)
     {
         connect(resource, &QnResource::nameChanged, this, &QnResourceTreeModelNode::update);
-        connect(resource, &QnResource::statusChanged, this, &QnResourceTreeModelNode::update);
         connect(resource, &QnResource::urlChanged, this, &QnResourceTreeModelNode::update);
         connect(resource, &QnResource::flagsChanged, this, &QnResourceTreeModelNode::update);
+
+        connect(resource, &QnResource::statusChanged, this,
+            &QnResourceTreeModelNode::updateResourceStatus);
 
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
@@ -471,10 +475,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        if (m_resource->hasFlags(Qn::server))
-            return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
-
-        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
+        return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
     }
 
     case Qn::OtherSystemsNode:
@@ -667,6 +668,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     {
         switch(m_type)
         {
+        case Qn::SharedResourceNode:
         case Qn::ResourceNode:
         case Qn::EdgeNode:
             m_editable.value = menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource));
@@ -1078,6 +1080,17 @@ void QnResourceTreeModelNode::setName(const QString& name)
     m_displayName = m_name = name;
 }
 
+
+void QnResourceTreeModelNode::updateResourceStatus()
+{
+    NX_ASSERT(m_resource);
+    if (!m_resource)
+        return;
+
+    m_status = m_resource->getStatus();
+    m_icon = calculateIcon();
+    changeInternal();
+}
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)
 {

@@ -357,12 +357,14 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
     QnJsonSerializer::registerSerializer<QnIOPortData>();
     QnJsonSerializer::registerSerializer<QnIOPortDataList>();
+    QnJsonSerializer::registerSerializer<QnCredentials>();
     QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
     QnJsonSerializer::registerSerializer<QnBounds>();
+    QnJsonSerializer::registerSerializer<std::vector<QString>>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
 

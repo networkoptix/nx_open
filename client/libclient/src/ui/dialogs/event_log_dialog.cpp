@@ -269,7 +269,6 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 {
     m_requests.clear();
     m_allEvents.clear();
-    QPointer<QnEventLogDialog> guard(this);
 
     const auto onlineServers = qnResPool->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
@@ -284,14 +283,13 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 
         m_requests << handle;
 
-        executeDelayed([this, handle, guard]
-        {
-            if (!guard)
-                return;
+        const auto timerCallback =
+            [this, handle]
+            {
+                at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
+            };
 
-            at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
-
-        }, kQueryTimeoutMs);
+        executeDelayedParented(timerCallback, kQueryTimeoutMs, this);
     }
 }
 
@@ -434,25 +432,13 @@ void QnEventLogDialog::at_filterAction_triggered()
 
 void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
-    auto hasAccess = [this](const QnResourcePtr& resource)
-    {
-        if (!resource)
-            return false;
-
-        if (resource.dynamicCast<QnMediaResource>())
-            return accessController()->hasPermissions(resource, Qn::ReadPermission);
-
-        /* Only admins should see context menu on servers and users. */
-        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    };
-
     QScopedPointer<QMenu> menu;
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
-        if (resource && hasAccess(resource))
+        if (resource)
         {
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);

@@ -3,13 +3,14 @@
 #include <ui/style/helper.h>
 
 QnTextEditLabel::QnTextEditLabel(QWidget* parent) :
-    base_type(parent)
+    base_type(parent),
+    m_documentSize(0, 0)
 {
     setFrameStyle(QFrame::NoFrame);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
     setReadOnly(true);
     setTextInteractionFlags(Qt::NoTextInteraction);
     setFocusPolicy(Qt::NoFocus);
@@ -18,10 +19,45 @@ QnTextEditLabel::QnTextEditLabel(QWidget* parent) :
 
     setProperty(style::Properties::kDontPolishFontProperty, true);
 
-    /* QTextEdit doesn't have precise vertical size hint, therefore we have to adjust maximum vertical size. */
+    connect(document(), &QTextDocument::contentsChanged, document(),
+        [this]()
+        {
+            if (!isAutoWrapped())
+                document()->adjustSize();
+        });
+
     connect(document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
         [this](const QSizeF& size)
         {
-            setMaximumHeight(size.height());
+            auto newSize = size.toSize();
+            if (m_documentSize == newSize)
+                return;
+
+            m_documentSize = newSize;
+            updateGeometry();
         });
+}
+
+bool QnTextEditLabel::isAutoWrapped() const
+{
+    switch (wordWrapMode())
+    {
+        case QTextOption::WordWrap:
+        case QTextOption::WrapAnywhere:
+        case QTextOption::WrapAtWordBoundaryOrAnywhere:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+QSize QnTextEditLabel::sizeHint() const
+{
+    return m_documentSize;
+}
+
+QSize QnTextEditLabel::minimumSizeHint() const
+{
+    return QSize(0, m_documentSize.height());
 }

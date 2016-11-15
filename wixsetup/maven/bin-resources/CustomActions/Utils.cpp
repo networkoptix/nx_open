@@ -568,17 +568,6 @@ bool isStandaloneSystem(const char* host) {
 
 }
 
-bool IsVistaOrLater() {
-    OSVERSIONINFO osvi;
-
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-    GetVersionEx(&osvi);
-
-    return osvi.dwMajorVersion > 5;
-}
-
 BOOL Is64BitWindows()
 {
 #if defined(_WIN64)
@@ -599,7 +588,7 @@ CString GetAppDataLocalFolderPath() {
 
     CAtlString result;
 
-    if (IsVistaOrLater()) {
+    if (IsWindowsVistaOrGreater()) {
         SHGetFolderPath(NULL, CSIDL_SYSTEM, NULL, SHGFP_TYPE_CURRENT, buffer);
         result.Format(L"%s\\config\\systemprofile\\AppData\\Local", buffer);
     } else {

@@ -15,7 +15,7 @@
 
 namespace {
 
-    const int kDefaultAspectRatio = 4.0 / 3.0;
+    const qreal kDefaultAspectRatio = 4.0 / 3.0;
 
 } // namespace
 
@@ -107,17 +107,9 @@ void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
     {
         m_thumbnailManager->selectResource(camera);
 
-        auto customAspectRatio = camera->customAspectRatio();
-        if (!qFuzzyIsNull(customAspectRatio))
-        {
-            m_aspectRatio = customAspectRatio;
-        }
-        else
-        {
-            CameraMediaStreams s = camera->mediaStreams();
-            if (!s.streams.empty())
-                m_aspectRatio = QnGeometry::aspectRatio(s.streams[0].getResolution());
-        }
+        auto customAspectRatio = camera->aspectRatio();
+        if (customAspectRatio.isValid())
+            m_aspectRatio = customAspectRatio.toFloat();
     }
 
     m_preview->setPixmap(QPixmap());

@@ -20,6 +20,8 @@
 
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -597,6 +599,12 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
+    qDebug() << "start loading resources";
+    QElapsedTimer tt;
+    tt.start();
+    qnResourceAccessManager->beginUpdate();
+    qnResourceAccessProvider->beginUpdate();
+
     QnServerAdditionalAddressesDictionary::instance()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
@@ -610,6 +618,12 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetUserRoles(fullData.userGroups);
     resetLicenses(fullData.licenses);
     resetTime();
+
+    qDebug() << "resources loaded for" << tt.elapsed();
+    qnResourceAccessProvider->endUpdate();
+    qDebug() << "access ready" << tt.elapsed();
+    qnResourceAccessManager->endUpdate();
+    qDebug() << "permissions ready" << tt.elapsed();
 
     emit initialResourcesReceived();
 }

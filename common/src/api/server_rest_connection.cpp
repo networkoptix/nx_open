@@ -414,9 +414,8 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
 Handle ServerConnection::sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback)
 {
     auto httpPool = nx_http::ClientPool::instance();
-    Handle requestId = httpPool->sendRequest(request);
-
     QnMutexLocker lock(&m_mutex);
+    Handle requestId = httpPool->sendRequest(request);
     m_runningRequests.insert(requestId, callback);
     return requestId;
 }

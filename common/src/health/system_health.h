@@ -10,8 +10,8 @@ namespace QnSystemHealth {
         EmailIsEmpty,
         NoLicenses,
         SmtpIsNotSet,
-        UsersEmailIsEmpty,
-        ConnectionLost,
+        UsersEmailIsEmpty,  /*< Other user's email is empty. */
+        ConnectionLost,     /*< Current user email is empty. */
         NoPrimaryTimeServer,
         SystemIsReadOnly,
 

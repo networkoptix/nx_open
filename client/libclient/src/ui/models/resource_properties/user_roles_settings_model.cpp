@@ -5,7 +5,9 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
 
 #include <nx/utils/string.h>
 
@@ -33,6 +35,10 @@ QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/
     m_currentRoleId(),
     m_roles()
 {
+    auto predefinedRoles = qnUserRolesManager->predefinedRoles();
+    predefinedRoles << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserGroup;
+    for (auto role : predefinedRoles)
+        m_predefinedNames << qnUserRolesManager->userRoleName(role).trimmed().toLower();
 }
 
 QnUserRolesSettingsModel::~QnUserRolesSettingsModel()
@@ -121,6 +127,27 @@ void QnUserRolesSettingsModel::setRoleName(const QString& value)
     emit dataChanged(idx, idx);
 }
 
+bool QnUserRolesSettingsModel::isRoleValid(const ec2::ApiUserGroupData& role) const
+{
+    const auto name = role.name.trimmed().toLower();
+    if (m_predefinedNames.contains(name))
+        return false;
+
+    using boost::algorithm::any_of;
+    return !any_of(m_roles,
+        [&](const ec2::ApiUserGroupData& other)
+        {
+            return other.id != role.id
+                && other.name.trimmed().toLower() == name;
+        });
+}
+
+bool QnUserRolesSettingsModel::isValid() const
+{
+    using boost::algorithm::all_of;
+    return all_of(m_roles, [this](const ec2::ApiUserGroupData& role){return isRoleValid(role);});
+}
+
 Qn::GlobalPermissions QnUserRolesSettingsModel::rawPermissions() const
 {
     auto iter = currentRole();
@@ -170,8 +197,15 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
     case Qt::AccessibleDescriptionRole:
         return userRole.name;
 
+    case Qt::TextColorRole:
+        return isRoleValid(userRole)
+            ? QVariant()
+            : QBrush(qnGlobals->errorTextColor());
+
     case Qt::DecorationRole:
-        return qnResIconCache->icon(QnResourceIconCache::Users);
+        return isRoleValid(userRole)
+            ? qnResIconCache->icon(QnResourceIconCache::Users)
+            : qnSkin->icon("tree/role_error.png");
 
     case Qn::UuidRole:
         return qVariantFromValue(userRole.id);

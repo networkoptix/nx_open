@@ -66,20 +66,25 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
     if (m_camerasToCheck.contains(id))
         return;
     m_camerasToCheck << cam->getId();
-    executeDelayed([this, id]()
-    {
-        if (!m_camerasToCheck.contains(id))
-            return;
-        m_camerasToCheck.remove(id);
 
-        QnSecurityCamResourcePtr cam = qnResPool->getResourceById<QnSecurityCamResource>(id);
-        if (!cam)
-            return;
+    const auto timerCallback =
+        [this, id]()
+        {
+            if (!m_camerasToCheck.contains(id))
+                return;
 
-        auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
-        if (cam && server && server->getId() != cam->getParentId())
-            invalidateCameraHistory(id);
-    }, HistoryCheckDelay);
+            m_camerasToCheck.remove(id);
+
+            QnSecurityCamResourcePtr cam = qnResPool->getResourceById<QnSecurityCamResource>(id);
+            if (!cam)
+                return;
+
+            auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
+            if (cam && server && server->getId() != cam->getParentId())
+                invalidateCameraHistory(id);
+        };
+
+    executeDelayedParented(timerCallback, HistoryCheckDelay, this);
 }
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
@@ -141,19 +146,26 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
     if (!server)
         return; // somethink wrong
 
+    rest::Handle requestToTerminate = 0;
     {
+        QnMutexLocker lock2(&m_syncLoadMutex);
         QnMutexLocker lock( &m_mutex );
         notify = m_historyValidCameras.contains(cameraId);
         m_historyValidCameras.remove(cameraId);
         if (m_asyncRunningRequests.contains(cameraId))
         {
-            auto handle = m_asyncRunningRequests[cameraId];
+            requestToTerminate = m_asyncRunningRequests[cameraId];
             m_asyncRunningRequests.remove(cameraId);
             notify = true;
-            lock.unlock();
-            server->restConnection()->cancelRequest(handle);
+
+            // terminate sync request
+            m_syncRunningRequests.remove(cameraId);
+            m_syncLoadWaitCond.wakeAll();
         }
     }
+    if (requestToTerminate > 0)
+        server->restConnection()->cancelRequest(requestToTerminate);
+
 
     if (notify)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
@@ -181,12 +193,23 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     {
         QnMutexLocker lock(&m_mutex);
         QPointer<QnCameraHistoryPool> guard(this);
-        auto handle = server->restConnection()->cameraHistoryAsync(request, [this, callback, guard](bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods)
-        {
-            if (!guard)
-                return;
-            at_cameraPrepared(success, id, periods, callback);
-        });
+
+        auto handle = server->restConnection()->cameraHistoryAsync(request,
+            [this, callback, guard = QPointer<QnCameraHistoryPool>(this), thread = this->thread()]
+            (bool success, rest::Handle id, ec2::ApiCameraHistoryDataList periods)
+            {
+                if (!guard)
+                    return;
+
+                const auto timerCallback =
+                    [this, guard, success, id, periods, callback]()
+                    {
+                        if (guard)
+                            at_cameraPrepared(success, id, periods, callback);
+                    };
+
+                executeDelayed(timerCallback, kDefaultDelay, thread);
+            });
 
         bool started = handle > 0;
         if (started)
@@ -221,10 +244,9 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
         }
     }
 
-
     lock.unlock();
     if (callback)
-        executeDelayed([callback, success] { callback(success); }, kDefaultDelay, this->thread());
+        callback(success);
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
@@ -484,7 +506,8 @@ bool QnCameraHistoryPool::updateCameraHistorySync(const QnSecurityCamResourcePtr
 
     if (result == StartResult::started) {
         m_syncRunningRequests.insert(camera->getId());
-        m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+        while (m_syncRunningRequests.contains(camera->getId()))
+            m_syncLoadWaitCond.wait(&m_syncLoadMutex);
     }
     return result != StartResult::failed;
 }

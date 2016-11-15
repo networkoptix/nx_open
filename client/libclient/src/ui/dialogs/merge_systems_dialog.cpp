@@ -27,6 +27,7 @@
 #include <api/global_settings.h>
 
 #include <nx/utils/string.h>
+#include <network/system_helpers.h>
 
 namespace {
 
@@ -209,6 +210,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     m_remoteOwnerCredentials.setUser(login);
     m_remoteOwnerCredentials.setPassword(password);
     m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
+    ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -236,6 +238,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const QnMediaServerResourcePtr& discoverer)
 {
     ui->buttonBox->hideProgress();
+    ui->credentialsGroupBox->setEnabled(true);
 
     if (mergeStatus != utils::MergeSystemsStatus::ok
         && mergeStatus != utils::MergeSystemsStatus::starterLicense)
@@ -249,7 +252,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server && server->getStatus() == Qn::Online
-        && moduleInformation.localSystemId == qnGlobalSettings->localSystemId())
+        && helpers::serverBelongsToCurrentSystem(moduleInformation))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {
