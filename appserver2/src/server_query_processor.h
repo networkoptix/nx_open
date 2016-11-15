@@ -292,7 +292,7 @@ private:
 
         QnMutexLocker lock(&m_updateDataMutex);
         std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
-        std::list<std::function<void()>> transactionsPostProcessList;
+        static std::list<std::function<void()>> transactionsPostProcessList;
 
         if(ApiCommand::isPersistent(tran.command))
         {
