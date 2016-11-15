@@ -21,7 +21,7 @@ public:
         QObject* parent = nullptr);
 
     /** Title bar widget. */
-    QPointer<QGraphicsProxyWidget> item;
+    QGraphicsProxyWidget* item;
 
 public:
     virtual bool isPinned() const override;

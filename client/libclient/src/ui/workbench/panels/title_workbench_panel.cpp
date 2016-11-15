@@ -30,13 +30,13 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentWidget, parent),
+    item(new QnMaskedProxyWidget(parentWidget)),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
         action(QnActions::ToggleTitleBarAction))),
     m_opacityAnimatorGroup(new AnimatorGroup(this)),
     m_yAnimator(new VariantAnimator(this)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget))
 {
-    item = new QnMaskedProxyWidget(parentWidget);
     item->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     item->setPos(0.0, 0.0);
     item->setZValue(ControlItemZOrder);
