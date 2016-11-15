@@ -28,6 +28,8 @@
 #include <ui/workbench/panels/buttons.h>
 #include <ui/workbench/panels/calendar_workbench_panel.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
@@ -35,9 +37,6 @@ namespace {
 
 static const int kDefaultThumbnailsHeight = 48;
 static const int kVideoWallTimelineAutoHideTimeoutMs = 10000;
-
-static const int kShowAnimationDurationMs = 240;
-static const int kHideAnimationDurationMs = 240;
 
 static const int kShowTimelineTimeoutMs = 100;
 static const int kCloseTimelineTimeoutMs = 250;
@@ -347,6 +346,8 @@ bool TimelineWorkbenchPanel::isOpened() const
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 {
+    using namespace nx::client::ui::workbench;
+
     ensureAnimationAllowed(&animate);
 
     if (!item)
@@ -358,12 +359,9 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     action(QnActions::ToggleTimelineAction)->setChecked(opened);
 
     m_yAnimator->stop();
-    if (opened)
-        m_yAnimator->setEasingCurve(QEasingCurve::InOutQuad);
-    else
-        m_yAnimator->setEasingCurve(QEasingCurve::OutQuad);
-
-    m_yAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
+    qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
+        ? Animations::Id::TimelineExpanding
+        : Animations::Id::TimelineCollapsing);
 
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()

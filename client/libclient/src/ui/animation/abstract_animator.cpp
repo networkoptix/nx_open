@@ -25,7 +25,11 @@ AbstractAnimator::~AbstractAnimator() {
     NX_ASSERT(isStopped()); /* Derived class must be sure to stop the animation in its destructor. */
 }
 
-void AbstractAnimator::setTimeLimit(int timeLimitMSec) {
+void AbstractAnimator::setTimeLimit(int timeLimitMSec)
+{
+    if (m_timeLimitMSec == timeLimitMSec)
+        return;
+
     if(isRunning()) {
         qnWarning("Cannot set time limit of a running animation.");
         return;
