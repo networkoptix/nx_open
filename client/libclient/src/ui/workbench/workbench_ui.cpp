@@ -9,8 +9,6 @@
 
 #include <core/resource/resource.h>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
-
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
@@ -121,12 +119,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_inactive(false),
     m_inFreespace(false)
 {
-    using namespace nx::client::ui::workbench;
-
     QGraphicsLayout::setInstantInvalidatePropagation(true);
-
-    /* Initialize animations manager. */
-    context()->instance<Animations>();
 
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);

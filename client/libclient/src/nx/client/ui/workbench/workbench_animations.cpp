@@ -1,6 +1,7 @@
 #include "workbench_animations.h"
 
 #include <ui/animation/variant_animator.h>
+#include <ui/animation/widget_animator.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -39,6 +40,9 @@ Animations::Animations(QObject* parent):
     setup(Id::NotificationsPanelCollapsing, QEasingCurve::OutQuad, 300);
     setup(Id::CalendarExpanding, QEasingCurve::OutQuad, 50);
     setup(Id::CalendarCollapsing, QEasingCurve::InQuad, 50);
+    setup(Id::SceneItemGeometryChange, QEasingCurve::InOutQuad, 200);
+    setup(Id::SceneZoomIn, QEasingCurve::InOutQuad, 500);
+    setup(Id::SceneZoomOut, QEasingCurve::InOutQuad, 500);
 }
 
 Animations::~Animations()
@@ -47,6 +51,16 @@ Animations::~Animations()
 }
 
 void Animations::setupAnimator(VariantAnimator* animator, Id id)
+{
+    NX_ASSERT(animator);
+    if (!animator)
+        return;
+
+    animator->setEasingCurve(m_easing[idx(id)]);
+    animator->setTimeLimit(m_timeLimit[idx(id)]);
+}
+
+void Animations::setupAnimator(WidgetAnimator* animator, Id id)
 {
     NX_ASSERT(animator);
     if (!animator)

@@ -35,6 +35,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
@@ -163,6 +165,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up properties. */
     setWindowTitle(QString());
+
+    /* Initialize animations manager. */
+    context->instance<nx::client::ui::workbench::Animations>();
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;

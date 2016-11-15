@@ -8,6 +8,7 @@
 #include <nx/utils/singleton.h>
 
 class VariantAnimator;
+class WidgetAnimator;
 
 namespace nx {
 namespace client {
@@ -32,6 +33,24 @@ public:
         CalendarExpanding,
         CalendarCollapsing,
 
+        /**
+         * Item size increasing/decreasing on click;
+         * New items appearing.
+         * Rotating items by context menu option.
+         */
+        SceneItemGeometryChange,
+
+        /**
+         * Item goes in fullscreen.
+         * Also handles switch between items in fullscreen.
+         */
+        SceneZoomIn,
+
+        /**
+        * Item goes out of fullscreen.
+        */
+        SceneZoomOut,
+
         IdCount
     };
 
@@ -39,6 +58,7 @@ public:
     virtual ~Animations();
 
     void setupAnimator(VariantAnimator* animator, Id id);
+    void setupAnimator(WidgetAnimator* animator, Id id);
 
     QEasingCurve::Type easing(Id id) const;
     void setEasing(Id id, QEasingCurve::Type value);
