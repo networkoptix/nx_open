@@ -59,11 +59,12 @@ SystemManager::SystemManager(
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false)
 {
+    using namespace std::placeholders;
+
     // Pre-filling cache.
     if (fillCache() != db::DBResult::ok)
         throw std::runtime_error("Failed to pre-load systems cache");
 
-    using namespace std::placeholders;
     m_dropSystemsTimerId =
         m_timerManager->addNonStopTimer(
             std::bind(&SystemManager::dropExpiredSystems, this, _1),
@@ -95,6 +96,9 @@ SystemManager::SystemManager(
          int>(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3),
             std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1, _2));
+
+    m_accountManager->setUpdateAccountSubroutine(
+        std::bind(&SystemManager::placeUpdateUserTransactionToEachSystem, this, _1, _2));
 }
 
 SystemManager::~SystemManager()
@@ -102,6 +106,8 @@ SystemManager::~SystemManager()
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
 
     m_startedAsyncCallsCounter.wait();
+
+    m_accountManager->setUpdateAccountSubroutine(nullptr);
 }
 
 void SystemManager::authenticateByName(
@@ -1410,16 +1416,8 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
                 sharing.systemID.c_str(),
                 std::move(userData));
 
-        //generating "save full name" transaction
-        ::ec2::ApiResourceParamWithRefData fullNameData;
-        fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
-        fullNameData.name = Qn::USER_FULL_NAME;
-        fullNameData.value = QString::fromStdString(account.fullName);
-        result = m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::setResourceParam>(
-                queryContext,
-                sharing.systemID.c_str(),
-                std::move(fullNameData));
+        generateUpdateFullNameTransaction(
+            queryContext, sharing, account.fullName);
     }
     else
     {
@@ -1444,6 +1442,48 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
     }
 
     return result;
+}
+
+nx::db::DBResult SystemManager::generateUpdateFullNameTransaction(
+    nx::db::QueryContext* const queryContext,
+    const api::SystemSharing& sharing,
+    const std::string& newFullName)
+{
+    //generating "save full name" transaction
+    ::ec2::ApiResourceParamWithRefData fullNameData;
+    fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
+    fullNameData.name = Qn::USER_FULL_NAME;
+    fullNameData.value = QString::fromStdString(newFullName);
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
+        ::ec2::ApiCommand::setResourceParam>(
+            queryContext,
+            sharing.systemID.c_str(),
+            std::move(fullNameData));
+}
+
+nx::db::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
+    nx::db::QueryContext* const queryContext,
+    const data::AccountUpdateDataWithEmail& accountUpdate)
+{
+    if (!accountUpdate.fullName)
+        return nx::db::DBResult::ok;
+
+    std::vector<api::SystemSharingEx> sharings;
+    auto dbResult = fetchUserSharings(
+        queryContext,
+        {{ "email", ":accountEmail", QnSql::serialized_field(accountUpdate.email) }},
+        &sharings);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+    for (const auto& sharing: sharings)
+    {
+        dbResult = generateUpdateFullNameTransaction(
+            queryContext, sharing, *accountUpdate.fullName);
+        if (dbResult != nx::db::DBResult::ok)
+            return dbResult;
+    }
+
+    return nx::db::DBResult::ok;
 }
 
 void SystemManager::updateSharingInCache(

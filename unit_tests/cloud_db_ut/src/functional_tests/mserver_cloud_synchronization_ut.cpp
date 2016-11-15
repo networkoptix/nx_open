@@ -545,5 +545,41 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
     }
 }
 
+class Ec2MserverCloudSynchronizationNew:
+    public Ec2MserverCloudSynchronization
+{
+public:
+    Ec2MserverCloudSynchronizationNew()
+    {
+        init();
+    }
+
+    ~Ec2MserverCloudSynchronizationNew()
+    {
+    }
+
+private:
+    void init()
+    {
+        ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+        ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+        ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+
+        establishConnectionBetweenVmsAndCloud();
+        waitForCloudAndVmsToSyncUsers();
+    }
+};
+
+TEST_F(Ec2MserverCloudSynchronizationNew, user_fullname_modification_pushed_to_vms_from_cloud)
+{
+    api::AccountUpdateData update;
+    update.fullName = ownerAccount().fullName + "new";
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->updateAccount(ownerAccount().email, ownerAccount().password, update));
+
+    waitForCloudAndVmsToSyncUsers();
+}
+
 } // namespace cdb
 } // namespace nx

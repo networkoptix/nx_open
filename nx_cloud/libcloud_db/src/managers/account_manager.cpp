@@ -192,13 +192,25 @@ void AccountManager::updateAccount(
     data::AccountUpdateDataWithEmail updateDataWithEmail(std::move(accountData));
     updateDataWithEmail.email = accountEmail;
 
+    auto onUpdateCompletion = 
+        [this, 
+            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            authenticatedByEmailCode,
+            completionHandler = std::move(completionHandler)](
+                nx::db::QueryContext* /*queryContext*/,
+                nx::db::DBResult resultCode,
+                data::AccountUpdateDataWithEmail accountData)
+        {
+            if (resultCode == db::DBResult::ok)
+                updateAccountCache(authenticatedByEmailCode, std::move(accountData));
+            completionHandler(dbResultToApiResult(resultCode));
+        };
+
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountUpdateDataWithEmail>(
         std::bind(&AccountManager::updateAccountInDB, this, authenticatedByEmailCode, _1, _2),
         std::move(updateDataWithEmail),
-        std::bind(&AccountManager::accountUpdated, this,
-                    m_startedAsyncCallsCounter.getScopedIncrement(),
-                    authenticatedByEmailCode, _1, _2, _3, std::move(completionHandler)));
+        std::move(onUpdateCompletion));
 }
 
 void AccountManager::resetPassword(
@@ -517,6 +529,11 @@ nx::db::DBResult AccountManager::createPasswordResetCode(
         std::move(tempPasswordData));
 }
 
+void AccountManager::setUpdateAccountSubroutine(UpdateAccountSubroutine func)
+{
+    m_updateAccountSubroutine = std::move(func);
+}
+
 db::DBResult AccountManager::fillCache()
 {
     std::promise<db::DBResult> cacheFilledPromise;
@@ -806,6 +823,36 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     nx::db::QueryContext* const queryContext,
     const data::AccountUpdateDataWithEmail& accountData)
 {
+    if (!isValidInput(accountData))
+        return nx::db::DBResult::cancelled;
+
+    std::vector<nx::db::SqlFilterField> fieldsToSet = 
+        prepareAccountFieldsToUpdate(accountData, activateAccountIfNotActive);
+
+    auto dbResult = executeUpdateAccountQuery(
+        queryContext,
+        accountData.email,
+        std::move(fieldsToSet));
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    if (accountData.passwordHa1 || accountData.passwordHa1Sha256)
+    {
+        dbResult = m_tempPasswordManager->removeTemporaryPasswordsFromDbByAccountEmail(
+            queryContext,
+            accountData.email);
+        if (dbResult != nx::db::DBResult::ok)
+            return dbResult;
+    }
+
+    if (m_updateAccountSubroutine)
+        return m_updateAccountSubroutine(queryContext, accountData);
+
+    return nx::db::DBResult::ok;
+}
+
+bool AccountManager::isValidInput(const data::AccountUpdateDataWithEmail& accountData) const
+{
     NX_ASSERT(
         static_cast<bool>(accountData.passwordHa1) ||
         static_cast<bool>(accountData.passwordHa1Sha256) ||
@@ -816,25 +863,60 @@ nx::db::DBResult AccountManager::updateAccountInDB(
           accountData.fullName || accountData.customization))
     {
         // Nothing to do.
-        return nx::db::DBResult::ok;
+        return false;
     }
 
-    std::vector<db::SqlFilterField> fieldsToSet;
-    prepareAccountFieldsToUpdate(accountData, &fieldsToSet);
+    return true;
+}
+
+std::vector<nx::db::SqlFilterField> AccountManager::prepareAccountFieldsToUpdate(
+    const data::AccountUpdateDataWithEmail& accountData,
+    bool activateAccountIfNotActive)
+{
+    std::vector<nx::db::SqlFilterField> fieldsToSet;
+
+    if (accountData.passwordHa1)
+        fieldsToSet.push_back({
+            "password_ha1", ":passwordHa1",
+            QnSql::serialized_field(accountData.passwordHa1.get())});
+
+    if (accountData.passwordHa1Sha256)
+        fieldsToSet.push_back({
+            "password_ha1_sha256", ":passwordHa1Sha256",
+            QnSql::serialized_field(accountData.passwordHa1Sha256.get())});
+
+    if (accountData.fullName)
+        fieldsToSet.push_back({
+            "full_name", ":fullName",
+            QnSql::serialized_field(accountData.fullName.get())});
+
+    if (accountData.customization)
+        fieldsToSet.push_back({
+            "customization", ":customization",
+            QnSql::serialized_field(accountData.customization.get())});
 
     if (activateAccountIfNotActive)
         fieldsToSet.push_back({
             "status_code", ":status_code",
             QnSql::serialized_field(static_cast<int>(api::AccountStatus::activated))});
 
+    return fieldsToSet;
+}
+
+nx::db::DBResult AccountManager::executeUpdateAccountQuery(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountEmail,
+    std::vector<nx::db::SqlFilterField> fieldsToSet)
+{
     QSqlQuery updateAccountQuery(*queryContext->connection());
     updateAccountQuery.prepare(
-        lit("UPDATE account SET %1 WHERE email=:email")
-            .arg(db::joinFields(fieldsToSet, ",")));
+        lit(R"sql(
+            UPDATE account SET %1 WHERE email=:email
+            )sql").arg(db::joinFields(fieldsToSet, ",")));
     db::bindFields(&updateAccountQuery, fieldsToSet);
     updateAccountQuery.bindValue(
         ":email",
-        QnSql::serialized_field(accountData.email));
+        QnSql::serialized_field(accountEmail));
     if (!updateAccountQuery.exec())
     {
         NX_LOG(lit("Could not update account in DB. %1").
@@ -842,51 +924,36 @@ nx::db::DBResult AccountManager::updateAccountInDB(
         return db::DBResult::ioError;
     }
 
-    if (accountData.passwordHa1 || accountData.passwordHa1Sha256)
-    {
-        return m_tempPasswordManager->removeTemporaryPasswordsFromDbByAccountEmail(
-            queryContext,
-            accountData.email);
-    }
-
     return db::DBResult::ok;
 }
 
-void AccountManager::accountUpdated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+void AccountManager::updateAccountCache(
     bool activateAccountIfNotActive,
-    nx::db::QueryContext* /*queryContext*/,
-    nx::db::DBResult resultCode,
-    data::AccountUpdateDataWithEmail accountData,
-    std::function<void(api::ResultCode)> completionHandler)
+    data::AccountUpdateDataWithEmail accountData)
 {
-    if (resultCode == db::DBResult::ok)
-    {
-        m_cache.atomicUpdate(
-            accountData.email,
-            [&accountData, activateAccountIfNotActive](api::AccountData& account) {
-                if (accountData.passwordHa1)
-                    account.passwordHa1 = accountData.passwordHa1.get();
-                if (accountData.passwordHa1Sha256)
-                    account.passwordHa1Sha256 = accountData.passwordHa1Sha256.get();
-                if (accountData.fullName)
-                    account.fullName = accountData.fullName.get();
-                if (accountData.customization)
-                    account.customization = accountData.customization.get();
-                if (activateAccountIfNotActive)
-                    account.statusCode = api::AccountStatus::activated;
-            });
-
-        if (accountData.passwordHa1 || accountData.passwordHa1Sha256)
+    m_cache.atomicUpdate(
+        accountData.email,
+        [&accountData, activateAccountIfNotActive](api::AccountData& account)
         {
-            // Removing account's temporary passwords.
-            m_tempPasswordManager->
-                removeTemporaryPasswordsFromCacheByAccountEmail(
-                    accountData.email);
-        }
-    }
+            if (accountData.passwordHa1)
+                account.passwordHa1 = accountData.passwordHa1.get();
+            if (accountData.passwordHa1Sha256)
+                account.passwordHa1Sha256 = accountData.passwordHa1Sha256.get();
+            if (accountData.fullName)
+                account.fullName = accountData.fullName.get();
+            if (accountData.customization)
+                account.customization = accountData.customization.get();
+            if (activateAccountIfNotActive)
+                account.statusCode = api::AccountStatus::activated;
+        });
 
-    completionHandler(dbResultToApiResult(resultCode));
+    if (accountData.passwordHa1 || accountData.passwordHa1Sha256)
+    {
+        // Removing account's temporary passwords.
+        m_tempPasswordManager->
+            removeTemporaryPasswordsFromCacheByAccountEmail(
+                accountData.email);
+    }
 }
 
 nx::db::DBResult AccountManager::resetPassword(
@@ -938,31 +1005,6 @@ void AccountManager::temporaryCredentialsSaved(
     return completionHandler(
         api::ResultCode::ok,
         std::move(temporaryCredentials));
-}
-
-void AccountManager::prepareAccountFieldsToUpdate(
-    const data::AccountUpdateDataWithEmail& accountData,
-    std::vector<db::SqlFilterField>* const fieldsToSet)
-{
-    if (accountData.passwordHa1)
-        fieldsToSet->push_back({
-            "password_ha1", ":passwordHa1",
-            QnSql::serialized_field(accountData.passwordHa1.get())});
-
-    if (accountData.passwordHa1Sha256)
-        fieldsToSet->push_back({
-            "password_ha1_sha256", ":passwordHa1Sha256",
-            QnSql::serialized_field(accountData.passwordHa1Sha256.get())});
-
-    if (accountData.fullName)
-        fieldsToSet->push_back({
-            "full_name", ":fullName",
-            QnSql::serialized_field(accountData.fullName.get())});
-
-    if (accountData.customization)
-        fieldsToSet->push_back({
-            "customization", ":customization",
-            QnSql::serialized_field(accountData.customization.get())});
 }
 
 } // namespace cdb

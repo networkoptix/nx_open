@@ -158,6 +158,11 @@ public:
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
         
+    nx::db::DBResult fetchUserSharings(
+        nx::db::QueryContext* const queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<api::SystemSharingEx>* const sharings);
+
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
@@ -317,11 +322,6 @@ private:
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
 
-    nx::db::DBResult fetchUserSharings(
-        nx::db::QueryContext* const queryContext,
-        const nx::db::InnerJoinFilterFields& filter,
-        std::vector<api::SystemSharingEx>* const sharings);
-
     nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
         const nx::db::InnerJoinFilterFields& filter,
@@ -365,6 +365,13 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand);
+    nx::db::DBResult generateUpdateFullNameTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing,
+        const std::string& newFullName);
+    nx::db::DBResult placeUpdateUserTransactionToEachSystem(
+        nx::db::QueryContext* const queryContext,
+        const data::AccountUpdateDataWithEmail& accountData);
     void updateSharingInCache(data::SystemSharing sharing);
     void updateSharingInCache(
         api::SystemSharingEx sharing,
