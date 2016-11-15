@@ -2,15 +2,17 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
+
 class AnimationTimer;
 class QGraphicsWidget;
 struct QnPaneSettings;
 
 namespace NxUi {
 
-class AbstractWorkbenchPanel: public QObject, public QnWorkbenchContextAware
+class AbstractWorkbenchPanel: public Connective<QObject>, public QnWorkbenchContextAware
 {
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
     Q_OBJECT
 public:
