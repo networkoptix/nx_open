@@ -200,7 +200,7 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
     case Qt::TextColorRole:
         return isRoleValid(userRole)
             ? QVariant()
-            : QBrush(QColor(qnGlobals->errorTextColor()));
+            : QBrush(qnGlobals->errorTextColor());
 
     case Qt::DecorationRole:
         return isRoleValid(userRole)

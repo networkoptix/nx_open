@@ -5,6 +5,7 @@ BUILDLIB = ${buildLib}
 LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${targetName}
+GUID = ${guid}
 VERSION = ${release.version}
 QT = ${qt.libs}
 BOX = ${box}

@@ -17,7 +17,8 @@ class QnCloudStatusWatcherPrivate;
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
 {
     Q_OBJECT
-    Q_PROPERTY(QString effectiveUserName READ effectiveUserName WRITE setEffectiveUserName NOTIFY effectiveUserNameChanged)
+    Q_PROPERTY(QnCredentials credentials READ credentials NOTIFY credentialsChanged)
+    Q_PROPERTY(QString effectiveUserName READ effectiveUserName NOTIFY effectiveUserNameChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool stayConnected READ stayConnected WRITE setStayConnected NOTIFY stayConnectedChanged)
@@ -48,7 +49,8 @@ public:
     ~QnCloudStatusWatcher();
 
     QnCredentials credentials() const;
-    void setCredentials(const QnCredentials& value);
+    void resetCredentials();
+    void setCredentials(const QnCredentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
@@ -61,9 +63,6 @@ public:
     void setStayConnected(bool value);
 
     void logSession(const QString& cloudSystemId);
-
-    void resetCloudCredentials();
-    void setCloudCredentials(const QnCredentials& credentials, bool initial = false);
 
     QnCredentials createTemporaryCredentials() const;
 
@@ -80,6 +79,7 @@ public:
     QnCloudSystemList recentCloudSystems() const;
 
 signals:
+    void credentialsChanged();
     void loginChanged();
     void passwordChanged();
     void effectiveUserNameChanged();

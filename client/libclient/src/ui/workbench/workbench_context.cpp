@@ -36,8 +36,6 @@
 #include <ui/workaround/x11_launcher_workaround.h>
 #endif
 
-#include <nx/vms/utils/system_uri.h>
-
 #include <utils/common/app_info.h>
 
 #include <watchers/cloud_status_watcher.h>
@@ -208,6 +206,74 @@ void QnWorkbenchContext::setClosingDown(bool value)
     m_closingDown = value;
 }
 
+bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& uri)
+{
+    if (!uri.isValid())
+        return false;
+
+    using namespace nx::vms::utils;
+
+    SystemUri::Auth auth = uri.authenticator();
+    QnCredentials credentials(auth.user, auth.password);
+
+    switch (uri.clientCommand())
+    {
+        case SystemUri::ClientCommand::LoginToCloud:
+        {
+            qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+            break;
+        }
+        case SystemUri::ClientCommand::ConnectToSystem:
+        {
+            QString systemId = uri.systemId();
+            bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
+
+            QUrl systemUrl = QUrl::fromUserInput(systemId);
+            systemUrl.setUserName(auth.user);
+            systemUrl.setPassword(auth.password);
+
+            if (systemIsCloud)
+                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+
+            auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
+            parameters.setArgument(Qn::ForceRole, true);
+            menu()->trigger(QnActions::ConnectAction, parameters);
+            break;
+        }
+        default:
+            break;
+    }
+    return true;
+}
+
+bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
+{
+    /* Set authentication parameters from command line. */
+
+    //TODO: #refactor System URI to support videowall
+    QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
+    if (!startupParams.videoWallGuid.isNull())
+    {
+        NX_ASSERT(appServerUrl.isValid());
+        if (!appServerUrl.isValid())
+        {
+            return false;
+        }
+
+        appServerUrl.setUserName(startupParams.videoWallGuid.toString());
+    }
+
+    auto params = QnActionParameters().withArgument(Qn::UrlRole, appServerUrl);
+    params.setArgument(Qn::ForceRole, true);
+    if (qnSettings->autoLogin())
+    {
+        params.setArgument(Qn::AutoLoginRole, true);
+        params.setArgument(Qn::StorePasswordRole, true);
+    }
+    menu()->trigger(QnActions::ConnectAction, params);
+    return true;
+}
+
 bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
     /* Process input files. */
@@ -225,73 +291,22 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         }
     }
 
-    if (startupParams.customUri.isValid())
-    {
-        using namespace nx::vms::utils;
-
-        SystemUri::Auth auth = startupParams.customUri.authenticator();
-        QnCredentials credentials(auth.user, auth.password);
-
-        switch (startupParams.customUri.clientCommand())
-        {
-            case SystemUri::ClientCommand::LoginToCloud:
-            {
-                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
-                break;
-            }
-            case SystemUri::ClientCommand::ConnectToSystem:
-            {
-                QString systemId = startupParams.customUri.systemId();
-                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
-
-                QUrl systemUrl = QUrl::fromUserInput(systemId);
-                systemUrl.setUserName(auth.user);
-                systemUrl.setPassword(auth.password);
-
-                if (systemIsCloud)
-                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
-
-                const auto resourceModeAction = action(QnActions::ResourcesModeAction);
-                const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
-
-                // Force to show preloader in case of connection caused by link
-                resourceModeAction->setChecked(false); //< Shows welcome screen
-                welcomeScreen->setGlobalPreloaderVisible(true);
-
-                menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, systemUrl));
-                break;
-            }
-            default:
-                break;
-        }
-    }
     /* If no input files were supplied --- open connection settings dialog.
     * Do not try to connect in the following cases:
     * * we were not connected and clicked "Open in new window"
     * * we have opened exported exe-file
     * Otherwise we should try to connect or show Login Dialog.
     */
-    else if (startupParams.instantDrop.isEmpty() && !haveInputFiles)
+    if (!connectUsingCustomUri(startupParams.customUri)
+        && startupParams.instantDrop.isEmpty()
+        && !haveInputFiles)
     {
-        /* Set authentication parameters from command line. */
-        QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString); //TODO: #refactor System URI to support videowall
-        if (!startupParams.videoWallGuid.isNull())
+        if (!connectUsingCommandLineAuth(startupParams))
         {
-            NX_ASSERT(appServerUrl.isValid());
-            if (!appServerUrl.isValid())
-            {
-                return false;
-            }
-
-            appServerUrl.setUserName(startupParams.videoWallGuid.toString());
+            const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+            welcomeScreen->setVisibleControls(true);
+            return false;
         }
-        auto params = QnActionParameters().withArgument(Qn::UrlRole, appServerUrl);
-        if (qnSettings->autoLogin())
-        {
-            params.setArgument(Qn::AutoLoginRole, true);
-            params.setArgument(Qn::StorePasswordRole, true);
-        }
-        menu()->trigger(QnActions::ConnectAction, params);
     }
 
     if (!startupParams.videoWallGuid.isNull())

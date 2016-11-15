@@ -57,6 +57,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget->setAttribute(Qt::WA_TranslucentBackground);
     connect(widget, &QnResourceBrowserWidget::selectionChanged,
         action(QnActions::SelectionChangeAction), &QAction::trigger);
+    connect(widget, &QnResourceBrowserWidget::scrollBarVisibleChanged, this,
+        &ResourceTreeWorkbenchPanel::updateControlsGeometry);
 
     QPalette defaultPalette = widget->palette();
     setPaletteColor(widget, QPalette::Window, Qt::transparent);
@@ -264,7 +266,11 @@ void ResourceTreeWorkbenchPanel::updateResizerGeometry()
         m_parentWidget->mapFromItem(item, treeRect.topRight()),
         m_parentWidget->mapFromItem(item, treeRect.bottomRight()));
 
-    resizerGeometry.moveTo(resizerGeometry.topLeft());
+    qreal offset = kResizerWidth;
+    if (widget->isScrollBarVisible())
+        offset += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+    resizerGeometry.moveLeft(resizerGeometry.left() - offset);
     resizerGeometry.setWidth(kResizerWidth);
 
     if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))

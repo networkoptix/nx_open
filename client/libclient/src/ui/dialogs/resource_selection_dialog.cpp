@@ -39,7 +39,7 @@ public:
     {
         if (role == Qt::TextColorRole && m_delegate
             && !m_delegate->isValid(id(proxyIndex)))
-            return QBrush(QColor(qnGlobals->errorTextColor()));
+            return QBrush(qnGlobals->errorTextColor());
         return QIdentityProxyModel::data(proxyIndex, role);
     }
 

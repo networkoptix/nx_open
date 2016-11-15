@@ -66,20 +66,25 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
     if (m_camerasToCheck.contains(id))
         return;
     m_camerasToCheck << cam->getId();
-    executeDelayed([this, id]()
-    {
-        if (!m_camerasToCheck.contains(id))
-            return;
-        m_camerasToCheck.remove(id);
 
-        QnSecurityCamResourcePtr cam = qnResPool->getResourceById<QnSecurityCamResource>(id);
-        if (!cam)
-            return;
+    const auto timerCallback =
+        [this, id]()
+        {
+            if (!m_camerasToCheck.contains(id))
+                return;
 
-        auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
-        if (cam && server && server->getId() != cam->getParentId())
-            invalidateCameraHistory(id);
-    }, HistoryCheckDelay);
+            m_camerasToCheck.remove(id);
+
+            QnSecurityCamResourcePtr cam = qnResPool->getResourceById<QnSecurityCamResource>(id);
+            if (!cam)
+                return;
+
+            auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
+            if (cam && server && server->getId() != cam->getParentId())
+                invalidateCameraHistory(id);
+        };
+
+    executeDelayedParented(timerCallback, HistoryCheckDelay, this);
 }
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
@@ -231,7 +236,17 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
 
     lock.unlock();
     if (callback)
-        executeDelayed([callback, success] { callback(success); }, kDefaultDelay, this->thread());
+    {
+        const auto guard = QPointer<QObject>(this);
+        const auto timerCallback =
+            [callback, success, guard]
+            {
+                if (guard)
+                    callback(success);
+            };
+
+        executeDelayed(timerCallback, kDefaultDelay, guard->thread());
+    }
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))

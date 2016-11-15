@@ -173,7 +173,7 @@ void QnContext::setCloudCredentials(const QString& login, const QString& passwor
     //TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCloudCredentials(QnCredentials(login, password));
+    cloudStatusWatcher()->setCredentials(QnCredentials(login, password));
     qnClientCoreSettings->save();
 }
 

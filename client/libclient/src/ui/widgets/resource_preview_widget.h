@@ -10,7 +10,6 @@ class QLabel;
 class QStackedWidget;
 class QnBusyIndicatorWidget;
 class QnCameraThumbnailManager;
-class QnBusyIndicatorWidget;
 
 class QnResourcePreviewWidget : public Connective<QWidget>
 {

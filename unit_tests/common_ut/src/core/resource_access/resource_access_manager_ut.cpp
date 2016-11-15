@@ -324,6 +324,29 @@ TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsAdmin)
     checkPermissions(layout, desired, forbidden);
 }
 
+/** Check permissions for new shared layout when the user is logged in as admin. */
+TEST_F(QnResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto owner = createUser(Qn::GlobalAdminPermission);
+    owner->setOwner(true);
+    qnResPool->addResource(owner);
+
+    auto layout = createLayout(Qn::remote, false, owner->getId());
+    qnResPool->addResource(layout);
+
+    /* Admin cannot modify owner's layout. */
+    Qn::Permissions desired = Qn::ModifyLayoutPermission;
+    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::SavePermission;
+    checkPermissions(layout, desired, forbidden);
+
+    layout->setParentId(QnUuid());
+
+    /* Admin has full access to shared layouts. */
+    checkPermissions(layout, Qn::FullLayoutPermissions, 0);
+}
+
 /************************************************************************/
 /* Checking videowall-based layouts                                     */
 /************************************************************************/
