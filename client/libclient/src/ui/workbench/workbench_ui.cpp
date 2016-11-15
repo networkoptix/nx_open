@@ -66,6 +66,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <utils/common/event_processors.h>
+
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
 #endif
