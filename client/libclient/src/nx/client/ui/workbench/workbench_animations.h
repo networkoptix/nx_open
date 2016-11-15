@@ -42,6 +42,10 @@ public:
 
         NotificationsPanelExpand,
         NotificationsPanelCollapse,
+
+        TitlePanelExpand,
+        TitlePanelCollapse,
+
         CalendarShow,
         CalendarHide,
 
