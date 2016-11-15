@@ -74,7 +74,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     navigator()->setDayTimeWidget(m_dayTimeWidget);
 
     const int kShowHideAnimationPeriodMs = qnWorkbenchAnimations->timeLimit(
-        nx::client::ui::workbench::Animations::Id::CalendarExpanding);
+        nx::client::ui::workbench::Animations::Id::CalendarShow);
 
     item->setWidget(m_widget);
     item->resize(kCalendarSize);
@@ -242,8 +242,8 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
-        ? Animations::Id::CalendarExpanding
-        : Animations::Id::CalendarCollapsing);
+        ? Animations::Id::CalendarShow
+        : Animations::Id::CalendarHide);
 
     if (animate)
         m_yAnimator->animateTo(newY);

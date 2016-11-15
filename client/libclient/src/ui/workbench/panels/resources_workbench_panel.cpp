@@ -174,8 +174,8 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
-        ? Animations::Id::ResourcesPanelExpanding
-        : Animations::Id::ResourcesPanelCollapsing);
+        ? Animations::Id::ResourcesPanelShow
+        : Animations::Id::ResourcesPanelHide);
 
     qreal width = item->size().width();
     qreal newX = opened ? 0.0 : - width - kHidePanelOffset;

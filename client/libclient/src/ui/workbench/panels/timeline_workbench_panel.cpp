@@ -360,8 +360,8 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
-        ? Animations::Id::TimelineExpanding
-        : Animations::Id::TimelineCollapsing);
+        ? Animations::Id::TimelineShow
+        : Animations::Id::TimelineHide);
 
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()

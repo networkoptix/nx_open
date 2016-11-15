@@ -12,6 +12,8 @@ namespace workbench {
 
 namespace {
 
+static const qreal kDefaultSpeed = 0.01;
+
 int idx(Animations::Id id)
 {
     return static_cast<int>(id);
@@ -30,19 +32,21 @@ Animations::Animations(QObject* parent):
             m_timeLimit[idx(id)] = timeLimit;
         };
 
-    setup(Id::TimelineExpanding, QEasingCurve::InOutQuad, 240);
-    setup(Id::TimelineCollapsing, QEasingCurve::OutQuad, 240);
+    setup(Id::TimelineShow, QEasingCurve::InOutQuad, 240);
+    setup(Id::TimelineHide, QEasingCurve::OutQuad, 240);
     setup(Id::TimelineTooltipShow, QEasingCurve::InOutQuad, 160);
     setup(Id::TimelineTooltipHide, QEasingCurve::InOutQuad, 160);
-    setup(Id::ResourcesPanelExpanding, QEasingCurve::InOutQuad, 300);
-    setup(Id::ResourcesPanelCollapsing, QEasingCurve::OutQuad, 300);
-    setup(Id::NotificationsPanelExpanding, QEasingCurve::InOutQuad, 300);
-    setup(Id::NotificationsPanelCollapsing, QEasingCurve::OutQuad, 300);
-    setup(Id::CalendarExpanding, QEasingCurve::OutQuad, 50);
-    setup(Id::CalendarCollapsing, QEasingCurve::InQuad, 50);
+    setup(Id::ResourcesPanelShow, QEasingCurve::InOutQuad, 300);
+    setup(Id::ResourcesPanelHide, QEasingCurve::OutQuad, 300);
+    setup(Id::NotificationsPanelShow, QEasingCurve::InOutQuad, 300);
+    setup(Id::NotificationsPanelHide, QEasingCurve::OutQuad, 300);
+    setup(Id::CalendarShow, QEasingCurve::OutQuad, 50);
+    setup(Id::CalendarHide, QEasingCurve::InQuad, 50);
     setup(Id::SceneItemGeometryChange, QEasingCurve::InOutQuad, 200);
     setup(Id::SceneZoomIn, QEasingCurve::InOutQuad, 500);
     setup(Id::SceneZoomOut, QEasingCurve::InOutQuad, 500);
+    setup(Id::ItemOverlayShow, QEasingCurve::InOutQuad, 200);
+    setup(Id::ItemOverlayHide, QEasingCurve::InOutQuad, 200);
 }
 
 Animations::~Animations()
@@ -56,6 +60,8 @@ void Animations::setupAnimator(VariantAnimator* animator, Id id)
     if (!animator)
         return;
 
+    /* Set base speed to very small value, so time limit will be default option to setup speed. */
+    animator->setSpeed(kDefaultSpeed);
     animator->setEasingCurve(m_easing[idx(id)]);
     animator->setTimeLimit(m_timeLimit[idx(id)]);
 }

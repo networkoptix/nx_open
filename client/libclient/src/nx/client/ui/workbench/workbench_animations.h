@@ -22,16 +22,16 @@ class Animations: public QObject, public Singleton<Animations>
 public:
     enum class Id
     {
-        TimelineExpanding,
-        TimelineCollapsing,
+        TimelineShow,
+        TimelineHide,
         TimelineTooltipShow,
         TimelineTooltipHide,
-        ResourcesPanelExpanding,
-        ResourcesPanelCollapsing,
-        NotificationsPanelExpanding,
-        NotificationsPanelCollapsing,
-        CalendarExpanding,
-        CalendarCollapsing,
+        ResourcesPanelShow,
+        ResourcesPanelHide,
+        NotificationsPanelShow,
+        NotificationsPanelHide,
+        CalendarShow,
+        CalendarHide,
 
         /**
          * Item size increasing/decreasing on click;
@@ -42,14 +42,18 @@ public:
 
         /**
          * Item goes in fullscreen.
-         * Also handles switch between items in fullscreen.
+         * Switch between items in fullscreen.
          */
         SceneZoomIn,
 
         /**
         * Item goes out of fullscreen.
+        * Scene size and position restoring on double click on a free space.
         */
         SceneZoomOut,
+
+        ItemOverlayShow,
+        ItemOverlayHide,
 
         IdCount
     };
