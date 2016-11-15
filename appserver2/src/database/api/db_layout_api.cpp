@@ -23,7 +23,7 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
         filterStr = lit("WHERE r.guid = %1").arg(guidToSqlString(id));
     query.setForwardOnly(true);
 
-    QString queryStr(lit(R"(
+    QString queryStr(R"(
         SELECT
         r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
         l.cell_spacing_height as verticalSpacing, l.locked,
@@ -32,7 +32,8 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
         l.cell_spacing_width as horizontalSpacing, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id
         FROM vms_layout l
         JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid
-        )").arg(filterStr));
+        )");
+    queryStr = queryStr.arg(filterStr);
 
     if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
