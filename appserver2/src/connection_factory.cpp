@@ -918,7 +918,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
-     * %param name User name.
+     * %param[opt] name User name. If isCloud is true, should be empty or omitted, otherwise,
+     *     should be non-empty.
+     * %param[opt] fullName Full user name. If isCloud is true, should be empty or omitted,
+     *     otherwise, can be either specified or omitted.
      * %param[opt] url Should be empty.
      * %param[proprietary] typeId Should have fixed value.
      *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}

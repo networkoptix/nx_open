@@ -2870,6 +2870,19 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     if (tran.params.name.isEmpty())
         return ErrorCode::dbError;
 
+    if (tran.params.isCloud && !tran.params.name.isEmpty())
+    {
+        NX_LOG(lit("Error at %1: user data has isCloud flag set and non-empty name")
+            .arg(Q_FUNC_INFO), cl_logWARNING);
+        return ErrorCode::dbError;
+    }
+    if (tran.params.isCloud && !tran.params.fullName.isEmpty())
+    {
+        NX_LOG(lit("Error at %1: user data has isCloud flag set and non-empty fullName")
+            .arg(Q_FUNC_INFO), cl_logWARNING);
+        return ErrorCode::dbError;
+    }
+
     qint32 internalId = 0;
     ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
     if (result !=ErrorCode::ok)
@@ -2941,7 +2954,7 @@ QString getObjectInfoSelectString(const QString& objType, const QString& objTabl
                 FROM %2 o JOIN vms_resource r  \
                     on r.id = o.resource_ptr_id WHERE r.parent_guid = :guid")
                 .arg(objType)
-                .arg(objTable); 
+                .arg(objTable);
 }
 
 QString getMultiObjectsInfoSelectString(const QStringList& selectStrings)
