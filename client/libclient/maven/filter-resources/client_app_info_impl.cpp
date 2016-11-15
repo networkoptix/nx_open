@@ -66,7 +66,7 @@ QString QnClientAppInfo::libDirSuffix()
     #if defined(Q_OS_LINUX)
         return QStringLiteral("lib");
     #elif defined(Q_OS_MACX)
-        return QStringLiteral("Contants/Frameworks");
+        return QStringLiteral("Contents/Frameworks");
     #else
         return QString();
     #endif
