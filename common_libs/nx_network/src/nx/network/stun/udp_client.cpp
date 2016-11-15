@@ -54,15 +54,14 @@ UDPClient::UDPClient(SocketAddress serverAddress)
 
 UDPClient::~UDPClient()
 {
-    //if not in aio thread and pleaseStop has not been called earlier - 
-        //undefined behavior can occur
     cleanupWhileInAioThread();
 }
 
 void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(
-        [handler = std::move(handler), this](){
+        [handler = std::move(handler), this]()
+        {
             cleanupWhileInAioThread();
             handler();
         });
@@ -260,20 +259,8 @@ void UDPClient::timedOut(nx::Buffer transactionId)
 
 void UDPClient::cleanupWhileInAioThread()
 {
-    //reporting failure for all ongoing requests
-    std::vector<RequestCompletionHandler> completionHandlers;
-    for (auto& requestData : m_ongoingRequests)
-    {
-        completionHandlers.push_back(
-            std::move(requestData.second.completionHandler));
-    }
-    //timers can be safely removed since we are in aio thread
+    // Timers can be safely removed since we are in aio thread.
     m_ongoingRequests.clear();
-
-    for (auto& completionHandler : completionHandlers)
-        completionHandler(
-            SystemError::interrupted,
-            Message());
 }
 
 }   //stun
