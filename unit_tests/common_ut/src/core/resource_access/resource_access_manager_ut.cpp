@@ -224,6 +224,17 @@ TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
     checkPermissions(layout, desired, forbidden);
 }
 
+TEST_F(QnResourceAccessManagerTest, checkLockedChanged)
+{
+    loginAs(Qn::NoGlobalPermissions);
+    auto user = m_currentUser;
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+    layout->setLocked(true);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+}
+
 /************************************************************************/
 /* Checking non-own remote layouts                                      */
 /************************************************************************/
@@ -347,6 +358,16 @@ TEST_F(QnResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
     checkPermissions(layout, Qn::FullLayoutPermissions, 0);
 }
 
+TEST_F(QnResourceAccessManagerTest, checkParentChanged)
+{
+    loginAs(Qn::NoGlobalPermissions);
+    auto user = m_currentUser;
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+    layout->setParentId(QnUuid());
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission));
+}
+
 /************************************************************************/
 /* Checking videowall-based layouts                                     */
 /************************************************************************/
@@ -408,6 +429,15 @@ TEST_F(QnResourceAccessManagerTest, checkUsedEditHimself)
     checkPermissions(m_currentUser, desired, forbidden);
 }
 
+TEST_F(QnResourceAccessManagerTest, checkEditDisabledAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+    auto user = m_currentUser;
+    auto otherAdmin = createUser(Qn::GlobalAdminPermission);
+    otherAdmin->setEnabled(false);
+    qnResPool->addResource(otherAdmin);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
+}
 
 /************************************************************************/
 /* Checking cameras access rights                                       */
@@ -510,37 +540,6 @@ TEST_F(QnResourceAccessManagerTest, checkRoleRemoved)
     qnUserRolesManager->removeUserRole(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
-}
-
-TEST_F(QnResourceAccessManagerTest, checkParentChanged)
-{
-    loginAs(Qn::NoGlobalPermissions);
-    auto user = m_currentUser;
-    auto layout = createLayout(Qn::remote);
-    qnResPool->addResource(layout);
-    layout->setParentId(QnUuid());
-    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission));
-}
-
-TEST_F(QnResourceAccessManagerTest, checkLockedChanged)
-{
-    loginAs(Qn::NoGlobalPermissions);
-    auto user = m_currentUser;
-    auto layout = createLayout(Qn::remote);
-    qnResPool->addResource(layout);
-    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
-    layout->setLocked(true);
-    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
-}
-
-TEST_F(QnResourceAccessManagerTest, checkEditDisabledAdmin)
-{
-    loginAs(Qn::GlobalAdminPermission);
-    auto user = m_currentUser;
-    auto otherAdmin = createUser(Qn::GlobalAdminPermission);
-    otherAdmin->setEnabled(false);
-    qnResPool->addResource(otherAdmin);
-    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
 }
 
 /************************************************************************/
