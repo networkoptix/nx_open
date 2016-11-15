@@ -24,10 +24,17 @@ public:
     void addOnSuccessfulCommitHandler(
         nx::utils::MoveOnlyFunc<void()> func);
 
+    void addOnTransactionCompletionHandler(
+        nx::utils::MoveOnlyFunc<void(DBResult)> func);
+
 private:
     QSqlDatabase* const m_connection;
     bool m_started;
     std::vector<nx::utils::MoveOnlyFunc<void()>> m_onSuccessfulCommitHandlers;
+    std::vector<nx::utils::MoveOnlyFunc<void(DBResult)>> m_onTransactionCompletedHandlers;
+
+    void notifyOnSuccessfullCommit();
+    void notifyOnTransactionCompletion(DBResult dbResult);
 };
 
 } // namespace db

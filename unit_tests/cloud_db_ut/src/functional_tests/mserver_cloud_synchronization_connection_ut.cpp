@@ -49,7 +49,7 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_re
 
     ASSERT_EQ(
         api::ResultCode::ok,
-        unbindSystem(account.data.email, account.password, system.id));
+        unbindSystem(account.email, account.password, system.id));
 
     for (const auto& connectionId: connectionIds)
     {
@@ -100,7 +100,6 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
 TEST_F(Ec2MserverCloudSynchronizationConnection, checking_connection_blink_stability)
 {
     constexpr int maxConcurrentConnectionsToCreate = 50;
-    constexpr auto delayBeforeCheckingConnectionState = std::chrono::seconds(3);
     constexpr auto testRunTime = std::chrono::seconds(10);
 
     ASSERT_TRUE(startAndWaitUntilStarted());

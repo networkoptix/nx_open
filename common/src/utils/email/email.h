@@ -1,5 +1,4 @@
-#ifndef QN_EMAIL_H
-#define QN_EMAIL_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -8,6 +7,20 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include "email_fwd.h"
 
+//TODO: #GDM move other methods to this namespace, then move module to nx/email (?) lib
+namespace nx {
+namespace email {
+
+/**
+ *  Check is string looks like correct email address.
+ *  Supports tags by RFC5233 ( user+tag@domain.com ).
+ *  Supports custom names ( Vasya Pupkin <vasya@pupkin.com> )
+ *  Domain length is limited to 255 symbols.
+ */
+bool isValidAddress(const QString& address);
+
+} // namespace email
+} // namespace nx
 
 struct QnEmailSmtpServerPreset {
     QnEmailSmtpServerPreset();
@@ -48,11 +61,18 @@ struct QnEmailSettings {
 };
 #define QnEmailSettings_Fields (email)(server)(user)(password)(signature)(supportEmail)(connectionType)(port)(timeout)(simple)
 
-class QnEmailAddress {
+/**
+ * Generic email address class.
+ * Supports user names and tagged addressing by RFC5233.
+ * Examples:
+ * * Vasya Pupkin <vasya@pupkin.com>
+ * * user+tag@domain.com
+ */
+class QnEmailAddress
+{
 public:
     explicit QnEmailAddress(const QString &email);
 
-    static bool isValid(const QString &email);
     bool isValid() const;
 
     /**
@@ -64,8 +84,19 @@ public:
 
     QnEmailSettings settings() const;
 
+    /** Username. For tagged addresses returns base part. */
     QString user() const;
+
+    /** Smtp domain */
     QString domain() const;
+
+    /** Email value. */
+    QString value() const;
+
+    /** User's full name (if provided) */
+    QString fullName() const;
+
+    bool operator==(const QnEmailAddress& other) const;
 
 private:
     /**
@@ -75,10 +106,7 @@ private:
     void initSmtpPresets() const;
 
     QString m_email;
+    QString m_fullName;
 };
 
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (metatype)(lexical)(json))
-
-#endif // QN_EMAIL_H
-

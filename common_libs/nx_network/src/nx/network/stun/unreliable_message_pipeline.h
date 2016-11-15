@@ -73,6 +73,8 @@ public:
         m_customPipeline(customPipeline),
         m_socket(std::make_unique<UDPSocket>())
     {
+        // TODO: Figure out smth more clever.
+        NX_CRITICAL(m_socket->setNonBlockingMode(true));
     }
 
     ~UnreliableMessagePipeline()

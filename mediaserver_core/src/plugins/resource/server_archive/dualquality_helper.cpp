@@ -11,8 +11,12 @@
 #include <cmath>
 #include <algorithm>
 
+namespace {
+    
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int FIRST_STREAM_FIND_EPS = 1000 * 15;
+
+} // namespace
 
 QnDualQualityHelper::QnDualQualityHelper()
 {
@@ -51,19 +55,19 @@ void QnDualQualityHelper::findDataForTime(
     const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
 )
 {
-    DeviceFileCatalogPtr normalCatalog = (m_quality == MEDIA_Quality_Low ? 
+    DeviceFileCatalogPtr normalCatalog = (isLowMediaQuality(m_quality) ?
                                           m_catalogLow[QnServer::StoragePool::Normal] : 
                                           m_catalogHi[QnServer::StoragePool::Normal]);
 
-    DeviceFileCatalogPtr normalCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
+    DeviceFileCatalogPtr normalCatalogAlt = (isLowMediaQuality(m_quality) ?
                                           m_catalogHi[QnServer::StoragePool::Normal] : 
                                           m_catalogLow[QnServer::StoragePool::Normal]);
 
-    DeviceFileCatalogPtr backupCatalog = (m_quality == MEDIA_Quality_Low ? 
+    DeviceFileCatalogPtr backupCatalog = (isLowMediaQuality(m_quality) ?
                                           m_catalogLow[QnServer::StoragePool::Backup] : 
                                           m_catalogHi[QnServer::StoragePool::Backup]);
 
-    DeviceFileCatalogPtr backupCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
+    DeviceFileCatalogPtr backupCatalogAlt = (isLowMediaQuality(m_quality) ?
                                           m_catalogHi[QnServer::StoragePool::Backup] : 
                                           m_catalogLow[QnServer::StoragePool::Backup]);
 

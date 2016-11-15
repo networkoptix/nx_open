@@ -54,14 +54,15 @@ QnTransactionTransport::~QnTransactionTransport()
 {
     pleaseStopSync();
 
-    if (m_ttFinishCallback)
-        m_ttFinishCallback();
+    if (m_beforeDestructionHandler)
+        m_beforeDestructionHandler();
 }
 
 void QnTransactionTransport::close()
 {
-    setState(State::Closed);    //changing state before freeing socket so that everyone
-                                //stop using socket before it is actually freed
+    // Changing state before freeing socket so that everyone
+    // stop using socket before it is actually freed.
+    setState(State::Closed);
 
     pleaseStopSync();
 
@@ -161,7 +162,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
 void QnTransactionTransport::setBeforeDestroyCallback(
     std::function<void()> ttFinishCallback)
 {
-    m_ttFinishCallback = ttFinishCallback;
+    m_beforeDestructionHandler = ttFinishCallback;
 }
 
 }   // namespace ec2

@@ -15,6 +15,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
@@ -41,7 +42,7 @@
 
 #include <nx/utils/timer_manager.h>
 #include <api/http_client_pool.h>
-
+#include <utils/common/long_runable_cleanup.h>
 
 namespace
 {
@@ -95,6 +96,8 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     QnCommonMetaTypes::initialize();
 
+    store<QnLongRunableCleanup>(new QnLongRunableCleanup());
+
     /* Init statics. */
     store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
@@ -109,8 +112,11 @@ QnCommonModule::QnCommonModule(QObject *parent):
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
 
+    instance<nx_http::ClientPool>();
+
     instance<QnResourcePool>();             /*< Depends on nothing. */
     instance<QnUserRolesManager>();         /*< Depends on nothing. */
+    instance<QnResourceAccessSubjectsCache>(); /*< Depends on respool and roles. */
     instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
     instance<QnResourceAccessProvider>();   /*< Depends on respool, roles and shared resources. */
 
@@ -126,7 +132,6 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
 
     instance<QnGlobalSettings>();
-    instance<nx_http::ClientPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();

@@ -87,6 +87,8 @@ private:
     void holePunchingDone(
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
+    std::unique_ptr<RendezvousConnectorWithVerification>
+        createRendezvousConnector(SocketAddress endpoint);
 };
 
 } // namespace udp

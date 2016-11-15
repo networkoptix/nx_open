@@ -69,18 +69,6 @@ class Socket
 {
 public:
     Socket(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-        int type,
-        int protocol,
-        int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
-    Socket(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-        int sockDesc,
-        int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
-    //TODO #ak remove following two constructors
-    Socket(
         int type,
         int protocol,
         int ipVersion,
@@ -155,7 +143,6 @@ public:
     bool createSocket( int type, int protocol );
 
 protected:
-    aio::BaseAsyncSocketImplHelper<Pollable>* m_baseAsyncHelper;
     const int m_ipVersion;
 
 private:
@@ -170,16 +157,16 @@ class CommunicatingSocket
 :
     public Socket<InterfaceToImplement>
 {
+    typedef CommunicatingSocket<InterfaceToImplement> SelfType;
+
 public:
     CommunicatingSocket(
-        bool natTraversal,
         int type,
         int protocol,
         int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
 
     CommunicatingSocket(
-        bool natTraversal,
         int newConnSD,
         int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
@@ -190,6 +177,7 @@ public:
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
+
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -224,7 +212,10 @@ public:
     virtual bool shutdown() override;
 
 private:
-    aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;
+    friend class aio::AsyncSocketImplHelper<SelfType>;
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
+    std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
 };
 
@@ -239,12 +230,9 @@ class NX_NETWORK_API TCPSocket
 
 public:
     /**
-     *   Construct a TCP socket with no connection
+     * Construct a TCP socket with no connection.
      */
-    TCPSocket(bool natTraversal, int ipVersion);
-
-    //!User by \a TCPServerSocket class
-    TCPSocket(int newConnSD, int ipVersion);
+    TCPSocket(int ipVersion);
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -274,11 +262,14 @@ public:
 
 private:
     // Access for TCPServerSocket::accept() connection creation
-    friend class TCPServerSocket;
+    friend class TCPServerSocketPrivate;
 
     #if defined(Q_OS_WIN)
         KeepAliveOptions m_keepAlive;
     #endif
+
+    /** Used by TCPServerSocket class. */
+    TCPSocket(int newConnSD, int ipVersion);
 };
 
 /**

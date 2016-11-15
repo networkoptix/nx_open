@@ -339,7 +339,7 @@ void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value) {
 QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &rect, QnVideowallManageWidget* q) :
     base_type(rect, ItemType::Screen, q)
 {
-    name = tr("Desktop %1").arg(idx + 1);
+    name = tr("Display %1").arg(idx + 1);
 
     for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
         snap->screenIndex = idx;

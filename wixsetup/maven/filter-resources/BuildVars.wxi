@@ -1,4 +1,13 @@
 <Include>
+
+    <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+
+    <?define serverUpgradeCode = "${customization.upgradeCode}"?>
+    <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
+    <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
+    <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
+    <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
+
     <?define cloudHost = "${cloudHost}"?>
 
     <?define arch = "${arch}"?>
@@ -37,6 +46,9 @@
         <?define SystemFolderActual = "System64Folder"?>
     <?endif?>
 
+    <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Client" ?>
+    <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Nxtool" ?>
+
     <!-- Wix Variables -->
 
     <?ifdef env.CommonProgramFiles(x86) ?>
@@ -64,6 +76,9 @@
     <?define PluginsDir="${libdir}/bin/${build.configuration}/plugins"?>
     <?define QtDir="${qt.dir}/bin"?>
     <?define QtPluginsDir="${qt.dir}/plugins"?>
+
+    <?define VC12RedistPath="${environment.dir}/packages/${rdep.target}/vcredist-2012/bin"?>
+    <?define VC14RedistPath="${environment.dir}/packages/${rdep.target}/vcredist-2015/bin"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

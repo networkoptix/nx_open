@@ -9,6 +9,7 @@ Item
     property bool isOnline: false;
     property bool isExpandedTile: false;
     property real expandedOpacity: 0;
+    property alias factorySystem: expandedArea.factorySystem;
 
     property string selectedHost: hostChooseItem.value;
     property string selectedUser: (control.impl.hasRecentConnections ?
@@ -75,6 +76,8 @@ Item
         anchors.left: parent.left;
         anchors.right: parent.right;
 
+        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 0);
+
         InfoItem
         {
             id: hostChooseItem;
@@ -94,7 +97,6 @@ Item
 
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
-            visible: control.isOnline;
 
             onAccepted: control.connectRequested();
 
@@ -106,8 +108,15 @@ Item
 
             model: control.recentLocalConnectionsModel;
 
+            Connections
+            {
+                target: userChooseItem.model;
+                ignoreUnknownSignals: true;
+                onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
+            }
+
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections && control.isOnline;
+            visible: control.impl.hasRecentConnections;
 
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";
@@ -163,6 +172,7 @@ Item
             if (currentItemIndex == -1) //< In case of non-existent user
             {
                 expandedArea.savePasswordCheckbox.checked = false;  // Reset "Store password" checkbox
+                expandedArea.passwordTextField.text = "";
                 return;
             }
 

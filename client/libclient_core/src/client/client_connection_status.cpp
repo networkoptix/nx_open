@@ -3,7 +3,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
-#define STRICT_STATE_CONTROL
+//#define STRICT_STATE_CONTROL
 #define DEBUG_CLIENT_CONNECTION_STATUS
 #ifdef DEBUG_CLIENT_CONNECTION_STATUS
 #define TRACE(...) qDebug() << "QnClientConnectionStatus: " << __VA_ARGS__;

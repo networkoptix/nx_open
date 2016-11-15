@@ -16,6 +16,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/resizer_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
@@ -25,6 +26,7 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
+#include <ui/workbench/panels/calendar_workbench_panel.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -43,7 +45,7 @@ static const int kCloseTimelineTimeoutMs = 250;
 static const int kMinThumbnailsHeight = 48;
 static const int kMaxThumbnailsHeight = 196;
 
-static const int kResizerHeight = 16;
+static const int kResizerHeight = 8;
 
 static const int kShowWidgetHeight = 50;
 static const int kShowWidgetHiddenHeight = 12;
@@ -62,11 +64,11 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     zoomingIn(false),
     zoomingOut(false),
     lastThumbnailsHeight(kDefaultThumbnailsHeight),
-
     m_ignoreClickEvent(false),
     m_visible(false),
     m_resizing(false),
     m_updateResizerGeometryLater(false),
+    m_autoHideHeight(0),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
         action(QnActions::ToggleTimelineAction))),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
@@ -107,7 +109,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_showWidget->setProperty(Qn::NoHandScrollOver, true);
     m_showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
     m_showWidget->setVisible(false);
-    m_showWidget->setZValue(ControlItemZOrder);
+    m_showWidget->setZValue(BackgroundItemZOrder);
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
         [this](Qn::ItemRole role)
         {
@@ -143,9 +145,14 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_resizerWidget);
     m_hidingProcessor->addTargetItem(m_showWidget);
+    m_hidingProcessor->addTargetItem(m_zoomButtonsWidget);
+    m_hidingProcessor->addTargetItem(item->timeSlider()->toolTipItem());
+    m_hidingProcessor->addTargetItem(item->timeSlider()->bookmarksViewer());
+    m_hidingProcessor->addTargetItem(item->speedSlider()->toolTipItem());
+    m_hidingProcessor->addTargetItem(item->volumeSlider()->toolTipItem());
     m_hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
             /* Do not auto-hide slider if we have opened context menu. */
@@ -199,11 +206,11 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_zoomButtonsWidget->setOpacity(0.0);
     m_zoomButtonsWidget->setZValue(NxUi::ControlItemZOrder);
 
-    m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
-        [this]()
+    m_zoomButtonsWidget->setVisible(navigator()->isTimelineRelevant());
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
+        [this](bool value)
         {
-            m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
+            m_zoomButtonsWidget->setVisible(value);
         });
 
     enum { kSliderLeaveTimeout = 100 };
@@ -270,8 +277,60 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateGeometry();
+}
 
+TimelineWorkbenchPanel::~TimelineWorkbenchPanel()
+{
+}
 
+void TimelineWorkbenchPanel::setCalendarPanel(CalendarWorkbenchPanel* calendar)
+{
+    if (m_calendar == calendar)
+        return;
+
+    if (m_calendar)
+    {
+        m_calendar->disconnect(this);
+        m_calendar->hidingProcessor->removeTargetItem(item->calendarButton());
+
+        for (auto item : m_calendar->activeItems())
+        {
+            m_opacityProcessor->removeTargetItem(item);
+            m_hidingProcessor->removeTargetItem(item);
+        }
+    }
+
+    m_calendar = calendar;
+
+    auto updateAutoHideHeight =
+        [this]()
+        {
+            auto autoHideHeight = m_calendar && m_calendar->isVisible()
+                ? effectiveGeometry().bottom() - m_calendar->effectiveGeometry().top() + 1
+                : 0;
+
+            if (m_autoHideHeight == autoHideHeight)
+                return;
+
+            m_autoHideHeight = autoHideHeight;
+            updateControlsGeometry();
+        };
+
+    updateAutoHideHeight();
+
+    if (!m_calendar)
+        return;
+
+    connect(m_calendar.data(), &NxUi::AbstractWorkbenchPanel::visibleChanged, this, updateAutoHideHeight);
+    connect(m_calendar.data(), &NxUi::AbstractWorkbenchPanel::geometryChanged, this, updateAutoHideHeight);
+
+    m_calendar->hidingProcessor->addTargetItem(item->calendarButton());
+
+    for (auto item : m_calendar->activeItems())
+    {
+        m_opacityProcessor->addTargetItem(item);
+        m_hidingProcessor->addTargetItem(item);
+    }
 }
 
 bool TimelineWorkbenchPanel::isPinned() const
@@ -314,6 +373,12 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_resizerWidget->setEnabled(opened);
     item->timeSlider()->setTooltipVisible(opened);
+
+    if (!opened)
+    {
+        item->speedSlider()->hideToolTip();
+        item->volumeSlider()->hideToolTip();
+    }
 
     emit openedChanged(opened, animate);
 }
@@ -458,7 +523,6 @@ void TimelineWorkbenchPanel::updateResizerGeometry()
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topLeft()),
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topRight()));
 
-    resizerGeometry.moveTo(resizerGeometry.topLeft() - QPointF(0, kResizerHeight / 2));
     resizerGeometry.setHeight(kResizerHeight);
 
     if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))
@@ -488,13 +552,17 @@ void TimelineWorkbenchPanel::updateControlsGeometry()
         qMin(parentWidgetRect.bottom(), geometry.top()));
     m_showButton->setPos(showButtonPos);
 
+    int showWidgetHeight = qMax(
+        m_autoHideHeight - geometry.height(),
+        kShowWidgetHeight);
+
     const int showWidgetY = isOpened()
-        ? geometry.top() - kShowWidgetHeight
+        ? geometry.top() - showWidgetHeight
         : parentWidgetRect.bottom() - kShowWidgetHiddenHeight;
 
     QRectF showWidgetGeometry(geometry);
     showWidgetGeometry.setTop(showWidgetY);
-    showWidgetGeometry.setHeight(kShowWidgetHeight);
+    showWidgetGeometry.setHeight(showWidgetHeight);
     m_showWidget->setGeometry(showWidgetGeometry);
 
     auto zoomButtonsPos = item->timeSlider()->mapToItem(m_parentWidget,

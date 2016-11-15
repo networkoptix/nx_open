@@ -10,6 +10,7 @@ Pane
     id: control
 
     property alias systemId: informationBlock.systemId
+    property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
     property alias online: informationBlock.online
@@ -30,7 +31,7 @@ Pane
     QnRecentLocalConnectionsModel
     {
         id: connectionsModel
-        systemId: control.systemId
+        systemId: control.localId
     }
 
     background: Rectangle
@@ -59,7 +60,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: hostsModel.firstHost
+        address: Nx.url(hostsModel.firstHost).address()
         user: connectionsModel.firstUser
     }
 
@@ -92,11 +93,10 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(LoginUtils.makeUrl(
+                connectionManager.connectToServer(
                     hostsModel.firstHost,
                     cloudStatusWatcher.cloudLogin(),
-                    cloudStatusWatcher.cloudPassword(),
-                    true))
+                    cloudStatusWatcher.cloudPassword())
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -104,10 +104,10 @@ Pane
         {
             if (connectionsModel.hasConnections)
             {
-                connectionManager.connectToServer(LoginUtils.makeUrl(
-                    informationBlock.address,
-                    informationBlock.user,
-                    connectionsModel.getData("password", 0)))
+                connectionManager.connectToServer(
+                    hostsModel.firstHost,
+                    connectionsModel.firstUser,
+                    connectionsModel.getData("password", 0))
                 Workflow.openResourcesScreen(systemName)
             }
             else

@@ -2,7 +2,6 @@ LIBRARY "CustomActions"
 
 EXPORTS
 
-FindConfiguredStorages
 GenerateGuidsForServers
 CheckPorts
 FindFreePorts

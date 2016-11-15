@@ -102,7 +102,7 @@ protected:
 
 private:
     const Qn::UserAccessData m_userAccessData;
-    std::function<void()> m_ttFinishCallback;
+    std::function<void()> m_beforeDestructionHandler;
 
     template<class T>
     bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)

@@ -191,16 +191,16 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
 {
+    using boost::algorithm::all_of;
+
     /* Return true if there are no invalid emails and there is at least one recipient. */
     auto users = qnResPool->getResources<QnUserResource>(ids);
 
-    if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
+    if (!all_of(users, &isValidUser))
         return false;
 
-    auto isValidEmail = [](const QString& email) { return QnEmailAddress::isValid(email); };
-
     const auto additionalRecipients = parseAdditional(additional);
-    if (!std::all_of(additionalRecipients.cbegin(), additionalRecipients.cend(), isValidEmail))
+    if (!all_of(additionalRecipients, nx::email::isValidAddress))
         return false;
 
     /* Using lazy calculations to avoid counting roles when not needed. */
@@ -243,7 +243,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     invalid = 0;
     for (const QString &email: additional)
     {
-        if (QnEmailAddress::isValid(email))
+        if (nx::email::isValidAddress(email))
             receivers << email;
         else
             invalid++;
@@ -286,6 +286,5 @@ QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional
 
 bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 {
-    const auto email = user->getEmail();
-    return !email.isEmpty() && QnEmailAddress::isValid(email);
+    return nx::email::isValidAddress(user->getEmail());
 }

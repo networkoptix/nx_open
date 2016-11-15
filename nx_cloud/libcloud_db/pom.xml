@@ -19,6 +19,7 @@
         <product.title>${company.name} libcloud_db</product.title>
         <product.display.title>${company.name} Cloud Database</product.display.title>
         <template>lib</template>
+        <targetName>cloud_db</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email -lnx_streaming -lappserver2</global.libs>

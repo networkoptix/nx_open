@@ -21,11 +21,12 @@ public:
         SearchRoleId = FirstRoleId,
         SystemNameRoleId,
         SystemIdRoleId,
+        LocalIdRoleId,
 
         OwnerDescriptionRoleId,
-        LastPasswordRoleId,
 
         IsFactorySystemRoleId,
+        SafeModeRoleId,
 
         IsCloudSystemRoleId,
         IsOnlineRoleId,
@@ -35,9 +36,6 @@ public:
 
         WrongVersionRoleId,
         CompatibleVersionRoleId,
-
-        // For local systems
-        LastPasswordsModelRoleId,
 
         RolesCount
     };

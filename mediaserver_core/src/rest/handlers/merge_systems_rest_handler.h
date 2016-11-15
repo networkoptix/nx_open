@@ -2,6 +2,7 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <core/resource/resource_fwd.h>
+#include <utils/merge_systems_common.h>
 
 struct MergeSystemData;
 
@@ -40,4 +41,8 @@ private:
         const QString& getKey,
         const QString& postKey,
         const QnRestConnectionProcessor* owner);
+
+    void setMergeError(
+        QnJsonRestResult& result,
+        utils::MergeSystemsStatus::Value mergeStatus);
 };

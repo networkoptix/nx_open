@@ -18,7 +18,7 @@
 namespace
 {
     /* Default text flags: */
-    const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignLeft | Qt::AlignVCenter;
+    const int kTextFlags = Qt::TextSingleLine | Qt::AlignLeft | Qt::AlignVCenter;
 
     /* Table row height: */
     const int kRowHeight = style::Metrics::kViewRowHeight;
@@ -40,23 +40,23 @@ namespace
 
         switch (record->eventType)
         {
-        case Qn::AR_ViewLive:
-        case Qn::AR_ViewArchive:
-        case Qn::AR_ExportVideo:
-            return QnAuditItemDelegate::tr("Play");
+            case Qn::AR_ViewLive:
+            case Qn::AR_ViewArchive:
+            case Qn::AR_ExportVideo:
+                return QnAuditItemDelegate::tr("Play");
 
-        case Qn::AR_UserUpdate:
-            return QnAuditItemDelegate::tr("User settings...");
+            case Qn::AR_UserUpdate:
+                return QnAuditItemDelegate::tr("User settings...");
 
-        case Qn::AR_ServerUpdate:
-            return QnAuditItemDelegate::tr("Server settings...");
+            case Qn::AR_ServerUpdate:
+                return QnAuditItemDelegate::tr("Server settings...");
 
-        case Qn::AR_CameraUpdate:
-        case Qn::AR_CameraInsert:
-            return QnAuditItemDelegate::tr("Camera settings...");
+            case Qn::AR_CameraUpdate:
+            case Qn::AR_CameraInsert:
+                return QnAuditItemDelegate::tr("Camera settings...");
 
-        default:
-            return QString();
+            default:
+                return QString();
         }
     }
 
@@ -135,9 +135,9 @@ QSize QnAuditItemDelegate::defaultSizeHint(const QStyleOptionViewItem& option, c
 QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     static const QDateTime dateTimePattern = QDateTime::fromString(lit("2015-12-12T23:59:59"), Qt::ISODate);
-    static const QString dateTimeStr = dateTimePattern.toString(Qt::SystemLocaleShortDate);
-    static const QString timeStr = dateTimePattern.time().toString(Qt::SystemLocaleShortDate);
-    static const QString dateStr = dateTimePattern.date().toString(Qt::SystemLocaleShortDate);
+    static const QString dateTimeStr = dateTimePattern.toString(Qt::DefaultLocaleShortDate);
+    static const QString timeStr = dateTimePattern.time().toString(Qt::DefaultLocaleShortDate);
+    static const QString dateStr = dateTimePattern.date().toString(Qt::DefaultLocaleShortDate);
     static const QString dateStrWithSpace = dateStr + lit(" ");
 
     QSize result(0, kRowHeight);
@@ -145,37 +145,37 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QM
 
     switch (column)
     {
-    case QnAuditLogModel::DescriptionColumn:
-        result = descriptionSizeHint(option, index);
-        break;
+        case QnAuditLogModel::DescriptionColumn:
+            result = descriptionSizeHint(option, index);
+            break;
 
-    case QnAuditLogModel::TimestampColumn:
-        result.setWidth(textWidth(option.font, dateStrWithSpace) + textWidth(option.font, timeStr, true));
-        break;
+        case QnAuditLogModel::TimestampColumn:
+            result.setWidth(textWidth(option.font, dateStrWithSpace) + textWidth(option.font, timeStr, true));
+            break;
 
-    case QnAuditLogModel::EndTimestampColumn:
-        result.setWidth(qMax(
-            textWidth(option.font, dateStrWithSpace) + textWidth(option.font, timeStr, true),
-            textWidth(option.font, QnAuditLogModel::eventTypeToString(Qn::AR_UnauthorizedLogin))));
-        break;
+        case QnAuditLogModel::EndTimestampColumn:
+            result.setWidth(qMax(
+                textWidth(option.font, dateStrWithSpace) + textWidth(option.font, timeStr, true),
+                textWidth(option.font, QnAuditLogModel::eventTypeToString(Qn::AR_UnauthorizedLogin))));
+            break;
 
-    case QnAuditLogModel::TimeColumn:
-        result.setWidth(textWidth(option.font, timeStr));
-        break;
+        case QnAuditLogModel::TimeColumn:
+            result.setWidth(textWidth(option.font, timeStr));
+            break;
 
-    case QnAuditLogModel::DateColumn:
-        result.setWidth(textWidth(option.font, dateStr, true));
-        break;
+        case QnAuditLogModel::DateColumn:
+            result.setWidth(textWidth(option.font, dateStr, true));
+            break;
 
-    case QnAuditLogModel::UserActivityColumn:
-        result = index.data(Qt::SizeHintRole).toSize();
-        if (!result.isValid())
+        case QnAuditLogModel::UserActivityColumn:
+            result = index.data(Qt::SizeHintRole).toSize();
+            if (!result.isValid())
+                result = defaultSizeHint(option, index);
+            break;
+
+        default:
             result = defaultSizeHint(option, index);
-        break;
-
-    default:
-        result = defaultSizeHint(option, index);
-        break;
+            break;
     }
 
     result.setWidth(result.width() + style::Metrics::kStandardPadding * 2);
@@ -193,21 +193,22 @@ QSize QnAuditItemDelegate::descriptionSizeHint(const QStyleOptionViewItem& optio
     {
         switch (record->eventType)
         {
-        case Qn::AR_ViewLive:
-        case Qn::AR_ViewArchive:
-        case Qn::AR_ExportVideo:
-        case Qn::AR_CameraUpdate:
-        case Qn::AR_CameraInsert:
-            if (QnAuditLogModel::hasDetail(record))
-            {
-                QFont smallFont(option.font);
-                smallFont.setPixelSize(option.font.pixelSize() - 1);
-                QFontMetrics smallFontMetrics(smallFont);
-                result.setHeight(result.height() + (smallFontMetrics.height() + kDetailLineVerticalMargin * 2) * QnAuditLogModel::getCameras(record).size());
-            }
-            break;
-        default:
-            break;
+            case Qn::AR_ViewLive:
+            case Qn::AR_ViewArchive:
+            case Qn::AR_ExportVideo:
+            case Qn::AR_CameraUpdate:
+            case Qn::AR_CameraInsert:
+                if (QnAuditLogModel::hasDetail(record))
+                {
+                    QFont smallFont(option.font);
+                    smallFont.setPixelSize(option.font.pixelSize() - 1);
+                    QFontMetrics smallFontMetrics(smallFont);
+                    result.setHeight(result.height() + (smallFontMetrics.height() + kDetailLineVerticalMargin * 2) * QnAuditLogModel::getCameras(record).size());
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -221,7 +222,7 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
     {
         switch (event->type())
         {
-        case QEvent::MouseMove:
+            case QEvent::MouseMove:
             {
                 /* First, check if mouse was released outside of our widget and discard any captures: */
                 if (m_mouseCapture != kNotCaptured && !static_cast<const QMouseEvent*>(event)->buttons().testFlag(Qt::LeftButton))
@@ -255,73 +256,78 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
                 /* If mouse is captured, skip default handling to avoid drag-selecting: */
                 if (m_mouseCapture != kNotCaptured)
                     return true;
-            }
-            break;
 
-        case QEvent::MouseButtonPress:
-            if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton)
+                break;
+            }
+
+            case QEvent::MouseButtonPress:
             {
-                if (index.data(Qn::ColumnDataRole).toInt() == QnAuditLogModel::DescriptionColumn)
+                if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton)
                 {
-                    if (m_lastHoveredButtonIndex == index)
+                    if (index.data(Qn::ColumnDataRole).toInt() == QnAuditLogModel::DescriptionColumn)
                     {
-                        /* Item button was pressed: */
-                        m_mouseCapture = kCapturedByButton;
-                        scrollArea->viewport()->update(m_lastHoveredButtonRect);
+                        if (m_lastHoveredButtonIndex == index)
+                        {
+                            /* Item button was pressed: */
+                            m_mouseCapture = kCapturedByButton;
+                            scrollArea->viewport()->update(m_lastHoveredButtonRect);
+                        }
+                        else
+                        {
+                            /* Do not produce clicks on description items without details: */
+                            const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+                            if (!record || record->resources.empty())
+                                break;
+
+                            /* Description was pressed outside its button: */
+                            m_mouseCapture = kCapturedByDescription;
+                        }
+
+                        m_lastPressedIndex = index;
+
+                        /* Skip default handling to avoid selection change: */
+                        return true;
                     }
-                    else
+                }
+
+                break;
+            }
+
+            case QEvent::MouseButtonRelease:
+            {
+                if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton && m_mouseCapture != kNotCaptured)
+                {
+                    if (m_lastPressedIndex == index)
                     {
-                        /* Do not produce clicks on description items without details: */
-                        const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
-                        if (!record || record->resources.empty())
+                        switch (m_mouseCapture)
+                        {
+                        case kNotCaptured:
                             break;
 
-                        /* Description was pressed outside its button: */
-                        m_mouseCapture = kCapturedByDescription;
+                        case kCapturedByDescription:
+                            /* Click on description outside its button: */
+                            emit descriptionClicked(index);
+                            break;
+
+                        case kCapturedByButton:
+                            /* Click on description item button: */
+                            scrollArea->viewport()->update(m_lastHoveredButtonRect);
+                            emit buttonClicked(index);
+                            break;
+                        }
                     }
 
-                    m_lastPressedIndex = index;
+                    m_lastPressedIndex = QModelIndex();
+                    m_mouseCapture = kNotCaptured;
 
                     /* Skip default handling to avoid selection change: */
                     return true;
                 }
+                break;
             }
-            break;
 
-        case QEvent::MouseButtonRelease:
-            if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton && m_mouseCapture != kNotCaptured)
-            {
-                if (m_lastPressedIndex == index)
-                {
-                    switch (m_mouseCapture)
-                    {
-                    case kNotCaptured:
-                        break;
-
-                    case kCapturedByDescription:
-                        /* Click on description outside its button: */
-                        emit descriptionClicked(index);
-                        break;
-
-                    case kCapturedByButton:
-                        /* Click on description item button: */
-                        scrollArea->viewport()->update(m_lastHoveredButtonRect);
-                        emit buttonClicked(index);
-                        break;
-                    }
-                }
-
-                m_lastPressedIndex = QModelIndex();
-                m_mouseCapture = kNotCaptured;
-
-                /* Skip default handling to avoid selection change: */
-                return true;
-            }
-            break;
-
-
-        default:
-            break;
+            default:
+                break;
         }
     }
 
@@ -369,30 +375,30 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
         QnAuditLogModel::Column column = static_cast<QnAuditLogModel::Column>(index.data(Qn::ColumnDataRole).toInt());
         switch (column)
         {
-        case QnAuditLogModel::TimestampColumn:
-            paintDateTime(style, painter, option, record->createdTimeSec);
-            paintFocusRect(style, painter, option);
-            return;
+            case QnAuditLogModel::TimestampColumn:
+                paintDateTime(style, painter, option, record->createdTimeSec);
+                paintFocusRect(style, painter, option);
+                return;
 
-        case QnAuditLogModel::EndTimestampColumn:
-            if (record->eventType == Qn::AR_UnauthorizedLogin || record->rangeEndSec == 0)
+            case QnAuditLogModel::EndTimestampColumn:
+                if (record->eventType == Qn::AR_UnauthorizedLogin || record->rangeEndSec == 0)
+                    break;
+                paintDateTime(style, painter, option, record->rangeEndSec);
+                paintFocusRect(style, painter, option);
+                return;
+
+            case QnAuditLogModel::DescriptionColumn:
+                paintDescription(style, painter, option, index, record);
+                paintFocusRect(style, painter, option);
+                return;
+
+            case QnAuditLogModel::UserActivityColumn:
+                paintUserActivity(style, painter, option, index);
+                paintFocusRect(style, painter, option);
+                return;
+
+            default:
                 break;
-            paintDateTime(style, painter, option, record->rangeEndSec);
-            paintFocusRect(style, painter, option);
-            return;
-
-        case QnAuditLogModel::DescriptionColumn:
-            paintDescription(style, painter, option, index, record);
-            paintFocusRect(style, painter, option);
-            return;
-
-        case QnAuditLogModel::UserActivityColumn:
-            paintUserActivity(style, painter, option, index);
-            paintFocusRect(style, painter, option);
-            return;
-
-        default:
-            break;
         }
     }
 
@@ -411,8 +417,8 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
 
     /* Get date and time strings: */
     QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(dateTimeSecs * 1000ll);
-    QString dateStr = dateTime.date().toString(Qt::SystemLocaleShortDate) + lit(" ");
-    QString timeStr = dateTime.time().toString(Qt::SystemLocaleShortDate);
+    QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + lit(" ");
+    QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
 
     /* Calculate time offset: */
     QFontMetrics fm(option.font);
@@ -431,7 +437,8 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
 }
 
 /* Description column complex drawing: */
-void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const
+void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painter,
+    const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const
 {
     /* Paint first line hover and/or selection: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
@@ -445,22 +452,25 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
 
     switch (record->eventType)
     {
-    case Qn::AR_ViewLive:
-    case Qn::AR_ViewArchive:
-    case Qn::AR_ExportVideo:
-        mainText = lit("%1 - %2").arg(context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(record->rangeStartSec * 1000ll).toString(Qt::SystemLocaleShortDate))
-                                 .arg(context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(record->rangeEndSec   * 1000ll).toString(Qt::SystemLocaleShortDate));
-        cameras = QnAuditLogModel::getCameras(record);
-        break;
+        case Qn::AR_ViewLive:
+        case Qn::AR_ViewArchive:
+        case Qn::AR_ExportVideo:
+            mainText = lit("%1 - %2").arg(
+                context()->instance<QnWorkbenchServerTimeWatcher>()->
+                    displayTime(record->rangeStartSec * 1000ll).toString(Qt::DefaultLocaleShortDate)).arg(
+                context()->instance<QnWorkbenchServerTimeWatcher>()->
+                    displayTime(record->rangeEndSec * 1000ll).toString(Qt::DefaultLocaleShortDate));
+            cameras = QnAuditLogModel::getCameras(record);
+            break;
 
-    case Qn::AR_CameraUpdate:
-    case Qn::AR_CameraInsert:
-        cameras = QnAuditLogModel::getCameras(record);
-        break;
+        case Qn::AR_CameraUpdate:
+        case Qn::AR_CameraInsert:
+            cameras = QnAuditLogModel::getCameras(record);
+            break;
 
-    default:
-        mainText = option.index.data(Qt::DisplayRole).toString();
-        break;
+        default:
+            mainText = option.index.data(Qt::DisplayRole).toString();
+            break;
     }
 
     QString linkText;
@@ -504,7 +514,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
 
     /* Draw main text: */
     QRect actualRect;
-    QString elidedMainText = option.fontMetrics.elidedText(mainText, option.textElideMode, rect.width(), kTextFlags);
+    QString elidedMainText = option.fontMetrics.elidedText(mainText, option.textElideMode, rect.width());
 
     painter->drawText(rect, kTextFlags, elidedMainText, &actualRect);
 
@@ -515,7 +525,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         if (actualRect.isValid())
             linkRect.setLeft(actualRect.right());
 
-        QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width(), kTextFlags);
+        QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width());
 
         QPalette::ColorGroup group = option.state.testFlag(QStyle::State_MouseOver) ? QPalette::Normal : QPalette::Inactive;
 
@@ -556,7 +566,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
 
             /* Draw camera name: */
             QString name = QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
-            QString elidedName = smallFontMetrics.elidedText(name, option.textElideMode, nameRect.width(), kTextFlags);
+            QString elidedName = smallFontMetrics.elidedText(name, option.textElideMode, nameRect.width());
             painter->drawText(nameRect, kTextFlags, elidedName);
             nameRect.moveTop(nameRect.top() + smallRowHeight);
             markerCenter.setY(markerCenter.y() + smallRowHeight);

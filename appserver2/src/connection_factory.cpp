@@ -97,13 +97,10 @@ int Ec2DirectConnectionFactory::testConnectionAsync(
     QUrl url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (m_transactionMessageBus->localPeer().isMobileClient())
-    {
-        QUrlQuery query(url);
-        query.removeQueryItem(lit("format"));
-        query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-        url.setQuery(query);
-    }
+    QUrlQuery query(url);
+    query.removeQueryItem(lit("format"));
+    query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+    url.setQuery(query);
 
     if (url.isEmpty())
         return testDirectConnection(url, handler);
@@ -180,6 +177,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Any user if a resource is a layout and a layout is her own resource. Custom user with 'Edit camera settings' permision. Administrator.
      * %param id Unique id of the resource.
      * %// AbstractResourceManager::remove
      */
@@ -208,6 +206,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
@@ -328,6 +327,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
      * %param parentId Should be empty.
      * %param name Storage name.
@@ -471,6 +471,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator or a custom user with 'Edit camera settings' permission.
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      * %param cameraName Camera name.
      * %param userDefinedGroupName Name of the user-defined camera group.
@@ -900,6 +901,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator.
      * %param userId User unique id.
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
@@ -912,6 +914,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
@@ -935,6 +938,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      *     %value GlobalCustomUserPermission Flag: this user has custom permissions
+     * %param[opt] groupId User group unique identifier.
      * %param email User's email.
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
@@ -968,6 +972,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator
      * %param id User unique id.
      * %// AbstractUserManager::remove
      */
@@ -979,6 +984,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator.
      * %param[opt] id Group unique id. Can be omitted when creating a new object. If such object
      * exists, omitted fields will not be changed.
      * %param name Group name.
@@ -1003,6 +1009,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Administrator
      * %param id User unique id.
      * %// AbstractUserManager::removeUserGroup
      */
@@ -1050,6 +1057,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Any user if a layout is her own resource. Administrator.
      * %param[opt] id Layout unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param parentId Unique id of the user owning the layout.
@@ -1182,6 +1190,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %permissions Any user if a layout is her own resource. Administrator.
      * %param id Unique Id of the layout to be deleted.
      * %// AbstractLayoutManager::remove
      */
@@ -1240,7 +1249,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
     /**%apidoc GET /ec2/getCurrentTime
-     * Read current time
+     * Read current time.
+     * %permissions Administrator.
      * %param[default] format
      * %param[opt] folder File name
      * %return Return object in requested format
@@ -1693,7 +1703,9 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
     auto func =
         [this, reqId, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
-            remoteTestConnectionFinished(reqId, errorCode, connectionInfo, addr, handler);
+            auto infoWithUrl = connectionInfo;
+            infoWithUrl.ecUrl = addr;
+            remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<nullptr_t, QnConnectionInfo>(
         addr, ApiCommand::testConnection, nullptr_t(), func);

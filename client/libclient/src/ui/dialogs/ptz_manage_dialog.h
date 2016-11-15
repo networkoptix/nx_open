@@ -35,7 +35,7 @@ public:
 
     bool askToSaveChanges(bool cancelIsAllowed = true);
 	void setHotkeysDelegate(QnAbstractPtzHotkeyDelegate* hotkeysDelegate);
-	
+
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
@@ -76,10 +76,11 @@ private:
     bool saveHomePosition();
     void enableDewarping();
     void clear();
+    void showSetPositionWarning();
 
 private:
     QScopedPointer<Ui::PtzManageDialog> ui;
-    
+
     QnPtzManageModel *m_model;
 	QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
     QnResourcePtr m_resource;

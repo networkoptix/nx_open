@@ -19,21 +19,18 @@ Item
             text: cloudStatusWatcher.effectiveUserName
         }
 
-        Item
+        Item { width: 1; height: 18 }
+
+        Button
         {
-            height: logoutButton.height + 40
+            id: logoutButton
+            text: qsTr("Log out")
             width: parent.width
 
-            Button
-            {
-                id: logoutButton
-                y: 24
-                text: qsTr("Logout")
-                width: parent.width
-
-                onClicked: setCloudCredentials("", "")
-            }
+            onClicked: setCloudCredentials("", "")
         }
+
+        Item { width: 1; height: 10 }
 
         LinkButton
         {

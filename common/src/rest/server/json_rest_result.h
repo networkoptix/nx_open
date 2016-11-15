@@ -66,7 +66,7 @@ public:
     }
 
     template<class T>
-    T deserialized() {
+    T deserialized() const {
         T result;
         QJson::deserialize(reply, &result);
         return result;

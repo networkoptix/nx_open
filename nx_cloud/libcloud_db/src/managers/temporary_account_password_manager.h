@@ -1,16 +1,17 @@
-/**********************************************************
-* Dec 15, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
-#define NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
+#pragma once
 
 #include "access_control/abstract_authentication_data_provider.h"
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/global_fun.hpp>
+#include <boost/multi_index/identity.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/counter.h>
+
 #include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
@@ -21,10 +22,11 @@
 namespace nx {
 namespace cdb {
 
-namespace conf
-{
+namespace conf {
+
 class Settings;
-}
+
+} // namespace
 
 class TemporaryAccountCredentialsEx
 :
@@ -94,16 +96,38 @@ public:
         const std::string& login) const;
 
 private:
+    typedef boost::multi_index::multi_index_container<
+        TemporaryAccountCredentialsEx,
+        boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                TemporaryAccountCredentialsEx,
+                std::string,
+                &TemporaryAccountCredentialsEx::id>>,
+            boost::multi_index::ordered_non_unique<boost::multi_index::member<
+                data::TemporaryAccountCredentials,
+                std::string,
+                &data::TemporaryAccountCredentials::login>>,
+            boost::multi_index::ordered_non_unique<boost::multi_index::member<
+                data::TemporaryAccountCredentials,
+                std::string,
+                &data::TemporaryAccountCredentials::accountEmail>>
+        >
+    > TemporaryCredentialsDictionary;
+
+    constexpr static const int kIndexById = 0;
+    constexpr static const int kIndexByLogin = 1;
+    constexpr static const int kIndexByAccountEmail = 2;
+
     const conf::Settings& m_settings;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     QnCounter m_startedAsyncCallsCounter;
-    //!map<login, password data>
-    std::multimap<std::string, TemporaryAccountCredentialsEx> m_temporaryCredentialsByLogin;
+    TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
 
-    bool checkTemporaryPasswordForExpiration(
-        QnMutexLockerBase* const lk,
-        std::multimap<std::string, TemporaryAccountCredentialsEx>::iterator passwordIter);
+    bool isTemporaryPasswordExpired(
+        const TemporaryAccountCredentialsEx& temporaryCredentials) const;
+    void removeTemporaryCredentialsFromDbDelayed(
+        const TemporaryAccountCredentialsEx& temporaryCredentials);
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchTemporaryPasswords(
@@ -118,16 +142,21 @@ private:
     nx::db::DBResult deleteTempPassword(
         nx::db::QueryContext* const queryContext,
         std::string tempPasswordID);
-    void tempPasswordDeleted(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult resultCode,
-        std::string tempPasswordID,
-        std::function<void(api::ResultCode)> completionHandler);
    
+    boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
+        const QnMutexLockerBase& lk,
+        const std::string& username,
+        std::function<bool(const nx::Buffer&)> checkPasswordHash);
+    void runExpirationRulesOnSuccessfulLogin(
+        const QnMutexLockerBase& lk,
+        const TemporaryAccountCredentialsEx& temporaryCredentials);
+
+    template<typename Index, typename Iterator>
+    void updateExpirationRulesAfterSuccessfulLogin(
+        const QnMutexLockerBase& lk,
+        Index& index,
+        Iterator it);
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
+} // namespace cdb
+} // namespace nx

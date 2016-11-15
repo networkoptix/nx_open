@@ -455,8 +455,6 @@ namespace nx_http
         NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
             arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_lastSysErrorCode = errorCode;
-        if (reconnectIfAppropriate())
-            return;
 
         m_state = sFailed;
         const auto requestSequenceBak = m_requestSequence;

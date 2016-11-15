@@ -10,9 +10,6 @@
     <height>279</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Login to Cloud</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
     <number>0</number>
@@ -101,7 +98,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Login</string>
+         <string>Log in</string>
         </property>
        </widget>
       </item>
@@ -148,7 +145,11 @@
        </widget>
       </item>
       <item row="0" column="0" colspan="3">
-       <widget class="QnInputField" name="loginInputField" native="true"/>
+       <widget class="QnInputField" name="loginInputField" native="true">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QWidget" name="spacer" native="true"/>
@@ -210,7 +211,11 @@
        </widget>
       </item>
       <item row="1" column="0" colspan="3">
-       <widget class="QnInputField" name="passwordInputField" native="true"/>
+       <widget class="QnInputField" name="passwordInputField" native="true">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1" colspan="2">
        <widget class="QLabel" name="invalidCredentialsLabel">
@@ -244,6 +249,8 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>loginInputField</tabstop>
+  <tabstop>passwordInputField</tabstop>
   <tabstop>stayLoggedInCheckBox</tabstop>
   <tabstop>loginButton</tabstop>
   <tabstop>restorePasswordLabel</tabstop>

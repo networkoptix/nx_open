@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/panels/buttons.h>
 
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -80,6 +81,20 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &CalendarWorkbenchPanel::updateControlsGeometry);
 
+    /* Hide pin/unpin button when any child line edit is visible: */
+    auto showHideSignalizer = new QnMultiEventSignalizer(this);
+    showHideSignalizer->addEventType(QEvent::Show);
+    showHideSignalizer->addEventType(QEvent::Hide);
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+        [this](QObject* object, QEvent* event)
+        {
+            Q_UNUSED(object);
+            m_pinButton->setVisible(event->type() == QEvent::Hide);
+        });
+
+    for (auto lineEdit : m_widget->findChildren<QLineEdit*>())
+        lineEdit->installEventFilter(showHideSignalizer);
+
     action(QnActions::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);
     m_pinButton->setZValue(ControlItemZOrder);
@@ -109,19 +124,11 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
             setDayTimeWidgetOpened(false, true);
         });
 
-    m_opacityProcessor->addTargetItem(item);
-    m_opacityProcessor->addTargetItem(m_dayTimeItem);
-    m_opacityProcessor->addTargetItem(m_pinButton);
-    m_opacityProcessor->addTargetItem(m_dayTimeMinimizeButton);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &AbstractWorkbenchPanel::hoverLeft);
 
-    hidingProcessor->addTargetItem(item);
-    hidingProcessor->addTargetItem(m_dayTimeItem);
-    hidingProcessor->addTargetItem(m_pinButton);
-    hidingProcessor->addTargetItem(m_dayTimeMinimizeButton);
     hidingProcessor->setHoverLeaveDelay(kClosePanelTimeoutMs);
     hidingProcessor->setFocusLeaveDelay(kClosePanelTimeoutMs);
     connect(hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -130,6 +137,12 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
             if (!isPinned())
                 setOpened(false);
         });
+
+    for (auto item : activeItems())
+    {
+        m_opacityProcessor->addTargetItem(item);
+        hidingProcessor->addTargetItem(item);
+    }
 
     m_yAnimator->setTimer(animationTimer());
     m_yAnimator->setTargetObject(item);
@@ -140,6 +153,15 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
     m_opacityAnimatorGroup->setTimeLimit(kShowHideAnimationPeriodMs);
+}
+
+QList<QGraphicsItem*> CalendarWorkbenchPanel::activeItems() const
+{
+    return {
+        item,
+        m_dayTimeItem,
+        m_pinButton,
+        m_dayTimeMinimizeButton };
 }
 
 bool CalendarWorkbenchPanel::isEnabled() const
@@ -155,7 +177,7 @@ void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
     action(QnActions::ToggleCalendarAction)->setEnabled(enabled);
     if (!isOpened())
         return;
-   
+
     if (enabled)
     {
         /* Minor hack to make animation look better. */
@@ -306,6 +328,8 @@ void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
         m_dayTimeItem->setOpacity(opacity);
         m_dayTimeMinimizeButton->setOpacity(opacity);
     }
+
+    emit geometryChanged();
 }
 
 void CalendarWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)

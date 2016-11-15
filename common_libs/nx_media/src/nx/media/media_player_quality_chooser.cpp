@@ -19,6 +19,31 @@ namespace {
 static const QSize kMaxTranscodingResolution(1920, 1080);
 static const QSize kDefaultAspect(16, 9);
 
+/**
+ * If a particular stream is missing, its out parameters are not assigned a value.
+ */
+void findCameraStreams(
+    const QnVirtualCameraResourcePtr& camera,
+    QSize* outHighResolution,
+    AVCodecID* outHighCodec,
+    QSize* outLowResolution,
+    AVCodecID* outLowCodec)
+{
+    for (const auto& stream: camera->mediaStreams().streams)
+    {
+        if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
+        {
+            *outHighCodec = (AVCodecID) stream.codec;
+            *outHighResolution = stream.getResolution();
+        }
+        else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
+        {
+            *outLowCodec = (AVCodecID) stream.codec;
+            *outLowResolution = stream.getResolution();
+        }
+    }
+}
+
 static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
 {
     if (desiredResolution.isEmpty() || limit.isEmpty())
@@ -112,12 +137,10 @@ static bool isTranscodingSupported(
     return server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding);
 }
 
-} // namespace
-
-const QSize media_player_quality_chooser::kQualityLow{-1, Player::LowVideoQuality};
-const QSize media_player_quality_chooser::kQualityHigh{-1, Player::HighVideoQuality};
-
-QSize media_player_quality_chooser::applyTranscodingIfPossible(
+/**
+ * @return Transcoding resolution, or invalid (default) QSize if transcoding is not possible.
+ */
+static QSize applyTranscodingIfPossible(
     AVCodecID transcodingCodec,
     bool liveMode,
     qint64 positionMs,
@@ -146,6 +169,67 @@ QSize media_player_quality_chooser::applyTranscodingIfPossible(
     return resolution;
 }
 
+} // namespace
+
+const QSize media_player_quality_chooser::kQualityLow{-1, Player::LowVideoQuality};
+const QSize media_player_quality_chooser::kQualityHigh{-1, Player::HighVideoQuality};
+const QSize media_player_quality_chooser::kQualityLowIframesOnly{-1,
+    Player::LowIframesOnlyVideoQuality};
+
+QSize media_player_quality_chooser::chooseHighStreamIfPossible(
+    AVCodecID transcodingCodec,
+    bool liveMode,
+    qint64 positionMs,
+    const QnVirtualCameraResourcePtr& camera,
+    AVCodecID highCodec,
+    const QSize& highResolution,
+    const QnConstResourceVideoLayoutPtr& videoLayout)
+{
+    if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
+    {
+        if (videoLayout->channelCount() > 1) //< Panoramic camera.
+        {
+            const QSize& maxResolution =
+                VideoDecoderRegistry::instance()->maxResolution(transcodingCodec);
+
+            const QSize& resolution = limitResolution(highResolution, maxResolution);
+
+            NX_LOG(lit("[media_player] Panoramic camera: "
+                "High stream requested => Attempt transcoding to %2 x %3:")
+                .arg(resolution.width()).arg(resolution.height()),
+                cl_logDEBUG2);
+
+            const QSize& quality = applyTranscodingIfPossible(
+                transcodingCodec, liveMode, positionMs, camera, resolution);
+            if (quality.isValid())
+                return quality;
+        }
+        else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
+            highCodec, highResolution))
+        {
+            NX_LOG(lit("[media_player] High stream requested => Set high stream"),
+                cl_logDEBUG2);
+            return kQualityHigh;
+        }
+        else
+        {
+            NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
+                cl_logDEBUG2);
+            const QSize& quality = applyTranscodingIfPossible(
+                transcodingCodec, liveMode, positionMs, camera, highResolution);
+            if (quality.isValid())
+                return quality;
+        }
+    }
+    else
+    {
+        NX_LOG(lit("[media_player] High stream requested but missing => Set low stream"),
+            cl_logDEBUG2);
+    }
+
+    return kQualityLow;
+}
+
 QSize media_player_quality_chooser::chooseVideoQuality(
     AVCodecID transcodingCodec,
     int videoQuality,
@@ -153,24 +237,20 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera)
 {
+    if (videoQuality == Player::LowIframesOnlyVideoQuality)
+    {
+        NX_LOG(lit("[media_player] Low stream I-frames only requested => Set low stream I-frames only"),
+            cl_logDEBUG2);
+        return kQualityLowIframesOnly;
+    }
+
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
     AVCodecID highCodec = AV_CODEC_ID_NONE;
     QSize lowResolution;
     AVCodecID lowCodec = AV_CODEC_ID_NONE;
-    for (const auto& stream: camera->mediaStreams().streams)
-    {
-        if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
-        {
-            highCodec = (AVCodecID) stream.codec;
-            highResolution = stream.getResolution();
-        }
-        else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
-        {
-            lowCodec = (AVCodecID) stream.codec;
-            lowResolution = stream.getResolution();
-        }
-    }
+    findCameraStreams(camera, &highResolution, &highCodec, &lowResolution, &lowCodec);
+
     QN_UNUSED(lowCodec);
 
     const bool highStreamRequested = videoQuality == Player::HighVideoQuality
@@ -183,54 +263,14 @@ QSize media_player_quality_chooser::chooseVideoQuality(
 
     if (highStreamRequested)
     {
-        if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
-        {
-            if (videoLayout->channelCount() > 1) //< Panoramic camera.
-            {
-                const QSize& maxResolution =
-                    VideoDecoderRegistry::instance()->maxResolution(transcodingCodec);
-
-                const QSize& resolution = limitResolution(highResolution, maxResolution);
-
-                NX_LOG(lit("[media_player] Panoramic camera: "
-                    "High stream requested => Attempt transcoding to %2 x %3:")
-                    .arg(resolution.width()).arg(resolution.height()),
-                    cl_logDEBUG2);
-
-                const QSize& quality = applyTranscodingIfPossible(
-                    transcodingCodec, liveMode, positionMs, camera, resolution);
-                if (quality.isValid())
-                    return quality;
-
-            }
-            else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-                highCodec, highResolution))
-            {
-                NX_LOG(lit("[media_player] High stream requested => Set high stream"),
-                    cl_logDEBUG2);
-                return kQualityHigh;
-            }
-            else
-            {
-                NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
-                    cl_logDEBUG2);
-                const QSize& quality = applyTranscodingIfPossible(
-                    transcodingCodec, liveMode, positionMs, camera, highResolution);
-                if (quality.isValid())
-                    return quality;
-            }
-        }
-        else
-        {
-            NX_LOG(lit("[media_player] High stream requested but missing => Set low stream"),
-                cl_logDEBUG2);
-        }
+        return chooseHighStreamIfPossible(transcodingCodec, liveMode, positionMs, camera,
+            highCodec, highResolution, videoLayout);
     }
     else if (lowStreamRequested)
     {
         NX_LOG(lit("[media_player] Low stream requested => Set low stream"), cl_logDEBUG2);
     }
-    else if (videoQuality > Player::HighVideoQuality) //< Custom lines count requested.
+    else if (videoQuality >= Player::CustomVideoQuality) //< Custom lines count requested.
     {
         const QSize& resolution = transcodingResolution(
             lowResolution, highResolution, videoQuality, transcodingCodec);

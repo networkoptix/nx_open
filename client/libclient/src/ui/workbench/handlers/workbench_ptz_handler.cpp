@@ -203,19 +203,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
     }
     else
     {
-        if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
-        {
-            QnMessageBox::critical(
-                mainWindow(),
-                tr("Unable to set position on camera."),
-                tr("An error has occurred while trying to set the current position for camera %1.")
-                .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
-                + L'\n'
-                + tr("Please wait for the camera to go online.")
-            );
-            return;
-        }
-        //TODO: #GDM #PTZ check other cases
+        showSetPositionWarning(resource);
     }
 }
 
@@ -264,19 +252,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
     }
     else
     {
-        if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
-        {
-            QnMessageBox::critical(
-                mainWindow(),
-                tr("Unable to set position on camera."),
-                tr("An error has occurred while trying to set the current position for camera %1.")
-                .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
-                + L'\n'
-                + tr("Please wait for the camera to go online.")
-            );
-            return;
-        }
-        //TODO: #GDM #PTZ check other cases
+        showSetPositionWarning(resource);
     }
 }
 
@@ -384,4 +360,20 @@ void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered()
     {
         qDebug() << "GOT POSITION" << position;
     }
+}
+
+void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource)
+{
+    if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
+    {
+        QnMessageBox::critical(
+            mainWindow(),
+            tr("Unable to set position on camera."),
+            tr("An error has occurred while trying to set the current position for camera %1.")
+            .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
+            + L'\n'
+            + tr("Please wait for the camera to go online.")
+        );
+    }
+    //TODO: #GDM #PTZ check other cases
 }

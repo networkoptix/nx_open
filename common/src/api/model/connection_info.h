@@ -1,19 +1,18 @@
 #pragma once
 
-#ifndef QN_NO_QT
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QUrl>
-#endif
 
-#ifndef QN_NO_BASE
 #include <utils/common/software_version.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include "compatibility_item.h"
 
-#endif
-
+/*
+ * Please note: part of this structure up to effectiveUserName (included) CANNOT BE MODIFIED.
+ * If changed, compatibility mode will stop working for clients 2.6 and older.
+ */
 struct QnConnectionInfo
 {
     /*!
@@ -24,20 +23,24 @@ struct QnConnectionInfo
     QUrl ecUrl;
     QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
+    QString ecsGuid;    //< Id of remote server. Contains valid QnUuid.
     QString systemName;
-    QString ecsGuid;    // Id of remote server. TODO: #GDM make QnUuid
     QString brand;
     QString box;
     bool allowSslConnections;
-    //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
-    int nxClusterProtoVersion;
+    int nxClusterProtoVersion; //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
     bool ecDbReadOnly;
-    bool newSystem;
-    QString customization;
     QString effectiveUserName;
+
+    /* --- 3.0 part goes further. It can be changed. ---- */
+
+    bool newSystem;
     QString cloudHost;
+    QString customization;
     QString cloudSystemId;
 	QnUuid localSystemId;
+
+    QnUuid serverId() const;
 
     /* Check if https protocol can be used. */
     QUrl effectiveUrl() const;
@@ -47,9 +50,8 @@ struct QnConnectionInfo
     (box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)(newSystem)\
     (cloudHost)(customization)(cloudSystemId)(localSystemId)
 
-#ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnCompatibilityItem)(QnConnectionInfo),
     (ubjson)(metatype)(xml)(json)(csv_record)
 )
-#endif
+

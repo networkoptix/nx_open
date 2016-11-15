@@ -77,8 +77,6 @@ template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::~Socket()
 {
     close();
-    delete m_baseAsyncHelper;
-    m_baseAsyncHelper = nullptr;
 }
 
 template<typename InterfaceToImplement>
@@ -348,13 +346,19 @@ Pollable* Socket<InterfaceToImplement>::pollable()
 template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_baseAsyncHelper->post(std::move(handler));
+    if (impl()->terminated.load(std::memory_order_relaxed) > 0)
+        return;
+
+    nx::network::SocketGlobals::aioService().post(this, std::move(handler));
 }
 
 template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_baseAsyncHelper->dispatch(std::move(handler));
+    if (impl()->terminated.load(std::memory_order_relaxed) > 0)
+        return;
+
+    nx::network::SocketGlobals::aioService().dispatch(this, std::move(handler));
 }
 
 template<typename InterfaceToImplement>
@@ -380,7 +384,6 @@ unsigned short Socket<InterfaceToImplement>::resolveService(
 
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int type,
     int protocol,
     int ipVersion,
@@ -389,40 +392,6 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( asyncHelper.release() ),
-    m_ipVersion( ipVersion ),
-    m_nonBlockingMode( false )
-{
-    createSocket( type, protocol );
-}
-
-template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-    int _sockDesc,
-    int ipVersion,
-    PollableSystemSocketImpl* impl )
-:
-    Pollable(
-        _sockDesc,
-        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( asyncHelper.release() ),
-    m_ipVersion( ipVersion ),
-    m_nonBlockingMode( false )
-{
-}
-
-template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::Socket(
-    int type,
-    int protocol,
-    int ipVersion,
-    PollableSystemSocketImpl* impl )
-:
-    Pollable(
-        INVALID_SOCKET,
-        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
@@ -438,7 +407,6 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
@@ -448,13 +416,9 @@ Socket<InterfaceToImplement>::Socket(
 template<typename InterfaceToImplement>
 SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAddress)
 {
-    // NOTE: blocking dns name resolve may happen here
-    if (!socketAddress.address.isResolved() &&
-        !SocketGlobals::addressResolver().dnsResolver().resolveAddressSync(
-            socketAddress.address.toString(),
-            const_cast<HostAddress*>(&socketAddress.address),
-            m_ipVersion))
+    if (SocketGlobals::config().isAddressDisabled(socketAddress.address))
     {
+        SystemError::setLastErrorCode(SystemError::noPermission);
         return SockAddrPtr();
     }
 
@@ -580,44 +544,34 @@ namespace
 
 template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
-    bool natTraversal,
     int type,
     int protocol,
     int ipVersion,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
-            new aio::AsyncSocketImplHelper<Pollable>(
-                this, this, natTraversal, ipVersion)),
         type,
         protocol,
         ipVersion,
         sockImpl),
-    m_aioHelper(nullptr),
+    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
     m_connected(false)
 {
-    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
-    bool natTraversal,
     int newConnSD,
     int ipVersion,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
-            new aio::AsyncSocketImplHelper<Pollable>(
-                this, this, natTraversal, ipVersion)),
         newConnSD,
         ipVersion,
         sockImpl),
-    m_aioHelper(nullptr),
-    m_connected(true)   //this constructor is used is server socket
+    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
+    m_connected(true)   // This constructor is used by server socket.
 {
-    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
@@ -628,115 +582,24 @@ CommunicatingSocket<InterfaceToImplement>::~CommunicatingSocket()
 }
 
 template<typename InterfaceToImplement>
-bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& remoteAddress, unsigned int timeoutMs )
+bool CommunicatingSocket<InterfaceToImplement>::connect(
+    const SocketAddress& remoteAddress, unsigned int timeoutMs)
 {
-    // Get the address of the requested host
-    m_connected = false;
+    if (remoteAddress.address.isIpAddress())
+        return connectToIp(remoteAddress, timeoutMs);
 
-    const auto addr = this->makeAddr(remoteAddress);
-    if (!addr.ptr)
-        return false;
+    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
+        remoteAddress.address.toString(), this->m_ipVersion);
 
-    //switching to non-blocking mode to connect with timeout
-    bool isNonBlockingModeBak = false;
-    if( !this->getNonBlockingMode( &isNonBlockingModeBak ) )
-        return false;
-    if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
-        return false;
-
-    int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
-
-    if( connectResult != 0 )
+    while (!ips.empty())
     {
-        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
-            return false;
-        if( isNonBlockingModeBak )
-            return true;        //async connect started
+        auto ip = std::move(ips.front());
+        ips.pop_front();
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+            return true;
     }
 
-    int iSelRet = 0;
-
-#ifdef _WIN32
-    timeval timeVal;
-    fd_set wrtFDS;
-
-    /* monitor for incomming connections */
-    FD_ZERO(&wrtFDS);
-    FD_SET(m_fd, &wrtFDS);
-
-    /* set timeout values */
-    timeVal.tv_sec  = timeoutMs/1000;
-    timeVal.tv_usec = timeoutMs%1000;
-    iSelRet = ::select(
-        m_fd + 1,
-        NULL,
-        &wrtFDS,
-        NULL,
-        timeoutMs >= 0 ? &timeVal : NULL );
-#else
-    //handling interruption by a signal
-    //struct timespec waitStartTime;
-    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
-    QElapsedTimer et;
-    et.start();
-    bool waitStartTimeActual = false;
-    if( timeoutMs > 0 )
-        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
-    for( ;; )
-    {
-        struct pollfd sockPollfd;
-        memset( &sockPollfd, 0, sizeof(sockPollfd) );
-        sockPollfd.fd = this->m_fd;
-        sockPollfd.events = POLLOUT;
-#ifdef _GNU_SOURCE
-        sockPollfd.events |= POLLRDHUP;
-#endif
-        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
-
-
-        //timeVal.tv_sec  = timeoutMs/1000;
-        //timeVal.tv_usec = timeoutMs%1000;
-
-        //iSelRet = ::select( m_fd + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
-        if( iSelRet == -1 && errno == EINTR )
-        {
-            //modifying timeout for time we've already spent in select
-            if( timeoutMs == 0 ||  //no timeout
-                !waitStartTimeActual )
-            {
-                //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
-                continue;
-            }
-            //struct timespec waitStopTime;
-            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
-            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-            //    continue;   //not updating timeout value
-            const int millisAlreadySlept = et.elapsed();
-            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
-            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-            if( millisAlreadySlept >= (int)timeoutMs )
-                break;
-            timeoutMs -= millisAlreadySlept;
-            continue;
-        }
-
-        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
-            iSelRet = 0;
-
-        int result;
-        socklen_t result_len = sizeof(result);
-        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
-            iSelRet = 0;
-
-        break;
-    }
-#endif
-
-    m_connected = iSelRet > 0;
-
-    //restoring original mode
-    this->setNonBlockingMode( isNonBlockingModeBak );
-    return m_connected;
+    return false; //< Could not connect by any of addresses.
 }
 
 template<typename InterfaceToImplement>
@@ -916,6 +779,118 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
 }
 
+template<typename InterfaceToImplement>
+bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
+    const SocketAddress& remoteAddress, unsigned int timeoutMs)
+{
+    // Get the address of the requested host
+    m_connected = false;
+
+    const auto addr = this->makeAddr(remoteAddress);
+    if (!addr.ptr)
+        return false;
+
+    //switching to non-blocking mode to connect with timeout
+    bool isNonBlockingModeBak = false;
+    if( !this->getNonBlockingMode( &isNonBlockingModeBak ) )
+        return false;
+    if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
+        return false;
+
+    int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
+
+    if( connectResult != 0 )
+    {
+        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
+            return false;
+        if( isNonBlockingModeBak )
+            return true;        //async connect started
+    }
+
+    int iSelRet = 0;
+
+#ifdef _WIN32
+    timeval timeVal;
+    fd_set wrtFDS;
+
+    /* monitor for incomming connections */
+    FD_ZERO(&wrtFDS);
+    FD_SET(m_fd, &wrtFDS);
+
+    /* set timeout values */
+    timeVal.tv_sec  = timeoutMs/1000;
+    timeVal.tv_usec = timeoutMs%1000;
+    iSelRet = ::select(
+        m_fd + 1,
+        NULL,
+        &wrtFDS,
+        NULL,
+        timeoutMs >= 0 ? &timeVal : NULL );
+#else
+    //handling interruption by a signal
+    //struct timespec waitStartTime;
+    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    QElapsedTimer et;
+    et.start();
+    bool waitStartTimeActual = false;
+    if( timeoutMs > 0 )
+        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+    for( ;; )
+    {
+        struct pollfd sockPollfd;
+        memset( &sockPollfd, 0, sizeof(sockPollfd) );
+        sockPollfd.fd = this->m_fd;
+        sockPollfd.events = POLLOUT;
+#ifdef _GNU_SOURCE
+        sockPollfd.events |= POLLRDHUP;
+#endif
+        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
+
+
+        //timeVal.tv_sec  = timeoutMs/1000;
+        //timeVal.tv_usec = timeoutMs%1000;
+
+        //iSelRet = ::select( m_fd + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
+        if( iSelRet == -1 && errno == EINTR )
+        {
+            //modifying timeout for time we've already spent in select
+            if( timeoutMs == 0 ||  //no timeout
+                !waitStartTimeActual )
+            {
+                //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
+                continue;
+            }
+            //struct timespec waitStopTime;
+            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
+            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+            //    continue;   //not updating timeout value
+            const int millisAlreadySlept = et.elapsed();
+            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
+            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+            if( millisAlreadySlept >= (int)timeoutMs )
+                break;
+            timeoutMs -= millisAlreadySlept;
+            continue;
+        }
+
+        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
+            iSelRet = 0;
+
+        int result;
+        socklen_t result_len = sizeof(result);
+        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
+            iSelRet = 0;
+
+        break;
+    }
+#endif
+
+    m_connected = iSelRet > 0;
+
+    //restoring original mode
+    this->setNonBlockingMode( isNonBlockingModeBak );
+    return m_connected;
+}
 
 //////////////////////////////////////////////////////////
 ///////// class TCPSocket
@@ -938,10 +913,9 @@ public:
 };
 #endif
 
-TCPSocket::TCPSocket(bool natTraversal, int ipVersion)
+TCPSocket::TCPSocket(int ipVersion)
 :
     base_type(
-        natTraversal,
         SOCK_STREAM,
         IPPROTO_TCP,
         ipVersion
@@ -955,7 +929,6 @@ TCPSocket::TCPSocket(bool natTraversal, int ipVersion)
 TCPSocket::TCPSocket(int newConnSD, int ipVersion)
 :
     base_type(
-        false, // in TCPSocket nat traversal only helps to resolve public address
         newConnSD,
         ipVersion
 #ifdef _WIN32
@@ -1425,7 +1398,7 @@ bool TCPServerSocket::setListen(int queueLen)
 
 UDPSocket::UDPSocket(int ipVersion)
 :
-    base_type(false, SOCK_DGRAM, IPPROTO_UDP, ipVersion),
+    base_type(SOCK_DGRAM, IPPROTO_UDP, ipVersion),
     m_destAddr()
 {
     setBroadcast();

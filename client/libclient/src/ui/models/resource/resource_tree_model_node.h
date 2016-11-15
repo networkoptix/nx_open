@@ -102,6 +102,8 @@ protected:
     void changeInternal();
 
     void setName(const QString& name);
+
+    void updateResourceStatus();
 private:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 

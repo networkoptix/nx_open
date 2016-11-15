@@ -6,7 +6,7 @@
 #include <common/common_module.h>
 
 #include <client/client_startup_parameters.h>
-
+#include <client/self_updater.h>
 #include <api/applauncher_api.h>
 #include <api/ipc_pipe_names.h>
 #include <utils/ipc/named_pipe_socket.h>
@@ -187,11 +187,25 @@ namespace applauncher
     {
         api::GetInstalledVersionsRequest request;
         api::GetInstalledVersionsResponse response;
-        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        api::ResultType::Value result = sendCommandToLauncher(request, &response);
         if( result != api::ResultType::ok )
             return result;
         *versions = response.versions;
         return response.result;
+    }
+
+    bool checkOnline(bool runWhenOffline)
+    {
+        /* Try to run applauncher if it is not running. */
+        static const QnSoftwareVersion anyVersion(3, 0);
+        bool notUsed = false;
+        const auto result = isVersionInstalled(anyVersion, &notUsed);
+
+        if (result == api::ResultType::ok)
+            return true;
+
+        return ((result == api::ResultType::connectError) && runWhenOffline
+            && nx::vms::client::SelfUpdater::runMinilaucher());
     }
 
 }

@@ -5,7 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/updatable.h>
+#include <utils/common/updatable.h>
 
 namespace Ui
 {

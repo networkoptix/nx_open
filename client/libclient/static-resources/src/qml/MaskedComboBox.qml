@@ -11,6 +11,12 @@ MaskedItem
     property bool isEditableComboBox: false;
     property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1);
 
+    function forceCurrentIndex(index)
+    {
+        if (maskedArea)
+            maskedArea.currentIndex = index;
+    }
+
     maskedAreaDelegate: NxComboBox
     {
         id: comboBox;

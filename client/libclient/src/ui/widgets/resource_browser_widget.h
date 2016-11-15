@@ -72,6 +72,9 @@ protected:
     virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
 
 private:
+    void forceLayoutUpdate();
+
+private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
     QnTextEditLabel* m_textLabel;
@@ -131,6 +134,7 @@ protected:
     virtual QString toolTipAt(const QPointF& pos) const override;
     virtual bool showOwnTooltip(const QPointF& pos) override;
 
+private:
     QnResourceTreeWidget* currentTreeWidget() const;
     QItemSelectionModel* currentSelectionModel() const;
     QModelIndex itemIndexAt(const QPoint& pos) const;
@@ -145,6 +149,8 @@ protected:
     void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
 
     void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
+
+    void handleItemActivated(const QModelIndex& index, bool withMouse);
 
 private slots:
     void updateFilter(bool force = false);

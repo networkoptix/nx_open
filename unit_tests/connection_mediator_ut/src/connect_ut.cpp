@@ -44,13 +44,13 @@ protected:
         server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
             &stunMessageDispatcher,
             false,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
         EXPECT_TRUE(server->bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server->listen());
 
         EXPECT_TRUE(server->endpoints().size());
-        m_address = server->endpoints().front();
+        m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
         network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
     }
 

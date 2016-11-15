@@ -1,5 +1,7 @@
-
 #include "dialog.h"
+
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <ui/workaround/cancel_drag.h>
 
@@ -27,11 +29,15 @@ void QnDialog::show(QDialog *dialog)
 
 void QnDialog::show()
 {
+    fixWindowFlags();
     show(this); /// Calls static member of QnDialog
 }
 
 int QnDialog::exec()
 {
+    fixWindowFlags();
+
+    /* We cannot cancel drag via modal dialog, let parent process it. */
     if (parentWidget())
         cancelDrag(parentWidget());
 
@@ -56,8 +62,20 @@ bool QnDialog::event(QEvent* event)
 {
     bool res = base_type::event(event);
 
-    if (event->type() == QEvent::LayoutRequest)
-        afterLayout();
+    switch (event->type())
+    {
+        case QEvent::LayoutRequest:
+            afterLayout();
+            break;
+
+        case QEvent::Show:
+            if (layout())
+                layout()->activate();
+            break;
+
+        default:
+            break;
+    }
 
     return res;
 }
@@ -84,4 +102,14 @@ void QnDialog::afterLayout()
             setFixedHeight(preferred.height());
         }
     }
+}
+
+void QnDialog::fixWindowFlags()
+{
+    auto flags = windowFlags();
+    if (helpTopic(this) != Qn::Empty_Help)
+        flags |= Qt::WindowContextHelpButtonHint;
+    else
+        flags &= ~Qt::WindowContextHelpButtonHint;
+    setWindowFlags(flags);
 }

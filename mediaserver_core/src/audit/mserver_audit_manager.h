@@ -17,8 +17,10 @@ protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) override;
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
 private:
-    //QHash<QnUuid, qint64> m_knownSessions;
+    QTimer m_timer;
     mutable QnMutex m_mutex;
+    std::map<int, QnAuditRecord> m_recordsToAdd;
+    int m_internalId;
 };
 
 #endif // __MSERVER_AUDIT_MANAGER_H__

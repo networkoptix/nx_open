@@ -14,8 +14,7 @@ namespace cdb {
 
 #if 1
 
-class HealthMonitoring
-    :
+class HealthMonitoring:
     public Ec2MserverCloudSynchronization
 {
 };
@@ -32,7 +31,7 @@ TEST_F(HealthMonitoring, general)
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->fetchSystemData(
-                ownerAccount().email, ownerAccountPassword(),
+                ownerAccount().email, ownerAccount().password,
                 registeredSystemData().id, &systemData));
         ASSERT_EQ(api::SystemHealth::offline, systemData.stateOfHealth);
 
@@ -43,7 +42,7 @@ TEST_F(HealthMonitoring, general)
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->fetchSystemData(
-                ownerAccount().email, ownerAccountPassword(),
+                ownerAccount().email, ownerAccount().password,
                 registeredSystemData().id, &systemData));
         ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
 
@@ -57,8 +56,7 @@ TEST_F(HealthMonitoring, general)
 
 
 #else
-class HealthMonitoring
-    :
+class HealthMonitoring:
     public CdbFunctionalTest
 {
 };

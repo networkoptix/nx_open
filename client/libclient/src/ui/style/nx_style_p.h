@@ -57,9 +57,16 @@ public:
     /* Insert horizontal separator line into QInputDialog above its button box. */
     bool polishInputDialog(QInputDialog* inputDialog) const;
 
+    /* Update QScrollArea hover if scrollBar is parented by one. */
+    void updateScrollAreaHover(QScrollBar* scrollBar) const;
+
+    /* Unlike QWidget::graphicsProxyWidget finds proxy recursively. */
+    static QGraphicsProxyWidget* graphicsProxyWidget(const QWidget* widget);
+    static const QWidget* graphicsProxiedWidget(const QWidget* widget);
+
 public:
     QnGenericPalette palette;
     QnNoptixStyleAnimator* idleAnimator;
     QnNoptixStyleAnimator* stateAnimator;
-    QWidget* lastProxiedWidgetUnderMouse;
+    QPointer<QWidget> lastProxiedWidgetUnderMouse;
 };

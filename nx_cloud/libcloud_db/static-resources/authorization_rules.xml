@@ -206,6 +206,8 @@
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
+                            <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                            <set value="localAdmin" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <sequence value="/cdb/system/update">

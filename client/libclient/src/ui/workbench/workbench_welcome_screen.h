@@ -16,6 +16,7 @@
 class QnCloudStatusWatcher;
 class QQuickView;
 class QnAppInfo;
+
 typedef QList<QUrl> UrlsList;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
@@ -67,6 +68,8 @@ public: // Properties
 
     QString connectingToSystem() const;
 
+    void openConnectingTile();
+
     void handleDisconnectedFromSystem();
 
     void handleConnectingToSystem();
@@ -86,9 +89,9 @@ public: // Properties
     QnAppInfo* appInfo() const;
 
 public slots:
-    bool isAcceptableDrag(const UrlsList& urls);
+    bool isAcceptableDrag(const QList<QUrl>& urls);
 
-    void makeDrop(const UrlsList& urls);
+    void makeDrop(const QList<QUrl>& urls);
 
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
     void connectToLocalSystem(
@@ -115,7 +118,6 @@ public slots:
 
     void forceActiveFocus();
 
-
 public slots:
     QColor getPaletteColor(const QString& group, int index);
 
@@ -124,6 +126,8 @@ public slots:
     QColor getLighterColor(const QColor& color, int offset = 1);
 
     QColor colorWithAlpha(QColor color, qreal alpha);
+
+    void hideSystem(const QString& systemId);
 
 signals:
     void visibleChanged();
@@ -157,8 +161,7 @@ private:
         bool autoLogin,
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
 
-private:
-    void showScreen();
+    void handleStartupTileAction(const QString& systemId, bool initial);
 
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;

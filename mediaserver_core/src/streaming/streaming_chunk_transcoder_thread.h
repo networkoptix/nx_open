@@ -93,6 +93,10 @@ private:
         const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
         bool transcodingFinishedSuccessfully,
         QnMutexLockerBase* const lk );
+    void finishTranscoding(
+        QnMutexLockerBase* const lk,
+        const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
+        bool transcodingFinishedSuccessfully);
 };
 
 #endif  //STREAMING_CHUNK_TRANSCODER_THREAD_H

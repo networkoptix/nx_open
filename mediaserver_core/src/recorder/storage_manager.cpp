@@ -889,6 +889,24 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
             if (storage->getStatus() == Qn::Online)
                 storagesToScan << storage;
         }
+
+        if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG1)
+        {
+            QString logString;
+            QTextStream logStream(&logString);
+
+            logStream << Q_FUNC_INFO << " rebuildCatalogAsync triggered\n";
+            if (storagesToScan.isEmpty())
+                logStream << "\tNo online storages found";
+            else
+                logStream << "\tFollowing storages found:\n";
+
+            for (const auto& s: storagesToScan)
+                logStream << "\t" << s->getUrl() << "\n";
+
+            NX_LOG(logString, cl_logDEBUG1);
+        }
+
         if (storagesToScan.isEmpty())
             return result;
         if (result.state <= Qn::RebuildState_None)
@@ -950,20 +968,27 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         return;
 
     QString line;
+    int lineNumber= 1;
+
     while (1)
     {
         if (infoFile->atEnd())
             break;
         line = QString(infoFile->readLine()).trimmed();
 
-        auto parseLine = [](const QString& line, std::pair<QString, QString>& keyValue)
+        auto parseLine = [&infoPath](const QString& line, std::pair<QString, QString>& keyValue, int lineNumber)
         {
+            if (line.isEmpty())
+                return false;
+
             thread_local QRegExp keyValueRegExp("^\"(.*)\"=\"(.*)\"$");
             int reIndex = keyValueRegExp.indexIn(line);
             if (reIndex == -1)
             {
-                NX_LOG(lit("%1: Couldn't parse info.txt entry. Line is %2")
+                NX_LOG(lit("%1: Couldn't parse info.txt entry. File name: %2. Line number: %3. Line data: %4")
                            .arg(Q_FUNC_INFO)
+                           .arg(infoPath)
+                           .arg(lineNumber)
                            .arg(line),
                        cl_logDEBUG1);
                 return false;
@@ -971,9 +996,11 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
             NX_ASSERT(keyValueRegExp.captureCount() == 2);
             if (keyValueRegExp.captureCount() != 2)
             {
-                NX_LOG(lit("%1: Expected capture count is 2. Got: %2. Line is %3")
+                NX_LOG(lit("%1: Expected capture count is 2. Got: %2. File: %3. Line number: %4. Line data: %5")
                            .arg(Q_FUNC_INFO)
                            .arg(keyValueRegExp.captureCount())
+                           .arg(infoPath)
+                           .arg(lineNumber)
                            .arg(line),
                        cl_logDEBUG1);
                 return false;
@@ -985,7 +1012,7 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         };
 
         std::pair<QString, QString> keyValue;
-        if (!parseLine(line, keyValue))
+        if (!parseLine(line, keyValue, lineNumber++))
             continue;
 
         if (keyValue.first.contains(kArchiveCameraNameKey))
@@ -1127,7 +1154,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     if (storage && storage->getParentId() == qnCommon->moduleGUID())
     {
 		m_warnSended = false;
-        connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
+        connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }
@@ -1169,6 +1196,10 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
         {
             if (itr.value()->getId() == storage->getId()) {
                 storageIndex = itr.key();
+                NX_LOG(lit("%1 Removing storage %2 from %3 StorageManager")
+                        .arg(Q_FUNC_INFO)
+                        .arg(storage->getUrl())
+                        .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup"), cl_logDEBUG1);
                 itr = m_storageRoots.erase(itr);
                 break;
             }
@@ -1194,6 +1225,11 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (!storage)
         return;
+
+    NX_LOG(lit("%1 role: %2, storage role: %3")
+            .arg(Q_FUNC_INFO)
+            .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup")
+            .arg(storage->isBackup() ? "Backup" : "Main"), cl_logDEBUG1);
 
     if (checkIfMyStorage(storage)) {
         if (!hasStorage(storage))
@@ -2149,10 +2185,8 @@ void QnStorageManager::writeCameraInfoFiles()
                 QString cameraUniqueId = cameraIt.key();
                 auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
                 if (!camResource)
-                {
-                    NX_LOG(lit("%1. CameraResource is NULL for this unique id %2").arg(Q_FUNC_INFO).arg(cameraUniqueId), cl_logDEBUG1);
                     continue;
-                }
+
                 auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
                 if (camResource->getTypeId() == archiveCamTypeId)
                     continue;

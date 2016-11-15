@@ -141,19 +141,26 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
     if (!server)
         return; // somethink wrong
 
+    rest::Handle requestToTerminate = 0;
     {
+        QnMutexLocker lock2(&m_syncLoadMutex);
         QnMutexLocker lock( &m_mutex );
         notify = m_historyValidCameras.contains(cameraId);
         m_historyValidCameras.remove(cameraId);
         if (m_asyncRunningRequests.contains(cameraId))
         {
-            auto handle = m_asyncRunningRequests[cameraId];
+            requestToTerminate = m_asyncRunningRequests[cameraId];
             m_asyncRunningRequests.remove(cameraId);
             notify = true;
-            lock.unlock();
-            server->restConnection()->cancelRequest(handle);
+
+            // terminate sync request
+            m_syncRunningRequests.remove(cameraId);
+            m_syncLoadWaitCond.wakeAll();
         }
     }
+    if (requestToTerminate > 0)
+        server->restConnection()->cancelRequest(requestToTerminate);
+
 
     if (notify)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
@@ -484,7 +491,8 @@ bool QnCameraHistoryPool::updateCameraHistorySync(const QnSecurityCamResourcePtr
 
     if (result == StartResult::started) {
         m_syncRunningRequests.insert(camera->getId());
-        m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+        while (m_syncRunningRequests.contains(camera->getId()))
+            m_syncLoadWaitCond.wait(&m_syncLoadMutex);
     }
     return result != StartResult::failed;
 }

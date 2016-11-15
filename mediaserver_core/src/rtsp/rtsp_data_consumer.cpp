@@ -17,6 +17,15 @@
 #include <recorder/recording_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
 
+namespace {
+
+bool needSecondaryStream(MediaQuality q)
+{
+    return isLowMediaQuality(q);
+}
+
+} // namespace
+
 const auto checkConstantsEquality = []()
 {
     NX_ASSERT((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
@@ -211,7 +220,7 @@ void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsa
     if (m_videoChannels == 1)
     {
         for (int i = 0; i < lastIndex; ++i)
-            unsafeQueue.pop_front();
+            unsafeQueue.popFront();
         currentIndex = 0;
         if (lastIndex > 0)
             m_someDataIsDropped = true;
@@ -250,7 +259,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
        (m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION))
     {
         auto unsafeQueue = m_dataQueue.lock();
-        bool clearHiQ = m_liveQuality != MEDIA_Quality_Low; // remove LQ packets, keep HQ
+        bool clearHiQ = !needSecondaryStream(m_liveQuality); // remove LQ packets, keep HQ
 
         // try to reduce queue by removed packets in specified quality
         bool somethingDeleted = false;
@@ -549,12 +558,14 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
             {
-                if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                    setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
+                if (needSecondaryStream(m_newLiveQuality) && isSecondaryProvider) 
+                {
+                    setLiveQualityInternal(m_newLiveQuality); // slow network. Reduce quality
                     m_newLiveQuality = MEDIA_Quality_None;
                     setNeedKeyData();
                 }
-                else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_ForceHigh) && !isSecondaryProvider) {
+                else if (!needSecondaryStream(m_newLiveQuality) && !isSecondaryProvider) 
+                {
                     setLiveQualityInternal(m_newLiveQuality);
                     m_newLiveQuality = MEDIA_Quality_None;
                     setNeedKeyData();
@@ -563,17 +574,22 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
         if (isLive)
         {
-            if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
+            if (!needSecondaryStream(m_liveQuality) && isSecondaryProvider)
                 return true; // data for other live quality stream
-            else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
+            else if (needSecondaryStream(m_liveQuality) && !isSecondaryProvider)
                 return true; // data for other live quality stream
 
             if (isVideo)
             {
                 if (isKeyFrame)
+                {
                     m_needKeyData[media->channelNumber] = false;
-                else if (!isKeyFrame && m_needKeyData[media->channelNumber])
+                }
+                else if (m_needKeyData[media->channelNumber] || 
+                    m_liveQuality == MEDIA_Quality_LowIframesOnly)
+                {
                     return true; // wait for I frame for this channel
+                }
             }
         }
     }
@@ -718,13 +734,18 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
     m_dataQueue.push(data);
 }
 
-int QnRtspDataConsumer::copyLastGopFromCamera(QnVideoCameraPtr camera, bool usePrimaryStream, qint64 skipTime, quint32 cseq)
+int QnRtspDataConsumer::copyLastGopFromCamera(
+    QnVideoCameraPtr camera, 
+    bool usePrimaryStream, 
+    qint64 skipTime, 
+    quint32 cseq,
+    bool iFramesOnly)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     int copySize = 0;
     if (camera) // && !res->hasFlags(Qn::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq, iFramesOnly);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 

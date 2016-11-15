@@ -44,9 +44,10 @@ namespace
 
             const auto itStoredPass = std::find_if(list.begin(), list.end(),
                 [userName](const QnLocalConnectionData &connection)
-            {
-                return (connection.isStoredPassword && (connection.url.userName() == userName));
-            });
+                {
+                    return !connection.password.isEmpty()
+                        && connection.url.userName() == userName;
+                });
 
             /// Stores first found connection with password (if found) or just first connection
             result.append(itStoredPass == list.end() ? connectionData : *itStoredPass);
@@ -75,17 +76,17 @@ QnRecentLocalConnectionsModel::~QnRecentLocalConnectionsModel()
     QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
-QString QnRecentLocalConnectionsModel::systemId() const
+QUuid QnRecentLocalConnectionsModel::systemId() const
 {
     return m_systemId;
 }
 
-void QnRecentLocalConnectionsModel::setSystemId(const QString &systemId)
+void QnRecentLocalConnectionsModel::setSystemId(const QUuid& localId)
 {
-    if (m_systemId == systemId)
+    if (m_systemId == localId)
         return;
 
-    m_systemId = systemId;
+    m_systemId = localId;
     emit systemIdChanged();
 }
 
@@ -186,9 +187,9 @@ QVariant QnRecentLocalConnectionsModel::data(const QModelIndex &index, int role)
         case UserNameRole:
             return userPasswordData.url.userName();
         case PasswordRole:
-            return userPasswordData.url.password();
+            return userPasswordData.password.value();
         case HasStoredPasswordRole:
-            return userPasswordData.isStoredPassword;
+            return !userPasswordData.password.isEmpty();
         default:
             return QVariant();
     }

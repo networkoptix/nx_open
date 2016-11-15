@@ -93,17 +93,25 @@ QString QnVideowallScreenWidget::calculateTitleText() const {
     if (idx < 0)
         idx = 0;
 
-    QString base = tr("Pc %1").arg(idx + 1);
+    int pcVisualIdx = idx + 1;
+    QString base = tr("PC %1").arg(pcVisualIdx);
 
     QSet<int> screens = m_items.first().screenSnaps.screens();
     if (screens.isEmpty())
         return base;
 
     QStringList screenIndices;
-    foreach (int screen, screens)
+    for (int screen: screens)
         screenIndices.append(QString::number(screen + 1));
 
-    return tr("Pc %1 - Screens %2", "", screens.size()).arg(idx + 1).arg(screenIndices.join(lit(" ,")));
+    if (screenIndices.size() == 1)
+        return tr("PC %1 - Display %2").arg(pcVisualIdx).arg(screenIndices.first());
+
+    return tr("PC %1 - Displays %2",
+        "%2 will be substituted by _list_ of displays",
+        screens.size())
+        .arg(pcVisualIdx)
+        .arg(screenIndices.join(lit(" ,")));
 }
 
 Qn::ResourceStatusOverlay QnVideowallScreenWidget::calculateStatusOverlay() const {

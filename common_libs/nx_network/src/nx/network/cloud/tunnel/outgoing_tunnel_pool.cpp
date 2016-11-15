@@ -7,7 +7,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace network {
@@ -15,6 +15,8 @@ namespace cloud {
 
 OutgoingTunnelPool::OutgoingTunnelPool()
 :
+    m_isSelfPeerIdDesignated(false),
+    m_selfPeerId(QnUuid::createUuid().toSimpleString().toUtf8()),
     m_terminated(false),
     m_stopping(false)
 {
@@ -54,6 +56,30 @@ void OutgoingTunnelPool::establishNewConnection(
         std::move(handler));
 }
 
+String OutgoingTunnelPool::selfPeerId() const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_isSelfPeerIdDesignated)
+    {
+        m_isSelfPeerIdDesignated = true; //< Peer Id is not supposed to be changed after first use.
+        NX_LOGX(lm("Random self peer Id: %1").arg(m_selfPeerId), cl_logINFO);
+    }
+
+    return m_selfPeerId;
+}
+
+void OutgoingTunnelPool::designateSelfPeerId(const String& name, const QnUuid& uuid)
+{
+    const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
+
+    QnMutexLocker lock(&m_mutex);
+    NX_ASSERT(!m_isSelfPeerIdDesignated, "selfPeerId is not supposed to be changed");
+    m_isSelfPeerIdDesignated = true;
+
+    m_selfPeerId = QString(id).toUtf8();
+    NX_LOGX(lm("Designated self peer Id: %1").arg(m_selfPeerId), cl_logINFO);
+}
+
 const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     const AddressEntry& targetHostAddress)
 {
@@ -69,14 +95,8 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
         cl_logDEBUG1);
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
-    tunnel->setStateHandler(
-        [this, tunnelPtr = tunnel.get()](OutgoingTunnel::State state)
-        {
-            if (state != OutgoingTunnel::State::kClosed)
-                return;
-            //tunnel supports deleting in "tunnel closed" handler
-            onTunnelClosed(tunnelPtr);
-        });
+    tunnel->setOnClosedHandler(
+        std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
     iterAndInsertionResult.first->second = std::move(tunnel);
     return iterAndInsertionResult.first->second;

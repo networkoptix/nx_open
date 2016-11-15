@@ -70,6 +70,7 @@ namespace style
     const char* Properties::kMenuAsDropdown = "_qn_menuAsDropdown";
     const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
     const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
+    const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
 
     qreal dpr(qreal value)
     {

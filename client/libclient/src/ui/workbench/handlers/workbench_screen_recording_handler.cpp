@@ -145,8 +145,12 @@ void QnWorkbenchScreenRecordingHandler::stopRecordingCountdown()
         m_timerId = 0;
     }
     m_countdown.invalidate();
+
     if (m_messageBox)
         m_messageBox->hideImmideately();
+
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setMessage(QString());
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const
@@ -283,7 +287,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
     while (true)
     {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            display()->view(),
+            mainWindow(),
             tr("Save Recording As..."),
             qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
             tr("AVI (Audio/Video Interleaved) (*.avi)")));
@@ -299,10 +303,13 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
                 filePath += selectedExtension;
 
             QFile::remove(filePath);
-            if (!QFile::rename(fileName, filePath)) {
+            if (!QFile::rename(fileName, filePath))
+            {
                 QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
-                CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QnMessageBox::warning(display()->view(), tr("Warning"), message, QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
+                QnMessageBox::warning(
+                    mainWindow(),
+                    tr("Warning"),
+                    message);
                 continue;
             }
 
@@ -321,6 +328,8 @@ void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
     stopRecording();
 
-    QnMessageBox::warning(display()->view(), tr("Warning"),
+    QnMessageBox::warning(
+        mainWindow(),
+        tr("Warning"),
         tr("Unable to start recording due to the following error: %1").arg(reason));
 }

@@ -25,6 +25,7 @@ public:
     QList<QLabel*> informativeLabels;
     QList<QWidget*> customWidgets;
     QnMessageBox::Icon icon;
+    QPointer<QWidget> focusWidget;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
 
@@ -494,7 +495,8 @@ void QnMessageBox::setInformativeText(const QString &text, bool split)
     }
 }
 
-void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch, Qt::Alignment alignment)
+void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
+    Qt::Alignment alignment, bool focusThisWidget)
 {
     Q_D(QnMessageBox);
     NX_ASSERT(!d->customWidgets.contains(widget));
@@ -523,6 +525,13 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch, 
         default:
             break;
     }
+
+    if (focusThisWidget)
+    {
+        d->focusWidget = widget;
+        if (isVisible())
+            widget->setFocus();
+    }
 }
 
 void QnMessageBox::removeCustomWidget(QWidget* widget)
@@ -540,6 +549,9 @@ void QnMessageBox::removeCustomWidget(QWidget* widget)
     ui->secondaryLine->setVisible(showSecondaryLine);
     ui->mainLayout->removeWidget(widget);
     ui->verticalLayout->removeWidget(widget);
+
+    if (d->focusWidget == widget)
+        d->focusWidget = nullptr;
 }
 
 QString QnMessageBox::checkBoxText() const
@@ -732,17 +744,6 @@ int QnMessageBox::exec()
 {
     Q_D(QnMessageBox);
 
-    Qt::WindowFlags flags = windowFlags();
-    if (helpTopic(this) != Qn::Empty_Help)
-        flags |= Qt::WindowContextHelpButtonHint;
-    else
-        flags &= ~Qt::WindowContextHelpButtonHint;
-    setWindowFlags(flags);
-
-    /* We cannot cancel drag via modal dialog, let parent process it. */
-    if (parentWidget())
-        cancelDrag(parentWidget());
-
     adjustSize();
 
     base_type::exec();
@@ -760,7 +761,7 @@ void QnMessageBox::closeEvent(QCloseEvent *event)
         return;
     }
 
-    QDialog::closeEvent(event);
+    base_type::closeEvent(event);
 
     d->clickedButton = d->escapeButton;
     setResult(d->execReturnCode(d->escapeButton));
@@ -832,23 +833,27 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
         }
     }
 
-    QDialog::keyPressEvent(event);
+    base_type::keyPressEvent(event);
 }
 
-bool QnMessageBox::event(QEvent* event)
+void QnMessageBox::showEvent(QShowEvent* event)
 {
-    bool res = QDialog::event(event);
+    base_type::showEvent(event);
 
-    if (event->type() != QEvent::LayoutRequest)
-        return res;
+    Q_D(QnMessageBox);
+    if (d->focusWidget)
+        d->focusWidget->setFocus();
+}
 
+void QnMessageBox::afterLayout()
+{
     if (hasHeightForWidth())
     {
         setFixedHeight(heightForWidth(width()));
-        return res;
     }
-
-    /* This dialog must have height-for-width, but just in case handle otherwise: */
-    setFixedHeight(sizeHint().height());
-    return res;
+    else
+    {
+        /* This dialog must have height-for-width, but just in case handle otherwise: */
+        setFixedHeight(sizeHint().height());
+    }
 }

@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <functional>
+#include <deque>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -22,36 +23,35 @@ class NX_NETWORK_API DnsResolver
     public QnLongRunnable
 {
 public:
-    typedef void* RequestID;
+    typedef void* RequestId;
+    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> Handler;
 
     DnsResolver();
     virtual ~DnsResolver();
 
-    //!Implementation of QnLongRunnable::pleaseStop
     virtual void pleaseStop() override;
 
     /*!
-        \param completionHandler MUST not block
-        \param reqID Used to cancel request. Multiple requests can be started using same request id
+        \param handler MUST not block
+        \param requestId Used to cancel request. Multiple requests can be started using same request id
+        \return false if failed to start asynchronous resolve operation
         \note It is garanteed that \a reqID is set before \a completionHandler is called
     */
-    void resolveAddressAsync(
-        const HostAddress& addressToResolve,
-        std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-        int ipVersion, RequestID reqID );
-    /*!
-        \note This method is re-enterable
-    */
-    bool resolveAddressSync(
-        const QString& hostName, HostAddress* const resolvedAddress, int ipVersion );
+    void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
+    std::deque<HostAddress> resolveSync(const QString& hostName, int ipVersion);
 
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
     */
-    void cancel( RequestID reqID, bool waitForRunningHandlerCompletion );
+    void cancel(RequestId requestId, bool waitForRunningHandlerCompletion);
 
     //!Returns \a true if at least one resolve operation is scheduled with \a reqID
-    bool isRequestIDKnown( RequestID reqID ) const;
+    bool isRequestIdKnown(RequestId requestId) const;
+
+    //!Even more priority than /etc/hosts
+    void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
+    void removeEtcHost(const QString& name);
+    std::deque<HostAddress> getEtcHost(const QString& name, int ipVersion = 0);
 
 protected:
     //!Implementation of QnLongRunnable::run
@@ -61,27 +61,26 @@ private:
     class ResolveTask
     {
     public:
-        HostAddress hostAddress;
-        std::function<void(SystemError::ErrorCode, const HostAddress&)> completionHandler;
-        RequestID reqID;
+        QString hostAddress;
+        Handler completionHandler;
+        RequestId requestId;
         size_t sequence;
         int ipVersion;
 
         ResolveTask(
-            HostAddress _hostAddress,
-            std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
-            RequestID _reqID,
-            size_t _sequence,
-            int _ipVersion);
+            QString hostAddress, Handler handler, RequestId requestId,
+            size_t sequence, int ipVersion);
     };
 
     bool m_terminated;
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_cond;
-    std::list<ResolveTask> m_taskQueue;
-    RequestID m_runningTaskReqID;
+    std::list<ResolveTask> m_taskdeque;
+    RequestId m_runningTaskRequestId;
     size_t m_currentSequence;
-    int ipVersion;
+
+    mutable QnMutex m_ectHostsMutex;
+    std::map<QString, std::vector<HostAddress>> m_etcHosts;
 };
 
 } // namespace network

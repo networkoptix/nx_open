@@ -49,7 +49,7 @@ namespace
     const char* kViewportMarginsBackupId = "viewportMargins";
     const char* kContentsMarginsBackupId = "contentsMargins";
 
-    const char* kHoveredWidgetProperty = "_qn_hoveredWidget";
+    const char* kHoveredWidgetProperty = "_qn_hoveredWidget"; // QPointer<QWidget>
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
 
@@ -235,7 +235,7 @@ namespace
 
         /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
          * To overcome this problem we process hover events and track hovered children: */
-        auto hoveredWidget = widget->property(kHoveredWidgetProperty).value<QWidget*>();
+        auto hoveredWidget = widget->property(kHoveredWidgetProperty).value<QPointer<QWidget>>();
         if (!hoveredWidget)
             return false;
 
@@ -352,19 +352,6 @@ namespace
         return false;
     }
 
-    QGraphicsProxyWidget* findProxyWidget(QWidget* widget)
-    {
-        while (widget)
-        {
-            if (auto proxy = widget->graphicsProxyWidget())
-                return proxy;
-
-            widget = widget->parentWidget();
-        }
-
-        return nullptr;
-    }
-
     enum ScrollBarStyle
     {
         CommonScrollBar,
@@ -462,6 +449,9 @@ void QnNxStyle::drawPrimitive(
         case PE_FrameFocusRect:
         {
             if (!option->state.testFlag(State_Enabled))
+                return;
+
+            if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
             QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ?
@@ -684,7 +674,9 @@ void QnNxStyle::drawPrimitive(
                 {
                     /* Markers can be semi-transparent, so we draw all layers on top of each other. */
 
-                    /* Obtain hover information: */
+                    /* Obtain hover information.
+                     * An item has enabled state here if whole widget is enabled
+                     * and the item has Qt::ItemIsEnabled flag. */
                     QBrush hoverBrush = option->palette.midlight();
                     bool hasHover = item->state.testFlag(State_MouseOver) && item->state.testFlag(State_Enabled) &&
                         !tree->property(Properties::kSuppressHoverPropery).toBool();
@@ -745,26 +737,42 @@ void QnNxStyle::drawPrimitive(
                 bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
                 bool hasHover = item->state.testFlag(State_MouseOver);
-                if (widget)
+                bool suppressHover = selectionOpaque;
+
+                if (widget && !suppressHover)
                 {
-                    if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
-                        (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
+                    if (!widget->isEnabled() || widget->property(Properties::kSuppressHoverPropery).toBool())
                     {
                         /* Itemviews with kSuppressHoverProperty should suppress hover. */
-                        /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
-                        hasHover = false;
+                        suppressHover = true;
                     }
                     else
                     {
-                        /* Obtain Nx hovered row information: */
-                        QVariant value = widget->property(Properties::kHoveredRowProperty);
-                        if (value.isValid())
-                            hasHover = value.toInt() == item->index.row();
+                        /* Treeviews can handle hover in a special way. */
+                        if (auto treeView = qobject_cast<const QTreeView*>(widget))
+                        {
+                            /* For items with Qt::ItemIsEnabled flag
+                             * treeviews draws hover in PE_PanelItemViewRow. */
+                            bool hoverDrawn = item->index.flags().testFlag(Qt::ItemIsEnabled);
+
+                            /* For items without Qt::ItemIsEnabled flag we should
+                             * draw hover only if selection behavior is SelectRows. */
+                            suppressHover = hoverDrawn
+                                || treeView->selectionBehavior() != QAbstractItemView::SelectRows;
+                        }
+
+                        if (!suppressHover)
+                        {
+                            /* Obtain Nx hovered row information: */
+                            QVariant value = widget->property(Properties::kHoveredRowProperty);
+                            if (value.isValid())
+                                hasHover = value.toInt() == item->index.row();
+                        }
                     }
                 }
 
                 /* Draw hover marker if needed: */
-                if (hasHover && !selectionOpaque)
+                if (hasHover && !suppressHover)
                     painter->fillRect(item->rect, option->palette.midlight());
 
                 /* Draw selection marker if needed: */
@@ -1679,6 +1687,8 @@ void QnNxStyle::drawControl(
                 {
                     QStyleOptionToolButton optionCopy(*button);
                     optionCopy.state &= ~State_MouseOver;
+                    optionCopy.icon = QnSkin::maximumSizePixmap(button->icon, QnIcon::Pressed,
+                        button->state.testFlag(State_On) ? QIcon::On : QIcon::Off, false);
                     base_type::drawControl(CE_ToolButtonLabel, &optionCopy, painter, widget);
                     return;
                 }
@@ -2179,7 +2189,11 @@ void QnNxStyle::drawControl(
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
+
                 Qt::Alignment textHorizontalAlignment = Qt::AlignHCenter;
+
+                if (widget && widget->property(Properties::kPushButtonMargin).canConvert<int>())
+                    textHorizontalAlignment = Qt::AlignLeft;
 
                 /* Draw icon left-aligned: */
                 if (!buttonOption->icon.isNull())
@@ -2201,6 +2215,9 @@ void QnNxStyle::drawControl(
                     {
                         textRect.setLeft(option->rect.left() + iconRect.width());
                     }
+
+                    iconRect = alignedRect(option->direction, Qt::AlignCenter,
+                        buttonOption->iconSize, iconRect);
 
                     buttonOption->icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
                     textHorizontalAlignment = Qt::AlignLeft;
@@ -2246,8 +2263,9 @@ void QnNxStyle::drawControl(
                         | Qt::TextSingleLine
                         | Qt::TextHideMnemonic;
 
+                    /* Measurements don't support Qt::TextHideMnemonic, must use Qt::TextShowMnemonic: */
                     QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
-                        Qt::ElideRight, textRect.width() + margin, textFlags);
+                        Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
                     proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
                         buttonOption->state.testFlag(State_Enabled), text, foregroundRole);
@@ -2442,7 +2460,10 @@ QRect QnNxStyle::subControlRect(
                         if (groupBox->text.isEmpty() || !groupBox->subControls.testFlag(SC_GroupBoxLabel))
                             return QRect();
 
-                        const int kTextFlags = Qt::AlignLeft | Qt::TextHideMnemonic;
+                        /* Measurements don't support Qt::TextHideMnemonic,
+                         * so if we draw with Qt::TextHideMnemonic we
+                         * must measure with Qt::TextShowMnemonic: */
+                        const int kTextFlags = Qt::AlignLeft | Qt::TextShowMnemonic;
                         int left = option->rect.left();
 
                         if (panel)
@@ -2846,8 +2867,10 @@ QRect QnNxStyle::subElementRect(
                     rect.setLeft(rect.left() + arrowSize + margin);
                 }
 
-                int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
-                rect = option->fontMetrics.boundingRect(rect, flags, header->text);
+                rect = option->fontMetrics.boundingRect(
+                    rect,
+                    Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic,
+                    header->text);
 
                 if (!header->icon.isNull())
                 {
@@ -3020,7 +3043,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             if (auto header = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
-                QSize textSize = header->fontMetrics.size(Qt::TextHideMnemonic, header->text);
+                QSize textSize = header->fontMetrics.size(Qt::TextShowMnemonic, header->text);
 
                 int width = textSize.width();
 
@@ -3104,6 +3127,14 @@ int QnNxStyle::pixelMetric(
             {
                 if (!button->icon.isNull())
                     return Metrics::kPushButtonIconMargin * 2;
+            }
+
+            if (widget)
+            {
+                bool ok;
+                int margin = widget->property(Properties::kPushButtonMargin).toInt(&ok);
+                if (ok && margin >= 0)
+                    return margin;
             }
 
             return Metrics::kStandardPadding * 2;
@@ -3328,7 +3359,8 @@ void QnNxStyle::polish(QWidget *widget)
 
     /* #QTBUG 18838 */
     /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
-    if (findProxyWidget(widget))
+    Q_D(QnNxStyle);
+    if (d->graphicsProxyWidget(widget))
         widget->installEventFilter(this);
 
     if (qobject_cast<QAbstractSpinBox*>(widget) ||
@@ -3462,11 +3494,21 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
-    if (qobject_cast<QScrollBar*>(widget))
+    if (auto scrollBar = qobject_cast<QScrollBar*>(widget))
     {
         /* In certain containers we want scrollbars with transparent groove: */
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         widget->setAttribute(Qt::WA_Hover);
+
+        /* Workaround to update scroll areas hover when they're scrolled: */
+        auto updateScrollAreaHover =
+            [d, scrollBar]()
+            {
+                d->updateScrollAreaHover(scrollBar);
+            };
+
+        connect(scrollBar, &QScrollBar::valueChanged,
+            this, updateScrollAreaHover, Qt::QueuedConnection);
     }
 
     if (qobject_cast<QTabBar*>(widget))
@@ -3537,19 +3579,16 @@ void QnNxStyle::polish(QWidget *widget)
      * Since input dialogs are short-lived, don't bother with unpolishing.
      */
     if (auto inputDialog = qobject_cast<QInputDialog*>(widget))
-    {
-        Q_D(const QnNxStyle);
         d->polishInputDialog(inputDialog);
-    }
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanion<QnLinkHoverProcessor>::installUnique(label, kLinkHoverProcessorCompanion);
+        QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
 
 #ifdef CUSTOMIZE_POPUP_SHADOWS
     if (popupToCustomizeShadow)
     {
         /* Create customized shadow: */
-        if (auto shadow = QnObjectCompanion<QnPopupShadow>::installUnique(popupToCustomizeShadow, kPopupShadowCompanion))
+        if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
         {
             QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
             shadowColor.setAlphaF(0.5);
@@ -3576,6 +3615,7 @@ void QnNxStyle::polish(QWidget *widget)
 void QnNxStyle::unpolish(QWidget* widget)
 {
     widget->removeEventFilter(this);
+    widget->disconnect(this);
 
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QHeaderView*>(widget) ||
@@ -3673,15 +3713,13 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
     if (auto widget = qobject_cast<QWidget*>(object))
     {
-        if (auto proxy = findProxyWidget(widget))
+        Q_D(QnNxStyle);
+        if (auto proxy = d->graphicsProxyWidget(widget))
         {
-            Q_D(QnNxStyle);
-
             switch (event->type())
             {
                 case QEvent::Leave:
                 case QEvent::HoverLeave:
-                case QEvent::Destroy:
                 {
                     if (d->lastProxiedWidgetUnderMouse == widget)
                         d->lastProxiedWidgetUnderMouse = nullptr;
@@ -3737,9 +3775,10 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
             }
             case QEvent::HoverLeave:
             {
-                if (tabBar->property(kHoveredWidgetProperty).value<QWidget*>() != hoveredWidget)
+                if (tabBar->property(kHoveredWidgetProperty).value<QPointer<QWidget>>() != hoveredWidget)
                 {
-                    tabBar->setProperty(kHoveredWidgetProperty, QVariant::fromValue(hoveredWidget));
+                    tabBar->setProperty(kHoveredWidgetProperty,
+                        QVariant::fromValue(QPointer<QWidget>(hoveredWidget)));
                     tabBar->update();
                 }
                 break;

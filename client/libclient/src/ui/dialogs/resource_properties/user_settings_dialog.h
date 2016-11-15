@@ -40,18 +40,17 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
 
+    void forcedUpdate();
+
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
-
     virtual void applyChanges() override;
-
-    virtual void showEvent(QShowEvent* event) override;
 
 private:
     void applyChangesInternal();
     void updateControlsVisibility();
-    void permissionsChanged();
+    void updatePermissions();
 
 private:
     Q_DISABLE_COPY(QnUserSettingsDialog)

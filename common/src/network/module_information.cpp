@@ -8,6 +8,7 @@
 #include <api/model/connection_info.h>
 #include <utils/common/app_info.h>
 #include <utils/common/software_version.h>
+#include <network/cloud_system_data.h>
 
 namespace {
 /*!
@@ -17,59 +18,7 @@ It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAM
 const QString nxClientId = lit("client.exe");
 const QString nxECId = lit("Enterprise Controller");
 const QString nxMediaServerId = lit("Media Server");
-
-static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
-static const auto kMinVersionWithLocalId = QnSoftwareVersion(3, 0);
-
-QString getFactorySystemIdImpl(const QnUuid& serverId)
-{
-    return serverId.toString();
-}
-
-QString getTargetSystemIdImpl(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    const QnUuid& serverId,
-    const QnSoftwareVersion& serverVersion)
-{
-    if (serverVersion < kMinVersionWithSystem)
-        return serverId.toString();    //< We have only one hub-server if version is less than 2.3
-
-    if (serverVersion < kMinVersionWithLocalId)
-        return systemName; //< No cloud, no local id, no new systems
-
-    if (localSystemId.isNull())
-        return getFactorySystemIdImpl(serverId);  //< New System id
-
-    return localSystemId.toString();
-}
-
-}
-
-QString helpers::getTargetSystemId(const QnConnectionInfo& info)
-{
-    return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
-        QnUuid::fromStringSafe(info.ecsGuid), info.version);
-}
-
-QString helpers::getTargetSystemId(const QnModuleInformation& info)
-{
-    return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
-        info.id, info.version);
-}
-
-QString helpers::getFactorySystemId(const QnModuleInformation& info)
-{
-    return getFactorySystemIdImpl(info.id);
-}
-
-bool helpers::isNewSystem(const QnModuleInformation& info)
-{
-    if (info.version < kMinVersionWithLocalId)
-        return false; //< No new systems until 3.0
-
-    return info.localSystemId.isNull();
-}
+} // namespace
 
 QnModuleInformation::QnModuleInformation():
     type(),

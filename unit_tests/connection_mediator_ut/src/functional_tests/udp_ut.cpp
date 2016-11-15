@@ -70,10 +70,10 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         ASSERT_TRUE(responseData.parse(responseMessage));
 
         //checking response
-        ASSERT_TRUE(std::find(
-            responseData.endpoints.begin(),
-            responseData.endpoints.end(),
-            system1Servers[i]->endpoint()) != responseData.endpoints.end());
+        ASSERT_EQ(1, responseData.endpoints.size());
+        ASSERT_EQ(
+            system1Servers[i]->endpoint().toString(),
+            responseData.endpoints.front().toString());
     }
 }
 

@@ -2,29 +2,12 @@
 
 #include <cmath> /* For std::floor. */
 
-#include <QtCore/QSettings>
-#include <QtCore/QTimer>
-
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMenu>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <common/common_module.h>
-
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/camera_bookmark.h>
-
-#include <camera/resource_display.h>
+#include <core/resource/resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -39,32 +22,22 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
-#include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/fps_counting_instrument.h>
-#include <ui/graphics/instruments/drop_instrument.h>
-#include <ui/graphics/instruments/focus_listener_instrument.h>
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
-#include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
-#include <ui/graphics/items/controls/speed_slider.h>
-#include <ui/graphics/items/controls/volume_slider.h>
-#include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -72,18 +45,12 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/statistics/modules/controls_statistics_module.h>
-
-#include <ui/style/skin.h>
-
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
-
-#include <ui/workaround/qtbug_workaround.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -207,6 +174,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     createTimelineWidget(settings[Qn::WorkbenchPane::Navigation]);
 
+    /* Make timeline panel aware of calendar panel. */
+    m_timeline->setCalendarPanel(m_calendar);
+
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
         Qt::TopEdge, NxUi::kShadowThickness, true);
@@ -221,7 +191,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Connect to display. */
     display()->view()->addAction(action(QnActions::FreespaceAction));
-    connect(display(), &QnWorkbenchDisplay::widgetChanged, this, &QnWorkbenchUi::at_display_widgetChanged);
+    connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
+        &QnWorkbenchUi::at_display_widgetChanged);
+
+    /* After widget was removed we can possibly increase margins. */
+    connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
+        &QnWorkbenchUi::updateViewportMargins, Qt::QueuedConnection);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
     connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this,
@@ -312,6 +287,32 @@ void QnWorkbenchUi::updateCursor()
 #endif
 }
 
+bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
+{
+    if (action(QnActions::ToggleTourModeAction)->isChecked())
+        return false;
+
+    if (!widget)
+        return false;
+
+    const auto resource = widget->resource();
+    if (!resource)
+        return false;
+
+    const auto flags = resource->flags();
+
+    /* Any of the flags is sufficient. */
+    if (flags & (Qn::still_image | Qn::server | Qn::videowall))
+        return false;
+
+    /* Qn::web_page is as flag combination. */
+    if (flags.testFlag(Qn::web_page))
+        return false;
+
+    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+        || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
+}
+
 Qn::ActionScope QnWorkbenchUi::currentScope() const
 {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
@@ -358,31 +359,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
 
-    const auto calculateTimelineVisible = [this]()
-        {
-            if (action(QnActions::ToggleTourModeAction)->isChecked())
-                return false;
-
-            if (!navigator()->currentWidget())
-                return false;
-
-            const auto resource = navigator()->currentWidget()->resource();
-            if (!resource)
-                return false;
-
-            const auto flags = resource->flags();
-
-            if (flags & (Qn::still_image | Qn::server | Qn::videowall))  /* Any of the flags is sufficient. */
-                return false;
-
-            if ((flags & Qn::web_page) == Qn::web_page)                  /* Qn::web_page is as flag combination. */
-                return false;
-
-            return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
-                || !navigator()->currentWidget()->resource()->flags().testFlag(Qn::live);   /* Show slider for local files. */
-        };
-
-    bool timelineVisible = calculateTimelineVisible();
+    bool timelineVisible = calculateTimelineVisible(navigator()->currentWidget());
 
     if (qnRuntime->isVideoWallMode())
     {
@@ -427,13 +404,23 @@ void QnWorkbenchUi::updateControlsVisibilityAnimated()
     updateControlsVisibility(true);
 }
 
-QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX)
+QMargins QnWorkbenchUi::calculateViewportMargins(
+    QRectF treeGeometry,
+    qreal titleY, qreal titleH,
+    QRectF timelineGeometry,
+    QRectF notificationsGeometry)
 {
-    QMargins result(
-        isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
-        std::floor(qMax(0.0, titleY + titleH)),
-        m_notifications ? std::floor(qMax(0.0, isNotificationsPinned() ? m_controlsWidgetRect.right() - notificationsX : 0.0)) : 0.0,
-        std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY)));
+    using namespace std;
+    QMargins result;
+    if (treeGeometry.isValid())
+        result.setLeft(max(0.0, floor(treeGeometry.left() + treeGeometry.width())));
+    result.setTop(max(0.0, floor(titleY + titleH)));
+
+    if (notificationsGeometry.isValid())
+        result.setRight(max(0.0, floor(m_controlsWidgetRect.right() - notificationsGeometry.left())));
+
+    if (timelineGeometry.isValid())
+        result.setBottom(max(0.0, floor(m_controlsWidgetRect.bottom() - timelineGeometry.top())));
 
     if (result.left() + result.right() >= m_controlsWidgetRect.width())
     {
@@ -442,7 +429,6 @@ QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal
     }
 
     return result;
-
 }
 
 void QnWorkbenchUi::setFlags(Flags flags)
@@ -463,21 +449,43 @@ bool QnWorkbenchUi::isTitleUsed() const
 
 void QnWorkbenchUi::updateViewportMargins()
 {
-    if (!m_flags.testFlag(AdjustMargins))
+    using boost::algorithm::any_of;
+
+    auto panelEffectiveGeometry = [](NxUi::AbstractWorkbenchPanel* panel)
+        {
+            if (panel && panel->isVisible() && panel->isPinned())
+                return panel->effectiveGeometry();
+            return QRectF();
+        };
+
+    const bool timelineCanBeVisible = m_timeline && any_of(display()->widgets(),
+        [this](QnResourceWidget* widget)
+        {
+            return calculateTimelineVisible(widget);
+        });
+
+    auto timelineEffectiveGeometry = (m_timeline && timelineCanBeVisible)
+        ? m_timeline->effectiveGeometry()
+        : QRectF();
+
+    auto oldMargins = display()->viewportMargins();
+
+    QMargins newMargins(0, 0, 0, 0);
+    if (m_flags.testFlag(AdjustMargins))
     {
-        display()->setViewportMargins(QMargins(0, 0, 0, 0));
-    }
-    else
-    {
-        display()->setViewportMargins(calculateViewportMargins(
-            m_tree ? (m_tree->xAnimator->isRunning() ? m_tree->xAnimator->targetValue().toReal() : m_tree->item->pos().x()) : 0.0,
-            m_tree ? m_tree->item->size().width() : 0.0,
+        newMargins = calculateViewportMargins(
+            panelEffectiveGeometry(m_tree),
             m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
             m_titleItem ? m_titleItem->size().height() : 0.0,
-            m_timeline->effectiveGeometry().top(),
-            m_notifications ? m_notifications->xAnimator->isRunning() ? m_notifications->xAnimator->targetValue().toReal() : m_notifications->item->pos().x() : 0.0
-        ));
+            timelineEffectiveGeometry,
+            panelEffectiveGeometry(m_notifications)
+        );
     }
+
+    if (oldMargins == newMargins)
+        return;
+    display()->setViewportMargins(newMargins);
+    display()->fitInView(true);
 }
 
 void QnWorkbenchUi::updateActivityInstrumentState()
@@ -493,8 +501,7 @@ bool QnWorkbenchUi::isHovered() const
         || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notifications && m_notifications->isHovered())
-        || (m_calendar && m_calendar->isHovered())
-        ;
+        || (m_calendar && m_calendar->isHovered());
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
@@ -596,9 +603,6 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
         setTimelineOpened(false, isFullscreen);
         setNotificationsOpened(false, isFullscreen);
 
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
-        action(QnActions::FitInViewAction)->trigger();
-
         m_inFreespace = true;
     }
     else
@@ -608,9 +612,6 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
         setTitleOpened(settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, isFullscreen);
         setTimelineOpened(settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, isFullscreen);
         setNotificationsOpened(settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, isFullscreen);
-
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
-        action(QnActions::FitInViewAction)->trigger();
 
         m_inFreespace = false;
     }
@@ -669,7 +670,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             /* User may have opened some panels while zoomed,
              * we want to leave them opened even if they were closed before. */
-            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels() | TimelinePanel, true);
+            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels(), true);
 
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
@@ -715,7 +716,6 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     m_timeline->updateGeometry();
 
-
     if (m_titleItem)
     {
         m_titleItem->setGeometry(QRectF(
@@ -735,6 +735,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
+    updateViewportMargins();
 }
 
 void QnWorkbenchUi::createControlsWidget()
@@ -1309,7 +1310,9 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
+            updateNotificationsGeometry();
             updateCalendarVisibility(animated);
+            updateViewportMargins();
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
@@ -1326,14 +1329,6 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateCalendarGeometry();
         });
 
-    /*
-     * Calendar is created before navigation slider (alot of logic relies on that).
-     * Therefore we have to bind calendar showing/hiding processors to navigation
-     * pane button "CLND" here and not in createCalendarWidget()
-     */
-    if (m_calendar)
-        m_calendar->hidingProcessor->addTargetItem(m_timeline->item->calendarButton());
-
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
@@ -1349,64 +1344,6 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    const auto getActionParamsFunc =
-        [this](const QnCameraBookmark &bookmark) -> QnActionParameters
-        {
-            QnActionParameters bookmarkParams(currentParameters(Qn::TimelineScope));
-            bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
-            return bookmarkParams;
-        };
-
-    /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
-    const auto bookmarksViewer = m_timeline->item->timeSlider()->bookmarksViewer();
-
-    const auto updateBookmarkActionsAvailability =
-        [this, bookmarksViewer]()
-        {
-            const bool readonly = qnCommon->isReadOnly()
-                || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
-
-            bookmarksViewer->setReadOnly(readonly);
-        };
-
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        updateBookmarkActionsAvailability);
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, updateBookmarkActionsAvailability);
-    connect(context(), &QnWorkbenchContext::userChanged, this, updateBookmarkActionsAvailability);
-
-    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_edit"));
-            menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
-        });
-
-    connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
-            menu()->triggerIfPossible(QnActions::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
-        });
-
-    connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
-
-            enum { kMicrosecondsFactor = 1000 };
-            navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
-            navigator()->setPlaying(true);
-        });
-
-    connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this,
-        [this, bookmarksViewer](const QString &tag)
-        {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
-
-            QnActionParameters params;
-            params.setArgument(Qn::BookmarkTagRole, tag);
-            menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
-        });
 
 }
 

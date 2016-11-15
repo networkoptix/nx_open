@@ -62,3 +62,12 @@ TEST(QTimeSpanTest, customApproximateStringNegative)
     ASSERT_EQ(s.toApproximateString(kDoNotSuppress, kFormat, kConverter, kSeparator)
         .toStdString(), "-1m 15s");
 }
+
+TEST(QTimeSpanTest, smallApproximateStringNegative)
+{
+    /* Check if small negative value correctly rounded to non-signed zero */
+    qint64 negativeMs = -1;
+    QTimeSpan s(negativeMs);
+    ASSERT_EQ(s.toApproximateString(kDoNotSuppress, kFormat, kConverter, kSeparator)
+        .toStdString(), "0s");
+}

@@ -254,7 +254,7 @@ int CloudDBProcess::exec()
             &authenticationManager,
             &httpMessageDispatcher,
             false,  //TODO #ak enable ssl when it works properly
-            SocketFactory::NatTraversalType::nttDisabled );
+            nx::network::NatTraversalSupport::disabled );
 
         if (m_settings->auth().connectionInactivityPeriod.count())
         {

@@ -79,22 +79,8 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         ui->emailInputField
     });
 
-    //TODO: #GDM move this to style helper or stacked widget subclass
-    auto stackedWidgetCurrentChanged =
-        [this](int index)
-        {
-            auto stackedWidget = static_cast<QStackedWidget*>(sender());
-            for (int i = 0; i < stackedWidget->count(); ++i)
-            {
-                auto policy = i == index ? QSizePolicy::Maximum : QSizePolicy::Ignored;
-                stackedWidget->widget(i)->setSizePolicy(QSizePolicy::Expanding, policy);
-                stackedWidget->widget(i)->adjustSize();
-            }
-
-            stackedWidget->adjustSize();
-        };
-
-    connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, stackedWidgetCurrentChanged);
+    autoResizePagesToContents(ui->stackedWidget,
+        { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
 }
 
 QnUserProfileWidget::~QnUserProfileWidget()
@@ -179,11 +165,11 @@ void QnUserProfileWidget::applyChanges()
 
             auto connections = qnClientCoreSettings->recentLocalConnections();
             if (!connections.isEmpty() &&
-                !connections.first().url.password().isEmpty() &&
+                !connections.first().password.isEmpty() &&
                 qnUrlEqual(connections.first().url, url))
             {
                 auto current = connections.takeFirst();
-                current.url = url;
+                current.password.setValue(m_newPassword);
                 connections.prepend(current);
                 qnClientCoreSettings->setRecentLocalConnections(connections);
             }

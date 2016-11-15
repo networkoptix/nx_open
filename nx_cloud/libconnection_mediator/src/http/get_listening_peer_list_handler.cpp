@@ -1,23 +1,15 @@
-/**********************************************************
-* May 4, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "get_listening_peer_list_handler.h"
 
-#include "listening_peer_pool.h"
-
+#include "peer_registrator.h"
 
 namespace nx {
 namespace hpm {
 namespace http {
 
-const char* GetListeningPeerListHandler::kHandlerPath = "/statistics/listening_peer_list";
+const char* GetListeningPeerListHandler::kHandlerPath = "/statistics/listening_peers";
 
-GetListeningPeerListHandler::GetListeningPeerListHandler(
-    const ListeningPeerPool& listeningPeerPool)
-:
-    m_listeningPeerPool(listeningPeerPool)
+GetListeningPeerListHandler::GetListeningPeerListHandler(const PeerRegistrator& registrator):
+    m_registrator(registrator)
 {
 }
 
@@ -26,9 +18,7 @@ void GetListeningPeerListHandler::processRequest(
     const nx_http::Request& /*request*/,
     stree::ResourceContainer /*authInfo*/)
 {
-    requestCompleted(
-        nx_http::FusionRequestResult(),
-        m_listeningPeerPool.getListeningPeers());
+    requestCompleted(nx_http::FusionRequestResult(), m_registrator.getListeningPeers());
 }
 
 } // namespace http

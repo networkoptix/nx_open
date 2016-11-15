@@ -59,6 +59,8 @@ angular.module('webadminApp')
 
                 getCloudInfo();
                 requestScripts();
+
+                $scope.user = user;
             });
         }
         $scope.Config = Config;
@@ -81,7 +83,6 @@ angular.module('webadminApp')
 
         $scope.openRestoreDefaultsDialog = function () {
             //1. confirm detach
-            var confirmation = L.settings.confirmRestoreDefault;
             dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
 
                 mediaserver.checkCurrentPassword(oldPassword).then(function() {
@@ -120,7 +121,7 @@ angular.module('webadminApp')
             dialogs.alert (L.settings.connnetionError);
             return false;
         }
-        function resultHandler (r){
+        function resultHandler (r, message){
             var data = r.data;
 
             if(data.error!=='0') {
@@ -137,11 +138,13 @@ angular.module('webadminApp')
                     restartServer(true);
                 });
             } else {
-                dialogs.alert(L.settings.settingsSaved);
-                if( $scope.settings.port !==  window.location.port ) {
-                    window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
-                }else{
-                    window.location.reload();
+                dialogs.alert(message || L.settings.settingsSaved);
+                if(!message) {
+                    if ($scope.settings.port !== window.location.port) {
+                        window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
+                    } else {
+                        window.location.reload();
+                    }
                 }
             }
         }
@@ -170,15 +173,18 @@ angular.module('webadminApp')
                     $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                     $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                     $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
-                $scope.canRunClient = data.data.reply.indexOf('start_lite_client') >= 0;
+                    $scope.canRunClient = data.data.reply.indexOf('start_lite_client') >= 0;
                     $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
                 }
             });
         }
 
 
+        function runResultHandler(result){
+            resultHandler(result, L.settings.nx1ControlHint);
+        }
         $scope.runClient = function(){
-            mediaserver.execute('start_lite_client').then(resultHandler, errorHandler);
+            mediaserver.execute('start_lite_client').then(runResultHandler, errorHandler);
         };
 
         $scope.stopClient = function(){
@@ -258,6 +264,22 @@ angular.module('webadminApp')
                 window.location.reload();
             });
         }
+
+        $scope.changePassword = function(){
+            dialogs.confirmWithPassword(
+                L.settings.confirmChangePasswordTitle,
+                L.settings.confirmChangePassword,
+                L.settings.confirmChangePasswordAction,
+                'danger').then(function (oldPassword) {
+                    //1. Check password
+                    return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                        // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
+                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(resultHandler, errorHandler);
+                    },function(){
+                        dialogs.alert(L.settings.wrongPassword);
+                    });
+                });
+        };
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             //Open Disconnect Dialog
 
@@ -309,8 +331,7 @@ angular.module('webadminApp')
         };
 
         $scope.connectToCloud = function() { // Connect to Cloud
-            //Open Connect Dialog
-            openCloudDialog(true);
+            openCloudDialog(true); //Open Connect Dialog
         };
 
 

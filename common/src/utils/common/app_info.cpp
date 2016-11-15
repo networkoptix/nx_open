@@ -20,6 +20,21 @@ bool QnAppInfo::isNx1()
     return armBox() == lit("nx1");
 }
 
+bool QnAppInfo::isAndroid()
+{
+    return applicationPlatform() == lit("android");
+}
+
+bool QnAppInfo::isIos()
+{
+    return applicationPlatform() == lit("ios");
+}
+
+bool QnAppInfo::isMobile()
+{
+    return isAndroid() || isIos();
+}
+
 QString QnAppInfo::applicationFullVersion()
 {
     static const QString kBeta = beta() ? lit("-beta") : QString();

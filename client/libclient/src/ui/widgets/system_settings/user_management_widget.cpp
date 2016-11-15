@@ -5,6 +5,8 @@
 
 #include <api/global_settings.h>
 
+#include <client/client_settings.h>
+
 #include <common/common_module.h>
 
 #include <core/resource/user_resource.h>
@@ -19,6 +21,7 @@
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -27,6 +30,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
+#include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -52,6 +56,14 @@ public:
         NX_ASSERT(m_hoverTracker);
     }
 
+    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+        if (index.column() == QnUserListModel::UserTypeColumn)
+            return QnSkin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
+
+        return base_type::sizeHint(option, index);
+    }
+
     virtual void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
     {
         /* Determine item opacity based on user enabled state: */
@@ -60,6 +72,22 @@ public:
             index.sibling(index.row(), QnUserListModel::EnabledColumn).data(Qt::CheckStateRole).toInt() != Qt::Checked)
         {
             painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+        }
+
+        /* Paint right-aligned user type icon: */
+        if (index.column() == QnUserListModel::UserTypeColumn)
+        {
+            auto icon = index.data(Qt::DecorationRole).value<QIcon>();
+            if (icon.isNull())
+                return;
+
+            auto rect = QStyle::alignedRect(Qt::LeftToRight,
+                Qt::AlignRight | Qt::AlignVCenter,
+                QnSkin::maximumSize(icon),
+                option.rect);
+
+            icon.paint(painter, rect);
+            return;
         }
 
         /* Determine if link should be drawn: */
@@ -85,7 +113,7 @@ public:
         QString linkText = tr("Edit");
 
         /* Measure link width: */
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignVCenter;
+        const int kTextFlags = Qt::TextSingleLine | Qt::AlignVCenter;
         int linkWidth = option.fontMetrics.width(linkText, -1, kTextFlags);
 
         int lineHeight = option.rect.height();
@@ -95,7 +123,7 @@ public:
 
         /* Draw original text elided: */
         int newTextWidth = textRect.width() - linkWidth - style::Metrics::kStandardPadding;
-        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth, kTextFlags);
+        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth);
         style->drawControl(QStyle::CE_ItemViewItem, &newOption, painter, newOption.widget);
 
         opacityRollback.rollback();
@@ -229,6 +257,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
         {
             ui->usersTable->unsetCursor();
         });
+
+    updateSelection();
 }
 
 QnUserManagementWidget::~QnUserManagementWidget()
@@ -239,7 +269,7 @@ void QnUserManagementWidget::loadDataToUi()
 {
     ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
     updateLdapState();
-    modelUpdated();
+    m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
 }
 
 void QnUserManagementWidget::updateLdapState()
@@ -253,12 +283,43 @@ void QnUserManagementWidget::updateLdapState()
 
 void QnUserManagementWidget::applyChanges()
 {
-    /* All changes are instant. */
+    auto modelUsers = m_usersModel->users();
+    QnUserResourceList usersToDelete;
+    for (auto user : qnResPool->getResources<QnUserResource>())
+    {
+        if (!modelUsers.contains(user))
+        {
+            usersToDelete << user;
+            continue;
+        }
+
+        bool enabled = m_usersModel->isUserEnabled(user);
+        if (user->isEnabled() != enabled)
+        {
+            qnResourcesChangesManager->saveUser(user,
+                [enabled](const QnUserResourcePtr &user)
+                {
+                    user->setEnabled(enabled);
+                });
+        }
+    }
+
+    /* User still can press cancel on 'Confirm Remove' dialog. */
+    if (confirmUsersDelete(usersToDelete))
+        qnResourcesChangesManager->deleteResources(usersToDelete);
+    else
+        m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
 }
 
 bool QnUserManagementWidget::hasChanges() const
 {
-    return false;
+    using boost::algorithm::any_of;
+    return any_of(qnResPool->getResources<QnUserResource>(),
+        [this, users = m_usersModel->users()](const QnUserResourcePtr& user)
+        {
+            return !users.contains(user)
+                || user->isEnabled() != m_usersModel->isUserEnabled(user);
+        });
 }
 
 void QnUserManagementWidget::modelUpdated()
@@ -293,24 +354,25 @@ void QnUserManagementWidget::updateSelection()
 
     using boost::algorithm::any_of;
 
-    ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
-    {
-        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
-            && !user->isEnabled();
-    }));
+    ui->enableSelectedButton->setEnabled(any_of(users,
+        [this](const QnUserResourcePtr& user)
+        {
+            return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
+                && !m_usersModel->isUserEnabled(user);
+        }));
 
-    ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
-    {
-        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
-            && user->isEnabled()
-            && !user->isOwner();
-    }));
+    ui->disableSelectedButton->setEnabled(any_of(users,
+        [this](const QnUserResourcePtr& user)
+        {
+            return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
+                && m_usersModel->isUserEnabled(user);
+        }));
 
-    ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
-    {
-        return accessController()->hasPermissions(user, Qn::RemovePermission)
-            && !user->isOwner();
-    }));
+    ui->deleteSelectedButton->setEnabled(any_of(users,
+        [this](const QnUserResourcePtr& user)
+        {
+            return accessController()->hasPermissions(user, Qn::RemovePermission);
+        }));
 
     update();
 }
@@ -380,7 +442,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             break;
 
         case QnUserListModel::EnabledColumn:
-            enableUser(user, !user->isEnabled());
+            enableUser(user, !m_usersModel->isUserEnabled(user));
             break;
 
         default:
@@ -396,17 +458,11 @@ void QnUserManagementWidget::clearSelection()
 
 bool QnUserManagementWidget::enableUser(const QnUserResourcePtr& user, bool enabled)
 {
-    if (user->isOwner())
-        return false;
-
     if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
 
-    qnResourcesChangesManager->saveUser(user,
-        [enabled](const QnUserResourcePtr &user)
-        {
-            user->setEnabled(enabled);
-        });
+    m_usersModel->setUserEnabled(user, enabled);
+    emit hasChangesChanged();
 
     return true;
 }
@@ -432,21 +488,13 @@ void QnUserManagementWidget::deleteSelected()
     QnUserResourceList usersToDelete;
     for (QnUserResourcePtr user : visibleSelectedUsers())
     {
-        if (user->isOwner())
-            continue;
-
         if (!accessController()->hasPermissions(user, Qn::RemovePermission))
             continue;
 
-        usersToDelete << user;
+        m_usersModel->removeUser(user);
     }
-
-    if (usersToDelete.isEmpty())
-        return;
-
-    menu()->trigger(QnActions::RemoveFromServerAction, usersToDelete);
+    emit hasChangesChanged();
 }
-
 
 QnUserResourceList QnUserManagementWidget::visibleUsers() const
 {
@@ -480,4 +528,37 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
     }
 
     return result;
+}
+
+bool QnUserManagementWidget::confirmUsersDelete(const QnUserResourceList& users)
+{
+    if (users.isEmpty())
+        return false;
+
+    /* Check if user have already silenced this warning. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteResources))
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Delete Users..."),
+        tr("Confirm Delete Users"),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        this);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
+    messageBox.setInformativeText(tr("Do you really want to delete the following %n users?",
+        "", users.size()));
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(users));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::DeleteResources;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
 }

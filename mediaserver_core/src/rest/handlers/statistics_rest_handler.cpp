@@ -4,6 +4,10 @@
 #include "network/tcp_connection_priv.h"
 #include "platform/platform_abstraction.h"
 #include "api/model/statistics_reply.h"
+#include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
 
 
 QnStatisticsRestHandler::QnStatisticsRestHandler(): QnJsonRestHandler() {
@@ -14,8 +18,20 @@ QnStatisticsRestHandler::~QnStatisticsRestHandler() {
     return;
 }
 
-int QnStatisticsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnStatisticsRestHandler::executeGet(
+    const QString &path, 
+    const QnRequestParams &params, 
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
+    if (!qnResourceAccessManager->hasPermission(
+            owner->accessRights(),
+            qnResPool->getResourceById(qnCommon->moduleGUID()),
+            Qn::ViewContentPermission))
+    {
+        return nx_http::StatusCode::forbidden;
+    }
+
     Q_UNUSED(params)
     Q_UNUSED(path)
 

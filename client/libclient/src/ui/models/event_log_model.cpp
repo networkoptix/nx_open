@@ -362,7 +362,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
 
         QDateTime dt = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampMs);
-        return dt.toString(Qt::SystemLocaleShortDate);
+        return dt.toString(Qt::DefaultLocaleShortDate);
     }
     case EventColumn:
         return QnBusinessStringsHelper::eventName(action.eventParams.eventType);

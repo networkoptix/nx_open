@@ -58,7 +58,7 @@ void QnResourceTreeModelUserResourcesNode::handleAccessChanged(
     }
     else
     {
-        for (auto node : m_items)
+        for (auto node: m_items)
         {
             if (node->resource() != resource)
                 continue;
@@ -78,6 +78,10 @@ bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr
     if (!QnResourceAccessFilter::isShareableMedia(resource))
         return false;
 
+    /* Web pages are displayed under separate node. */
+    if (resource->hasFlags(Qn::web_page))
+        return false;
+
     if (!qnResourceAccessProvider->hasAccess(context()->user(), resource))
         return false;
 
@@ -90,7 +94,7 @@ bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr
 QnResourceTreeModelNodePtr QnResourceTreeModelUserResourcesNode::ensureResourceNode(
     const QnResourcePtr& resource)
 {
-    for (auto node : m_items)
+    for (auto node: m_items)
     {
         if (node->resource() == resource)
             return node;
@@ -141,7 +145,7 @@ void QnResourceTreeModelUserResourcesNode::rebuild()
     if (!context()->user())
         return;
 
-    for (const auto& resource : qnResPool->getResources())
+    for (const auto& resource: qnResPool->getResources())
     {
         if (isResourceVisible(resource))
             ensureResourceNode(resource);
@@ -158,7 +162,7 @@ void QnResourceTreeModelUserResourcesNode::removeNode(const QnResourceTreeModelN
             return;
 
         /* Recursively remove all child nodes. */
-        for (auto child : children())
+        for (auto child: node->children())
             removeNode(child);
 
         m_recorders.remove(key);
@@ -177,7 +181,7 @@ void QnResourceTreeModelUserResourcesNode::removeNode(const QnResourceTreeModelN
 
 void QnResourceTreeModelUserResourcesNode::clean()
 {
-    for (auto node : m_items)
+    for (auto node: m_items)
         node->deinitialize();
     m_items.clear();
 
@@ -189,12 +193,12 @@ void QnResourceTreeModelUserResourcesNode::clean()
 void QnResourceTreeModelUserResourcesNode::cleanupRecorders()
 {
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
-    for (auto node : m_recorders.values())
+    for (auto node: m_recorders.values())
     {
         if (node->children().isEmpty())
             nodesToDelete << node;
     }
 
-    for (auto node : nodesToDelete)
+    for (auto node: nodesToDelete)
         removeNode(node);
 }

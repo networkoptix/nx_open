@@ -11,7 +11,10 @@
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
 #include <utils/common/sync_call.h>
+
+#include <nx_ec/data/api_cloud_system_data.h>
 #include <nx/fusion/model_functions.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
@@ -119,15 +122,12 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
 
-    QMap<QByteArray, QByteArray> systemAttributes;
-    systemAttributes.insert(
-        nx::settings_names::kNameLocalSystemId.toUtf8(),
-        qnGlobalSettings->localSystemId().toByteArray());
+    ec2::ApiCloudSystemData opaque;
+    opaque.localSystemId = qnGlobalSettings->localSystemId();
 
     api::SystemAttributesUpdate systemAttributesUpdate;
     systemAttributesUpdate.systemID = data.cloudSystemID.toStdString();
-    systemAttributesUpdate.opaque =
-        nx::utils::serializeNameValuePairs(systemAttributes).toStdString();
+    systemAttributesUpdate.opaque = QJson::serialized(opaque).toStdString();
 
     auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);

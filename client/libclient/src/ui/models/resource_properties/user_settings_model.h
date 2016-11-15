@@ -30,6 +30,8 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& value);
 
+    void updatePermissions();
+
     virtual Qn::GlobalPermissions rawPermissions() const override;
     virtual void setRawPermissions(Qn::GlobalPermissions value) override;
 
@@ -44,6 +46,7 @@ signals:
 private:
     Mode m_mode;
     QnUserResourcePtr m_user;
-    QSet<QnUuid> m_accessibleLayoutsPreview;
+
+    /** Proxying via local field is required because new user can have no id yet. */
     QSet<QnUuid> m_accessibleResources;
 };

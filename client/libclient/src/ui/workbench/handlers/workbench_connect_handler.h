@@ -23,6 +23,7 @@ public:
     enum class LogicalState
     {
         disconnected,           /*< Client is disconnected. Initial state. */
+        testing,                /*< Testing connection to some system. */
         connecting,             /*< Trying to connect to some system. */
         reconnecting,           /*< Reconnecting to the current system. */
         connecting_to_target,   /*< Connecting to the predefined server (New Window, Link). */
@@ -51,13 +52,11 @@ public:
         bool isConnectionToCloud;
         bool storePassword;
         bool autoLogin;
-        bool forceRemoveOldConnection;
 
         static ConnectionSettingsPtr create(
             bool isConnectionToCloud,
             bool storePassword,
-            bool autoLogin,
-            bool forceRemoveOldConnection);
+            bool autoLogin);
     };
 
 private:
@@ -69,19 +68,26 @@ private:
     void clearConnection();
 
     /// @brief Connects to server and stores successful connection data
-    /// according to specified settings. If no settings are specified no
-    /// connection data will be stored.
-    void connectToServer(
-        const QUrl &url,
-        const ConnectionSettingsPtr &storeSettings);
+    /// according to specified settings.
+    void testConnectionToServer(
+        const QUrl& url,
+        const ConnectionSettingsPtr& storeSettings);
 
-    bool disconnectFromServer(bool force);
+    void connectToServer(const QUrl& url);
+
+    bool disconnectFromServer(bool force, bool isErrorReason = false);
+
+    void handleTestConnectionReply(
+        int handle,
+        const QUrl& url,
+        ec2::ErrorCode errorCode,
+        const QnConnectionInfo& connectionInfo,
+        const ConnectionSettingsPtr& storeSettings);
 
     void handleConnectReply(
         int handle,
         ec2::ErrorCode errorCode,
-        ec2::AbstractECConnectionPtr connection,
-        const ConnectionSettingsPtr &storeSettings);
+        ec2::AbstractECConnectionPtr connection);
 
     void processReconnectingReply(
         Qn::ConnectionResult status,
@@ -91,6 +97,7 @@ private:
         ec2::AbstractECConnectionPtr connection);
 
     void storeConnectionRecord(
+        const QUrl& url,
         const QnConnectionInfo& info,
         const ConnectionSettingsPtr& storeSettings);
 

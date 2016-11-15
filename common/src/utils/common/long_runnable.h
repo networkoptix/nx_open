@@ -90,34 +90,4 @@ private:
     QSharedPointer<QnLongRunnablePoolPrivate> d;
 };
 
-
-/**
- * Helper cleanup class to use QnLongRunnable inside Qt smart pointers in a
- * non-blocking fashion.
- */
-struct QnRunnableCleanup {
-    static inline void cleanup(QnLongRunnable *runnable) {
-        if(!runnable)
-            return;
-
-        if(runnable->isRunning()) {
-            QObject::connect(runnable, SIGNAL(finished()), runnable, SLOT(deleteLater()));
-            runnable->pleaseStop();
-        } else {
-            delete runnable;
-        }
-    }
-
-    static inline void cleanupSync(QnLongRunnable *runnable) {
-        if(!runnable)
-            return;
-
-        if(runnable->isRunning())
-            runnable->stop();
-
-        delete runnable;
-    }
-};
-
-
 #endif // QN_LONG_RUNNABLE_H

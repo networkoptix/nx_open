@@ -15,7 +15,10 @@ namespace {
 typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 
 /* Top-level domains can already be up to 30 symbols length for now, so do not limiting them. */
-const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,255}\\b");
+const QLatin1String emailPattern("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,255}\\b");
+
+/* RFC5233 (sub-addressing, also known as plus addressing or tagged addressing). */
+const QLatin1String fullNamePattern("(.*)<(.+)>");
 
 const int tlsPort = 587;
 const int sslPort = 465;
@@ -23,6 +26,11 @@ const int unsecurePort = 25;
 
 const int defaultSmtpTimeout = 300; //seconds, 5 min
 
+}
+
+bool nx::email::isValidAddress(const QString& address)
+{
+    return QnEmailAddress(address).isValid();
 }
 
 static QnSmtpPresets smtpServerPresetPresets;
@@ -82,31 +90,66 @@ bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* =
     return !compareView || (simple == other.simple);
 }
 
-QnEmailAddress::QnEmailAddress(const QString &email) :
-    m_email(email.trimmed().toLower())
-{}
+QnEmailAddress::QnEmailAddress(const QString &email):
+    m_email(email.trimmed())
+{
+    QRegExp rx(fullNamePattern);
+    if (rx.exactMatch(m_email))
+    {
+        auto parts = rx.capturedTexts();
+        NX_ASSERT(parts.size() == 3);
+        if (parts.size() == 3)
+        {
+            m_fullName = parts[1].trimmed();
+            m_email = parts[2].trimmed();
+        }
+    }
+
+    m_email = m_email.toLower();
+}
 
 bool QnEmailAddress::isValid() const
 {
-    return isValid(m_email);
-}
-
-bool QnEmailAddress::isValid(const QString &email)
-{
     QRegExp rx(emailPattern);
-    return rx.exactMatch(email.trimmed().toUpper());
+    return rx.exactMatch(m_email);
 }
 
 QString QnEmailAddress::user() const
 {
+    /* Support for tagged addressing: username+tag@domain.com */
+
     int idx = m_email.indexOf(L'@');
-    return m_email.left(idx).trimmed();
+    int idxSuffix = m_email.indexOf(L'+');
+    if (idx >= 0)
+    {
+        if (idxSuffix >= 0)
+            return m_email.left(std::min(idx, idxSuffix));
+        return m_email.left(idx);
+    }
+
+    return QString();
 }
 
 QString QnEmailAddress::domain() const
 {
     int idx = m_email.indexOf(L'@');
-    return m_email.mid(idx + 1).trimmed();
+    return m_email.mid(idx + 1);
+}
+
+QString QnEmailAddress::value() const
+{
+    return m_email;
+}
+
+QString QnEmailAddress::fullName() const
+{
+    return m_fullName;
+}
+
+bool QnEmailAddress::operator==(const QnEmailAddress& other) const
+{
+    return m_email == other.m_email
+        && m_fullName == other.m_fullName;
 }
 
 QnEmailSmtpServerPreset QnEmailAddress::smtpServer() const

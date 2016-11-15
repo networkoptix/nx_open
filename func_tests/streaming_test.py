@@ -15,6 +15,7 @@ _NUM_STREAM_SERV = 1
 _WORK_HOST = 0
 
 class StreamingTest(StorageBasedTest):
+    helpStr = "Streaming test"
     _test_name = "Streaming"
     _test_key = "stream"
     _suits = (
@@ -71,6 +72,7 @@ class StreamingTest(StorageBasedTest):
 
 
 class HlsOnlyTest(StreamingTest):
+    helpStr = "HLS streaming test only"
     _test_name = "HLS-only streaming"
     _test_key = "hlso"
     _suits = (

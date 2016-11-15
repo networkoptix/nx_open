@@ -49,9 +49,6 @@ QnUserResource::QnUserResource(const QnUserResource& right):
 
 Qn::UserRole QnUserResource::role() const
 {
-    if (!resourcePool())
-        return Qn::UserRole::CustomPermissions;
-
     if (isOwner())
         return Qn::UserRole::Owner;
 
@@ -304,6 +301,18 @@ QString QnUserResource::fullName() const
     QString result = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
     QnMutexLocker locker(&m_mutex);
     return result.isNull() ? m_fullName : result;
+}
+
+ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
+{
+    ec2::ApiResourceParamWithRefDataList result;
+    QString value = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
+    if (!value.isEmpty())
+    {
+        ec2::ApiResourceParamWithRefData param(getId(), Qn::USER_FULL_NAME, value);
+        result.push_back(param);
+    }
+    return result;
 }
 
 void QnUserResource::setFullName(const QString& value)

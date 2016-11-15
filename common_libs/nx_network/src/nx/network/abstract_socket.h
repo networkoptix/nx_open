@@ -227,6 +227,7 @@ public:
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
+
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,

@@ -11,6 +11,7 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
+#include <network/system_helpers.h>
 
 #include "ec2_connection.h"
 
@@ -104,14 +105,14 @@ namespace ec2
         #undef dbManager_queryOrReturn
         #undef dbManager_queryOrReturn_uuid
 
-        outData->systemId = qnGlobalSettings->localSystemId();
+        outData->systemId = helpers::currentSystemLocalId();
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = qnGlobalSettings->localSystemId();
+        outData->systemId = helpers::currentSystemLocalId();
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }

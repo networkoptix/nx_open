@@ -4,7 +4,7 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/singleton.h>
-
+#include <nx/utils/uuid.h>
 #include <client_core/local_connection_data.h>
 
 class QnRecentLocalConnectionsModel;
@@ -27,7 +27,7 @@ private:
 
 private:
     using QnrecentLocalConnectionsModelPtr = QPointer<QnRecentLocalConnectionsModel>;
-    using DataCache = QHash<QString, QnLocalConnectionDataList>;
+    using DataCache = QHash<QnUuid, QnLocalConnectionDataList>;
 
     QList<QnrecentLocalConnectionsModelPtr> m_models;
     DataCache m_dataCache;

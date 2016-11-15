@@ -1,9 +1,11 @@
-
 #pragma once
 
 #include <QtCore/QUrl>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
+
+#include <utils/crypt/encoded_string.h>
 
 class QSettings;
 
@@ -11,66 +13,46 @@ struct QnLocalConnectionData
 {
     QnLocalConnectionData();
 
-    QnLocalConnectionData(const QString& name,
+    QnLocalConnectionData(
         const QString& systemName,
-        const QString& systemId,
-        const QUrl& url,
-        bool isStoredPassword);
+        const QnUuid& localId,
+        const QUrl& url);
 
-    QString name;           //< Alias of connection. Used for saved connections in dialogs.
-                            // Empty alias means that it was real (not saved) connection.
+    QUrl urlWithPassword() const;
+
+    bool isStoredPassword() const;
+
     QString systemName;
-    QString systemId;
-
+    QnUuid localId;
     QUrl url;
-    bool isStoredPassword;
-
-    static QnLocalConnectionData fromSettings(QSettings* settings);
-
-    void writeToSettings(QSettings* settings) const;
+    QnEncodedString password;
 };
 
-#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
-QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq))
+#define QnLocalConnectionData_Fields (systemName)(localId)(url)(password)
+QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq)(json))
+
+typedef QList<QnLocalConnectionData> QnLocalConnectionDataList;
+Q_DECLARE_METATYPE(QnLocalConnectionDataList)
 
 struct QnWeightData
 {
-    QString systemId;
+    QnUuid localId;
     qreal weight;
     qint64 lastConnectedUtcMs;
     bool realConnection;    //< Shows if it was real connection or just record for new system
-
-    static QnWeightData fromSettings(QSettings* settings);
-
-    void writeToSettings(QSettings* settings) const;
 };
-typedef QList<QnWeightData> QnWeightDataList;
 
-#define QnWeightData_Fields (systemId)(weight)(lastConnectedUtcMs)(realConnection)
-QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq))
+#define QnWeightData_Fields (localId)(weight)(lastConnectedUtcMs)(realConnection)
+QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq)(json))
+
+typedef QList<QnWeightData> QnWeightDataList;
 Q_DECLARE_METATYPE(QnWeightDataList)
 
-struct QnLocalConnectionDataList : public QList<QnLocalConnectionData>
-{
-    using base_type = QList<QnLocalConnectionData>;
+namespace helpers {
 
-public:
-    QnLocalConnectionDataList();
+QnLocalConnectionData storeLocalSystemConnection(
+    const QString& systemName,
+    const QnUuid& localSystemId,
+    const QUrl& url);
 
-    QnLocalConnectionDataList(const base_type& data);
-
-    ~QnLocalConnectionDataList();
-
-    int getIndexByName(const QString& name) const;
-
-    QnLocalConnectionData getByName(const QString& name) const;
-
-    using base_type::contains;
-    bool contains(const QString& name) const;
-
-    QString generateUniqueName(const QString &base) const;
-
-    bool remove(const QString &name);
-};
-
-Q_DECLARE_METATYPE(QnLocalConnectionDataList)
+}

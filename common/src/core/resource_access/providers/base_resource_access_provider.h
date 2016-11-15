@@ -2,6 +2,8 @@
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
+#include <nx/utils/thread/mutex.h>
+
 /** Abstract base class for access providers containing common code.
  *  Thread-safety is achieved by using only signal-slot system with auto-connections.
  */
@@ -22,6 +24,9 @@ public:
         QnResourceList* providers = nullptr) const override;
 
 protected:
+    virtual void beforeUpdate() override;
+    virtual void afterUpdate() override;
+
     virtual Source baseSource() const = 0;
 
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
@@ -53,6 +58,9 @@ protected:
 
     bool isLayout(const QnResourcePtr& resource) const;
     bool isMediaResource(const QnResourcePtr& resource) const;
+
+protected:
+    mutable QnMutex m_mutex;
 
 private:
     /** Hash of accessible resources by subject id. */

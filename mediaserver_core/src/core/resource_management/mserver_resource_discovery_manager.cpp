@@ -150,15 +150,9 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (needToStop())
             return false;
 
-        if (QnResourceDiscoveryManager::sameResourceWithAnotherGuidExists(
-                *it, 
-                [](const QnNetworkResourcePtr& res) { return true; },
-                false))
-        {
-            it = resources.erase(it);
-            continue;
-        }
-
+        DLOG(lit("%1 processing %2 resources")
+                .arg(FL1(Q_FUNC_INFO))
+                .arg(resources.size()));
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes) {
@@ -168,8 +162,23 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-        QnResourcePtr rpResource = qnResPool->getResourceByUniqueId(newNetRes->getUniqueId());
-        if (!rpResource) {
+        DLOG(lit("%1 Processing resource %2")
+                .arg(FL1(Q_FUNC_INFO))
+                .arg(NetResString(newNetRes)));
+
+        QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
+        QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
+        
+        if (!rpResource) 
+        {
+            if (newCamRes && newCamRes->needCheckIpConflicts())
+            {
+                // do not count 2--N channels of multichannel cameras as conflict
+                quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+                if (ips)
+                    ipsList[ips].insert(newNetRes);
+            }
+
             ++it; // keep new resource in a list
             continue;
         }
@@ -187,21 +196,19 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
-        if (newCamRes && newCamRes->needCheckIpConflicts())
-        {
-            // do not count 2--N channels of multichannel cameras as conflict
-            quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-            if (ips)
-                ipsList[ips].insert(newNetRes);
-        }
-
         const bool isForeign = rpResource->hasFlags(Qn::foreigner);
         QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
         if (existCamRes)
         {
             QnUuid newTypeId = newNetRes->getTypeId();
             bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
+
+            DLOG(lit("%1 Found existing cam res %1 for new resource %2")
+                    .arg(FL1(Q_FUNC_INFO))
+                    .arg(NetResString(rpNetRes))
+                    .arg(NetResString(newNetRes)));
+                    
+            newNetRes->setPhysicalId(rpNetRes->getUniqueId());
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
                 if (isForeign || updateTypeId)

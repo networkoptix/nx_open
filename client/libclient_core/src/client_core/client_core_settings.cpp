@@ -3,51 +3,17 @@
 #include <QtCore/QLatin1String>
 #include <QtCore/QSettings>
 
+#include <nx/fusion/model_functions.h>
+
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
+
 
 namespace {
 
 const QString kEncodeXorKey = lit("ItIsAGoodDayToDie");
 
 const auto kCoreSettingsGroup = lit("client_core");
-
-const auto kRecentLocalConnectionsTag = lit("UserRecentConnections");
-const auto kRecentCloudSystemsTag = lit("recentCloudSystems");
-const auto kLocalSystemWeights = lit("localSystemWeights");
-
-template<typename DataType>
-void writeListData(QSettings* settings, const QVariant& value, const QString& tag)
-{
-    const auto data = value.value<QList<DataType>>();
-    settings->beginWriteArray(tag);
-    const auto arrayWriteGuard = QnRaiiGuard::createDestructable([settings]() { settings->endArray(); });
-
-    settings->remove(QString());  // Clear children
-    const auto dataCount = data.size();
-    auto it = data.begin();
-    for (int i = 0; i != dataCount; ++i, ++it)
-    {
-        settings->setArrayIndex(i);
-        it->writeToSettings(settings);
-    }
-}
-
-template<typename ResultType>
-QVariant readListData(QSettings* settings, const QString& tag)
-{
-    QList<ResultType> result;
-    const int count = settings->beginReadArray(tag);
-    const auto endArrayGuard = QnRaiiGuard::createDestructable([settings]() { settings->endArray(); });
-
-    for (int i = 0; i != count; ++i)
-    {
-        settings->setArrayIndex(i);
-        result.append(ResultType::fromSettings(settings));
-    }
-
-    return QVariant::fromValue(result);
-}
 
 } //namespace
 
@@ -56,7 +22,6 @@ QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
     m_settings(new QSettings(this))
 {
     m_settings->beginGroup(kCoreSettingsGroup);
-
     init();
     updateFromSettings(m_settings);
 }
@@ -71,24 +36,39 @@ void QnClientCoreSettings::writeValueToSettings(
     int id,
     const QVariant& value) const
 {
+    auto processedValue = value;
     switch (id)
     {
+        /* This value should not be modified by the client. */
+        case CdbEndpoint:
+            return;
+
         case RecentLocalConnections:
-            writeListData<QnLocalConnectionData>(settings, value, kRecentLocalConnectionsTag);
+        {
+            auto list = value.value<QnLocalConnectionDataList>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
             break;
+        }
         case LocalSystemWeightsData:
-            writeListData<QnWeightData>(settings, value, kLocalSystemWeights);
+        {
+            auto list = value.value<QnWeightDataList>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
             break;
+        }
         case RecentCloudSystems:
-            writeListData<QnCloudSystem>(settings, value, kRecentCloudSystemsTag);
+        {
+            auto list = value.value<QnCloudSystemList>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
             break;
+        }
         case CloudPassword:
-            base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(),
-                kEncodeXorKey));
+            processedValue = nx::utils::xorEncrypt(value.toString(), kEncodeXorKey);
             break;
         default:
-            base_type::writeValueToSettings(settings, id, value);
+            break;
     }
+
+    base_type::writeValueToSettings(settings, id, processedValue);
 }
 
 QVariant QnClientCoreSettings::readValueFromSettings(
@@ -96,21 +76,29 @@ QVariant QnClientCoreSettings::readValueFromSettings(
     int id,
     const QVariant& defaultValue)
 {
+    auto baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
     switch (id)
     {
         case RecentLocalConnections:
-            return readListData<QnLocalConnectionData>(settings, kRecentLocalConnectionsTag);
+            return qVariantFromValue(
+                QJson::deserialized<QnLocalConnectionDataList>(baseValue.toByteArray()));
+
         case LocalSystemWeightsData:
-            return readListData<QnWeightData>(settings, kLocalSystemWeights);
+            return qVariantFromValue(
+                QJson::deserialized<QnWeightDataList>(baseValue.toByteArray()));
+
         case RecentCloudSystems:
-            return readListData<QnCloudSystem>(settings, kRecentCloudSystemsTag);
+            return qVariantFromValue(
+                QJson::deserialized<QnCloudSystemList>(baseValue.toByteArray()));
+
         case CloudPassword:
-            return nx::utils::xorDecrypt(
-                base_type::readValueFromSettings(settings, id, defaultValue).toString(),
-                kEncodeXorKey);
+            return nx::utils::xorDecrypt(baseValue.toString(), kEncodeXorKey);
+
         default:
-            return base_type::readValueFromSettings(settings, id, defaultValue);
+            break;
     }
+
+    return baseValue;
 }
 
 void QnClientCoreSettings::save()

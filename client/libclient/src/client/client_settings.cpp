@@ -25,9 +25,46 @@
 
 namespace
 {
-    const QString kEncodeXorKey = lit("ItIsAGoodDayToDie");
-} // anonymous namespace
+static const QString kXorKey = lit("ItIsAGoodDayToDie");
 
+static const auto kNameTag = lit("name");
+static const auto kUrlTag = lit("url");
+static const auto kLocalId = lit("localId");
+static const auto kPasswordTag = lit("pwd");
+
+QnConnectionData readConnectionData(QSettings *settings)
+{
+    QnConnectionData connection;
+
+    const bool useHttps = settings->value(lit("secureAppserverConnection"), true).toBool();
+    connection.url = settings->value(kUrlTag).toString();
+    connection.url.setScheme(useHttps ? lit("https") : lit("http"));
+    connection.name = settings->value(kNameTag).toString();
+    connection.localId = settings->value(kLocalId).toUuid();
+    const auto password = settings->value(kPasswordTag).toString();
+    if (!password.isEmpty())
+        connection.url.setPassword(nx::utils::xorDecrypt(password, kXorKey));
+
+    return connection;
+}
+
+void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
+{
+    QUrl url = connection.url;
+
+    QString password;
+    if (!url.password().isEmpty())
+        password = nx::utils::xorEncrypt(url.password(), kXorKey);
+
+    url.setPassword(QString()); /* Don't store password in plain text. */
+
+    settings->setValue(kNameTag, connection.name);
+    settings->setValue(kPasswordTag, password);
+    settings->setValue(kUrlTag, url.toString());
+    settings->setValue(kLocalId, connection.localId.toQUuid());
+}
+
+} // anonymous namespace
 QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     base_type(parent),
     m_loading(true)
@@ -85,55 +122,100 @@ QnClientSettings::~QnClientSettings() {
 }
 
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
-    switch(id) {
-    case LAST_USED_CONNECTION: {
-        settings->beginGroup(QLatin1String("AppServerConnections"));
-        settings->beginGroup(QLatin1String("lastUsed"));
-        auto result = QnLocalConnectionData::fromSettings(settings);
-        settings->endGroup();
-        settings->endGroup();
-        return QVariant::fromValue<QnLocalConnectionData>(result);
-    }
-    case AUDIO_VOLUME: {
-        settings->beginGroup(QLatin1String("audioControl"));
-        qreal result = qvariant_cast<qreal>(settings->value(QLatin1String("volume"), defaultValue));
-        settings->endGroup();
-        return result;
-    }
-    case LIGHT_MODE:
+    switch(id)
     {
-        QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-        if (baseValue.type() == QVariant::Int)  //compatibility mode
-            return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
-        return baseValue;
-    }
+        case LAST_USED_CONNECTION:
+        {
+            settings->beginGroup(QLatin1String("AppServerConnections"));
+            settings->beginGroup(QLatin1String("lastUsed"));
+            auto result = readConnectionData(settings);
+            settings->endGroup();
+            settings->endGroup();
+            return QVariant::fromValue<QnConnectionData>(result);
+        }
+        case CUSTOM_CONNECTIONS:
+        {
+            QnConnectionDataList result;
+            const int size = settings->beginReadArray(QLatin1String("AppServerConnections"));
+            for (int index = 0; index < size; ++index)
+            {
+                settings->setArrayIndex(index);
+                QnConnectionData connection = readConnectionData(settings);
+                if (connection.isValid())
+                    result.append(connection);
+            }
+            settings->endArray();
+
+            return QVariant::fromValue<QnConnectionDataList>(result);
+        }
+        case AUDIO_VOLUME:
+        {
+            settings->beginGroup(QLatin1String("audioControl"));
+            qreal result = qvariant_cast<qreal>(settings->value(QLatin1String("volume"), defaultValue));
+            settings->endGroup();
+            return result;
+        }
+        case LIGHT_MODE:
+        {
+            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+            if (baseValue.type() == QVariant::Int)  //compatibility mode
+                return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
+            return baseValue;
+        }
 
 
-    case SHOW_ONCE_MESSAGES:
-    {
-        QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-        return qVariantFromValue(static_cast<Qn::ShowOnceMessages>(baseValue.toInt()));
-    }
+        case SHOW_ONCE_MESSAGES:
+        {
+            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+            return qVariantFromValue(static_cast<Qn::ShowOnceMessages>(baseValue.toInt()));
+        }
 
-    case WORKBENCH_PANES:
-    {
-        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
-            .value<QString>().toUtf8();
-        return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson,
-            defaultValue.value<QnPaneSettingsMap>()));
-    }
+        case WORKBENCH_PANES:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson,
+                defaultValue.value<QnPaneSettingsMap>()));
+        }
 
-    case BACKGROUND_IMAGE:
-    {
-        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
-            .value<QString>().toUtf8();
-        return QVariant::fromValue(QJson::deserialized<QnBackgroundImage>(asJson,
-            defaultValue.value<QnBackgroundImage>()));
-    }
+        case WORKBENCH_STATES:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<QnWorkbenchStateList>(asJson,
+                defaultValue.value<QnWorkbenchStateList>()));
+        }
 
-    default:
-        return base_type::readValueFromSettings(settings, id, defaultValue);
-        break;
+        case BACKGROUND_IMAGE:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<QnBackgroundImage>(asJson,
+                defaultValue.value<QnBackgroundImage>()));
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel defaultLevel = defaultValue.value<Qn::ResourceInfoLevel>();
+
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+
+            if (asJson.isEmpty())
+            {
+                /* Compatibility with 2.5 and older versions. */
+                bool result = settings->value(lit("isIpShownInTree"), false).toBool();
+                if (result)
+                    return QVariant::fromValue(Qn::RI_FullInfo);
+            }
+
+            return QVariant::fromValue(QJson::deserialized<Qn::ResourceInfoLevel>(asJson,
+                defaultLevel));
+        }
+
+        default:
+            return base_type::readValueFromSettings(settings, id, defaultValue);
+            break;
     }
 }
 
@@ -143,48 +225,88 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 
     switch(id)
     {
-    case LAST_USED_CONNECTION:
-        settings->beginGroup(QLatin1String("AppServerConnections"));
-        settings->beginGroup(QLatin1String("lastUsed"));
-        value.value<QnLocalConnectionData>().writeToSettings(settings);
-        settings->endGroup();
-        settings->endGroup();
-        break;
-    case AUDIO_VOLUME:
-    {
-        settings->beginGroup(QLatin1String("audioControl"));
-        settings->setValue(QLatin1String("volume"), value);
-        settings->endGroup();
-        break;
-    }
+        case LAST_USED_CONNECTION:
+            settings->beginGroup(QLatin1String("AppServerConnections"));
+            settings->beginGroup(QLatin1String("lastUsed"));
+            writeConnectionData(settings, value.value<QnConnectionData>());
+            settings->endGroup();
+            settings->endGroup();
+            break;
+        case CUSTOM_CONNECTIONS:
+        {
+            settings->beginWriteArray(QLatin1String("AppServerConnections"));
+            settings->remove(QLatin1String("")); /* Clear children. */
 
-    case SHOW_ONCE_MESSAGES:
-        base_type::writeValueToSettings(settings, id, static_cast<int>(value.value<Qn::ShowOnceMessages>()));
+            int index = 0;
+            for (const auto &connection: value.value<QnConnectionDataList>())
+            {
+                if (!connection.isValid())
+                    continue;
 
-    case UPDATE_FEED_URL:
-    case SETTINGS_URL:
-    case GL_VSYNC:
-    case LIGHT_MODE:
-    case NO_CLIENT_UPDATE:
-        break; /* Not to be saved to settings. */
+                if (connection.name.trimmed().isEmpty())
+                    continue; /* Last used one. */
 
-    case WORKBENCH_PANES:
-    {
-        QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnPaneSettingsMap>()));
-        base_type::writeValueToSettings(settings, id, asJson);
-        break;
-    }
+                settings->setArrayIndex(index++);
+                writeConnectionData(settings, connection);
+            }
+            settings->endArray();
 
-    case BACKGROUND_IMAGE:
-    {
-        QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnBackgroundImage>()));
-        base_type::writeValueToSettings(settings, id, asJson);
-        break;
-    }
+            /* Write out last used connection as it has been cleared. */
+            writeValueToSettings(settings, LAST_USED_CONNECTION,
+                QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
+            break;
+        }
+        case AUDIO_VOLUME:
+        {
+            settings->beginGroup(QLatin1String("audioControl"));
+            settings->setValue(QLatin1String("volume"), value);
+            settings->endGroup();
+            break;
+        }
 
-    default:
-        base_type::writeValueToSettings(settings, id, value);
-        break;
+        case SHOW_ONCE_MESSAGES:
+            base_type::writeValueToSettings(settings, id, static_cast<int>(value.value<Qn::ShowOnceMessages>()));
+
+        case UPDATE_FEED_URL:
+        case SETTINGS_URL:
+        case GL_VSYNC:
+        case LIGHT_MODE:
+        case NO_CLIENT_UPDATE:
+            break; /* Not to be saved to settings. */
+
+        case WORKBENCH_PANES:
+        {
+            QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnPaneSettingsMap>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case WORKBENCH_STATES:
+        {
+            QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnWorkbenchStateList>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case BACKGROUND_IMAGE:
+        {
+            QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnBackgroundImage>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel level = value.value<Qn::ResourceInfoLevel>();
+            QString asJson = QString::fromUtf8(QJson::serialized(level));
+            base_type::writeValueToSettings(settings, id, asJson);
+            settings->setValue(lit("isIpShownInTree"), (level != Qn::RI_NameOnly));
+            break;
+        }
+
+        default:
+            base_type::writeValueToSettings(settings, id, value);
+            break;
     }
 }
 

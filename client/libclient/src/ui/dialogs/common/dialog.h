@@ -31,5 +31,8 @@ protected:
     virtual void afterLayout();
 
 private:
+    void fixWindowFlags();
+
+private:
     Qt::Orientations m_resizeToContentsMode;
 };

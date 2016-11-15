@@ -34,6 +34,12 @@ QnUserRolesModel::~QnUserRolesModel()
 {
 }
 
+int QnUserRolesModel::rowForUser(const QnUserResourcePtr& user) const
+{
+    Q_D(const QnUserRolesModel);
+    return d->rowForUser(user);
+}
+
 void QnUserRolesModel::setUserRoles(const ec2::ApiUserGroupDataList& roles)
 {
     Q_D(QnUserRolesModel);
@@ -69,6 +75,12 @@ int QnUserRolesModel::columnCount(const QModelIndex& parent) const
         return 0;
 
     return 1;
+}
+
+void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& description)
+{
+    Q_D(QnUserRolesModel);
+    d->setCustomRoleStrings(name, description);
 }
 
 QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const

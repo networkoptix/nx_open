@@ -197,13 +197,28 @@ void QnAccessibleResourcesWidget::loadDataToUi()
 
     if (m_controlsVisible)
     {
+        bool hasAllMedia = m_permissionsModel->rawPermissions().testFlag(
+            Qn::GlobalAccessAllMediaPermission);
+
+        /* For custom users 'All Resources' must be unchecked by default */
+        if (m_permissionsModel->subject().user())
+        {
+            hasAllMedia &= m_permissionsModel->rawPermissions().testFlag(
+                Qn::GlobalCustomUserPermission);
+        }
+
         QSet<QnUuid> checkedControls;
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission))
+        if (hasAllMedia)
+        {
+            /* Really we are checking the only dummy resource. */
             for (const auto& resource : m_controlsModel->resources())
-                checkedControls << resource->getId();   /*< Really we are checking the only dummy resource. */
+                checkedControls << resource->getId();
+        }
         m_controlsModel->setCheckedResources(checkedControls);
     }
-    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
+
+    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter,
+        m_permissionsModel->accessibleResources()));
 }
 
 bool QnAccessibleResourcesWidget::isAll() const

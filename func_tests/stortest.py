@@ -8,7 +8,7 @@ Their common base class StorageBasedTest also used in other tests.
 """
 __author__ = 'Danil Lavrentyuk'
 import os, os.path, copy, sys, time
-import hashlib
+import hashlib, urllib
 #import urllib2
 import subprocess
 #import traceback
@@ -262,6 +262,7 @@ class BackupStorageTest(StorageBasedTest):
     The test for backup storage functionality.
     Creates a backup storage and tries to start the backup procedure both manually and scheduled.
     """
+    helpStr = "Backup storage test"
     _test_name = "Backup Storage"
     _test_key = 'bstorage'
     num_serv = _NUM_SERV_BAK
@@ -400,6 +401,7 @@ class BackupStorageTest(StorageBasedTest):
 
 
 class MultiserverArchiveTest(StorageBasedTest):
+    helpStr = "Multiserver archive test"
     _test_name = "Multiserver Archive"
     _test_key = "msarch"
     num_serv = _NUM_SERV_MSARCH
@@ -468,6 +470,14 @@ class MultiserverArchiveTest(StorageBasedTest):
         type(self).time_periods_joined = tmp['time_periods_joined']
         time.sleep(20)
 
+    
+    def _changeSystemId(self, host, new_guid):
+        res = self._server_request(host, "api/configure?%s" % \
+                                   urllib.urlencode({"localSystemId": new_guid}))
+        self.assertEqual(res['error'], "0",
+            "api/configure failed to set a new localSystemId %s for the server %s: %s" % (new_guid, host, res['errorString']))
+        
+
     @checkInit
     def CheckArchiveMultiserv(self):
         "Checks recorded time periods for both servers joined into one system."
@@ -485,13 +495,13 @@ class MultiserverArchiveTest(StorageBasedTest):
 
     def _splitSystems(self):
         print "Split servers into two systems"
-        newname = "anothername"
-        self._change_system_name(1, newname)
+        guid =  '{%s}' % uuid.uuid4()
+        self._changeSystemId(1, guid)
         time.sleep(1)
-        info0 = self._server_request(0, 'api/moduleInformation')
-        info1 = self._server_request(1, 'api/moduleInformation')
-        self.assertEqual(info1['reply']['systemName'], newname, "Failed to give server 1 new system name")
-        self.assertNotEqual(info0['reply']['systemName'], newname, "Server 0 system name also has changed")
+        info0 = self._server_request(0, 'ec2/testConnection')
+        info1 = self._server_request(1, 'ec2/testConnection')
+        self.assertEqual(info1['localSystemId'], guid, "Failed to give server 1 new system id")
+        self.assertNotEqual(info0['localSystemId'], guid, "Server 0 system id also has changed")
 
     @checkInit
     def CheckArchivesSeparated(self):

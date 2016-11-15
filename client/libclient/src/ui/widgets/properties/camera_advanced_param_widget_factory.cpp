@@ -105,7 +105,7 @@ public:
 		QnAbstractCameraAdvancedParamWidget(parameter, parent),
 		m_comboBox(new QComboBox(this))
 	{
-		m_comboBox->addItems(parameter.getRange());
+        m_comboBox->addItems(parameter.getRange());
 		m_comboBox->setToolTip(parameter.description);
 		setReadOnly(m_comboBox, parameter.readOnly);
 
@@ -115,6 +115,18 @@ public:
 			emit valueChanged(m_id, value());
 		});
 	}
+
+    virtual void setRange(const QString& range)
+    {
+        auto rangeToSet = range.split(L',');
+        setRange(rangeToSet);
+    }
+
+    void setRange(const QStringList& range)
+    {
+        m_comboBox->clear();
+        m_comboBox->addItems(range);
+    }
 
 	virtual QString value() const override	{
 		return m_comboBox->currentText();

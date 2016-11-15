@@ -19,6 +19,12 @@
 #include "noptix_icon_loader.h"
 #include "nx_style.h"
 
+namespace {
+
+static const QSize kHugeSize(100000, 100000);
+
+} // namespace
+
 QnSkin::QnSkin(QObject* parent): QObject(parent)
 {
     init(QStringList());
@@ -64,6 +70,9 @@ const QStringList& QnSkin::paths() const
 
 QString QnSkin::path(const QString& name) const
 {
+    if (QDir::isAbsolutePath(name))
+        return QFile::exists(name) ? name : QString();
+
     for (int i = m_paths.size() - 1; i >= 0; i--)
     {
         QString path = m_paths[i] + name;
@@ -120,9 +129,8 @@ QPixmap QnSkin::pixmap(const QString& name,
     Qt::TransformationMode mode)
 {
     static const auto kHiDpiSuffix = lit("@2x");
-    static const bool kIsHiDpi = (qApp->devicePixelRatio() > 1);
 
-    if (kIsHiDpi)
+    if (isHiDpi())
     {
         QFileInfo info(name);
         const auto suffix = info.completeSuffix();
@@ -180,16 +188,22 @@ QMovie* QnSkin::newMovie(const char* name, QObject* parent)
     return newMovie(QLatin1String(name), parent);
 }
 
-QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode,
-    QIcon::State state, const QWindow* window)
+QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode, QIcon::State state)
 {
-    static const QSize huge(32768, 32768);
-    qreal pixelRatio = window ? window->devicePixelRatio() : qApp->devicePixelRatio();
-    return icon.actualSize(huge, mode, state) / pixelRatio;
+    int scale = isHiDpi() ? 2 : 1; //< we have only 1x and 2x scale icons
+    return icon.actualSize(kHugeSize, mode, state) / scale;
 }
 
 QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
-    QIcon::State state, const QWindow* window)
+    QIcon::State state, bool correctDevicePixelRatio)
 {
-    return icon.pixmap(maximumSize(icon, mode, state, window), mode, state);
+    auto pixmap = icon.pixmap(kHugeSize, mode, state);
+    if (correctDevicePixelRatio && isHiDpi())
+        pixmap.setDevicePixelRatio(2.0);
+    return pixmap;
+}
+
+bool QnSkin::isHiDpi()
+{
+    return qApp->devicePixelRatio() > 1.0;
 }

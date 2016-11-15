@@ -19,7 +19,7 @@
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
 
-        <qt.libs>core qml quick quick-private concurrent network sql multimedia xml</qt.libs>
+        <qt.libs>core qml quick quick-private concurrent network sql multimedia qtmultimediaquicktools_private xml</qt.libs>
         <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
         <global.libs>-lclient_core -lnx_media -lnx_audio -lnx_vms_utils -lnx_streaming -lnx_network -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
@@ -148,10 +148,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-                <google.keystore>${customization.dir}/mobile_client/key.store</google.keystore>
-                <google.storepass>${android.storepass}</google.storepass>
-                <google.keypass>${android.keypass}</google.keypass>
-                <google.alias>${namespace.additional}</google.alias>
+                <android.keystore>${customization.dir}/mobile_client/key.store</android.keystore>
                 <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
                 <rdep.packages>openssl ffmpeg</rdep.packages>
             </properties>

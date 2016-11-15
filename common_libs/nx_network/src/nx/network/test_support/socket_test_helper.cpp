@@ -36,9 +36,9 @@ QString NX_NETWORK_API toString(TestTrafficLimitType type)
 {
     switch (type)
     {
-        case TestTrafficLimitType::none: return QLatin1String("none");
-        case TestTrafficLimitType::incoming: return QLatin1String("incoming");
-        case TestTrafficLimitType::outgoing: return QLatin1String("outgoing");
+        case TestTrafficLimitType::none: return lit("none");
+        case TestTrafficLimitType::incoming: return lit("incoming");
+        case TestTrafficLimitType::outgoing: return lit("outgoing");
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -49,9 +49,9 @@ QString NX_NETWORK_API toString(TestTransmissionMode type)
 {
     switch (type)
     {
-        case TestTransmissionMode::spam: return QLatin1String("spam");
-        case TestTransmissionMode::ping: return QLatin1String("ping");
-        case TestTransmissionMode::pong: return QLatin1String("pong");
+        case TestTransmissionMode::spam: return lit("spam");
+        case TestTransmissionMode::ping: return lit("ping");
+        case TestTransmissionMode::pong: return lit("pong");
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -899,6 +899,7 @@ void AddressBinder::add(const SocketAddress& key, SocketAddress address)
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     NX_CRITICAL(it->second.insert(std::move(address)).second);
+    NX_LOGX(lm("New address %1 is bound to %2").strs(address, key), cl_logDEBUG1);
 }
 
 void AddressBinder::remove(const SocketAddress& key, const SocketAddress& address)
@@ -906,7 +907,17 @@ void AddressBinder::remove(const SocketAddress& key, const SocketAddress& addres
     QnMutexLocker lock(&m_mutex);
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
-    NX_CRITICAL(it->second.erase(std::move(address)));
+    NX_CRITICAL(it->second.erase(address));
+    NX_LOGX(lm("Address %1 is unbound from %2").strs(address, key), cl_logDEBUG1);
+}
+
+void AddressBinder::remove(const SocketAddress& key)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    m_map.erase(it);
+    NX_LOGX(lm("Key %1 is removed").str(key), cl_logDEBUG1);
 }
 
 std::set<SocketAddress> AddressBinder::get(const SocketAddress& key) const
@@ -929,7 +940,7 @@ boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) c
 
 MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)
 :
-    TCPSocket(false, AF_INET),
+    TCPSocket(AF_INET),
     m_addressBinder(addressBinder)
 {
 }
@@ -956,8 +967,7 @@ SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& add
         NX_CRITICAL(addressOpt);
 
         m_address = std::move(*addressOpt);
-        NX_LOGX(lm("using %2 instead of '%1'").arg(address.toString())
-            .arg(m_address.toString()), cl_logDEBUG2);
+        NX_LOGX(lm("Using %2 instead of %1").strs(address, m_address), cl_logDEBUG2);
     }
 
     return m_address;

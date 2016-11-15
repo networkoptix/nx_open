@@ -24,8 +24,12 @@
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
-
+#include <client/system_weights_manager.h>
+#include <client/forgotten_systems_manager.h>
+#include <client/startup_tile_manager.h>
 #include <client_core/client_core_settings.h>
+
+#include <cloud/cloud_connection.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
@@ -39,9 +43,6 @@
 #include <decoders/video/abstract_video_decoder.h>
 
 #include <finders/systems_finder.h>
-#include <finders/direct_systems_finder.h>
-#include <finders/cloud_systems_finder.h>
-#include <finders/recent_local_systems_finder.h>
 #include <network/module_finder.h>
 #include <network/router.h>
 
@@ -267,6 +268,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
     common->store<QnClientInstanceManager>(clientInstanceManager);
     common->setModuleGUID(clientInstanceManager->instanceGuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("dc", common->moduleGUID());
 
     common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
@@ -294,6 +296,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
     /* Just to feel safe */
+    common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
@@ -478,28 +481,11 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 
-    enum
-    {
-        kCloudPriority,
-        kDirectFinder,
-        kRecentFinder,
-    };
+    qnCommon->store<QnSystemsFinder>(new QnSystemsFinder());
+    qnCommon->store<QnForgottenSystemsManager>(new QnForgottenSystemsManager());
 
-    QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
-
-    QScopedPointer<QnCloudSystemsFinder> cloudSystemsFinder(new QnCloudSystemsFinder());
-    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), kCloudPriority);
-
-    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
-    systemsFinder->addSystemsFinder(directSystemsFinder.data(), kDirectFinder);
-
-    QScopedPointer<QnRecentLocalSystemsFinder> recentLocalSystemsFinder(new QnRecentLocalSystemsFinder());
-    systemsFinder->addSystemsFinder(recentLocalSystemsFinder.data(), kRecentFinder);
-
-    qnCommon->store<QnSystemsFinder>(systemsFinder.take());
-    qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
-    qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
-    qnCommon->store<QnRecentLocalSystemsFinder>(recentLocalSystemsFinder.take());
+    // Depends on qnSystemsFinder
+    qnCommon->store<QnStartupTileManager>(new QnStartupTileManager());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);
@@ -519,7 +505,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 #else
     Q_UNUSED(startupParams);
     QString customizationPath = lit(":/skin_dark");
-    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+    QScopedPointer<QnSkin> skin(new QnSkin({lit(":/skin"), customizationPath}));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QnCustomization customization;
@@ -535,7 +521,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
+        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
@@ -582,4 +568,5 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);
+    qnCommon->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
 }

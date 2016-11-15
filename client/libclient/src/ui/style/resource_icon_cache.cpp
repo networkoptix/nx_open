@@ -14,6 +14,7 @@
 
 #include <ui/style/skin.h>
 #include <api/global_settings.h>
+#include <network/system_helpers.h>
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -46,6 +47,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
     m_cache.insert(VideoWallLayout,         loadIcon(lit("tree/layout_videowall.png")));
     m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
+    m_cache.insert(SharedLayouts,           loadIcon(lit("tree/layouts_shared.png")));
     m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
     m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
     m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
@@ -209,7 +211,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             case Qn::Incompatible:
                 if (auto server = resource.dynamicCast<QnMediaServerResource>())
                 {
-                    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
+                    if (!helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
                     {
                         status = Online;
                         break;

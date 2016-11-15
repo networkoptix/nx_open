@@ -61,8 +61,11 @@ public:
     ResizingInstrument(QObject* parent = nullptr);
     virtual ~ResizingInstrument();
 
-    qreal effectRadius() const;
-    void setEffectRadius(qreal effectRadius);
+    qreal innerEffectRadius() const;
+    void setInnerEffectRadius(qreal effectRadius);
+
+    qreal outerEffectRadius() const;
+    void setOuterEffectRadius(qreal effectRadius);
 
     void rehandle();
 
@@ -83,22 +86,43 @@ protected:
     virtual void finishDrag(DragInfo* info) override;
     virtual void finishDragProcess(DragInfo* info) override;
 
+private:
+    using QGraphicsWidgetPtr = QPointer<QGraphicsWidget>;
+
     void getWidgetAndFrameSection(
         QWidget* viewport,
         const QPoint& pos,
         Qt::WindowFrameSection& section,
-        QGraphicsWidget*& widget) const;
+        QGraphicsWidget*& widget,
+        QPoint& correctedPos) const;
 
-  private:
+    QGraphicsWidget* resizableWidgetAtPos(
+        QGraphicsView* view,
+        const QPoint& pos
+    ) const;
+
+    Qt::WindowFrameSection queryFrameSection(
+        QGraphicsView* view,
+        QGraphicsWidget* widget,
+        const QPoint& pos,
+        qreal effectRadius) const;
+
+    QList<QGraphicsWidgetPtr> getAffectedWidgets(QWidget* viewport, const QPoint& pos) const;
+
+private:
     friend class ResizingInfo;
 
-    qreal m_effectRadius;
+    qreal m_innerEffectRadius;
+    qreal m_outerEffectRadius;
+
     QPointF m_startPinPoint;
     QSizeF m_startSize;
     QTransform m_startTransform;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
-    QPointer<QGraphicsWidget> m_widget;
+    QGraphicsWidgetPtr m_widget;
     ConstrainedGeometrically* m_constrained;
-    QPointer<QGraphicsWidget> m_affectedWidget;
+
+    /** List of widgets, for which we have changed cursor. */
+    QList<QGraphicsWidgetPtr> m_affectedWidgets;
 };

@@ -107,12 +107,9 @@ void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
     {
         m_thumbnailManager->selectResource(camera);
 
-        CameraMediaStreams s = camera->mediaStreams();
-        if (!s.streams.empty())
-        {
-            m_resolutionHint = s.streams[0].getResolution();
-            m_aspectRatio = static_cast<qreal>(m_resolutionHint.width()) / m_resolutionHint.height();
-        }
+        auto customAspectRatio = camera->aspectRatio();
+        if (customAspectRatio.isValid())
+            m_aspectRatio = customAspectRatio.toFloat();
     }
 
     m_preview->setPixmap(QPixmap());

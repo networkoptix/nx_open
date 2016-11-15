@@ -8,8 +8,10 @@ namespace cloud {
 namespace gateway {
 
 namespace conf {
+
 class Settings;
 class RunTimeOptions;
+
 } // namespace conf
 
 class ProxyHandler
@@ -62,6 +64,6 @@ private:
     void onMessageFromTargetHost(nx_http::Message message);
 };
 
-}   //namespace gateway
-}   //namespace cloud
-}   //namespace nx
+} // namespace gateway
+} // namespace cloud
+} // namespace nx

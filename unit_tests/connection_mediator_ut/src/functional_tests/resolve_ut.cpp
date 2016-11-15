@@ -66,11 +66,12 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
                 api::ResolvePeerRequest(
                     system1Servers[i]->serverId() + "." + system1.id),
                 std::placeholders::_1));
+
         ASSERT_EQ(api::ResultCode::ok, resultCode);
-        ASSERT_TRUE(std::find(
-            resolveResponse.endpoints.begin(),
-            resolveResponse.endpoints.end(),
-            system1Servers[i]->endpoint()) != resolveResponse.endpoints.end());
+        ASSERT_EQ(1, resolveResponse.endpoints.size());
+        ASSERT_EQ(
+            system1Servers[i]->endpoint().toString(),
+            resolveResponse.endpoints.front().toString());
     }
 
     client->pleaseStopSync();
@@ -97,15 +98,12 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
             client.get(),
             api::ResolvePeerRequest(server1->serverId() + "." + system1.id),
             std::placeholders::_1));
+
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        server2->endpoint()) != resolveResponse.endpoints.end());
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        server1->endpoint()) == resolveResponse.endpoints.end());
+    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(
+        server2->endpoint().toString(),
+        resolveResponse.endpoints.front().toString());
 
     client->pleaseStopSync();
 }
@@ -180,11 +178,12 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
             client.get(),
             api::ResolvePeerRequest(mserverEmulator.serverId() + "." + system1.id),
             std::placeholders::_1));
+
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
+    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(
+        mserverEmulator.endpoint().toString(),
+        resolveResponse.endpoints.front().toString());
 
     //resolve by system name is supported!
     std::tie(resultCode, resolveResponse) =
@@ -193,11 +192,12 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
             client.get(),
             api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
+
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
+    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(
+        mserverEmulator.endpoint().toString(),
+        resolveResponse.endpoints.front().toString());
 
     client->pleaseStopSync();
 }

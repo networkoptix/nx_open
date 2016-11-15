@@ -59,7 +59,7 @@ ComboBox
             {
                 var newCurrenIndex = currentIndex + (last - first + 1);
                 if (newCurrenIndex < count)
-                    currentItemIndex = newCurrenIndex;
+                    currentIndex = newCurrenIndex;
                 else
                     overflowCurrentIndex = newCurrenIndex;
             }
@@ -165,6 +165,11 @@ ComboBox
             {
                 thisComponent.currentIndex = thisComponent.find(text.trim()
                     , Qt.MatchExactly | Qt.MatchCaseSensitive);
+            }
+            onActiveFocusChanged:
+            {
+                if (activeFocus)
+                    selectAll();
             }
         }
 

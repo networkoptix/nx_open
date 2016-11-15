@@ -8,25 +8,11 @@
 #include <nx/streaming/config.h>
 
 #include <motion/motion_detection.h>
+#include <nx/fusion/model_functions.h>
 
 #ifdef Q_OS_OSX
 #include <smmintrin.h>
 #endif
-
-
-const char* mediaQualityToString(MediaQuality value)
-{
-    switch (value)
-    {
-        case MEDIA_Quality_High: return "MEDIA_Quality_High";
-        case MEDIA_Quality_Low: return "MEDIA_Quality_Low";
-        case MEDIA_Quality_ForceHigh: return "MEDIA_Quality_ForceHigh";
-        case MEDIA_Quality_Auto: return "MEDIA_Quality_Auto";
-        case MEDIA_Quality_CustomResolution: return "MEDIA_Quality_CustomResolution";
-        case MEDIA_Quality_None: return "MEDIA_Quality_None";
-        default: return "(INTERNAL ERROR) MediaQuality UNKNOWN";
-    }
-}
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
 :
@@ -464,4 +450,19 @@ bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs)
 bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
+}
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(/*global namespace*/, MediaQuality,
+    (MEDIA_Quality_High, "high")
+    (MEDIA_Quality_Low, "low")
+    (MEDIA_Quality_ForceHigh, "force-high")
+    (MEDIA_Quality_Auto, "auto")
+    (MEDIA_Quality_CustomResolution, "custom")
+    (MEDIA_Quality_LowIframesOnly, "low-iframes-only")
+    (MEDIA_Quality_None, "")
+)
+
+bool isLowMediaQuality(MediaQuality q)
+{
+    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
 }

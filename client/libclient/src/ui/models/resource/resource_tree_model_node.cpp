@@ -235,14 +235,18 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     );
 
     if (m_resource)
-        disconnect(m_resource, nullptr, this, nullptr);
+        m_resource->disconnect(this);
+
     m_resource = resource;
+
     if (m_resource)
     {
         connect(resource, &QnResource::nameChanged, this, &QnResourceTreeModelNode::update);
-        connect(resource, &QnResource::statusChanged, this, &QnResourceTreeModelNode::update);
         connect(resource, &QnResource::urlChanged, this, &QnResourceTreeModelNode::update);
         connect(resource, &QnResource::flagsChanged, this, &QnResourceTreeModelNode::update);
+
+        connect(resource, &QnResource::statusChanged, this,
+            &QnResourceTreeModelNode::updateResourceStatus);
 
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
@@ -471,7 +475,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
+        return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
     }
 
     case Qn::OtherSystemsNode:
@@ -944,8 +948,10 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case Qn::LayoutsNode:
-        case Qn::AllLayoutsAccessNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
+
+        case Qn::AllLayoutsAccessNode:
+            return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
         case Qn::RecorderNode:
             return qnResIconCache->icon(QnResourceIconCache::Recorder);
@@ -1073,6 +1079,17 @@ void QnResourceTreeModelNode::setName(const QString& name)
     m_displayName = m_name = name;
 }
 
+
+void QnResourceTreeModelNode::updateResourceStatus()
+{
+    NX_ASSERT(m_resource);
+    if (!m_resource)
+        return;
+
+    m_status = m_resource->getStatus();
+    m_icon = calculateIcon();
+    changeInternal();
+}
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)
 {

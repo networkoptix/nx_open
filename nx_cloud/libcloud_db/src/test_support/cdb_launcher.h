@@ -22,9 +22,10 @@
 namespace nx {
 namespace cdb {
 
-struct AccountWithPassword
+class AccountWithPassword:
+    public api::AccountData
 {
-    api::AccountData data;
+public:
     std::string password;
 };
 

@@ -1,6 +1,6 @@
 #include "global_permissions_manager.h"
 
-#include <core/resource_access/providers/abstract_resource_access_provider.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -78,7 +78,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
 
 void QnGlobalPermissionsManager::recalculateAllPermissions()
 {
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updateGlobalPermissions(subject);
 }
 
@@ -193,14 +193,14 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
 void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 

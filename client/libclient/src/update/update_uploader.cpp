@@ -230,6 +230,7 @@ void QnUpdateUploader::at_restReply_finished(int status, const QnUploadUpdateRep
 
         switch (status) {
         case QNetworkReply::AuthenticationRequiredError:
+        case QNetworkReply::ContentAccessDenied:
             errorCode = AuthenticationError;
             break;
         case QNetworkReply::TimeoutError:

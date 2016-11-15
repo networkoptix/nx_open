@@ -176,6 +176,7 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
 {
     Q_D(QnInputField);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    setFocusPolicy(Qt::StrongFocus);
 
     QGridLayout* grid = new QGridLayout(this);
     grid->addWidget(d->title, 0, 0, 1, 1, Qt::AlignRight);

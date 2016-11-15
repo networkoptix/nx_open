@@ -300,14 +300,10 @@ void QnEventLogDialog::retranslateUi()
     ui->retranslateUi(this);
     auto cameraList = cameras(m_filterCameraList);
 
-    const QString cameraButtonText = (cameraList.empty()
-        ? QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("<Any Device>"),
-            tr("<Any Camera>")
-            )
-        : lit("<%1>").arg(QnDeviceDependentStrings::getNumericName(cameraList, false)));
-
-    ui->cameraButton->setText(cameraButtonText);
+    if (cameraList.empty())
+        ui->cameraButton->selectAny();
+    else
+        ui->cameraButton->selectDevices(cameraList);
 
     /// Updates action type combobox model
     for (int row = 0; row != m_actionTypesModel->rowCount(); ++row)
@@ -348,11 +344,11 @@ void QnEventLogDialog::requestFinished()
 
     if (start != end)
         ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::SystemLocaleLongDate))
-        .arg(end.toString(Qt::SystemLocaleLongDate)));
+        .arg(start.toString(Qt::DefaultLocaleLongDate))
+        .arg(end.toString(Qt::DefaultLocaleLongDate)));
     else
         ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::SystemLocaleLongDate)));
+        .arg(start.toString(Qt::DefaultLocaleLongDate)));
     ui->loadingProgressBar->hide();
     ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }
@@ -438,25 +434,13 @@ void QnEventLogDialog::at_filterAction_triggered()
 
 void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
-    auto hasAccess = [this](const QnResourcePtr& resource)
-    {
-        if (!resource)
-            return false;
-
-        if (resource.dynamicCast<QnMediaResource>())
-            return accessController()->hasPermissions(resource, Qn::ReadPermission);
-
-        /* Only admins should see context menu on servers and users. */
-        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    };
-
     QScopedPointer<QMenu> menu;
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
-        if (resource && hasAccess(resource))
+        if (resource)
         {
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);

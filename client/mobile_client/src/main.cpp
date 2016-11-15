@@ -1,9 +1,6 @@
 #include <QtCore/QDir>
-#include <QtCore/QCommandLineParser>
 #include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
 #include <QtGui/QFont>
-#include <QtGui/QOpenGLContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
@@ -13,7 +10,6 @@
 
 #include <nx/utils/log/log.h>
 #include <api/app_server_connection.h>
-#include <api/runtime_info_manager.h>
 #include <nx_ec/ec2_lib.h>
 #include <common/common_module.h>
 #include <utils/common/app_info.h>
@@ -24,6 +20,7 @@
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_uri_handler.h>
+#include <mobile_client/mobile_client_startup_parameters.h>
 
 #include <ui/camera_thumbnail_provider.h>
 #include <ui/window_utils.h>
@@ -93,9 +90,8 @@ int runUi(QGuiApplication *application) {
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
-#ifdef Q_OS_IOS
-    engine.addImportPath(lit("qt_qml"));
-#endif
+    if (QnAppInfo::applicationPlatform() == lit("ios"))
+        engine.addImportPath(lit("qt_qml"));
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
@@ -106,20 +102,21 @@ int runUi(QGuiApplication *application) {
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    if (mainWindow)
+    if (!QnAppInfo::isMobile())
     {
-        if (context.liteMode() && !conf.disableFullScreen)
+        if (mainWindow)
         {
-            mainWindow->showFullScreen();
-        }
-        else
-        {
-            mainWindow->setWidth(800);
-            mainWindow->setHeight(600);
+            if (context.liteMode() && !conf.disableFullScreen)
+            {
+                mainWindow->showFullScreen();
+            }
+            else
+            {
+                mainWindow->setWidth(800);
+                mainWindow->setHeight(600);
+            }
         }
     }
-#endif
 
     if (!mainComponent.errors().isEmpty())
     {
@@ -138,52 +135,37 @@ int runUi(QGuiApplication *application) {
     {
         // Use platform-dependent defaults.
 
-#if defined(__arm__)
+        if (QnAppInfo::isArm())
+        {
+            if (QnAppInfo::isBpi())
+                maxFfmpegResolution = QSize(1280, 720);
+            else
+                maxFfmpegResolution = QSize(1920, 1080);
 
-        if (QnAppInfo::isBpi())
-            maxFfmpegResolution = QSize(1280, 720);
-        else
-            maxFfmpegResolution = QSize(1920, 1080);
-
-#elif defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-
-        maxFfmpegResolution = QSize(1920, 1080);
-
-#endif
+            if (QnAppInfo::isMobile())
+                maxFfmpegResolution = QSize(1920, 1080);
+        }
     }
 
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
-#if defined(Q_OS_ANDROID)
-    QUrl initialIntentData = getInitialIntentData();
-    if (initialIntentData.isValid())
-        QDesktopServices::openUrl(initialIntentData);
-#endif
+    #if defined(Q_OS_ANDROID)
+        QUrl initialIntentData = getInitialIntentData();
+        if (initialIntentData.isValid())
+            QDesktopServices::openUrl(initialIntentData);
+    #endif
 
     return application->exec();
 }
 
-int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid)
+int runApplication(QGuiApplication *application)
 {
-    auto peerType = Qn::PT_MobileClient;
-
     NX_ASSERT(nx::utils::TimerManager::instance());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(peerType, nx::utils::TimerManager::instance()));
+        getConnectionFactory(Qn::PT_MobileClient, nx::utils::TimerManager::instance()));
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
-
-    ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = peerType;
-    runtimeData.peer.dataFormat = Qn::JsonFormat;
-    runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.customization = QnAppInfo::customizationName();
-    if (!videowallInstanceGuid.isNull())
-        runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
-    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
     int result = runUi(application);
 
@@ -199,11 +181,10 @@ void initLog()
 
     if (conf.enableEc2TranLog)
     {
-        #if defined(ANDROID) || defined(__ANDROID__)
-            const QString logFileBaseName = lit("-");
-        #else
-            const QString logFileBaseName = QLatin1String(conf.tempPath()) + lit("ec2_tran");
-        #endif
+        const auto logFileBaseName = QnAppInfo::isAndroid()
+            ? lit("-")
+            : QLatin1String(conf.tempPath()) + lit("ec2_tran");
+
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             logFileBaseName,
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
@@ -213,11 +194,10 @@ void initLog()
 
     if (conf.enableLog)
     {
-        #if defined(ANDROID) || defined(__ANDROID__)
-            const QString logFileBaseName = lit("-");
-        #else
-            const QString logFileBaseName = QLatin1String(conf.tempPath()) + lit("mobile_client");
-        #endif
+        const auto logFileBaseName = QnAppInfo::isAndroid()
+            ? lit("-")
+            : QLatin1String(conf.tempPath()) + lit("mobile_client");
+
         QnLog::instance(QnLog::MAIN_LOG_ID)->create(
             logFileBaseName,
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
@@ -226,83 +206,29 @@ void initLog()
     }
 }
 
-void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallInstanceGuid)
+void processStartupParams(const QnMobileClientStartupParameters& startupParameters)
 {
-    QCommandLineParser parser;
-
-    const auto basePathOption = QCommandLineOption(
-        lit("base-path"),
-        lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
-        lit("basePath"));
-    parser.addOption(basePathOption);
-
-    const auto liteModeOption = QCommandLineOption(
-        lit("lite-mode"),
-        lit("Enable lite mode."));
-    parser.addOption(liteModeOption);
-
-    const auto urlOption = QCommandLineOption(
-        lit("url"),
-        lit("URL to be used for server connection instead of asking login/password."),
-        lit("url"));
-    parser.addOption(urlOption);
-
-    const auto videowallInstanceGuidOption = QCommandLineOption(
-        lit("videowall-instance-guid"),
-        lit("GUID which is used to check Videowall Control messages."),
-        lit("videowallInstanceGuid"));
-    parser.addOption(videowallInstanceGuidOption);
-
-    auto testOption = QCommandLineOption(
-        lit("test"),
-        lit("Enable test."),
-        lit("test"));
-    testOption.setHidden(true);
-    parser.addOption(testOption);
-
-    parser.parse(application.arguments());
-
-    if (parser.isSet(basePathOption))
+    if (!startupParameters.basePath.isEmpty())
     {
-        const auto basePath = parser.value(basePathOption);
-        const auto path = QDir(basePath).absoluteFilePath(lit("qml/main.qml"));
+        const auto path = QDir(startupParameters.basePath).absoluteFilePath(lit("qml/main.qml"));
         if (QFile::exists(path))
-            qnSettings->setBasePath(basePath);
+            qnSettings->setBasePath(startupParameters.basePath);
         else
             qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
     }
 
-    if (parser.isSet(liteModeOption) || conf.forceLiteMode)
-        qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
     if (conf.forceNonLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeDisabled));
+    else if (startupParameters.liteMode || conf.forceLiteMode)
+        qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
-    if (parser.isSet(urlOption))
-    {
-        NX_LOG(lit("--url: %1").arg(parser.value(urlOption)), cl_logDEBUG1);
-        qnSettings->setLastUsedUrl(parser.value(urlOption));
-    }
-    else
-    {
-        NX_LOG(lit("--url not set"), cl_logDEBUG1);
-    }
+    if (startupParameters.url.isValid())
+        NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
 
-    if (parser.isSet(videowallInstanceGuidOption) && outVideowallInstanceGuid)
-    {
-        NX_LOG(lit("--videowall-instance-guid: %1").arg(parser.value(videowallInstanceGuidOption)),
-            cl_logDEBUG1);
-        *outVideowallInstanceGuid = QnUuid::fromStringSafe(
-            parser.value(videowallInstanceGuidOption));
-    }
-    else
-    {
-        NX_LOG(lit("--videowall-instance-guid not set"), cl_logDEBUG1);
-    }
-
-    if (parser.isSet(testOption))
+    if (startupParameters.testMode)
     {
         qnSettings->setTestMode(true);
-        qnSettings->setInitialTest(parser.value(testOption));
+        qnSettings->setInitialTest(startupParameters.initialTest);
     }
 }
 
@@ -323,11 +249,13 @@ int main(int argc, char *argv[])
     conf.reload();
     initLog();
 
-    QnMobileClientModule mobile_client;
+    QnMobileClientStartupParameters startupParams(application);
+
+    QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);
 
-    QnUuid videowallInstanceGuid;
-    parseCommandLine(application, &videowallInstanceGuid);
+    qnSettings->setStartupParameters(startupParams);
+    processStartupParams(startupParams);
 
     migrateSettings();
 
@@ -335,7 +263,7 @@ int main(int argc, char *argv[])
         registerIntentListener();
     #endif
 
-    int result = runApplication(&application, videowallInstanceGuid);
+    int result = runApplication(&application);
 
     return result;
 }

@@ -14,6 +14,7 @@
 #include <nx_ec/data/api_tran_state_data.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/storage_resource.h>
 
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
@@ -496,7 +497,18 @@ bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& re
         && accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             return true;
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    bool result = qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    if (!result)
+        NX_LOG(
+            lit("%1 \n\tuser %2 with %3 permissions is asking for \
+                \n\t%4 resource with %5 permissions and fails...")
+                .arg(Q_FUNC_INFO)
+                .arg(accessData.userId.toString())
+                .arg((int)accessData.access)
+                .arg(resourceId.toString())
+                .arg(permissions), cl_logDEBUG1);
+
+    return result;
 }
 
 struct ModifyResourceAccess
@@ -541,6 +553,16 @@ void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData&
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
+}
+
+void applyColumnFilter(const Qn::UserAccessData& accessData, ApiStorageData& data)
+{
+    if (!hasSystemAccess(accessData) && !qnResourceAccessManager->hasGlobalPermission(
+            accessData,
+            Qn::GlobalPermission::GlobalAdminPermission))
+    {
+        data.url = QnStorageResource::urlWithoutCredentials(data.url);
+    }
 }
 
 struct ReadResourceAccess

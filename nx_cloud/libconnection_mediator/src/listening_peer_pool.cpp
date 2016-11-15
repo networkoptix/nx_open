@@ -213,15 +213,15 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
     for (const auto& peerPair: m_peers)
     {
         data::ListeningPeer peerData;
-        peerData.id = peerPair.first.serverId;
         const auto peerConnetion = peerPair.second.peerConnection.lock();
         if (peerConnetion)
-            peerData.endpoint = peerConnetion->getSourceAddress().toString().toUtf8();
-        for (const auto& forwardedEndpoint: peerPair.second.endpoints)
-            peerData.forwardedEndpoints.push_back(forwardedEndpoint.toString());
+            peerData.connectionEndpoint = peerConnetion->getSourceAddress().toString().toUtf8();
 
-        data::ListeningPeerList& peersOfASystem = result.systems[peerPair.first.systemId];
-        peersOfASystem.peers.emplace_back(std::move(peerData));
+        for (const auto& forwardedEndpoint: peerPair.second.endpoints)
+            peerData.directTcpEndpoints.push_back(forwardedEndpoint.toString());
+
+        auto& system = result[peerPair.first.systemId];
+        system.emplace(peerPair.first.serverId, std::move(peerData));
     }
 
     return result;

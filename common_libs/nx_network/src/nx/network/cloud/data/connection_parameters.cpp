@@ -5,7 +5,6 @@
 
 #include "connection_parameters.h"
 
-
 namespace nx {
 namespace hpm {
 namespace api {
@@ -14,7 +13,8 @@ ConnectionParameters::ConnectionParameters()
 :
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
-    udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault)
+    udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),
+    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout)
 {
 }
 
@@ -23,6 +23,7 @@ bool ConnectionParameters::operator==(const ConnectionParameters& rhs) const
     return rendezvousConnectTimeout == rhs.rendezvousConnectTimeout
         && udpTunnelKeepAliveInterval == rhs.udpTunnelKeepAliveInterval
         && udpTunnelKeepAliveRetries == rhs.udpTunnelKeepAliveRetries
+        && tunnelInactivityTimeout == rhs.tunnelInactivityTimeout
         && tcpReverseRetryPolicy == rhs.tcpReverseRetryPolicy
         && tcpReverseHttpTimeouts == rhs.tcpReverseHttpTimeouts;
 }
@@ -38,6 +39,9 @@ void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
     message->addAttribute(
         stun::cc::attrs::udpTunnelKeepAliveRetries,
         udpTunnelKeepAliveRetries);
+    message->addAttribute(
+        stun::cc::attrs::tunnelInactivityTimeout,
+        tunnelInactivityTimeout);
 
     message->addAttribute(
         stun::cc::attrs::tcpReverseRetryMaxCount,
@@ -65,7 +69,7 @@ void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
 
 bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
 {
-    //all attributes are optional
+    // All attributes are optional.
 
     readAttributeValue(
         message, stun::cc::attrs::rendezvousConnectTimeout,
@@ -79,6 +83,10 @@ bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
         message, stun::cc::attrs::udpTunnelKeepAliveRetries,
         &udpTunnelKeepAliveRetries,
         (int)kUdpTunnelKeepAliveRetriesDefault);
+    readAttributeValue(
+        message, stun::cc::attrs::tunnelInactivityTimeout,
+        &tunnelInactivityTimeout,
+        std::chrono::duration_cast<std::chrono::seconds>(kDefaultTunnelInactivityTimeout));
 
     // TODO: make real support for unsigned int(s) in STUN,
     //  curently unsigned int(s) are represented like simple ints
@@ -115,6 +123,6 @@ bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
     return true;
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

@@ -83,10 +83,10 @@ Page
         anchors
         {
             fill: parent
-            topMargin: 12
-            bottomMargin: 12
-            leftMargin: 12
-            rightMargin: 12
+            topMargin: 4
+            bottomMargin: 4
+            leftMargin: 4
+            rightMargin: 4
         }
         displayMarginBeginning: anchors.topMargin
         displayMarginEnd: anchors.bottomMargin

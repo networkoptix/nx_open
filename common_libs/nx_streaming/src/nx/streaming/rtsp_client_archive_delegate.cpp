@@ -34,6 +34,7 @@ extern "C"
 #include <nx/streaming/nx_rtp_parser.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 static const int REOPEN_TIMEOUT = 1000;
@@ -643,6 +644,11 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     return time;
 }
 
+int QnRtspClientArchiveDelegate::getSequence() const
+{
+    return m_sendedCSec;
+}
+
 void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
 {
     if (value == m_singleShotMode)
@@ -763,13 +769,7 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
             m_rtspSession->sendSetParameter(kMediaQualityParamName, resolutionToString(m_resolution).toLatin1());
     }
     else {
-        QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
-        if (quality == MEDIA_Quality_ForceHigh)
-            value = "force-high";
-        else if (quality == MEDIA_Quality_High)
-            value = "high";
-        else
-            value = "low";
+        QByteArray value = QnLexical::serialized(quality).toUtf8();
 
         m_rtspSession->setAdditionAttribute(kMediaQualityParamName, value);
         m_rtspSession->removeAdditionAttribute(kResolutionParamName);
@@ -819,7 +819,7 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
-    if (longNoData || m_quality == MEDIA_Quality_Low)
+    if (longNoData || m_quality == MEDIA_Quality_Low || m_quality == MEDIA_Quality_LowIframesOnly)
     {
         m_blockReopening = true;
         close();

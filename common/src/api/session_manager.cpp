@@ -249,8 +249,8 @@ int QnSessionManager::sendAsyncRequest(
 
     const auto appServerUrl = QnAppServerConnectionFactory::url();
     auto requestUrl = createApiUrl(url, objectName, params);
-    requestUrl.setUserName(appServerUrl.userName());
-    requestUrl.setPassword(appServerUrl.password());
+    requestUrl.setUserName(_url.userName().isEmpty() ? appServerUrl.userName() : _url.userName());
+    requestUrl.setPassword(_url.password().isEmpty() ? appServerUrl.password() : _url.password());
 
     auto httpPool = nx_http::ClientPool::instance();
 

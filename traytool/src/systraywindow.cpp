@@ -489,7 +489,7 @@ void QnSystrayWindow::createTrayIcon()
 
     m_trayIcon = new QSystemTrayIcon(this);
     m_trayIcon->setContextMenu(trayIconMenu);
-    m_trayIcon->setIcon(QIcon(lit(":/traytool.png")));
+    m_trayIcon->setIcon(QIcon(lit(":/logo.png")));
 
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &QnSystrayWindow::iconActivated);
     m_trayIcon->show();

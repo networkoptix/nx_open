@@ -14,8 +14,8 @@ describe('Help Page', function () {
     });
 
     it("Get Support button opens external support page",function(){
-        expect(p.supportButton.isPresent()).toBe(true);
-        p.supportButton.click();
+        expect(p.supportLink.isPresent()).toBe(true);
+        p.supportLink.click();
         p.helper.performAtSecondTab( function() {
             p.helper.ignoreSyncFor( function() {
                 expect(browser.getCurrentUrl()).toContain('/hc/');
@@ -26,8 +26,8 @@ describe('Help Page', function () {
     });
 
     it("Calculate button opens external hardware calculator",function(){
-        expect(p.calculatorButton.isPresent()).toBe(true);
-        p.calculatorButton.click();
+        expect(p.calculatorLink.isPresent()).toBe(true);
+        p.calculatorLink.click();
         p.helper.performAtSecondTab( function() {
             p.helper.ignoreSyncFor( function() {
                 expect(browser.getCurrentUrl()).toContain('networkoptix.com/calculator');

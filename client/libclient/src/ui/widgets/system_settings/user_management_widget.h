@@ -58,6 +58,7 @@ private:
     QnUserResourceList visibleUsers() const;
     QnUserResourceList visibleSelectedUsers() const;
 
+    bool confirmUsersDelete(const QnUserResourceList& users);
 private:
     QScopedPointer<Ui::QnUserManagementWidget> ui;
     QnUserListModel* m_usersModel;

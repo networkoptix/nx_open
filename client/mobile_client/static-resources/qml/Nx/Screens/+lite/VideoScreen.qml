@@ -12,7 +12,7 @@ PageBase
     objectName: "videoScreen"
 
     property alias resourceId: videoScreenController.resourceId
-    property string initialScreenshot
+    property alias initialScreenshot: screenshot.source
     property QnLiteClientLayoutHelper layoutHelper: null
     property QnCameraListModel camerasModel: null
 
@@ -26,7 +26,7 @@ PageBase
         mediaPlayer.onPlayingChanged:
         {
             if (mediaPlayer.playing)
-                video.screenshotSource = ""
+                screenshot.source = ""
         }
 
         onOfflineChanged:
@@ -67,13 +67,18 @@ PageBase
         id: video
 
         anchors.fill: parent
-        visible: !dummyLoader.visible
+        visible: !dummyLoader.visible && !screenshot.visible
 
-        source: videoScreenController.mediaPlayer
-        screenshotSource: initialScreenshot
-        customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
-            || videoScreenController.mediaPlayer.aspectRatio)
-        videoRotation: videoScreenController.resourceHelper.customRotation
+        mediaPlayer: videoScreenController.mediaPlayer
+        resourceHelper: videoScreenController.resourceHelper
+    }
+
+    Image
+    {
+        id: screenshot
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectFit
+        visible: status == Image.Ready
     }
 
     Loader
