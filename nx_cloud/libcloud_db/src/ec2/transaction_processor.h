@@ -301,8 +301,7 @@ private:
             m_transactionLog->checkIfNeededAndSaveToLog(
                 queryContext,
                 transactionContext.transportHeader.systemId,
-                transactionContext.transaction,
-                transactionContext.transportHeader);
+                transactionContext.transaction);
 
         const auto transactionCommand = 
             transactionContext.transaction.get().command;

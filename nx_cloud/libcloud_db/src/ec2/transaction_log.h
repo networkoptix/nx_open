@@ -88,8 +88,7 @@ public:
     nx::db::DBResult checkIfNeededAndSaveToLog(
         nx::db::QueryContext* connection,
         const nx::String& systemId,
-        const SerializableTransaction<TransactionDataType>& transaction,
-        TransactionTransportHeader /*transportHeader*/)
+        const SerializableTransaction<TransactionDataType>& transaction)
     {
         const auto transactionHash = calculateTransactionHash(transaction.get());
 
@@ -97,7 +96,7 @@ public:
         if (isShouldBeIgnored(
                 connection,
                 systemId,
-            transaction.get(),
+                transaction.get(),
                 transactionHash))
         {
             NX_LOGX(
@@ -132,11 +131,11 @@ public:
      */
     template<int TransactionCommandValue, typename TransactionDataType>
     nx::db::DBResult generateTransactionAndSaveToLog(
-        nx::db::QueryContext* connection,
+        nx::db::QueryContext* queryContext,
         const nx::String& systemId,
         TransactionDataType transactionData)
     {
-        const int tranSequence = generateNewTransactionSequence(connection, systemId);
+        const int tranSequence = generateNewTransactionSequence(queryContext, systemId);
 
         // Generating transaction.
         ::ec2::QnTransaction<TransactionDataType> transaction(m_peerId);
@@ -147,7 +146,7 @@ public:
         transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);
         transaction.persistentInfo.sequence = tranSequence;
         transaction.persistentInfo.timestamp =
-            generateNewTransactionTimestamp(connection, systemId);
+            generateNewTransactionTimestamp(queryContext, systemId);
         transaction.params = std::move(transactionData);
 
         const auto transactionHash = calculateTransactionHash(transaction);
@@ -163,7 +162,7 @@ public:
 
         // Saving transaction to the log.
         const auto result = saveToDb(
-            connection,
+            queryContext,
             systemId,
             transaction,
             transactionHash,
@@ -180,8 +179,7 @@ public:
         // Saving transactions, generated under current DB transaction,
         //  so that we can send "new transaction" notifications after commit.
         QnMutexLocker lk(&m_mutex);
-        DbTransactionContext& dbTranContext = m_dbTransactionContexts[connection];
-        dbTranContext.systemId = systemId;
+        DbTransactionContext& dbTranContext = getTransactionContext(lk, queryContext, systemId);
         dbTranContext.transactions.push_back(std::move(transactionSerializer));
 
         return nx::db::DBResult::ok;
@@ -256,7 +254,10 @@ private:
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
-    std::map<nx::db::QueryContext*, DbTransactionContext> m_dbTransactionContexts;
+    std::map<
+        std::pair<nx::db::QueryContext*, nx::String>,
+        DbTransactionContext
+    > m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
 
@@ -302,7 +303,13 @@ private:
         const nx::String& systemId);
     void onDbTransactionCompleted(
         nx::db::QueryContext* dbConnection,
+        const nx::String& systemId,
         nx::db::DBResult dbResult);
+
+    DbTransactionContext& getTransactionContext(
+        const QnMutexLockerBase& lk,
+        nx::db::QueryContext* const queryContext,
+        const nx::String& systemId);
 };
 
 } // namespace ec2
