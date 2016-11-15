@@ -193,12 +193,23 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     {
         QnMutexLocker lock(&m_mutex);
         QPointer<QnCameraHistoryPool> guard(this);
-        auto handle = server->restConnection()->cameraHistoryAsync(request, [this, callback, guard](bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods)
-        {
-            if (!guard)
-                return;
-            at_cameraPrepared(success, id, periods, callback);
-        });
+
+        auto handle = server->restConnection()->cameraHistoryAsync(request,
+            [this, callback, guard = QPointer<QnCameraHistoryPool>(this), thread = this->thread()]
+            (bool success, rest::Handle id, ec2::ApiCameraHistoryDataList periods)
+            {
+                if (!guard)
+                    return;
+
+                const auto timerCallback =
+                    [this, guard, success, id, periods, callback]()
+                    {
+                        if (guard)
+                            at_cameraPrepared(success, id, periods, callback);
+                    };
+
+                executeDelayed(timerCallback, kDefaultDelay, thread);
+            });
 
         bool started = handle > 0;
         if (started)
@@ -233,20 +244,9 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
         }
     }
 
-
     lock.unlock();
     if (callback)
-    {
-        const auto guard = QPointer<QObject>(this);
-        const auto timerCallback =
-            [callback, success, guard]
-            {
-                if (guard)
-                    callback(success);
-            };
-
-        executeDelayed(timerCallback, kDefaultDelay, guard->thread());
-    }
+        callback(success);
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
