@@ -727,12 +727,8 @@ void QnWorkbenchUi::createControlsWidget()
     display()->scene()->addItem(m_controlsWidget);
     display()->setLayer(m_controlsWidget, Qn::UiLayer);
 
-    QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
-    deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
-    m_controlsWidget->installEventFilter(deactivationSignalizer);
-
-    /* Reactivate controls widget if it is deactivated. */
-    connect(deactivationSignalizer, &QnAbstractEventSignalizer::activated, this, [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
+    installEventHandler(m_controlsWidget, QEvent::WindowDeactivate, this,
+        [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
 
     connect(m_controlsWidget, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::at_controlsWidget_geometryChanged);
 }

@@ -104,11 +104,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     ui->tableView->clearSelection();
 
-    // TODO: #Elric replace with a single connect call
-    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    ui->tableView->viewport()->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
+    installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
+        &QnPtzManageDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
 
     connect(m_model, &QnPtzManageModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(m_model, &QnPtzManageModel::presetsChanged, this, &QnPtzManageDialog::updateUi);

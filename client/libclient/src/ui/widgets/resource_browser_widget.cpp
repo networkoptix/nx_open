@@ -61,7 +61,8 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
@@ -219,8 +220,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),
     m_tooltipWidget(nullptr),
-    m_hoverProcessor(nullptr),
-    m_scrollbarSignalizer(new QnMultiEventSignalizer(this))
+    m_hoverProcessor(nullptr)
 {
     ui->setupUi(this);
 
@@ -277,14 +277,9 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         &QnResourceBrowserWidget::updateIcons);
 
-    m_scrollbarSignalizer->addEventType(QEvent::Show);
-    m_scrollbarSignalizer->addEventType(QEvent::Hide);
-    ui->resourceTreeWidget->treeView()->verticalScrollBar()->installEventFilter(
-        m_scrollbarSignalizer);
-    ui->searchTreeWidget->treeView()->verticalScrollBar()->installEventFilter(
-        m_scrollbarSignalizer);
-    connect(m_scrollbarSignalizer, &QnMultiEventSignalizer::activated, this,
-        &QnResourceBrowserWidget::scrollBarVisibleChanged);
+    installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
+        ui->searchTreeWidget->treeView()->verticalScrollBar() }, { QEvent::Show, QEvent::Hide },
+        this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
     /* Run handlers. */
     updateFilter();
@@ -295,8 +290,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
 QnResourceBrowserWidget::~QnResourceBrowserWidget()
 {
-    m_scrollbarSignalizer->disconnect(this);
-
     disconnect(workbench(), nullptr, this, nullptr);
 
     at_workbench_currentLayoutAboutToBeChanged();
