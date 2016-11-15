@@ -40,7 +40,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const QnTransaction<ApiIdData>& tran,
-    const AbstractECConnectionPtr& connection,
+    const AbstractECConnectionPtr& /*connection*/,
     std::list<std::function<void()>>* const transactionsToSend)
 {
     ApiResourceParamWithRefDataList resourceParams;
