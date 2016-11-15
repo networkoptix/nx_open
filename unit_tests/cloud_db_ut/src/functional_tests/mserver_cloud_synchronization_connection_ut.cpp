@@ -49,7 +49,7 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_re
 
     ASSERT_EQ(
         api::ResultCode::ok,
-        unbindSystem(account.data.email, account.password, system.id));
+        unbindSystem(account.email, account.password, system.id));
 
     for (const auto& connectionId: connectionIds)
     {

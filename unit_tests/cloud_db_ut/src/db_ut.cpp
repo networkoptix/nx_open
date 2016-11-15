@@ -106,7 +106,7 @@ TEST_F(DbFailure, basic)
 
     const auto account = addActivatedAccount2();
 
-    auto cdbConnection = connection(account.data.email, account.password);
+    auto cdbConnection = connection(account.email, account.password);
     api::AccountData accountData;
     accountData.email = generateRandomEmailAddress();
     accountData.passwordHa1 = "sdfdsfsdf";
@@ -125,7 +125,7 @@ TEST_F(DbFailure, basic)
     accountUpdate.fullName = "qweasd123";
     ASSERT_EQ(
         api::ResultCode::retryLater,
-        updateAccount(account.data.email, account.password, accountUpdate));
+        updateAccount(account.email, account.password, accountUpdate));
     ASSERT_EQ(
         api::ResultCode::ok,
         newAccountRegisteredPromise.get_future().get());

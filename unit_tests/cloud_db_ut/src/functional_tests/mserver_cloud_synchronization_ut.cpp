@@ -73,7 +73,7 @@ TEST_F(Ec2MserverCloudSynchronization, reconnecting)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(Ec2MserverCloudSynchronization, addingUserLocallyWhileOffline)
+TEST_F(Ec2MserverCloudSynchronization, adding_user_locally_while_offline)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -113,7 +113,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserLocallyWhileOffline)
                 api::ResultCode::ok,
                 cdb()->removeSystemSharing(
                     ownerAccount().email,
-                    ownerAccountPassword(),
+                    ownerAccount().password,
                     registeredSystemData().id,
                     account2VmsData.email.toStdString()));
 
@@ -134,7 +134,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserLocallyWhileOffline)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, mergingOfflineChanges)
+TEST_F(Ec2MserverCloudSynchronization, merging_offline_changes)
 {
     constexpr const int kTestAccountNumber = 10;
 
@@ -169,7 +169,7 @@ TEST_F(Ec2MserverCloudSynchronization, mergingOfflineChanges)
 
         ASSERT_EQ(
             api::ResultCode::ok,
-            cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+            cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
     }
 
     // Establishing connection.
@@ -189,7 +189,7 @@ TEST_F(Ec2MserverCloudSynchronization, mergingOfflineChanges)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, addingUserInCloudAndRemovingLocally)
+TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -221,7 +221,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserInCloudAndRemovingLocally)
         sharing.accessRole = api::SystemAccessRole::cloudAdmin;
         ASSERT_EQ(
             api::ResultCode::ok,
-            cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+            cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
 
         waitForCloudAndVmsToSyncUsers();
 
@@ -239,7 +239,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserInCloudAndRemovingLocally)
         fetchCloudTransactionLog(&transactionList));
 }
 
-TEST_F(Ec2MserverCloudSynchronization, syncFromCloud)
+TEST_F(Ec2MserverCloudSynchronization, sync_from_cloud)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -257,14 +257,14 @@ TEST_F(Ec2MserverCloudSynchronization, syncFromCloud)
     sharing.accessRole = api::SystemAccessRole::cloudAdmin;
     ASSERT_EQ(
         api::ResultCode::ok,
-        cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+        cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
 
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
+TEST_F(Ec2MserverCloudSynchronization, rebinding_system_to_cloud)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -284,7 +284,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
         sharing.accessRole = api::SystemAccessRole::cloudAdmin;
         ASSERT_EQ(
             api::ResultCode::ok,
-            cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+            cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
 
         appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
@@ -301,7 +301,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, newTransactionTimestamp)
+TEST_F(Ec2MserverCloudSynchronization, new_transaction_timestamp)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -343,12 +343,12 @@ TEST_F(Ec2MserverCloudSynchronization, newTransactionTimestamp)
             sharing.accessRole = api::SystemAccessRole::cloudAdmin;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+                cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
         }
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, renameSystem)
+TEST_F(Ec2MserverCloudSynchronization, rename_system)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -379,7 +379,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
                 api::ResultCode::ok,
                 cdb()->renameSystem(
                     ownerAccount().email,
-                    ownerAccountPassword(),
+                    ownerAccount().password,
                     registeredSystemData().id,
                     newSystemName));
         }
@@ -405,7 +405,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
+TEST_F(Ec2MserverCloudSynchronization, adding_cloud_user_with_not_registered_email)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -450,7 +450,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
         cdb()->resetAccountPassword(testEmail, &confirmationCode));
 }
 
-TEST_F(Ec2MserverCloudSynchronization, migrateTransactions)
+TEST_F(Ec2MserverCloudSynchronization, migrate_transactions)
 {
     const std::string preRegisteredCloudAccountEmail =
         "akolesnikov@networkoptix.com";
@@ -527,7 +527,7 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
             api::ResultCode::ok,
             cdb()->removeSystemSharing(
                 ownerAccount().email,
-                ownerAccountPassword(),
+                ownerAccount().password,
                 registeredSystemData().id,
                 newAccountEmail));
         waitForCloudAndVmsToSyncUsers();
@@ -538,7 +538,7 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
             api::ResultCode::ok,
             cdb()->getSystemSharings(
                 ownerAccount().email,
-                ownerAccountPassword(),
+                ownerAccount().password,
                 registeredSystemData().id,
                 &systemUsers));
         ASSERT_EQ(1, systemUsers.size());
