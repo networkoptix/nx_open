@@ -53,6 +53,8 @@ static const int kShowWidgetHiddenHeight = 12;
 
 namespace NxUi {
 
+using namespace nx::client::ui::workbench;
+
 TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     const QnPaneSettings& settings,
     QGraphicsWidget* parentWidget,
@@ -346,8 +348,6 @@ bool TimelineWorkbenchPanel::isOpened() const
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
-
     ensureAnimationAllowed(&animate);
 
     if (!item)
@@ -441,14 +441,24 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
 {
     base_type::updateOpacity(animate);
 
-    bool isButtonOpaque = m_visible && m_opacityProcessor->isHovered();
-    const qreal buttonsOpacity = isButtonOpaque ? NxUi::kOpaque : NxUi::kHidden;
+    bool buttonsVisible = m_visible && m_opacityProcessor->isHovered();
+    const qreal buttonsOpacity = buttonsVisible ? NxUi::kOpaque : NxUi::kHidden;
 
     ensureAnimationAllowed(&animate);
     if (animate)
-        opacityAnimator(m_zoomButtonsWidget)->animateTo(buttonsOpacity);
+    {
+        auto animator = opacityAnimator(m_zoomButtonsWidget);
+        qnWorkbenchAnimations->setupAnimator(animator, buttonsVisible
+            ? Animations::Id::TimelineButtonsShow
+            : Animations::Id::TimelineButtonsHide);
+        animator->animateTo(buttonsOpacity);
+    }
     else
+    {
+        if (hasOpacityAnimator(m_zoomButtonsWidget))
+            opacityAnimator(m_zoomButtonsWidget)->stop();
         m_zoomButtonsWidget->setOpacity(buttonsOpacity);
+    }
 }
 
 bool TimelineWorkbenchPanel::isHovered() const

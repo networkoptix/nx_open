@@ -30,6 +30,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/animation/opacity_animator.h>
@@ -740,14 +742,24 @@ void QnResourceBrowserWidget::hideToolTip()
 {
     if (!m_tooltipWidget)
         return;
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
+
+    using namespace nx::client::ui::workbench;
+
+    auto animator = opacityAnimator(m_tooltipWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipHide);
+    animator->animateTo(0.0);
 }
 
 void QnResourceBrowserWidget::showToolTip()
 {
     if (!m_tooltipWidget)
         return;
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+
+    using namespace nx::client::ui::workbench;
+
+    auto animator = opacityAnimator(m_tooltipWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipShow);
+    animator->animateTo(1.0);
 }
 
 void QnResourceBrowserWidget::updateIcons()

@@ -675,8 +675,6 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
      *
      * Note that widget is set as animator's parent. */
     animator = new WidgetAnimator(widget, "geometry", "rotation", widget);
-    animator->setAbsoluteMovementSpeed(0.0);
-    animator->setRelativeMovementSpeed(8.0);
     animator->setTimer(m_instrumentManager->animationTimer());
 
     qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::SceneItemGeometryChange);

@@ -26,8 +26,14 @@ public:
         TimelineHide,
         TimelineTooltipShow,
         TimelineTooltipHide,
+        TimelineButtonsShow,
+        TimelineButtonsHide,
+
         ResourcesPanelShow,
         ResourcesPanelHide,
+        ResourcesPanelTooltipShow,
+        ResourcesPanelTooltipHide,
+
         NotificationsPanelShow,
         NotificationsPanelHide,
         CalendarShow,
@@ -37,6 +43,9 @@ public:
          * Item size increasing/decreasing on click;
          * New items appearing.
          * Rotating items by context menu option.
+         * Restoring item size after resizing.
+         * Restoring item position after dragging.
+         * Adding new item on scene on double-click.
          */
         SceneItemGeometryChange,
 

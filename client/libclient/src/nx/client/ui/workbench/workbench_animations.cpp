@@ -36,15 +36,24 @@ Animations::Animations(QObject* parent):
     setup(Id::TimelineHide, QEasingCurve::OutQuad, 240);
     setup(Id::TimelineTooltipShow, QEasingCurve::InOutQuad, 160);
     setup(Id::TimelineTooltipHide, QEasingCurve::InOutQuad, 160);
+    setup(Id::TimelineButtonsShow, QEasingCurve::InOutQuad, 200);
+    setup(Id::TimelineButtonsHide, QEasingCurve::InOutQuad, 200);
+
     setup(Id::ResourcesPanelShow, QEasingCurve::InOutQuad, 300);
     setup(Id::ResourcesPanelHide, QEasingCurve::OutQuad, 300);
+    setup(Id::ResourcesPanelTooltipShow, QEasingCurve::InOutQuad, 200);
+    setup(Id::ResourcesPanelTooltipHide, QEasingCurve::OutQuad, 200);
+
     setup(Id::NotificationsPanelShow, QEasingCurve::InOutQuad, 300);
     setup(Id::NotificationsPanelHide, QEasingCurve::OutQuad, 300);
     setup(Id::CalendarShow, QEasingCurve::OutQuad, 50);
     setup(Id::CalendarHide, QEasingCurve::InQuad, 50);
+
     setup(Id::SceneItemGeometryChange, QEasingCurve::InOutQuad, 200);
+
     setup(Id::SceneZoomIn, QEasingCurve::InOutQuad, 500);
     setup(Id::SceneZoomOut, QEasingCurve::InOutQuad, 500);
+
     setup(Id::ItemOverlayShow, QEasingCurve::InOutQuad, 200);
     setup(Id::ItemOverlayHide, QEasingCurve::InOutQuad, 200);
 }
@@ -72,6 +81,9 @@ void Animations::setupAnimator(WidgetAnimator* animator, Id id)
     if (!animator)
         return;
 
+    /* Set base speed to very small value, so time limit will be default option to setup speed. */
+    animator->setAbsoluteMovementSpeed(0.0);
+    animator->setRelativeMovementSpeed(kDefaultSpeed);
     animator->setEasingCurve(m_easing[idx(id)]);
     animator->setTimeLimit(m_timeLimit[idx(id)]);
 }
