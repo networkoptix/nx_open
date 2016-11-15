@@ -910,9 +910,7 @@ nx::db::DBResult AccountManager::executeUpdateAccountQuery(
 {
     QSqlQuery updateAccountQuery(*queryContext->connection());
     updateAccountQuery.prepare(
-        lit(R"sql(
-            UPDATE account SET %1 WHERE email=:email
-            )sql").arg(db::joinFields(fieldsToSet, ",")));
+        lit("UPDATE account SET %1 WHERE email=:email").arg(db::joinFields(fieldsToSet, ",")));
     db::bindFields(&updateAccountQuery, fieldsToSet);
     updateAccountQuery.bindValue(
         ":email",
