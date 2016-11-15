@@ -365,10 +365,22 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand);
+    
+    nx::db::DBResult generateSaveUserTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing,
+        const api::AccountData& account);
     nx::db::DBResult generateUpdateFullNameTransaction(
         nx::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         const std::string& newFullName);
+    nx::db::DBResult generateRemoveUserTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing);
+    nx::db::DBResult generateRemoveUserFullNameTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing);
+
     nx::db::DBResult placeUpdateUserTransactionToEachSystem(
         nx::db::QueryContext* const queryContext,
         const data::AccountUpdateDataWithEmail& accountData);

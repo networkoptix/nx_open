@@ -1405,43 +1405,42 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
 
     if (sharing.accessRole != api::SystemAccessRole::none)
     {
-        //generating saveUser transaction
-        ::ec2::ApiUserData userData;
-        ec2::convert(sharing, &userData);
-        userData.isCloud = true;
-        userData.fullName = QString::fromStdString(account.fullName);
-        result = m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::saveUser>(
-                queryContext,
-                sharing.systemID.c_str(),
-                std::move(userData));
+        result = generateSaveUserTransaction(queryContext, sharing, account);
+        if (result != nx::db::DBResult::ok)
+            return result;
 
-        generateUpdateFullNameTransaction(
-            queryContext, sharing, account.fullName);
+        result = generateUpdateFullNameTransaction(queryContext, sharing, account.fullName);
+        if (result != nx::db::DBResult::ok)
+            return result;
     }
     else
     {
-        //generating removeUser transaction
-        ::ec2::ApiIdData userId;
-        ec2::convert(sharing, &userId);
-        result = m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::removeUser>(
-                queryContext,
-                sharing.systemID.c_str(),
-                std::move(userId));
+        result = generateRemoveUserTransaction(queryContext, sharing);
+        if (result != nx::db::DBResult::ok)
+            return result;
 
-        //generating removeResourceParam transaction
-        ::ec2::ApiResourceParamWithRefData fullNameParam;
-        fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
-        fullNameParam.name = Qn::USER_FULL_NAME;
-        result = m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::removeResourceParam>(
-                queryContext,
-                sharing.systemID.c_str(),
-                std::move(fullNameParam));
+        result = generateRemoveUserFullNameTransaction(queryContext, sharing);
+        if (result != nx::db::DBResult::ok)
+            return result;
     }
 
-    return result;
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::generateSaveUserTransaction(
+    nx::db::QueryContext* const queryContext,
+    const api::SystemSharing& sharing,
+    const api::AccountData& account)
+{
+    ::ec2::ApiUserData userData;
+    ec2::convert(sharing, &userData);
+    userData.isCloud = true;
+    userData.fullName = QString::fromStdString(account.fullName);
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
+        ::ec2::ApiCommand::saveUser>(
+            queryContext,
+            sharing.systemID.c_str(),
+            std::move(userData));
 }
 
 nx::db::DBResult SystemManager::generateUpdateFullNameTransaction(
@@ -1459,6 +1458,33 @@ nx::db::DBResult SystemManager::generateUpdateFullNameTransaction(
             queryContext,
             sharing.systemID.c_str(),
             std::move(fullNameData));
+}
+
+nx::db::DBResult SystemManager::generateRemoveUserTransaction(
+    nx::db::QueryContext* const queryContext,
+    const api::SystemSharing& sharing)
+{
+    ::ec2::ApiIdData userId;
+    ec2::convert(sharing, &userId);
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
+        ::ec2::ApiCommand::removeUser>(
+            queryContext,
+            sharing.systemID.c_str(),
+            std::move(userId));
+}
+
+nx::db::DBResult SystemManager::generateRemoveUserFullNameTransaction(
+    nx::db::QueryContext* const queryContext,
+    const api::SystemSharing& sharing)
+{
+    ::ec2::ApiResourceParamWithRefData fullNameParam;
+    fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
+    fullNameParam.name = Qn::USER_FULL_NAME;
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
+        ::ec2::ApiCommand::removeResourceParam>(
+            queryContext,
+            sharing.systemID.c_str(),
+            std::move(fullNameParam));
 }
 
 nx::db::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
