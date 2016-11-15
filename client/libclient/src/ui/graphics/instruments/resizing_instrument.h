@@ -107,7 +107,9 @@ private:
         const QPoint& pos,
         qreal effectRadius) const;
 
-    QList<QGraphicsWidgetPtr> getAffectedWidgets(QWidget* viewport, const QPoint& pos) const;
+    typedef QList<QGraphicsWidgetPtr> WidgetsList;
+    WidgetsList getAffectedWidgets(QWidget* viewport, const QPoint& pos) const;
+    static WidgetsList subtructWidgets(const WidgetsList& first, const WidgetsList& second);
 
 private:
     friend class ResizingInfo;

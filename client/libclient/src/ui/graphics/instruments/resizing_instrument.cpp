@@ -49,6 +49,17 @@ GraphicsWidget* open(QGraphicsWidget* widget)
     return static_cast<GraphicsWidget*>(widget);
 }
 
+uint qHash(const QPointer<QGraphicsWidget>& widget)
+{
+    return ::qHash(static_cast<void *>(widget.data()));
+}
+
+void safeUnsetCursor(QGraphicsWidget* widget)
+{
+    if (widget)
+        widget->unsetCursor();
+}
+
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
@@ -181,11 +192,8 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     bool needUnsetCursor = !widget || oldTargetWidget != widget || section == Qt::NoSection;
     if (needUnsetCursor)
     {
-        for (auto w: m_affectedWidgets)
-        {
-            if (w)
-                w->unsetCursor();
-        }
+        for (const auto& w: m_affectedWidgets)
+            safeUnsetCursor(w);
         m_affectedWidgets.clear();
     }
 
@@ -204,9 +212,14 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
         widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())) * 180.0 / M_PI;
     const auto cursor = QnCursorCache::instance()->cursor(cursorShape, rotation, 5.0);
 
-    m_affectedWidgets = getAffectedWidgets(viewport, correctedPos);
+    const auto newAffected = getAffectedWidgets(viewport, correctedPos);
+    const auto lostWidgets = subtructWidgets(m_affectedWidgets, newAffected);
+    for (const auto& lost: lostWidgets)
+        safeUnsetCursor(lost);
+
+    m_affectedWidgets = newAffected;
     NX_ASSERT(m_affectedWidgets.last() == widget);
-    for (auto w: m_affectedWidgets)
+    for (auto w : m_affectedWidgets)
     {
         NX_ASSERT(w);
         if (w)
@@ -215,6 +228,13 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
 
     event->accept();
     return false;
+}
+
+ResizingInstrument::WidgetsList ResizingInstrument::subtructWidgets(
+    const WidgetsList& first,
+    const WidgetsList& second)
+{
+    return first.toSet().subtract(second.toSet()).toList();
 }
 
 void ResizingInstrument::startDragProcess(DragInfo* info)
