@@ -269,7 +269,7 @@ Rectangle
                 anchors.top: gridHolder.bottom;
                 anchors.topMargin: 8;
 
-                pagesCount: grid.pagesCount;
+                pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
                 onCurrentPageChanged:
                 {

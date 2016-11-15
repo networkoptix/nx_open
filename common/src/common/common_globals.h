@@ -764,7 +764,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission,
+        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
 
         AllPermissions = 0xFFFFFFFF
     };

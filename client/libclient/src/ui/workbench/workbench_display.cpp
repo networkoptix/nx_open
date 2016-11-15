@@ -37,6 +37,8 @@
 
 #include <ui/common/notification_levels.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
@@ -124,9 +126,6 @@ const qreal focusExpansion = 100.0;
 /** Maximal expanded size of a raised widget, relative to viewport size. */
 const qreal maxExpandedSize = 0.5;
 
-static const int kWidgetAnimationDurationMs = 200;
-const int zoomAnimationDurationMsec = 500;
-
 /** The amount of z-space that one layer occupies. */
 const qreal layerZSize = 10000000.0;
 
@@ -197,6 +196,8 @@ void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
 };
 
 } // namespace
+
+using namespace nx::client::ui::workbench;
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     base_type(parent),
@@ -287,8 +288,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
     m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
-    m_viewportAnimator->setScalingSpeed(4.0); /* Viewport scaling speed, scale factor per second. */
-    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);
+    m_viewportAnimator->setScalingSpeed(1.0); /* Viewport scaling speed, scale factor per second. */
     m_viewportAnimator->setTimer(animationTimer);
     connect(m_viewportAnimator, SIGNAL(started()), this, SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator, SIGNAL(started()), m_boundingInstrument, SLOT(recursiveDisable()));
@@ -674,14 +674,11 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new WidgetAnimator(widget, "geometry", "rotation", widget); // ANIMATION: items.
-    animator->setAbsoluteMovementSpeed(0.0);
-    animator->setRelativeMovementSpeed(8.0);
-    animator->setScalingSpeed(128.0);
-    animator->setRotationSpeed(270.0);
-    animator->setEasingCurve(QEasingCurve::InOutQuad);
+    animator = new WidgetAnimator(widget, "geometry", "rotation", widget);
     animator->setTimer(m_instrumentManager->animationTimer());
-    animator->setTimeLimit(kWidgetAnimationDurationMs);
+
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::SceneItemGeometryChange);
+
     widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }
@@ -808,16 +805,19 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             if (oldWidget != NULL)
                 synchronize(oldWidget, true);
 
+            m_viewportAnimator->stop();
             if (newWidget != NULL)
             {
                 bringToFront(newWidget);
                 synchronize(newWidget, true);
 
+                qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomIn);
                 m_viewportAnimator->moveTo(itemGeometry(newWidget->item()));
                 m_curtainAnimator->curtain(newWidget);
             }
             else
             {
+                qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomOut);
                 m_viewportAnimator->moveTo(fitInViewGeometry());
                 m_curtainAnimator->uncurtain();
             }
@@ -997,10 +997,12 @@ void QnWorkbenchDisplay::fitInView(bool animate)
     if (zoomedWidget != NULL)
     {
         targetGeometry = itemGeometry(zoomedWidget->item());
+        qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomIn);
     }
     else
     {
         targetGeometry = fitInViewGeometry();
+        qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomOut);
     }
 
     if (animate)
