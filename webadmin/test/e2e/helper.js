@@ -171,7 +171,7 @@ var Helper = function () {
         });
     };
 
-    // accepts array with objects, like [{'login1', 'password1'}, {'login2', 'password2'}]
+    // accepts array with objects, like [{login:'login1', password:'password1'}, {login:'login2', password:'password2'}]
     this.attemptLogin = function (args) {
         var closeButton = element(by.buttonText('Close'));
 
@@ -186,7 +186,7 @@ var Helper = function () {
             });
         };
 
-        self.login('admin', self.password);
+        self.login(self.admin, self.password);
 
         for (var i = 0; i < args.length; i ++) {
             loginAgain(args[i].login, args[i].password);
