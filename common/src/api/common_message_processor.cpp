@@ -106,30 +106,30 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved, Qt::DirectConnection);
 
     auto cameraManager = connection->getCameraNotificationManager();
-    connect(cameraManager, &ec2::AbstractCameraNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData));
+    connect(cameraManager, &ec2::AbstractCameraNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData), Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged, Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved, Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged, Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
 
     auto userManager = connection->getUserNotificationManager();
-    connect(userManager, &ec2::AbstractUserNotificationManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
+    connect(userManager, &ec2::AbstractUserNotificationManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData), Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged, Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::groupAddedOrUpdated,            this, &QnCommonMessageProcessor::on_userGroupChanged, Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::groupRemoved,                   this, &QnCommonMessageProcessor::on_userGroupRemoved, Qt::DirectConnection);
 
     auto layoutManager = connection->getLayoutNotificationManager();
-    connect(layoutManager, &ec2::AbstractLayoutNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
+    connect(layoutManager, &ec2::AbstractLayoutNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData), Qt::DirectConnection);
     connect(layoutManager, &ec2::AbstractLayoutNotificationManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
 
     auto videowallManager = connection->getVideowallNotificationManager();
-    connect(videowallManager, &ec2::AbstractVideowallNotificationManager::addedOrUpdated,       this, on_resourceUpdated(ec2::ApiVideowallData));
+    connect(videowallManager, &ec2::AbstractVideowallNotificationManager::addedOrUpdated,       this, on_resourceUpdated(ec2::ApiVideowallData), Qt::DirectConnection);
     connect(videowallManager, &ec2::AbstractVideowallNotificationManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
     connect(videowallManager, &ec2::AbstractVideowallNotificationManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived);
 
     auto webPageManager = connection->getWebPageNotificationManager();
-    connect(webPageManager, &ec2::AbstractWebPageNotificationManager::addedOrUpdated,           this, on_resourceUpdated(ec2::ApiWebPageData));
+    connect(webPageManager, &ec2::AbstractWebPageNotificationManager::addedOrUpdated,           this, on_resourceUpdated(ec2::ApiWebPageData), Qt::DirectConnection);
     connect(webPageManager, &ec2::AbstractWebPageNotificationManager::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
 
     auto licenseManager = connection->getLicenseNotificationManager();
