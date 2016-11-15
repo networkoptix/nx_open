@@ -17,6 +17,8 @@ def unique_list(iter_list):
 def process_js_file(file_name):
     with open(file_name, 'r') as file_descriptor:
         data = file_descriptor.read()
+
+        print data
         strings = re.findall("(?<=').+?(?<!\\\\)(?=')", data)
         strings += re.findall("(?<=\").+?(?<!\\\\)(?=\")", data)
         strings = [x for x in strings if x not in ignore_strings]
@@ -127,6 +129,7 @@ def generate_ts(data):
         eTree.SubElement(context, "name").text = file_name
         first = True
         for string in record['inline'] + record['attributes']:
+            # print(string)
             if not string.strip() or re.match('^\W+$', string):
                 continue
             message = eTree.SubElement(context, "message")
@@ -142,17 +145,11 @@ def generate_ts(data):
     return parsed.toprettyxml(indent="  ", encoding='UTF-8')
 
 
-def extract_strings(file_root_dir, file_filter, dir_exclude=None, mode='html', recursive=True):
+def extract_strings(file_root_dir, file_filter, dir_exclude=None, mode='html'):
     all_strings = []
-    for root, dirs, files in os.walk(file_root_dir):
+    for root, subs2, files in os.walk(file_root_dir):
         if dir_exclude and root.endswith(dir_exclude):
             continue
-
-        if not recursive:
-            print ("drop", dirs)
-            while len(dirs) > 0:
-                dirs.pop()
-
         for filename in files:
             if filename.endswith(file_filter):
                 if mode == 'js':
@@ -170,13 +167,12 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('static/scripts', 'language.js', mode='js')
-js_strings1 = extract_strings('static/', 'apple-app-site-association', mode='js')
-html_strings = extract_strings('static/views', '.html')  # , dir_exclude='static'
-html_strings1 = extract_strings('static/', '503.html')  # , dir_exclude='static'
-# html_strings1 = extract_strings('localization/static/', '.html', recursive=False)  # , dir_exclude='static'
+js_strings = extract_strings('../../front_end/dist/scripts', 'language.js', mode='js')
+js_strings1 = extract_strings('../../front_end/dist/', 'apple-app-site-association', mode='js')
+html_strings = extract_strings('../../front_end/dist/views', '.html')  # , dir_exclude='static'
+html_strings1 = extract_strings('../../front_end/dist/', '.html')  # , dir_exclude='static'
 
 format_ts(js_strings + js_strings1 + html_strings + html_strings1, "cloud_portal.ts")
 
-template_strings = extract_strings('templates', '.mustache')
+template_strings = extract_strings('../notifications/static/templates', '.mustache')
 format_ts(template_strings, "templates.ts")

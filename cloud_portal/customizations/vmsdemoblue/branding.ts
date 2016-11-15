@@ -4,43 +4,43 @@
     <name>global</name>
     <message>
       <source>PRODUCT_NAME</source>
-      <translation>DW Cloud</translation>
+      <translation>VMS Demo Cloud</translation>
     </message>
     <message>
       <source>CLIENT_PROTOCOL</source>
-      <translation>dw-vms</translation>
-    </message>    
+      <translation>demo-vms</translation>
+    </message>
     <message>
       <source>VMS_NAME</source>
-      <translation>DW Spectrum</translation>
+      <translation>VMS Demonstration</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
-      <translation>http://digital-watchdog.com/dw_spec_landing/</translation>
+      <translation>http://www.networkoptix.com/live-demo#fulltrial</translation>
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://digital-watchdog.com/contact-tech-support/</translation>
+      <translation>http://support.networkoptix.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>digital-watchdog.com/contact-tech-support</translation>
+      <translation>http://support.networkoptix.com</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
-      <translation>http://digital-watchdog.com</translation>
+      <translation>http://networkoptix.com</translation>
     </message>
     <message>
       <source>{{portalDomain}}</source>
-      <translation>dwcc.cloud</translation>
+      <translation>cloud-demo.hdw.mx</translation>
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>HW58JB7FUF.tv.dwcc.DwMobile</translation>
-    </message>    
+      <translation>L6FE34GJWM.com.networkoptix.NxMobile</translation>
+    </message>
     <message>
       <source>COMPANY_NAME</source>
-      <translation>Digital Watchdog</translation>
+      <translation>Network Optix</translation>
     </message>
-  </context>
+  </context>    
 </TS>

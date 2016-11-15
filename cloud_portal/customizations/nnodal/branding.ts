@@ -4,43 +4,39 @@
     <name>global</name>
     <message>
       <source>PRODUCT_NAME</source>
-      <translation>DW Cloud</translation>
+      <translation>nvision Cloud</translation>
     </message>
     <message>
       <source>CLIENT_PROTOCOL</source>
-      <translation>dw-vms</translation>
-    </message>    
+      <translation>nvision-vms</translation>
+    </message>
     <message>
       <source>VMS_NAME</source>
-      <translation>DW Spectrum</translation>
+      <translation>nvision</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
-      <translation>http://digital-watchdog.com/dw_spec_landing/</translation>
+      <translation>http://nnodal.com/?page_id=584</translation>
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://digital-watchdog.com/contact-tech-support/</translation>
+      <translation>info@nnodal.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>digital-watchdog.com/contact-tech-support</translation>
+      <translation>info@nnodal.com</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
-      <translation>http://digital-watchdog.com</translation>
+      <translation>http://nnodal.com</translation>
     </message>
     <message>
       <source>{{portalDomain}}</source>
-      <translation>dwcc.cloud</translation>
+      <translation>cloud-demo.hdw.mx</translation>
     </message>
     <message>
-      <source>{{iOSappID}}</source>
-      <translation>HW58JB7FUF.tv.dwcc.DwMobile</translation>
-    </message>    
-    <message>
       <source>COMPANY_NAME</source>
-      <translation>Digital Watchdog</translation>
+      <translation>nvision</translation>
     </message>
   </context>
 </TS>

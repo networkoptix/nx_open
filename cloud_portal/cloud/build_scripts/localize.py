@@ -14,8 +14,18 @@ root_directory = ''
 branding_messages = {}
 
 
+def get_config():
+    conf_dir = os.getenv('CLOUD_PORTAL_CONF_DIR')
+    if not conf_dir:
+        raise RuntimeError('CLOUD_PORTAL_CONF_DIR environment variable is undefined')
+
+    return yaml.safe_load(open(join(conf_dir, 'cloud_portal.yaml')))
+
+
 def read_branding():
     print "read_branding"
+    conf = get_config()
+    customization = conf['customization']
     branding_file = 'branding.ts'
     tree = eTree.parse(branding_file)
     root = tree.getroot()

@@ -76,16 +76,10 @@ do
     echo "------------------------------"
     echo "Localization"
 
-    echo "Generate blank translation files"
+    echo "Copy branding and translation files"
+    cp $dir/*.ts $TARGET_DIR/$CUSTOMIZATION
     pushd $TARGET_DIR/$CUSTOMIZATION
     python ../../../build_scripts/generate_ts.py
-    popd
-
-    echo "Copy branding and translation files"
-    cp -f $dir/*.ts $TARGET_DIR/$CUSTOMIZATION
-
-    pushd $TARGET_DIR/$CUSTOMIZATION
-    echo "Customizing and localizing"
     python ../../../build_scripts/localize.py
     popd
 
@@ -93,6 +87,7 @@ do
     rm -rf $TARGET_DIR/$CUSTOMIZATION/*.ts
 
     echo "Localization success"
+
 done
 
 echo "Done!"
