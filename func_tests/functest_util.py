@@ -696,6 +696,7 @@ class ClusterWorker(object):
     def startThreads(self):
         for _ in xrange(self._threadNum):
             t = threading.Thread(target=self._worker, args=(_,))
+            t.daemon = False
             t.start()
             self._threadList.append(t)
 

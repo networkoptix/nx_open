@@ -119,12 +119,15 @@ def RunTests(testclass, *args):
     :type config: FtConfigParser
     """
     #print "DEBUG: run test class %s" % testclass
+    print "RunTests: %s, %s" % (testclass, args)
     config = _testMaster.getConfig()
     try:
         try:
             testclass.globalInit(config)
         except Exception as err:
-            print "FAIL: %s initialization failed: %s!" % (testclass.__name__, err)
+            #traceback.print_exc()
+            print "FAIL: %s initialization failed: %s!" % (testclass.__name__,
+                "".join(traceback.format_exception(*sys.exc_info())))
             return
         return all([
                     _singleSuiteRun(testclass, suite_name, config, args)
@@ -309,7 +312,7 @@ class FuncTestCase(unittest.TestCase):
 
     @classmethod
     def _clear_script_args(cls, num):
-        return (str(num), )
+        return (str(num),)
 
     @classmethod
     def _global_clear_extra_args(cls, num):
@@ -1041,7 +1044,9 @@ class FuncTestMaster(object):
     def init(self, notest=False):
         self._loadConfig()
         self.setUpPassword()
-        return (True,"") if notest or self.testConnection() else (False, "Connection test failed")
+        if not notest:
+            if not self.testConnection():
+                raise FuncTestError("Connection test failed")
 
     def init_rollback(self):
         self.unittestRollback = UnitTestRollback()
