@@ -223,7 +223,7 @@ void DnsResolver::run()
         lk.unlock();
         {
             auto result = resolveSync(task.hostAddress, task.ipVersion);
-            auto code = SystemError::getLastOSErrorCode();
+            auto code = result.empty() ? SystemError::getLastOSErrorCode() : SystemError::noError;
             if (task.requestId)
             {
                 lk.relock();

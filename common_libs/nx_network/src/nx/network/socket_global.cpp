@@ -14,19 +14,20 @@ bool SocketGlobals::Config::isAddressDisabled(const HostAddress& address) const
         return false;
 
     // Here 'static const' is an optimization as reload is called only on start.
-    static const auto disabledIps = [this]()
-    {
-        std::list<QRegExp> addresses;
-        const auto disabledAddressesString = QString::fromUtf8(disableAddresses);
-        if (!disabledAddressesString.isEmpty())
+    static const auto disabledRegExps =
+        [this]()
         {
-            for (const auto& s: disabledAddressesString.split(QChar(',')))
-                addresses.push_back(QRegExp(s, Qt::CaseInsensitive, QRegExp::Wildcard));
-        }
-        return addresses;
-    }();
+            std::list<QRegExp> regExps;
+            for (const auto& s: QString::fromUtf8(disableAddresses).split(QChar(',')))
+            {
+                if (!s.isEmpty())
+                    regExps.push_back(QRegExp(s, Qt::CaseInsensitive, QRegExp::Wildcard));
+            }
 
-    for (const auto& r: disabledIps)
+            return regExps;
+        }();
+
+    for (const auto& r: disabledRegExps)
     {
         if (r.exactMatch(address.toString()))
             return true;
@@ -73,9 +74,9 @@ SocketGlobals::~SocketGlobals()
 void SocketGlobals::init()
 {
     QnMutexLocker lock(&s_mutex);
-    if (++s_counter == 1) // first in
+    if (++s_counter == 1) //< First in.
     {
-        s_initState = InitState::inintializing;
+        s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals;
         s_initState = InitState::done;
 
@@ -87,12 +88,12 @@ void SocketGlobals::init()
 void SocketGlobals::deinit()
 {
     QnMutexLocker lock(&s_mutex);
-    if (--s_counter == 0) // last out
+    if (--s_counter == 0) //< Last out.
     {
         delete s_instance;
-        s_initState = InitState::deinitializing;
+        s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
         s_instance = nullptr;
-        s_initState = InitState::none; // allow creating Pollable(s) in destructor
+        s_initState = InitState::none;
     }
 }
 

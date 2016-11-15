@@ -77,5 +77,8 @@
     <?define QtDir="${qt.dir}/bin"?>
     <?define QtPluginsDir="${qt.dir}/plugins"?>
 
+    <?define VC12RedistPath="${environment.dir}/packages/${rdep.target}/vcredist-2012/bin"?>
+    <?define VC14RedistPath="${environment.dir}/packages/${rdep.target}/vcredist-2015/bin"?>
+
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

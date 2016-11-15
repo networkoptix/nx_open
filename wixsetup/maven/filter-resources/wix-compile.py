@@ -37,16 +37,16 @@ full_exe_name = '${finalName}.exe'
 nxtool_msi_name = '${finalName}-servertool.msi'
 nxtool_exe_name = '${finalName}-servertool.exe'
 
-wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
+wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
 server_components = ['ServerVox', 'Server', 'traytool']
 nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls']
 
-client_exe_components = ['VC14RedistPackage', 'ClientPackage']
-server_exe_components = ['VC14RedistPackage', 'ServerPackage']
-full_exe_components = ['VC14RedistPackage', 'ClientPackage', 'ServerPackage']
-nxtool_exe_components = ['VC14RedistPackage', 'NxtoolPackage']
+client_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage']
+server_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ServerPackage']
+full_exe_components =   ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage', 'ServerPackage']
+nxtool_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'NxtoolPackage']
 
 def add_wix_extensions(command):
     for ext in wix_extensions:
@@ -83,7 +83,7 @@ def get_candle_command(project, suffix, args, components):
     if suffix.startswith('nxtool'):
         command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
         command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
-        
+
     add_wix_extensions(command)
     add_components(command, common_components)
     command.append('Product-{0}.wxs'.format(project))
@@ -153,14 +153,14 @@ def create_sign_burn_exe_command_set(folder, engine_folder, exe):
         get_bundle_engine_command(engine_path, exe_path),
         get_sign_command(folder, exe)
     ]
-    
+
 def execute_command(command):
     print 'Executing command:\n{0}\n'.format(' '.join(command))
     retcode = subprocess.call(command)
     print "finished with return code {0}".format(retcode)
     if retcode != 0 and retcode != 204:
         sys.exit(1)
-    
+
 def create_commands_set(project, folder, msi, suffix=None, candle_args=None, components=None):
     if suffix is None:
         suffix = project
@@ -169,7 +169,7 @@ def create_commands_set(project, folder, msi, suffix=None, candle_args=None, com
         get_candle_command(project, suffix, candle_args, components),
         get_light_command(folder, msi, suffix)
     ]
-    
+
 def rename(folder, old_name, new_name):
     if os.path.exists(join(folder, new_name)):
         os.unlink(join(folder, new_name))
@@ -195,18 +195,18 @@ def add_build_strip_client_commands(commands):
     add_build_commands_msi_exe_generic(commands,
                 'client-only', 'client-exe',
                 client_msi_strip_folder, client_msi_name,
-                client_exe_folder, client_exe_name, 
-                ['-dNoStrip=no'], 
-                client_components, client_exe_components, 
+                client_exe_folder, client_exe_name,
+                ['-dNoStrip=no'],
+                client_components, client_exe_components,
                 engine_tmp_folder,
                 suffix='client-strip')
 
 def add_build_strip_server_commands(commands):
     add_build_commands_msi_exe_generic(commands, 'server-only', 'server-exe',
                 server_msi_strip_folder, server_msi_name,
-                server_exe_folder, server_exe_name, 
-                ['-dNoStrip=no'], 
-                server_components, server_exe_components, 
+                server_exe_folder, server_exe_name,
+                ['-dNoStrip=no'],
+                server_components, server_exe_components,
                 engine_tmp_folder,
                 suffix='server-strip')
 
@@ -216,9 +216,9 @@ def add_build_full_commands(commands):
 def add_build_nxtool_commands(commands):
     add_build_commands_msi_exe_generic(commands, 'nxtool', 'nxtool-exe',
                 nxtool_msi_folder, nxtool_msi_name,
-                nxtool_exe_folder, nxtool_exe_name, 
-                None, 
-                nxtool_components, nxtool_exe_components, 
+                nxtool_exe_folder, nxtool_exe_name,
+                None,
+                nxtool_components, nxtool_exe_components,
                 engine_tmp_folder)
 
 def main():
