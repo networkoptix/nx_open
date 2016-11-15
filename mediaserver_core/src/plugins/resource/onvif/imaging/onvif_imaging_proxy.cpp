@@ -85,7 +85,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
         if (!range)
             return;
         QnCameraAdvancedParameter param = parameters.getParameterById(id);
-        NX_ASSERT(param.isValid());
+//        NX_ASSERT(param.isValid());
         if (!param.isValid())
             return;
         param.setRange(range->Min, range->Max);

@@ -177,7 +177,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
+     * %permissions Any user if a resource is a layout and a layout is her own resource. Custom user with 'Edit camera settings' permision. Administrator.
      * %param id Unique id of the resource.
      * %// AbstractResourceManager::remove
      */
@@ -206,7 +206,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyServerAttributesAccess / ReadServerAttributesAccess
+     * %permissions Administrator
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
@@ -327,7 +327,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
+     * %permissions Administrator
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
      * %param parentId Should be empty.
      * %param name Storage name.
@@ -471,7 +471,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyCameraAttributesAccess / ReadCameraAttributesAccess
+     * %permissions Administrator or a custom user with 'Edit camera settings' permission.
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      * %param cameraName Camera name.
      * %param userDefinedGroupName Name of the user-defined camera group.
@@ -914,7 +914,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
+     * %permissions Administrator
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
@@ -972,7 +972,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions ModifyResourceAccess / ReadResourceAccess
+     * %permissions Administrator
      * %param id User unique id.
      * %// AbstractUserManager::remove
      */
@@ -1009,7 +1009,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO RemoveUserGroupAccess
+     * %permissions Administrator
      * %param id User unique id.
      * %// AbstractUserManager::removeUserGroup
      */
@@ -1057,7 +1057,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
+     * %permissions Any user if a layout is her own resource. Administrator.
      * %param[opt] id Layout unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param parentId Unique id of the user owning the layout.
@@ -1190,7 +1190,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions TODO ModifyResourceAccess / ReadResourceAccess
+     * %permissions Any user if a layout is her own resource. Administrator.
      * %param id Unique Id of the layout to be deleted.
      * %// AbstractLayoutManager::remove
      */
