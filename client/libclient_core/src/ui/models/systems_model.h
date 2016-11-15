@@ -52,6 +52,8 @@ public: // overrides
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    int getRowIndex(const QString& systemId) const;
+
 signals:
     void minimalVersionChanged();
 
