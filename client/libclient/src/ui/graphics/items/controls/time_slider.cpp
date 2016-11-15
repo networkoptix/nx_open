@@ -1819,6 +1819,7 @@ void QnTimeSlider::updateStepAnimationTargets()
     qreal prevLabelWidth = 0.0; /* - we track previous level text label widths to avoid overlapping with them */
     int minLevelStepIndexMinusOne = qMax(0, m_maxStepIndex - kNumTickmarkLevels);
 
+    int prevLevel = -1;
     for (int i = m_steps.size() - 1; i >= minLevelStepIndexMinusOne; --i)
     {
         TimeStepData& data = m_stepData[i];
@@ -1838,8 +1839,12 @@ void QnTimeSlider::updateStepAnimationTargets()
             qreal minTextStepPixels = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0) + kMinTickmarkTextSpacingPixels;
             data.targetTextOpacity = separationPixels < minTextStepPixels ? 0.0 : 1.0;
             data.targetTextOpacity *= prevTextVisible;
-            prevLabelWidth = labelWidth;
+            prevLabelWidth = prevLevel == level
+                ? qMax(labelWidth, prevLabelWidth)
+                : labelWidth;
         }
+
+        prevLevel = level;
 
         data.targetLineOpacity = qFuzzyIsNull(data.targetHeight) ? 0.0 : 1.0;
         prevTextVisible = data.targetTextOpacity;
