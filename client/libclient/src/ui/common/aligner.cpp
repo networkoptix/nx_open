@@ -37,14 +37,9 @@ QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     m_skipInvisible(false)
 {
     if (parent)
-    {
-        auto signalizer = new QnMultiEventSignalizer(this);
-        signalizer->addEventType(QEvent::LayoutRequest);
-        signalizer->addEventType(QEvent::Show);
-        connect(signalizer, &QnMultiEventSignalizer::activated, this, &QnAligner::align);
-        parent->installEventFilter(signalizer);
-    }
+        installEventHandler(parent, { QEvent::Show, QEvent::LayoutRequest }, this, &QnAligner::align);
 }
+
 
 QnAligner::~QnAligner()
 {

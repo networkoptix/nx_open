@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
+#include <utils/common/connective.h>
 
 class QnImageButtonWidget;
 class HoverFocusProcessor;
@@ -9,9 +10,9 @@ class VariantAnimator;
 
 namespace NxUi {
 
-class TitleWorkbenchPanel: public AbstractWorkbenchPanel
+class TitleWorkbenchPanel: public Connective<AbstractWorkbenchPanel>
 {
-    using base_type = AbstractWorkbenchPanel;
+    using base_type = Connective<AbstractWorkbenchPanel>;
 
     Q_OBJECT
 public:

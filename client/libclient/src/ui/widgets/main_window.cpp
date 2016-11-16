@@ -153,15 +153,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
     /* And file open events on Mac. */
-    QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
-    fileOpenSignalizer->setEventType(QEvent::FileOpen);
-    qApp->installEventFilter(fileOpenSignalizer);
-    connect(fileOpenSignalizer,             SIGNAL(activated(QObject *, QEvent *)),         this,                                   SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
+    installEventHandler(qApp, QEvent::FileOpen, this, &QnMainWindow::at_fileOpenSignalizer_activated);
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
+    connect(m_dwm, &QnDwm::compositionChanged, this, &QnMainWindow::updateDwmState);
 
     /* Set up properties. */
     setWindowTitle(QString());

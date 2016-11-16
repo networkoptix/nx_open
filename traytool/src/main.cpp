@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
 
     // Each user may have it's own traytool running.
     QtSingleApplication app(QnTraytoolAppInfo::applicationName(), argc, argv);
+    QApplication::setWindowIcon(QIcon(lit(":/logo.png")));
     QApplication::setQuitOnLastWindowClosed(false);
 
     QDir::setCurrent(QApplication::applicationDirPath());
