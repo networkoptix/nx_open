@@ -156,6 +156,7 @@ public:
     const ec2::ApiPeerData& remotePeer() const;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
+    int remotePeerProtocolVersion() const;
 
     nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
 
@@ -350,6 +351,7 @@ private:
     std::unique_ptr<nx::network::aio::Timer> m_timer;
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
+    int m_remotePeerEcProtoVersion;
 
 private:
     QnTransactionTransportBase(

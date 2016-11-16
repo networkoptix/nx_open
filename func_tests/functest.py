@@ -1250,109 +1250,28 @@ class MainFunctests(FuncTestCase):
         self._skipIfBasicFailed()
         if testMaster.unittestRollback:
             testMaster.init_rollback()
-        MergeTest_Resource().test()
+        try:
+            MergeTest_Resource().test()
+        finally:
+            if testMaster.unittestRollback:
+                doCleanUp()
 
     def SysnameTest(self):
         self._checkSkipLegacy()
         self._skipIfBasicFailed()
-        try:
-            SystemIdTest(testMaster.getConfig()).run()
-        finally:
-            if testMaster.unittestRollback:
-                doCleanUp()
+        SystemIdTest(testMaster.getConfig()).run()
+        testMaster.checkServerListStates()
 
     def ProxyTest(self):
         ""
         ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
 
 
-"""
-    def _LegacyTests(self):
-        ""
-        try:
-            config = testMaster.getConfig()
-            with LegacyTestWrapperOld(config):
-                if not testMaster.args.skiplegacy:
-
-                    print "Basic functional tests start"
-                    title = "basic functional tests"
-
-                    if the_test.result.wasSuccessful():
-                        print "Basic functional tests end"
-                        if testMaster.unittestRollback:
-                            doCleanUp(reinit=True)
-                        title = "merge test"
-                        MergeTestRun()
-                        title = "system name test"
-                        SystemNameTest(config).run()
-                    else:
-                        print "Basic functional test FAILED"
-                    if testMaster.unittestRollback:
-                        doCleanUp()
-                        need_rollback = False
-                    time.sleep(4)
-                title = "proxy test"
-                ServerProxyTest(*config.rtget('ServerList')[0:2]).run()
-        except Exception as err:
-            print "FAIL: %s failed with error: %s" % (title, err,)
-"""
-
-
 def RunByAutotest():
     """
     Used when this script is called by the autotesting script auto.py
     """
-    """-------------------
-    testMaster.args.autorollback = True
-    #config = testMaster.getConfig()
-    need_rollback = True
-    title = "functests init"
-    try:
-        print "" # FIXME add startup message
-        ret, reason = testMaster.init(notest=True)
-        if not ret:
-            print "FAIL: can't initialize the cluster test object: %s" % (reason)
-            return False
-        config = testMaster.getConfig()
-        with LegacyTestWrapperOld(config):
-            title = "connection test"
-            if not testMaster.testConnection():
-                print "FAIL: connection test"
-                return False
-            if not testMaster.args.skiplegacy:
-                title = "initial cluster test"
-                ret, reason = testMaster.initial_tests()
-                if ret == False:
-                    print "FAIL: initial cluster test: %s" % (reason)
-                    return False
-                print "Basic functional tests start"
-                title = "basic functional tests"
-                the_test = unittest.main(module=legacy_main, exit=False, argv=[sys.argv[0]],
-                                         testRunner=unittest.TextTestRunner(
-                                             stream=sys.stdout,
-                                         ))
-                if the_test.result.wasSuccessful():
-                    print "Basic functional tests end"
-                    if testMaster.unittestRollback:
-                        doCleanUp(reinit=True)
-                    title = "merge test"
-                    MergeTestRun()
-                    title = "system name test"
-                    SystemNameTest(config).run()
-                else:
-                    print "Basic functional test FAILED"
-                if testMaster.unittestRollback:
-                    doCleanUp()
-                    need_rollback = False
-                time.sleep(4)
-            title = "proxy test"
-            ServerProxyTest(*config.rtget('ServerList')[0:2]).run()
-    except Exception as err:
-        print "FAIL: %s failed with error: %s" % (title, err,)
-    finally:
-        if need_rollback and testMaster.unittestRollback:
-            doCleanUp()
-    """
+    testMaster.init(notest=True)
     CallTest(MainFunctests)
     if not testMaster.args.mainonly:
         if not testMaster.args.skiptime:
@@ -1380,16 +1299,16 @@ SimpleTestKeys = {
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
 BoxTestKeys = OrderedDict([
+    ('--mainonly', MainFunctests),
     ('--timesync', TimeSyncTest),
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
     ('--bstorage', BackupStorageTest),
     ('--msarch', MultiserverArchiveTest),
-    ('--natcon', NatConnectionTest),
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
     ('--dbup', DBTest),
-    ('--mainonly', MainFunctests),
+    ('--natcon', NatConnectionTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
@@ -1435,13 +1354,8 @@ def LegacyTestsRun(only = False, argv=[]):
 def DoTests(argv):
     print "The automatic test starts, please wait for checking cluster status, test connection and APIs and do proper rollback..."
     # initialize cluster test environment
-
     argc = len(argv)
-
-    ret, reason = testMaster.init()
-    if not ret:
-        print "Failed to initialize the cluster test object: %s" % (reason)
-        return False
+    testMaster.init()
 
     if argc == 1 and argv[0] in SimpleTestKeys:
         try:
@@ -1464,7 +1378,7 @@ def DoTests(argv):
         ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
         #FIXME no result code returning!
 
-    if argc >= 1 and argv[0] == '--legacy':
+    elif argc >= 1 and argv[0] == '--legacy':
         LegacyTestsRun(argv[1] == '--only' if argc >= 2 else False, argv)
         #FIXME no result code returning!
 
@@ -1557,7 +1471,7 @@ def parseArgs():
     #parser.add_argument()
 
     args, other = parser.parse_known_args()
-    args.natcon = '--natcon' in other # we need it as a flag
+    #args.natcon = '--natcon' in other # we need it as a flag
     #if args.log is not None and getattr(args, 'BoxTest', None) is None:
     #    print "WARNING: --log is used only with one of 'Functional test selection' arguments!"
     return args, other

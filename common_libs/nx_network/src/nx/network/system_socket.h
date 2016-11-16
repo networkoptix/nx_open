@@ -178,10 +178,6 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
 
-    virtual bool connectToIp(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
-
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -216,6 +212,9 @@ public:
     virtual bool shutdown() override;
 
 private:
+    friend class aio::AsyncSocketImplHelper<SelfType>;
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
 };

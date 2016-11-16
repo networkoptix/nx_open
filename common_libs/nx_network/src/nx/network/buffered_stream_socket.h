@@ -43,10 +43,6 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis) override;
 
-    bool connectToIp(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis) override;
-
     int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     int send(const void* buffer, unsigned int bufferLen) override;
     SocketAddress getForeignAddress() const override;

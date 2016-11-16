@@ -97,7 +97,7 @@ private:
         std::unique_ptr<nx::network::aio::Timer> timer;
         SocketAddress originalServerAddress;
         /** this address reported by socket on send completion */
-        SocketAddress resolvedServerAddress;
+        SocketAddress serverAddress;
         Message request;
 
         RequestContext();
@@ -126,7 +126,7 @@ private:
     void messageSent(
         SystemError::ErrorCode errorCode,
         nx::Buffer transactionId,
-        SocketAddress resolvedServerAddress);
+        SocketAddress serverAddress);
     void timedOut(nx::Buffer transactionId);
     void cleanupWhileInAioThread();
 };

@@ -70,10 +70,6 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
 
-    virtual bool connectToIp(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
-
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
 

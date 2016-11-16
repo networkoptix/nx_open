@@ -54,15 +54,14 @@ UDPClient::UDPClient(SocketAddress serverAddress)
 
 UDPClient::~UDPClient()
 {
-    //if not in aio thread and pleaseStop has not been called earlier - 
-        //undefined behavior can occur
     cleanupWhileInAioThread();
 }
 
 void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(
-        [handler = std::move(handler), this](){
+        [handler = std::move(handler), this]()
+        {
             cleanupWhileInAioThread();
             handler();
         });
@@ -130,17 +129,15 @@ void UDPClient::messageReceived(SocketAddress sourceAddress, Message message)
     if (requestContextIter == m_ongoingRequests.end())
     {
         //this may be late response
-        NX_LOGX(lm("Received message with from %1 with unexpected transaction id %2").
-            arg(sourceAddress.toString()).arg(message.header.transactionId),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Received message from %1 with unexpected transaction id %2")
+            .strs(sourceAddress, message.header.transactionId.toHex()), cl_logDEBUG1);
         return;
     }
 
-    if (sourceAddress != requestContextIter->second.resolvedServerAddress)
+    if (sourceAddress.toString() != requestContextIter->second.serverAddress.toString())
     {
-        NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2").
-            arg(message.header.transactionId).arg(sourceAddress.toString()),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2")
+            .strs(message.header.transactionId.toHex(), sourceAddress), cl_logDEBUG1);
         return;
     }
 
@@ -209,7 +206,7 @@ void UDPClient::sendRequestAndStartTimer(
 void UDPClient::messageSent(
     SystemError::ErrorCode errorCode,
     nx::Buffer transactionId,
-    SocketAddress resolvedServerAddress)
+    SocketAddress serverAddress)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     if (requestContextIter == m_ongoingRequests.end())
@@ -235,7 +232,7 @@ void UDPClient::messageSent(
     }
 
     //success
-    requestContextIter->second.resolvedServerAddress = std::move(resolvedServerAddress);
+    requestContextIter->second.serverAddress = std::move(serverAddress);
 }
 
 void UDPClient::timedOut(nx::Buffer transactionId)
@@ -260,20 +257,8 @@ void UDPClient::timedOut(nx::Buffer transactionId)
 
 void UDPClient::cleanupWhileInAioThread()
 {
-    //reporting failure for all ongoing requests
-    std::vector<RequestCompletionHandler> completionHandlers;
-    for (auto& requestData : m_ongoingRequests)
-    {
-        completionHandlers.push_back(
-            std::move(requestData.second.completionHandler));
-    }
-    //timers can be safely removed since we are in aio thread
+    // Timers can be safely removed since we are in aio thread.
     m_ongoingRequests.clear();
-
-    for (auto& completionHandler : completionHandlers)
-        completionHandler(
-            SystemError::interrupted,
-            Message());
 }
 
 }   //stun
