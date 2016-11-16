@@ -410,6 +410,14 @@
             "isRTSPSupported": false
     	},
         {
+            "keys": ["ArecontVision|20185DN"],
+            "forceRtspSupport": true
+        },
+        {
+            "keys": ["ArecontVision|*"],
+            "forceRtcpReports": true
+        },
+        {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
                 "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H", 

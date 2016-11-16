@@ -75,23 +75,27 @@ namespace
 
 // --------------------- RTPIODevice --------------------------
 
-RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
+RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort, quint16 rtcpPort):
     m_owner(owner),
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0),
     ssrc(0),
-    m_rtpTrackNum(0)
+    m_rtpTrackNum(0),
+    m_mediaPort(mediaPort),
+    m_remoteEndpointRtcpPort(rtcpPort),
+    m_reportTimerStarted(false),
+    m_forceRtcpReports(false)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode)
     {
         m_mediaSocket = SocketFactory::createDatagramSocket();
-        m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_mediaSocket->bind(SocketAddress(HostAddress::anyHost, 0));
         m_mediaSocket->setRecvTimeout(500);
 
         m_rtcpSocket = SocketFactory::createDatagramSocket();
-        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_rtcpSocket->bind(SocketAddress(HostAddress::anyHost, 0));
         m_rtcpSocket->setRecvTimeout(500);
     }
 }
@@ -137,6 +141,8 @@ void RTPIODevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
+    
+    bool rtcpReportAlreadySent = false;
     while( m_rtcpSocket->hasData() )
     {
         SocketAddress senderEndpoint;
@@ -156,7 +162,37 @@ void RTPIODevice::processRtcpData()
                 m_statistic = stats;
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
+            {
                 m_rtcpSocket->send(sendBuffer, outBufSize);
+                rtcpReportAlreadySent = true;
+            }
+        }
+    }
+
+    if (m_forceRtcpReports && !rtcpReportAlreadySent)
+    {
+        if (!m_reportTimerStarted)
+        {
+            m_reportTimer.start();
+            m_reportTimerStarted = true;
+        }
+
+        if (m_reportTimer.elapsed() > 5000)
+        {
+            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            if (outBufSize > 0)
+            {
+                auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
+                if (!m_rtcpSocket->setDestAddr(remoteEndpoint))
+                {
+                    qWarning() 
+                        << "RTPIODevice::processRtcpData(): setDestAddr() failed: " 
+                        << SystemError::getLastOSErrorText();
+                }
+                m_rtcpSocket->send(sendBuffer, outBufSize);
+            }
+
+            m_reportTimer.restart();
         }
     }
 }
@@ -1128,7 +1164,15 @@ bool RTPSession::sendSetup()
                         }
                     }
                 }
-
+                else if (tmpList[k].startsWith(QLatin1String("server_port"))) {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        tmpParams = tmpParams[1].split(QLatin1String("-"));
+                        if (tmpParams.size() == 2) {
+                            trackInfo->setRemoteEndpointRtcpPort(tmpParams[1].toInt());
+                        }
+                    }
+                }
             }
         }
 
@@ -1749,7 +1793,10 @@ QAuthenticator RTPSession::getAuth() const
     return m_auth;
 }
 
-
+QUrl RTPSession::getUrl() const
+{
+    return m_url;
+}
 void RTPSession::setAudioEnabled(bool value)
 {
     m_isAudioEnabled = value;
