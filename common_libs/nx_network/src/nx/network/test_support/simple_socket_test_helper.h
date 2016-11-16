@@ -76,7 +76,7 @@ void syncSocketServerMainFunc(
         startedPromise->set_value(std::move(serverAddress));
     }
 
-    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 20)) << lastError();
+    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 10)) << lastError();
     for (int i = clientCount; i > 0; --i)
     {
         std::unique_ptr<AbstractStreamSocket> client(server->accept());
