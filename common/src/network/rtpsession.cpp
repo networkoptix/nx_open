@@ -80,10 +80,10 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort, quin
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0),
-    ssrc(0),
-    m_rtpTrackNum(0),
     m_mediaPort(mediaPort),
     m_remoteEndpointRtcpPort(rtcpPort),
+    ssrc(0),
+    m_rtpTrackNum(0),
     m_reportTimerStarted(false),
     m_forceRtcpReports(false)
 {

@@ -102,9 +102,6 @@ public:
     explicit RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
     virtual ~RTPIODevice();
     virtual qint64 read(char * data, qint64 maxSize );
-
-    void init();
-
     const RtspStatistic& getStatistic() { return m_statistic;}
     void setStatistic(const RtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
