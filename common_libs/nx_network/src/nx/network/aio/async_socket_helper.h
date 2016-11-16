@@ -132,33 +132,41 @@ public:
         }
     }
 
+    void resolve(
+        const HostAddress& address,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
+    {
+        m_addressResolverIsInUse = true;
+        SocketGlobals::addressResolver().dnsResolver().resolveAsync(
+            address.toString(),
+            [this, handler = std::move(handler)](
+                SystemError::ErrorCode code, std::deque<HostAddress> ips)
+            {
+                m_addressResolverIsInUse = false;
+                handler(code, std::move(ips));
+            },
+            m_ipVersion,
+            this);
+    }
+
     void connectAsync(
-        const SocketAddress& address,
+        const SocketAddress& endpoint,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         NX_ASSERT(isNonBlockingMode());
-        if (address.address.isIpAddress())
-            return connectToIpAsync(address, std::move(handler));
+        if (endpoint.address.isIpAddress())
+            return connectToIpAsync(endpoint, std::move(handler));
 
-        m_addressResolverIsInUse = true;
-        SocketGlobals::addressResolver().dnsResolver().resolveAsync(
-            address.address.toString(),
-            [this, address, handler = std::move(handler)](
+        resolve(
+            endpoint.address,
+            [this, port = endpoint.port, handler = std::move(handler)](
                 SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
                     return this->post([h = std::move(handler), code]() { h(code); });
 
-                if (ips.empty())
-                {
-                    NX_ASSERT(false);
-                    return this->post([h = std::move(handler)]() { h(SystemError::hostNotFound); });
-                }
-
-                connectToIpsAsync(std::move(ips), address.port, std::move(handler));
-            },
-            m_ipVersion,
-            this);
+                connectToIpsAsync(std::move(ips), port, std::move(handler));
+            });
     }
 
     void connectToIpsAsync(

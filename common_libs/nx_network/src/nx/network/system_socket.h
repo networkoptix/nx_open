@@ -32,30 +32,20 @@ typedef CommonSocketImpl PollableSystemSocketImpl;
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
-}   //aio
+} // namespace aio
 
 #ifdef Q_OS_WIN
 typedef int socklen_t;
 #endif
 
-struct SockAddrPtr
+struct NX_NETWORK_API SystemSocketAddress
 {
     std::shared_ptr<const sockaddr> ptr;
     socklen_t size;
 
-    SockAddrPtr():
-        ptr(nullptr),
-        size(0)
-    {
-    }
-
-    template<typename T>
-    SockAddrPtr(T* addr):
-        ptr((sockaddr*)addr),
-        size(sizeof(T))
-    {
-        memset(addr, 0, size);
-    }
+    SystemSocketAddress();
+    SystemSocketAddress(SocketAddress address, int ipVersion);
+    operator SocketAddress() const;
 };
 
 /**
@@ -139,7 +129,6 @@ public:
         const QString &service,
         const QString &protocol = QLatin1String("tcp"));
 
-    SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
 
 protected:
@@ -211,7 +200,7 @@ public:
     virtual bool close() override;
     virtual bool shutdown() override;
 
-private:
+protected:
     friend class aio::AsyncSocketImplHelper<SelfType>;
     bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
 
@@ -375,6 +364,7 @@ public:
 
     //!Implementation of AbstractDatagramSocket::setDestAddr
     virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
+
     //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
@@ -411,7 +401,7 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    SockAddrPtr m_destAddr;
+    SystemSocketAddress m_destAddr;
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();
