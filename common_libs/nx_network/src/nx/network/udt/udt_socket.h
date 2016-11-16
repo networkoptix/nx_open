@@ -112,10 +112,6 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
 
-    virtual bool connectToIp(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
-
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //  What's difference between foreign address with peer address 
@@ -150,6 +146,9 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
+    friend class aio::AsyncSocketImplHelper<UdtStreamSocket>;
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay;
 

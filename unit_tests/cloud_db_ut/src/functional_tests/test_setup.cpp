@@ -26,13 +26,11 @@ CdbFunctionalTest::~CdbFunctionalTest()
 AccountWithPassword CdbFunctionalTest::addActivatedAccount2()
 {
     //creating two accounts
-    api::AccountData account1;
-    std::string account1Password;
+    AccountWithPassword account;
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
-        CdbLauncher::addActivatedAccount(&account1, &account1Password));
-
-    return AccountWithPassword{ std::move(account1), std::move(account1Password) };
+        CdbLauncher::addActivatedAccount(&account, &account.password));
+    return account;
 }
 
 api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
@@ -42,7 +40,7 @@ api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
     api::SystemData system1;
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
-        CdbLauncher::bindRandomSystem(account.data.email, account.password, &system1));
+        CdbLauncher::bindRandomSystem(account.email, account.password, &system1));
     return system1;
 }
 
@@ -55,10 +53,10 @@ void CdbFunctionalTest::shareSystemEx(
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
         CdbLauncher::shareSystem(
-            from.data.email,
+            from.email,
             from.password,
             what.id,
-            to.data.email,
+            to.email,
             targetRole));
 }
 
@@ -71,7 +69,7 @@ void CdbFunctionalTest::shareSystemEx(
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
         CdbLauncher::shareSystem(
-            from.data.email,
+            from.email,
             from.password,
             what.id,
             emailToShareWith,

@@ -56,15 +56,15 @@ void DnsResolver::resolveAsync(
     const QString& hostName, Handler handler, int ipVersion, RequestId requestId)
 {
     QnMutexLocker lk(&m_mutex);
-    m_taskQueue.push_back(ResolveTask(
+    m_taskdeque.push_back(ResolveTask(
         hostName, std::move(handler), requestId, ++m_currentSequence, ipVersion));
 
     m_cond.wakeAll();
 }
 
-static DnsResolver::HostAddresses convertAddrInfo(addrinfo* addressInfo)
+static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
 {
-    DnsResolver::HostAddresses ipAddresses;
+    std::vector<HostAddress> ipAddresses;
     for (addrinfo* info = addressInfo; info; info = info->ai_next)
     {
         HostAddress newAddress;
@@ -91,21 +91,24 @@ static DnsResolver::HostAddresses convertAddrInfo(addrinfo* addressInfo)
     if (ipAddresses.empty())
         SystemError::setLastErrorCode(SystemError::hostNotFound);
 
-    return ipAddresses;
+    std::deque<HostAddress> deque;
+    for (auto& a: ipAddresses)
+        deque.push_back(a);
+
+    return std::move(deque);
 }
 
-DnsResolver::HostAddresses
-    DnsResolver::resolveSync(const QString& hostName, int ipVersion)
+std::deque<HostAddress> DnsResolver::resolveSync(const QString& hostName, int ipVersion)
 {
     auto resultCode = SystemError::noError;
     const auto guard = makeScopedGuard([&](){ SystemError::setLastErrorCode(resultCode); });
     if (hostName.isEmpty())
     {
         resultCode = SystemError::invalidData;
-        return HostAddresses();
+        return std::deque<HostAddress>();
     }
 
-    HostAddresses ipAddresses = getEtcHost(hostName, ipVersion);
+    std::deque<HostAddress> ipAddresses = getEtcHost(hostName, ipVersion);
     if (!ipAddresses.empty())
         return ipAddresses;
 
@@ -143,7 +146,7 @@ DnsResolver::HostAddresses
             default: resultCode = SystemError::dnsServerFailure; break;
         };
         
-        return HostAddresses();
+        return std::deque<HostAddress>();
     }
 
     std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
@@ -158,7 +161,7 @@ void DnsResolver::cancel(RequestId requestId, bool waitForRunningHandlerCompleti
 {
     QnMutexLocker lk( &m_mutex );
     // TODO: #ak improve search complexity
-    m_taskQueue.remove_if(
+    m_taskdeque.remove_if(
         [requestId](const ResolveTask& task){ return task.requestId == requestId; } );
 
     // We are waiting only for handler completion but not resolveSync completion.
@@ -172,13 +175,13 @@ bool DnsResolver::isRequestIdKnown(RequestId requestId) const
     //TODO #ak improve search complexity
     return m_runningTaskRequestId == requestId ||
         std::find_if(
-            m_taskQueue.cbegin(), m_taskQueue.cend(),
+            m_taskdeque.cbegin(), m_taskdeque.cend(),
             [requestId](const ResolveTask& task) { return task.requestId == requestId; }
-        ) != m_taskQueue.cend();
+        ) != m_taskdeque.cend();
 }
 
 
-void DnsResolver::addEtcHost(const QString& name, HostAddresses addresses)
+void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
 {
     QnMutexLocker lk(&m_ectHostsMutex);
     m_etcHosts[name] = std::move(addresses);
@@ -190,19 +193,18 @@ void DnsResolver::removeEtcHost(const QString& name)
     m_etcHosts.erase(name);
 }
 
-DnsResolver::HostAddresses DnsResolver::getEtcHost(
-    const QString& name, int ipVersion)
+std::deque<HostAddress> DnsResolver::getEtcHost(const QString& name, int ipVersion)
 {
     QnMutexLocker lk(&m_ectHostsMutex);
     const auto it = m_etcHosts.find(name);
     if (it == m_etcHosts.end())
-        return HostAddresses();
+        return std::deque<HostAddress>();
 
-    HostAddresses ipAddresses;
+    std::deque<HostAddress> ipAddresses;
     for (const auto address: it->second)
     {
         if (ipVersion != AF_INET || address.ipV4())
-            ipAddresses.push_back(address);
+             ipAddresses.push_back(address);
     }
 
     return ipAddresses;
@@ -213,13 +215,13 @@ void DnsResolver::run()
     QnMutexLocker lk(&m_mutex);
     while(!m_terminated)
     {
-        while (m_taskQueue.empty() && !m_terminated)
+        while (m_taskdeque.empty() && !m_terminated)
             m_cond.wait(&m_mutex);
 
         if (m_terminated)
             break;  //not completing posted tasks
 
-        ResolveTask task = std::move(m_taskQueue.front());
+        ResolveTask task = std::move(m_taskdeque.front());
         lk.unlock();
         {
             auto result = resolveSync(task.hostAddress, task.ipVersion);
@@ -227,11 +229,11 @@ void DnsResolver::run()
             if (task.requestId)
             {
                 lk.relock();
-                if (m_taskQueue.empty() || (m_taskQueue.front().sequence != task.sequence))
+                if (m_taskdeque.empty() || (m_taskdeque.front().sequence != task.sequence))
                     continue;   //current task has been cancelled
 
                 m_runningTaskRequestId = task.requestId;
-                m_taskQueue.pop_front();
+                m_taskdeque.pop_front();
                 lk.unlock();
             }
 

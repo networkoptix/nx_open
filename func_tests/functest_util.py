@@ -696,6 +696,7 @@ class ClusterWorker(object):
     def startThreads(self):
         for _ in xrange(self._threadNum):
             t = threading.Thread(target=self._worker, args=(_,))
+            t.daemon = False
             t.start()
             self._threadList.append(t)
 
@@ -821,7 +822,7 @@ def real_caps(str):
 
 def textdiff(data0, data1, src0, src1):
     ud = difflib.unified_diff(data0.splitlines(True), data1.splitlines(True), src0, src1, n=5)
-    return ''.join(ud)
+    return ''.join(line if line.endswith('\n') else line+'\n' for line in ud)
 
 
 def sendRequest(lock, url, data, notify=False):
@@ -855,7 +856,6 @@ def generateMehodKey(method, user, digest, nonce):
     return urllib.quote(base64.urlsafe_b64encode("%s:%s:%s" % (user.lower(), nonce, authDigest)))
 
 def generateKey(method, user, password, nonce, realm):
-    print "GEN KEY:", method, user, password, nonce, realm
     m = hashlib.md5()
     m.update("%s:%s:%s" % (user.lower(), realm, password) )
     digest = m.hexdigest()
