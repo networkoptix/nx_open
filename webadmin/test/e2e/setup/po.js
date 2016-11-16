@@ -70,6 +70,12 @@ var Page = function () {
 
         this.helper.waitIfNotPresent(this.setupDialog, 15000);
         browser.refresh();
+    };
+
+    this.pressEnter = function () {
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
     }
 };
 
