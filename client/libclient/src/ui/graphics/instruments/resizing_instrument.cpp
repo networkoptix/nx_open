@@ -49,10 +49,15 @@ GraphicsWidget* open(QGraphicsWidget* widget)
     return static_cast<GraphicsWidget*>(widget);
 }
 
-void safeUnsetCursor(QGraphicsWidget* widget)
+void safeUnsetCursor(QGraphicsWidgetPtr widget)
 {
     if (widget)
         widget->unsetCursor();
+}
+
+WidgetsList subtractWidgets(const WidgetsList& first, const WidgetsList& second)
+{
+    return first.toSet().subtract(second.toSet()).toList();
 }
 
 } // anonymous namespace
@@ -213,7 +218,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     const auto cursor = QnCursorCache::instance()->cursor(cursorShape, rotation, 5.0);
 
     const auto newAffected = getAffectedWidgets(viewport, correctedPos);
-    const auto lostWidgets = subtructWidgets(m_affectedWidgets, newAffected);
+    const auto lostWidgets = subtractWidgets(m_affectedWidgets, newAffected);
     for (const auto& lost: lostWidgets)
         safeUnsetCursor(lost);
 
@@ -228,13 +233,6 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
 
     event->accept();
     return false;
-}
-
-ResizingInstrument::WidgetsList ResizingInstrument::subtructWidgets(
-    const WidgetsList& first,
-    const WidgetsList& second)
-{
-    return first.toSet().subtract(second.toSet()).toList();
 }
 
 void ResizingInstrument::startDragProcess(DragInfo* info)
@@ -441,11 +439,11 @@ Qt::WindowFrameSection ResizingInstrument::queryFrameSection(
         itemPos - QPointF(radius, radius), QSizeF(2 * radius, 2 * radius)));
 }
 
-QList<ResizingInstrument::QGraphicsWidgetPtr> ResizingInstrument::getAffectedWidgets(
+WidgetsList ResizingInstrument::getAffectedWidgets(
     QWidget* viewport,
     const QPoint& pos) const
 {
-    QList<QGraphicsWidgetPtr> result;
+    WidgetsList result;
 
     if (!dragProcessor()->isWaiting())
         return result;
