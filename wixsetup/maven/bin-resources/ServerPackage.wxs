@@ -17,7 +17,7 @@
     <Fragment Id='FragmentConditions'>
         <?include BuildVars.wxi ?>
 
-        <?define CloudHostIsDifferent="(CLOUD_HOST <> "" AND CLOUD_HOST <> "$(var.cloudHost)")" ?>
+        <?define CloudHostIsDifferent="(CloudHost <> "" AND CloudHost <> "$(var.cloudHost)")" ?>
 
         <util:RegistrySearch
           Id='SearchForIsConnectedToCloud' 
@@ -26,6 +26,16 @@
           Root="HKLM"
           Key="$(var.ServerRegPath)" 
           Value="isConnectedToCloud"
+          Format="raw"
+          Win64="yes"/>
+
+        <util:RegistrySearch
+          Id='SearchForCloudHost' 
+          Variable="CloudHost" 
+          Result="value"
+          Root="HKLM"
+          Key="$(var.ServerRegPath)" 
+          Value="cloudHost"
           Format="raw"
           Win64="yes"/>
 
