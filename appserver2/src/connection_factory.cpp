@@ -863,7 +863,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * hash data with salt
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %Return object in the requested format. If id parameter is specified, the list contains only one
+     * %return Return object in the requested format. If id parameter is specified, the list contains only one
      * object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUsers
      */
@@ -873,7 +873,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return user groups registered in the system.
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %Return object in the requested format. If id parameter is specified, the list contains only one
+     * %return Return object in the requested format. If id parameter is specified, the list contains only one
      * object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUserGroups
      */
