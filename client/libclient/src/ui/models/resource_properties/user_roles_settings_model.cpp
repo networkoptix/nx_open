@@ -130,6 +130,9 @@ void QnUserRolesSettingsModel::setRoleName(const QString& value)
 bool QnUserRolesSettingsModel::isRoleValid(const ec2::ApiUserGroupData& role) const
 {
     const auto name = role.name.trimmed().toLower();
+    if (name.isEmpty())
+        return false;
+
     if (m_predefinedNames.contains(name))
         return false;
 

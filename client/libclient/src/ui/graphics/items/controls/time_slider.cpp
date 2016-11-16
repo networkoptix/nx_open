@@ -1828,11 +1828,14 @@ void QnTimeSlider::updateStepAnimationTargets()
         int level = tickmarkLevel(i);
         data.targetHeight = separationPixels >= kMinTickmarkLineStepPixels ? kTickmarkLengthPixels[level] : 0.0;
 
+        qreal speedFactor = qMax(1.0, m_msecsPerPixel / m_animationUpdateMSecsPerPixel);
         qreal labelWidth = data.textWidthToHeight * kTickmarkFontHeights[level];
+
         if (level > kMaxDisplayedTextLevel)
         {
             data.targetHeight *= prevTextVisible;
             data.targetTextOpacity = 0.0;
+            speedFactor *= qPow(2.0, level - kMaxDisplayedTextLevel);
         }
         else
         {
@@ -1850,9 +1853,12 @@ void QnTimeSlider::updateStepAnimationTargets()
         prevTextVisible = data.targetTextOpacity;
 
         /* Compute speeds. */
-        data.heightSpeed = qMax(data.heightSpeed, speed(data.currentHeight, data.targetHeight, kTickmarkHeightAnimationMs));
-        data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speed(data.currentLineOpacity, data.targetLineOpacity, kTickmarkOpacityAnimationMs));
-        data.textOpacitySpeed = qMax(data.textOpacitySpeed, speed(data.currentTextOpacity, data.targetTextOpacity, kTickmarkOpacityAnimationMs));
+        data.heightSpeed = qMax(data.heightSpeed, speedFactor *
+            speed(data.currentHeight, data.targetHeight, kTickmarkHeightAnimationMs));
+        data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speedFactor *
+            speed(data.currentLineOpacity, data.targetLineOpacity, kTickmarkOpacityAnimationMs));
+        data.textOpacitySpeed = qMax(data.textOpacitySpeed, speedFactor *
+            speed(data.currentTextOpacity, data.targetTextOpacity, kTickmarkOpacityAnimationMs) * speedFactor);
     }
 
     /* Clean up remaining steps. */

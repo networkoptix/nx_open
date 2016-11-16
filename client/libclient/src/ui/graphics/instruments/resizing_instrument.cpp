@@ -49,7 +49,23 @@ GraphicsWidget* open(QGraphicsWidget* widget)
     return static_cast<GraphicsWidget*>(widget);
 }
 
+void safeUnsetCursor(QGraphicsWidgetPtr widget)
+{
+    if (widget)
+        widget->unsetCursor();
+}
+
+WidgetsList subtractWidgets(const WidgetsList& first, const WidgetsList& second)
+{
+    return first.toSet().subtract(second.toSet()).toList();
+}
+
 } // anonymous namespace
+
+uint qHash(const QPointer<QGraphicsWidget>& widget)
+{
+    return ::qHash(widget.data());
+}
 
 // -------------------------------------------------------------------------- //
 // ResizingInfo
@@ -181,11 +197,8 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     bool needUnsetCursor = !widget || oldTargetWidget != widget || section == Qt::NoSection;
     if (needUnsetCursor)
     {
-        for (auto w: m_affectedWidgets)
-        {
-            if (w)
-                w->unsetCursor();
-        }
+        for (const auto& w: m_affectedWidgets)
+            safeUnsetCursor(w);
         m_affectedWidgets.clear();
     }
 
@@ -204,9 +217,14 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
         widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())) * 180.0 / M_PI;
     const auto cursor = QnCursorCache::instance()->cursor(cursorShape, rotation, 5.0);
 
-    m_affectedWidgets = getAffectedWidgets(viewport, correctedPos);
+    const auto newAffected = getAffectedWidgets(viewport, correctedPos);
+    const auto lostWidgets = subtractWidgets(m_affectedWidgets, newAffected);
+    for (const auto& lost: lostWidgets)
+        safeUnsetCursor(lost);
+
+    m_affectedWidgets = newAffected;
     NX_ASSERT(m_affectedWidgets.last() == widget);
-    for (auto w: m_affectedWidgets)
+    for (auto w : m_affectedWidgets)
     {
         NX_ASSERT(w);
         if (w)
@@ -421,11 +439,11 @@ Qt::WindowFrameSection ResizingInstrument::queryFrameSection(
         itemPos - QPointF(radius, radius), QSizeF(2 * radius, 2 * radius)));
 }
 
-QList<ResizingInstrument::QGraphicsWidgetPtr> ResizingInstrument::getAffectedWidgets(
+WidgetsList ResizingInstrument::getAffectedWidgets(
     QWidget* viewport,
     const QPoint& pos) const
 {
-    QList<QGraphicsWidgetPtr> result;
+    WidgetsList result;
 
     if (!dragProcessor()->isWaiting())
         return result;

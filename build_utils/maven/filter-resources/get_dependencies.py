@@ -26,7 +26,6 @@ DEPENDENCY_VERSIONS = {
     "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
     "server-external": "${server-external.version}",
-    "server-external-${branch}": "${server-external.version}",
     "help": "${help.version}"
 }
 

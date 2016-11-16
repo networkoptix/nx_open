@@ -53,10 +53,7 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     connect(tableView, SIGNAL(changeDate(const QDate &, bool)), this, SIGNAL(dateClicked(const QDate &)));
     //setPaletteColor(tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
 
-    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
-    signalizer->setEventType(QEvent::Paint);
-    tableView->viewport()->installEventFilter(signalizer);
-    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
+    installEventHandler(tableView->viewport(), QEvent::Paint, this, &QnCalendarWidget::updateCurrentTime);
 
     QAbstractItemModel *model = tableView->model();
     connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));

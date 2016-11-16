@@ -54,10 +54,7 @@ public:
 
         updateCursor();
 
-        auto clickSignalizer = new QnSingleEventSignalizer(q);
-        clickSignalizer->setEventType(QEvent::MouseButtonPress);
-        label->installEventFilter(clickSignalizer);
-        connect(clickSignalizer, &QnSingleEventSignalizer::activated, q,
+        installEventHandler(label, QEvent::MouseButtonPress, q,
             [this](QObject* sender, QEvent* event)
             {
                 Q_UNUSED(sender);
