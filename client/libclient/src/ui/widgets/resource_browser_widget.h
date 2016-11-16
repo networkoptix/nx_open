@@ -27,6 +27,7 @@ class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
 class HoverFocusProcessor;
+class QnAbstractEventSignalizer;
 
 class QnResourceCriterion;
 class QnResourcePreviewWidget;
@@ -184,6 +185,7 @@ private:
     QnResourceTreeModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
+    QnAbstractEventSignalizer* m_scrollbarSignalizer;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
 };
