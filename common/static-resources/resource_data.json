@@ -337,7 +337,8 @@
                 "Axis|AXISP7016*",
                 "Axis|P7214*",
                 "Axis|M70114*",
-                "Axis|P7016*"
+                "Axis|P7016*",
+                "UNIVIEW|DVS4116"
             ],
             "analogEncoder": true
         },
@@ -1516,7 +1517,7 @@
 		},
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR"
+                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
@@ -1562,6 +1563,11 @@
                 "user": "root",
                 "password": "pass"
             }
+        },
+        {
+            "keys": ["DW|DWC-MV950TIR"],
+            "forceOnvifAdvancedParameters": true
+
         }
     ]
 }
