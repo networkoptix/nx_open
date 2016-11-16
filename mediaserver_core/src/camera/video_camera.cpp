@@ -259,14 +259,14 @@ void QnVideoCameraGopKeeper::clearVideoData()
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 :
     m_resource(resource),
+    m_primaryGopKeeper(nullptr),
+    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
     m_hiStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
-        nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
-    m_primaryGopKeeper(nullptr),
-    m_secondaryGopKeeper(nullptr)
+        nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
     //ensuring that vectors will not take much memory
     static_assert(
