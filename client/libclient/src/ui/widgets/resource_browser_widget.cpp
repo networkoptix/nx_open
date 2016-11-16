@@ -220,8 +220,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),
     m_tooltipWidget(nullptr),
-    m_hoverProcessor(nullptr),
-    m_scrollbarSignalizer(nullptr)
+    m_hoverProcessor(nullptr)
 {
     ui->setupUi(this);
 
@@ -278,7 +277,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         &QnResourceBrowserWidget::updateIcons);
 
-    m_scrollbarSignalizer = installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
+    installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
         ui->searchTreeWidget->treeView()->verticalScrollBar() }, { QEvent::Show, QEvent::Hide },
         this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
@@ -292,7 +291,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 QnResourceBrowserWidget::~QnResourceBrowserWidget()
 {
     disconnect(workbench(), nullptr, this, nullptr);
-    disconnect(m_scrollbarSignalizer, nullptr, this, nullptr);
 
     at_workbench_currentLayoutAboutToBeChanged();
 

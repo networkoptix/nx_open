@@ -236,6 +236,12 @@ QnWorkbenchUi::~QnWorkbenchUi()
      * the ui machinery is shutting down. */
     disconnectAll();
 
+    delete m_calendar;
+    delete m_notifications;
+    delete m_title;
+    delete m_tree;
+    delete m_timeline;
+
     delete m_controlsWidget;
 }
 
