@@ -30,6 +30,12 @@ std::string lastError() { return SystemError::getLastOSErrorText().toStdString()
 
 } // namespace
 
+enum class ActionOnReadWriteError
+{
+    ignore,
+    triggerAssert
+};
+
 template<typename SocketType>
 QByteArray readNBytes(SocketType* clientSocket, int count)
 {
@@ -59,7 +65,7 @@ void syncSocketServerMainFunc(
     int clientCount,
     ServerSocketType server,
     nx::utils::promise<SocketAddress>* startedPromise,
-    bool ignoreReadWriteError = false)
+    ActionOnReadWriteError actionOnReadWriteError)
 {
     ASSERT_TRUE(server->setReuseAddrFlag(true)) << lastError();
     ASSERT_TRUE(server->bind(endpointToBindTo)) << lastError();
@@ -80,7 +86,7 @@ void syncSocketServerMainFunc(
     for (int i = clientCount; i > 0; --i)
     {
         std::unique_ptr<AbstractStreamSocket> client(server->accept());
-        if (ignoreReadWriteError && !client)
+        if (actionOnReadWriteError == ActionOnReadWriteError::ignore && !client)
             continue;
 
         ASSERT_TRUE(client.get()) << lastError() << " on " << i;
@@ -91,14 +97,14 @@ void syncSocketServerMainFunc(
             continue;
 
         const auto incomingMessage = readNBytes(client.get(), testMessage.size());
-        if (!ignoreReadWriteError)
+        if (actionOnReadWriteError == ActionOnReadWriteError::triggerAssert)
         {
             ASSERT_TRUE(!incomingMessage.isEmpty()) << lastError();
             ASSERT_EQ(testMessage, incomingMessage);
         }
 
         const int bytesSent = client->send(testMessage);
-        if (!ignoreReadWriteError)
+        if (actionOnReadWriteError == ActionOnReadWriteError::triggerAssert)
             ASSERT_NE(-1, bytesSent) << lastError();
 
         //waiting for connection to be closed by client
@@ -137,7 +143,7 @@ void socketSimpleSync(
         clientCount,
         std::move(server),
         &promise,
-        false);
+        ActionOnReadWriteError::triggerAssert);
 
     auto serverAddress = promise.get_future().get();
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -592,7 +598,7 @@ void socketShutdown(
 {
     SocketAddress endpointToBindToTo = SocketAddress::anyPrivateAddress;
 
-    // Taks amazingly long with UdtSocket
+    // Takes amazingly long with UdtSocket.
     const auto repeatCount = useAsyncPriorSync ? 5 : 14;
     for (int i = 0; i < repeatCount; ++i)
     {
@@ -605,7 +611,7 @@ void socketShutdown(
             1,
             serverMaker(),
             &promise,
-            true);  //this test shuts down socket, so any server socket operation may fail 
+            ActionOnReadWriteError::ignore);  //this test shuts down socket, so any server socket operation may fail 
                     //at any moment, so ignoring errors in serverThread.
                     //Testing that shutdown interrupts client socket operations
 
@@ -634,12 +640,12 @@ void socketShutdown(
                         *endpointToConnectTo,
                         [&](SystemError::ErrorCode code)
                         {
-                            ASSERT_EQ(code, SystemError::noError);
+                            ASSERT_EQ(SystemError::noError, code);
                             client->sendAsync(
                                 kTestMessage,
                                 [&](SystemError::ErrorCode code, size_t /*size*/)
                                 {
-                                    ASSERT_EQ(code, SystemError::noError);
+                                    ASSERT_EQ(SystemError::noError, code);
                                     client->post(
                                         [&]() { asyncDone.set_value(); });
                                 });
@@ -685,6 +691,7 @@ void socketShutdown(
             //testing that shutdown interrupts recv call
             client->shutdown();
         }
+
         ASSERT_EQ(
             std::future_status::ready,
             recvExitedPromise.get_future().wait_for(std::chrono::seconds(1)));
