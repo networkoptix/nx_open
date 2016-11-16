@@ -43,8 +43,8 @@ public:
         SocketAttributes socketAttributes,
         OutgoingTunnel::NewConnectionHandler handler);
 
-    /** Returns designated ID or generates a random one. */
-    String getOrCreateSelfPeerId();
+    /** Returns peer Id for cloud connect. */
+    String selfPeerId() const;
 
     /**
      * Sould be called somewhere in every module, so this Id is useful for debug.
@@ -56,7 +56,8 @@ public:
 private:
     typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
 
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
+    mutable bool m_isSelfPeerIdDesignated;
     String m_selfPeerId;
     TunnelDictionary m_pool;
     bool m_terminated;

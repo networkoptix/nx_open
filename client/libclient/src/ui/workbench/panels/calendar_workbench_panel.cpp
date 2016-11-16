@@ -86,18 +86,12 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
         &CalendarWorkbenchPanel::updateControlsGeometry);
 
     /* Hide pin/unpin button when any child line edit is visible: */
-    auto showHideSignalizer = new QnMultiEventSignalizer(this);
-    showHideSignalizer->addEventType(QEvent::Show);
-    showHideSignalizer->addEventType(QEvent::Hide);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(m_widget->findChildren<QLineEdit*>(), { QEvent::Show, QEvent::Hide }, this,
         [this](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);
             m_pinButton->setVisible(event->type() == QEvent::Hide);
         });
-
-    for (auto lineEdit : m_widget->findChildren<QLineEdit*>())
-        lineEdit->installEventFilter(showHideSignalizer);
 
     action(QnActions::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);

@@ -812,7 +812,7 @@ api::ResultCode CdbLauncher::recordUserSessionStart(
     const std::string& systemId)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(account.data.email, account.password);
+    connection->setCredentials(account.email, account.password);
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode) =

@@ -40,31 +40,17 @@ ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const QnTransaction<ApiIdData>& tran,
-    const AbstractECConnectionPtr& connection,
+    const AbstractECConnectionPtr& /*connection*/,
     std::list<std::function<void()>>* const transactionsToSend)
 {
     ApiResourceParamWithRefDataList resourceParams;
     dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
 
-    ErrorCode errorCode = processMultiUpdateSync(
+    return processMultiUpdateSync(
         ApiCommand::removeResourceParam,
         tran.transactionType,
         resourceParams,
         transactionsToSend);
-
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    for (const auto& param : resourceParams)
-    {
-        QnTransaction<ApiResourceParamWithRefData> removeParamTran = 
-            createTransaction(
-                ApiCommand::Value::removeResourceParam,
-                param);
-        triggerNotification(connection, removeParamTran);
-    }
-
-    return errorCode;
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(

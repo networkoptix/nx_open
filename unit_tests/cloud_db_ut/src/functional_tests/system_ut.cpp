@@ -403,7 +403,7 @@ TEST_F(System, rename)
     ASSERT_EQ(
         api::ResultCode::ok,
         renameSystem(
-            account1.data.email, account1.password,
+            account1.email, account1.password,
             system1.id, actualSystemName));
 
     for (int j = 0; j < 2; ++j)
@@ -417,7 +417,7 @@ TEST_F(System, rename)
         api::SystemDataEx systemData;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystem(account1.data.email, account1.password, system1.id, &systemData));
+            getSystem(account1.email, account1.password, system1.id, &systemData));
         ASSERT_EQ(actualSystemName, systemData.name);
     }
 
@@ -425,16 +425,16 @@ TEST_F(System, rename)
     actualSystemName = "sdfn[rtsdh";
     ASSERT_EQ(
         api::ResultCode::ok,
-        renameSystem(account2.data.email, account2.password, system1.id, actualSystemName));
+        renameSystem(account2.email, account2.password, system1.id, actualSystemName));
 
     actualSystemName = "sdfn[rtsdh111";
     ASSERT_EQ(
         api::ResultCode::ok,
-        renameSystem(account3.data.email, account3.password, system1.id, actualSystemName));
+        renameSystem(account3.email, account3.password, system1.id, actualSystemName));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        renameSystem(account4.data.email, account4.password, system1.id, "xxx"));
+        renameSystem(account4.email, account4.password, system1.id, "xxx"));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -444,19 +444,19 @@ TEST_F(System, rename)
     ASSERT_EQ(
         api::ResultCode::badRequest,
         renameSystem(
-            account1.data.email, account1.password,
+            account1.email, account1.password,
             system1.id, std::string()));
     ASSERT_EQ(
         api::ResultCode::badRequest,
         renameSystem(
-            account1.data.email, account1.password,
+            account1.email, account1.password,
             system1.id, std::string(4096, 'z')));
 
     // Checking system1 name.
     api::SystemDataEx systemData;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystem(account1.data.email, account1.password, system1.id, &systemData));
+        getSystem(account1.email, account1.password, system1.id, &systemData));
     ASSERT_EQ(actualSystemName, systemData.name);
 }
 
@@ -551,7 +551,7 @@ TEST_F(System, sorting_order_weight_expiration)
     std::vector<api::SystemDataEx> systems;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency1 = systems[0].usageFrequency;
 
     // Second access.
@@ -562,7 +562,7 @@ TEST_F(System, sorting_order_weight_expiration)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency2 = systems[0].usageFrequency;
 
     ASSERT_GT(usageFrequency2, usageFrequency1);
@@ -573,7 +573,7 @@ TEST_F(System, sorting_order_weight_expiration)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency3 = systems[0].usageFrequency;
 
     ASSERT_LT(usageFrequency3, usageFrequency2);
@@ -584,7 +584,7 @@ TEST_F(System, sorting_order_weight_expiration)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency4 = systems[0].usageFrequency;
 
     ASSERT_LT(usageFrequency4, usageFrequency3);
@@ -595,7 +595,7 @@ TEST_F(System, sorting_order_weight_expiration)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency5 = systems[0].usageFrequency;
 
     ASSERT_EQ(usageFrequency4, usageFrequency5);
@@ -644,7 +644,7 @@ TEST_F(System, sorting_order_multiple_systems)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account.data.email, account.password, &systems));
+            getSystems(account.email, account.password, &systems));
 
         ASSERT_EQ(3, systems.size());
         std::sort(
@@ -669,7 +669,7 @@ TEST_F(System, sorting_order_last_login_time)
     std::vector<api::SystemDataEx> systems;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto lastLoginTime1 = systems[0].lastLoginTime;
     // Initial value for lastLoginTime is current time.
     ASSERT_GT(systems[0].lastLoginTime, nx::utils::utcTime() - std::chrono::seconds(10));
@@ -680,7 +680,7 @@ TEST_F(System, sorting_order_last_login_time)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto lastLoginTime2 = systems[0].lastLoginTime;
     ASSERT_GT(lastLoginTime2, lastLoginTime1);
 
@@ -691,7 +691,7 @@ TEST_F(System, sorting_order_last_login_time)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto lastLoginTime3 = systems[0].lastLoginTime;
 
     ASSERT_GT(lastLoginTime3, lastLoginTime2);
@@ -713,7 +713,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
     std::vector<api::SystemDataEx> systems;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
 
     const auto system2 = addRandomSystemToAccount(account);
 
@@ -747,7 +747,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
         systems.clear();
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account.data.email, account.password, &systems));
+            getSystems(account.email, account.password, &systems));
 
         std::sort(
             systems.begin(), systems.end(),
@@ -787,7 +787,7 @@ TEST_F(System, sorting_order_persistence_after_sharing_update)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account2.data.email, account2.password, &systems));
+            getSystems(account2.email, account2.password, &systems));
         std::sort(
             systems.begin(), systems.end(),
             [](const api::SystemDataEx& one, const api::SystemDataEx& two)
@@ -841,7 +841,7 @@ TEST_F(System, update)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account1.data.email, account1.password, &systems));
+            getSystems(account1.email, account1.password, &systems));
         ASSERT_EQ(1, systems.size());
         ASSERT_EQ(system1, systems[0]);
         ASSERT_EQ(system1.opaque, systems[0].opaque);

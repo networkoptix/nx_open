@@ -58,7 +58,7 @@ def compareResults(a, b):
     diff = compareJson(a.data, b.data)
     if diff.hasDiff():
         diffresult = textdiff(a.rawdata, b.rawdata, a.req_str(), b.req_str())
-        raise FuncTestError("Function %s. Diferent responses for %s and %s: %s\nText diff:\n%s" %
+        raise FuncTestError("Function %s. Diferent responses for %s and %s:\n%s\nText diff:\n%s" %
                             (a.func, a.req_str(), b.req_str(), diff.errorInfo(), diffresult))
 
 
@@ -105,18 +105,23 @@ class ServerProxyTest(object):
             func = 'ec2/getResourceParams'
             time.sleep(0.1)
             res1 = self._performRequest(func, self.mainHost)
-            time.sleep(1)
-            res2 = self._performRequest(func, self.mainHost, self.secHost)
+            time.sleep(0.1)
+            res2 = self._performRequest(func, self.secHost)
             compareResults(res1, res2)
             time.sleep(0.1)
-            res3 = self._performRequest(func, self.secHost)
-            compareResults(res2, res3)
+            res2a = self._performRequest(func, self.mainHost, self.secHost)
+            compareResults(res2, res2a)
+            time.sleep(0.1)
             func = 'api/moduleInformation'
             res1 = self._performRequest(func, self.secHost)
             time.sleep(0.1)
             res2 = self._performRequest(func, self.mainHost, self.secHost)
             compareResults(res1, res2)
-            time.sleep(1)
+            res1 = self._performRequest(func, self.mainHost)
+            time.sleep(0.1)
+            res2 = self._performRequest(func, self.secHost, self.mainHost)
+            compareResults(res1, res2)
+            #time.sleep(1)
             #res2 = self._performRequest(func, self.mainHost)
             #if res1.length == res2.length:
             #    diff = compareJson(res1.data, res2.data)

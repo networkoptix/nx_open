@@ -106,7 +106,7 @@ class TimeSyncTest(FuncTestCase):
     def setUpClass(cls):
         if cls.testset == 'InetTimeSyncTests':
             if not check_inet_time():
-                raise unittest.SkipTest("Internet time servers aren't sccessible")
+                raise AssertionError("Internet time servers aren't accessible")
         super(TimeSyncTest, cls).setUpClass()
         if not cls._init_time:
             t = int(time.time())
@@ -132,11 +132,15 @@ class TimeSyncTest(FuncTestCase):
         self.times = [EMPTY_TIME.copy() for _ in xrange(self.num_serv)]
 
     @classmethod
-    def globalFinalise(cls):
-        for num in xrange(cls.num_serv):
+    def _global_clear_extra_args(cls, num):
+        return (str(int(time.time())),)
+
+#    @classmethod
+#    def globalFinalise(cls):
+#        for num in xrange(cls.num_serv):
 #            cls.class_call_box(cls.hosts[num], 'date', '--set=@%d' % int(time.time()))
-            cls.class_call_box(cls.hosts[num], '/vagrant/ctl.sh', 'timesync', 'clear', str(int(time.time())))
-        super(TimeSyncTest, cls).globalFinalise()
+#            #cls.class_call_box(cls.hosts[num], '/vagrant/ctl.sh', 'timesync', 'clear', str(int(time.time())))
+#        super(TimeSyncTest, cls).globalFinalise()
 
 
     ################################################################

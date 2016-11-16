@@ -20,21 +20,21 @@ namespace network {
 namespace cloud {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
-    TEST, CloudStreamSocketTcpIp,
+    TEST, CloudStreamSocketTcpByIp,
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
 
-class CloudStreamSocketTester:
+class TestTcpServerSocket:
     public TCPServerSocket
 {
 public:
-    CloudStreamSocketTester(HostAddress host):
+    TestTcpServerSocket(HostAddress host):
         TCPServerSocket(AF_INET),
         m_host(std::move(host))
     {
     }
 
-    ~CloudStreamSocketTester()
+    ~TestTcpServerSocket()
     {
         if (m_socketAddress)
             SocketGlobals::addressResolver().removeFixedAddress(m_host, *m_socketAddress);
@@ -60,17 +60,17 @@ private:
     boost::optional<SocketAddress> m_socketAddress;
 };
 
-struct CloudStreamSocketTcpHost:
+struct CloudStreamSocketTcpByHost:
     public ::testing::Test
 {
     const HostAddress testHost;
-    CloudStreamSocketTcpHost(): testHost(id() + lit(".") + id()) {}
+    CloudStreamSocketTcpByHost(): testHost(id() + lit(".") + id()) {}
     static QString id() { return QnUuid::createUuid().toSimpleString(); }
 };
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
-    TEST_F, CloudStreamSocketTcpHost,
-    [&]() { return std::make_unique<CloudStreamSocketTester>(testHost); },
+    TEST_F, CloudStreamSocketTcpByHost,
+    [&]() { return std::make_unique<TestTcpServerSocket>(testHost); },
     [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
     SocketAddress(testHost));
 

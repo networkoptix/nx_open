@@ -202,7 +202,7 @@ void AddressResolver::resolveAsync(
     if (hostName.isIpAddress())
     {
         AddressEntry entry(AddressType::direct, hostName);
-        return handler(SystemError::noError, {std::move(entry)});
+        return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
 
     if (SocketGlobals::config().isAddressDisabled(hostName))
@@ -237,20 +237,22 @@ void AddressResolver::resolveAsync(
         dnsResolve(info, &lk, natTraversalSupport == NatTraversalSupport::enabled, ipVersion);
 }
 
-std::vector<AddressEntry> AddressResolver::resolveSync(
+std::deque<AddressEntry> AddressResolver::resolveSync(
     const HostAddress& hostName,
     NatTraversalSupport natTraversalSupport,
     int ipVersion)
 {
-    utils::promise<std::vector<AddressEntry>> promise;
+    utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
     auto handler = 
-        [&](SystemError::ErrorCode /*code*/, std::vector<AddressEntry> entries)
+        [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
         {
-            promise.set_value(std::move(entries));
+            promise.set_value({code, std::move(entries)});
         };
 
     resolveAsync(hostName, std::move(handler), natTraversalSupport, ipVersion);
-    return promise.get_future().get();
+    const auto result = promise.get_future().get();
+    SystemError::setLastErrorCode(result.first);
+    return result.second;
 }
 
 void AddressResolver::cancel(
@@ -363,24 +365,26 @@ bool AddressResolver::HostAddressInfo::isResolved(
             || m_mediatorState == State::resolved);
 }
 
-template<typename Container>
-void containerAppend(Container& c1, const Container& c2)
+std::deque<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
 {
-    c1.insert(c1.end(), c2.begin(), c2.end());
-}
+    std::deque<AddressEntry> entries;
+    const auto endeque =
+        [&entries](const std::vector<AddressEntry>& v)
+        {
+            for (const auto i: v)
+                entries.push_back(i);
+        };
 
-std::vector<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
-{
-    std::vector<AddressEntry> entries(fixedEntries);
+    endeque(fixedEntries);
     if (isLikelyCloudAddress)
     {
-        containerAppend(entries, m_mediatorEntries);
-        containerAppend(entries, m_dnsEntries);
+        endeque(m_mediatorEntries);
+        endeque(m_dnsEntries);
     }
     else
     {
-        containerAppend(entries, m_dnsEntries);
-        containerAppend(entries, m_mediatorEntries);
+        endeque(m_dnsEntries);
+        endeque(m_mediatorEntries);
     }
 
     return entries;
@@ -434,14 +438,17 @@ void AddressResolver::dnsResolve(
     m_dnsResolver.resolveAsync(
         info->first.toString(),
         [this, info, needMediator, ipVersion](
-            SystemError::ErrorCode code, DnsResolver::HostAddresses ips)
+            SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
             std::vector<Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
             std::vector<AddressEntry> entries;
-            for (auto& ip: ips)
-                entries.push_back(AddressEntry(AddressType::direct, std::move(ip)));
+            while (!ips.empty())
+            {
+                entries.emplace_back(AddressType::direct, std::move(ips.front()));
+                ips.pop_front();
+            }
 
             DEBUG_LOG(lm("Address %1 is resolved by DNS to %2")
                 .str(info->first).container(entries));

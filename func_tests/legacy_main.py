@@ -99,7 +99,7 @@ class _pvt(object):
 
         def test(self):
             print "\n==================================="
-            print "Test %s start!\n" % (self._getMethodName(),)
+            print "Test %s start\n" % (self._getMethodName(),)
 
             postDataList = self._generateModifySeq()
 
@@ -127,7 +127,7 @@ class _pvt(object):
                 else:
                     break
 
-            print "Test %s done!" % (self._getMethodName())
+            print "Test %s done" % (self._getMethodName())
             print "===================================\n"
 
 
@@ -340,8 +340,8 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
     def test(self):
         workerQueue = ClusterWorker(testMaster.threadNumber, self._testCase * 2)
 
-        print "===================================\n"
-        print "Test:ResourceConfliction start!\n"
+        print "==================================="
+        print "Test: ResourceConfliction start\n"
 
         for _ in xrange(self._testCase):
             conf = self._generateResourceConfliction()
@@ -356,7 +356,7 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
 
         self._checkStatus()
 
-        print "Test:ResourceConfliction finish!\n"
+        print "Test: ResourceConfliction done"
         print "===================================\n"
 
 

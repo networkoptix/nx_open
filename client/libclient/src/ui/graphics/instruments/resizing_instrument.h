@@ -30,6 +30,9 @@ private:
     ResizingInstrument* m_instrument;
 };
 
+typedef QPointer<QGraphicsWidget> QGraphicsWidgetPtr;
+typedef QList<QGraphicsWidgetPtr> WidgetsList;
+
 
 /**
  * This instrument implements resizing of QGraphicsWidget.
@@ -87,8 +90,6 @@ protected:
     virtual void finishDragProcess(DragInfo* info) override;
 
 private:
-    using QGraphicsWidgetPtr = QPointer<QGraphicsWidget>;
-
     void getWidgetAndFrameSection(
         QWidget* viewport,
         const QPoint& pos,
@@ -107,7 +108,7 @@ private:
         const QPoint& pos,
         qreal effectRadius) const;
 
-    QList<QGraphicsWidgetPtr> getAffectedWidgets(QWidget* viewport, const QPoint& pos) const;
+    WidgetsList getAffectedWidgets(QWidget* viewport, const QPoint& pos) const;
 
 private:
     friend class ResizingInfo;
