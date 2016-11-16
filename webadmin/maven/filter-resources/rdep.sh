@@ -8,7 +8,9 @@ function upload() {
     PACKAGE=$1
     PACKAGE_DIR="$ROOT/any/$PACKAGE"
 
-    [ -d "$PACKAGE_DIR" ] && rm -rf "$PACKAGE_DIR"
+    if [ -d "$PACKAGE_DIR" ]; then
+        rm -rf "$PACKAGE_DIR"
+    fi
 
     mkdir -p "$PACKAGE_DIR"/bin
     cp -f ${basedir}/external.dat "$PACKAGE_DIR"/bin
@@ -17,4 +19,6 @@ function upload() {
 }
 
 upload "server-external-${branch}"
-[[ "${branch}" == "prod_${release.version}" ]] && upload "server-external-${release.version}"
+if [[ "${branch}" == "prod_${release.version}" ]]; then
+    upload "server-external-${release.version}"
+fi
