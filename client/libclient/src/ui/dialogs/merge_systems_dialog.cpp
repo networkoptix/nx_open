@@ -210,6 +210,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     m_remoteOwnerCredentials.setUser(login);
     m_remoteOwnerCredentials.setPassword(password);
     m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
+    ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -237,6 +238,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const QnMediaServerResourcePtr& discoverer)
 {
     ui->buttonBox->hideProgress();
+    ui->credentialsGroupBox->setEnabled(true);
 
     if (mergeStatus != utils::MergeSystemsStatus::ok
         && mergeStatus != utils::MergeSystemsStatus::starterLicense)

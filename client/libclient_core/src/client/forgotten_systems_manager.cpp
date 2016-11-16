@@ -39,12 +39,15 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
     for (const auto& system: qnSystemsFinder->systems())
         processSystemDiscovered(system);
 
-    connect(this, &QnForgottenSystemsManager::forgottenSystemsChanged, this,
+    const auto storeSystems =
         [this]()
         {
             qnClientCoreSettings->setForgottenSystems(m_systems);
             qnClientCoreSettings->save();
-        });
+        };
+
+    connect(this, &QnForgottenSystemsManager::forgottenSystemAdded, this, storeSystems);
+    connect(this, &QnForgottenSystemsManager::forgottenSystemRemoved, this, storeSystems);
 }
 
 void QnForgottenSystemsManager::forgetSystem(const QString& id)
@@ -54,7 +57,7 @@ void QnForgottenSystemsManager::forgetSystem(const QString& id)
         return;
 
     m_systems.insert(id);
-    emit forgottenSystemsChanged();
+    emit forgottenSystemAdded(id);
 }
 
 bool QnForgottenSystemsManager::isForgotten(const QString& id) const
@@ -65,5 +68,5 @@ bool QnForgottenSystemsManager::isForgotten(const QString& id) const
 void QnForgottenSystemsManager::rememberSystem(const QString& id)
 {
     if (m_systems.remove(id))
-        emit forgottenSystemsChanged();
+        emit forgottenSystemRemoved(id);
 }

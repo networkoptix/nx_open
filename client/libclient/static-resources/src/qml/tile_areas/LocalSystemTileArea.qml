@@ -6,7 +6,6 @@ Item
 {
     id: control;
 
-    property bool isOnline: false;
     property bool isExpandedTile: false;
     property real expandedOpacity: 0;
     property alias factorySystem: expandedArea.factorySystem;

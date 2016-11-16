@@ -17,13 +17,17 @@
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 
-#include <utils/applauncher_utils.h>
+#include <nx/client/ui/dialogs/debug/animations_control_dialog.h>
+#include <nx/client/ui/dialogs/debug/applauncher_control_dialog.h>
+
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
 //#endif
 
 namespace {
+
+
 
 // -------------------------------------------------------------------------- //
 // QnDebugControlDialog
@@ -37,10 +41,33 @@ public:
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
+        using namespace nx::client::ui::dialogs;
+
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
         layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
         layout->addWidget(newActionButton(QnActions::DebugShowResourcePoolAction));
+
+        {
+            auto button = new QPushButton(lit("Applaucher control"), parent);
+            connect(button, &QPushButton::clicked, this, [this]
+            {
+                auto dialog(new QnApplauncherControlDialog(mainWindow()));
+                dialog->show();
+            });
+            layout->addWidget(button);
+        }
+
+        {
+            auto button = new QPushButton(lit("Animations control"), parent);
+            connect(button, &QPushButton::clicked, this, [this]
+            {
+                auto dialog(new AnimationsControlDialog(mainWindow()));
+                dialog->show();
+            });
+            layout->addWidget(button);
+        }
+
         setLayout(layout);
     }
 
@@ -89,82 +116,8 @@ private:
     QLineEdit* m_urlLineEdit;
 };
 
-class QnApplauncherControlDialog: public QDialog
-{
-    using base_type = QDialog;
-public:
-    QnApplauncherControlDialog(QWidget* parent = nullptr):
-        base_type(parent, Qt::Window)
-    {
-        using namespace applauncher;
 
-        auto l = new QVBoxLayout(this);
-
-        {
-            auto row = new QHBoxLayout();
-            l->addLayout(row);
-
-            auto button = new QPushButton(lit("Check version"), this);
-            row->addWidget(button);
-
-            auto edit = new QLineEdit(this);
-            row->addWidget(edit, 1);
-
-            auto result = new QLabel(this);
-            row->addWidget(result);
-
-            connect(button, &QPushButton::clicked, this, [edit, result]
-            {
-                QnSoftwareVersion v(edit->text());
-                if (v.isNull())
-                    v = qnCommon->engineVersion();
-
-                bool isInstalled = false;
-                auto errCode = isVersionInstalled(v, &isInstalled);
-
-                result->setText(
-                    lit("Version %1: %2 (%3)")
-                        .arg(v.toString())
-                        .arg(isInstalled ? lit("Installed") : lit("Not Installed"))
-                        .arg(QString::fromUtf8(api::ResultType::toString(errCode)))
-                    );
-            });
-        }
-
-        {
-            auto row = new QHBoxLayout();
-            l->addLayout(row);
-
-            auto button = new QPushButton(lit("Get versions list"), this);
-            row->addWidget(button);
-
-            auto result = new QLabel(this);
-            row->addWidget(result);
-
-            connect(button, &QPushButton::clicked, this, [result]
-            {
-                QList<QnSoftwareVersion> versions;
-                auto errCode = getInstalledVersions(&versions);
-
-                QStringList text;
-                for (auto v: versions)
-                    text << v.toString();
-
-                result->setText(
-                    lit("Result %1:\n %2")
-                    .arg(QString::fromUtf8(api::ResultType::toString(errCode)))
-                    .arg(text.join(L'\n'))
-                );
-            });
-        }
-
-        l->addStretch();
-        setMinimumHeight(500);
-    }
-
-};
-
-}
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDebugHandler
@@ -198,8 +151,7 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered()
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
     qDebug() << qnRuntime->debugCounter();
 
-    auto dialog(new QnApplauncherControlDialog(mainWindow()));
-    dialog->show();
+    at_debugControlPanelAction_triggered();
     return;
 
     auto showPalette = [this]

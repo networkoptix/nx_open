@@ -26,6 +26,9 @@ exports.config = {
         defaultTimeoutInterval: 30000
     },
 
+    // Waiting for Page Synchronization https://github.com/angular/protractor/blob/master/docs/timeouts.md
+    allScriptsTimeout: 20000,
+
     // Authentication before running tests
     onPrepare: function() {
         var CustomReporter = require('./custom_reporter.js');
@@ -44,6 +47,6 @@ exports.config = {
                 self.helper.completeSetup(); }
         });
 
-        self.helper.login('admin', 'qweasd123');
+        self.helper.login(self.helper.admin, self.helper.password);
     }
 };

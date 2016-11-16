@@ -83,6 +83,7 @@ private:
     /** Remove recorder nodes that are not in use. */
     void cleanupRecorders();
 
+    void handleResourceAdded(const QnResourcePtr& resource);
     void handleUserChanged(const QnUserResourcePtr& user);
     void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
     void handleGlobalPermissionsChanged(const QnResourceAccessSubject& subject);

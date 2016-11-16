@@ -1,5 +1,7 @@
 #include "resources_workbench_panel.h"
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
@@ -22,9 +24,6 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-
-static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 300;
 
 static const int kResizerWidth = 8;
 
@@ -57,6 +56,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget->setAttribute(Qt::WA_TranslucentBackground);
     connect(widget, &QnResourceBrowserWidget::selectionChanged,
         action(QnActions::SelectionChangeAction), &QAction::trigger);
+    connect(widget, &QnResourceBrowserWidget::scrollBarVisibleChanged, this,
+        &ResourceTreeWorkbenchPanel::updateControlsGeometry);
 
     QPalette defaultPalette = widget->palette();
     setPaletteColor(widget, QPalette::Window, Qt::transparent);
@@ -159,6 +160,8 @@ bool ResourceTreeWorkbenchPanel::isOpened() const
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 {
+    using namespace nx::client::ui::workbench;
+
     ensureAnimationAllowed(&animate);
 
     if (!item)
@@ -170,14 +173,11 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
     action(QnActions::ToggleTreeAction)->setChecked(opened);
 
     xAnimator->stop();
-    if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
-    else
-        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
+    qnWorkbenchAnimations->setupAnimator(xAnimator, opened
+        ? Animations::Id::ResourcesPanelExpand
+        : Animations::Id::ResourcesPanelCollapse);
 
     qreal width = item->size().width();
-    xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
-
     qreal newX = opened ? 0.0 : - width - kHidePanelOffset;
     if (animate)
         xAnimator->animateTo(newX);
@@ -264,7 +264,11 @@ void ResourceTreeWorkbenchPanel::updateResizerGeometry()
         m_parentWidget->mapFromItem(item, treeRect.topRight()),
         m_parentWidget->mapFromItem(item, treeRect.bottomRight()));
 
-    resizerGeometry.moveTo(resizerGeometry.topLeft());
+    qreal offset = kResizerWidth;
+    if (widget->isScrollBarVisible())
+        offset += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+    resizerGeometry.moveLeft(resizerGeometry.left() - offset);
     resizerGeometry.setWidth(kResizerWidth);
 
     if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))

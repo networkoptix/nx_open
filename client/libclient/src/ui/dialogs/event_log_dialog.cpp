@@ -269,7 +269,6 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 {
     m_requests.clear();
     m_allEvents.clear();
-    QPointer<QnEventLogDialog> guard(this);
 
     const auto onlineServers = qnResPool->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
@@ -284,14 +283,13 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 
         m_requests << handle;
 
-        executeDelayed([this, handle, guard]
-        {
-            if (!guard)
-                return;
+        const auto timerCallback =
+            [this, handle]
+            {
+                at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
+            };
 
-            at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
-
-        }, kQueryTimeoutMs);
+        executeDelayedParented(timerCallback, kQueryTimeoutMs, this);
     }
 }
 

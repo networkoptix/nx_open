@@ -44,30 +44,14 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (auto user = resource.dynamicCast<QnUserResource>())
-            {
-                connect(user, &QnUserResource::enabledChanged, this,
-                    &QnResourceTreeModelUserNodes::rebuildSubjectTree);
-
-                connect(user, &QnUserResource::userGroupChanged, this,
-                    [this](const QnUserResourcePtr& user)
-                    {
-                        removeUserNode(user);
-                        rebuildSubjectTree(user);
-                    });
-
-                rebuildSubjectTree(user);
-            }
-        });
+        &QnResourceTreeModelUserNodes::handleResourceAdded);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
+            resource->disconnect(this);
             if (auto user = resource.dynamicCast<QnUserResource>())
             {
-                user->disconnect(this);
                 removeUserNode(user);
             }
         });
@@ -557,6 +541,37 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
         removeNode(node);
 }
 
+void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (auto user = resource.dynamicCast<QnUserResource>())
+    {
+        connect(user, &QnUserResource::enabledChanged, this,
+            &QnResourceTreeModelUserNodes::rebuildSubjectTree);
+
+        connect(user, &QnUserResource::userGroupChanged, this,
+            [this](const QnUserResourcePtr& user)
+        {
+            removeUserNode(user);
+            rebuildSubjectTree(user);
+        });
+
+        rebuildSubjectTree(user);
+    }
+    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        /* Here we must handle if common user's layout become shared. */
+        auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
+        if (!owner)
+            return;
+
+        connect(layout, &QnResource::parentIdChanged, this,
+            [this, layout, owner]
+            {
+                handleAccessChanged(owner, layout);
+            });
+    }
+}
+
 void QnResourceTreeModelUserNodes::handleUserChanged(const QnUserResourcePtr& user)
 {
     m_valid = !user.isNull()
@@ -575,25 +590,30 @@ void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSub
 
     if (qnResourceAccessProvider->hasAccess(subject, resource))
     {
-        auto node = ensureResourceNode(subject, resource);
-        if (node)
-            node->update();
-    }
-    else
-    {
-        auto id = subject.id();
-        if (!m_shared.contains(id))
-            return;
-        for (auto node : m_shared[id])
+        if (auto node = ensureResourceNode(subject, resource))
         {
-            if (node->resource() != resource)
-                continue;
-
-            removeNode(node);
-            cleanupRecorders();
-            break;
+            node->update();
+            return;
         }
     }
+
+    /* In some cases we should remove nodes under user even if he has access. For example, when
+     * user's own layout become shared. */
+
+    auto id = subject.id();
+    if (!m_shared.contains(id))
+        return;
+
+    for (auto node : m_shared[id])
+    {
+        if (node->resource() != resource)
+            continue;
+
+        removeNode(node);
+        cleanupRecorders();
+        break;
+    }
+
 }
 
 void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(

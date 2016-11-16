@@ -5,6 +5,8 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <utils/common/warnings.h>
 
 detail::OverlayedBase::OverlayWidget::OverlayWidget()
@@ -173,10 +175,22 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
 
     qreal opacity = visible ? 1.0 : 0.0;
 
-    if(animate)
-        opacityAnimator(widget)->animateTo(opacity);
+    if (animate)
+    {
+        using namespace nx::client::ui::workbench;
+        auto animator = opacityAnimator(widget);
+
+        qnWorkbenchAnimations->setupAnimator(animator, visible
+            ? Animations::Id::ItemOverlayShow
+            : Animations::Id::ItemOverlayHide);
+        animator->animateTo(opacity);
+    }
     else
+    {
+        if (hasOpacityAnimator(widget))
+            opacityAnimator(widget)->stop();
         widget->setOpacity(opacity);
+    }
 
     NX_ASSERT(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
 }

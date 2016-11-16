@@ -54,7 +54,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
         static const int kVeryFarPriority = 100000;
 
         QnModuleInformation fakeServerInfo;
-        fakeServerInfo.id = QnUuid::createUuid();   // It does not matter
+        fakeServerInfo.id = QnUuid::createUuid();   // It SHOULD be new unique id
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         system->setServerHost(fakeServerInfo.id, connection.url);
         newSystems.insert(system->id(), system);

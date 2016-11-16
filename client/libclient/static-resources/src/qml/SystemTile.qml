@@ -199,7 +199,6 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;

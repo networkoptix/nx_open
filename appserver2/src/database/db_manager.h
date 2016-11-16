@@ -507,8 +507,6 @@ namespace detail
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
-        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
-        ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
@@ -637,6 +635,7 @@ namespace detail
         bool m_needResyncUsers;
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
+        bool m_needResyncVideoWall = false;
 
         bool m_dbReadOnly;
     };

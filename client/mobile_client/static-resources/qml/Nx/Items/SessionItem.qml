@@ -95,8 +95,8 @@ Pane
             {
                 connectionManager.connectToServer(
                     hostsModel.firstHost,
-                    cloudStatusWatcher.cloudLogin(),
-                    cloudStatusWatcher.cloudPassword())
+                    cloudStatusWatcher.credentials.user,
+                    cloudStatusWatcher.credentials.password)
                 Workflow.openResourcesScreen(systemName)
             }
         }

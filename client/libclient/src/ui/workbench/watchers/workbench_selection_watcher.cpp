@@ -19,15 +19,16 @@ QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nul
     , m_selectionUpdatePending(false)
     , m_lastScope(Qn::InvalidScope)
 {
-    connect(action(QnActions::SelectionChangeAction),  &QAction::triggered,    this,   [this] {
-        if (m_selectionUpdatePending)
-            return;
+    connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this,
+        [this]()
+        {
+            if (m_selectionUpdatePending)
+                return;
 
-        m_selectionUpdatePending = true;
-        executeDelayed([this] {
-            updateFromSelection();
-        }, selectionUpdateTimeoutMs);
-    });
+            m_selectionUpdatePending = true;
+            const auto callback = [this]() { updateFromSelection(); };
+            executeDelayedParented(callback, selectionUpdateTimeoutMs, this);
+        });
 
 }
 

@@ -24,7 +24,9 @@ public:
     bool isForgotten(const QString& id) const;
 
 signals:
-    void forgottenSystemsChanged();
+    void forgottenSystemAdded(const QString& id);
+
+    void forgottenSystemRemoved(const QString& id);
 
 private:
     void rememberSystem(const QString& id);

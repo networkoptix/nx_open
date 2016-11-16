@@ -30,6 +30,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/animation/opacity_animator.h>
@@ -100,8 +102,9 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     /* And specify maximum width and height for the widget: */
     m_previewWidget->setMaximumSize(kMaxThumbnailSize);
 
-    m_previewWidget->busyIndicator()->setDotRadius(style::Metrics::kStandardPadding / 2.0);
-    m_previewWidget->busyIndicator()->setDotSpacing(style::Metrics::kStandardPadding);
+    auto dots = m_previewWidget->busyIndicator()->dots();
+    dots->setDotRadius(style::Metrics::kStandardPadding / 2.0);
+    dots->setDotSpacing(style::Metrics::kStandardPadding);
 
     auto layout = new QVBoxLayout(m_embeddedWidget);
     layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -216,7 +219,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),
     m_tooltipWidget(nullptr),
-    m_hoverProcessor(nullptr)
+    m_hoverProcessor(nullptr),
+    m_scrollbarSignalizer(new QnMultiEventSignalizer(this))
 {
     ui->setupUi(this);
 
@@ -273,6 +277,15 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         &QnResourceBrowserWidget::updateIcons);
 
+    m_scrollbarSignalizer->addEventType(QEvent::Show);
+    m_scrollbarSignalizer->addEventType(QEvent::Hide);
+    ui->resourceTreeWidget->treeView()->verticalScrollBar()->installEventFilter(
+        m_scrollbarSignalizer);
+    ui->searchTreeWidget->treeView()->verticalScrollBar()->installEventFilter(
+        m_scrollbarSignalizer);
+    connect(m_scrollbarSignalizer, &QnMultiEventSignalizer::activated, this,
+        &QnResourceBrowserWidget::scrollBarVisibleChanged);
+
     /* Run handlers. */
     updateFilter();
     updateIcons();
@@ -282,6 +295,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
 QnResourceBrowserWidget::~QnResourceBrowserWidget()
 {
+    m_scrollbarSignalizer->disconnect(this);
+
     disconnect(workbench(), nullptr, this, nullptr);
 
     at_workbench_currentLayoutAboutToBeChanged();
@@ -612,6 +627,11 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     updateToolTipPosition();
 }
 
+bool QnResourceBrowserWidget::isScrollBarVisible() const
+{
+    return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
+}
+
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
 {
     if (scope != Qn::TreeScope)
@@ -722,14 +742,24 @@ void QnResourceBrowserWidget::hideToolTip()
 {
     if (!m_tooltipWidget)
         return;
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
+
+    using namespace nx::client::ui::workbench;
+
+    auto animator = opacityAnimator(m_tooltipWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipHide);
+    animator->animateTo(0.0);
 }
 
 void QnResourceBrowserWidget::showToolTip()
 {
     if (!m_tooltipWidget)
         return;
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+
+    using namespace nx::client::ui::workbench;
+
+    auto animator = opacityAnimator(m_tooltipWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipShow);
+    animator->animateTo(1.0);
 }
 
 void QnResourceBrowserWidget::updateIcons()
@@ -934,6 +964,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
     }
 
     emit currentTabChanged();
+    emit scrollBarVisibleChanged();
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked()

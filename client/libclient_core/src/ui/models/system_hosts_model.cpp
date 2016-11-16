@@ -150,6 +150,7 @@ void QnSystemHostsModel::reloadHosts()
 
         m_disconnectHelper->add(serverAddedConnection);
         m_disconnectHelper->add(serverRemovedConnection);
+        m_disconnectHelper->add(changedConnection);
     };
 
     const auto system = qnSystemsFinder->getSystem(m_systemId);

@@ -501,10 +501,10 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     {
         /* Check if schedule was changed during load, e.g. limited by max fps. */
         if (!silent)
-            executeDelayed([this]
         {
-            showMaxFpsWarningIfNeeded();
-        });
+            const auto callback = [this]() { showMaxFpsWarningIfNeeded(); };
+            executeDelayedParented(callback, kDefaultDelay, this);
+        }
     }
 
     // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm

@@ -198,8 +198,12 @@ void QnVideoWallItemAccessProvider::handleLayoutAdded(const QnLayoutResourcePtr&
         auto parent = layout->getParentResource();
         if (parent && parent->hasFlags(Qn::videowall))
         {
-            QnMutexLocker lk(&m_mutex);
-            m_accessibleLayouts.insert(layout);
+            {
+                QnMutexLocker lk(&m_mutex);
+                m_accessibleLayouts.insert(layout);
+            }
+            for (const auto& resource: layout->layoutResources())
+                updateAccessToResource(resource);
         }
     }
 }
