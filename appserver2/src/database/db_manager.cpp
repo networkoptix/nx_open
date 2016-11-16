@@ -794,9 +794,6 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
-    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
-        return false;
-
     return true;
 }
 
