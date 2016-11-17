@@ -119,10 +119,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_resetFilterAction = new QAction(tr("Clear Filter"), this);
     m_resetFilterAction->setShortcut(Qt::ControlModifier + Qt::Key_R); //TODO: #Elric shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)? --gdm
 
-    QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
-    mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    ui->gridEvents->viewport()->installEventFilter(mouseSignalizer);
-    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnEventLogDialog::at_mouseButtonRelease);
+    installEventHandler(ui->gridEvents->viewport(), QEvent::MouseButtonRelease,
+        this, &QnEventLogDialog::at_mouseButtonRelease);
 
     ui->gridEvents->addAction(m_clipboardAction);
     ui->gridEvents->addAction(m_exportAction);
@@ -269,7 +267,6 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 {
     m_requests.clear();
     m_allEvents.clear();
-    QPointer<QnEventLogDialog> guard(this);
 
     const auto onlineServers = qnResPool->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
@@ -284,14 +281,13 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 
         m_requests << handle;
 
-        executeDelayed([this, handle, guard]
-        {
-            if (!guard)
-                return;
+        const auto timerCallback =
+            [this, handle]
+            {
+                at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
+            };
 
-            at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
-
-        }, kQueryTimeoutMs);
+        executeDelayedParented(timerCallback, kQueryTimeoutMs, this);
     }
 }
 

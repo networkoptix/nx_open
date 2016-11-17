@@ -194,31 +194,18 @@ angular.module('webadminApp')
             getnonce: '/api/moduleInformation',
             physicalId: '00-16-6C-7E-0B-E7',
             cameraIds:[
-                '00-1A-07-0E-EE-6C',
-                '00-16-6C-7E-0B-E7',
                 '00-1C-A6-01-67-DA',
-                '00-1C-A6-01-27-D3',
-                '64-76-57-80-0C-52',
+                'ACTI_E96--A-XX-13K-00850',
+                '00-1A-07-0E-EE-6C',
+                '00-1C-A6-01-CA-A6',
+                'urn_uuid_0b89056d-9de8-e5aa-a50b-ac03207875e4'
 
-                'AC-CC-8E-2C-BE-FF',
-                 '64-76-57-80-0C-44',
-                 'urn_uuid_0007d817-0007-4d81-8795-0007d81795b8',
-                 'urn_uuid_077e29a5-c659-31f2-5c1b-4f75897c133a',
-                 '64-76-57-80-0C-5C',
-                 '64-76-57-80-0C-46',
-                 'ACTI_E96--A-XX-13K-00850',
-                 '00-1C-A6-01-6E-6E',
-                 '64-76-57-00-03-32',
-                 '00-1A-07-01-E3-0B',
-                 '00-1C-A6-01-6E-A5',
-                 '00-1A-07-09-55-AB',
-                 '00-1C-A6-01-CA-A6'
              ],
             nonce: '',
             realm:'networkoptix',
             method: 'PLAY',
-            login:'admin',
-            password:'videopowered',
+            login:'demo',
+            password:'nxwitness',
             auth:'',
             rtspLink:''
         };

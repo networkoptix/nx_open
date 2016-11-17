@@ -63,9 +63,6 @@ public:
     using InternalSystemDataPtr = QSharedPointer<InternalSystemData>;
     using InternalList = QVector<InternalSystemDataPtr>;
 
-    InternalList::iterator getInternalDataIt(
-            const QnSystemDescriptionPtr& systemDescription);
-
     void at_serverChanged(
             const QnSystemDescriptionPtr& systemDescription,
             const QnUuid &serverId,
@@ -119,6 +116,19 @@ QnSystemsModel::QnSystemsModel(QObject *parent)
 
 QnSystemsModel::~QnSystemsModel()
 {}
+
+int QnSystemsModel::getRowIndex(const QString& systemId) const
+{
+    Q_D(const QnSystemsModel);
+
+    const auto it = std::find_if(d->internalData.begin(), d->internalData.end(),
+        [systemId](const QnSystemsModelPrivate::InternalSystemDataPtr& data)
+        {
+            return systemId == data->system->id();
+        });
+
+    return (it == d->internalData.end() ? -1 : it - d->internalData.begin());
+}
 
 int QnSystemsModel::rowCount(const QModelIndex &parent) const
 {
@@ -360,21 +370,6 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId)
     q->endRemoveRows();
 }
 
-QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternalDataIt(
-    const QnSystemDescriptionPtr& systemDescription)
-{
-    const auto target = InternalSystemDataPtr(new InternalSystemData(
-        { systemDescription, QnDisconnectHelper() }));
-
-    const auto it = std::find_if(internalData.begin(), internalData.end(),
-        [target](const InternalSystemDataPtr& data)
-        {
-            return target->system->id() == data->system->id();
-        });
-
-    return it;
-}
-
 void QnSystemsModelPrivate::emitDataChanged(
     const QnSystemDescriptionPtr& systemDescription,
     QnSystemsModel::RoleId role)
@@ -411,7 +406,12 @@ void QnSystemsModelPrivate::at_serverChanged(
 
     Q_Q(QnSystemsModel);
 
-    const auto dataIt = getInternalDataIt(systemDescription);
+    const auto dataIt = std::find_if(internalData.begin(), internalData.end(),
+        [id = systemDescription->id()](const InternalSystemDataPtr& data)
+        {
+            return id == data->system->id();
+        });
+
     if (dataIt == internalData.end())
         return;
 

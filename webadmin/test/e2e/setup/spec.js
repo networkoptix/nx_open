@@ -322,15 +322,17 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-    it("Run setup again after local setup using link (#/setup) - it shows success depending on cloud settings",function(){
+    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-408 is fixed
+    xit("Run setup again after local setup using link (#/setup) - it shows success depending on cloud settings",function(){
         p.triggerSetupWizard();
         p.helper.completeSetup();
         browser.get('/#/setup');
         expect(p.setupDialog.getText()).toContain('System is ready for use');
         p.finishButton.click();
+        browser.pause();
     });
 
-    // TODO: Enable when connect to cloud is fixed
+    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-408 is fixed
     xit("Run setup again after cloud setup using link (#/setup) - it shows success depending on cloud settings",function(){
         p.triggerSetupWizard();
         p.helper.completeSetupWithCloud();

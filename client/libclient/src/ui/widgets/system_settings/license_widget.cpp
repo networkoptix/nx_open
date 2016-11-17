@@ -43,10 +43,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     setMonospaceFont(ui->onlineKeyEdit);
 
     /* Upon taking focus by license input line set cursor to first empty position: */
-    auto focusSignalizer = new QnSingleEventSignalizer(this);
-    focusSignalizer->setEventType(QEvent::FocusIn);
-    ui->onlineKeyEdit->installEventFilter(focusSignalizer);
-    connect(focusSignalizer, &QnSingleEventSignalizer::activated, this,
+    installEventHandler(ui->onlineKeyEdit, QEvent::FocusIn, this,
         [this]()
         {
             auto adjustCursorPosition =

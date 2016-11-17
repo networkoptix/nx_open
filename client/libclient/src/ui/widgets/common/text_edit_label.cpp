@@ -10,7 +10,7 @@ QnTextEditLabel::QnTextEditLabel(QWidget* parent) :
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
     setReadOnly(true);
     setTextInteractionFlags(Qt::NoTextInteraction);
     setFocusPolicy(Qt::NoFocus);
@@ -59,5 +59,5 @@ QSize QnTextEditLabel::sizeHint() const
 
 QSize QnTextEditLabel::minimumSizeHint() const
 {
-    return QSize(0, 0);
+    return QSize(0, m_documentSize.height());
 }

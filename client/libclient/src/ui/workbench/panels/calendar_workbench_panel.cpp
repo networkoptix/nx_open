@@ -1,5 +1,7 @@
 #include "calendar_workbench_panel.h"
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -17,6 +19,8 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/panels/buttons.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
@@ -30,9 +34,6 @@ static const qreal kClosedPositionOffsetY = 20;
 
 /* Offset of pin button - in calendar header size count o_O */
 static const int kPinOffsetCellsCount = 2;
-
-/* Time to show/hide calendar. */
-static const int kShowHideAnimationPeriodMs = 50;
 
 }
 
@@ -72,6 +73,9 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     setHelpTopic(m_dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
     navigator()->setDayTimeWidget(m_dayTimeWidget);
 
+    const int kShowHideAnimationPeriodMs = qnWorkbenchAnimations->timeLimit(
+        nx::client::ui::workbench::Animations::Id::CalendarShow);
+
     item->setWidget(m_widget);
     item->resize(kCalendarSize);
     item->setProperty(Qn::NoHandScrollOver, true);
@@ -82,18 +86,12 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
         &CalendarWorkbenchPanel::updateControlsGeometry);
 
     /* Hide pin/unpin button when any child line edit is visible: */
-    auto showHideSignalizer = new QnMultiEventSignalizer(this);
-    showHideSignalizer->addEventType(QEvent::Show);
-    showHideSignalizer->addEventType(QEvent::Hide);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(m_widget->findChildren<QLineEdit*>(), { QEvent::Show, QEvent::Hide }, this,
         [this](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);
             m_pinButton->setVisible(event->type() == QEvent::Hide);
         });
-
-    for (auto lineEdit : m_widget->findChildren<QLineEdit*>())
-        lineEdit->installEventFilter(showHideSignalizer);
 
     action(QnActions::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);
@@ -147,7 +145,6 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_yAnimator->setTimer(animationTimer());
     m_yAnimator->setTargetObject(item);
     m_yAnimator->setAccessor(new PropertyAccessor("y"));
-    m_yAnimator->setTimeLimit(kShowHideAnimationPeriodMs);
 
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
@@ -226,6 +223,8 @@ bool CalendarWorkbenchPanel::isOpened() const
 
 void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 {
+    using namespace nx::client::ui::workbench;
+
     ensureAnimationAllowed(&animate);
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
@@ -236,10 +235,9 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
         newY += kClosedPositionOffsetY;
 
     m_yAnimator->stop();
-    if (opened)
-        m_yAnimator->setEasingCurve(QEasingCurve::OutQuad);
-    else
-        m_yAnimator->setEasingCurve(QEasingCurve::InQuad);
+    qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
+        ? Animations::Id::CalendarShow
+        : Animations::Id::CalendarHide);
 
     if (animate)
         m_yAnimator->animateTo(newY);

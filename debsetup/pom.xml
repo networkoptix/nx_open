@@ -65,7 +65,6 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <failOnError>false</failOnError>
                             <skip>skip-deb</skip>                        
                             <target>							
                                 <chmod file="${project.build.directory}/*.sh" perm="755"/>							

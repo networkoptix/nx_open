@@ -109,10 +109,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     m_delegate = new QnDayTimeItemDelegate(this);
     m_tableWidget->setItemDelegate(m_delegate);
 
-    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
-    signalizer->setEventType(QEvent::Paint);
-    m_tableWidget->viewport()->installEventFilter(signalizer);
-    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
+    installEventHandler(m_tableWidget->viewport(), QEvent::Paint, this, &QnDayTimeWidget::updateCurrentTime);
 
     QHBoxLayout *headerLayout = new QHBoxLayout();
     headerLayout->setContentsMargins(kHeaderLabelMargin, kHeaderLabelMargin

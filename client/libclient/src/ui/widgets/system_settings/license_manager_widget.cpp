@@ -121,24 +121,22 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->gridLicenses->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        int key = static_cast<QKeyEvent*>(event)->key();
-        switch (key)
+    installEventHandler(ui->gridLicenses, QEvent::KeyPress, this,
+        [this](QObject* object, QEvent* event)
         {
-            case Qt::Key_Delete:
+            Q_UNUSED(object);
+            int key = static_cast<QKeyEvent*>(event)->key();
+            switch (key)
+            {
+                case Qt::Key_Delete:
 #if defined(Q_OS_MAC)
-            case Qt::Key_Backspace:
+                case Qt::Key_Backspace:
 #endif
-                removeSelectedLicenses();
-            default:
-                return;
-        }
-    });
+                    removeSelectedLicenses();
+                default:
+                    return;
+            }
+        });
 
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 

@@ -6,17 +6,15 @@
 
 #include <utils/common/checked_cast.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 
 #include "slider_tooltip_widget.h"
 
 namespace {
-    const int toolTipHideDelay = 2500;
-
-    /* Tooltip animation speed. */
-    const int kTooltipAnimationDurationMs = 160;
-
+const int toolTipHideDelay = 2500;
 } // anonymous namespace
 
 /**
@@ -63,7 +61,6 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
 
     m_tooltipWidgetVisibilityAnimator->setAccessor(new QnToolTipSliderVisibilityAccessor());
     m_tooltipWidgetVisibilityAnimator->setTargetObject(this);
-    m_tooltipWidgetVisibilityAnimator->setTimeLimit(kTooltipAnimationDurationMs);
     registerAnimation(m_tooltipWidgetVisibilityAnimator);
 
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
@@ -134,6 +131,10 @@ void QnToolTipSlider::setAutoHideToolTip(bool autoHideToolTip) {
 
 void QnToolTipSlider::hideToolTip(bool animated)
 {
+    using namespace nx::client::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
+        Animations::Id::TimelineTooltipHide);
+
     //TODO: #GDM we certainly need to find place for these constants
     const qreal kTransparent = 0.0;
     if (animated)
@@ -149,6 +150,10 @@ void QnToolTipSlider::hideToolTip(bool animated)
 
 void QnToolTipSlider::showToolTip(bool animated)
 {
+    using namespace nx::client::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
+        Animations::Id::TimelineTooltipShow);
+
     const qreal kOpaque = 1.0;
     if (animated)
     {

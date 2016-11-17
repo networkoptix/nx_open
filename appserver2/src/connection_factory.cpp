@@ -145,11 +145,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     using namespace std::placeholders;
 
     /**%apidoc GET /ec2/getResourceTypes
-     * Read all resource types. Resource type contain object type such as
-     * "Server", "Camera", etc. Also, resource types contain additional information
+     * Read all resource types. Resource type contains object type such as
+     * "Server", "Camera", etc. Also, resource type contains additional information
      * for cameras such as maximum fps, resolution, etc.
      * %param[default] format
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractResourceManager::getResourceTypes
      */
     regGet<nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
@@ -159,10 +159,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     /**%apidoc GET /ec2/getResourceParams
      * Read resource (camera, user or server) additional parameters (camera firmware version, etc).
-     * List of parameters depends of resource type.
+     * The list of parameters depends on the resource type.
      * %param[default] format
-     * %param id Resource unique id
-     * %return Return object in requested format
+     * %param id Resource unique id.
+     * %return Return object in the requested format.
      * %// AbstractResourceManager::getKvPairs
      */
     regGet<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
@@ -177,7 +177,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Any user if a resource is a layout and a layout is her own resource. Custom user with 'Edit camera settings' permision. Administrator.
+     * %permissions Administrator, or a custom user with "Edit camera settings" permission,
+     *     or a user who owns the resource in case the resource is a layout.
      * %param id Unique id of the resource.
      * %// AbstractResourceManager::remove
      */
@@ -187,8 +188,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read current status values for cameras, servers and storages.
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %return Returns objects status list data formatted in a requested
-     * format. If id parameter is specified, the list contains only one
+     * %return Return list of object statuses in the requested format.
+     * If "id" parameter is specified, the list will contain only one
      * object with that id, or nothing, if there is no such object found.
      */
     regGet<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
@@ -206,7 +207,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Administrator
+     * %permissions Administrator.
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
@@ -215,11 +216,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value false
      *     %value true
      * %param backupType Settings for storage redundancy.
-     *     %value Backup_Manual Backup is performed only at user's request.
+     *     %value Backup_Manual Backup is performed only at a user's request.
      *     %value Backup_RealTime Backup is performed during recording.
      *     %value Backup_Schedule Backup is performed on schedule.
-     * %param backupDaysOfTheWeek Combination (via "|") of day of week
-     *     names, for which the backup is active.
+     * %param backupDaysOfTheWeek Combination (via "|") of the days of week on which the backup is
+     *     active.
      *     %value Monday
      *     %value Tuesday
      *     %value Wednesday
@@ -227,10 +228,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value Friday
      *     %value Saturday
      *     %value Sunday
-     * %param backupStart Start time of the backup, in seconds passed from 00:00:00.
-     * %param backupDuration Duration of the synchronization period in seconds.
+     * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
+     * %param backupDuration Duration of the synchronization period (in seconds).
      *     -1 if not set.
-     * %param backupBitrate Maximum backup bitrate in bytes per second. Negative
+     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
@@ -251,11 +252,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value false
      *     %value true
      * %param backupType Settings for storage redundancy.
-     *     %value Backup_Manual Backup is performed only at user's request.
+     *     %value Backup_Manual Backup is performed only at a user's request.
      *     %value Backup_RealTime Backup is performed during recording.
      *     %value Backup_Schedule Backup is performed on schedule.
-     * %param backupDaysOfTheWeek Combination (via "|") of day of week
-     *     names, for which the backup is active.
+     * %param backupDaysOfTheWeek Combination (via "|") of weekdays
+     *     the backup is active on.
      *     %value Monday
      *     %value Tuesday
      *     %value Wednesday
@@ -263,10 +264,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value Friday
      *     %value Saturday
      *     %value Sunday
-     * %param backupStart Start time of the backup, in seconds passed from 00:00:00.
-     * %param backupDuration Duration of the synchronization period in seconds.
+     * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
+     * %param backupDuration Duration of the synchronization period (in seconds).
      *     -1 if not set.
-     * %param backupBitrate Maximum backup bitrate in bytes per second. Negative
+     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
@@ -286,11 +287,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *         %value false
     *         %value true
     *     %param backupType Settings for storage redundancy.
-    *         %value Backup_Manual Backup is performed only at user's request.
+    *         %value Backup_Manual Backup is performed only at a user's request.
     *         %value Backup_RealTime Backup is performed during recording.
     *         %value Backup_Schedule Backup is performed on schedule.
-    *     %param backupDaysOfTheWeek Combination (via "|") of day of week
-    *         names, for which the backup is active.
+    *     %param backupDaysOfTheWeek Combination (via "|") of the days of week on which the backup
+    *         is active on.
     *         %value Monday
     *         %value Tuesday
     *         %value Wednesday
@@ -298,7 +299,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *         %value Friday
     *         %value Saturday
     *         %value Sunday
-    *     %param backupStart Start time of the backup, in seconds passed from 00:00:00.
+    *     %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
     *     %param backupDuration Duration of the synchronization period in seconds.
     *         -1 if not set.
     *     %param backupBitrate Maximum backup bitrate in bytes per second. Negative
@@ -313,7 +314,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getMediaServersEx
      * Return server list
      * %param[default] format
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractMediaServerManager::getServersEx
      */
     regGet<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
@@ -327,13 +328,13 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Administrator
+     * %permissions Administrator.
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
      * %param parentId Should be empty.
      * %param name Storage name.
      * %param url Should be empty.
-     * %param spaceLimit Storage space to leave free on the storage,
-     *     in bytes. Recommended space is 5 gigabytes.
+     * %param spaceLimit Free space to maintain on the storage,
+     *     in bytes. Recommended free space is about 5 gigabytes.
      * %param usedForWriting Whether writing to the storage is
      *         allowed.
      *     %value false
@@ -363,115 +364,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regGet<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
 
     /**%apidoc POST /ec2/saveCameraUserAttributesList
-    * Save additional camera attributes for a number of cameras.
-    * <p>
-    * Parameters should be passed as a JSON array of objects in POST message body with
-    * content type "application/json". Example of such object can be seen in
-    * the result of the corresponding GET function.
-    * </p>
-    * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
-    * %param cameraName Camera name.
-    * %param userDefinedGroupName Name of the user-defined camera group.
-    * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
-    *     %value false
-    *     %value true
-    * %param licenseUsed Whether the license is used for the camera.
-    *     %value false
-    *     %value true
-    * %param motionType Type of motion detection method.
-    *     %value MT_Default Use default method.
-    *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
-    *     %value MT_SoftwareGrid Use motion detection grid implemented by the server.
-    *     %value MT_MotionWindow Use motion detection window implemented by the camera.
-    *     %value MT_NoMotion Do not perform motion detection.
-    * %param motionMask List of motion detection areas and their
-    *     sensitivity. The format is proprietary and is likely to change in
-    *     future API versions. Currently, this string defines several rectangles separated with
-    *     ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
-    *     left top corner), width, height.
-    * %param scheduleTasks List of scheduleTask objects which define the camera recording
-    *     schedule.
-    *     %param scheduleTask.startTime Time of day to start backup as
-    *         seconds passed from the day's 00:00:00.
-    *     %param scheduleTask.endTime: Time of day to end backup as
-    *         seconds passed from the day's 00:00:00.
-    *     %param scheduleTask.recordAudio Whether to record the sound.
-    *         %value false
-    *         %value true
-    *     %param scheduleTask.recordingType
-    *         %value RT_Always Record always.
-    *         %value RT_MotionOnly Record only when the motion is detected.
-    *         %value RT_Never Never record.
-    *         %value RT_MotionAndLowQuality Always record low quality
-    *             stream, and record high quality stream on motion.
-    *     %param scheduleTask.dayOfWeek Day of week for the recording task.
-    *         %value 1 Monday
-    *         %value 2 Tuesday
-    *         %value 3 Wednesday
-    *         %value 4 Thursday
-    *         %value 5 Friday
-    *         %value 6 Saturday
-    *         %value 7 Sunday
-    *     %param scheduleTask.beforeThreshold The number of seconds before a motion event to
-    *         record the video for.
-    *     %param scheduleTask.afterThreshold The number of seconds after a motion event to
-    *         record the video for.
-    *     %param scheduleTask.streamQuality Quality of the recording.
-    *         %value QualityLowest
-    *         %value QualityLow
-    *         %value QualityNormal
-    *         %value QualityHigh
-    *         %value QualityHighest
-    *         %value QualityPreSet
-    *         %value QualityNotDefined
-    *     %param scheduleTask.fps Frames per second (integer).
-    * %param audioEnabled Whether the audio is enabled on the camera.
-    *     %value false
-    *     %value true
-    * %param secondaryStreamQuality
-    *     %value SSQualityLow Low quality second stream.
-    *     %value SSQualityMedium Medium quality second stream.
-    *     %value SSQualityHigh High quality second stream.
-    *     %value SSQualityNotDefined Second stream quality is not defined.
-    *     %value SSQualityDontUse Second stream is not used for the camera.
-    * %param controlEnabled Whether server will manage the camera (change resolution, fps, create
-    *     profiles, etc).
-    *     %value false
-    *     %value true
-    * %param dewarpingParams Image dewarping parameters.
-    *     The format is proprietary and is likely to change in future API
-    *     versions.
-    * %param minArchiveDays Minimum number of days to keep the archive for.
-    *     If the value is less than or equal to zero, it is not used.
-    * %param maxArchiveDays Maximum number of days to keep the archive for.
-    *     If the value is less than or equal to zero, it is not used.
-    * %param preferredServerId Unique id of a server which is preferred for
-    *     the camera for failover.
-    * %param failoverPriority Priority for the camera for being transferred
-    *     to another server for failover.
-    *     %value FP_Never Will never be transferred to another server.
-    *     %value FP_Low Low priority against other cameras.
-    *     %value FP_Medium Medium priority against other cameras.
-    *     %value FP_High High priority against other cameras.
-    * %param backupType Combination (via "|") of flags defining backup options.
-    *     %value CameraBackup_Disabled Backup is disabled.
-    *     %value CameraBackup_HighQuality Backup is in high quality.
-    *     %value CameraBackup_LowQuality Backup is in low quality.
-    *     %value CameraBackup_Both
-    *         Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
-    *     %value CameraBackup_Default A default value is used for backup options.
-    * %// AbstractCameraManager::saveUserAttributes
-    */
-    regUpdate<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
-
-    /**%apidoc POST /ec2/saveCameraUserAttributes
-     * Save additional camera attributes for a single camera.
+     * Save additional camera attributes for a number of cameras.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
+     * Parameters should be passed as a JSON array of objects in POST message body with
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Administrator or a custom user with 'Edit camera settings' permission.
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      * %param cameraName Camera name.
      * %param userDefinedGroupName Name of the user-defined camera group.
@@ -489,16 +387,16 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value MT_NoMotion Do not perform motion detection.
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
-     *     future API versions. Currently, this string defines several rectangles separated with
-     *     ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
-     *     left top corner), width, height.
+     *     future API versions. Currently, this string defines several rectangles separated
+     *     with ":", each rectangle is described by 5 comma-separated numbers: sensitivity,
+     *     x and y (for left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
-     *     %param scheduleTask.startTime Time of day to start backup as
-     *         seconds passed from the day's 00:00:00.
-     *     %param scheduleTask.endTime: Time of day to end backup as
-     *         seconds passed from the day's 00:00:00.
-     *     %param scheduleTask.recordAudio Whether to record the sound.
+     *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *         from 00:00:00).
+     *     %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *         from 00:00:00).
+     *     %param scheduleTask.recordAudio Whether to record sound.
      *         %value false
      *         %value true
      *     %param scheduleTask.recordingType
@@ -528,7 +426,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value QualityPreSet
      *         %value QualityNotDefined
      *     %param scheduleTask.fps Frames per second (integer).
-     * %param audioEnabled Whether the audio is enabled on the camera.
+     * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
      * %param secondaryStreamQuality
@@ -537,7 +435,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value SSQualityHigh High quality second stream.
      *     %value SSQualityNotDefined Second stream quality is not defined.
      *     %value SSQualityDontUse Second stream is not used for the camera.
-     * %param controlEnabled Whether server will manage the camera (change resolution, fps, create
+     * %param controlEnabled Whether server manages the camera (changes resolution, fps, create
      *     profiles, etc).
      *     %value false
      *     %value true
@@ -547,12 +445,115 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param minArchiveDays Minimum number of days to keep the archive for.
      *     If the value is less than or equal to zero, it is not used.
      * %param maxArchiveDays Maximum number of days to keep the archive for.
-     *     If the value is less than or equal to zero, it is not used.
-     * %param preferredServerId Unique id of a server which is preferred for
-     *     the camera for failover.
-     * %param failoverPriority Priority for the camera for being transferred
-     *     to another server for failover.
-     *     %value FP_Never Will never be transferred to another server.
+     *     If the value is less than or equal zero, it is not used.
+     * %param preferredServerId Unique id of a server which has the highest priority of hosting
+     *     the camera for failover (if the current server fails).
+     * %param failoverPriority Priority for the camera to be moved
+     *     to another server for failover (if the current server fails).
+     *     %value FP_Never Will never be moved to another server.
+     *     %value FP_Low Low priority against other cameras.
+     *     %value FP_Medium Medium priority against other cameras.
+     *     %value FP_High High priority against other cameras.
+     * %param backupType Combination (via "|") of flags defining backup options.
+     *     %value CameraBackup_Disabled Backup is disabled.
+     *     %value CameraBackup_HighQuality Backup is in high quality.
+     *     %value CameraBackup_LowQuality Backup is in low quality.
+     *     %value CameraBackup_Both
+     *         Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+     *     %value CameraBackup_Default A default value is used for backup options.
+     * %// AbstractCameraManager::saveUserAttributes
+     */
+    regUpdate<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
+
+    /**%apidoc POST /ec2/saveCameraUserAttributes
+     * Save additional camera attributes for a single camera.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator, or a custom user with "Edit camera settings" permission.
+     * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
+     * %param cameraName Camera name.
+     * %param userDefinedGroupName Name of the user-defined camera group.
+     * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
+     *     %value false
+     *     %value true
+     * %param licenseUsed Whether the license is used for the camera.
+     *     %value false
+     *     %value true
+     * %param motionType Type of motion detection method.
+     *     %value MT_Default Use default method.
+     *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
+     *     %value MT_SoftwareGrid Use motion detection grid implemented by the server.
+     *     %value MT_MotionWindow Use motion detection window implemented by the camera.
+     *     %value MT_NoMotion Do not perform motion detection.
+     * %param motionMask List of motion detection areas and their
+     *     sensitivity. The format is proprietary and is likely to change in
+     *     future API versions. Currently, this string defines several rectangles separated
+     *     with ":", each rectangle is described by 5 comma-separated numbers: sensitivity,
+     *     x and y (for left top corner), width, height.
+     * %param scheduleTasks List of scheduleTask objects which define the camera recording
+     *     schedule.
+     *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *         from 00:00:00).
+     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
+     *         from 00:00:00).
+     *     %param scheduleTask.recordAudio Whether to record sound.
+     *         %value false
+     *         %value true
+     *     %param scheduleTask.recordingType
+     *         %value RT_Always Record always.
+     *         %value RT_MotionOnly Record only when the motion is detected.
+     *         %value RT_Never Never record.
+     *         %value RT_MotionAndLowQuality Always record low quality
+     *             stream, and record high quality stream on motion.
+     *     %param scheduleTask.dayOfWeek Weekday for the recording task.
+     *         %value 1 Monday
+     *         %value 2 Tuesday
+     *         %value 3 Wednesday
+     *         %value 4 Thursday
+     *         %value 5 Friday
+     *         %value 6 Saturday
+     *         %value 7 Sunday
+     *     %param scheduleTask.beforeThreshold The number of seconds before a motion event to
+     *         record the video for.
+     *     %param scheduleTask.afterThreshold The number of seconds after a motion event to
+     *         record the video for.
+     *     %param scheduleTask.streamQuality Quality of the recording.
+     *         %value QualityLowest
+     *         %value QualityLow
+     *         %value QualityNormal
+     *         %value QualityHigh
+     *         %value QualityHighest
+     *         %value QualityPreSet
+     *         %value QualityNotDefined
+     *     %param scheduleTask.fps Frames per second (integer).
+     * %param audioEnabled Whether audio is enabled on the camera.
+     *     %value false
+     *     %value true
+     * %param secondaryStreamQuality
+     *     %value SSQualityLow Low quality second stream.
+     *     %value SSQualityMedium Medium quality second stream.
+     *     %value SSQualityHigh High quality second stream.
+     *     %value SSQualityNotDefined Second stream quality is not defined.
+     *     %value SSQualityDontUse Second stream is not used for the camera.
+     * %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     *     profiles, etc).
+     *     %value false
+     *     %value true
+     * %param dewarpingParams Image dewarping parameters.
+     *     The format is proprietary and is likely to change in future API
+     *     versions.
+     * %param minArchiveDays Minimum number of days to keep the archive for.
+     *     If the value is less than or equal zero, it is not used.
+     * %param maxArchiveDays Maximum number of days to keep the archive for.
+     *     If the value is less than or equal zero, it is not used.
+     * %param preferredServerId Unique id of a server which has the highest priority of hosting
+     *     the camera for failover (if the current server fails).
+     * %param failoverPriority Priority for the camera to be moved
+     *     to another server for failover (if the current server fails).
+     *     %value FP_Never Will never be moved to another server.
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
@@ -591,15 +592,15 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
-     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x
-     *         and y (for left top corner), width, height.
+     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity,
+     *         x and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
-     *         %param scheduleTask.startTime Time of day to start backup as
-     *             seconds passed from the day's 00:00:00.
-     *         %param scheduleTask.endTime: Time of day to end backup as
-     *             seconds passed from the day's 00:00:00.
-     *         %param scheduleTask.recordAudio Whether to record the sound.
+     *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *             from 00:00:00).
+     *         %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *             from 00:00:00).
+     *         %param scheduleTask.recordAudio Whether to record sound.
      *             %value false
      *             %value true
      *         %param scheduleTask.recordingType
@@ -608,7 +609,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             %value RT_Never Never record.
      *             %value RT_MotionAndLowQuality Always record low quality
      *                 stream, and record high quality stream on motion.
-     *         %param scheduleTask.dayOfWeek Day of week for the recording task.
+     *         %param scheduleTask.dayOfWeek Weekday for the recording task.
      *             %value 1 Monday
      *             %value 2 Tuesday
      *             %value 3 Wednesday
@@ -629,7 +630,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             %value QualityPreSet
      *             %value QualityNotDefined
      *         %param scheduleTask.fps Frames per second (integer).
-     *     %param audioEnabled Whether the audio is enabled on the camera.
+     *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
      *     %param secondaryStreamQuality
@@ -638,22 +639,22 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value SSQualityHigh High quality second stream.
      *         %value SSQualityNotDefined Second stream quality is not defined.
      *         %value SSQualityDontUse Second stream is not used for the camera.
-     *     %param controlEnabled Whether server will manage the camera (change resolution, fps,
-     *         create profiles, etc).
+     *     %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     *         profiles, etc).
      *         %value false
      *         %value true
      *     %param dewarpingParams Image dewarping parameters.
      *         The format is proprietary and is likely to change in future API
      *         versions.
      *     %param minArchiveDays Minimum number of days to keep the archive for.
-     *         If the value is less than or equal to zero, it is not used.
+     *         If the value is less than or equal zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
-     *         If the value is less than or equal to zero, it is not used.
-     *     %param preferredServerId Unique id of a server which is preferred for
-     *         the camera for failover.
-     *     %param failoverPriority Priority for the camera for being transferred
-     *         to another server for failover.
-     *         %value FP_Never Will never be transferred to another server.
+     *         If the value is less than or equal zero, it is not used.
+     *     %param preferredServerId Unique id of a server which has the highest priority of hosting
+     *         the camera for failover (if the current server fails).
+     *     %param failoverPriority Priority for the camera to be moved
+     *         to another server for failover (if the current server fails).
+     *         %value FP_Never Will never be moved to another server.
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
@@ -672,11 +673,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
     /**%apidoc GET /ec2/getCameraHistoryItems
-     * Read information about which server hold camera in some time
-     * period. This information is used for archive play if camera was moved from
+     * Read information about which server was hosting the camera at which period.
+     * This information is used for archive playback if camera has been moved from
      * one server to another.
      * %param[default] format
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
      */
     regGet<nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
@@ -684,14 +685,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
-     * %return List of objects with camera information formatted in the requested format.
+     * %return List of camera information objects in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
-     *     %param parentId Unique Id of a camera server.
+     *     %param parentId Unique id of the server hosting the camera.
      *     %param name Camera name.
      *     %param url Camera IP address, or a complete HTTP URL if the camera was added manually.
-     *         Also, for multichannel encoders a complete URL is used.
-     *     %param typeId Unique Id of a camera type. Camera type can describe predefined
+     *         Also, for multichannel encoders a complete URL is always used.
+     *     %param typeId Unique id of the camera type. A camera type can describe predefined
      *         information such as camera maximum resolution, fps, etc. Detailed type information
      *         can be obtained via GET /ec2/getResourceTypes request.
      *
@@ -705,13 +706,13 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param model Camera model.
      *     %param groupId Internal group identifier. It is used for grouping channels of
      *         multi-channel cameras together.
-     *     %param groupName Group name. This name can be changed by the user.
-     *     %param statusFlags Usually this field is zero. Non-zero value is used to mark that a lot
-     *         of network issues have occurred with this camera.
+     *     %param groupName Group name. This name can be changed by users.
+     *     %param statusFlags Usually this field is zero. Non-zero value indicates that the camera
+     *          is causing a lot of network issues.
      *     %param vendor Camera manufacturer.
      *
      *     %// From struct ApiCameraAttributesData:
-     *     %param cameraId Camera unique id.
+     *     %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
@@ -729,15 +730,15 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
-     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x
-     *         and y (for left top corner), width, height.
+     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity,
+     *         x and y (for the left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
-     *         %param scheduleTask.startTime Time of day to start backup as
-     *             seconds passed from the day's 00:00:00.
-     *         %param scheduleTask.endTime: Time of day to end backup as
-     *             seconds passed from the day's 00:00:00.
-     *         %param scheduleTask.recordAudio Whether to record the sound.
+     *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *             from 00:00:00).
+     *         %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *             from 00:00:00).
+     *         %param scheduleTask.recordAudio Whether to record sound.
      *             %value false
      *             %value true
      *         %param scheduleTask.recordingType
@@ -767,7 +768,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             %value QualityPreSet
      *             %value QualityNotDefined
      *         %param scheduleTask.fps Frames per second (integer).
-     *     %param audioEnabled Whether the audio is enabled on the camera.
+     *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
      *     %param secondaryStreamQuality
@@ -776,8 +777,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value SSQualityHigh High quality second stream.
      *         %value SSQualityNotDefined Second stream quality is not defined.
      *         %value SSQualityDontUse Second stream is not used for the camera.
-     *     %param controlEnabled Whether server will manage the camera (change resolution, fps,
-     *         create profiles, etc).
+     *     %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     *         profiles, etc).
      *         %value false
      *         %value true
      *     %param dewarpingParams Image dewarping parameters.
@@ -787,11 +788,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal to zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal to zero, it is not used.
-     *     %param preferredServerId Unique id of a server which is preferred for
-     *         the camera for failover.
-     *     %param failoverPriority Priority for the camera for being transferred
-     *         to another server for failover.
-     *         %value FP_Never Will never be transferred to another server.
+     *     %param preferredServerId Unique id of a server which has the highest priority of hosting
+     *         the camera for failover (if the current server fails).
+     *     %param failoverPriority Priority for the camera to be moved
+     *         to another server for failover (if the current server fails).
+     *         %value FP_Never Will never be moved to another server.
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
@@ -848,9 +849,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return all event rules.
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %return Returns objects status list data formatted in a requested
-     * format. If id parameter is specified, the list contains only one
-     * object with that id, or nothing, if there is no such object found.
+     * %return Return list of object statuses in the requested format. 
+     *     If "id" parameter is specified, the list will contain only one
+     *     object with that id, or nothing, if there is no such object found.
      * %// AbstractBusinessEventManager::getBusinessRules
      */
     regGet<QnUuid, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
@@ -871,8 +872,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * hash data with salt
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %return Object in requested format. If id parameter is specified, the list contains only one
-     * object with that id, or nothing, if there is no such object found.
+     * %return Return object in the requested format. If "id" parameter is specified, the list will
+     *     contain only one object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUsers
      */
     regGet<QnUuid, ApiUserDataList>(p, ApiCommand::getUsers);
@@ -881,8 +882,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return user groups registered in the system.
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %return Object in requested format. If id parameter is specified, the list contains only one
-     * object with that id, or nothing, if there is no such object found.
+     * %return Return object in the requested format. If "id" parameter is specified, the list will
+     *     contain only one object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUserGroups
      */
     regGet<QnUuid, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
@@ -890,7 +891,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getAccessRights
      * Return list of accessible resources ids for each user in the system.
      * %param[default] format
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractUserManager::getAccessRights
      */
     regGet<nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
@@ -914,11 +915,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Administrator
+     * %permissions Administrator.
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
      * %param name User name.
+     * %param fullName Full name of the user.
      * %param[opt] url Should be empty.
      * %param[proprietary] typeId Should have fixed value.
      *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
@@ -938,7 +940,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      *     %value GlobalCustomUserPermission Flag: this user has custom permissions
-     * %param[opt] groupId User group unique identifier.
+     * %param[opt] groupId User group unique id.
      * %param email User's email.
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
@@ -972,7 +974,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Administrator
+     * %permissions Administrator.
      * %param id User unique id.
      * %// AbstractUserManager::remove
      */
@@ -1009,7 +1011,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Administrator
+     * %permissions Administrator.
      * %param id User unique id.
      * %// AbstractUserManager::removeUserGroup
      */
@@ -1018,14 +1020,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getPredefinedRoles
     * Return list of predefined user roles.
     * %param[default] format
-    * %return Return object in requested format
+    * %return Return object in the requested format.
     */
     regGet<nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
      * Return list of video walls
      * %param[default] format
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractVideowallManager::getVideowalls
      */
     regGet<QnUuid, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
@@ -1044,8 +1046,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return list of user layout
      * %param[default] format
      * %param[opt] id Layout unique id.
-     * %return Return object in requested format. If id parameter is specified, the list contains
-     * only one object with that id, or nothing, if there is no such object found.
+     * %return Return object in the requested format. If "id" parameter is specified, the list will
+     *     contain only one object with that id, or nothing, if there is no such object found.
      * %// AbstractLayoutManager::getLayouts
      */
     regGet<QnUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
@@ -1057,7 +1059,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Any user if a layout is her own resource. Administrator.
+     * %permissions Administrator, or a user who owns the layout.
      * %param[opt] id Layout unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
      * %param parentId Unique id of the user owning the layout.
@@ -1190,8 +1192,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %permissions Any user if a layout is her own resource. Administrator.
-     * %param id Unique Id of the layout to be deleted.
+     * %permissions Administrator, or a user who owns the layout.
+     * %param id Unique id of the layout to be deleted.
      * %// AbstractLayoutManager::remove
      */
     regUpdate<ApiIdData>(p, ApiCommand::removeLayout);
@@ -1202,7 +1204,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * to database.
      * %param[default] format
      * %param[opt] folder Folder name in a virtual FS
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractStoredFileManager::listDirectory
      */
     regGet<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
@@ -1211,7 +1213,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read file data from a virtual FS
      * %param[default] format
      * %param[opt] folder File name
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractStoredFileManager::getStoredFile
      */
     regGet<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
@@ -1253,7 +1255,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %permissions Administrator.
      * %param[default] format
      * %param[opt] folder File name
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      * %// AbstractTimeManager::getCurrentTimeImpl
      */
     regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
@@ -1272,7 +1274,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read all data such as all servers, cameras, users, etc.
      * %param[default] format
      * %param[opt] folder File name
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      */
     regGet<nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
 
@@ -1280,7 +1282,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read license list
      * %param[default] format
      * %param[opt] folder File name
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      */
     regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
@@ -1297,7 +1299,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read general system settings such as email address, etc.
      * %param[default] format
      * %param[opt] folder File name
-     * %return Return object in requested format
+     * %return Return object in the requested format.
      */
     regFunctor<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2, _3));

@@ -9,25 +9,26 @@
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "nx/fusion/serialization/binary_stream.h"
-#include "nx/fusion/serialization/sql_functions.h"
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
 #include "utils/crypt/symmetrical.h"
-#include "nx/fusion/serialization/json.h"
 
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
 
 #include <core/resource_management/user_roles_manager.h>
 
-#include "migrations/business_rules_db_migration.h"
-#include "migrations/user_permissions_db_migration.h"
-#include "migrations/accessible_resources_db_migration.h"
-#include "migrations/legacy_transaction_migration.h"
-#include "migrations/add_transaction_type.h"
-#include "migrations/make_transaction_timestamp_128bit.h"
-#include "migrations/add_history_attributes_to_transaction.h"
+#include <database/api/db_resource_api.h>
+#include <database/api/db_layout_api.h>
+
+#include <database/migrations/business_rules_db_migration.h>
+#include <database/migrations/user_permissions_db_migration.h>
+#include <database/migrations/accessible_resources_db_migration.h>
+#include <database/migrations/legacy_transaction_migration.h>
+#include <database/migrations/add_transaction_type.h>
+#include <database/migrations/make_transaction_timestamp_128bit.h>
+#include <database/migrations/add_history_attributes_to_transaction.h>
+#include <database/migrations/reparent_videowall_layouts.h>
 
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
@@ -53,6 +54,8 @@
 #include "restype_xml_parser.h"
 #include "business/business_event_rule.h"
 #include "settings.h"
+
+#include <nx/fusion/model_functions.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -493,6 +496,11 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
                     return false;
             }
+            if (m_needResyncVideoWall)
+            {
+//                 if (!fillTransactionLogInternal<ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+//                     return false;
+            }
 
         }
 
@@ -725,6 +733,13 @@ bool QnDbManager::queryObjects<ApiCameraDataList>(ApiCameraDataList& objects)
     return errCode == ErrorCode::ok;
 }
 
+template <>
+bool QnDbManager::queryObjects<ApiResourceStatusDataList>(ApiResourceStatusDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
 template <class ObjectListType>
 bool QnDbManager::queryObjects(ObjectListType& objects)
 {
@@ -784,6 +799,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
         return false;
 
     return true;
@@ -1472,6 +1490,17 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncUsers = true;
     }
+    else if (updateName == lit(":/updates/78_migrate_videowall_layouts.sql"))
+    {
+        if (!ec2::database::migrations::reparentVideoWallLayouts(m_sdb))
+            return false;
+
+        if (!m_dbJustCreated)
+        {
+            m_needResyncLayout = true;
+            m_needResyncVideoWall = true;
+        }
+    }
 
     return true;
 }
@@ -1615,14 +1644,9 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
     return ErrorCode::ok;
 }
 
-qint32 QnDbManager::getResourceInternalId( const QnUuid& guid ) {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id from vms_resource where guid = ?");
-    query.bindValue(0, guid.toRfc4122());
-    if (!query.exec() || !query.next())
-        return 0;
-    return query.value(0).toInt();
+qint32 QnDbManager::getResourceInternalId( const QnUuid& guid )
+{
+    return database::api::getResourceInternalId(m_sdb, guid);
 }
 
 QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
@@ -1637,30 +1661,8 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    *internalId = getResourceInternalId(data.id);
-
-    //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
-    NX_ASSERT(!data.id.isNull(), "Resource id must not be null");
-    if (data.id.isNull())
+    if (!database::api::insertOrReplaceResource(m_sdb, data, internalId))
         return ErrorCode::dbError;
-
-    QSqlQuery query(m_sdb);
-    if (*internalId) {
-        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalId");
-        query.bindValue(":internalId", *internalId);
-    }
-    else {
-        query.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url) VALUES(:id, :typeId, :parentId, :name, :url)");
-    }
-    QnSql::bind(data, &query);
-
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    if (*internalId == 0)
-        *internalId = query.lastInsertId().toInt();
-
     return ErrorCode::ok;
 }
 
@@ -1876,35 +1878,6 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
     }
-}
-
-
-ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId)
-{
-    QSqlQuery insQuery(m_sdb);
-    QString queryStr(R"(
-        INSERT OR REPLACE
-        INTO vms_layout
-        (
-        cell_spacing_height, locked,
-        cell_aspect_ratio, background_width,
-        background_image_filename, background_height,
-        cell_spacing_width, background_opacity, resource_ptr_id
-        ) VALUES (
-        :verticalSpacing, :locked,
-        :cellAspectRatio, :backgroundWidth,
-        :backgroundImageFilename, :backgroundHeight,
-        :horizontalSpacing, :backgroundOpacity, :internalId
-        )
-    )");
-    if (!prepareSQLQuery(&insQuery, queryStr, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    QnSql::bind(data, &insQuery);
-    insQuery.bindValue(":internalId", internalId);
-    if (execSQLQuery(&insQuery, Q_FUNC_INFO))
-        return ErrorCode::ok;
-    return ErrorCode::dbError;
 }
 
 ErrorCode QnDbManager::removeStorage(const QnUuid& guid)
@@ -2235,48 +2208,11 @@ ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
 
 ErrorCode QnDbManager::removeLayoutItems(qint32 id)
 {
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_layoutitem WHERE layout_id = :id");
-    delQuery.bindValue(":id", id);
-    if (!delQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+    if (!database::api::removeLayoutItems(m_sdb, id))
         return ErrorCode::dbError;
-    }
-
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId)
-{
-    ErrorCode result = removeLayoutItems(internalLayoutId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_guid, \
-        zoom_right, top, layout_id, bottom, zoom_top, \
-        zoom_target_uuid, flags, contrast_params, rotation, \
-        dewarping_params, left, display_info \
-        ) VALUES \
-        (:zoomBottom, :right, :id, :zoomLeft, :resourceId, \
-        :zoomRight, :top, :layoutId, :bottom, :zoomTop, \
-        :zoomTargetId, :flags, :contrastParams, :rotation, \
-        :dewarpingParams, :left, :displayInfo \
-        )\
-    ");
-    for(const ApiLayoutItemData& item: data.items)
-    {
-        QnSql::bind(item, &insQuery);
-        insQuery.bindValue(":layoutId", internalLayoutId);
-
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-            return ErrorCode::dbError;
-        }
-    }
-    return ErrorCode::ok;
-}
 
 ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
 {
@@ -2390,18 +2326,11 @@ ErrorCode QnDbManager::removeBusinessRule( const QnUuid& guid )
 
 ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 {
-    qint32 internalId;
+    if (!database::api::saveLayout(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 
-    ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result !=ErrorCode::ok)
-        return result;
 
-    result = insertOrReplaceLayout(params, internalId);
-    if (result !=ErrorCode::ok)
-        return result;
-
-    result = updateLayoutItems(params, internalId);
-    return result;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
@@ -2941,7 +2870,7 @@ QString getObjectInfoSelectString(const QString& objType, const QString& objTabl
                 FROM %2 o JOIN vms_resource r  \
                     on r.id = o.resource_ptr_id WHERE r.parent_guid = :guid")
                 .arg(objType)
-                .arg(objTable); 
+                .arg(objTable);
 }
 
 QString getMultiObjectsInfoSelectString(const QStringList& selectStrings)
@@ -3285,49 +3214,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
 
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layouts)
 {
-    QSqlQuery query(m_sdb);
-    QString filterStr;
-    if (!id.isNull())
-        filterStr = QString("WHERE l.guid = %1").arg(guidToSqlString(id));
-    query.setForwardOnly(true);
-    QString queryStr(lit(" \
-        SELECT \
-        r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        l.cell_spacing_height as verticalSpacing, l.locked, \
-        l.cell_aspect_ratio as cellAspectRatio, l.background_width as backgroundWidth, \
-        l.background_image_filename as backgroundImageFilename, l.background_height as backgroundHeight, \
-        l.cell_spacing_width as horizontalSpacing, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id \
-        FROM vms_layout l \
-        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid \
-        ").arg(filterStr));
-    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!database::api::fetchLayouts(m_sdb, id, layouts))
         return ErrorCode::dbError;
-
-    if (!execSQLQuery(&query, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    QSqlQuery queryItems(m_sdb);
-    queryItems.setForwardOnly(true);
-    QString queryItemsStr(R"(
-        SELECT
-        r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_guid as resourceId,
-        li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop,
-        li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id,
-        li.dewarping_params as dewarpingParams, li.left, li.display_info as displayInfo
-        FROM vms_layoutitem li
-        JOIN vms_resource r on r.id = li.layout_id order by r.guid
-    )");
-    if (!prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    if (!execSQLQuery(&queryItems, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    QnSql::fetch_many(query, &layouts);
-    std::vector<ApiLayoutItemWithRefData> items;
-    QnSql::fetch_many(queryItems, &items);
-    mergeObjectListData(layouts, items, &ApiLayoutData::items, &ApiLayoutItemWithRefData::layoutId);
-
     return ErrorCode::ok;
 }
 
@@ -4218,10 +4106,16 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     DB_LOAD(QnUuid(), data->layouts);
     if (user) // Remove layouts belonging to other users.
     {
+        QSet<QnUuid> serverIds;
+        for (const auto& server: data->servers)
+            serverIds.insert(server.id);
+
         data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
-            [user](const ApiLayoutData& layout)
+            [user, &serverIds](const ApiLayoutData& layout)
             {
-                return layout.parentId != user->id;
+                return !layout.parentId.isNull()
+                    && layout.parentId != user->id
+                    && !serverIds.contains(layout.parentId);
             }),
             data->layouts.end());
     }

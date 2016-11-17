@@ -16,8 +16,11 @@ enum class DBResult
     statementError,
     ioError,
     notFound,
-    cancelled, //< This code means that business logic decided to cancel operation 
-                // and rollback transaction. This is not an error.
+    /**
+     * Business logic decided to cancel operation and rollback transaction. 
+     * This is not an error.
+     */
+    cancelled, 
     retryLater,
     uniqueConstraintViolation,
     connectionError

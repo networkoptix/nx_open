@@ -369,10 +369,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     context()->instance<QnAppServerNotificationCache>();
 
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen](bool checked)
+        [this, welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>()](bool checked)
         {
             welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
@@ -643,6 +641,13 @@ void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
     setState(m_logicalState, value);
 }
 
+void QnWorkbenchConnectHandler::showPreloader()
+{
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->handleConnectingToSystem();
+    welcomeScreen->setGlobalPreloaderVisible(true);
+}
+
 void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
     PhysicalState physicalValue)
 {
@@ -657,13 +662,13 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
             welcomeScreen->setGlobalPreloaderVisible(false);
             resourceModeAction->setChecked(false);  //< Shows welcome screen
             break;
+
+        case LogicalState::connecting_to_target:
+            showPreloader();
+            break;
         case LogicalState::connecting:
             if (physicalValue == PhysicalState::waiting_resources)
-            {
-                // If connection is successful we show global preloader while loading resources
-                welcomeScreen->handleConnectingToSystem();
-                welcomeScreen->setGlobalPreloaderVisible(true);
-            }
+                showPreloader();
             break;
         case LogicalState::connected:
             stopReconnecting();
@@ -783,16 +788,19 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
     /* In several seconds after connect show warnings. */
-    executeDelayed([this] { showWarnMessagesOnce(); }, kMessagesDelayMs);
+    executeDelayedParented([this] { showWarnMessagesOnce(); }, kMessagesDelayMs, this);
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
-    bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setVisibleControls(true);
+
+    bool directConnection = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (m_logicalState == LogicalState::connected)
     {
         // Ask user if he wants to save changes.
-        if (!disconnectFromServer(force))
+        if (!disconnectFromServer(directConnection))
             return;
     }
     else
@@ -806,21 +814,22 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
-    if (force)
+    if (directConnection)
     {
+        // We don't have to test connection here.
         NX_ASSERT(url.isValid());
         setLogicalState(LogicalState::connecting_to_target);
         connectToServer(url);
     }
     else if (url.isValid())
     {
+        const auto forceConnection = parameters.argument(Qn::ForceRole, false);
         const auto connectionSettings = ConnectionSettings::create(
             isConnectionToCloud(url),
             parameters.argument(Qn::StorePasswordRole, false),
             parameters.argument(Qn::AutoLoginRole, false));
 
-        setLogicalState(LogicalState::testing);
-        testConnectionToServer(url, connectionSettings);
+        testConnectionToServer(url, connectionSettings, forceConnection);
     }
     else
     {
@@ -834,8 +843,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             const auto connectionSettings = ConnectionSettings::create(
                 false, false, true);
 
-            setLogicalState(LogicalState::testing);
-            testConnectionToServer(url, connectionSettings);
+            testConnectionToServer(url, connectionSettings, true);
         }
     }
 }
@@ -866,9 +874,6 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
 
     qnSettings->setAutoLogin(false);
     qnSettings->save();
-
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setVisible(true);
 }
 
 QnWorkbenchConnectHandler::ConnectionSettingsPtr
@@ -928,10 +933,15 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     const QUrl& url,
     ec2::ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
-    const ConnectionSettingsPtr& storeSettings)
+    const ConnectionSettingsPtr& storeSettings,
+    bool force)
 {
-    if (m_connectingHandle != handle || m_logicalState != LogicalState::testing)
+    const bool invalidState = ((m_logicalState != LogicalState::testing)
+        && (m_logicalState != LogicalState::connecting_to_target));
+
+    if (m_connectingHandle != handle || invalidState)
         return;
+
     m_connectingHandle = 0;
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
@@ -959,7 +969,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
-            setLogicalState(LogicalState::connecting);
+            setLogicalState(force ? LogicalState::connecting : LogicalState::connecting_to_target);
             connectToServer(url);
             break;
         case Qn::IncompatibleProtocolConnectionResult:
@@ -1027,20 +1037,18 @@ void QnWorkbenchConnectHandler::clearConnection()
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
     const QUrl& url,
-    const ConnectionSettingsPtr& storeSettings)
+    const ConnectionSettingsPtr& storeSettings,
+    bool force)
 {
-    auto validState = m_logicalState == LogicalState::testing;
-    NX_ASSERT(validState);
-    if (!validState)
-        return;
+    setLogicalState(force ? LogicalState::connecting_to_target : LogicalState::testing);
 
     setPhysicalState(PhysicalState::testing);
     m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
-        [this, storeSettings, url]
+        [this, storeSettings, url, force]
         (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
-            handleTestConnectionReply(handle, url, errorCode, connectionInfo, storeSettings);
+            handleTestConnectionReply(handle, url, errorCode, connectionInfo, storeSettings, force);
         });
 }
 

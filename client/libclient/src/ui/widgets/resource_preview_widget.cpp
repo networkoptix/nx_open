@@ -15,7 +15,7 @@
 
 namespace {
 
-    const int kDefaultAspectRatio = 4.0 / 3.0;
+    const qreal kDefaultAspectRatio = 4.0 / 3.0;
 
 } // namespace
 

@@ -8,6 +8,7 @@ __author__ = 'Danil Lavrentyuk'
 
 import os, time
 from functest_util import compareJson, textdiff
+from testbase import FuncTestCase
 from stortest import StorageBasedTest
 
 NUM_SERV=2
@@ -46,7 +47,7 @@ def _saveDump(name, data, mode = "t"):
 
 class DBTest(StorageBasedTest):
 
-    helpStr = "DB migration on version upgrade test"
+    helpStr = "DB upgrade and backup/restore tests"
     num_serv = NUM_SERV
     _test_name = "Database"
     _test_key = 'db'
@@ -74,6 +75,10 @@ class DBTest(StorageBasedTest):
     @classmethod
     def _global_clear_extra_args(cls, num):
         return ()
+
+    @classmethod
+    def _need_clear_box(cls, num):
+        return super(StorageBasedTest, cls)._need_clear_box(num)
 
     def _init_script_args(self, boxnum):
         print "DEBUG: box %s, set id %s" % (boxnum, self._ids[boxnum])

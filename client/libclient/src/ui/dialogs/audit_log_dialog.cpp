@@ -92,14 +92,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::updateTabWidgetSize);
 
     /* Setup details label and its aligning by detailsTabWidget: */
-    QnSingleEventSignalizer* resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    ui->detailsTabWidget->installEventFilter(resizeSignalizer);
-
     m_detailsLabel = new QLabel(ui->detailsTabWidget);
-    m_detailsLabel->installEventFilter(resizeSignalizer);
-
-    connect(resizeSignalizer, &QnAbstractEventSignalizer::activated, this,
+    installEventHandler(ui->detailsTabWidget, QEvent::Resize, this,
         [this]()
         {
             m_detailsLabel->move(

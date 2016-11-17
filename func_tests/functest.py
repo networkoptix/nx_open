@@ -1271,6 +1271,7 @@ def RunByAutotest():
     """
     Used when this script is called by the autotesting script auto.py
     """
+    testMaster.init(notest=True)
     CallTest(MainFunctests)
     if not testMaster.args.mainonly:
         if not testMaster.args.skiptime:
@@ -1353,13 +1354,8 @@ def LegacyTestsRun(only = False, argv=[]):
 def DoTests(argv):
     print "The automatic test starts, please wait for checking cluster status, test connection and APIs and do proper rollback..."
     # initialize cluster test environment
-
     argc = len(argv)
-
-    ret, reason = testMaster.init()
-    if not ret:
-        print "Failed to initialize the cluster test object: %s" % (reason)
-        return False
+    testMaster.init()
 
     if argc == 1 and argv[0] in SimpleTestKeys:
         try:
@@ -1475,7 +1471,7 @@ def parseArgs():
     #parser.add_argument()
 
     args, other = parser.parse_known_args()
-    args.natcon = '--natcon' in other # we need it as a flag
+    #args.natcon = '--natcon' in other # we need it as a flag
     #if args.log is not None and getattr(args, 'BoxTest', None) is None:
     #    print "WARNING: --log is used only with one of 'Functional test selection' arguments!"
     return args, other

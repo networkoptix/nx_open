@@ -130,6 +130,9 @@ void QnUserRolesSettingsModel::setRoleName(const QString& value)
 bool QnUserRolesSettingsModel::isRoleValid(const ec2::ApiUserGroupData& role) const
 {
     const auto name = role.name.trimmed().toLower();
+    if (name.isEmpty())
+        return false;
+
     if (m_predefinedNames.contains(name))
         return false;
 
@@ -200,7 +203,7 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
     case Qt::TextColorRole:
         return isRoleValid(userRole)
             ? QVariant()
-            : QBrush(QColor(qnGlobals->errorTextColor()));
+            : QBrush(qnGlobals->errorTextColor());
 
     case Qt::DecorationRole:
         return isRoleValid(userRole)

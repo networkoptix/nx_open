@@ -117,9 +117,12 @@ public:
 
     void setToolTipParent(QGraphicsWidget* widget);
 
+    bool isScrollBarVisible() const;
+
 signals:
     void currentTabChanged();
     void selectionChanged();
+    void scrollBarVisibleChanged();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* ) override;

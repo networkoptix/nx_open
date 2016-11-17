@@ -309,6 +309,10 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 {
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
+        /* If layout become shared AND user is admin - he will not receive access notification
+         * (because he already had access) but permissions must be recalculated. */
+         connect(layout, &QnResource::parentIdChanged, this,
+             &QnResourceAccessManager::updatePermissionsToResource);
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
     }

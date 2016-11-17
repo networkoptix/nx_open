@@ -3,19 +3,46 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
+#include <utils/common/connective.h>
+
 /*
- * Primitive class able to paint dot indicator for specified time moment.
- */
-class QnBusyIndicatorPainterPrivate;
-class QnBusyIndicatorPainter : protected AnimationTimerListener
+* Abstract base class of animated indicators able to draw themselves with specified painter.
+*/
+class QnBusyIndicatorBase : public QObject, protected AnimationTimerListener
 {
+    Q_OBJECT
+    using base_type = QObject;
+
 public:
-    QnBusyIndicatorPainter();
-    virtual ~QnBusyIndicatorPainter();
+    explicit QnBusyIndicatorBase(QObject* parent = nullptr);
+    virtual ~QnBusyIndicatorBase();
+
+    /** Size of entire indicator without any margins: */
+    virtual QSize size() const = 0;
+
+    /** Paint method: */
+    virtual void paint(QPainter*) = 0;
+
+signals:
+    void sizeChanged();
+    void updated();
+};
+
+/*
+* Primitive class able to paint dot indicator with specified painter.
+*/
+class QnBusyIndicatorPrivate;
+class QnBusyIndicator: public QnBusyIndicatorBase
+{
+    Q_OBJECT
+    using base_type = QnBusyIndicatorBase;
+
+public:
+    explicit QnBusyIndicator(QObject* parent = nullptr);
+    virtual ~QnBusyIndicator();
 
     /** Number of dots in the indicator: */
     unsigned int dotCount() const;
@@ -30,7 +57,7 @@ public:
     void setDotRadius(qreal radius);
 
     /** Size of entire indicator without any margins: */
-    QSize indicatorSize() const;
+    virtual QSize size() const override;
 
     /** Minimum opacity: */
     qreal minimumOpacity() const;
@@ -61,49 +88,38 @@ public:
     void setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs);
 
     /** Paint method: */
-    void paintIndicator(QPainter* painter, const QPointF& origin);
+    virtual void paint(QPainter* painter) override;
+
+signals:
+    void sizeChanged();
+    void updated();
 
 protected:
-    /** Protected overridable called when indicator size changes. */
-    virtual void indicatorSizeChanged();
-
-    /** Protected overridable called when indicator needs to be redrawn. */
-    virtual void updateIndicator();
-
     /** Overridden tick of animation timer listener: */
     virtual void tick(int deltaMs) override;
 
 private:
-    QScopedPointer<QnBusyIndicatorPainterPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnBusyIndicatorPainter);
+    QScopedPointer<QnBusyIndicatorPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(QnBusyIndicator);
 };
 
 /*
  * Widget class representing animated dot indicator.
  */
-class QnBusyIndicatorWidget : public QWidget, public QnBusyIndicatorPainter
+class QnBusyIndicatorWidget: public Connective<QWidget>
 {
     Q_OBJECT
+    using base_type = Connective<QWidget>;
 
-    Q_PROPERTY(unsigned int        dotCount       READ dotCount       WRITE setDotCount)
-    Q_PROPERTY(unsigned int        dotSpacing     READ dotSpacing     WRITE setDotSpacing)
-    Q_PROPERTY(qreal               dotRadius      READ dotRadius      WRITE setDotRadius)
-    Q_PROPERTY(QSize               indicatorSize  READ indicatorSize)
-    Q_PROPERTY(qreal               minimumOpacity READ minimumOpacity WRITE setMinimumOpacity)
-    Q_PROPERTY(int                 dotLagMs       READ dotLagMs       WRITE setDotLagMs)
-    Q_PROPERTY(unsigned int        downTimeMs     READ downTimeMs     WRITE setDownTimeMs)
-    Q_PROPERTY(unsigned int        fadeInTimeMs   READ fadeInTimeMs   WRITE setFadeInTimeMs)
-    Q_PROPERTY(unsigned int        upTimeMs       READ upTimeMs       WRITE setUpTimeMs)
-    Q_PROPERTY(unsigned int        fadeOutTimeMs  READ fadeOutTimeMs  WRITE setFadeOutTimeMs)
-    Q_PROPERTY(unsigned int        totalTimeMs    READ totalTimeMs)
+    Q_PROPERTY(QnBusyIndicator*    dots           READ dots)
     Q_PROPERTY(QPalette::ColorRole indicatorRole  READ indicatorRole  WRITE setIndicatorRole)
     Q_PROPERTY(QPalette::ColorRole borderRole     READ borderRole     WRITE setBorderRole)
+    Q_PROPERTY(QRect               indicatorRect  READ indicatorRect)
 
 public:
     explicit QnBusyIndicatorWidget(QWidget* parent = nullptr);
 
-    virtual QSize minimumSizeHint() const override;
-    virtual QSize sizeHint() const override;
+    QnBusyIndicator* dots() const;
 
     QPalette::ColorRole indicatorRole() const;
     void setIndicatorRole(QPalette::ColorRole role);
@@ -111,14 +127,18 @@ public:
     QPalette::ColorRole borderRole() const;
     void setBorderRole(QPalette::ColorRole role);
 
+    virtual QSize minimumSizeHint() const override;
+    virtual QSize sizeHint() const override;
+
+    QRect indicatorRect() const; /**< rect with dots */
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
-    virtual void indicatorSizeChanged() override;
-    virtual void updateIndicator() override;
 
-    QRect indicatorRect() const;
+    void updateIndicator();
 
 private:
+    QScopedPointer<QnBusyIndicator> m_indicator;
     QPalette::ColorRole m_indicatorRole;
     QPalette::ColorRole m_borderRole;
 };
@@ -126,31 +146,21 @@ private:
 /*
 * Graphics Widget class representing animated dot indicator.
 */
-class QnBusyIndicatorGraphicsWidget : public Animated<GraphicsWidget>, public QnBusyIndicatorPainter
+class QnBusyIndicatorGraphicsWidget: public Connective<GraphicsWidget>
 {
     Q_OBJECT
+    using base_type = Connective<GraphicsWidget>;
 
-    Q_PROPERTY(unsigned int dotCount        READ dotCount       WRITE setDotCount)
-    Q_PROPERTY(unsigned int dotSpacing      READ dotSpacing     WRITE setDotSpacing)
-    Q_PROPERTY(qreal        dotRadius       READ dotRadius      WRITE setDotRadius)
-    Q_PROPERTY(QSize        indicatorSize   READ indicatorSize)
-    Q_PROPERTY(qreal        minimumOpacity  READ minimumOpacity WRITE setMinimumOpacity)
-    Q_PROPERTY(int          dotLagMs        READ dotLagMs       WRITE setDotLagMs)
-    Q_PROPERTY(unsigned int downTimeMs      READ downTimeMs     WRITE setDownTimeMs)
-    Q_PROPERTY(unsigned int fadeInTimeMs    READ fadeInTimeMs   WRITE setFadeInTimeMs)
-    Q_PROPERTY(unsigned int upTimeMs        READ upTimeMs       WRITE setUpTimeMs)
-    Q_PROPERTY(unsigned int fadeOutTimeMs   READ fadeOutTimeMs  WRITE setFadeOutTimeMs)
-    Q_PROPERTY(unsigned int totalTimeMs     READ totalTimeMs)
-    Q_PROPERTY(QColor       indicatorColor  READ indicatorColor WRITE setIndicatorColor)
-    Q_PROPERTY(QColor       borderColor     READ borderColor    WRITE setBorderColor)
-
-    using base_type = Animated<GraphicsWidget>;
+    Q_PROPERTY(QnBusyIndicator* dots           READ dots)
+    Q_PROPERTY(QColor           indicatorColor READ indicatorColor WRITE setIndicatorColor)
+    Q_PROPERTY(QColor           borderColor    READ borderColor    WRITE setBorderColor)
+    Q_PROPERTY(QRectF           indicatorRect  READ indicatorRect)
 
 public:
     explicit QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr,
         Qt::WindowFlags windowFlags = 0);
 
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+    QnBusyIndicator* dots() const;
 
     QColor indicatorColor() const;
     void setIndicatorColor(QColor color);
@@ -158,14 +168,17 @@ public:
     QColor borderColor() const;
     void setBorderColor(QColor color);
 
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+    QRectF indicatorRect() const; /**< rect with dots */
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
-    virtual void indicatorSizeChanged() override;
-    virtual void updateIndicator() override;
 
-    QRectF indicatorRect() const;
+    void updateIndicator();
 
 private:
+    QScopedPointer<QnBusyIndicator> m_indicator;
     QColor m_indicatorColor;
     QColor m_borderColor;
 };

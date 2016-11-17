@@ -35,6 +35,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
@@ -151,18 +153,18 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
     /* And file open events on Mac. */
-    QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
-    fileOpenSignalizer->setEventType(QEvent::FileOpen);
-    qApp->installEventFilter(fileOpenSignalizer);
-    connect(fileOpenSignalizer,             SIGNAL(activated(QObject *, QEvent *)),         this,                                   SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
+    installEventHandler(qApp, QEvent::FileOpen, this, &QnMainWindow::at_fileOpenSignalizer_activated);
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
+    connect(m_dwm, &QnDwm::compositionChanged, this, &QnMainWindow::updateDwmState);
 
     /* Set up properties. */
     setWindowTitle(QString());
+
+    /* Initialize animations manager. */
+    context->instance<nx::client::ui::workbench::Animations>();
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
