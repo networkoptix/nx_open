@@ -14,7 +14,6 @@
 #include <common/common_module.h>
 #include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
-#include <utils/settings_migration.h>
 
 #include <context/context.h>
 #include <mobile_client/mobile_client_module.h>
@@ -256,8 +255,6 @@ int main(int argc, char *argv[])
 
     qnSettings->setStartupParameters(startupParams);
     processStartupParams(startupParams);
-
-    migrateSettings();
 
     #if defined(Q_OS_ANDROID)
         registerIntentListener();

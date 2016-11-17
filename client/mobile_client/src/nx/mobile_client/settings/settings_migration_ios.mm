@@ -39,6 +39,10 @@
 
 @end
 
+namespace nx {
+namespace mobile_client {
+namespace settings {
+
 QnMigratedSessionList getMigratedSessions(bool *success)
 {
     if (success)
@@ -74,3 +78,7 @@ QnMigratedSessionList getMigratedSessions(bool *success)
 
     return result;
 }
+
+} // namespace settings
+} // namespace mobile_client
+} // namespace nx

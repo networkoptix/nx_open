@@ -1,19 +1,17 @@
 #pragma once
 
 #include <QtCore/QVariantMap>
-#include <utils/common/software_version.h>
 
-struct QnLoginSession {
-    QString id;
+#include <nx/utils/uuid.h>
+#include <nx/network/socket_common.h>
+
+struct QnLoginSession
+{
+    QnUuid id;
     QString systemName;
-    QString address;
-    int port;
-    QString user;
-    QString password;
+    QUrl url;
 
     QnLoginSession();
-
-    QUrl url() const;
 
     QVariantMap toVariant() const;
     static QnLoginSession fromVariant(const QVariantMap &variant);
