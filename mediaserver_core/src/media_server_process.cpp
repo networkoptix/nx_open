@@ -1644,12 +1644,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/installUpdate", new QnUpdateRestHandler());
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
     reg("api/connect", new QnOldClientConnectRestHandler());
-    reg("api/moduleInformation", new QnModuleInformationRestHandler() );
-    reg("api/iflist", new QnIfListRestHandler() );
-    reg("api/aggregator", new QnJsonAggregatorRestHandler() );
+    reg("api/moduleInformation", new QnModuleInformationRestHandler());
+    reg("api/iflist", new QnIfListRestHandler());
+    reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin);
-    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
+    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(), kAdmin);
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloud), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);

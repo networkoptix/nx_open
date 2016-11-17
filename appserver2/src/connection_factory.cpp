@@ -229,8 +229,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value Saturday
      *     %value Sunday
      * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
-     * %param backupDuration Duration of the synchronization period (in seconds).
-     *     -1 if not set.
+     * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
      * %// AbstractCameraManager::saveUserAttributes
@@ -265,8 +264,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value Saturday
      *     %value Sunday
      * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
-     * %param backupDuration Duration of the synchronization period (in seconds).
-     *     -1 if not set.
+     * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
      * %// AbstractMediaServerManager::saveUserAttributes
@@ -300,8 +298,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *         %value Saturday
     *         %value Sunday
     *     %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
-    *     %param backupDuration Duration of the synchronization period in seconds.
-    *         -1 if not set.
+    *     %param backupDuration Duration of the synchronization period in seconds. -1 if not set.
     *     %param backupBitrate Maximum backup bitrate in bytes per second. Negative
     *         value if not limited.
     * %// AbstractMediaServerManager::getUserAttributes
@@ -849,7 +846,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return all event rules.
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %return Return list of object statuses in the requested format. 
+     * %return Return list of object statuses in the requested format.
      *     If "id" parameter is specified, the list will contain only one
      *     object with that id, or nothing, if there is no such object found.
      * %// AbstractBusinessEventManager::getBusinessRules
