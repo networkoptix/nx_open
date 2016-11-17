@@ -529,7 +529,9 @@ void QnWorkbenchDisplay::initSceneView()
 
         viewport->makeCurrent();
         QnGlHardwareChecker::checkCurrentContext(true);
-        QGLContext::currentContext()->setTextureCacheLimit(256 * 1024);
+
+        /* QGLTextureCache leaks memory very fast when limit exceeded (Qt 5.6.1). */
+        QGLContext::currentContext()->setTextureCacheLimit(2 * 1024 * 1024);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
