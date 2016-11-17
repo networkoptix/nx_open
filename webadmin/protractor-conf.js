@@ -47,6 +47,7 @@ exports.config = {
                 self.helper.completeSetup(); }
         });
 
-        self.helper.login(self.helper.admin, self.helper.password);
+        var pwd = self.helper.password;
+        self.helper.attemptLogin([self.helper.cloudEmail, pwd], [self.helper.admin, pwd], [self.helper.cloudEmail, pwd]);
     }
 };

@@ -171,26 +171,33 @@ var Helper = function () {
         });
     };
 
-    // accepts array with objects, like [{login:'login1', password:'password1'}, {login:'login2', password:'password2'}]
-    this.attemptLogin = function (args) {
+    // accepts array with objects, like [['login1', 'password1'], ['login2', 'password2']]
+    this.attemptLogin = function (credentialsArray) {
         var closeButton = element(by.buttonText('Close'));
+        var incorrectPassMess = "Login or password is incorrect";
 
-        // If page contains text "Login or password is incorrect"
-        var loginAgain = function (login, password) {
-            element(by.css('body')).getText().then( function (text) {
-                var incorrectPassMess = "Login or password is incorrect";
-                if (self.isSubstr(text, incorrectPassMess)) {
-                    closeButton.click();
-                    self.login(login, password);
-                }
-            });
-        };
+        var args = Array.prototype.slice.call(arguments);
 
-        self.login(self.admin, self.password);
+        (function process(i) {
+            // finish loop when range is finished
+            if (i >= args.length) return;
 
-        for (var i = 0; i < args.length; i ++) {
-            loginAgain(args[i].login, args[i].password);
-        }
+            // reject if credentials are not strings or not full
+            if ((typeof(args[i][0]) != "string" || typeof(args[i][1]) != "string") &&
+                (typeof(args[i][0]) == "undefined" || typeof(args[i][1]) == "undefined")) {
+                console.log('Skipping this credentials pair, because login or password are not strings or missing: '
+                    + args[i][0] + ' (login) is "' + typeof(args[i][0]) + '"; and ' + args[i][1] + ' (password) is "' + typeof(args[i][1]) + '".' );
+                process(i + 1);
+            }
+
+            self.login(args[i][0], args[i][1]);
+            self.checkContainsString(element(by.css('body')), incorrectPassMess) // if page contains message about wrong credentials
+                .then( function () {
+                    closeButton.click();                      // close error message
+                    process(i + 1);
+                }, function () {}); // if string is not contained, skip silently
+        })(0);
+
     };
 
     this.getTab = function(tab) {
