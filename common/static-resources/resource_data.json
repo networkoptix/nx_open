@@ -131,6 +131,12 @@
                     "inputName": "Digital Input 1",
                     "portType": "Input",
                     "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "$DO:0",
+                    "outputName": "Digital Output 0",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
                 }
             ]
         },

@@ -6,39 +6,29 @@
 #include <QtWebSockets/QWebSocket>
 
 #include "flir_websocket_proxy.h"
+#include "flir_nexus_response.h"
+#include "flir_nexus_parsing_utils.h"
 
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_data.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
 #include <nx/utils/timer_manager.h>
-#include <utils/common/safe_direct_connection.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <core/resource/resource_data.h>
 
-class FlirWebSocketIoManager :
+namespace nx{
+namespace plugins{
+namespace flir{
+
+class WebSocketIoManager :
     public QObject,
-    public Qn::EnableSafeDirectConnection,
     public QnAbstractIOManager
 {
     Q_OBJECT
 
-    struct AlarmEvent
-    {
-        QString alarmId;
-        bool alarmState = 0;
-    };
-
-    struct ServerWhoAmIResponse
-    {
-        qint64 returnCode;
-        QString returnString;
-        qint64 sessionId;
-        bool owner;
-        QString ip;
-    };
-
 public:
-    FlirWebSocketIoManager(QnResource* resource);
+    WebSocketIoManager(QnVirtualCameraResource* resource);
 
-    virtual ~FlirWebSocketIoManager();
+    virtual ~WebSocketIoManager();
 
     virtual bool startIOMonitoring() override;
 
@@ -62,26 +52,21 @@ public:
 
     virtual void setNetworkIssueCallback(NetworkIssueCallback callback) override;
 
-    virtual void terminate() override;
+    virtual void terminate();
 
 private slots:
     void at_controlWebSocketConnected();
     void at_controlWebSocketDisconnected();
+
     void at_notificationWebSocketConnected();
     void at_notificationWebSocketDisconnected();
+
     void at_controlWebSocketError(QAbstractSocket::SocketError error);
     void at_notificationWebSocketError(QAbstractSocket::SocketError error);
 
+    void at_gotMessageOnControlSocket(const QString& message);
+
 private:
-
-    using NexusSettingGroup = std::map<QString, QString>;
-
-    struct NexusServerStatus
-    {
-        std::map<QString, NexusSettingGroup> settings;
-        bool isNexusServerEnabled = true;
-    };
-
     enum class InitState
     {
         initial,
@@ -89,6 +74,7 @@ private:
         nexusServerEnabled,
         controlSocketConnected,
         sessionIdObtained,
+        remoteControlObtained,
         subscribed,
         error
     };
@@ -103,7 +89,6 @@ private:
     QnResourceData getResourceData() const;
 
     void tryToGetNexusServerStatus();
-    NexusServerStatus parseNexusServerStatusResponse(const QString& response) const;
 
     void tryToEnableNexusServer();
 
@@ -115,24 +100,26 @@ private:
     void connectControlWebsocket(std::chrono::milliseconds delay = std::chrono::milliseconds(0));
     void connectNotificationWebSocket();
     void requestSessionId();
-    ServerWhoAmIResponse parseControlMessage(const QString& message);
+    void requestRemoteControl();
 
     QString buildNotificationSubscriptionPath() const; 
-    QString buildNotificationSubscriptionParamString(const QString& subscriptionType) const;
     
-    void handleNotification(const QString& message);
-    bool isThgObjectNotificationType(const QString& notificationType) const;
-    AlarmEvent parseNotification(const QString& message, bool *outStatus) const;
-    AlarmEvent parseThgObjectNotification(const QStringList& notificationParts, bool* outStatus) const;    
-    AlarmEvent parseAlarmNotification(const QStringList& notificationParts, bool* outStatus) const; //< maybe it's worth to subscribe to $IO not $ALARM
+    void handleServerWhoAmIResponse(const nexus::Response& response);
+    void handleRemoteControlRequestResponse(const nexus::Response& response);
+    void handleRemoteControlReleaseResponse(const nexus::Response& response);
+    void handleIoSensorOutputStateSetResponse(const nexus::Response& response);
 
-    qint64 parseFlirDateTime(const QString& dateTime, bool* outStatus);
-    void checkAndNotifyIfNeeded(const AlarmEvent& notification);
+    void handleNotification(const QString& message);
+
+    void checkAndNotifyIfNeeded(const nexus::Notification& notification);
 
     void sendKeepAlive();
 
+    int getPortNumberByPortId(const QString& portId) const;
+    int getGpioModuleIdByPortId(const QString& portId) const;
+
 private:
-    QnResource* m_resource;
+    QnVirtualCameraResource* m_resource;
     InitState m_initializationState;
     qint64 m_nexusSessionId;
     nx::utils::TimerId m_timerId;
@@ -154,4 +141,10 @@ private:
     quint16 m_nexusPort;
 
     mutable QnMutex m_mutex;
+    mutable QnMutex m_setOutputStateMutex;
+    mutable QnWaitCondition m_setOutputStateRequestCondition;
 };
+
+} //namespace flir
+} //namespace plugins
+} //namespace nx

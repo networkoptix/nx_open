@@ -6,14 +6,15 @@
 
 #ifdef ENABLE_ONVIF
 
-QnFlirOnvifResource::QnFlirOnvifResource()
+QnFlirOnvifResource::QnFlirOnvifResource():
+    m_ioManager(nullptr)
 {
 }
 
 QnFlirOnvifResource::~QnFlirOnvifResource()
 {
     stopInputPortMonitoringAsync();
-    m_ioManager->terminate();
+
     if (m_ioManager)
     {
         QMetaObject::invokeMethod(
@@ -32,7 +33,7 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
 
     if (!m_ioManager)
     {
-        m_ioManager = new FlirWebSocketIoManager(this);
+        m_ioManager = new nx::plugins::flir::WebSocketIoManager(dynamic_cast<QnVirtualCameraResource*>(this));
         m_ioManager->moveToThread(FlirIoExecutor::instance()->getThread());
     }
 
@@ -122,7 +123,15 @@ bool QnFlirOnvifResource::setRelayOutputState(
 
 QnIOPortDataList QnFlirOnvifResource::getRelayOutputList() const
 {
-    return QnPlOnvifResource::getRelayOutputList();
+    if (!m_ioManager)
+        return QnIOPortDataList();
+
+    auto onvifPorts = QnPlOnvifResource::getRelayOutputList();
+    auto nexusPorts = m_ioManager->getOutputPortList();
+
+    onvifPorts.insert(onvifPorts.end(), nexusPorts.begin(), nexusPorts.end());
+
+    return onvifPorts;
 }
 
 #endif // ENABLE_ONVIF

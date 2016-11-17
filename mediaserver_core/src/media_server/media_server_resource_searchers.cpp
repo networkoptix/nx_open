@@ -8,6 +8,7 @@
 
 #include <plugins/resource/acti/acti_resource_searcher.h>
 #include <plugins/resource/adam/adam_resource_searcher.h>
+#include <plugins/resource/flir/flir_onvif_resource_searcher.h>
 #include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
 #include <plugins/resource/axis/axis_resource_searcher.h>
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
@@ -36,6 +37,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
 
+#if 0
 #ifndef EDGE_SERVER
     #ifdef ENABLE_ARECONT
         m_searchers << new QnPlArecontResourceSearcher();
@@ -66,6 +68,8 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
         m_searchers << new QnAdamResourceSearcher();
     #endif
 
+        m_searchers << new FlirOnvifResourceSearcher();
+
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         m_searchers << new QnPlVmax480ResourceSearcher();
     #endif
@@ -79,7 +83,8 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
         m_searchers << new OnvifResourceSearcher();
     #endif //ENABLE_ONVIF
 #endif
-
+#endif
+    m_searchers << new OnvifResourceSearcher();
     for (auto searcher : m_searchers)
         QnResourceDiscoveryManager::instance()->addDeviceServer(searcher);
 }

@@ -42,6 +42,7 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 
 QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {    
+    qDebug() << "Flir searcher,  checking host address!!!!";
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
     auto hostname = url.host().isEmpty() ?

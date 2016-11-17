@@ -27,7 +27,7 @@ public:
         unsigned int autoResetTimeoutMS) override;
 
 private:
-    FlirWebSocketIoManager* m_ioManager;
+    nx::plugins::flir::WebSocketIoManager* m_ioManager;
 };
 
 typedef QnSharedResourcePointer<QnFlirOnvifResource> QnFlirOnvifResourcePtr;

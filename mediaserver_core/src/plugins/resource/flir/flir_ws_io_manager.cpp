@@ -6,11 +6,15 @@
 
 #include "flir_ws_io_manager.h"
 #include "flir_io_executor.h"
+#include "flir_nexus_common.h"
+#include "flir_nexus_parsing_utils.h"
+#include "flir_nexus_string_builder.h"
 
 #include <core/resource/camera_resource.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/to_string.h>
 
 namespace {
 using ErrorSignalType = void(QWebSocket::*)(QAbstractSocket::SocketError);
@@ -30,54 +34,30 @@ const std::size_t kMaxThgAreasNumber = 4;
 const std::size_t kMaxThgSpotsNumber = 8;
 const std::size_t kMaxAlarmsNumber = 10;
 
-const quint16 kDefaultNexusPort = 8090;
-
-const QString kCommandPrefix = lit("Nexus.cgi");
-const QString kControlPrefix = lit("NexusWS.cgi");
-const QString kSubscriptionPrefix = lit("NexusWS_Status.cgi");
-const QString kServerWhoAmICommand = lit("SERVERWhoAmI");
-
-const QString kSessionParamName = lit("session");
-const QString kSubscriptionNumParamName = lit("numSubscriptions");
-const QString kNotificationFormatParamName = lit("NotificationFormat");
-
-const QString kJsonNotificationFormat = lit("JSON");
-const QString kStringNotificationFormat = lit("String");
+const quint16 kDefaultNexusPort = 8080;
 
 // Timeouts is so big because Nexus server launching is quite long process 
 const std::chrono::milliseconds kHttpSendTimeout(20000);
 const std::chrono::milliseconds kHttpReceiveTimeout(20000);
 
-const std::chrono::milliseconds kKeepAliveTimeout(1000);
+const std::chrono::milliseconds kKeepAliveTimeout(5000);
 const std::chrono::milliseconds kMinNotificationInterval(500);
 const std::chrono::milliseconds kMaxNotificationInterval(500);
+const std::chrono::milliseconds kSetOutputStateTimeout(5000);
 
-const int kNoError = 0;
-const int kAnyDevice = -1;
-
-const QString kAlarmSubscription = lit("ALARM");
-const QString kThgSpotSubscription = lit("THGSPOT");
-const QString kThgAreaSubscription = lit("THGAREA");
-const QString kIOSubscription = lit("IO");
-
-const QString kAlarmPrefix = lit("$ALARM");
-const QString kThgSpotPrefix = lit("$THGSPOT");
-const QString kThgAreaPrefix = lit("$THGAREA");
-const QString kIOPrefix = lit("$DI");
-
-const int kMdDeviceType = 12;
-const int kIODeviceType = 28;
-const int kThgObjectDeviceType = 5;
-const int kThgSpotDeviceType = 53;
-const int kThgAreaDeviceType = 54;
-
-const QString kDateTimeFormat("yyyyMMddhhmmsszzz");
+const QString kAlarmNameTemplate = lit("Alarm %1");
+const QString kDigitalInputNameTemplate = lit("Digital Input %1");
+const QString kDigitalOutputNameTemplate = lit("Digital Output %1");
 
 } // namespace
 
 using namespace nx::utils;
 
-FlirWebSocketIoManager::FlirWebSocketIoManager(QnResource* resource):
+namespace nx{
+namespace plugins{
+namespace flir{
+
+WebSocketIoManager::WebSocketIoManager(QnVirtualCameraResource* resource):
     m_resource(resource),
     m_initializationState(InitState::initial),
     m_nexusSessionId(kInvalidSessionId),
@@ -91,14 +71,24 @@ FlirWebSocketIoManager::FlirWebSocketIoManager(QnResource* resource):
 
 }
 
-FlirWebSocketIoManager::~FlirWebSocketIoManager()
+WebSocketIoManager::~WebSocketIoManager()
 {
     stopIOMonitoring();
+
+    nx::utils::TimerId timerId = 0;
+    {
+        QnMutexLocker lock(&m_mutex);
+        timerId = m_keepAliveTimerId;
+    }
+
+    if (timerId)
+        TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 
-
-bool FlirWebSocketIoManager::startIOMonitoring()
+bool WebSocketIoManager::startIOMonitoring()
 {
+    qDebug() << "Flir, Starting IO monitoring";
+
     QnMutexLocker lock(&m_mutex);
     if (m_monitoringIsInProgress)
         return true;
@@ -119,57 +109,77 @@ bool FlirWebSocketIoManager::startIOMonitoring()
     return m_monitoringIsInProgress;
 }
 
-
-void FlirWebSocketIoManager::stopIOMonitoring()
+void WebSocketIoManager::stopIOMonitoring()
 {
+    qDebug() << "Flir, Stopping IO monitoring";
+
     QnMutexLocker lock(&m_mutex);
     if (!m_monitoringIsInProgress)
         return;
 
     m_monitoringIsInProgress = false;
-    resetSocketProxies();
 
     QObject::disconnect();
+    resetSocketProxies();
 }
 
-bool FlirWebSocketIoManager::setOutputPortState(const QString& portId, bool isActive)
+bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive)
 {
-    // Actually this function does nothing because all the outputs are handled
-    // by the Onvif driver not this IO manager.
+    if (!m_monitoringIsInProgress)
+        return false;
+
+    QnMutexLocker lock(&m_mutex);
+    if (m_initializationState < InitState::remoteControlObtained)
+        return false;
+
+    const QString kSetPortStateMessage = 
+        lit("%1?session=%2&action=%3&Port=%4&Output=%5&State=%6")
+            .arg(nexus::kCommandPrefix)
+            .arg(m_nexusSessionId)
+            .arg(nexus::kSetOutputPortStateCommand)
+            .arg(getGpioModuleIdByPortId(portId))
+            .arg(getPortNumberByPortId(portId))
+            .arg(isActive ? 1 : 0);
+
+    m_controlProxy->sendTextMessage(kSetPortStateMessage);
+
+    //m_setOutputStateRequestCondition.wait(&m_mutex, kSetOutputStateTimeout.count());
+    //Need to verify somehow 
+
     return true;
 }
 
-bool FlirWebSocketIoManager::isMonitoringInProgress() const
+bool WebSocketIoManager::isMonitoringInProgress() const
 {
-    QnMutexLocker lock(&m_mutex);
     return m_monitoringIsInProgress;
 }
 
-QnIOPortDataList FlirWebSocketIoManager::getOutputPortList() const
-{
-    // Same as above - handled by Onvif.
-    return QnIOPortDataList();
-}
-
-QnIOPortDataList FlirWebSocketIoManager::getInputPortList() const
+QnIOPortDataList WebSocketIoManager::getInputPortList() const
 {
     auto resData = getResourceData();
-    auto inputs = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    auto allPorts = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    QnIOPortDataList inputs;
+
+    for (const auto& port : allPorts)
+    {
+        if (port.portType == Qn::IOPortType::PT_Input)
+            inputs.push_back(port);
+    }
 
     for (std::size_t i = 0; i < kMaxAlarmsNumber; ++i)
     {
         auto alarmInput = QnIOPortData();
 
         alarmInput.id = lit("%1:%2")
-            .arg(kAlarmPrefix)
+            .arg(nexus::kAlarmPrefix)
             .arg(i);
 
-        alarmInput.inputName = lit("Alarm %1").arg(i);
+        alarmInput.inputName = kAlarmNameTemplate.arg(i);
         inputs.push_back(alarmInput);
     }
 
     QnMutexLocker lock(&m_mutex);
-    for (auto& input: inputs)
+    for (auto& input : inputs)
     {
         input.portType = Qn::IOPortType::PT_Input;
         input.supportedPortTypes = Qn::IOPortType::PT_Input;
@@ -181,87 +191,225 @@ QnIOPortDataList FlirWebSocketIoManager::getInputPortList() const
     return inputs;
 }
 
-QnIOStateDataList FlirWebSocketIoManager::getPortStates() const
+QnIOPortDataList WebSocketIoManager::getOutputPortList() const
 {
-    // Unused.
+    auto resData = getResourceData();
+    auto allPorts = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    QnIOPortDataList outputs;
+
+    for (const auto& port : allPorts)
+    {
+        if (port.portType == Qn::IOPortType::PT_Output)
+            outputs.push_back(port);
+    }
+
+    return outputs;
+}
+
+QnIOStateDataList WebSocketIoManager::getPortStates() const
+{
+    NX_ASSERT(false, lm("Unused. We should never be here."));
     return QnIOStateDataList();
 }
 
 
-nx_io_managment::IOPortState FlirWebSocketIoManager::getPortDefaultState(const QString& /*portId*/) const
+nx_io_managment::IOPortState WebSocketIoManager::getPortDefaultState(const QString& /*portId*/) const
 {
-    // Unused.
+    NX_ASSERT(false, lm("Unused. We should never be here."));
     return nx_io_managment::IOPortState::nonActive;
 }
 
 
-void FlirWebSocketIoManager::setPortDefaultState(
+void WebSocketIoManager::setPortDefaultState(
     const QString& /*portId*/,
     nx_io_managment::IOPortState/*state*/)
 {
-    // Unused.
+    NX_ASSERT(false, lm("Unused. We should never be here."));
 }
 
-
-void FlirWebSocketIoManager::setInputPortStateChangeCallback(QnAbstractIOManager::InputStateChangeCallback callback)
+void WebSocketIoManager::setInputPortStateChangeCallback(QnAbstractIOManager::InputStateChangeCallback callback)
 {
     QnMutexLocker lock(&m_mutex);
     m_stateChangeCallback = callback;
 }
 
 
-void FlirWebSocketIoManager::setNetworkIssueCallback(QnAbstractIOManager::NetworkIssueCallback callback)
+void WebSocketIoManager::setNetworkIssueCallback(QnAbstractIOManager::NetworkIssueCallback callback)
 {
     QnMutexLocker lock(&m_mutex);
-    m_networkIssueCallback = callback; 
+    m_networkIssueCallback = callback;
 }
 
-
-void FlirWebSocketIoManager::terminate()
+void WebSocketIoManager::terminate()
 {
-    directDisconnectAll();
+
 }
 
-void FlirWebSocketIoManager::at_controlWebSocketConnected()
+//============================================================================
+
+void WebSocketIoManager::routeIOMonitoringInitialization(InitState newState)
+{
+    if (!m_monitoringIsInProgress)
+        return;
+
+    qDebug() << "Routing IO Monitoring initialization" << (int)newState;
+    m_initializationState = newState;
+
+    switch (m_initializationState)
+    {
+        case InitState::initial:
+            tryToGetNexusServerStatus();
+            break;
+        case InitState::nexusServerStatusRequested:
+            tryToEnableNexusServer();
+            break;
+        case InitState::nexusServerEnabled:
+        {
+            std::chrono::milliseconds delay(0);
+            if (m_nexusServerHasJustBeenEnabled)
+                delay = std::chrono::milliseconds(5000);
+
+            connectControlWebsocket(delay);
+        }
+        break;
+        case InitState::controlSocketConnected:
+            requestSessionId();
+            break;
+        case InitState::sessionIdObtained:
+            requestRemoteControl();
+            break;
+        case InitState::remoteControlObtained:
+            connectNotificationWebSocket();
+            break;
+        case InitState::subscribed:
+            NX_LOG(lit("Flir, successfully subscribed to IO notifications"), cl_logDEBUG2);
+            break;
+        case InitState::error:
+            NX_LOG(lit("Flir, error occurred when subscribing to IO notifications"), cl_logWARNING);
+            break;
+        default:
+            NX_ASSERT(false, "We should never be here.");
+    }
+}
+
+void WebSocketIoManager::at_controlWebSocketConnected()
 {
     QnMutexLocker lock(&m_mutex);
+
     qDebug() << "Flir, control websocket connected";
     routeIOMonitoringInitialization(InitState::controlSocketConnected);
 }
 
-void FlirWebSocketIoManager::at_controlWebSocketDisconnected()
+void WebSocketIoManager::at_controlWebSocketDisconnected()
 {
     QnMutexLocker lock(&m_mutex);
-    //What should I do here ? 
-    qDebug() << "Flir, control web socket disconnected";
+
+    auto message = lm("Error occured, control websocket spuriously disconnected. Device %1 %2 (%3)")
+        .arg(m_resource->getVendor())
+        .arg(m_resource->getModel())
+        .arg(m_resource->getUrl());
+
+    if (m_monitoringIsInProgress)
+    {
+        qDebug() << message;
+        NX_LOGX(message, cl_logWARNING);
+        ;//< do reinit
+    }
 }
 
-void FlirWebSocketIoManager::at_controlWebSocketError(QAbstractSocket::SocketError error)
+void WebSocketIoManager::at_controlWebSocketError(QAbstractSocket::SocketError error)
 {
     QnMutexLocker lock(&m_mutex);
-    qDebug() << "Flir, error occured on control web socket" << error;
+
+    auto message = lm("Flir, error occured on control web socket: %1. Device %2 %3 (%4). ")
+        .arg(toString(error))
+        .arg(m_resource->getVendor())
+        .arg(m_resource->getModel())
+        .arg(m_resource->getUrl());
+
+    if (m_monitoringIsInProgress)
+    {
+        qDebug() << message;
+        NX_LOGX(message, cl_logWARNING);
+        ;//< do reinit
+    }
 }
 
-void FlirWebSocketIoManager::at_notificationWebSocketConnected()
+void WebSocketIoManager::at_gotMessageOnControlSocket(const QString& message)
+{
+    using namespace nx::plugins::flir::nexus;
+
+    Response response(message);
+
+    if (!response.isValid())
+        return;
+
+    if (response.returnCode() != kNoError)
+        return;
+
+    const auto kResponseType = response.responseType();
+    switch (kResponseType)
+    {
+        case Response::Type::serverWhoAmI:
+            handleServerWhoAmIResponse(response);
+            break;
+        case Response::Type::serverRemoteControlRequest:
+            handleRemoteControlRequestResponse(response);
+            break;
+        case Response::Type::serverRemoteControlRelease:
+            handleRemoteControlReleaseResponse(response);
+            break;
+        case Response::Type::ioSensorOutputStateSet:
+            handleIoSensorOutputStateSetResponse(response);
+            break;
+        default:
+            NX_ASSERT(false, lit("We should never be here."));
+    }
+}
+
+void WebSocketIoManager::at_notificationWebSocketConnected()
 {
     QnMutexLocker lock(&m_mutex);
-    qDebug() << "Flir, notification web socket disconnected";
+    qDebug() << "Flir, notification web socket connected";
     routeIOMonitoringInitialization(InitState::subscribed);
 }
 
-void FlirWebSocketIoManager::at_notificationWebSocketDisconnected()
+void WebSocketIoManager::at_notificationWebSocketDisconnected()
 {
     QnMutexLocker lock(&m_mutex);
-    qDebug() << "Flir, notification web socket disconnected";
+
+    auto message = lm("Error occured, notification websocket spuriously disconnected. Device %1 %2 (%3)")
+        .arg(m_resource->getVendor())
+        .arg(m_resource->getModel())
+        .arg(m_resource->getUrl());
+
+    if (m_monitoringIsInProgress)
+    {
+        qDebug() << message;
+        NX_LOGX(message, cl_logWARNING);
+        ;//< do reinit
+    }
 }
 
-void FlirWebSocketIoManager::at_notificationWebSocketError(QAbstractSocket::SocketError error)
+void WebSocketIoManager::at_notificationWebSocketError(QAbstractSocket::SocketError error)
 {
     QnMutexLocker lock(&m_mutex);
-    qDebug() << "Flir, error occured on notification web socket" << error;
+
+    auto message = lm("Flir, error occured on control web socket: %1. Device %2 %3 (%4). ")
+        .arg(toString(error))
+        .arg(m_resource->getVendor())
+        .arg(m_resource->getModel())
+        .arg(m_resource->getUrl());
+
+    if (m_monitoringIsInProgress)
+    {
+        qDebug() << message;
+        NX_LOGX(message, cl_logWARNING);
+        ;//< do reinit
+    }
 }
 
-void FlirWebSocketIoManager::connectWebsocket(
+void WebSocketIoManager::connectWebsocket(
     const QString& path,
     FlirWebSocketProxy* proxy,
     std::chrono::milliseconds delay)
@@ -278,8 +426,6 @@ void FlirWebSocketIoManager::connectWebsocket(
                 .arg(m_nexusPort)
                 .arg(path);
 
-            qDebug() << "Flir, Connecting websocket to url" << kUrl;
-
             proxy->open(kUrl);
 
             qDebug() << "Flir, socket is opened";
@@ -290,46 +436,51 @@ void FlirWebSocketIoManager::connectWebsocket(
         delay);
 }
 
-void FlirWebSocketIoManager::connectControlWebsocket(std::chrono::milliseconds delay)
+void WebSocketIoManager::connectControlWebsocket(std::chrono::milliseconds delay)
 {
     auto socket = m_controlProxy->getSocket();
     QObject::connect(
         socket, &QWebSocket::connected,
-        this, &FlirWebSocketIoManager::at_controlWebSocketConnected, Qt::QueuedConnection);
+        this, &WebSocketIoManager::at_controlWebSocketConnected, Qt::QueuedConnection);
 
     QObject::connect(
         socket, &QWebSocket::disconnected,
-        this, &FlirWebSocketIoManager::at_controlWebSocketDisconnected, Qt::QueuedConnection);
+        this, &WebSocketIoManager::at_controlWebSocketDisconnected, Qt::QueuedConnection);
 
     QObject::connect(
         socket, static_cast<ErrorSignalType>(&QWebSocket::error),
-        this, &FlirWebSocketIoManager::at_controlWebSocketError, Qt::QueuedConnection);
+        this, &WebSocketIoManager::at_controlWebSocketError, Qt::QueuedConnection);
 
-    const auto kControlPath = kControlPrefix/* + kServerWhoAmICommand*/;
+    QObject::connect(
+        socket, &QWebSocket::textMessageReceived,
+        this, &WebSocketIoManager::at_gotMessageOnControlSocket, Qt::QueuedConnection);
+
+
+    const auto kControlPath = nexus::kControlPrefix;
 
     qDebug() << "Control socket's signals are connected";
 
     connectWebsocket(kControlPath, m_controlProxy, delay);
 }
 
-void FlirWebSocketIoManager::connectNotificationWebSocket()
+void WebSocketIoManager::connectNotificationWebSocket()
 {
     auto socket = m_notificationProxy->getSocket();
     QObject::connect(
         socket, &QWebSocket::connected,
-        this, &FlirWebSocketIoManager::at_notificationWebSocketConnected, Qt::QueuedConnection);
+        this, &WebSocketIoManager::at_notificationWebSocketConnected, Qt::QueuedConnection);
 
     QObject::connect(
         socket, &QWebSocket::disconnected,
-        this, &FlirWebSocketIoManager::at_notificationWebSocketDisconnected, Qt::QueuedConnection);
+        this, &WebSocketIoManager::at_notificationWebSocketDisconnected, Qt::QueuedConnection);
 
     QObject::connect(
         socket, static_cast<ErrorSignalType>(&QWebSocket::error),
-        this, &FlirWebSocketIoManager::at_notificationWebSocketError, Qt::QueuedConnection);
+        this, &WebSocketIoManager::at_notificationWebSocketError, Qt::QueuedConnection);
 
     QObject::connect(
         socket, &QWebSocket::textMessageReceived,
-        this, &FlirWebSocketIoManager::handleNotification, Qt::QueuedConnection);
+        this, &WebSocketIoManager::handleNotification, Qt::QueuedConnection);
 
     const auto kNotificationPath = buildNotificationSubscriptionPath();
 
@@ -338,252 +489,155 @@ void FlirWebSocketIoManager::connectNotificationWebSocket()
     connectWebsocket(kNotificationPath, m_notificationProxy);
 }
 
-void FlirWebSocketIoManager::requestSessionId()
+void WebSocketIoManager::tryToEnableNexusServer()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_monitoringIsInProgress)
+        return;
+
+    auto onNexusServerResponseReceived =
+        [this](nx_http::AsyncHttpClientPtr httpClient)
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (httpClient->state() != nx_http::AsyncHttpClient::sDone)
+        {
+            routeIOMonitoringInitialization(InitState::error);
+            return;
+        }
+
+        m_isNexusServerEnabled = true;
+        m_nexusServerHasJustBeenEnabled = true;
+        routeIOMonitoringInitialization(InitState::nexusServerEnabled);
+    };
+
+    m_asyncHttpClient->doGet(
+        lit("http://%1:%2%3")
+        .arg(getResourcesHostAddress())
+        .arg(nx_http::DEFAULT_HTTP_PORT)
+        .arg(kStartNexusServerCommand),
+        onNexusServerResponseReceived);
+}
+
+void WebSocketIoManager::tryToGetNexusServerStatus()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_monitoringIsInProgress)
+        return;
+
+    auto onSettingsRequestDone =
+        [this](nx_http::AsyncHttpClientPtr httpClient)
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (httpClient->state() != nx_http::AsyncHttpClient::sDone)
+        {
+            // It's ok, we can continue initialization using default Nexus port
+            // and hoping that Nexus server is already enabled.
+            routeIOMonitoringInitialization(InitState::nexusServerEnabled);
+            return;
+        }
+
+        auto response = httpClient->response();
+        if (!response)
+        {
+            routeIOMonitoringInitialization(InitState::nexusServerEnabled);
+            return;
+        }
+
+        if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+        {
+            routeIOMonitoringInitialization(InitState::nexusServerEnabled);
+            return;
+        }
+
+        auto serverStatus = nexus::parseNexusServerStatusResponse(
+            QString::fromUtf8(httpClient->fetchMessageBodyBuffer()));
+
+        const auto& kSettings = serverStatus.settings;
+
+        if (kSettings.find(kNexusInterfaceGroupName) != kSettings.cend())
+        {
+            const auto& group = kSettings.at(kNexusInterfaceGroupName);
+            if (group.find(kNexusPortParamName) != group.cend())
+            {
+                bool status = true;
+                const auto kNexusPort = group
+                    .at(kNexusPortParamName)
+                    .toInt(&status);
+
+                if (status)
+                    m_nexusPort = kNexusPort;
+            }
+        }
+
+        if (serverStatus.isNexusServerEnabled)
+            routeIOMonitoringInitialization(InitState::nexusServerEnabled);
+        else
+            routeIOMonitoringInitialization(InitState::nexusServerStatusRequested);
+    };
+
+    initHttpClient();
+    m_asyncHttpClient->doGet(
+        lit("http://%1:%2%3")
+        .arg(getResourcesHostAddress())
+        .arg(nx_http::DEFAULT_HTTP_PORT)
+        .arg(kConfigurationFile),
+        onSettingsRequestDone);
+}
+
+void WebSocketIoManager::requestSessionId()
 {
     if (!m_monitoringIsInProgress)
         return;
 
-    const auto kMessage = lit("Nexus.cgi?action=") + kServerWhoAmICommand;
+    const auto kMessage = lit("%1?action=%2")
+        .arg(nexus::kCommandPrefix)
+        .arg(nexus::kServerWhoAmICommand);
 
-    auto sendKeepAliveWrapper =
-        [this](nx::utils::TimerId timerId)
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (timerId != m_keepAliveTimerId)
-                return;
-
-            sendKeepAlive();
-        };
-
-    auto parseResponseAndScheduleKeepAlive = 
-        [this, sendKeepAliveWrapper](const QString& message)
-        {
-            QnMutexLocker lock(&m_mutex);
-            auto response = parseControlMessage(message);
-            if (response.returnCode != kNoError)
-            {
-                qDebug() << "Flir, error occurred while requesting control token, code:" << response.returnCode;
-            }
-
-            m_nexusSessionId = response.sessionId;
-
-            m_keepAliveTimerId = TimerManager::instance()->addTimer(
-                sendKeepAliveWrapper,
-                kKeepAliveTimeout);
-
-            if (m_initializationState < InitState::sessionIdObtained)
-                routeIOMonitoringInitialization(InitState::sessionIdObtained);
-        };
-
-    QObject::connect(
-        m_controlProxy->getSocket(), &QWebSocket::textMessageReceived,
-        this, parseResponseAndScheduleKeepAlive, Qt::QueuedConnection);
-    
     m_controlProxy->sendTextMessage(kMessage);
 }
 
-FlirWebSocketIoManager::ServerWhoAmIResponse FlirWebSocketIoManager::parseControlMessage(const QString& message)
+void WebSocketIoManager::requestRemoteControl()
 {
-    auto jsonDocument = QJsonDocument::fromJson(message.toUtf8());
-    auto jsonObject = jsonDocument.object();
+    if (!m_monitoringIsInProgress)
+        return;
 
-    ServerWhoAmIResponse response;
+    const int kForced = 1;
+    const auto kMessage = lit("%1?session=%2&action=%3&Forced=%4")
+        .arg(nexus::kCommandPrefix)
+        .arg(m_nexusSessionId)
+        .arg(nexus::kRequestControlCommand)
+        .arg(kForced);
 
-    if (jsonObject.contains(kServerWhoAmICommand))
-    {
-        if (!jsonObject[kServerWhoAmICommand].isObject())
-            return response;
-
-        auto serverWhoAmI = jsonObject[kServerWhoAmICommand].toObject();
-
-        if (serverWhoAmI.contains("Return Code"))
-            response.returnCode = serverWhoAmI["Return Code"].toInt();
-
-        if (serverWhoAmI.contains("Return String"))
-            response.returnString = serverWhoAmI["Return String"].toString();
-
-        if (serverWhoAmI.contains("Id"))
-            response.sessionId = serverWhoAmI["Id"].toInt();
-
-        if (serverWhoAmI.contains("Owner"))
-            response.owner = serverWhoAmI["Owner"].toInt();
-
-        if (serverWhoAmI.contains("ip"))
-            response.ip = serverWhoAmI["ip"].toString();
-    }
-
-    qDebug() << "Got SERVERWHOAMI response:" 
-        << "Return Code" << response.returnCode
-        << "Return String" << response.returnString
-        << "Session Id" << response.sessionId
-        << "Owner" << response.owner
-        << "IP" << response.ip;
-
-    return response;
+    m_controlProxy->sendTextMessage(kMessage);
 }
 
-QString FlirWebSocketIoManager::buildNotificationSubscriptionPath() const
+QString WebSocketIoManager::buildNotificationSubscriptionPath() const
 {
-    QUrlQuery query;
+    nexus::SubscriptionStringBuilder builder;
+    builder.setSessionId(m_nexusSessionId);
+    builder.setNotificationFormat(nexus::kStringNotificationFormat);
 
-    const int kSubscriptionNumber = 1;
-    const std::vector<QString> kSubscriptions = {
-        kAlarmSubscription,
-        /*kThgSpotSubscription,
-        kThgAreaSubscription*/};
+    std::vector<nexus::Subscription> subscriptions = {
+        nexus::Subscription(nexus::kAlarmSubscription)/*,
+        nexus::Subscription(nexus::kThgSpotSubscription),
+        nexus::Subscription(nexus::kThgAreaSubscription)*/
+    };
 
-    query.addQueryItem(kSessionParamName, QString::number(m_nexusSessionId));
-    query.addQueryItem(kSubscriptionNumParamName, QString::number(kSubscriptions.size()));
-    query.addQueryItem(kNotificationFormatParamName, kStringNotificationFormat);
-
-    for (auto i = 0; i < kSubscriptions.size(); ++i)
-    {
-        query.addQueryItem(
-            lit("subscription%1").arg(i + 1),
-            buildNotificationSubscriptionParamString(kSubscriptions[i]));
-    }
-
-    return kSubscriptionPrefix + lit("?") + query.toString(QUrl::FullyEncoded);
+    return builder.buildSubscriptionString(subscriptions);
 }
 
-QString FlirWebSocketIoManager::buildNotificationSubscriptionParamString(const QString& subscriptionType) const
-{
-    const int kPeriodicNotificationsMode = 0;
-
-    auto subscriptionString = lit("\"%1,%2,%3,%4,%5\"")
-        .arg(subscriptionType)
-        .arg(kAnyDevice)
-        .arg(kMinNotificationInterval.count())
-        .arg(kMaxNotificationInterval.count())
-        .arg(kPeriodicNotificationsMode);
-
-    qDebug() << "Flir, building subscription string" << subscriptionString;
-
-    return subscriptionString;
-}
-
-FlirWebSocketIoManager::AlarmEvent FlirWebSocketIoManager::parseNotification(
-    const QString& message,
-    bool* outStatus) const
-{
-    AlarmEvent notification;
-
-    const auto kParts = message.split(L',');
-    const auto kNotificationType = kParts[0];
-
-    if (kNotificationType == kAlarmPrefix)
-        notification = parseAlarmNotification(kParts, outStatus);
-    else if (isThgObjectNotificationType(kNotificationType))
-        notification = parseThgObjectNotification(kParts, outStatus);
-    else
-        *outStatus = false;
-
-    return notification;
-}
-
-FlirWebSocketIoManager::AlarmEvent FlirWebSocketIoManager::parseThgObjectNotification(
-    const QStringList& notificationParts,
-    bool* outStatus) const
-{
-    AlarmEvent alarmEvent;
-
-    const auto kObjectTypeFieldPosition = 0;
-    const auto kObjectIndexFieldPosition = 7;
-    const auto kObjectStateFieldPosition = 11;
-
-    const auto kObjectType = notificationParts[kObjectTypeFieldPosition];
-    const auto kObjectIndex = notificationParts[kObjectIndexFieldPosition].toInt(outStatus);
-
-    if (!*outStatus)
-        return alarmEvent;
-
-    NX_ASSERT(
-        isThgObjectNotificationType(kObjectType),
-        lm("Flir notification parser: wrong notification type %1. %2 or %3 are expected.")
-            .arg(kObjectType)
-            .arg(kThgAreaPrefix)
-            .arg(kThgSpotPrefix));
-
-    if (!isThgObjectNotificationType(kObjectType))
-    {
-        *outStatus = false;
-        return alarmEvent;
-    }
-
-    alarmEvent.alarmId = lit("%1:%2")
-        .arg(kObjectType)
-        .arg(kObjectIndex);
-
-    alarmEvent.alarmState = notificationParts[kObjectStateFieldPosition].toInt(outStatus);
-
-    return alarmEvent;
-}
-
-FlirWebSocketIoManager::AlarmEvent FlirWebSocketIoManager::parseAlarmNotification(
-    const QStringList& notificationParts,
-    bool* outStatus) const
-{
-    AlarmEvent alarmEvent;
-
-    const auto kDeviceTypeFieldPosition = 5;
-    const auto kAlarmSourceIndexFieldPosition = 6;
-    const auto kAlarmStateFieldPosition = 9;
-
-    const auto kDeviceType = notificationParts[kDeviceTypeFieldPosition]
-        .toInt(outStatus);
-
-    if (!*outStatus)
-        return alarmEvent;
-
-    const auto kAlarmSourceIndex = notificationParts[kAlarmSourceIndexFieldPosition]
-        .toInt(outStatus);
-
-    if (!*outStatus)
-        return alarmEvent;
-
-    QString prefix;
-    if (kDeviceType == kIODeviceType)
-        prefix = kIOPrefix;
-    else if (kDeviceType == kThgObjectDeviceType)
-        prefix = kAlarmPrefix;
-        
-
-    alarmEvent.alarmId = lit("%1:%2")
-        .arg(prefix)
-        .arg(kAlarmSourceIndex);
-
-    alarmEvent.alarmState = notificationParts[kAlarmStateFieldPosition].toInt(outStatus);
-
-    return alarmEvent;
-}
-
-bool FlirWebSocketIoManager::isThgObjectNotificationType(const QString& notificationType) const
-{
-    return notificationType == kThgSpotPrefix || notificationType == kThgAreaPrefix;
-}
-
-qint64 FlirWebSocketIoManager::parseFlirDateTime(const QString& dateTimeString, bool* outStatus)
-{
-    *outStatus = true;
-    auto dateTime = QDateTime::fromString(dateTimeString, kDateTimeFormat);
-
-    if (!dateTime.isValid())
-        outStatus = false;
-
-    return dateTime.toMSecsSinceEpoch();
-}
-
-void FlirWebSocketIoManager::sendKeepAlive()
+void WebSocketIoManager::sendKeepAlive()
 {
     if (!m_monitoringIsInProgress)
         return;
 
     auto keepAliveMessage = lit("%1?action=%2&%3=%4")
-        .arg(kCommandPrefix)
-        .arg(kServerWhoAmICommand)
-        .arg(kSessionParamName)
+        .arg(nexus::kCommandPrefix)
+        .arg(nexus::kServerWhoAmICommand)
+        .arg(nexus::kSessionParamName)
         .arg(m_nexusSessionId);
 
+    qDebug() << "Flir, Sending keep alive";
     m_controlProxy->sendTextMessage(keepAliveMessage);
 
     auto sendKeepAliveWrapper =
@@ -601,10 +655,10 @@ void FlirWebSocketIoManager::sendKeepAlive()
         kKeepAliveTimeout);
 }
 
-void FlirWebSocketIoManager::handleNotification(const QString& message)
+void WebSocketIoManager::handleNotification(const QString& message)
 {
     bool status = true;
-    auto notification = parseNotification(message, &status);
+    auto notification = nexus::parseNotification(message, &status);
 
     if (!status)
         return;
@@ -612,7 +666,56 @@ void FlirWebSocketIoManager::handleNotification(const QString& message)
     checkAndNotifyIfNeeded(notification);
 }
 
-void FlirWebSocketIoManager::checkAndNotifyIfNeeded(const AlarmEvent& notification)
+void WebSocketIoManager::handleServerWhoAmIResponse(const nexus::Response& response)
+{
+    qDebug() << "Got session id response";
+
+    const auto sessionId = response.value<int>(nexus::kSessionIdParamName);
+
+    QnMutexLocker lock(&m_mutex);
+    if (m_initializationState == InitState::controlSocketConnected)
+    {
+        m_keepAliveTimerId = TimerManager::instance()->addTimer(
+            [this](TimerId timerId)
+            {
+                if (timerId != m_keepAliveTimerId)
+                    return;
+
+                sendKeepAlive();
+            },
+            kKeepAliveTimeout);
+
+        m_nexusSessionId = sessionId;
+        routeIOMonitoringInitialization(InitState::sessionIdObtained);
+    }
+}
+
+void WebSocketIoManager::handleRemoteControlRequestResponse(const nexus::Response& response)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_initializationState != InitState::sessionIdObtained)
+        return;
+
+    if(!response.isValid())
+        return;
+
+    routeIOMonitoringInitialization(InitState::remoteControlObtained);
+}
+
+void WebSocketIoManager::handleRemoteControlReleaseResponse(const nexus::Response& /*response*/)
+{
+    qDebug() << "Got remote control release response. It's nice.";
+}
+
+void WebSocketIoManager::handleIoSensorOutputStateSetResponse(const nexus::Response& response)
+{
+    if (!response.isValid())
+        return;
+
+    m_setOutputStateRequestCondition.wakeOne();
+}
+
+void WebSocketIoManager::checkAndNotifyIfNeeded(const nexus::Notification& notification)
 {
     QnMutexLocker lock(&m_mutex);
     if (!m_monitoringIsInProgress)
@@ -634,101 +737,7 @@ void FlirWebSocketIoManager::checkAndNotifyIfNeeded(const AlarmEvent& notificati
         nx_io_managment::fromBoolToIOPortState(notification.alarmState));
 }
 
-void FlirWebSocketIoManager::tryToEnableNexusServer()
-{
-    QnMutexLocker lock(&m_mutex);
-    if (!m_monitoringIsInProgress)
-        return;
-
-    auto onNexusServerResponseReceived = 
-        [this](nx_http::AsyncHttpClientPtr httpClient)
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (httpClient->state() != nx_http::AsyncHttpClient::sDone)
-            {
-                routeIOMonitoringInitialization(InitState::error);
-                return;
-            }
-
-            m_isNexusServerEnabled = true;
-            m_nexusServerHasJustBeenEnabled = true;
-            routeIOMonitoringInitialization(InitState::nexusServerEnabled);
-        };
-
-    m_asyncHttpClient->doGet(
-        lit("http://%1:%2%3")
-            .arg(getResourcesHostAddress())
-            .arg(nx_http::DEFAULT_HTTP_PORT)
-            .arg(kStartNexusServerCommand),
-        onNexusServerResponseReceived);
-}
-
-void FlirWebSocketIoManager::tryToGetNexusServerStatus()
-{
-    if (!m_monitoringIsInProgress)
-        return;
-
-    auto onSettingsRequestDone = 
-        [this](nx_http::AsyncHttpClientPtr httpClient)
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (httpClient->state() != nx_http::AsyncHttpClient::sDone)
-            {
-                // It's ok, we can continue initialization using default Nexus port
-                // and hoping that Nexus server is already enabled.
-                routeIOMonitoringInitialization(InitState::nexusServerEnabled);
-                return;
-            }
-
-            auto response = httpClient->response();
-            if (!response)
-            {
-                routeIOMonitoringInitialization(InitState::nexusServerEnabled);
-                return;
-            }
-
-            if (response->statusLine.statusCode != nx_http::StatusCode::ok)
-            {
-                routeIOMonitoringInitialization(InitState::nexusServerEnabled);
-                return;
-            }
-
-            auto serverStatus = parseNexusServerStatusResponse(
-                QString::fromUtf8(httpClient->fetchMessageBodyBuffer()));
-
-            const auto& kSettings = serverStatus.settings;
-
-            if (kSettings.find(kNexusInterfaceGroupName) != kSettings.cend())
-            {
-                const auto& group = kSettings.at(kNexusInterfaceGroupName);
-                if (group.find(kNexusPortParamName) != group.cend())
-                {
-                    bool status = true;
-                    const auto kNexusPort = group
-                        .at(kNexusPortParamName)
-                        .toInt(&status);
-
-                    if (status)
-                        m_nexusPort = kNexusPort;
-                }
-            }
-
-            if (serverStatus.isNexusServerEnabled)
-                routeIOMonitoringInitialization(InitState::nexusServerEnabled);
-            else
-                routeIOMonitoringInitialization(InitState::nexusServerStatusRequested);
-        };
-
-    initHttpClient();
-    m_asyncHttpClient->doGet(
-        lit("http://%1:%2%3")
-            .arg(getResourcesHostAddress())
-            .arg(nx_http::DEFAULT_HTTP_PORT)
-            .arg(kConfigurationFile),
-        onSettingsRequestDone);
-}
-
-bool FlirWebSocketIoManager::initHttpClient()
+bool WebSocketIoManager::initHttpClient()
 {
     auto auth = getResourceAuth();
     nx_http::AuthInfo authInfo;
@@ -744,141 +753,13 @@ bool FlirWebSocketIoManager::initHttpClient()
     return true;
 }
 
-void FlirWebSocketIoManager::routeIOMonitoringInitialization(InitState newState)
-{
-    if (!m_monitoringIsInProgress)
-        return;
-
-    qDebug() << "Routing IO Monitoring initialization" << (int)newState;
-    m_initializationState = newState;
-
-    switch (m_initializationState)
-    {
-        case InitState::initial:
-            tryToGetNexusServerStatus();
-        break;
-        case InitState::nexusServerStatusRequested:
-            tryToEnableNexusServer();
-        break;
-        case InitState::nexusServerEnabled:
-        {
-            std::chrono::milliseconds delay(0);
-            if (m_nexusServerHasJustBeenEnabled)
-                delay = std::chrono::milliseconds(5000);
-
-            connectControlWebsocket(delay);
-        }
-        break;
-        case InitState::controlSocketConnected:
-            requestSessionId();
-        break;
-        case InitState::sessionIdObtained:
-            connectNotificationWebSocket();
-        break;
-        case InitState::subscribed:
-            NX_LOG(lit("Flir, successfully subscribed to IO notifications"), cl_logDEBUG2);
-        break;
-        case InitState::error:
-            NX_LOG(lit("Flir, error occurred when subscribing to IO notifications"), cl_logWARNING);
-        break;
-        default:
-            NX_ASSERT(false, "We should never be here.");
-    }
-    
-}
-
-QString FlirWebSocketIoManager::getResourcesHostAddress() const
-{
-    auto virtualResource = dynamic_cast<QnVirtualCameraResource*>(m_resource);
-    NX_ASSERT(virtualResource, lit("Resource should be inherited from QnVirtualCameraResource"));
-    if (!virtualResource)
-        return QString();
-
-    return virtualResource->getHostAddress();
-
-    /*return lit("122.116.27.82");*/
-}
-
-QAuthenticator FlirWebSocketIoManager::getResourceAuth() const
-{
-    auto virtualResource = dynamic_cast<QnVirtualCameraResource*>(m_resource);
-    NX_ASSERT(virtualResource, lit("Resource should be inherited from QnVirtualCameraResource"));
-    if (!virtualResource)
-        return QAuthenticator();
-
-    return virtualResource->getAuth();
-
-    /*QAuthenticator auth;
-
-    auth.setUser(lit("admin"));
-    auth.setPassword(lit("fliradmin"));
-
-    return auth;*/
-}
-
-QnResourceData FlirWebSocketIoManager::getResourceData() const
-{
-    auto virtualResource = dynamic_cast<QnVirtualCameraResource*>(m_resource);
-    NX_ASSERT(virtualResource, lit("Resource should be inherited from QnVirtualCameraResource"));
-    if (!virtualResource)
-        return QnResourceData();
-
-    return qnCommon->dataPool()->data(
-        virtualResource->getVendor(),
-        virtualResource->getModel());
-
-    /*return qnCommon->dataPool()->data(
-        lit("FLIR"),
-        lit("FC-632"));*/
-}
-
-FlirWebSocketIoManager::NexusServerStatus FlirWebSocketIoManager::parseNexusServerStatusResponse(
-    const QString& response) const
-{
-    qDebug() << "Parsing Nexus server status response:" << response;
-    NexusServerStatus serverStatus;
-    QString currentGroupName;
-    auto lines = response.split(lit("\n"));
-    
-    if (lines.isEmpty())
-        return serverStatus;
-
-    serverStatus.isNexusServerEnabled = lines.back().trimmed().toInt();
-    lines.pop_back();
-
-    for (const auto& line: lines)
-    {
-        auto trimmedLine  = line.trimmed();
-        if (trimmedLine.startsWith(L'['))
-        {
-            // Group name pattern is [Group Name]
-            currentGroupName = trimmedLine
-                .mid(1, trimmedLine.size() - 2)
-                .trimmed();
-        }
-        else
-        {
-            auto settingNameAndValue = trimmedLine.split("=");
-            auto partsCount = settingNameAndValue.size();
-            auto& currentGroup = serverStatus.settings[currentGroupName];
-
-            if(partsCount == 2)
-                currentGroup[settingNameAndValue[0]] = settingNameAndValue[1];
-            else if (partsCount == 1)
-                currentGroup[settingNameAndValue[0]] = QString();
-        }
-    }
-
-    return serverStatus;
-}
-
-
-void FlirWebSocketIoManager::resetSocketProxies()
+void WebSocketIoManager::resetSocketProxies()
 {
     std::vector<FlirWebSocketProxy**> proxies = {
         &m_controlProxy,
         &m_notificationProxy};
 
+    qDebug() << "Flir, Resetting socket proxies";
     for (auto proxyPtr: proxies)
     {
         if (!*proxyPtr)
@@ -892,3 +773,49 @@ void FlirWebSocketIoManager::resetSocketProxies()
         *proxyPtr = nullptr;
     }
 }
+
+int WebSocketIoManager::getPortNumberByPortId(const QString& portId) const
+{
+    auto typeAndNumber = portId.split(L':');
+    NX_ASSERT(
+        typeAndNumber.size() == 2,
+        lm("Wrong port id format. Expected: $TYPE:NUMBER, given: %1")
+            .arg(portId));
+
+    if (typeAndNumber.size() != 2)
+        return 0; //< There is no output with such a number.
+
+    return typeAndNumber[1].toInt();
+}
+
+int WebSocketIoManager::getGpioModuleIdByPortId(const QString& portId) const
+{
+    //Change this function if there will be devices with more than one GPIO module.
+    NX_ASSERT(
+        portId.startsWith(nexus::kDigitalInputPrefix),
+        lm("Only digital outputs belong to device's GPIO module. Given Id: %1")
+            .arg(portId));
+    
+    return 0;
+}
+
+QString WebSocketIoManager::getResourcesHostAddress() const
+{
+    return m_resource->getHostAddress();
+}
+
+QAuthenticator WebSocketIoManager::getResourceAuth() const
+{
+    return m_resource->getAuth();
+}
+
+QnResourceData WebSocketIoManager::getResourceData() const
+{
+    return qnCommon->dataPool()->data(
+        m_resource->getVendor(),
+        m_resource->getModel());
+}
+
+} //namespace flir
+} //namespace plugins
+} //namespace nx
