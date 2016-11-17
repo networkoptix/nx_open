@@ -494,21 +494,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
         return false;
 
-    ec2::ApiUserData adminUserData;
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
-        return false;
-    for (const auto& user: users)
-    {
-        if (user.id == admin->getId())
-        {
-            adminUserData = user;
-            break;
-        }
-    }
-    if (adminUserData.id.isNull())
-        return false; //< not admin user in remote data
-
     {
         QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (!mServer)
@@ -534,15 +519,31 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     }
 
     auto userManager = ec2Connection()->getUserManager(owner->accessRights());
-    ec2::ErrorCode errorCode = userManager->saveSync(adminUserData);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errorCode != ec2::ErrorCode::ok)
+    for (const auto& userData: users)
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")
-            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
-        return false;
-    }
+        QnUserResourcePtr user = fromApiToResource(userData);
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            ec2::ErrorCode errorCode = userManager->saveSync(userData);
+            NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+            if (errorCode != ec2::ErrorCode::ok)
+            {
+                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")
+                    .arg(ec2::toString(errorCode)), cl_logDEBUG1);
+                return false;
+            }
 
+            auto resourceManager = ec2Connection()->getResourceManager(owner->accessRights());
+            ec2::ApiResourceParamWithRefDataList dummyData;
+            errorCode = resourceManager->saveSync(user->params(), &dummyData);
+            if (errorCode != ec2::ErrorCode::ok)
+            {
+                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save user parameters: %1")
+                    .arg(ec2::toString(errorCode)), cl_logDEBUG1);
+                return false;
+            }
+        }
+    }
 
     QnSystemSettingsHandler settingsSubHandler;
     const QnRequestParams settingsParams;
@@ -567,7 +568,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     }
 
     auto miscManager = ec2Connection()->getMiscManager(Qn::kSystemAccess);
-    errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
+    ec2::ErrorCode errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {
