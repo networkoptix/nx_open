@@ -248,8 +248,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                 break;
 
             if (!isValid(column))
-                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
-            return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
+                return qnGlobals->businessRuleInvalidColumnBackgroundColor();
+            return qnGlobals->businessRuleInvalidBackgroundColor();
 
         case Qn::UuidRole:
             return qVariantFromValue(m_id);

@@ -771,6 +771,10 @@ void QnNxStyle::drawPrimitive(
                     }
                 }
 
+                QVariant background = item->index.data(Qt::BackgroundRole);
+                if (background.isValid() && background.canConvert<QBrush>())
+                    painter->fillRect(item->rect, background.value<QBrush>());
+
                 /* Draw hover marker if needed: */
                 if (hasHover && !suppressHover)
                     painter->fillRect(item->rect, option->palette.midlight());
