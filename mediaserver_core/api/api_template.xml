@@ -814,53 +814,60 @@
                 </function>
                 <function>
                     <name>manualCamera/search</name>
-                    <description>Search cameras in manual mode</description>
+                    <description>Start searching for the cameras in manual mode.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>start_ip</name>
-                            <description>First IP address in range to scan.</description>
+                            <description>First IP address in the range to scan.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>end_ip</name>
-                            <description>Last IP address in range to scan.</description>
+                            <description>Last IP address in the range to scan.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Camera(s) port to check. Port is auto-detected if parameter
-                                is absent.</description>
+                            <description>Camera(s) IP port to check. Port is auto-detected if this
+                                parameter is omitted.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>user</name>
-                            <description>Username for the cameras</description>
+                            <description>Camera(s) username.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Password for the cameras</description>
+                            <description>Camera(s) password.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with camera names, manufacturers and urls.</caption>
+                        <caption>JSON object with the initial status of camera search process,
+                            including processUuid used for other /api/manualCamera calls, and the
+                            list of objects describing cameras found to the moment.</caption>
                     </result>
                 </function>
                 <function>
                     <name>manualCamera/status</name>
-                    <description>Get manual adding progress.</description>
+                    <description>Get the current status of the process of searching for the cameras.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique id.</description>
+                            <description>Process unique id, can be obtained from "processUuid"
+                                field in the result of /api/manualCamera/search.</description>
                             <optional>false</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with progress value.</caption>
+                      <caption>
+                        JSON object with the initial status of camera search process,
+                        including processUuid used for other /api/manualCamera calls, and the
+                        list of objects describing cameras found to the moment.
+                      </caption>
                     </result>
                 </function>
                 <function>
@@ -870,43 +877,60 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique id.</description>
+                            <description>
+                              Process unique id, can be obtained from "processUuid"
+                              field in the result of /api/manualCamera/search.
+                            </description>
                             <optional>false</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with OK message or error code.</caption>
+                        <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
                 <function>
                     <name>manualCamera/add</name>
                     <description>Manually add camera(s). If several cameras are added, parameters
-                        "url" and "manufacturer" must be defined several times.</description>
-                    <method>POST</method>
+                        "url" and "manufacturer" must be defined several times with incrementing
+                        suffix "0", "1", etc.</description>
+                    <method>GET</method>
                     <params>
                         <param>
-                            <name>url</name>
-                            <description>Camera url returned by scan request.</description>
+                            <name>url0</name>
+                            <description>
+                              Camera url, can be obtained from
+                              "reply.cameras.url" field in the result of
+                              /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>manufacturer</name>
-                            <description>Camera manufacturer.</description>
+                            <name>uniqueId0</name>
+                            <description>Camera physical id, can be obtained from
+                                "reply.cameras.uniqueId" field in the result of
+                                /api/manualCamera/status.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>manufacturer0</name>
+                            <description>
+                              Camera manufacturer, can be obtained from
+                              "reply.cameras.manufacturer" field in the result of
+                              /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>user</name>
-                            <description>Username for the cameras</description>
+                            <description>Username for the cameras.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Password for the cameras</description>
+                            <description>Password for the cameras.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with OK message or error code.</caption>
+                        <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
                 <function>
