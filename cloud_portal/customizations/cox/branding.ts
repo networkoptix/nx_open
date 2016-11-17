@@ -4,7 +4,7 @@
     <name>global</name>
     <message>
       <source>PRODUCT_NAME</source>
-      <translation>Cox Business Security Solutions Cloud</translation>
+      <translation>Cox Cloud</translation>
     </message>
     <message>
       <source>CLIENT_PROTOCOL</source>

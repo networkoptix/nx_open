@@ -4,7 +4,7 @@
     <name>global</name>
     <message>
       <source>PRODUCT_NAME</source>
-      <translation>Fly View Cloud</translation>
+      <translation>FlyView Cloud</translation>
     </message>
     <message>
       <source>CLIENT_PROTOCOL</source>

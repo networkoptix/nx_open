@@ -44,7 +44,7 @@ class System(object):
         # TODO: create wrappers
         request = CLOUD_DB_URL + "/system/get"
         params = {
-           'systemID': system_id
+           'systemId': system_id
         }
         return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
 
@@ -52,9 +52,9 @@ class System(object):
     @validate_response
     @lower_case_email
     def users(email, password, system_id):
-        request = CLOUD_DB_URL + "/system/get_cloud_users"
+        request = CLOUD_DB_URL + "/system/getCloudUsers"
         params = {
-           'systemID': system_id
+           'systemId': system_id
         }
         return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
 
@@ -64,7 +64,7 @@ class System(object):
     def share(email, password, system_id, account_email, role):
         request = CLOUD_DB_URL + "/system/share"
         params = {
-            'systemID': system_id,
+            'systemId': system_id,
             'accountEmail': account_email,
             'accessRole': role
         }
@@ -75,9 +75,9 @@ class System(object):
     @lower_case_email
     def get_nonce(email, password, system_id):
         # TODO: create wrappers
-        request = CLOUD_DB_URL + '/auth/get_nonce'
+        request = CLOUD_DB_URL + '/auth/getNonce'
         params = {
-            'systemID': system_id
+            'systemId': system_id
         }
         return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
 
@@ -87,7 +87,7 @@ class System(object):
     def rename(email, password, system_id, system_name):
         request = CLOUD_DB_URL + "/system/rename"
         params = {
-            'systemID': system_id,
+            'systemId': system_id,
             'name': system_name
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
@@ -96,9 +96,9 @@ class System(object):
     @validate_response
     @lower_case_email
     def access_roles(email, password, system_id):
-        request = CLOUD_DB_URL + "/system/get_access_role_list"
+        request = CLOUD_DB_URL + "/system/getAccessRoleList"
         params = {
-           'systemID': system_id
+           'systemId': system_id
         }
         return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
 
@@ -108,7 +108,7 @@ class System(object):
     def unbind(email, password, system_id):
         request = CLOUD_DB_URL + "/system/unbind"
         params = {
-            'systemID': system_id,
+            'systemId': system_id,
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
@@ -201,7 +201,7 @@ class Account(object):
         params = {
             'type': type
         }
-        request = CLOUD_DB_URL + '/account/create_temporary_credentials'
+        request = CLOUD_DB_URL + '/account/createTemporaryCredentials'
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
@@ -211,7 +211,7 @@ class Account(object):
         params = {
             'email': user_email
         }
-        request = CLOUD_DB_URL + '/account/reset_password'
+        request = CLOUD_DB_URL + '/account/resetPassword'
         return requests.post(request, json=params)
 
     @staticmethod
