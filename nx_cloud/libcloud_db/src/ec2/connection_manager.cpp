@@ -89,7 +89,7 @@ void ConnectionManager::createTransactionConnection(
     // TODO: #ak
 
     std::string systemId;
-    if (!authInfo.get(attr::authSystemID, &systemId))
+    if (!authInfo.get(attr::authSystemId, &systemId))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")

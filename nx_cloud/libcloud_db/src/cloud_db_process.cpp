@@ -65,7 +65,6 @@ CloudDBProcess::CloudDBProcess(int argc, char **argv):
     m_argc(argc),
     m_argv(argv),
     m_terminated(false),
-    m_timerID(-1),
     m_settings(nullptr),
     m_dbManager(nullptr),
     m_timerManager(nullptr),

@@ -41,11 +41,11 @@ void AuthenticationProvider::getCdbNonce(
 {
     std::string systemId;
     std::string accountEmail;
-    if (!authzInfo.get(attr::authSystemID, &systemId))
+    if (!authzInfo.get(attr::authSystemId, &systemId))
     {
         if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
             return completionHandler(api::ResultCode::forbidden, api::NonceData());
-        if (!filter.get(attr::systemID, &systemId))
+        if (!filter.get(attr::systemId, &systemId))
             return completionHandler(api::ResultCode::badRequest, api::NonceData());
         const auto accessRole = m_systemManager.getAccountRightsForSystem(
             accountEmail, systemId);
@@ -68,7 +68,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
     std::string systemId;
-    if (!authzInfo.get(attr::authSystemID, &systemId))
+    if (!authzInfo.get(attr::authSystemId, &systemId))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
     if (authRequest.realm != AuthenticationManager::realm())
         return completionHandler(api::ResultCode::unknownRealm, api::AuthResponse());
