@@ -81,9 +81,9 @@ int QnConfigureRestHandler::execute(
         return CODE_OK;
     }
 
-    /* set system id */
+    /* set system id and move tran log time */
     const auto oldSystemId = qnGlobalSettings->localSystemId();
-    if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemId())
+    if (!data.localSystemId.isNull())
     {
         if (!backupDatabase())
         {
@@ -106,6 +106,15 @@ int QnConfigureRestHandler::execute(
                 data.tranLogTime,
                 ec2::DummyHandler::instance(),
                 &ec2::DummyHandler::onRequestDone);
+        }
+        if (data.rewriteLocalSettings)
+        {
+            // rewrite system settings to update transaction time
+
+            const auto& settings = QnGlobalSettings::instance()->allSettings();
+            for (QnAbstractResourcePropertyAdaptor* setting: settings)
+                setting->markDirty();
+            qnGlobalSettings->synchronizeNowSync();
         }
     }
 

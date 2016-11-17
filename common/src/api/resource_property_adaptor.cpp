@@ -119,6 +119,11 @@ void QnAbstractResourcePropertyAdaptor::setValueInternal(const QVariant &value) 
     emit valueChanged();
 }
 
+void QnAbstractResourcePropertyAdaptor::markDirty()
+{
+    enqueueSaveRequest();
+}
+
 bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expectedValue, const QVariant &newValue) {
     bool save = false;
     {
