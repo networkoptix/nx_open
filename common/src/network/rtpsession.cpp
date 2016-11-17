@@ -1214,9 +1214,11 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
 
 void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
 {
+    nx_http::StringType rangeVal;
     if (startPos != qint64(AV_NOPTS_VALUE))
     {
-        nx_http::StringType rangeVal;
+        //There is no guarantee that every RTSP server understands utc ranges.
+        //RFC requires only npt ranges support.
         if (startPos != DATETIME_NOW)
             rangeVal += "clock=" + nx_http::StringType::number(startPos);
         else
@@ -1229,10 +1231,16 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
             else
                 rangeVal += "clock";
         }
-        nx_http::insertOrReplaceHeader(
-            &request->headers,
-            nx_http::HttpHeader("Range", rangeVal));
+        
     }
+    else
+    {
+        rangeVal += "npt=0.000-";
+    }
+
+    nx_http::insertOrReplaceHeader(
+        &request->headers,
+        nx_http::HttpHeader("Range", rangeVal));
 }
 
 QByteArray RTPSession::getGuid()
