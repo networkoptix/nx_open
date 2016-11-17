@@ -548,7 +548,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return XML with parameter value</caption>
+                        <caption>Return JSON object with error code, error message and diagnostics result.</caption>
                     </result>
                 </function>
                 <function>
@@ -1037,7 +1037,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON message with error code and error message.</caption>
+                        <caption>JSON message with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
                 <function>
