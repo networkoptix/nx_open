@@ -93,7 +93,10 @@ libnx_network \
 libnx_streaming \
 libnx_utils \
 libpostproc \
-libudt )
+libudt \
+libGLESv2 \
+libMali \
+libUMP )
 
 #additional libs for nx1 client
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
@@ -108,10 +111,7 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     libproxydecoder \
     libEGL \
     libGLESv1_CM \
-    libGLESv2 \
-    libMali \
     libpixman-1 \
-    libUMP \
     libvdpau_sunxi )
 fi
 
