@@ -888,7 +888,7 @@
                         <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>manualCamera/add</name>
                     <description>Manually add camera(s). If several cameras are added, parameters
                         "url" and "manufacturer" must be defined several times with incrementing
@@ -899,14 +899,14 @@
                             <name>url0</name>
                             <description>
                               Camera url, can be obtained from
-                              "reply.cameras.url" field in the result of
+                              "reply.cameras[].url" field in the result of
                               /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>uniqueId0</name>
                             <description>Camera physical id, can be obtained from
-                                "reply.cameras.uniqueId" field in the result of
+                                "reply.cameras[].uniqueId" field in the result of
                                 /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
@@ -914,7 +914,7 @@
                             <name>manufacturer0</name>
                             <description>
                               Camera manufacturer, can be obtained from
-                              "reply.cameras.manufacturer" field in the result of
+                              "reply.cameras[].manufacturer" field in the result of
                               /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
@@ -933,6 +933,82 @@
                         <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
+              <function>
+                <name>manualCamera/add</name>
+                <description>
+                  Manually add camera(s). If several cameras are added, parameters
+                  "url" and "manufacturer" must be defined several times with incrementing
+                  suffix "0", "1", etc.
+<p>
+Parameters should be passed as a JSON object in POST message body with
+content type "application/json". Example of such object:
+<pre><code>
+{
+    "user": "some_user",
+    "password: "some_password",
+    "cameras":
+    [
+        {
+            "uniqueId": "00-1A-07-00-FF-FF",
+            "url": "192.168.0.100"
+            "manufacturer": "3100",
+        }
+    ]
+}
+</code></pre>
+</p>
+              </description>
+                <method>POST</method>
+                <params>
+                  <param>
+                    <name>user</name>
+                    <description>Username for the cameras.</description>
+                    <optional>true</optional>
+                  </param>
+                  <param>
+                    <name>password</name>
+                    <description>Password for the cameras.</description>
+                    <optional>true</optional>
+                  </param>
+                  <param>
+                    <name>cameras</name>
+                    <description>
+                      List of objects with fields defined below.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cameras[].url</name>
+                    <description>
+                      Camera url, can be obtained from
+                      "reply.cameras[].url" field in the result of
+                      /api/manualCamera/status.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cameras[].uniqueId</name>
+                    <description>
+                      Camera physical id, can be obtained from
+                      "reply.cameras[].uniqueId" field in the result of
+                      /api/manualCamera/status.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cameras[].manufacturer</name>
+                    <description>
+                      Camera manufacturer, can be obtained from
+                      "reply.cameras[].manufacturer" field in the result of
+                      /api/manualCamera/status.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+                <result>
+                  <caption>JSON object with error message and error code (0 means OK).</caption>
+                </result>
+              </function>
                 <function>
                     <name>ping</name>
                     <description>Ping the server</description>
