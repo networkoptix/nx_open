@@ -179,7 +179,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=1").arg(testSetup->endpoint().port));
+        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=1").arg(testSetup->endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
@@ -187,7 +187,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
+        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
             arg(testSetup->endpoint().port).arg(QString::fromStdString(system1.id)));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
@@ -199,7 +199,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     {
         nx_http::HttpClient client;
         QString urlStr(
-            lm("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
+            lm("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
                 arg(testSetup->endpoint().port).arg(QUrl::toPercentEncoding(QString::fromStdString(system1.id))));
         urlStr.replace(lit("{"), lit("%7B"));
         urlStr.replace(lit("}"), lit("%7D"));
@@ -825,7 +825,7 @@ TEST_F(System, update)
     auto system1 = addRandomSystemToAccount(account1);
 
     api::SystemAttributesUpdate updatedData;
-    updatedData.systemID = system1.id;
+    updatedData.systemId = system1.id;
     updatedData.opaque = kOpaqueValue;
     ASSERT_EQ(
         api::ResultCode::ok,

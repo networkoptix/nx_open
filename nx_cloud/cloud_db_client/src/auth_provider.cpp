@@ -35,7 +35,7 @@ void AuthProvider::getCdbNonce(
 {
     executeRequest(
         kAuthGetNoncePath,
-        api::SystemID(systemId),
+        api::SystemId(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::NonceData()));
 }

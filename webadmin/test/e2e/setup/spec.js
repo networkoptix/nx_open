@@ -238,53 +238,37 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-391 is fixed
+    // Does not work locally
     xit("Enter works for next button in every place next is available: advanced settings",function(){
         p.triggerSetupWizard();
         browser.sleep(1000);
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
 
         p.advancedSysSett.click();
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
+        p.pressEnter();
 
         p.systemNameInput.clear().sendKeys('autotest-system');
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
+        p.pressEnter();
+
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
+        p.pressEnter();
     });
 
-    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-391 is fixed
+    // Does not work locally
     xit("Enter works for next button in every place next is available: cloud connect",function(){
         p.triggerSetupWizard();
         browser.sleep(1000);
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
         p.systemNameInput.clear().sendKeys('autotest-system');
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
 
         p.systemTypeRightButton.click();  // choose cloud system type
-        browser.actions().
-            sendKeys(protractor.Key.ENTER).
-            perform();
+        p.pressEnter();
         p.useCloudAccButton.click();
         p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
         p.cloudPassInput.sendKeys(p.helper.password);
@@ -303,7 +287,7 @@ describe('Setup Wizard', function () {
         p.helper.login('admin', p.helper.password);
     });
 
-    // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-391 is fixed
+    // Does not work locally
     xit("Enter works for next button in every place next is available: merge with another",function(){
         p.triggerSetupWizard();
         browser.sleep(1000);
@@ -329,7 +313,6 @@ describe('Setup Wizard', function () {
         browser.get('/#/setup');
         expect(p.setupDialog.getText()).toContain('System is ready for use');
         p.finishButton.click();
-        browser.pause();
     });
 
     // TODO: Enable when https://networkoptix.atlassian.net/browse/WEB-408 is fixed
@@ -492,7 +475,7 @@ describe('Setup Wizard', function () {
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
         p.nextButton.click();
         p.finishButton.click();
-    });
+    }, 90000);
 
     it("Cloud connect: wrong cloud credentials",function(){
         p.triggerSetupWizard();

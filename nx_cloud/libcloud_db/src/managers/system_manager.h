@@ -100,7 +100,7 @@ public:
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(api::ResultCode)> completionHandler);
     //!Fetches systems satisfying specified \a filter
     /*!
@@ -125,7 +125,7 @@ public:
 
     void getAccessRoleList(
         const AuthorizationInfo& authzInfo,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
     void updateSystem(
@@ -140,15 +140,15 @@ public:
 
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
-        - \a accountEmail has no rights for \a systemID
-        - \a accountEmail or \a systemID is unknown
+        - \a accountEmail has no rights for \a systemId
+        - \a accountEmail or \a systemId is unknown
     */
     api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
-        const std::string& systemID) const;
+        const std::string& systemId) const;
     boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
-        const std::string& systemID) const;
+        const std::string& systemId) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(
@@ -196,7 +196,7 @@ private:
                 api::SystemSharing, std::string, &api::SystemSharing::accountEmail>>,
             //indexing by system
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
-                api::SystemSharing, std::string, &api::SystemSharing::systemID>>,
+                api::SystemSharing, std::string, &api::SystemSharing::systemId>>,
             //indexing by pair<systemId, vmsUserId>
             boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
                 const api::SystemSharing&,
@@ -278,12 +278,12 @@ private:
 
     nx::db::DBResult deleteSystemFromDB(
         nx::db::QueryContext* const queryContext,
-        const data::SystemID& systemID);
+        const data::SystemId& systemId);
     void systemDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
     //---------------------------------------------------------------------------------------------

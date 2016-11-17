@@ -38,19 +38,19 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
-class SystemID
+class SystemId
 {
 public:
-    std::string systemID;
+    std::string systemId;
 
-    SystemID();
-    SystemID(std::string systemIDStr);
+    SystemId();
+    SystemId(std::string systemIdStr);
 };
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
-void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemId* const systemId);
+void serializeToUrlQuery(const SystemId& data, QUrlQuery* const urlQuery);
 
-#define SystemID_Fields (systemID)
+#define SystemId_Fields (systemId)
 
 
 //-------------------------------------------------------------------------------------------------
@@ -73,10 +73,10 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
 
-#define SystemSharing_Fields (accountEmail)(systemID)(accessRole)(groupID)(customPermissions)(isEnabled)(vmsUserId)
+#define SystemSharing_Fields (accountEmail)(systemId)(accessRole)(groupId)(customPermissions)(isEnabled)(vmsUserId)
 #define SystemSharingList_Fields (sharing)
 
-#define SystemSharingEx_Fields SystemSharing_Fields(accountID)(accountFullName)(usageFrequency)(lastLoginTime)
+#define SystemSharingEx_Fields SystemSharing_Fields(accountId)(accountFullName)(usageFrequency)(lastLoginTime)
 #define SystemSharingExList_Fields (sharing)
 
 #define SystemAccessRoleData_Fields (accessRole)
@@ -99,7 +99,7 @@ bool deserialize(QnJsonContext*, const QJsonValue&, UserSessionDescriptor*);
 // common functions
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemAttributesUpdate),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemId)(SystemAttributesUpdate),
     (json));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
