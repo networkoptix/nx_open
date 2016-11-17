@@ -28,7 +28,7 @@
 
 #include <rest/helpers/permissions_helper.h>
 #include <api/global_settings.h>
-
+#include <api/resource_property_adaptor.h>
 
 namespace
 {
@@ -112,7 +112,7 @@ int QnConfigureRestHandler::execute(
             // rewrite system settings to update transaction time
 
             const auto& settings = QnGlobalSettings::instance()->allSettings();
-            for (QnAbstractResourcePropertyAdaptor* setting: settings)
+            for (auto setting: settings)
                 setting->markDirty();
             qnGlobalSettings->synchronizeNowSync();
         }
