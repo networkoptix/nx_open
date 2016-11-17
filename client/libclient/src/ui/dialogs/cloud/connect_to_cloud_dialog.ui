@@ -113,6 +113,12 @@
          </property>
          <item>
           <widget class="QLabel" name="forgotPasswordLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::TabFocus</enum>
            </property>

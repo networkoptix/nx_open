@@ -10,20 +10,24 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <cdb/result_code.h>
+#include <nx_ec/ec_proto_version.h>
 #include <utils/common/id.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include <transaction/transaction.h>
 #include <transaction/transaction_descriptor.h>
 
-#include "transaction_serializer.h"
+#include "serialization/transaction_serializer.h"
+#include "serialization/ubjson_serialized_transaction.h"
 #include "transaction_timestamp_calculator.h"
 #include "transaction_transport_header.h"
 
 namespace nx {
 
 namespace db {
+
 class AsyncSqlQueryExecutor;
+
 } // namespace db
 
 namespace cdb {
@@ -33,30 +37,24 @@ class OutgoingTransactionDispatcher;
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
-/**
- * Result of \a TransactionLog::readTransactions
- */
-struct TransactionData
+struct TransactionLogRecord
 {
     nx::Buffer hash;
-    std::shared_ptr<const Serializable> serializer;
+    std::unique_ptr<const TransactionSerializer> serializer;
 };
 
-/** 
- * Comment will appear here later during class implementation.
- */
 class TransactionLog
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
     typedef nx::utils::MoveOnlyFunc<void(
         api::ResultCode /*resultCode*/,
-        std::vector<TransactionData> /*serializedTransactions*/,
+        std::vector<TransactionLogRecord> /*serializedTransactions*/,
         ::ec2::QnTranState /*readedUpTo*/)> TransactionsReadHandler;
 
     /**
      * Fills internal cache.
-     * @throw \a std::runtime_error In case of failure to pre-fill data cache.
+     * @throw std::runtime_error In case of failure to pre-fill data cache.
      */
     TransactionLog(
         const QnUuid& peerId,
@@ -64,10 +62,10 @@ public:
         OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
     /** 
-     * Begins SQL DB transaction and passes that to \a dbOperationsFunc.
-     * @note nx::db::DBResult::retryLater can be reported to \a onDbUpdateCompleted if 
+     * Begins SQL DB transaction and passes that to dbOperationsFunc.
+     * @note nx::db::DBResult::retryLater can be reported to onDbUpdateCompleted if 
      *      there are already too many requests for transaction
-     * @note In case of error \a dbUpdateFunc can be skipped
+     * @note In case of error dbUpdateFunc can be skipped
      */
     void startDbTransaction(
         const nx::String& systemId,
@@ -75,7 +73,7 @@ public:
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> onDbUpdateCompleted);
 
     /**
-     * \note This call should be made only once when generating first transaction.
+     * @note This call should be made only once when generating first transaction.
      */
     nx::db::DBResult updateTimestampHiForSystem(
         nx::db::QueryContext* connection,
@@ -84,29 +82,29 @@ public:
 
     /** 
      * If transaction is not needed (it can be late or something), 
-     *      \a db::DBResult::cancelled is returned.
+     *      db::DBResult::cancelled is returned.
      */
     template<typename TransactionDataType>
     nx::db::DBResult checkIfNeededAndSaveToLog(
         nx::db::QueryContext* connection,
         const nx::String& systemId,
-        ::ec2::QnTransaction<TransactionDataType> transaction,
-        TransactionTransportHeader /*transportHeader*/)
+        const SerializableTransaction<TransactionDataType>& transaction)
     {
-        const auto transactionHash = calculateTransactionHash(transaction);
+        const auto transactionHash = calculateTransactionHash(transaction.get());
 
         // Checking whether transaction should be saved or not.
         if (isShouldBeIgnored(
                 connection,
                 systemId,
-                transaction,
+                transaction.get(),
                 transactionHash))
         {
             NX_LOGX(
                 QnLog::EC2_TRAN_LOG,
                 lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
-                    .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-                    .str(transaction).arg(calculateTransactionHash(transaction)),
+                    .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.get().command))
+                    .str(transaction.get())
+                    .arg(calculateTransactionHash(transaction.get())),
                 cl_logDEBUG1);
             // Returning nx::db::DBResult::cancelled if transaction should be skipped.
             return nx::db::DBResult::cancelled;
@@ -117,16 +115,15 @@ public:
             QnMutexLocker lk(&m_mutex);
             auto& transactionLogData = m_systemIdToTransactionLog[systemId];
             transactionLogData.timestampCalculator->shiftTimestampIfNeeded(
-                transaction.persistentInfo.timestamp);
+                transaction.get().persistentInfo.timestamp);
         }
 
-        // TODO: #ak: Should not serialize transaction here, but receive already serialized version.
         return saveToDb(
             connection,
             systemId,
-            transaction,
+            transaction.get(),
             transactionHash,
-            QnUbjson::serialized(transaction));
+            transaction.serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION));
     }
 
     /**
@@ -134,11 +131,11 @@ public:
      */
     template<int TransactionCommandValue, typename TransactionDataType>
     nx::db::DBResult generateTransactionAndSaveToLog(
-        nx::db::QueryContext* connection,
+        nx::db::QueryContext* queryContext,
         const nx::String& systemId,
         TransactionDataType transactionData)
     {
-        const int tranSequence = generateNewTransactionSequence(connection, systemId);
+        const int tranSequence = generateNewTransactionSequence(queryContext, systemId);
 
         // Generating transaction.
         ::ec2::QnTransaction<TransactionDataType> transaction(m_peerId);
@@ -149,7 +146,7 @@ public:
         transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);
         transaction.persistentInfo.sequence = tranSequence;
         transaction.persistentInfo.timestamp =
-            generateNewTransactionTimestamp(connection, systemId);
+            generateNewTransactionTimestamp(queryContext, systemId);
         transaction.params = std::move(transactionData);
 
         const auto transactionHash = calculateTransactionHash(transaction);
@@ -165,7 +162,7 @@ public:
 
         // Saving transaction to the log.
         const auto result = saveToDb(
-            connection,
+            queryContext,
             systemId,
             transaction,
             transactionHash,
@@ -173,16 +170,16 @@ public:
         if (result != nx::db::DBResult::ok)
             return result;
 
-        auto transactionSerializer = std::make_shared<
-            TransactionWithUbjsonPresentation<TransactionDataType>>(
+        auto transactionSerializer = std::make_unique<
+            UbjsonSerializedTransaction<TransactionDataType>>(
                 std::move(transaction),
-                std::move(serializedTransaction));
+                std::move(serializedTransaction),
+                nx_ec::EC2_PROTO_VERSION);
 
         // Saving transactions, generated under current DB transaction,
         //  so that we can send "new transaction" notifications after commit.
         QnMutexLocker lk(&m_mutex);
-        DbTransactionContext& dbTranContext = m_dbTransactionContexts[connection];
-        dbTranContext.systemId = systemId;
+        DbTransactionContext& dbTranContext = getTransactionContext(lk, queryContext, systemId);
         dbTranContext.transactions.push_back(std::move(transactionSerializer));
 
         return nx::db::DBResult::ok;
@@ -195,10 +192,10 @@ public:
      * @param to State (transaction source id, sequence) to read up to. Boundary is inclusive
      * @param completionHandler is called within unspecified DB connection thread.
      * In case of high load request can be cancelled internaly. 
-     * In this case \a api::ResultCode::retryLater will be reported
-     * \note If there more transactions then \a maxTransactionsToReturn then 
-     *      \a api::ResultCode::partialContent result code will be reported 
-     *      to the \a completionHandler.
+     * In this case api::ResultCode::retryLater will be reported
+     * @note If there more transactions then maxTransactionsToReturn then 
+     *      api::ResultCode::partialContent result code will be reported 
+     *      to the completionHandler.
      */
     void readTransactions(
         const nx::String& systemId,
@@ -240,7 +237,7 @@ private:
     public:
         nx::String systemId;
         /** List of transactions, added within this DB transaction. */
-        std::vector<std::shared_ptr<const TransactionWithSerializedPresentation>> transactions;
+        std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions;
         /** Changes done to vms transaction log under Db transaction. */
         VmsTransactionLogData transactionLogUpdate;
     };
@@ -248,7 +245,7 @@ private:
     struct TransactionReadResult
     {
         api::ResultCode resultCode;
-        std::vector<TransactionData> transactions;
+        std::vector<TransactionLogRecord> transactions;
         /** (Read start state) + (readed transactions). */
         ::ec2::QnTranState state;
     };
@@ -257,7 +254,10 @@ private:
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
-    std::map<nx::db::QueryContext*, DbTransactionContext> m_dbTransactionContexts;
+    std::map<
+        std::pair<nx::db::QueryContext*, nx::String>,
+        DbTransactionContext
+    > m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
 
@@ -303,7 +303,13 @@ private:
         const nx::String& systemId);
     void onDbTransactionCompleted(
         nx::db::QueryContext* dbConnection,
+        const nx::String& systemId,
         nx::db::DBResult dbResult);
+
+    DbTransactionContext& getTransactionContext(
+        const QnMutexLockerBase& lk,
+        nx::db::QueryContext* const queryContext,
+        const nx::String& systemId);
 };
 
 } // namespace ec2

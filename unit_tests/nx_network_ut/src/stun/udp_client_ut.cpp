@@ -315,8 +315,6 @@ TEST_F(StunUDP, client_cancellation)
     }
 
     client.pleaseStopSync();
-
-    ASSERT_EQ(REQUESTS_TO_SEND, errorsReported);
 }
 
 /** testing that client accepts response from server endpoint only */

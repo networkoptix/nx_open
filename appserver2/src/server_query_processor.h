@@ -289,10 +289,10 @@ private:
             this, SCOPED_GUARD_FUNC);
 
         // Starting transaction.
-        std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
-        std::list<std::function<void()>> transactionsPostProcessList;
 
         QnMutexLocker lock(&m_updateDataMutex);
+        std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
+        static std::list<std::function<void()>> transactionsPostProcessList;
 
         if(ApiCommand::isPersistent(tran.command))
         {

@@ -529,6 +529,7 @@ void QnWorkbenchDisplay::initSceneView()
 
         viewport->makeCurrent();
         QnGlHardwareChecker::checkCurrentContext(true);
+        QGLContext::currentContext()->setTextureCacheLimit(256 * 1024);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);

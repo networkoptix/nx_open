@@ -22,6 +22,7 @@
 namespace
 {
     const int kWelcomeFontPixelSize = 24;
+    const int kWelcomeFontWeight = QFont::Light;
 }
 
 class QnLoginToCloudDialogPrivate : public QObject
@@ -44,7 +45,7 @@ public:
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
-    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
+    base_type(parent),
     ui(new Ui::QnLoginToCloudDialog),
     d_ptr(new QnLoginToCloudDialogPrivate(this))
 {
@@ -81,6 +82,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
+    welcomeFont.setWeight(kWelcomeFontWeight);
+    ui->cloudWelcomeLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->cloudWelcomeLabel->setFont(welcomeFont);
 
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
@@ -102,7 +105,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 
-    setResizeToContentsMode(Qt::Vertical);
+    setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 }
 
 QnLoginToCloudDialog::~QnLoginToCloudDialog()

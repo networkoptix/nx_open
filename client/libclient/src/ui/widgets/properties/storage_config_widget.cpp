@@ -370,10 +370,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
         &QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
 
     /* By [Left] disable storage, by [Right] enable storage: */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->storageView->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this,
+    installEventHandler(ui->storageView, QEvent::KeyPress, this,
         [this, itemClicked](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);

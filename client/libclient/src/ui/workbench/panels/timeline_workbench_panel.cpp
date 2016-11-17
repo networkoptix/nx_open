@@ -242,10 +242,6 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     sliderWheelEater->setEventType(QEvent::GraphicsSceneWheel);
     m_resizerWidget->installEventFilter(sliderWheelEater);
 
-    auto sliderWheelSignalizer = new QnSingleEventSignalizer(this);
-    sliderWheelSignalizer->setEventType(QEvent::GraphicsSceneWheel);
-    m_resizerWidget->installEventFilter(sliderWheelSignalizer);
-
     connect(sliderZoomInButton, &QnImageButtonWidget::pressed, this,
         [this]
         {
@@ -272,7 +268,8 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
             item->timeSlider()->hurryKineticAnimations();
         });
 
-    connect(sliderWheelSignalizer, &QnAbstractEventSignalizer::activated, this,
+    //TODO: #vkutin #GDM #common Check if this still works (installSceneEventFilter might be required)
+    installEventHandler(m_resizerWidget, QEvent::GraphicsSceneWheel, this,
         &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
 
     /* Create a shadow: */

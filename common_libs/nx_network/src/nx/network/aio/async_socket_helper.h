@@ -144,29 +144,29 @@ public:
         SocketGlobals::addressResolver().dnsResolver().resolveAsync(
             address.address.toString(),
             [this, address, handler = std::move(handler)](
-                SystemError::ErrorCode code, DnsResolver::HostAddresses ips) mutable
+                SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
-                    return this->post(
-                        [handler = std::move(handler), code]() { handler(code); });
+                    return this->post([h = std::move(handler), code]() { h(code); });
 
-                std::queue<HostAddress> ipQueue;
-                for (auto& ip: ips)
-                    ipQueue.push(std::move(ip));
+                if (ips.empty())
+                {
+                    NX_ASSERT(false);
+                    return this->post([h = std::move(handler)]() { h(SystemError::hostNotFound); });
+                }
 
-                NX_CRITICAL(!ipQueue.empty());
-                connectToIpsAsync(std::move(ipQueue), address.port, std::move(handler));
+                connectToIpsAsync(std::move(ips), address.port, std::move(handler));
             },
             m_ipVersion,
             this);
     }
 
     void connectToIpsAsync(
-        std::queue<HostAddress> ips, uint16_t port,
+        std::deque<HostAddress> ips, uint16_t port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         SocketAddress firstAddress(std::move(ips.front()), port);
-        ips.pop();
+        ips.pop_front();
         connectToIpAsync(
             firstAddress,
             [this, ips = std::move(ips), port, handler = std::move(handler)](
@@ -206,7 +206,7 @@ public:
             )
         {
             this->post(
-                [handler = move(handler), 
+                [handler = std::move(handler),
                     errorCode = SystemError::getLastOSErrorCode()]() mutable
                 { 
                     handler(errorCode);
@@ -221,7 +221,7 @@ public:
         if (!startAsyncConnect(addr))
         {
             this->post(
-                [handler = move(m_connectHandler),
+                [handler = std::move(m_connectHandler),
                     code = SystemError::getLastOSErrorCode()]() mutable
                 {
                     handler(code);
@@ -549,7 +549,7 @@ private:
             boost::none,
             [this, resolvedAddress, sendTimeout]()
             {
-                this->m_socket->connectToIp( resolvedAddress, sendTimeout );
+                connectToIp( resolvedAddress, sendTimeout );
             });    //to be called between pollset.add and pollset.polladdress
         return true;
     }
@@ -794,6 +794,11 @@ private:
                 this->m_socket, aio::etTimedOut, true);
             m_timerHandler = nullptr;
         }
+    }
+
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis)
+    {
+        return this->m_socket->connectToIp(remoteAddress, timeoutMillis);
     }
 };
 

@@ -43,12 +43,14 @@ public:
     QPixmap pixmap(const char* name,
         const QSize& size = QSize(),
         Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
-        Qt::TransformationMode mode = Qt::FastTransformation);
+        Qt::TransformationMode mode = Qt::FastTransformation,
+        bool correctDevicePixelRatio = false);
 
     QPixmap pixmap(const QString& name,
         const QSize& size = QSize(),
         Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
-        Qt::TransformationMode mode = Qt::FastTransformation);
+        Qt::TransformationMode mode = Qt::FastTransformation,
+        bool correctDevicePixelRatio = false);
 
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);

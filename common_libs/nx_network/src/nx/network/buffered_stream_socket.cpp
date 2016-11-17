@@ -103,13 +103,6 @@ bool BufferedStreamSocket::connect(
     return m_socket->connect(remoteAddress, timeoutMillis);
 }
 
-bool BufferedStreamSocket::connectToIp(
-    const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
-{
-    return m_socket->connectToIp(remoteAddress, timeoutMillis);
-}
-
 int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     if (m_internalRecvBuffer.isEmpty())

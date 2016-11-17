@@ -57,7 +57,8 @@ def _addResult(textList, resData, resType, name):
     ("\t%s: %d\n" % (resType.capitalize(), len(resData))) +
     ''.join(
 #        "%s.%s (%s)\n" % (type(res[0]).__name__, res[0]._testMethodName, res[0]._testMethodDoc)
-        "\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
+        #"\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
+        "\t\t%s\n" % (res[0],)
         for res in resData
     ))
             #trace = res[1].split('\n')
@@ -118,12 +119,15 @@ def RunTests(testclass, *args):
     :type config: FtConfigParser
     """
     #print "DEBUG: run test class %s" % testclass
+    print "RunTests: %s, %s" % (testclass, args)
     config = _testMaster.getConfig()
     try:
         try:
             testclass.globalInit(config)
         except Exception as err:
-            print "FAIL: %s initialization failed: %s!" % (testclass.__name__, err)
+            #traceback.print_exc()
+            print "FAIL: %s initialization failed: %s!" % (testclass.__name__,
+                "".join(traceback.format_exception(*sys.exc_info())))
             return
         return all([
                     _singleSuiteRun(testclass, suite_name, config, args)
@@ -308,7 +312,7 @@ class FuncTestCase(unittest.TestCase):
 
     @classmethod
     def _clear_script_args(cls, num):
-        return (str(num), )
+        return (str(num),)
 
     @classmethod
     def _global_clear_extra_args(cls, num):
@@ -1040,23 +1044,35 @@ class FuncTestMaster(object):
     def init(self, notest=False):
         self._loadConfig()
         self.setUpPassword()
-        return (True,"") if notest or self.testConnection() else (False, "Connection test failed")
+        if not notest:
+            if not self.testConnection():
+                raise FuncTestError("Connection test failed")
 
     def init_rollback(self):
         self.unittestRollback = UnitTestRollback()
 
-    def initial_tests(self):
+    def checkServerListStates(self):
         # ensure all the server are on the same page
-        try:  # FIXME: all methods should raise exceptions and they must be cought outside!
-            self._ensureServerListStates(self.clusterTestSleepTime)
-        except Exception as err:
-            traceback.print_exc(file=sys.stdout)
-            assert False, str(err)
+        count = 5
+        while True:
+            try:
+                self._ensureServerListStates(self.clusterTestSleepTime)
+            except ServerCompareFailure as err:
+                count -= 1
+                if count > 0:
+                    print "DEBUG: initial_tests: %s (%s attempts left)" % (err, count)
+                else:
+                    raise
+#            except Exception as err:
+#                #traceback.print_exc(file=sys.stdout)
+#                assert False, str(err)
+            else:
+                break
 
+    def initial_tests(self):
+        self.checkServerListStates()
         self._fetchClusterTestServerNames()
-
         self._callAllGetters()
-
         # do the rollback here
         self.init_rollback()
 

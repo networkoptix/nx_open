@@ -66,6 +66,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <utils/common/event_processors.h>
+
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
 #endif
@@ -233,6 +235,12 @@ QnWorkbenchUi::~QnWorkbenchUi()
     /* The disconnect call is needed so that our methods don't get triggered while
      * the ui machinery is shutting down. */
     disconnectAll();
+
+    delete m_timeline;
+    delete m_calendar;
+    delete m_notifications;
+    delete m_title;
+    delete m_tree;
 
     delete m_controlsWidget;
 }
@@ -727,12 +735,8 @@ void QnWorkbenchUi::createControlsWidget()
     display()->scene()->addItem(m_controlsWidget);
     display()->setLayer(m_controlsWidget, Qn::UiLayer);
 
-    QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
-    deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
-    m_controlsWidget->installEventFilter(deactivationSignalizer);
-
-    /* Reactivate controls widget if it is deactivated. */
-    connect(deactivationSignalizer, &QnAbstractEventSignalizer::activated, this, [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
+    installEventHandler(m_controlsWidget, QEvent::WindowDeactivate, this,
+        [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
 
     connect(m_controlsWidget, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::at_controlsWidget_geometryChanged);
 }

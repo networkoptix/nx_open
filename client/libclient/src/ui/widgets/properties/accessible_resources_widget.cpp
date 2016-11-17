@@ -85,19 +85,11 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     if (m_controlsVisible)
     {
-        auto keyPressSignalizer = new QnSingleEventSignalizer(this);
-        keyPressSignalizer->setEventType(QEvent::KeyPress);
-        ui->resourcesTreeView->installEventFilter(keyPressSignalizer);
-        ui->controlsTreeView->installEventFilter(keyPressSignalizer);
-        connect(keyPressSignalizer, &QnSingleEventSignalizer::activated,
+        installEventHandler({ ui->resourcesTreeView, ui->controlsTreeView }, QEvent::KeyPress,
             this, &QnAccessibleResourcesWidget::at_itemViewKeyPress);
     }
 
-    auto showHideSignalizer = new QnMultiEventSignalizer(this);
-    showHideSignalizer->addEventType(QEvent::Show);
-    showHideSignalizer->addEventType(QEvent::Hide);
-    scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(scrollBar, { QEvent::Show, QEvent::Hide }, this,
         [this, scrollBar](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);

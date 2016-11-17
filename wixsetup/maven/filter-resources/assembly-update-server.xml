@@ -6,10 +6,10 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}/bin/msi</directory>
+			<directory>${project.build.directory}/bin/exe</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>*-server-*.msi</include>
+				<include>*-server-*.exe</include>
 			</includes>		
 		</fileSet>				
 		<fileSet>

@@ -69,7 +69,7 @@ void MaintenanceManager::onTransactionLogRead(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
     api::ResultCode resultCode,
-    std::vector<ec2::TransactionData> serializedTransactions,
+    std::vector<ec2::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,
@@ -94,7 +94,7 @@ void MaintenanceManager::onTransactionLogRead(
         ::ec2::ApiTransactionData tran(m_moduleGuid);
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
-            transactionContext.serializer->serialize(Qn::UbjsonFormat);
+            transactionContext.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
         QnUbjsonReader<nx::Buffer> stream(&serializedTransaction);
         if (QnUbjson::deserialize(&stream, &tran.tran))
         {

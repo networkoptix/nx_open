@@ -329,18 +329,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
 
     ui->exportWarningLabel->setVisible(false);
 
-    auto releaseSignalizer = new QnSingleEventSignalizer(this);
-    releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    connect(releaseSignalizer, &QnSingleEventSignalizer::activated, this,
-        &QnCameraScheduleWidget::at_releaseSignalizer_activated);
-    ui->recordMotionButton->installEventFilter(releaseSignalizer);
-    ui->recordMotionPlusLQButton->installEventFilter(releaseSignalizer);
+    installEventHandler({ ui->recordMotionButton, ui->recordMotionPlusLQButton },
+        QEvent::MouseButtonRelease, this, &QnCameraScheduleWidget::at_releaseSignalizer_activated);
 
-    auto gridMouseReleaseSignalizer = new QnSingleEventSignalizer(this);
-    gridMouseReleaseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    connect(gridMouseReleaseSignalizer, &QnSingleEventSignalizer::activated, this,
-        &QnCameraScheduleWidget::controlsChangesApplied);
-    ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
+    installEventHandler(ui->gridWidget, QEvent::MouseButtonRelease,
+        this, &QnCameraScheduleWidget::controlsChangesApplied);
 
     updateGridEnabledState();
     updateMotionButtons();

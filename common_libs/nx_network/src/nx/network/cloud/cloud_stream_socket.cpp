@@ -161,14 +161,6 @@ bool CloudStreamSocket::connect(
     return true;
 }
 
-bool CloudStreamSocket::connectToIp(
-    const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
-{
-    NX_CRITICAL(remoteAddress.address.isIpAddress());
-    return connect(remoteAddress, timeoutMillis);
-}
-
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
@@ -282,7 +274,7 @@ void CloudStreamSocket::connectAsync(
         address.address,
         [this, operationGuard = m_asyncConnectGuard.sharedGuard(),
             port = address.port, handler = std::move(handler)](
-                SystemError::ErrorCode code, std::vector<AddressEntry> dnsEntries) mutable
+                SystemError::ErrorCode code, std::deque<AddressEntry> dnsEntries) mutable
         {
             if (operationGuard->lock())
             {
@@ -293,12 +285,13 @@ void CloudStreamSocket::connectAsync(
                         if (code != SystemError::noError)
                             return handler(code);
 
-                        std::queue<AddressEntry> dnsEntriesQueue;
-                        for (auto& entry: dnsEntries)
-                            dnsEntriesQueue.push(std::move(entry));
+                        if (dnsEntries.empty())
+                        {
+                            NX_ASSERT(false);
+                            return handler(SystemError::hostNotFound);
+                        }
 
-                        NX_CRITICAL(!dnsEntriesQueue.empty());
-                        connectToEntriesAsync(std::move(dnsEntriesQueue), port, std::move(handler));
+                        connectToEntriesAsync(std::move(dnsEntries), port, std::move(handler));
                     });
             }
         },
@@ -348,11 +341,11 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 }
 
 void CloudStreamSocket::connectToEntriesAsync(
-    std::queue<AddressEntry> dnsEntries, int port,
+    std::deque<AddressEntry> dnsEntries, int port,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     AddressEntry firstEntry(std::move(dnsEntries.front()));
-    dnsEntries.pop();
+    dnsEntries.pop_front();
     connectToEntryAsync(
         firstEntry, port,
         [this, dnsEntries = std::move(dnsEntries), port, handler = std::move(handler)](

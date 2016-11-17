@@ -294,7 +294,8 @@ TEST( Socket, HostNameResolve3 )
         ASSERT_EQ(1, ip4s.size());
         ASSERT_EQ(kTestAddresses.front(), ip4s.front());
         ASSERT_EQ(2, ip6s.size());
-        ASSERT_EQ(kTestAddresses, ip6s);
+        ASSERT_EQ(kTestAddresses.front(), ip6s.front());
+        ASSERT_EQ(kTestAddresses.back(), ip6s.back());
     }
 }
 

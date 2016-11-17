@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <functional>
+#include <deque>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -23,8 +24,7 @@ class NX_NETWORK_API DnsResolver
 {
 public:
     typedef void* RequestId;
-    typedef std::vector<HostAddress> HostAddresses;
-    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, HostAddresses)> Handler;
+    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> Handler;
 
     DnsResolver();
     virtual ~DnsResolver();
@@ -38,7 +38,7 @@ public:
         \note It is garanteed that \a reqID is set before \a completionHandler is called
     */
     void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
-    HostAddresses resolveSync(const QString& hostName, int ipVersion);
+    std::deque<HostAddress> resolveSync(const QString& hostName, int ipVersion);
 
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
@@ -49,9 +49,9 @@ public:
     bool isRequestIdKnown(RequestId requestId) const;
 
     //!Even more priority than /etc/hosts
-    void addEtcHost(const QString& name, HostAddresses addresses);
+    void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
     void removeEtcHost(const QString& name);
-    HostAddresses getEtcHost(const QString& name, int ipVersion = 0);
+    std::deque<HostAddress> getEtcHost(const QString& name, int ipVersion = 0);
 
 protected:
     //!Implementation of QnLongRunnable::run
@@ -75,12 +75,12 @@ private:
     bool m_terminated;
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_cond;
-    std::list<ResolveTask> m_taskQueue;
+    std::list<ResolveTask> m_taskdeque;
     RequestId m_runningTaskRequestId;
     size_t m_currentSequence;
 
     mutable QnMutex m_ectHostsMutex;
-    std::map<QString, HostAddresses> m_etcHosts;
+    std::map<QString, std::vector<HostAddress>> m_etcHosts;
 };
 
 } // namespace network

@@ -562,47 +562,15 @@ bool UdtStreamSocket::connect(
     auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
         remoteAddress.address.toString(), AF_INET);
 
-    for (auto& ip: ips)
+    while (!ips.empty())
     {
+        auto ip = std::move(ips.front());
+        ips.pop_front();
         if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
             return true;
     }
 
     return false; //< Could not connect by any of addresses.
-}
-
-bool UdtStreamSocket::connectToIp(
-    const SocketAddress& remoteAddress,
-    unsigned int /*timeoutMs*/ )
-{
-    //TODO #ak use timeoutMs
-
-    NX_ASSERT(m_state == detail::SocketState::open);
-    sockaddr_in addr;
-    detail::AddressFrom(remoteAddress, &addr);
-    // The official documentation doesn't advice using select but here we just need
-    // to wait on a single socket fd, select is way more faster than epoll on linux
-    // since epoll needs to create the internal structure inside of kernel.
-    bool nbk_sock = false;
-    if (!getNonBlockingMode(&nbk_sock))
-        return false;
-    if (!nbk_sock)
-    {
-        if (!setNonBlockingMode(nbk_sock))
-            return false;
-    }
-    int ret = UDT::connect(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
-    // The UDT connect will always return zero even if such operation is async which is
-    // different with the existed Posix/Win32 socket design. So if we meet an non-zero
-    // value, the only explanation is an error happened which cannot be solved.
-    if (ret != 0)
-    {
-        // Error happened
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
-        return false;
-    }
-    m_state = detail::SocketState::connected;
-    return true;
 }
 
 int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
@@ -807,6 +775,40 @@ void UdtStreamSocket::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
+}
+
+bool UdtStreamSocket::connectToIp(
+    const SocketAddress& remoteAddress,
+    unsigned int /*timeoutMs*/ )
+{
+    //TODO #ak use timeoutMs
+
+    NX_ASSERT(m_state == detail::SocketState::open);
+    sockaddr_in addr;
+    detail::AddressFrom(remoteAddress, &addr);
+    // The official documentation doesn't advice using select but here we just need
+    // to wait on a single socket fd, select is way more faster than epoll on linux
+    // since epoll needs to create the internal structure inside of kernel.
+    bool nbk_sock = false;
+    if (!getNonBlockingMode(&nbk_sock))
+        return false;
+    if (!nbk_sock)
+    {
+        if (!setNonBlockingMode(nbk_sock))
+            return false;
+    }
+    int ret = UDT::connect(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
+    // The UDT connect will always return zero even if such operation is async which is
+    // different with the existed Posix/Win32 socket design. So if we meet an non-zero
+    // value, the only explanation is an error happened which cannot be solved.
+    if (ret != 0)
+    {
+        // Error happened
+        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        return false;
+    }
+    m_state = detail::SocketState::connected;
+    return true;
 }
 
 // =====================================================================

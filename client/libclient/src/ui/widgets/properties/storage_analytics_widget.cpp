@@ -213,10 +213,8 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
 
-    QnSingleEventSignalizer* mouseSignalizer = new QnSingleEventSignalizer(this);
-    mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    table->viewport()->installEventFilter(mouseSignalizer);
-    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnStorageAnalyticsWidget::at_mouseButtonRelease);
+    installEventHandler(table->viewport(), QEvent::MouseButtonRelease,
+        this, &QnStorageAnalyticsWidget::at_mouseButtonRelease);
 
     table->addAction(m_clipboardAction);
     table->addAction(m_exportAction);

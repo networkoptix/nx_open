@@ -441,7 +441,8 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
             pixmap = standardPixmap(QStyle::SP_MessageBoxQuestion);
             break;
         case Success:
-            pixmap = qnSkin->pixmap("standard_icons/message_box_success.png");
+            pixmap = qnSkin->pixmap("standard_icons/message_box_success.png",
+                QSize(), Qt::IgnoreAspectRatio, Qt::FastTransformation, true);
             break;
         default:
             break;
