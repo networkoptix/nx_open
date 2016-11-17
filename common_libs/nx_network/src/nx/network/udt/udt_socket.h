@@ -146,7 +146,6 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    friend class aio::AsyncSocketImplHelper<UdtStreamSocket>;
     bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
