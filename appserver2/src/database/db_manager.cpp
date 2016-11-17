@@ -2796,9 +2796,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     if (result !=ErrorCode::ok)
         return result;
     */
-    if (tran.params.name.isEmpty())
-        return ErrorCode::dbError;
-
     qint32 internalId = 0;
     ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
     if (result !=ErrorCode::ok)
