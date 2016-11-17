@@ -1040,14 +1040,21 @@ void MediaServerProcess::stopSync()
 {
     qWarning()<<"Stopping server";
     NX_LOG( lit("Stopping server"), cl_logALWAYS );
+
+    const int kStopTimeoutMs = 10000;
+
     if (serviceMainInstance) {
         {
             QnMutexLocker lock( &m_stopMutex );
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
-        serviceMainInstance->exit();
-        serviceMainInstance->wait();
+        serviceMainInstance->quit();
+        if (!serviceMainInstance->wait(kStopTimeoutMs))
+        {
+            serviceMainInstance->terminate();
+            serviceMainInstance->wait();
+        }
         serviceMainInstance = 0;
     }
     qApp->quit();
