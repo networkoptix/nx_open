@@ -116,10 +116,18 @@ Pollable* UnifiedPollSet::const_iterator::socket()
     {
         case CurrentSet::udtRead:
         case CurrentSet::udtWrite:
-            return m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_udtSockets.end());
+            return it->second.socket;
+        }
         case CurrentSet::sysRead:
         case CurrentSet::sysWrite:
-            return m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_sysSockets.end());
+            return it->second.socket;
+        }
         default:
             return nullptr;
     }
@@ -131,10 +139,18 @@ const Pollable* UnifiedPollSet::const_iterator::socket() const
     {
         case CurrentSet::udtRead:
         case CurrentSet::udtWrite:
-            return m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_udtSockets.end());
+            return it->second.socket;
+        }
         case CurrentSet::sysRead:
         case CurrentSet::sysWrite:
-            return m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_sysSockets.end());
+            return it->second.socket;
+        }
         default:
             return nullptr;
     }
