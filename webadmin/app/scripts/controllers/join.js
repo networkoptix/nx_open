@@ -96,7 +96,7 @@ angular.module('webadminApp')
                 }
                 $scope.systems.systemFound = true;
                 $scope.systems.joinSystemName = r.data.reply.systemName;
-            },function(){
+            },function(r){
                 var errorToShow = L.join.unknownError;
                 if(r.data && r.data.error!=='0') {
                     errorToShow = errorHandler(r.data.errorString);
