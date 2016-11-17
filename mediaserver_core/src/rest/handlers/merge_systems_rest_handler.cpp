@@ -474,10 +474,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
 
-    ec2::ApiMediaServerDataList servers;
-    if (!executeRequest(remoteUrl, getKey, servers, lit("/ec2/getMediaServers")))
-        return false;
-
     QnJsonRestResult settingsRestResult;
     if (!executeRequest(remoteUrl, getKey, settingsRestResult, lit("/api/systemSettings")))
         return false;
@@ -513,17 +509,29 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (adminUserData.id.isNull())
         return false; //< not admin user in remote data
 
-    ec2::ApiMediaServerData mediaServerData;
-    for (const auto& server: servers)
     {
-        if (server.id == pingReply.moduleGuid)
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        if (!mServer)
+            return false;
+        ec2::ApiMediaServerData currentServer;
+        fromResourceToApi(mServer, currentServer);
+
+        nx_http::HttpClient client;
+        client.setResponseReadTimeoutMs(kRequestTimeout.count());
+        client.setSendTimeoutMs(kRequestTimeout.count());
+        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+        client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+
+        QByteArray serializedData = QJson::serialized(currentServer);
+        QUrl requestUrl(remoteUrl);
+        addAuthToRequest(requestUrl, postKey);
+        requestUrl.setPath(lit("/ec2/saveMediaServer"));
+        if (!client.doPost(requestUrl, "application/json", serializedData) ||
+            !isResponseOK(client))
         {
-            mediaServerData = server;
-            break;
+            return false;
         }
     }
-    if (mediaServerData.id.isNull())
-        return false; //< no own media server in remote data
 
     auto userManager = ec2Connection()->getUserManager(owner->accessRights());
     ec2::ErrorCode errorCode = userManager->saveSync(adminUserData);
@@ -535,17 +543,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    // Users (include administrator) is not allowed to save media server directly via API.
-    // Exec this call with system super user permissions.
-    auto serverManager = ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
-    errorCode = serverManager->saveSync(mediaServerData);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errorCode != ec2::ErrorCode::ok)
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save media server: %1")
-            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
-        return false;
-    }
 
     QnSystemSettingsHandler settingsSubHandler;
     const QnRequestParams settingsParams;
