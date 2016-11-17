@@ -23,8 +23,9 @@ class QnDirectModuleFinderHelper : public Connective<QObject> {
 public:
     explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder, bool clientMode = false);
 
-    void addForcedUrl(QUrl url);
-    void setForcedUrls(QSet<QUrl> forcedUrls);
+    void addForcedUrl(QObject* requester, const QUrl& url);
+    void removeForcedUrl(QObject* requester, const QUrl& url);
+    void setForcedUrls(QObject* requester, const QSet<QUrl>& forcedUrls);
 
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
@@ -37,6 +38,7 @@ private slots:
 
 private:
     void updateModuleFinder();
+    void mergeForcedUrls();
 
 private:
     /** When the helper works in client mode it does not use ignoredUrls from database. */
@@ -48,6 +50,7 @@ private:
     QHash<QUrl, int> m_urls;
     QHash<QUrl, int> m_ignoredUrls;
     QSet<QUrl> m_forcedUrls;
+    QHash<QObject*, QSet<QUrl>> m_forcedUrlsByRequester;
 
     QHash<QnUuid, QnUrlSet> m_serverUrlsById;
     QHash<QnUuid, QnUrlSet> m_additionalServerUrlsById;

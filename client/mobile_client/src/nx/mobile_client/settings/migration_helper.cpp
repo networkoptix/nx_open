@@ -4,6 +4,7 @@
 #include <boost/range/algorithm/remove_if.hpp>
 
 #include <network/module_finder.h>
+#include <network/direct_module_finder_helper.h>
 #include <network/system_helpers.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
@@ -63,6 +64,7 @@ public:
                          && !migratedSessionIds.contains(connectionData.localId);
                  });
             migratedSessionIds.remove(migratedIt->localId);
+            qnModuleFinder->directModuleFinderHelper()->removeForcedUrl(this, address.toUrl());
 
             if (existingIt == recentConnections.end())
                 migratedIt->localId = systemId;
@@ -89,10 +91,14 @@ SessionsMigrationHelper::SessionsMigrationHelper(QObject* parent):
 {
     Q_D(SessionsMigrationHelper);
 
-    for (const auto& sessionVariant: qnSettings->savedSessions())
-        d->migratedSessionIds.insert(savedSessionId(sessionVariant));
-
     NX_ASSERT(qnModuleFinder);
+
+    for (const auto& sessionVariant: qnSettings->savedSessions())
+    {
+        const auto& session = QnLoginSession::fromVariant(sessionVariant.toMap());
+        d->migratedSessionIds.insert(session.id);
+        qnModuleFinder->directModuleFinderHelper()->addForcedUrl(d, session.url);
+    }
 
     for (const auto& moduleInformation: qnModuleFinder->foundModules())
     {
