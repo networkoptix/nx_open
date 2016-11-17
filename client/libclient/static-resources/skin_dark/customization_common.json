@@ -744,6 +744,10 @@
 
     "QnFisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
+    },
+    
+    "QnNotificationWidget": {
+        "palette": { "default": { "windowText": "light10" } }
     }
 }
 
