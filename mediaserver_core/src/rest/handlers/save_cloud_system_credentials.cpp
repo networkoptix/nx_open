@@ -126,7 +126,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     opaque.localSystemId = qnGlobalSettings->localSystemId();
 
     api::SystemAttributesUpdate systemAttributesUpdate;
-    systemAttributesUpdate.systemID = data.cloudSystemID.toStdString();
+    systemAttributesUpdate.systemId = data.cloudSystemID.toStdString();
     systemAttributesUpdate.opaque = QJson::serialized(opaque).toStdString();
 
     auto cloudConnection = m_cloudConnectionManager.getCloudConnection(

@@ -40,8 +40,8 @@ bool AuthorizationManager::authorize(
     const auto authenticatedAccountEmail = 
         authenticationProperties.get<std::string>(attr::authAccountEmail);
     const auto authenticatedSystemID =
-        authenticationProperties.get<std::string>(attr::authSystemID);
-    const auto requestedSystemID = dataToAuthorize.get<std::string>(attr::systemID);
+        authenticationProperties.get<std::string>(attr::authSystemId);
+    const auto requestedSystemID = dataToAuthorize.get<std::string>(attr::systemId);
     stree::ResourceContainer auxSearchAttrs;
     if (authenticatedAccountEmail)
     {

@@ -24,7 +24,7 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )
     {
-        case attr::accountID:
+        case attr::accountId:
             *value = QString::fromStdString(id);
             return true;
         case attr::accountEmail:

@@ -228,9 +228,9 @@ void Ec2MserverCloudSynchronization::verifyTransactionConnection()
             vmsConnections.connections.cbegin(),
             vmsConnections.connections.cend(),
             [systemId = registeredSystemData().id](const api::VmsConnectionData& data)
-        {
-            return data.systemId == systemId;
-        });
+            {
+                return data.systemId == systemId;
+            });
         if (connectionIt != vmsConnections.connections.cend())
             return; //< Connection has been found
 
@@ -271,10 +271,10 @@ void Ec2MserverCloudSynchronization::testSynchronizingUserFromCloudToMediaServer
         cdb()->addActivatedAccount(&account2, &account2Password));
 
     api::SystemSharingEx sharingData;
-    sharingData.systemID = registeredSystemData().id;
+    sharingData.systemId = registeredSystemData().id;
     sharingData.accountEmail = account2.email;
     sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
-    sharingData.groupID = "test_group";
+    sharingData.groupId = "test_group";
     sharingData.accountFullName = account2.fullName;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -361,7 +361,7 @@ void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
                 // TODO: Validating data
                 ASSERT_EQ(accountVmsData.isEnabled, user.isEnabled);
                 ASSERT_EQ(accountVmsData.id.toSimpleString().toStdString(), user.vmsUserId);
-                ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupID);
+                ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupId);
                 //ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
                 //ASSERT_EQ(accountVmsData.fullName.toStdString(), user.accountFullName);
                 ASSERT_EQ(
@@ -704,8 +704,8 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    const QUrl url(lm("http://%1/%2?systemID=%3")
-        .str(cdb()->endpoint()).arg("cdb/maintenance/get_transaction_log")
+    const QUrl url(lm("http://%1/%2?systemId=%3")
+        .str(cdb()->endpoint()).arg("cdb/maintenance/getTransactionLog")
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }

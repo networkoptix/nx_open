@@ -126,7 +126,6 @@ private:
     int m_argc;
     char** m_argv;
     std::atomic<bool> m_terminated;
-    int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
     nx::utils::promise<void> m_processTerminationEvent;
