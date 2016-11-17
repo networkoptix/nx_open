@@ -733,6 +733,13 @@ bool QnDbManager::queryObjects<ApiCameraDataList>(ApiCameraDataList& objects)
     return errCode == ErrorCode::ok;
 }
 
+template <>
+bool QnDbManager::queryObjects<ApiResourceStatusDataList>(ApiResourceStatusDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
 template <class ObjectListType>
 bool QnDbManager::queryObjects(ObjectListType& objects)
 {
@@ -792,6 +799,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
         return false;
 
     return true;

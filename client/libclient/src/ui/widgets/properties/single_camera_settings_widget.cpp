@@ -373,8 +373,6 @@ void QnSingleCameraSettingsWidget::submitToResource()
         if (m_camera->getAuth() != loginEditAuth)
             m_camera->setAuth(loginEditAuth);
 
-        m_camera->setLicenseUsed(ui->licensingWidget->state() == Qt::Checked);
-
         ui->cameraScheduleWidget->submitToResources();
 
         if (!m_camera->isDtsBased())
