@@ -96,23 +96,26 @@ libpostproc \
 libudt )
 
 #additional libs for nx1 client
-if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
-    LIBS_TO_COPY+=( \
-    ldpreloadhook \
-    libcedrus \
-    libnx_vms_utils \
-    libclient_core \
-    libnx_audio \
-    libnx_media \
-    libopenal \
-    libproxydecoder \
-    libEGL \
-    libGLESv1_CM \
-    libGLESv2 \
-    libMali \
-    libpixman-1 \
-    libUMP \
-    libvdpau_sunxi )
+if [[ "${box}" == "bpi" ]]; then
+    LIBS_TO_COPY+=(
+        libGLESv2 \
+        libMali \
+        libUMP )
+    if [[ ! -z "$WITH_CLIENT" ]]; then
+        LIBS_TO_COPY+=( \
+            ldpreloadhook \
+            libcedrus \
+            libnx_vms_utils \
+            libclient_core \
+            libnx_audio \
+            libnx_media \
+            libopenal \
+            libproxydecoder \
+            libEGL \
+            libGLESv1_CM \
+            libpixman-1 \
+            libvdpau_sunxi )
+    fi
 fi
 
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
