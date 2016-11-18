@@ -155,7 +155,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
+                <rdep.linux.packages>gcc-4.8.3 sysroot quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
 
