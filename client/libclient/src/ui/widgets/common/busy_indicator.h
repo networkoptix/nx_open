@@ -134,6 +134,7 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
+    virtual void paint(QPainter* painter);
 
     void updateIndicator();
 
