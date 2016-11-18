@@ -328,6 +328,8 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setDevMode(true);
     }
 
+    qnRuntime->setGLDoubleBuffer(qnSettings->isGlDoubleBuffer());
+    qnRuntime->setTranslationPath(qnSettings->translationPath());
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);

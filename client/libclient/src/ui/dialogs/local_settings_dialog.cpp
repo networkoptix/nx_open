@@ -58,7 +58,26 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
 
 QnLocalSettingsDialog::~QnLocalSettingsDialog() {}
 
+bool QnLocalSettingsDialog::canApplyChanges() const
+{
+    return qnSettings->isWritable()
+        && base_type::canApplyChanges();
+}
+
 void QnLocalSettingsDialog::applyChanges()
+{
+    base_type::applyChanges();
+    if (qnSettings->isWritable())
+        qnSettings->save();
+}
+
+void QnLocalSettingsDialog::updateButtonBox()
+{
+    base_type::updateButtonBox();
+    m_restartLabel->setVisible(isRestartRequired());
+}
+
+void QnLocalSettingsDialog::accept()
 {
     bool restartQueued = false;
 
@@ -72,33 +91,26 @@ void QnLocalSettingsDialog::applyChanges()
             QDialogButtonBox::Yes);
         switch (result)
         {
-        case QDialogButtonBox::Cancel:
-            return;
-        case QDialogButtonBox::Yes:
-            restartQueued = true;
-            break;
-        default:
-            break;
+            case QDialogButtonBox::Cancel:
+                return;
+            case QDialogButtonBox::Yes:
+                restartQueued = true;
+                break;
+            default:
+                break;
         }
     }
 
-    base_type::applyChanges();
-    if (qnSettings->isWritable())
-        qnSettings->save();
+    base_type::accept();
 
     if (restartQueued)
         menu()->trigger(QnActions::QueueAppRestartAction);
 }
 
-void QnLocalSettingsDialog::updateButtonBox()
-{
-    base_type::updateButtonBox();
-    m_restartLabel->setVisible(isRestartRequired());
-}
-
 bool QnLocalSettingsDialog::isRestartRequired() const
 {
-    return m_advancedSettingsWidget->isRestartRequired() || m_lookAndFeelWidget->isRestartRequired();
+    return m_advancedSettingsWidget->isRestartRequired()
+        || m_lookAndFeelWidget->isRestartRequired();
 }
 
 void QnLocalSettingsDialog::addRestartLabel()

@@ -15,7 +15,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash), (serverUuid)(storagePath));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime));
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBackgroundImage, (json), QnBackgroundImage_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBackgroundImage, (json)(eq), QnBackgroundImage_Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzHotkey, (json), (id)(hotkey))
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(

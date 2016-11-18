@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>419</width>
-    <height>395</height>
+    <width>397</width>
+    <height>419</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,8 +33,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>399</width>
-        <height>300</height>
+        <width>377</width>
+        <height>294</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -61,79 +61,57 @@
             <property name="text">
              <string>Language</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
             <property name="buddy">
              <cstring>languageComboBox</cstring>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QComboBox" name="languageComboBox"/>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="languageWarningLabel">
-              <property name="text">
-               <string>Restart required.</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QComboBox" name="languageComboBox">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="timeModeLabel">
             <property name="text">
              <string>Time Mode</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buddy">
+             <cstring>timeModeComboBox</cstring>
+            </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <item>
-             <widget class="QComboBox" name="timeModeComboBox"/>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           <widget class="QComboBox" name="timeModeComboBox">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+           </widget>
           </item>
           <item row="2" column="1">
            <widget class="QnWordWrappedLabel" name="timeModeWarningLabel" native="true"/>
           </item>
-          <item row="3" column="1">
-           <widget class="QCheckBox" name="showIpInTreeCheckBox">
-            <property name="text">
-             <string>Show extra info in tree</string>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="0">
            <widget class="QLabel" name="tourCycleTimeLabel">
             <property name="text">
-             <string>Tour sequence cycle time</string>
+             <string>Tour cycle</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="buddy">
              <cstring>tourCycleTimeSpinBox</cstring>
@@ -150,7 +128,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="cycleHintLabel">
               <property name="text">
                <string> seconds</string>
               </property>
@@ -158,11 +136,24 @@
             </item>
            </layout>
           </item>
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="showIpInTreeCheckBox">
+            <property name="text">
+             <string>Show extra info in tree</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
        <item>
         <widget class="QGroupBox" name="imageGroupBox">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
          <property name="title">
           <string>Background Image</string>
          </property>
@@ -180,6 +171,12 @@
            <widget class="QLabel" name="imageNameLabel">
             <property name="text">
              <string>Image</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buddy">
+             <cstring>imageNameLineEdit</cstring>
             </property>
            </widget>
           </item>
@@ -209,32 +206,24 @@
             <property name="text">
              <string>Mode</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buddy">
+             <cstring>imageModeComboBox</cstring>
+            </property>
            </widget>
-          </item>
-          <item row="1" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QComboBox" name="imageModeComboBox"/>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="imageOpacityLabel">
             <property name="text">
              <string>Intensity</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buddy">
+             <cstring>imageOpacitySpinBox</cstring>
             </property>
            </widget>
           </item>
@@ -271,6 +260,16 @@
             </item>
            </layout>
           </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="imageModeComboBox">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -289,10 +288,12 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>scrollArea</tabstop>
   <tabstop>languageComboBox</tabstop>
   <tabstop>timeModeComboBox</tabstop>
   <tabstop>showIpInTreeCheckBox</tabstop>
   <tabstop>tourCycleTimeSpinBox</tabstop>
+  <tabstop>imageGroupBox</tabstop>
   <tabstop>imageNameLineEdit</tabstop>
   <tabstop>imageSelectButton</tabstop>
   <tabstop>imageModeComboBox</tabstop>

@@ -7,6 +7,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 
@@ -98,8 +99,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
 bool QnAdvancedSettingsWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return qnSettings->isAudioDownmixed() != isAudioDownmixed()
-        || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled();
+    return qnRuntime->isGlDoubleBuffer() != isDoubleBufferingEnabled();
 }
 
 // -------------------------------------------------------------------------- //
