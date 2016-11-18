@@ -21,8 +21,8 @@ namespace {
     const qreal kDefaultAspectRatio = 4.0 / 3.0;
     const QMargins kMinIndicationMargins(4, 2, 4, 2);
 
-    /* QnBusyIndicatorWidget draws dots aligned to the pixel grid.
-     * This descendant does not, when it is downscaled. */
+    /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
+     * This descendant when it is downscaled draws dots generally not snapped. */
     class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
     {
         using base_type = QnBusyIndicatorWidget;
