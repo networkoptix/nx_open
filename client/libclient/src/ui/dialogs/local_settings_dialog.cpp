@@ -7,6 +7,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 
+#include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/style/custom_style.h>
 
 #include <ui/widgets/local_settings/general_preferences_widget.h>
@@ -16,6 +17,7 @@
 #include <ui/widgets/local_settings/advanced_settings_widget.h>
 
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
 QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -26,18 +28,29 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     m_restartLabel(nullptr)
 {
     ui->setupUi(this);
+    auto recorderSettings = new QnVideoRecorderSettings(this);
+    auto updateRecorderSettings = [this]
+        {
+            context()->instance<QnWorkbenchDesktopCameraWatcher>()->forcedUpdate();
+        };
 
-    addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
+
+    auto generalPageWidget = new QnGeneralPreferencesWidget(recorderSettings, this);
+    addPage(GeneralPage, generalPageWidget, tr("General"));
+    connect(generalPageWidget, &QnGeneralPreferencesWidget::recordingSettingsChanged, this,
+        updateRecorderSettings);
+
     addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
-    auto recordingSettingsWidget = new QnRecordingSettingsWidget(this);
 
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
-    addPage(
-        RecordingPage,
-        recordingSettingsWidget,
-        screenRecordingAction ? tr("Screen Recording") : tr("Audio Settings") );
-
+    if (screenRecordingAction)
+    {
+        auto recordingSettingsWidget = new QnRecordingSettingsWidget(recorderSettings, this);
+        addPage(RecordingPage, recordingSettingsWidget, tr("Screen Recording"));
+        connect(recordingSettingsWidget, &QnRecordingSettingsWidget::recordingSettingsChanged, this,
+            updateRecorderSettings);
+    }
 
     addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));
     addPage(AdvancedPage, m_advancedSettingsWidget, tr("Advanced"));
@@ -51,6 +64,9 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
         tr("Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.")
 #endif
     );
+
+    //;
+
     addRestartLabel();
 
     loadDataToUi();

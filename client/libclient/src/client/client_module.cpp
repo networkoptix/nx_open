@@ -541,12 +541,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
 
-    if (!QDir(qnSettings->mediaFolder()).exists())
-        QDir().mkpath(qnSettings->mediaFolder());
-
-    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
-    QDir::setCurrent(qnSettings->mediaFolder());
-
     QnClientResourceProcessor* resourceProcessor(new QnClientResourceProcessor());
     QnResourceDiscoveryManager* resourceDiscoveryManager(new QnResourceDiscoveryManager());
     resourceProcessor->moveToThread(QnResourceDiscoveryManager::instance());

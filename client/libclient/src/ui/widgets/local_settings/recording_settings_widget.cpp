@@ -4,8 +4,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
-#include <QtMultimedia/QAudioDeviceInfo>
-
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -14,103 +12,54 @@
 #include <ui/style/custom_style.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/dwm.h>
-#include <ui/workbench/workbench_context.h>
 
 #if defined(Q_OS_WIN)
 #   include <plugins/resource/desktop_win/win_audio_device_info.h>
 #endif
 
-#include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
-namespace {
-    const int ICON_SIZE = 32;
-
-    void setDefaultSoundIcon(QLabel *label)
-    {
-        label->setPixmap(qnSkin->pixmap("microphone.png", QSize(ICON_SIZE, ICON_SIZE), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
-
-} // anonymous namespace
-
-
-QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
+QnRecordingSettingsWidget::QnRecordingSettingsWidget(QnVideoRecorderSettings* settings, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingSettings),
-    m_settings(new QnVideoRecorderSettings(this)),
-    m_dwm(new QnDwm(this)),
-    m_screenRecordingSupported(action(QnActions::ToggleScreenRecordingAction))
+    m_settings(settings),
+    m_dwm(new QnDwm(this))
 {
     ui->setupUi(this);
 
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    ui->additionalGroupBox->setVisible(m_screenRecordingSupported);
-    ui->recordingFolderGroupBox->setVisible(m_screenRecordingSupported);
-    ui->captureModeGroupBox->setVisible(m_screenRecordingSupported);
-    ui->qualityGroupBox->setVisible(m_screenRecordingSupported);
-
-    if (m_screenRecordingSupported)
+    QDesktopWidget *desktop = qApp->desktop();
+    for (int i = 0; i < desktop->screenCount(); i++)
     {
-        QDesktopWidget *desktop = qApp->desktop();
-        for (int i = 0; i < desktop->screenCount(); i++)
-        {
-            bool isPrimaryScreen = (i == desktop->primaryScreen());
-            if (!m_dwm->isSupported() && !isPrimaryScreen)
-                continue; //TODO: #GDM can we record from secondary screen without DWM?
+        bool isPrimaryScreen = (i == desktop->primaryScreen());
+        if (!m_dwm->isSupported() && !isPrimaryScreen)
+            continue; //TODO: #GDM can we record from secondary screen without DWM?
 
-            QRect geometry = desktop->screenGeometry(i);
-            QString item = tr("Screen %1 - %2x%3")
-                .arg(i + 1)
-                .arg(geometry.width())
-                .arg(geometry.height());
-            if (isPrimaryScreen)
-                item = tr("%1 (Primary)").arg(item);
-            ui->screenComboBox->addItem(item, i);
-        }
-
-        setWarningStyle(ui->recordingWarningLabel);
+        QRect geometry = desktop->screenGeometry(i);
+        QString item = tr("Screen %1 - %2x%3")
+            .arg(i + 1)
+            .arg(geometry.width())
+            .arg(geometry.height());
+        if (isPrimaryScreen)
+            item = tr("%1 (Primary)").arg(item);
+        ui->screenComboBox->addItem(item, i);
     }
 
-    foreach (const QString& deviceName, QnVideoRecorderSettings::availableDeviceNames(QAudio::AudioInput)) {
-        ui->primaryAudioDeviceComboBox->addItem(deviceName);
-        ui->secondaryAudioDeviceComboBox->addItem(deviceName);
-    }
-
+    setWarningStyle(ui->recordingWarningLabel);
     setHelpTopic(this, Qn::SystemSettings_ScreenRecording_Help);
 
-    connect(ui->primaryAudioDeviceComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
-    connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
+    connect(ui->fullscreenButton, SIGNAL(toggled(bool)), ui->screenComboBox, SLOT(setEnabled(bool)));
+    connect(ui->fullscreenButton, SIGNAL(toggled(bool)), ui->disableAeroCheckBox, SLOT(setEnabled(bool)));
 
-    if (m_screenRecordingSupported)
-    {
-        connect(ui->fullscreenButton,               SIGNAL(toggled(bool)),              ui->screenComboBox,         SLOT(setEnabled(bool)));
-        connect(ui->fullscreenButton,               SIGNAL(toggled(bool)),              ui->disableAeroCheckBox,    SLOT(setEnabled(bool)));
+    connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
+    connect(ui->resolutionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
+    connect(ui->screenComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDisableAeroCheckbox()));
+    connect(ui->browseRecordingFolderButton, SIGNAL(clicked()), this, SLOT(at_browseRecordingFolderButton_clicked()));
+    connect(m_dwm, SIGNAL(compositionChanged()), this, SLOT(at_dwm_compositionChanged()));
 
-        connect(ui->qualityComboBox,                SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateRecordingWarning()));
-        connect(ui->resolutionComboBox,             SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateRecordingWarning()));
-        connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateDisableAeroCheckbox()));
-        connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
-        connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged()));
-    }
-
-    connect(
-        this,
-        &QnRecordingSettingsWidget::recordingSettingsChanged,
-        this->context()->instance<QnWorkbenchDesktopCameraWatcher>(),
-        &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
-
-    setDefaultSoundIcon(ui->primaryDeviceIconLabel);
-    setDefaultSoundIcon(ui->secondaryDeviceIconLabel);
-
-    if (m_screenRecordingSupported)
-    {
-        at_dwm_compositionChanged();
-        updateDisableAeroCheckbox();
-    }
-
-    /* Calling once even if screen recording not supported to hide the warning. */
+    at_dwm_compositionChanged();
+    updateDisableAeroCheckbox();
     updateRecordingWarning();
 }
 
@@ -119,73 +68,52 @@ QnRecordingSettingsWidget::~QnRecordingSettingsWidget()
 
 void QnRecordingSettingsWidget::loadDataToUi()
 {
-    setPrimaryAudioDeviceName(m_settings->primaryAudioDevice().fullName());
-    setSecondaryAudioDeviceName(m_settings->secondaryAudioDevice().fullName());
-
-    if (m_screenRecordingSupported)
-    {
-        setCaptureMode(m_settings->captureMode());
-        setDecoderQuality(m_settings->decoderQuality());
-        setResolution(m_settings->resolution());
-        setScreen(m_settings->screen());
-        ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
-        ui->recordingFolderLabel->setText(m_settings->recordingFolder());
-    }
+    setCaptureMode(m_settings->captureMode());
+    setDecoderQuality(m_settings->decoderQuality());
+    setResolution(m_settings->resolution());
+    setScreen(m_settings->screen());
+    ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
+    ui->recordingFolderLabel->setText(m_settings->recordingFolder());
 }
 
 void QnRecordingSettingsWidget::applyChanges()
 {
     bool isChanged = false;
 
-    if (m_settings->primaryAudioDeviceName() != primaryAudioDeviceName())
+    if (m_settings->captureMode() != captureMode())
     {
-        m_settings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
+        m_settings->setCaptureMode(captureMode());
         isChanged = true;
     }
 
-    if (m_settings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
+    if (m_settings->decoderQuality() != decoderQuality())
     {
-        m_settings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
+        m_settings->setDecoderQuality(decoderQuality());
         isChanged = true;
     }
 
-    if (m_screenRecordingSupported)
+    if (m_settings->resolution() != resolution())
     {
-        if (m_settings->captureMode() != captureMode())
-        {
-            m_settings->setCaptureMode(captureMode());
-            isChanged = true;
-        }
+        m_settings->setResolution(resolution());
+        isChanged = true;
+    }
 
-        if (m_settings->decoderQuality() != decoderQuality())
-        {
-            m_settings->setDecoderQuality(decoderQuality());
-            isChanged = true;
-        }
+    if (m_settings->screen() != screen())
+    {
+        m_settings->setScreen(screen());
+        isChanged = true;
+    }
 
-        if (m_settings->resolution() != resolution())
-        {
-            m_settings->setResolution(resolution());
-            isChanged = true;
-        }
+    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
+    {
+        m_settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
+        isChanged = true;
+    }
 
-        if (m_settings->screen() != screen())
-        {
-            m_settings->setScreen(screen());
-            isChanged = true;
-        }
-
-        if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
-        {
-            m_settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
-            isChanged = true;
-        }
-
-        if (m_settings->recordingFolder() != ui->recordingFolderLabel->text())
-        {
-            m_settings->setRecordingFolder(ui->recordingFolderLabel->text());
-            isChanged = true;
-        }
+    if (m_settings->recordingFolder() != ui->recordingFolderLabel->text())
+    {
+        m_settings->setRecordingFolder(ui->recordingFolderLabel->text());
+        isChanged = true;
     }
 
     if (isChanged)
@@ -196,32 +124,23 @@ bool QnRecordingSettingsWidget::hasChanges() const
 {
     //TODO: #GDM refactor and emit hasChangesChanged correctly
 
-    if (m_settings->primaryAudioDeviceName() != primaryAudioDeviceName())
+    if (m_settings->captureMode() != captureMode())
         return true;
 
-    if (m_settings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
+    if (m_settings->decoderQuality() != decoderQuality())
         return true;
 
-    if (m_screenRecordingSupported)
-    {
-        if (m_settings->captureMode() != captureMode())
-            return true;
+    if (m_settings->resolution() != resolution())
+        return true;
 
-        if (m_settings->decoderQuality() != decoderQuality())
-            return true;
+    if (m_settings->screen() != screen())
+        return true;
 
-        if (m_settings->resolution() != resolution())
-            return true;
+    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
+        return true;
 
-        if (m_settings->screen() != screen())
-            return true;
-
-        if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
-            return true;
-
-        if (m_settings->recordingFolder() != ui->recordingFolderLabel->text())
-            return true;
-    }
+    if (m_settings->recordingFolder() != ui->recordingFolderLabel->text())
+        return true;
 
     return false;
 }
@@ -295,70 +214,26 @@ void QnRecordingSettingsWidget::setScreen(int screen)
     ui->screenComboBox->setCurrentIndex(screen);
 }
 
-QString QnRecordingSettingsWidget::primaryAudioDeviceName() const
-{
-    return ui->primaryAudioDeviceComboBox->currentText();
-}
-
-void QnRecordingSettingsWidget::setPrimaryAudioDeviceName(const QString &name)
-{
-    if (name.isEmpty()) {
-        ui->primaryAudioDeviceComboBox->setCurrentIndex(0);
-        return;
-    }
-
-    for (int i = 1; i < ui->primaryAudioDeviceComboBox->count(); i++)
-    {
-        if (ui->primaryAudioDeviceComboBox->itemText(i).startsWith(name))
-        {
-            ui->primaryAudioDeviceComboBox->setCurrentIndex(i);
-            return;
-        }
-    }
-}
-
-QString QnRecordingSettingsWidget::secondaryAudioDeviceName() const
-{
-    return ui->secondaryAudioDeviceComboBox->currentText();
-}
-
-void QnRecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
-{
-    if (name.isEmpty()) {
-        ui->secondaryAudioDeviceComboBox->setCurrentIndex(0);
-        return;
-    }
-
-    for (int i = 1; i < ui->secondaryAudioDeviceComboBox->count(); i++)
-    {
-        if (ui->secondaryAudioDeviceComboBox->itemText(i).startsWith(name))
-        {
-            ui->secondaryAudioDeviceComboBox->setCurrentIndex(i);
-            return;
-        }
-    }
-}
-
 void QnRecordingSettingsWidget::additionalAdjustSize()
 {
-    ui->primaryDeviceTextLabel->adjustSize();
-    ui->secondaryDeviceTextLabel->adjustSize();
-
-    int maxWidth = qMax(ui->primaryDeviceTextLabel->width(), ui->secondaryDeviceTextLabel->width());
-    QSize s = ui->primaryDeviceTextLabel->minimumSize();
-    s.setWidth(maxWidth);
-    ui->primaryDeviceTextLabel->setMinimumSize(s);
-    ui->secondaryDeviceTextLabel->setMinimumSize(s);
-
-    ui->primaryDeviceTextLabel->adjustSize();
-    ui->secondaryDeviceTextLabel->adjustSize();
+//     ui->primaryDeviceTextLabel->adjustSize();
+//     ui->secondaryDeviceTextLabel->adjustSize();
+//
+//     int maxWidth = qMax(ui->primaryDeviceTextLabel->width(), ui->secondaryDeviceTextLabel->width());
+//     QSize s = ui->primaryDeviceTextLabel->minimumSize();
+//     s.setWidth(maxWidth);
+//     ui->primaryDeviceTextLabel->setMinimumSize(s);
+//     ui->secondaryDeviceTextLabel->setMinimumSize(s);
+//
+//     ui->primaryDeviceTextLabel->adjustSize();
+//     ui->secondaryDeviceTextLabel->adjustSize();
 }
 
 void QnRecordingSettingsWidget::updateRecordingWarning()
 {
-    ui->recordingWarningLabel->setVisible(m_screenRecordingSupported
-        && decoderQuality() == Qn::BestQuality
-        && (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution ));
+    ui->recordingWarningLabel->setVisible(decoderQuality() == Qn::BestQuality
+        && (resolution() == Qn::Exact1920x1080Resolution
+            || resolution() == Qn::NativeResolution ));
 }
 
 void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
@@ -372,23 +247,6 @@ void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnRecordingSettingsWidget::onComboboxChanged(int index)
-{
-    additionalAdjustSize();
-#ifdef Q_OS_WIN
-    QComboBox* c = (QComboBox*) sender();
-    QnWinAudioDeviceInfo info(c->itemText(index));
-    QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->primaryDeviceIconLabel : ui->secondaryDeviceIconLabel;
-    QPixmap icon = info.deviceIcon();
-    if (!icon.isNull())
-        l->setPixmap(icon.scaled(ICON_SIZE, ICON_SIZE));
-    else
-        setDefaultSoundIcon(l);
-#else
-    Q_UNUSED(index)
-#endif
-}
-
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
 {
     QString dirName = QnFileDialog::getExistingDirectory(this,

@@ -4,25 +4,34 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/screen_recording/video_recorder_settings.h>
+#include <ui/screen_recording/video_recorder_settings.h> //TODO: #GDM move out enums
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 
 namespace Ui {
-    class RecordingSettings;
+class RecordingSettings;
 }
 
 class QnDwm;
+class QnVideoRecorderSettings;
 
-class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    explicit QnRecordingSettingsWidget(QWidget *parent = NULL);
+    explicit QnRecordingSettingsWidget(QnVideoRecorderSettings* recorderSettings, QWidget *parent = NULL);
     virtual ~QnRecordingSettingsWidget();
+
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
+
+signals:
+    void recordingSettingsChanged();
+
+private:
+    void additionalAdjustSize();
 
     Qn::CaptureMode captureMode() const;
     void setCaptureMode(Qn::CaptureMode c);
@@ -36,25 +45,7 @@ public:
     int screen() const;
     void setScreen(int screen);
 
-    QString primaryAudioDeviceName() const;
-    void setPrimaryAudioDeviceName(const QString &name);
-
-    QString secondaryAudioDeviceName() const;
-    void setSecondaryAudioDeviceName(const QString &name);
-
-    void setAudioOnlyMode(bool mode);
-
-    virtual void applyChanges() override;
-    virtual void loadDataToUi() override;
-    virtual bool hasChanges() const override;
-signals:
-    void recordingSettingsChanged();
-private:
-    void additionalAdjustSize();
-
 private slots:
-    void onComboboxChanged(int index);
-
     void updateRecordingWarning();
     void updateDisableAeroCheckbox();
 
@@ -65,7 +56,6 @@ private:
     QScopedPointer<Ui::RecordingSettings> ui;
     QnVideoRecorderSettings *m_settings;
     QnDwm* m_dwm;
-    const bool m_screenRecordingSupported;
 };
 
 #endif // VIDEORECORDINGDIALOG_H
