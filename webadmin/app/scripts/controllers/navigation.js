@@ -8,17 +8,19 @@ angular.module('webadminApp')
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
-
-            mediaserver.resolveNewSystemAndUser().then(function(user){
-                if(user === null){
-                    return;
-                }
-                $scope.user = user;
-            },function(error){
-                if(error.status !== 401 && error.status !== 403) {
-                    dialogs.alert(L.navigaion.cannotGetUser);
-                }
-            });
+            $scope.noPanel = $scope.settings.flags.noHDD;
+            if(!$scope.noPanel) {
+                mediaserver.resolveNewSystemAndUser().then(function (user) {
+                    if (user === null) {
+                        return;
+                    }
+                    $scope.user = user;
+                }, function (error) {
+                    if (error.status !== 401 && error.status !== 403) {
+                        dialogs.alert(L.navigaion.cannotGetUser);
+                    }
+                });
+            }
         });
         $scope.isActive = function (path) {
             var local_path = $location.path();

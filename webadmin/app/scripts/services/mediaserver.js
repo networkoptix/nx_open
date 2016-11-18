@@ -251,6 +251,34 @@ angular.module('webadminApp')
                 //Some another server
                 return $http.get(url + '/web/api/moduleInformation?showAddresses=true',{
                     timeout: 3*1000
+                }).then(function(r){
+                    var data = r.data.reply;
+                    if(!url && !Config.cloud.portalUrl) {
+                        Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                    }
+
+                    data.flags = {};
+                    data.flags.noHDD = data.ecDbReadOnly;
+
+                    var ips = data.remoteAddresses;
+                    data.flags.noNetwork = ips.length <= 1;
+                    data.flags.wrongNetwork = true;
+                    for(var ip in ips){
+                        if(ip == '127.0.0.1'){ // Localhost
+                            continue;
+                        }
+                        if(ip.indexOf('169.254.') == 0){ // No DHCP address
+                            continue;
+                        }
+                        data.flags.wrongNetwork = false;
+                    }
+
+                    data.flags.hasInternet = data.serverFlags.indexOf(Config.publicIpFlag) >= 0;
+
+                    data.flags.newSystem = data.serverFlags.indexOf(Config.newServerFlag) >= 0
+                        && ! (data.flags.noNetwork || data.flags.noHDD);
+
+                    return r;
                 });
             },
             systemCloudInfo:function(){
@@ -491,7 +519,7 @@ angular.module('webadminApp')
 
                 return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly &&
+                    if(r.data.reply.flags.newSystem &&
                         $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
                         $location.path('/setup');
                         return null;
@@ -502,7 +530,7 @@ angular.module('webadminApp')
             checkInternet:function(reload){
                 return this.getModuleInformation(reload).then(function(r){
                     var serverInfo = r.data.reply;
-                    return  (serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
+                    return serverInfo.flags.hasInternet;
                 });
             },
             createEvent:function(params){

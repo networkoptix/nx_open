@@ -18,22 +18,17 @@ angular.module('webadminApp')
         });
 
         mediaserver.getModuleInformation().then(function (r) {
-            Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
+            var data = r.data.reply;
 
-            if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
+            if(data.flags.newSystem){
                 return;
             }
 
+            $scope.settings = data;
+            // $scope.noNetwork =
 
-            $scope.settings = {
-                systemName: r.data.reply.systemName,
-                port: r.data.reply.port,
-                id: r.data.reply.id,
-                ecDbReadOnly:r.data.reply.ecDbReadOnly
-            };
-
-            $scope.oldSystemName = r.data.reply.systemName;
-            $scope.oldPort = r.data.reply.port;
+            $scope.oldSystemName = data.systemName;
+            $scope.oldPort = data.port;
             checkUserRights();
         });
 

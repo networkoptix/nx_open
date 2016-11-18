@@ -140,7 +140,7 @@ angular.module('webadminApp')
                     $scope.serverInfo = r.data.reply;
                     $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
                     checkInternet(false);
-                    if($scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
+                    if($scope.serverInfo.flags.newSystem) {
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                         return $q.reject();
@@ -724,8 +724,6 @@ angular.module('webadminApp')
 
         function readCloudHost(){
             return mediaserver.getModuleInformation().then(function (r) {
-                Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
-
                 $log.log("Read cloud portal url from module information: " + Config.cloud.portalUrl);
             });
         }

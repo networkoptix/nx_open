@@ -5,8 +5,15 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
 
-            <alert type="warning" ng-if="settings.ecDbReadOnly">The system is running in safe mode. Changes are impossible.</alert>
-            <tabset ng-hide="settings.ecDbReadOnly">
+            <alert type="danger" ng-if="settigns.flags.noHDD">
+                This device is intended to work with hard disk drive installed.<br>
+                Please turn off the device and install a hard disk drive.
+            </alert>
+            <alert type="danger" ng-if="settigns.flags.noNetwork">
+                This device needs network connection to work.<br>
+                Please connect it to your local network ot Internet
+            </alert>
+            <tabset ng-hide="settings.flags.noHDD">
                 <tab heading="Server" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
