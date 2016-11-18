@@ -14,6 +14,9 @@
 
 int main(int argc, char **argv)
 {
+    // Making legacy code happy.
+    QCoreApplication application(argc, argv);
+
     Q_INIT_RESOURCE(cloud_db_ut);
     const auto resultCode = nx::utils::runTest(
         argc, argv,
