@@ -6,6 +6,8 @@
 #ifndef NX_NETWORK_UDT_SOCKET_IMPL_H
 #define NX_NETWORK_UDT_SOCKET_IMPL_H
 
+#include <udt/udt.h>
+
 #include "../common_socket_impl.h"
 
 
