@@ -65,6 +65,7 @@ private slots:
     void at_notificationWebSocketError(QAbstractSocket::SocketError error);
 
     void at_gotMessageOnControlSocket(const QString& message);
+    void at_gotMessageOnNotificationWebSocket(const QString& message);
 
 private:
     enum class InitState
@@ -79,44 +80,43 @@ private:
         error
     };
 
-    void routeIOMonitoringInitialization(InitState newState);
+    void routeIOMonitoringInitializationUnsafe(InitState newState);
 
-    bool initHttpClient();
-    void resetSocketProxies();
+    void initIoPortStatesUnsafe();
+    bool initHttpClientUnsafe();
+    void resetSocketProxiesUnsafe();
+    void reinitMonitoringUnsafe();
 
     QString getResourcesHostAddress() const;
     QAuthenticator getResourceAuth() const;
     QnResourceData getResourceData() const;
+    int getPortNumberByPortId(const QString& portId) const;
+    int getGpioModuleIdByPortId(const QString& portId) const;
 
-    void tryToGetNexusServerStatus();
+    void tryToGetNexusServerStatusUnsafe();
+    void tryToEnableNexusServerUnsafe();
+    void requestSessionIdUnsafe();
+    void requestRemoteControlUnsafe();
 
-    void tryToEnableNexusServer();
-
-    void connectWebsocket(
+    void connectWebsocketUnsafe(
         const QString& path,
-        FlirWebSocketProxy* proxy,
+        nexus::WebSocketProxy* proxy,
         std::chrono::milliseconds delay = std::chrono::milliseconds(0));
-
-    void connectControlWebsocket(std::chrono::milliseconds delay = std::chrono::milliseconds(0));
-    void connectNotificationWebSocket();
-    void requestSessionId();
-    void requestRemoteControl();
+    void connectControlWebsocketUnsafe(std::chrono::milliseconds delay = std::chrono::milliseconds(0));
+    void connectNotificationWebSocketUnsafe();
 
     QString buildNotificationSubscriptionPath() const; 
     
-    void handleServerWhoAmIResponse(const nexus::Response& response);
-    void handleRemoteControlRequestResponse(const nexus::Response& response);
-    void handleRemoteControlReleaseResponse(const nexus::Response& response);
-    void handleIoSensorOutputStateSetResponse(const nexus::Response& response);
+    void handleServerWhoAmIResponseUnsafe(const nexus::Response& response);
+    void handleRemoteControlRequestResponseUnsafe(const nexus::Response& response);
+    void handleRemoteControlReleaseResponseUnsafe(const nexus::Response& response);
+    void handleIoSensorOutputStateSetResponseUnsafe(const nexus::Response& response);
+    void handleServerStatusResponseUnsafe(nx_http::AsyncHttpClientPtr httpClient);
+    void handleServerEnableResponseUnsafe(nx_http::AsyncHttpClientPtr httpClient);
 
-    void handleNotification(const QString& message);
+    void sendKeepAliveUnsafe();
 
     void checkAndNotifyIfNeeded(const nexus::Notification& notification);
-
-    void sendKeepAlive();
-
-    int getPortNumberByPortId(const QString& portId) const;
-    int getGpioModuleIdByPortId(const QString& portId) const;
 
 private:
     QnVirtualCameraResource* m_resource;
@@ -126,15 +126,17 @@ private:
     nx::utils::TimerId m_keepAliveTimerId;
     std::atomic<bool> m_monitoringIsInProgress;
 
-    FlirWebSocketProxy* m_controlProxy;
-    FlirWebSocketProxy* m_notificationProxy;
+    nexus::WebSocketProxy* m_controlProxy;
+    nexus::WebSocketProxy* m_notificationProxy;
 
     nx_http::AsyncHttpClientPtr m_asyncHttpClient;
 
     InputStateChangeCallback m_stateChangeCallback;
     NetworkIssueCallback m_networkIssueCallback;
 
-    mutable std::map<QString, bool> m_alarmStates; //< TODO: #dmishin mutable looks a little bit odd here, remove it.
+    std::map<QString, int> m_alarmStates;
+    QnIOPortDataList m_inputs;
+    QnIOPortDataList m_outputs;
 
     bool m_isNexusServerEnabled;
     bool m_nexusServerHasJustBeenEnabled;

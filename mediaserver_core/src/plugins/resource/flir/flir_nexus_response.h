@@ -7,12 +7,14 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 
+#include <boost/optional.hpp>
+
 #include "flir_nexus_common.h"
 
-namespace nx{
-namespace plugins{
-namespace flir{
-namespace nexus{
+namespace nx {
+namespace plugins {
+namespace flir {
+namespace nexus {
 
 class Response
 {
@@ -38,34 +40,69 @@ public:
     void deserialize(const QString& serialized);
 
     template<typename T>
-    T value(const QString& parameterName) const;
+    boost::optional<T> value(const QString& parameterName) const
+    {
+        static_assert(false, "Only QString, int, double and bool specializations are allowed");
+    };
     
     template<>
-    bool value<bool>(const QString& parameterName) const
+    boost::optional<bool> value<bool>(const QString& parameterName) const
     {
-        NX_ASSERT(m_parameters.at(parameterName).isBool(), lm("Json value is not of boolean type."));
-        return m_parameters.at(parameterName).toBool();
+        bool isBool = m_parameters.at(parameterName).isBool();
+        NX_ASSERT(
+            isBool,
+            lm("Json value is not of boolean type. Requested parameter name %1")
+                .arg(parameterName));
+
+        if (isBool)
+            return m_parameters.at(parameterName).toBool();
+
+        return boost::none;
     }
 
     template<>
-    QString value<QString>(const QString& parameterName) const
+    boost::optional<QString> value<QString>(const QString& parameterName) const
     {
-        NX_ASSERT(m_parameters.at(parameterName).isString(), lm("Json value is not of string type."));
-        return m_parameters.at(parameterName).toString();
+        bool isString = m_parameters.at(parameterName).isString();
+        NX_ASSERT(
+            isString,
+            lm("Json value is not of string type. Requested parameter name: %1")
+                .arg(parameterName));
+
+        if (isString)
+            return m_parameters.at(parameterName).toString();
+
+        return boost::none;
     }
 
     template<>
-    int value<int>(const QString& parameterName) const
+    boost::optional<int> value<int>(const QString& parameterName) const
     {
-        NX_ASSERT(m_parameters.at(parameterName).isDouble(), lm("Json value is not of double type."));
-        return m_parameters.at(parameterName).toInt();
+        bool isNumeric = m_parameters.at(parameterName).isDouble();
+        NX_ASSERT(
+            isNumeric,
+            lm("Json value is not of double type. Requested parameter name: %1")
+                .arg(parameterName));
+
+        if (isNumeric)
+            return m_parameters.at(parameterName).toInt();
+
+        return boost::none;
     }
 
     template<>
-    double value<double>(const QString& parameterName) const
+    boost::optional<double> value<double>(const QString& parameterName) const
     {
-        NX_ASSERT(m_parameters.at(parameterName).isDouble(), lm("Json value is not of double type."));
-        return m_parameters.at(parameterName).toDouble();
+        bool isNumeric = m_parameters.at(parameterName).isDouble();
+        NX_ASSERT(
+            isNumeric,
+            lm("Json value is not of double type. Requested parameter name: %1")
+                .arg(parameterName));
+
+        if (isNumeric)
+            return m_parameters.at(parameterName).toInt();
+
+        return boost::none;
     }
 
 private:
@@ -76,8 +113,8 @@ private:
 };
 
 
-}// namespace nexus
-}// namespace flir
-}// namespace plugins
-}// namespace nx
+} // namespace nexus
+} // namespace flir
+} // namespace plugins
+} // namespace nx
 

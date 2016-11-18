@@ -1,10 +1,10 @@
 #include "flir_nexus_string_builder.h"
 #include "flir_nexus_common.h"
 
-namespace nx{
-namespace plugins{
-namespace flir{
-namespace nexus{
+namespace nx {
+namespace plugins {
+namespace flir {
+namespace nexus {
 
 SubscriptionStringBuilder::SubscriptionStringBuilder():
     m_sessionId(-1),
@@ -56,9 +56,9 @@ QString SubscriptionStringBuilder::serializeSingleSubscription(
     return subscriptionString;
 }
 
-} //namespace nexus
-} //namespace flir
-} //namespace plugins
-} //namespace nx
+} // namespace nexus
+} // namespace flir
+} // namespace plugins
+} // namespace nx
 
 

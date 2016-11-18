@@ -1,21 +1,29 @@
-#include "flir_io_executor.h"
 #include <QtWebSockets/QWebSocket>
 
+#include "flir_io_executor.h"
 
-FlirIoExecutor::FlirIoExecutor():
+namespace nx {
+namespace plugins {
+namespace flir {
+
+IoExecutor::IoExecutor():
     m_thread(new QThread())
 {
     qRegisterMetaType<QWebSocket*>("QWebSocket*");
     m_thread->setObjectName(lit("FlirIoExecutor thread"));
 }
 
-FlirIoExecutor::~FlirIoExecutor()
+IoExecutor::~IoExecutor()
 {
     m_thread->exit();
     m_thread->wait();
 }
 
-QThread* FlirIoExecutor::getThread() const
+QThread* IoExecutor::getThread() const
 {
     return m_thread.get();
 }
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx

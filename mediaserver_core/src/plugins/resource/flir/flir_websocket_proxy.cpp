@@ -1,10 +1,15 @@
 #include "flir_websocket_proxy.h"
 #include "flir_io_executor.h"
 
-FlirWebSocketProxy::FlirWebSocketProxy(QObject* parent):
+namespace nx {
+namespace plugins {
+namespace flir {
+namespace nexus {
+
+WebSocketProxy::WebSocketProxy(QObject* parent):
     QObject(parent)
 {
-    auto executorThread = FlirIoExecutor::instance()->getThread();
+    auto executorThread = IoExecutor::instance()->getThread();
     executorThread->start();
 
     m_socket = new QWebSocket();
@@ -12,12 +17,12 @@ FlirWebSocketProxy::FlirWebSocketProxy(QObject* parent):
     moveToThread(executorThread);
 }
 
-QWebSocket* FlirWebSocketProxy::getSocket()
+QWebSocket* WebSocketProxy::getSocket()
 {
     return m_socket;
 }
 
-void FlirWebSocketProxy::open(const QUrl& url)
+void WebSocketProxy::open(const QUrl& url)
 {
     QMetaObject::invokeMethod(
         this,
@@ -26,7 +31,7 @@ void FlirWebSocketProxy::open(const QUrl& url)
         Q_ARG(QUrl, url));
 };
 
-void FlirWebSocketProxy::sendTextMessage(const QString& message)
+void WebSocketProxy::sendTextMessage(const QString& message)
 {
     QMetaObject::invokeMethod(
         this,
@@ -35,12 +40,18 @@ void FlirWebSocketProxy::sendTextMessage(const QString& message)
         Q_ARG(const QString&, message));
 };
 
-void FlirWebSocketProxy::openInternal(const QUrl& url)
+void WebSocketProxy::openInternal(const QUrl& url)
 {
     m_socket->open(url);
 }
 
-void FlirWebSocketProxy::sendTextMessageInternal(const QString& message)
+void WebSocketProxy::sendTextMessageInternal(const QString& message)
 {
     m_socket->sendTextMessage(message);
 }
+
+} // namespace nexus
+} // namespace flir
+} // namespace plugins
+} // namespace nx
+

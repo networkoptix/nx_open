@@ -34,7 +34,7 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
     if (!m_ioManager)
     {
         m_ioManager = new nx::plugins::flir::WebSocketIoManager(dynamic_cast<QnVirtualCameraResource*>(this));
-        m_ioManager->moveToThread(FlirIoExecutor::instance()->getThread());
+        m_ioManager->moveToThread(nx::plugins::flir::IoExecutor::instance()->getThread());
     }
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;

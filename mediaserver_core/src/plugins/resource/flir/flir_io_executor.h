@@ -7,15 +7,23 @@
 
 #include <nx/utils/singleton.h>
 
-class FlirIoExecutor: 
+namespace nx {
+namespace plugins {
+namespace flir {
+
+class IoExecutor: 
     public QObject,
-    public Singleton<FlirIoExecutor>
+    public Singleton<IoExecutor>
 {
     Q_OBJECT
 public:
-    FlirIoExecutor();
-    virtual ~FlirIoExecutor();
+    IoExecutor();
+    virtual ~IoExecutor();
     QThread* getThread() const;
 private:
     std::unique_ptr<QThread> m_thread;
 };
+
+} // namespace flir
+} // namespace plugins
+} // nx
