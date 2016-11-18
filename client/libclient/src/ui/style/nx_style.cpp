@@ -3085,17 +3085,27 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_ItemViewItem:
         {
-            if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+            if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
             {
                 QnIndents indents = itemViewItemIndents(item);
 
                 if (isCheckboxOnlyItem(*item))
-                    return QSize(indents.left() + indents.right() + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);
+                {
+                    return QSize(indents.left() + indents.right() + Metrics::kCheckIndicatorSize,
+                        Metrics::kCheckIndicatorSize);
+                }
 
-                QSize sz = base_type::sizeFromContents(type, option, size, widget);
-                sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
-                    sz.setWidth(sz.width() + indents.left() + indents.right() - (pixelMetric(PM_FocusFrameHMargin, option, widget) + 1) * 2);
-                return sz;
+                QSize size = base_type::sizeFromContents(type, option, size, widget);
+
+                int minHeight = qobject_cast<const QListView*>(item->widget)
+                    ? Metrics::kListRowHeight
+                    : Metrics::kViewRowHeight;
+
+                size.setHeight(qMax(size.height(), minHeight));
+                size.setWidth(size.width() + indents.left() + indents.right() -
+                    (pixelMetric(PM_FocusFrameHMargin, option, widget) + 1) * 2);
+
+                return size;
             }
 
             break;

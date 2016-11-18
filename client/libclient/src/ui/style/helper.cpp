@@ -17,6 +17,7 @@ namespace style
     const int Metrics::kMinimumButtonWidth = 80;
     const int Metrics::kButtonHeight = 28;
     const int Metrics::kHeaderSize = 32;
+    const int Metrics::kListRowHeight = 20;
     const int Metrics::kViewRowHeight = 24;
     const int Metrics::kSortIndicatorSize = 14;
     const int Metrics::kRounding = 1;
