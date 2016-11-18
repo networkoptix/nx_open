@@ -1,5 +1,4 @@
-#ifndef VIDEORECORDINGDIALOG_H
-#define VIDEORECORDINGDIALOG_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
@@ -31,7 +30,9 @@ signals:
     void recordingSettingsChanged();
 
 private:
-    void additionalAdjustSize();
+    void initScreenComboBox();
+    void initQualityCombobox();
+    void initResolutionCombobox();
 
     Qn::CaptureMode captureMode() const;
     void setCaptureMode(Qn::CaptureMode c);
@@ -45,7 +46,7 @@ private:
     int screen() const;
     void setScreen(int screen);
 
-private slots:
+private:
     void updateRecordingWarning();
     void updateDisableAeroCheckbox();
 
@@ -57,5 +58,3 @@ private:
     QnVideoRecorderSettings *m_settings;
     QnDwm* m_dwm;
 };
-
-#endif // VIDEORECORDINGDIALOG_H

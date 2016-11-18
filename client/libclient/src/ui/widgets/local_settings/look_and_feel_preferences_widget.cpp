@@ -2,8 +2,6 @@
 #include "ui_look_and_feel_preferences_widget.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QStandardPaths>
-#include <QtGui/QDesktopServices>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -20,7 +18,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/translation_list_model.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -49,9 +46,6 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     ui(new Ui::LookAndFeelPreferencesWidget)
 {
     ui->setupUi(this);
-
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
-    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     ui->timeModeWarningLabel->setText(
         tr("This option will not affect Recording Schedule. "
@@ -231,7 +225,6 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
             {
                 QnBackgroundImage background = qnSettings->backgroundImage();
                 background.name = storedFileName;
-                qDebug() << "stored filename" << storedFileName;
                 background.originalName = originalFileName;
                 qnSettings->setBackgroundImage(background);
                 ui->imageNameLineEdit->setText(QFileInfo(originalFileName).fileName());
