@@ -32,7 +32,7 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
         m_urls = m_urls.mid(0, kMaxUrlsToStore);
         qnSettings->setKnownServerUrls(m_urls);
     }
-    directModuleFinderHelper->setForcedUrls(QSet<QUrl>::fromList(m_urls));
+    directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
     connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened,
             this, [this, directModuleFinderHelper]()
@@ -49,7 +49,7 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
                 while (m_urls.size() > kMaxUrlsToStore)
                     m_urls.removeLast();
 
-                directModuleFinderHelper->setForcedUrls(QSet<QUrl>::fromList(m_urls));
+                directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
                 qnSettings->setKnownServerUrls(m_urls);
             }

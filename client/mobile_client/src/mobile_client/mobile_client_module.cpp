@@ -34,7 +34,10 @@
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
 #include <nx/network/socket_global.h>
+#include <nx/mobile_client/settings/migration_helper.h>
+#include <nx/mobile_client/settings/settings_migration.h>
 
+using namespace nx::mobile_client;
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -68,6 +71,7 @@ QnMobileClientModule::QnMobileClientModule(
     common->store<QnTranslationManager>(translationManager);
     common->store<QnClientCoreSettings>(new QnClientCoreSettings());
     common->store<QnMobileClientSettings>(new QnMobileClientSettings);
+    settings::migrateSettings();
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
@@ -112,6 +116,8 @@ QnMobileClientModule::QnMobileClientModule(
 
     common->store<QnSystemsFinder>(new QnSystemsFinder());
     common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
+
+    common->store<settings::SessionsMigrationHelper>(new settings::SessionsMigrationHelper());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleFinder](Qt::ApplicationState state)

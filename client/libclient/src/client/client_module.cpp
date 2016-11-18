@@ -328,6 +328,8 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setDevMode(true);
     }
 
+    qnRuntime->setGLDoubleBuffer(qnSettings->isGlDoubleBuffer());
+    qnRuntime->setTranslationPath(qnSettings->translationPath());
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
@@ -538,12 +540,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
-
-    if (!QDir(qnSettings->mediaFolder()).exists())
-        QDir().mkpath(qnSettings->mediaFolder());
-
-    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
-    QDir::setCurrent(qnSettings->mediaFolder());
 
     QnClientResourceProcessor* resourceProcessor(new QnClientResourceProcessor());
     QnResourceDiscoveryManager* resourceDiscoveryManager(new QnResourceDiscoveryManager());

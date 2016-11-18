@@ -7,7 +7,6 @@
 #include <utils/mobile_app_info.h>
 #include <common/common_module.h>
 #include <context/connection_manager.h>
-#include <context/context_settings.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
 #include <client_core/client_core_settings.h>
@@ -33,7 +32,6 @@ QnContext::QnContext(QObject* parent) :
     m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
-    m_settings(new QnContextSettings(this)),
     m_uiController(new QnMobileClientUiController(this)),
     m_cloudUrlHelper(new QnCloudUrlHelper(
         SystemUri::ReferralSource::MobileClient,

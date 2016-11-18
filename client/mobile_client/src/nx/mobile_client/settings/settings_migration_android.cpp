@@ -7,6 +7,10 @@
 #include <mobile_client/mobile_client_app_info.h>
 #include <mobile_client/mobile_client_settings.h>
 
+namespace nx {
+namespace mobile_client {
+namespace settings {
+
 QnMigratedSessionList getMigratedSessions(bool *success)
 {
     QnMigratedSessionList result;
@@ -69,5 +73,9 @@ QnMigratedSessionList getMigratedSessions(bool *success)
 
     return result;
 }
+
+} // namespace settings
+} // namespace mobile_client
+} // namespace nx
 
 #endif

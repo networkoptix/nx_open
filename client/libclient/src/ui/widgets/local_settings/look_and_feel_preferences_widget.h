@@ -1,5 +1,4 @@
-#ifndef LOOK_AND_FEEL_PREFERENCES_WIDGET_H
-#define LOOK_AND_FEEL_PREFERENCES_WIDGET_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
@@ -10,10 +9,12 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class LookAndFeelPreferencesWidget;
+class LookAndFeelPreferencesWidget;
 }
 
-class QnLookAndFeelPreferencesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnLookAndFeelPreferencesWidget:
+    public QnAbstractPreferencesWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
@@ -25,24 +26,27 @@ public:
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
-    virtual bool canDiscardChanges() const override;
+    virtual void discardChanges() override;
 
     bool isRestartRequired() const;
+
 private:
     void setupLanguageUi();
     void setupTimeModeUi();
     void setupBackgroundUi();
 
     void selectBackgroundImage();
+
+    bool backgroundAllowed() const;
+
+    QString selectedTranslation() const;
+    Qn::TimeMode selectedTimeMode() const;
+    Qn::ResourceInfoLevel selectedInfoLevel() const;
+    int selectedTourCycleTimeMs() const;
+    Qn::ImageBehaviour selectedImageMode() const;
 private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;
-    bool m_updating;
-
-    int m_oldLanguage;
-
-    Qn::TimeMode m_oldTimeMode;
+    bool m_updating = false;
 
     QnBackgroundImage m_oldBackground;
 };
-
-#endif // LOOK_AND_FEEL_PREFERENCES_WIDGET_H
