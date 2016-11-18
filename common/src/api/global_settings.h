@@ -92,7 +92,17 @@ public:
     bool isInitialized() const;
 
     void synchronizeNow();
+
+    /**
+     * Save all settings to database
+     */
+    bool resynchronizeNowSync();
+
+    /**
+    * Save modified settings to database
+    */
     bool synchronizeNowSync();
+
     bool takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer);
 
     QSet<QString> disabledVendorsSet() const;

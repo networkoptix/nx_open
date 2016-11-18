@@ -483,6 +483,18 @@ void QnGlobalSettings::synchronizeNow()
     propertyDictionary->saveParamsAsync(m_admin->getId());
 }
 
+bool QnGlobalSettings::resynchronizeNowSync()
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+        if (!m_admin)
+            return false;
+        propertyDictionary->markAllParamsDirty(m_admin->getId());
+    }
+    return  synchronizeNowSync();
+}
+
 bool QnGlobalSettings::synchronizeNowSync()
 {
     for (QnAbstractResourcePropertyAdaptor* adaptor : m_allAdaptors)

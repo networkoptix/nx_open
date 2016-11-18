@@ -107,15 +107,10 @@ int QnConfigureRestHandler::execute(
                 ec2::DummyHandler::instance(),
                 &ec2::DummyHandler::onRequestDone);
         }
-        if (data.rewriteLocalSettings)
-        {
-            // rewrite system settings to update transaction time
 
-            const auto& settings = QnGlobalSettings::instance()->allSettings();
-            for (auto setting: settings)
-                setting->markDirty();
-            qnGlobalSettings->synchronizeNowSync();
-        }
+        // rewrite system settings to update transaction time
+        if (data.rewriteLocalSettings)
+            qnGlobalSettings->resynchronizeNowSync();
     }
 
     /* set port */
