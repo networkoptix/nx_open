@@ -66,7 +66,7 @@ public:
                 return tr("Could not configure the remote system %1.")
                     .arg(moduleInformation.systemName);
             case dependentSystemBoundToCloud:
-                return tr("System being merged cannot be connected to %1.")
+                return tr("In this version you can only merge systems which are not connected to %1")
                     .arg(QnAppInfo::cloudName());
             case bothSystemBoundToCloud:
                 return tr("Both systems are connected to %1. Merge is not allowed.")
