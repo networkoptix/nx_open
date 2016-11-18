@@ -98,7 +98,7 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>gcc-4.9.3 quazip openldap</rdep.linux.packages>
+                <rdep.linux.packages>quazip openldap</rdep.linux.packages>
                 <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>
@@ -118,7 +118,6 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>gcc-4.9.3 quazip</rdep.linux.packages>
             </properties>
         </profile>
 
@@ -137,7 +136,6 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>gcc-4.9.3 quazip</rdep.linux.packages>
             </properties>
         </profile>
 
@@ -155,25 +153,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>gcc-4.8.3 sysroot quazip opengl-es-mali</rdep.linux.packages>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-tx1</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>tx1</value>
-                </property>
-            </activation>
-            <properties>
-                <rdep.linux.packages>gcc-4.8.4 sysroot quazip</rdep.linux.packages>
+                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
 
