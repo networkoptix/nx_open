@@ -34,6 +34,7 @@
 #include <ui/widgets/common/input_field.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -399,6 +400,18 @@ QnNxStylePrivate::QnNxStylePrivate() :
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
+    //TODO: Think through how to make it better
+    /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates: */
+    installEventHandler(qApp, QEvent::WindowDeactivate, this,
+        [this](QObject* watched, QEvent*)
+    {
+        auto view = qobject_cast<QGraphicsView*>(watched);
+        if (!view || !view->scene())
+            return;
+
+        if (auto grabber = view->scene()->mouseGrabberItem())
+            grabber->ungrabMouse();
+    });
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
