@@ -5,7 +5,7 @@ __author__ = 'Danil Lavrentyuk'
 """
 import sys, os, threading
 import argparse
-import requests
+#import requests
 from requests.exceptions import SSLError, ConnectionError, RequestException
 import signal
 import time
@@ -13,6 +13,7 @@ import random
 import traceback as TB
 from collections import deque
 from subprocess import Popen, PIPE
+import urllib2
 
 #from requests.packages.urllib3.connectionpool import HTTPSConnectionPool, HTTPConnectionPool
 #HTTPSConnectionPool._validate_conn = HTTPConnectionPool._validate_conn
@@ -94,31 +95,32 @@ class RequestWorker(BaseWorker):
     def __init__(self, master, num, mix):
         super(RequestWorker, self).__init__(master, num)
         self.fails = _init_fails() # failures, groupped by error message
-        self._session = requests.Session()
+        ##self._session = requests.Session()
         #self._session.verify = False
         if mix:
             self._url = None
             self._prep = [
-                self._session.prepare_request(requests.Request('GET', url=mk_url(proto, HOST, uri), auth=AUTH))
+                urllib2.Request(mk_url(proto, HOST, uri))
+                #self._session.prepare_request(requests.Request('GET', url=mk_url(proto, HOST, uri), auth=AUTH))
                 for proto in ('http', 'https')
                 for uri in (URI, URI_HEAVY)
             ]
         else:
             self._url = mk_url(PROTO, HOST, URI)
-            kwargs = dict(url=self._url, auth=AUTH)
-            self._prep = [self._session.prepare_request(requests.Request('GET', **kwargs))]
+            #kwargs = dict(url=self._url, auth=AUTH)
+            self._prep = [urllib2.Request(self._url)] # [self._session.prepare_request(requests.Request('GET', **kwargs))]
 
     def _req(self):
         try:
             req = random.choice(self._prep)
-            kwargs = {'verify': False} if req.url.startswith('https') else dict()
-            if logfile:
-                print >>logfile, "URL: %s, HTTPS %s" % (req.url, 'ON' if 'verify' in kwargs else 'OFF')
-            res = self._session.send(req,   **kwargs)
-            if res.status_code == 200:
+            #kwargs = {'verify': False} if req.url.startswith('https') else dict()
+            #if logfile:
+            #    print >>logfile, "URL: %s, HTTPS %s" % (req.url, 'ON' if 'verify' in kwargs else 'OFF')
+            res = urllib2.urlopen(req,)
+            if res.getcode() == 200:
                 return None # means success!
             else:
-                return 'Code: %s' % res.status_code
+                return 'Code: %s' % res.getcode()
         except RequestException, e:
             self._output("%s: %s\n" % (type(e).__name__, e.message))
             return type(e).__name__
@@ -347,26 +349,8 @@ class StressTestRunner(object):
         print 'Test complete.'
 
 
-def parse_args():
+def preprocessArgs(args):
     global PROTO, REPORT_PERIOD, HOST, URI
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-T', '--threads', type=int, help="Number of threads to use. Default: %s" % DEFAULT_THREADS, default=DEFAULT_THREADS)
-    parser.add_argument('-H', '--host', help="Server hostname or IP. May include portnumber too.", default=DEFAULT_HOST)
-    parser.add_argument('-P', '--port', type=int, help="Server port number", default=DEFAULT_PORT)
-    parser.add_argument('-p', '--proto', choices=('http', 'https'), help="Protocol using (http or https, %s is default)" % PROTO)
-    parser.add_argument('-r', '--reports', type=float, help="Counters report preriod, seconds. Default = %.1f" % REPORT_PERIOD)
-    parser.add_argument('-y', '--heavy', action='store_true', help="Use requests with heavy response")
-    parser.add_argument('-x', '--mix', action='store_true', help="Mix mode: http and https, light and heavy requests")
-    parser.add_argument('-l', '--log', action='store_true', help="Write a log file")
-    parser.add_argument('-b', '--batch', type=int, help="Batch testing mode. Optional value - testing duration, whole seconds. Default is %s" % BATCH_PERIOD, nargs='?', const=BATCH_PERIOD)
-    parser.add_argument('-f', '--full', help="Full 2-step test with drop-phase", nargs='?', const="")
-    parser.add_argument('-e', '--logexc', action='store_true', help="Log to console every request exception. Without it exceptions are counted only")
-    #TODO: add print exception option (don't print request exceptions withot it)
-    #TODO: add option to set HANG_GRACE and calculate the minimal FAILS_TAIL from it
-    #TODO: also check that HANG_GRACE is less than BATCH_PERIOD
-    #TODO: add quiet mode option to produce less outpot
-    parser.add_argument('--drop', action='store_true', help="Debug request dropping")
-    args = parser.parse_args()
     #if args.host and args.port:
     if args.reports is not None:
         if args.reports > 0:
@@ -394,6 +378,27 @@ def parse_args():
         print "Using heavy requests"
         URI = URI_HEAVY
     return args
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-T', '--threads', type=int, help="Number of threads to use. Default: %s" % DEFAULT_THREADS, default=DEFAULT_THREADS)
+    parser.add_argument('-H', '--host', help="Server hostname or IP. May include portnumber too.", default=DEFAULT_HOST)
+    parser.add_argument('-P', '--port', type=int, help="Server port number", default=DEFAULT_PORT)
+    parser.add_argument('-p', '--proto', choices=('http', 'https'), help="Protocol using (http or https, %s is default)" % PROTO)
+    parser.add_argument('-r', '--reports', type=float, help="Counters report preriod, seconds. Default = %.1f" % REPORT_PERIOD)
+    parser.add_argument('-y', '--heavy', action='store_true', help="Use requests with heavy response")
+    parser.add_argument('-x', '--mix', action='store_true', help="Mix mode: http and https, light and heavy requests")
+    parser.add_argument('-l', '--log', action='store_true', help="Write a log file")
+    parser.add_argument('-b', '--batch', type=int, help="Batch testing mode. Optional value - testing duration, whole seconds. Default is %s" % BATCH_PERIOD, nargs='?', const=BATCH_PERIOD)
+    parser.add_argument('-f', '--full', help="Full 2-step test with drop-phase", nargs='?', const="")
+    parser.add_argument('-e', '--logexc', action='store_true', help="Log to console every request exception. Without it exceptions are counted only")
+    #TODO: add print exception option (don't print request exceptions withot it)
+    #TODO: add option to set HANG_GRACE and calculate the minimal FAILS_TAIL from it
+    #TODO: also check that HANG_GRACE is less than BATCH_PERIOD
+    #TODO: add quiet mode option to produce less outpot
+    parser.add_argument('--drop', action='store_true', help="Debug request dropping")
+    return preprocessArgs(parser.parse_args())
 
 
 if __name__ == '__main__':
