@@ -32,6 +32,8 @@
 #include <core/resource/security_cam_resource.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
+QnMutex QnResource::m_initAsyncMutex;
+
 // TODO: #rvasilenko move it to QnResourcePool
 Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 
@@ -1103,12 +1105,16 @@ private:
 
 void QnResource::stopAsyncTasks()
 {
-    m_appStopping = true;
+    {
+        QnMutexLocker lock(&m_initAsyncMutex);
+        m_appStopping = true;
+    }
     initResPool()->waitForDone();
 }
 
 void QnResource::pleaseStopAsyncTasks()
 {
+    QnMutexLocker lock(&m_initAsyncMutex);
     m_appStopping = true;
 }
 
@@ -1138,7 +1144,6 @@ void QnResource::initAsync(bool optional)
     else
     {
         m_lastInitTime = t;
-        lock.unlock();
         initResPool()->start(task);
     }
 }
