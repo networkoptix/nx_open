@@ -1715,7 +1715,7 @@ qreal QnTimeSlider::msecsPerPixel() const
 
 void QnTimeSlider::updateMSecsPerPixel()
 {
-    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
+    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / qMax(size().width(), 1);
     if (qFuzzyIsNull(msecsPerPixel))
         msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
 
@@ -1883,11 +1883,11 @@ void QnTimeSlider::animateStepValues(int deltaMs)
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, data.lineOpacitySpeed * deltaMs);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, data.textOpacitySpeed * deltaMs);
 
-        if (data.currentHeight == data.targetHeight)
+        if (qFuzzyIsNull(data.currentHeight - data.targetHeight))
             data.heightSpeed = 0.0;
-        if (data.currentLineOpacity == data.targetLineOpacity)
+        if (qFuzzyIsNull(data.currentLineOpacity - data.targetLineOpacity))
             data.lineOpacitySpeed = 0.0;
-        if (data.currentTextOpacity == data.targetTextOpacity)
+        if (qFuzzyIsNull(data.currentTextOpacity - data.targetTextOpacity))
             data.textOpacitySpeed = 0.0;
     }
 }

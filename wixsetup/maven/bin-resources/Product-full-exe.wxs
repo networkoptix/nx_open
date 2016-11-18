@@ -17,7 +17,7 @@
 
         <Chain>
             <PackageGroupRef Id="VC12RedistPackageGroup"/>
-            <PackageGroupRef Id="VC14RedistPackageGroup"/>
+<!--            <PackageGroupRef Id="VC14RedistPackageGroup"/> -->
 
             <RollbackBoundary />
 
