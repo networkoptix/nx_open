@@ -3,6 +3,7 @@
 #include <boost/range/algorithm/find_if.hpp>
 
 #include <nx/utils/url_builder.h>
+#include <nx/utils/log/log.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <client_core/client_core_settings.h>
 
@@ -14,10 +15,10 @@ namespace settings {
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
-QnMigratedSessionList getMigratedSessions(bool *success)
+QnMigratedSessionList getMigratedSessions(bool* success)
 {
     if (success)
-        *success = false;
+        *success = true;
 
     return QnMigratedSessionList();
 }
@@ -34,13 +35,13 @@ static void migrateFrom24To25()
 
     if (importedSessions.isEmpty())
     {
-        qDebug() << "Settings migration is skipped.";
+        NX_LOG("Settings migration is skipped.", cl_logDEBUG1);
         return;
     }
 
     if (!success)
     {
-        qDebug() << "Settings migration failed.";
+        NX_LOG("Settings migration failed.", cl_logERROR);
         return;
     }
 
@@ -61,7 +62,7 @@ static void migrateFrom24To25()
 
     qnSettings->setSavedSessions(sessions);
 
-    qDebug() << "Imported" << importedSessions.size() << "sessions.";
+    NX_LOG(lit("Imported %1 sessions.").arg(importedSessions.size()), cl_logINFO);
 
     qnSettings->setSettingsMigrated(true);
 }
