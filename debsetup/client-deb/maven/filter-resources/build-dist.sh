@@ -48,7 +48,7 @@ CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
 CLIENT_HELP_PATH=${ClientHelpSourceDir}
-ICONS_PATH=${customization.dir}/icons/hicolor
+ICONS_PATH=${customization.dir}/icons/linux/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
 #. $CLIENT_BIN_PATH/env.sh
@@ -97,7 +97,7 @@ cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
 #copying qt libs
-QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
+QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia MultimediaQuick_p Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
 if [ '${arch}' == 'arm' ]
 then
   QTLIBS+=( Sensors )

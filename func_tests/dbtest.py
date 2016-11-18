@@ -8,14 +8,14 @@ __author__ = 'Danil Lavrentyuk'
 
 import os, time
 from functest_util import compareJson, textdiff
+from testbase import FuncTestCase
 from stortest import StorageBasedTest
 
 NUM_SERV=2
 SERVERS_MERGE_WAIT=20
 BACKUP_RESTORE_TIMEOUT=40
 REALM_FIX_TIMEOUT=10
-#BACKUP_DB_FILE="BackupRestoreTest.db.sqlite"
-BACKUP_DB_FILE=""
+BACKUP_DB_FILE="" # "data-backup"
 DUMP_BEFORE="" # "data-before"
 DUMP_AFTER="" # "data-after"
 
@@ -46,6 +46,7 @@ def _saveDump(name, data, mode = "t"):
 
 class DBTest(StorageBasedTest):
 
+    helpStr = "DB upgrade and backup/restore tests"
     num_serv = NUM_SERV
     _test_name = "Database"
     _test_key = 'db'
@@ -73,6 +74,10 @@ class DBTest(StorageBasedTest):
     @classmethod
     def _global_clear_extra_args(cls, num):
         return ()
+
+    @classmethod
+    def _need_clear_box(cls, num):
+        return super(StorageBasedTest, cls)._need_clear_box(num)
 
     def _init_script_args(self, boxnum):
         print "DEBUG: box %s, set id %s" % (boxnum, self._ids[boxnum])
@@ -121,10 +126,26 @@ class DBTest(StorageBasedTest):
         elif sleep > 0:
             _sleep(sleep)
 
+    def _get_db_copy(self, suffix):
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-stop')
+        for num, box in enumerate(self.hosts):
+            self._call_box(box, '/vagrant/cpdb.sh', suffix, str(num+1))
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-start')
+        self._wait_servers_up()
+
+
     def BackupRestoreTest(self):
         """ Check if backup/restore preserve all necessary data. """
+        #self._mediaserver_ctl(self.hosts[1], 'safe-stop')
+        #
+        #self._prepare_test_phase(self._stop_and_init)
+        #time.sleep(0.5)
+        #
         _clearDumps()
         WORK_HOST = 0  # which server do we check with backup/restore
+        #self._get_db_copy('before')
         getInfoFunc = 'ec2/getFullInfo?extraFormatting'
         self._waitOrInput("Before dump")
         fulldataBefore = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
@@ -137,11 +158,12 @@ class DBTest(StorageBasedTest):
         # Now change DB data -- add a camera
         self._add_test_camera(0, nodump=True)
         #
-        self._waitOrInput("Before restore", 10)
+        #self._get_db_copy('middle')
+        self._waitOrInput("Before restore", 15)
         self._server_request(WORK_HOST, 'ec2/restoreDatabase', data={'data': backup}, nodump=True)
         save_guids = self.guids[:]
-        self._waitOrInput("After restore", 10)
-        self._wait_servers_up()
+        self._waitOrInput("After restore", 15)
+        self._wait_servers_up() # servers=set([0, 1]))
         self.assertSequenceEqual(save_guids, self.guids,
             "Server guids have changed after restore: %s -> %s" % (save_guids, self.guids))
         _sleep(5)
@@ -157,6 +179,7 @@ class DBTest(StorageBasedTest):
                 time.sleep(1.5)
                 continue
             break
+        #self._get_db_copy('after')
         _saveDump(DUMP_AFTER, fulldataAfter[1])
         if diff.hasDiff():
             print "DEBUG: compareJson has found differences: %s" % (diff.errorInfo(),)

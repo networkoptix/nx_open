@@ -39,7 +39,7 @@ public:
     {
         if (role == Qt::TextColorRole && m_delegate
             && !m_delegate->isValid(id(proxyIndex)))
-            return QBrush(QColor(qnGlobals->errorTextColor()));
+            return QBrush(qnGlobals->errorTextColor());
         return QIdentityProxyModel::data(proxyIndex, role);
     }
 
@@ -74,11 +74,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    auto showHideSignalizer = new QnMultiEventSignalizer(this);
-    showHideSignalizer->addEventType(QEvent::Show);
-    showHideSignalizer->addEventType(QEvent::Hide);
-    scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(scrollBar, { QEvent::Show, QEvent::Hide }, this,
         [this](QObject* watched, QEvent* event)
         {
             Q_UNUSED(watched);

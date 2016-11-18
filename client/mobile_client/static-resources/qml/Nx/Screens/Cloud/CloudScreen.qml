@@ -10,7 +10,7 @@ Page
 {
     id: cloudScreen
 
-    padding: 16
+    padding: 8
     topPadding: 0
 
     title: qsTr("Cloud Account")

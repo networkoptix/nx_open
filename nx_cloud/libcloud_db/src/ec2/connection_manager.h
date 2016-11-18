@@ -24,9 +24,9 @@
 #include <utils/common/subscription.h>
 
 #include "access_control/auth_types.h"
+#include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
-#include "transaction_serializer.h"
 
 namespace nx_http {
 class HttpServerConnection;
@@ -70,7 +70,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler);
+        nx_http::RequestProcessedHandler completionHandler);
     /**
      * Mediaserver uses this method to push transactions.
      */
@@ -79,14 +79,14 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler);
+        nx_http::RequestProcessedHandler completionHandler);
 
     /**
      * Dispatches transaction to corresponding peers.
      */
     void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
     bool isSystemConnected(const std::string& systemId) const;
@@ -174,7 +174,7 @@ private:
     void onGotTransaction(
         const nx::String& connectionId,
         Qn::SerializationFormat tranFormat,
-        const QByteArray& data,
+        QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);
     
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);

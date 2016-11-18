@@ -129,7 +129,7 @@ int MediatorProcess::executeApplication()
     MultiAddressServer<stun::SocketServer> tcpStunServer(
         &stunMessageDispatcher,
         false,
-        SocketFactory::NatTraversalType::nttDisabled);
+        nx::network::NatTraversalSupport::disabled);
     if (!tcpStunServer.bind(settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to TCP addresses: %1")
@@ -152,7 +152,7 @@ int MediatorProcess::executeApplication()
     
     launchHttpServerIfNeeded(
         settings,
-        listeningPeerPool,
+        listeningPeerRegistrator,
         &httpMessageDispatcher,
         &multiAddressHttpServer);
 
@@ -213,7 +213,7 @@ void MediatorProcess::stop()
 
 bool MediatorProcess::launchHttpServerIfNeeded(
     const conf::Settings& settings,
-    const ListeningPeerPool& listeningPeerPool,
+    const PeerRegistrator& peerRegistrator,
     std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
         multiAddressHttpServer)
@@ -228,18 +228,14 @@ bool MediatorProcess::launchHttpServerIfNeeded(
     //registering HTTP handlers
     (*httpMessageDispatcher)->registerRequestProcessor<http::GetListeningPeerListHandler>(
         http::GetListeningPeerListHandler::kHandlerPath,
-        [&listeningPeerPool]() -> std::unique_ptr<http::GetListeningPeerListHandler>
-        {
-            return std::make_unique<http::GetListeningPeerListHandler>(
-                listeningPeerPool);
-        });
+        [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
     
     *multiAddressHttpServer =
         std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
             nullptr,    //TODO #ak add authentication 
             httpMessageDispatcher->get(),
             false,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
     if (!(*multiAddressHttpServer)->bind(settings.http().addrToListenList))
     {

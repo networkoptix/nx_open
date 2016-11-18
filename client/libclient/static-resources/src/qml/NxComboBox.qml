@@ -44,11 +44,30 @@ ComboBox
                 return;
 
             if (count === 0)
+            {
                 currentIndex = -1;
-            else if (currentIndex >= first && currentIndex <= last)
-                currentIndex = -1;  // This item has been removed
+                return;
+            }
+
+            var removedCount = (last - first + 1);
+            if (currentIndex >= first && currentIndex <= last)
+            {
+                var prevItemIndex = first - 1;
+                if (prevItemIndex >= 0)
+                {
+                    currentIndex = prevItemIndex;
+                }
+                else
+                {
+                    var nextItemIndex = (last - removedCount) + 1;
+                    if (nextItemIndex < count)
+                        currentIndex = nextItemIndex;
+                }
+            }
             else if (currentIndex > last)
-                currentIndex -= (last - first + 1);
+            {
+                currentIndex -= removedCount;
+            }
         }
 
         onRowsInserted:
@@ -59,7 +78,7 @@ ComboBox
             {
                 var newCurrenIndex = currentIndex + (last - first + 1);
                 if (newCurrenIndex < count)
-                    currentItemIndex = newCurrenIndex;
+                    currentIndex = newCurrenIndex;
                 else
                     overflowCurrentIndex = newCurrenIndex;
             }
@@ -165,6 +184,11 @@ ComboBox
             {
                 thisComponent.currentIndex = thisComponent.find(text.trim()
                     , Qt.MatchExactly | Qt.MatchCaseSensitive);
+            }
+            onActiveFocusChanged:
+            {
+                if (activeFocus)
+                    selectAll();
             }
         }
 

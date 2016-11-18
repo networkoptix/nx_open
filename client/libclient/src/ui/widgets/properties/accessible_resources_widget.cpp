@@ -85,19 +85,11 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     if (m_controlsVisible)
     {
-        auto keyPressSignalizer = new QnSingleEventSignalizer(this);
-        keyPressSignalizer->setEventType(QEvent::KeyPress);
-        ui->resourcesTreeView->installEventFilter(keyPressSignalizer);
-        ui->controlsTreeView->installEventFilter(keyPressSignalizer);
-        connect(keyPressSignalizer, &QnSingleEventSignalizer::activated,
+        installEventHandler({ ui->resourcesTreeView, ui->controlsTreeView }, QEvent::KeyPress,
             this, &QnAccessibleResourcesWidget::at_itemViewKeyPress);
     }
 
-    auto showHideSignalizer = new QnMultiEventSignalizer(this);
-    showHideSignalizer->addEventType(QEvent::Show);
-    showHideSignalizer->addEventType(QEvent::Hide);
-    scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(scrollBar, { QEvent::Show, QEvent::Hide }, this,
         [this, scrollBar](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);
@@ -197,13 +189,28 @@ void QnAccessibleResourcesWidget::loadDataToUi()
 
     if (m_controlsVisible)
     {
+        bool hasAllMedia = m_permissionsModel->rawPermissions().testFlag(
+            Qn::GlobalAccessAllMediaPermission);
+
+        /* For custom users 'All Resources' must be unchecked by default */
+        if (m_permissionsModel->subject().user())
+        {
+            hasAllMedia &= m_permissionsModel->rawPermissions().testFlag(
+                Qn::GlobalCustomUserPermission);
+        }
+
         QSet<QnUuid> checkedControls;
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission))
+        if (hasAllMedia)
+        {
+            /* Really we are checking the only dummy resource. */
             for (const auto& resource : m_controlsModel->resources())
-                checkedControls << resource->getId();   /*< Really we are checking the only dummy resource. */
+                checkedControls << resource->getId();
+        }
         m_controlsModel->setCheckedResources(checkedControls);
     }
-    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
+
+    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter,
+        m_permissionsModel->accessibleResources()));
 }
 
 bool QnAccessibleResourcesWidget::isAll() const
@@ -265,11 +272,11 @@ void QnAccessibleResourcesWidget::initControlsModel()
         return;
 
     QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
-    dummy->setName(tr("All Cameras && Resources"));
+    dummy->setName(tr("All Cameras & Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
     qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
-    m_controlsModel->setResources(QnResourceList() << dummy);
+    m_controlsModel->setResources(QnResourceList({ dummy }));
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
     m_controlsModel->setSimplified(true);

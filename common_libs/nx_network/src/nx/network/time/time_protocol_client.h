@@ -26,6 +26,7 @@ public:
     virtual ~TimeProtocolClient();
 
     virtual void stopWhileInAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread);
 
     virtual void getTimeAsync(CompletionHandler completionHandler) override;
 

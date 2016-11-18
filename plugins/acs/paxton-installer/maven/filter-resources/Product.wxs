@@ -13,7 +13,7 @@
     <WixVariable Id="WixUIBannerBmp" Value="resources\logo_493x58.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="resources\logo_493x312.bmp" />
 
-    <Icon Id="logo.ico" SourceFile="resources\logo.ico"/>
+    <Icon Id="logo.ico" SourceFile="favicon.ico"/>
     <Property Id="ARPPRODUCTICON" Value="logo.ico" />
 
     <Property Id="PAXTONDIR">

@@ -27,8 +27,6 @@ FocusScope
         opacity: showProgress ? 0.0 : 1.0
         Behavior on opacity { NumberAnimation { duration: 200 } }
         padding: 0
-        leftPadding: 0
-        rightPadding: 0
     }
 
     ThreeDotBusyIndicator

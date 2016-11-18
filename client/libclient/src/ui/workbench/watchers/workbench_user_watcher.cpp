@@ -38,7 +38,9 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
             if (!subject.user() || subject.user() != m_user)
                 return;
 
-            reconnect();
+            /* We may get globalPermissionsChanged when user is removed. */
+            if (m_user->resourcePool())
+                reconnect();
         });
 }
 

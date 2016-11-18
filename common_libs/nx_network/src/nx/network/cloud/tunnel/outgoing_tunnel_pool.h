@@ -31,21 +31,34 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
-    /** Establish new connection.
-    * \param timeout zero - no timeout
-    * \param socketAttributes attribute values to apply to a newly-created socket
-    * \note This method is re-enterable. So, it can be called in
-    *        different threads simultaneously */
+    /**
+     * Establish new connection for user needs.
+     * @param timeout Zero means no timeout.
+     * @param socketAttributes Attribute values to apply to a newly-created socket.
+     * @note This method can be called from different threads simultaneously.
+     */
     void establishNewConnection(
         const AddressEntry& targetHostAddress,
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OutgoingTunnel::NewConnectionHandler handler);
 
+    /** Returns peer Id for cloud connect. */
+    String selfPeerId() const;
+
+    /**
+     * Sould be called somewhere in every module, so this Id is useful for debug.
+     * @param name Short module name, useful for debug.
+     * @param uuid Unique instance Id, e.g. Hardware Id.
+     */
+    void designateSelfPeerId(const String& name, const QnUuid& uuid);
+
 private:
     typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
 
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
+    mutable bool m_isSelfPeerIdDesignated;
+    String m_selfPeerId;
     TunnelDictionary m_pool;
     bool m_terminated;
     bool m_stopping;

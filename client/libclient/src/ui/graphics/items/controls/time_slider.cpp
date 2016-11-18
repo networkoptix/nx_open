@@ -46,8 +46,6 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
-//TODO: #gdm simple graphics item depends on workbench globals? should move out
-#include <ui/workbench/workbench_ui_globals.h>
 
 namespace
 {
@@ -139,7 +137,7 @@ namespace
     /** Gap between position marker and tooltip tail. */
     const qreal kToolTipMargin = 4.0;
 
-    const qreal kDegreesFor2x = 180.0;
+    const qreal kDegreesFor2x = 90.0;
 
     const qreal kZoomSideSnapDistance = 0.075;
 
@@ -1585,16 +1583,11 @@ void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
         animated = false;
 
     bool visible = canBeVisible && m_tooltipVisible;
-    if (!animated)
-    {
-        toolTipItem()->setOpacity(visible ? NxUi::kOpaque : NxUi::kHidden);
-        return;
-    }
 
     if (visible)
-        showToolTip();
+        showToolTip(animated);
     else
-        hideToolTip();
+        hideToolTip(animated);
 }
 
 void QnTimeSlider::updateToolTipText()
@@ -1826,6 +1819,7 @@ void QnTimeSlider::updateStepAnimationTargets()
     qreal prevLabelWidth = 0.0; /* - we track previous level text label widths to avoid overlapping with them */
     int minLevelStepIndexMinusOne = qMax(0, m_maxStepIndex - kNumTickmarkLevels);
 
+    int prevLevel = -1;
     for (int i = m_steps.size() - 1; i >= minLevelStepIndexMinusOne; --i)
     {
         TimeStepData& data = m_stepData[i];
@@ -1834,27 +1828,37 @@ void QnTimeSlider::updateStepAnimationTargets()
         int level = tickmarkLevel(i);
         data.targetHeight = separationPixels >= kMinTickmarkLineStepPixels ? kTickmarkLengthPixels[level] : 0.0;
 
+        qreal speedFactor = qMax(1.0, m_msecsPerPixel / m_animationUpdateMSecsPerPixel);
         qreal labelWidth = data.textWidthToHeight * kTickmarkFontHeights[level];
+
         if (level > kMaxDisplayedTextLevel)
         {
             data.targetHeight *= prevTextVisible;
             data.targetTextOpacity = 0.0;
+            speedFactor *= qPow(2.0, level - kMaxDisplayedTextLevel);
         }
         else
         {
             qreal minTextStepPixels = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0) + kMinTickmarkTextSpacingPixels;
             data.targetTextOpacity = separationPixels < minTextStepPixels ? 0.0 : 1.0;
             data.targetTextOpacity *= prevTextVisible;
-            prevLabelWidth = labelWidth;
+            prevLabelWidth = prevLevel == level
+                ? qMax(labelWidth, prevLabelWidth)
+                : labelWidth;
         }
+
+        prevLevel = level;
 
         data.targetLineOpacity = qFuzzyIsNull(data.targetHeight) ? 0.0 : 1.0;
         prevTextVisible = data.targetTextOpacity;
 
         /* Compute speeds. */
-        data.heightSpeed = qMax(data.heightSpeed, speed(data.currentHeight, data.targetHeight, kTickmarkHeightAnimationMs));
-        data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speed(data.currentLineOpacity, data.targetLineOpacity, kTickmarkOpacityAnimationMs));
-        data.textOpacitySpeed = qMax(data.textOpacitySpeed, speed(data.currentTextOpacity, data.targetTextOpacity, kTickmarkOpacityAnimationMs));
+        data.heightSpeed = qMax(data.heightSpeed, speedFactor *
+            speed(data.currentHeight, data.targetHeight, kTickmarkHeightAnimationMs));
+        data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speedFactor *
+            speed(data.currentLineOpacity, data.targetLineOpacity, kTickmarkOpacityAnimationMs));
+        data.textOpacitySpeed = qMax(data.textOpacitySpeed, speedFactor *
+            speed(data.currentTextOpacity, data.targetTextOpacity, kTickmarkOpacityAnimationMs) * speedFactor);
     }
 
     /* Clean up remaining steps. */
@@ -2834,20 +2838,32 @@ void QnTimeSlider::sliderChange(SliderChange change)
             qint64 windowStart = m_windowStart;
             qint64 windowEnd = m_windowEnd;
 
-            if (m_options.testFlag(StickToMaximum) && windowEnd == m_oldMaximum)
-            {
-                if (m_options.testFlag(PreserveWindowSize))
-                    windowStart += maximum() - windowEnd;
+            bool wasAtMinimum = windowStart == m_oldMinimum;
+            bool wasAtMaximum = windowEnd == m_oldMaximum;
 
+            /* If a window is full range it should always be preserved: */
+            if (wasAtMinimum && wasAtMaximum)
+            {
+                windowStart = minimum();
                 windowEnd = maximum();
             }
-
-            if (m_options.testFlag(StickToMinimum) && windowStart == m_oldMinimum)
+            else
             {
-                if (m_options.testFlag(PreserveWindowSize))
-                    windowEnd += minimum() - windowStart;
+                if (wasAtMaximum && m_options.testFlag(StickToMaximum))
+                {
+                    if (m_options.testFlag(PreserveWindowSize))
+                        windowStart += maximum() - windowEnd;
 
-                windowStart = minimum();
+                    windowEnd = maximum();
+                }
+
+                if (wasAtMinimum && m_options.testFlag(StickToMinimum))
+                {
+                    if (m_options.testFlag(PreserveWindowSize))
+                        windowEnd += minimum() - windowStart;
+
+                    windowStart = minimum();
+                }
             }
 
             /* Stick zoom anchor. */
@@ -3228,15 +3244,22 @@ void QnTimeSlider::dragMove(DragInfo* info)
         else
             right += m_dragDelta.x();
 
+        const auto redrag =
+            [this]()
+            {
+                const auto redragCallback = [this]() { dragProcessor()->redrag(); };
+                executeDelayedParented(redragCallback, kDefaultDelay, this);
+            };
+
         if (left < 0)
         {
             ensureWindowContains(valueFromPosition(QPointF(left, 0), false));
-            executeDelayed([this]() { dragProcessor()->redrag(); });
+            redrag();
         }
         else if (right > rect().right())
         {
             ensureWindowContains(valueFromPosition(QPointF(right, 0), false));
-            executeDelayed([this]() { dragProcessor()->redrag(); });
+            redrag();
         }
     }
 

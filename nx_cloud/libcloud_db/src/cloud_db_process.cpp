@@ -65,7 +65,6 @@ CloudDBProcess::CloudDBProcess(int argc, char **argv):
     m_argc(argc),
     m_argv(argv),
     m_terminated(false),
-    m_timerID(-1),
     m_settings(nullptr),
     m_dbManager(nullptr),
     m_timerManager(nullptr),
@@ -255,7 +254,7 @@ int CloudDBProcess::exec()
             &authenticationManager,
             &httpMessageDispatcher,
             false,  //TODO #ak enable ssl when it works properly
-            SocketFactory::NatTraversalType::nttDisabled );
+            nx::network::NatTraversalSupport::disabled );
 
         if (m_settings->auth().connectionInactivityPeriod.count())
         {
@@ -292,7 +291,7 @@ int CloudDBProcess::exec()
 
         // First of all, cancelling accepting new requests.
         multiAddressHttpServer.forEachListener(
-            [](nx_http::HttpStreamSocketServer* listener){ listener->pleaseStop(); });
+            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStop(); });
 
         ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
             systemManager.systemMarkedAsDeletedSubscription());

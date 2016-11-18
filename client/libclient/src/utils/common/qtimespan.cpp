@@ -2070,31 +2070,41 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
 */
 QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format, unitStringFunction unitStringConverter, QString unitsSeparator)
 {
-    /* Handle negative span value. */
-    if (d->interval < 0)
-    {
-        QTimeSpan positive = this->normalized();
-        return L'-' + positive.toApproximateString(suppresSecondUnitLimit, format,
-            unitStringConverter, unitsSeparator);
-    }
-
     if (format == Qt::NoUnit)
         return QString();
+
+    auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
+    {
+        if (unitStringConverter)
+            return unitStringConverter(unit, num);
+        return d->unitString(unit, num);
+    };
 
     Qt::TimeSpanUnit primairyUnit = magnitude();
     Qt::TimeSpanUnit smallest = smallestUnit(format);
 
+    /* Check scenario where magnitude in milliseconds and format in seconds. */
     if (primairyUnit < smallest)
+        return toUnitString(smallest, 0);
+
+    /* Handle negative span value. */
+    if (d->interval < 0)
     {
-        /* Check scenario where magnitude in milliseconds, and format in seconds. */
-        primairyUnit = smallest;
+        QTimeSpan positive = this->normalized();
+        QString positiveResult = positive.toApproximateString(suppresSecondUnitLimit, format,
+            unitStringConverter, unitsSeparator);
+
+        /* Handle error scenario or zero returned. */
+        if (positiveResult.isEmpty())
+            return positiveResult;
+
+        return L'-' + positiveResult;
     }
-    else
-    {
-        /* Check scenario where magnitude in seconds, and format in milliseconds. */
-        while (!format.testFlag(primairyUnit ) && primairyUnit > Qt::Milliseconds)
-            primairyUnit = prevUnit(primairyUnit);
-    }
+
+    /* Check scenario where magnitude in seconds, and format in milliseconds. */
+    while (!format.testFlag(primairyUnit) && primairyUnit > Qt::Milliseconds)
+        primairyUnit = prevUnit(primairyUnit);
+
     Q_ASSERT_X(format.testFlag(primairyUnit), Q_FUNC_INFO, "Invalid format");
     if (!format.testFlag(primairyUnit))
         return QString();
@@ -2137,12 +2147,7 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
     int secondairy = safeValue(secondairyUnit);
     Q_ASSERT_X(primairy != 0 || secondairy == 0, Q_FUNC_INFO, "Secondary without primary is an error");
 
-    auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
-    {
-        if (unitStringConverter)
-            return unitStringConverter(unit, num);
-        return d->unitString(unit, num);
-    };
+
 
     bool showSecondary = [=]()
     {

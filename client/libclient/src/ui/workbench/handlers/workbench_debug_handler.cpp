@@ -3,6 +3,8 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWebKitWidgets/QWebView>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -14,11 +16,18 @@
 #include <ui/dialogs/common/dialog.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/workaround/qtbug_workaround.h>
+
+#include <nx/client/ui/dialogs/debug/animations_control_dialog.h>
+#include <nx/client/ui/dialogs/debug/applauncher_control_dialog.h>
+
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
 //#endif
+
+namespace {
+
+
 
 // -------------------------------------------------------------------------- //
 // QnDebugControlDialog
@@ -32,10 +41,33 @@ public:
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
+        using namespace nx::client::ui::dialogs;
+
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
         layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
         layout->addWidget(newActionButton(QnActions::DebugShowResourcePoolAction));
+
+        {
+            auto button = new QPushButton(lit("Applaucher control"), parent);
+            connect(button, &QPushButton::clicked, this, [this]
+            {
+                auto dialog(new QnApplauncherControlDialog(mainWindow()));
+                dialog->show();
+            });
+            layout->addWidget(button);
+        }
+
+        {
+            auto button = new QPushButton(lit("Animations control"), parent);
+            connect(button, &QPushButton::clicked, this, [this]
+            {
+                auto dialog(new AnimationsControlDialog(mainWindow()));
+                dialog->show();
+            });
+            layout->addWidget(button);
+        }
+
         setLayout(layout);
     }
 
@@ -85,6 +117,8 @@ private:
 };
 
 
+} // namespace
+
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDebugHandler
 // -------------------------------------------------------------------------- //
@@ -116,6 +150,9 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
     qDebug() << qnRuntime->debugCounter();
+
+    at_debugControlPanelAction_triggered();
+    return;
 
     auto showPalette = [this]
     {

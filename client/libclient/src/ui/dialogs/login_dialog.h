@@ -7,7 +7,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <client/client_settings.h>
-#include <ui/dialogs/common/dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"
@@ -26,16 +26,16 @@ namespace Ui {
 class LoginDialog;
 }
 
-class QnLoginDialog: public QnDialog, public QnWorkbenchContextAware
+class QnLoginDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QnDialog base_type;
+    using base_type = QnButtonBoxDialog;
 public:
-    explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    explicit QnLoginDialog(QWidget *parent = NULL);
     virtual ~QnLoginDialog();
 
-    public slots:
+public slots:
     virtual void accept() override;
     virtual void reject() override;
 
@@ -44,6 +44,7 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void hideEvent(QHideEvent *event) override;
 
+private:
     /**
      * Reset connections model to its initial state. Select last used connection.
      */
@@ -59,7 +60,7 @@ protected:
      */
     void resetAutoFoundConnectionsModel();
 
-    private slots:
+private:
     void updateAcceptibility();
     void updateFocus();
     void updateUsability();
@@ -72,14 +73,12 @@ protected:
     void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
-private:
     QUrl currentUrl() const;
+    bool isValid() const;
 
-    QnLocalConnectionData gatherSystemConnectionData(const QUrl& url,
-        const QString& name,
-        bool savePassword);
+    QStandardItem* newConnectionItem(const QnConnectionData& connection);
 
-    QStandardItem* newConnectionItem(const QnLocalConnectionData& connection);
+    QModelIndex getModelIndexForName(const QString& name);
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;

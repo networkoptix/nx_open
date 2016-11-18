@@ -2,17 +2,20 @@
 
 #include <core/resource/resource.h>
 
-class QnWebPageResource: public QnResource {
+class QnWebPageResource: public QnResource
+{
     Q_OBJECT
-    typedef QnResource base_type;
+    using base_type = QnResource;
+
 public:
     QnWebPageResource();
-    QnWebPageResource(const QUrl &url);
+    QnWebPageResource(const QUrl& url);
 
     virtual ~QnWebPageResource();
 
     virtual QString getUniqueId() const override;
 
+    virtual void setUrl(const QString& url) override;
 };
 
 Q_DECLARE_METATYPE(QnWebPageResourcePtr)

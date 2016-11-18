@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, $sessionStorage) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, dialogs) {
         $scope.user = {
             isAdmin: true
         };
@@ -13,13 +13,10 @@ angular.module('webadminApp')
                 if(user === null){
                     return;
                 }
-                $scope.user = {
-                    isAdmin: user.isAdmin,
-                    name: user.name
-                };
+                $scope.user = user;
             },function(error){
                 if(error.status !== 401 && error.status !== 403) {
-                    alert(L.navigaion.cannotGetUser);
+                    dialogs.alert(L.navigaion.cannotGetUser);
                 }
             });
         });

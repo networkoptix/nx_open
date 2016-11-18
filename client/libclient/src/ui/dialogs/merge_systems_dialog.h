@@ -4,6 +4,7 @@
 #include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
+#include <utils/merge_systems_common.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -34,8 +35,13 @@ private slots:
     void at_testConnectionButton_clicked();
     void at_mergeButton_clicked();
 
-    void at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
-    void at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation);
+    void at_mergeTool_systemFound(
+        utils::MergeSystemsStatus::Value mergeStatus,
+        const QnModuleInformation& moduleInformation,
+        const QnMediaServerResourcePtr& discoverer);
+    void at_mergeTool_mergeFinished(
+        utils::MergeSystemsStatus::Value mergeStatus,
+        const QnModuleInformation& moduleInformation);
 
 private:
     void updateKnownSystems();

@@ -8,6 +8,34 @@ const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 namespace nx {
 namespace network {
 
+bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
+{
+    if (SocketGlobals::s_initState != InitState::done)
+        return false;
+
+    // Here 'static const' is an optimization as reload is called only on start.
+    static const auto disabledHostPatterns =
+        [this]()
+        {
+            std::list<QRegExp> regExps;
+            for (const auto& s: QString::fromUtf8(disableHosts).split(QChar(',')))
+            {
+                if (!s.isEmpty())
+                    regExps.push_back(QRegExp(s, Qt::CaseInsensitive, QRegExp::Wildcard));
+            }
+
+            return regExps;
+        }();
+
+    for (const auto& p: disabledHostPatterns)
+    {
+        if (p.exactMatch(host.toString()))
+            return true;
+    }
+
+    return false;
+}
+
 SocketGlobals::SocketGlobals():
     m_log(QnLog::logs()),
     m_mediatorConnector(new hpm::api::MediatorConnector),
@@ -46,10 +74,11 @@ SocketGlobals::~SocketGlobals()
 void SocketGlobals::init()
 {
     QnMutexLocker lock(&s_mutex);
-    if (++s_counter == 1) // first in
+    if (++s_counter == 1) //< First in.
     {
-        s_isInitialized = true; // allow creating Pollable(s) in constructor
+        s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals;
+        s_initState = InitState::done;
 
         lock.unlock();
         s_instance->setDebugConfigurationTimer();
@@ -59,18 +88,19 @@ void SocketGlobals::init()
 void SocketGlobals::deinit()
 {
     QnMutexLocker lock(&s_mutex);
-    if (--s_counter == 0) // last out
+    if (--s_counter == 0) //< Last out.
     {
         delete s_instance;
+        s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
         s_instance = nullptr;
-        s_isInitialized = false; // allow creating Pollable(s) in destructor
+        s_initState = InitState::none;
     }
 }
 
 void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
-        s_isInitialized,
+        s_initState != InitState::none,
         "SocketGlobals::InitGuard must be initialized before using Sockets");
 }
 
@@ -105,7 +135,7 @@ void SocketGlobals::setDebugConfigurationTimer()
 }
 
 QnMutex SocketGlobals::s_mutex;
-std::atomic<bool> SocketGlobals::s_isInitialized(false);
+std::atomic<SocketGlobals::InitState> SocketGlobals::s_initState(SocketGlobals::InitState::none);
 size_t SocketGlobals::s_counter(0);
 SocketGlobals* SocketGlobals::s_instance(nullptr);
 

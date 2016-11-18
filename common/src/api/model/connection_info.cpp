@@ -18,6 +18,11 @@ QnConnectionInfo::QnConnectionInfo():
 {
 }
 
+QnUuid QnConnectionInfo::serverId() const
+{
+    return QnUuid::fromStringSafe(ecsGuid);
+}
+
 QUrl QnConnectionInfo::effectiveUrl() const
 {
     if (!allowSslConnections)

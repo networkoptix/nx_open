@@ -154,12 +154,18 @@ QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    if (getUrl().isEmpty()) {
-        int postfixPos = url.indexOf(QLatin1Char('?'));
+    if (getUrl().isEmpty())
+    {
+        QString layoutUrl = url;
+        NX_ASSERT(url.startsWith(kLayoutProtocol));
+        if (layoutUrl.startsWith(kLayoutProtocol))
+            layoutUrl = layoutUrl.mid(kLayoutProtocol.length());
+
+        int postfixPos = layoutUrl.indexOf(L'?');
         if (postfixPos == -1)
-            setUrl(url);
+            setUrl(layoutUrl);
         else
-            setUrl(url.left(postfixPos));
+            setUrl(layoutUrl.left(postfixPos));
     }
 
 #ifdef _DEBUG
@@ -340,7 +346,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
     return 0; // not implemented
 }
 
-Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate() 
+Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
 {
     QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp")
         + QString::number(nx::utils::random::number<uint>());
@@ -478,6 +484,8 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
 
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
+    NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
+
     setId(QnUuid::createUuid());
     QnStorageResource::setUrl(value);
     if (value.endsWith(QLatin1String(".exe")) || value.endsWith(QLatin1String(".exe.tmp")))

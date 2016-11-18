@@ -1,4 +1,3 @@
-
 #include "peer_registrator.h"
 
 #include <functional>
@@ -9,7 +8,7 @@
 #include <nx/network/stun/cc/custom_stun.h>
 
 #include "listening_peer_pool.h"
-
+#include "data/listening_peer.h"
 
 namespace nx {
 namespace hpm {
@@ -77,6 +76,27 @@ PeerRegistrator::PeerRegistrator(
 
     // TODO: NX_LOG
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
+}
+
+data::ListeningPeers PeerRegistrator::getListeningPeers() const
+{
+    data::ListeningPeers result;
+    result.systems = m_listeningPeerPool->getListeningPeers();
+
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& client: m_boundClients)
+    {
+        data::BoundClient info;
+        if (const auto connetion = client.second.connection.lock())
+            info.connectionEndpoint = connetion->getSourceAddress().toString();
+
+        for (const auto& endpoint: client.second.tcpReverseEndpoints)
+            info.tcpReverseEndpoints.push_back(endpoint.toString());
+
+        result.clients.emplace(QString::fromUtf8(client.first), std::move(info));
+    }
+
+    return result;
 }
 
 void PeerRegistrator::bind(

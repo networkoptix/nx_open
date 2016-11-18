@@ -58,7 +58,7 @@ api::ResultCode Ec2MserverCloudSynchronization::setOwnerAccountCredentials(
     const auto resultCode = m_cdb.getAccount(email, password, &m_account);
     if (resultCode != api::ResultCode::ok)
         return resultCode;
-    m_accountPassword = password;
+    m_account.password = password;
     return api::ResultCode::ok;
 }
 
@@ -66,7 +66,7 @@ api::ResultCode Ec2MserverCloudSynchronization::bindSystemToOwnerAccount()
 {
     // Adding system1 to account1.
     api::ResultCode result = m_cdb.bindRandomSystem(
-        m_account.email, m_accountPassword, &m_system);
+        m_account.email, m_account.password, &m_system);
     if (result != api::ResultCode::ok)
         return result;
 
@@ -79,7 +79,7 @@ api::ResultCode Ec2MserverCloudSynchronization::registerAccountAndBindSystemToIt
     api::ResultCode result = api::ResultCode::ok;
     if (m_account.email.empty())    //< Account is not registered yet
     {
-        result = m_cdb.addActivatedAccount(&m_account, &m_accountPassword);
+        result = m_cdb.addActivatedAccount(&m_account, &m_account.password);
         if (result != api::ResultCode::ok)
             return result;
     }
@@ -90,7 +90,7 @@ api::ResultCode Ec2MserverCloudSynchronization::registerAccountAndBindSystemToIt
 
 api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
 {
-    api::ResultCode result = m_cdb.unbindSystem(m_account.email, m_accountPassword, m_system.id);
+    api::ResultCode result = m_cdb.unbindSystem(m_account.email, m_account.password, m_system.id);
     if (result != api::ResultCode::ok)
         return result;
 
@@ -185,14 +185,9 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
     return api::ResultCode::ok;
 }
 
-const api::AccountData& Ec2MserverCloudSynchronization::ownerAccount() const
+const AccountWithPassword& Ec2MserverCloudSynchronization::ownerAccount() const
 {
     return m_account;
-}
-
-const std::string& Ec2MserverCloudSynchronization::ownerAccountPassword() const
-{
-    return m_accountPassword;
 }
 
 const api::SystemData& Ec2MserverCloudSynchronization::registeredSystemData() const
@@ -206,6 +201,16 @@ QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
     url.setUserName(QString::fromStdString(m_system.id));
     url.setPassword(QString::fromStdString(m_system.authKey));
     return url;
+}
+
+void Ec2MserverCloudSynchronization::establishConnectionBetweenVmsAndCloud()
+{
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+}
+
+void Ec2MserverCloudSynchronization::breakConnectionBetweenVmsAndCloud()
+{
+    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
 }
 
 void Ec2MserverCloudSynchronization::verifyTransactionConnection()
@@ -223,9 +228,9 @@ void Ec2MserverCloudSynchronization::verifyTransactionConnection()
             vmsConnections.connections.cbegin(),
             vmsConnections.connections.cend(),
             [systemId = registeredSystemData().id](const api::VmsConnectionData& data)
-        {
-            return data.systemId == systemId;
-        });
+            {
+                return data.systemId == systemId;
+            });
         if (connectionIt != vmsConnections.connections.cend())
             return; //< Connection has been found
 
@@ -266,14 +271,14 @@ void Ec2MserverCloudSynchronization::testSynchronizingUserFromCloudToMediaServer
         cdb()->addActivatedAccount(&account2, &account2Password));
 
     api::SystemSharingEx sharingData;
-    sharingData.systemID = registeredSystemData().id;
+    sharingData.systemId = registeredSystemData().id;
     sharingData.accountEmail = account2.email;
     sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
-    sharingData.groupID = "test_group";
+    sharingData.groupId = "test_group";
     sharingData.accountFullName = account2.fullName;
     ASSERT_EQ(
         api::ResultCode::ok,
-        cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharingData));
+        cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharingData));
 
     // Waiting for new cloud user to arrive to local system.
     constexpr const auto maxTimetoWait = std::chrono::seconds(10);
@@ -344,7 +349,7 @@ void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
             api::ResultCode::ok,
             cdb()->getSystemSharings(
                 ownerAccount().email,
-                ownerAccountPassword(),
+                ownerAccount().password,
                 registeredSystemData().id,
                 &systemUsers));
 
@@ -356,7 +361,7 @@ void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
                 // TODO: Validating data
                 ASSERT_EQ(accountVmsData.isEnabled, user.isEnabled);
                 ASSERT_EQ(accountVmsData.id.toSimpleString().toStdString(), user.vmsUserId);
-                ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupID);
+                ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupId);
                 //ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
                 //ASSERT_EQ(accountVmsData.fullName.toStdString(), user.accountFullName);
                 ASSERT_EQ(
@@ -389,7 +394,7 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearFromCloud(const std::
             api::ResultCode::ok,
             cdb()->getSystemSharings(
                 ownerAccount().email,
-                ownerAccountPassword(),
+                ownerAccount().password,
                 registeredSystemData().id,
                 &systemUsers));
 
@@ -493,12 +498,15 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     if (assertOnUserAbsense)
     {
         ASSERT_TRUE(fullNameIter != kvPairs.cend());
+        ASSERT_EQ(sharingData.accountFullName, fullNameIter->value.toStdString());
     }
-    else if (fullNameIter == kvPairs.cend())
+    else
     {
-        return;
+        if (fullNameIter == kvPairs.cend())
+            return;
+        if (sharingData.accountFullName != fullNameIter->value.toStdString())
+            return;
     }
-    ASSERT_EQ(sharingData.accountFullName, fullNameIter->value.toStdString());
 
     // TODO: #ak verify permissions
     if (found)
@@ -512,7 +520,7 @@ void Ec2MserverCloudSynchronization::fetchOwnerSharing(api::SystemSharingEx* con
         api::ResultCode::ok,
         cdb()->getSystemSharings(
             ownerAccount().email,
-            ownerAccountPassword(),
+            ownerAccount().password,
             registeredSystemData().id,
             &systemUsers));
     for (auto& sharingData: systemUsers)
@@ -547,7 +555,7 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
         api::ResultCode::ok,
         cdb()->getSystemSharings(
             ownerAccount().email,
-            ownerAccountPassword(),
+            ownerAccount().password,
             registeredSystemData().id,
             &sharings));
 
@@ -589,7 +597,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
         api::ResultCode::ok,
         cdb()->getSystem(
             ownerAccount().email,
-            ownerAccountPassword(),
+            ownerAccount().password,
             registeredSystemData().id,
             &systemData));
 
@@ -696,8 +704,8 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    const QUrl url(lm("http://%1/%2?systemID=%3")
-        .str(cdb()->endpoint()).arg("cdb/maintenance/get_transaction_log")
+    const QUrl url(lm("http://%1/%2?systemId=%3")
+        .str(cdb()->endpoint()).arg("cdb/maintenance/getTransactionLog")
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }

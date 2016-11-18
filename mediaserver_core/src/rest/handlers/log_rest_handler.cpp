@@ -6,6 +6,9 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include <nx/utils/log/log.h>
+#include <nx/network/http/httptypes.h>
+#include <rest/server/rest_connection_processor.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include <media_server/serverutil.h>
 
@@ -20,9 +23,16 @@ int QnLogRestHandler::executeGet(
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& contentType,
-    const QnRestConnectionProcessor*)
+    const QnRestConnectionProcessor* processor)
 {
     Q_UNUSED(path);
+
+    if (!qnResourceAccessManager->hasGlobalPermission(
+            processor->accessRights(),
+            Qn::GlobalPermission::GlobalAdminPermission))
+    {
+        return nx_http::StatusCode::forbidden;
+    }
 
     qint64 linesToRead = 100;
     for (int i = 0; i < params.size(); ++i)

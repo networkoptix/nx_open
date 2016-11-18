@@ -73,6 +73,41 @@ QnUserRolesModelPrivate::QnUserRolesModelPrivate(
     }
 }
 
+int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
+{
+    /* Rows order: standard, user-defined, custom. */
+
+    int defaultRow = m_customRoleEnabled
+        ? count() - 1
+        : -1;
+
+    auto role = user->role();
+    switch (role)
+    {
+        case Qn::UserRole::CustomUserGroup:
+        {
+            auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
+                [roleId = user->userGroup()](const ec2::ApiUserGroupData& role)
+                {
+                    return role.id == roleId;
+                });
+
+            if (roleIterator == m_userRoles.end())
+                return defaultRow;
+
+            return std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
+        }
+
+        case Qn::UserRole::CustomPermissions:
+            return defaultRow;
+
+        default:
+            break;
+    }
+
+    return m_standardRoles.indexOf(role);
+}
+
 void QnUserRolesModelPrivate::setUserRoles(ec2::ApiUserGroupDataList value)
 {
     std::sort(value.begin(), value.end(), lessRoleByName);
@@ -185,9 +220,9 @@ bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
     if (roleIterator == m_userRoles.end())
         return false;
 
-    Q_Q(QnUserRolesModel);
     int row = std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
 
+    Q_Q(QnUserRolesModel);
     QnUserRolesModel::ScopedRemoveRows removeRows(q, QModelIndex(), row, row);
     m_userRoles.erase(roleIterator);
     return true;
@@ -213,7 +248,14 @@ RoleDescription QnUserRolesModelPrivate::roleByRow(int row) const
 
     NX_ASSERT(m_customRoleEnabled);
     if (m_customRoleEnabled)
-        return RoleDescription(Qn::UserRole::CustomPermissions);
+    {
+        auto result = RoleDescription(Qn::UserRole::CustomPermissions);
+        if (!m_customRoleName.isEmpty())
+            result.name = m_customRoleName;
+        if (!m_customRoleDescription.isEmpty())
+            result.description = m_customRoleDescription;
+        return result;
+    }
 
     return RoleDescription();
 }
@@ -226,3 +268,18 @@ int QnUserRolesModelPrivate::count() const
     return total;
 }
 
+void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QString& description)
+{
+    if (m_customRoleName == name && m_customRoleDescription == description)
+        return;
+
+    m_customRoleName = name;
+    m_customRoleDescription = description;
+
+    if (!m_customRoleEnabled)
+        return;
+
+    Q_Q(QnUserRolesModel);
+    QModelIndex customRoleIndex = q->index(count() - 1, 0);
+    emit q->dataChanged(customRoleIndex, customRoleIndex);
+}

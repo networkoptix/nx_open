@@ -9,6 +9,9 @@ username=%(username)s
 password=%(password)s
 testCaseSize=10
 #
+[Nat]
+serverList=%(natTestServerList)s
+#
 [Rtsp]
 # comma separated list, number of threads for each server from serverList:
 threadNumbers=100
@@ -35,6 +38,7 @@ archiveStreamRate=1M
 # Percentage of live data requests in the test (the other part is archive data)
 # A whole number from 0 to 100 (0 means only archive, 100 -- only live), default is 50
 liveDataPart=30
+#
 [PerfTest]
 # This value means how many operations will be issued AT MOST in one seconds, the bigger the more
 frequency=100

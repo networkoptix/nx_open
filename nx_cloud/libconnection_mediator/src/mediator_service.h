@@ -1,10 +1,4 @@
-/**********************************************************
-* 27 aug 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef HOLE_PUNCHER_SERVICE_H
-#define HOLE_PUNCHER_SERVICE_H
+#pragma once
 
 #include <memory>
 
@@ -18,20 +12,13 @@
 
 #include <utils/common/stoppable.h>
 
-
-namespace nx_http {
-    class HttpStreamSocketServer;
-    class MessageDispatcher;
-}   // namespace nx_http
+namespace nx_http { class HttpStreamSocketServer; }
+namespace nx_http { class MessageDispatcher; }
+namespace nx { namespace hpm { class PeerRegistrator; } }
+namespace nx { namespace hpm { namespace conf { class Settings; } } }
 
 namespace nx {
 namespace hpm {
-
-class ListeningPeerPool;
-
-namespace conf {
-    class Settings;
-}   // namespace conf
 
 class MediatorProcess
 :
@@ -66,7 +53,7 @@ private:
     int printHelp();
     bool launchHttpServerIfNeeded(
         const conf::Settings& settings,
-        const ListeningPeerPool& listeningPeerPool,
+        const PeerRegistrator& peerRegistrator,
         std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
         std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
             multiAddressHttpServer);
@@ -74,5 +61,3 @@ private:
 
 } // namespace hpm
 } // namespace nx
-
-#endif  //HOLE_PUNCHER_SERVICE_H

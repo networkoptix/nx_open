@@ -36,6 +36,12 @@ enum class TransportProtocol
     udt
 };
 
+enum class NatTraversalSupport
+{
+    disabled,
+    enabled,
+};
+
 static const size_t kUDPHeaderSize = 8;
 static const size_t kIPHeaderSize = 20;
 static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
@@ -57,13 +63,6 @@ public:
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
 
-    bool isResolved() const;
-    bool isLocal() const;
-
-    /**
-     * WARNING: There is a logical bug in here:
-     *  "!(a > b) && !(a < b)" does not mean "a == b"
-     */
     bool operator==(const HostAddress& right) const;
     bool operator!=(const HostAddress& right) const;
     bool operator<(const HostAddress& right) const;
@@ -72,10 +71,13 @@ public:
     const QString& toString() const;
 
     /** IP v4 if address is v4 or v6 which can be converted to v4 */
-    const boost::optional<in_addr>& ipV4() const;
+    boost::optional<in_addr> ipV4() const;
 
     /** IP v6 if address is v6 or v4 converted to v6 */
-    const boost::optional<in6_addr>& ipV6() const;
+    boost::optional<in6_addr> ipV6() const;
+
+    bool isLocal() const;
+    bool isIpAddress() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
@@ -91,11 +93,8 @@ public:
 
 private:
     mutable boost::optional<QString> m_string;
-    mutable boost::optional<in_addr> m_ipV4;
-    mutable boost::optional<in6_addr> m_ipV6;
-
-    // TODO: use IpAddress instead
-    friend class nx::network::DnsResolver;
+    boost::optional<in_addr> m_ipV4;
+    boost::optional<in6_addr> m_ipV6;
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)
@@ -120,6 +119,7 @@ public:
     bool isNull() const;
 
     static const SocketAddress anyAddress;
+    static const SocketAddress anyPrivateAddress;
     static QString trimIpV6(const QString& ip);
 };
 

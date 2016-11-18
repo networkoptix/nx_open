@@ -10,7 +10,6 @@
 #include <context/context_settings.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
-#include <ui/models/recent_local_connections_model.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
@@ -19,6 +18,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
+#include <helpers/nx_globals_object.h>
 
 using namespace nx::vms::utils;
 
@@ -30,6 +30,7 @@ const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
+    m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this)),
@@ -147,49 +148,24 @@ void QnContext::removeSavedConnection(const QString& systemName)
     qnClientCoreSettings->save();
 }
 
-void QnContext::setLastUsedConnection(const QString& systemId, const QUrl& url)
-{
-    qnSettings->setLastUsedSystemId(systemId);
-    QUrl clearedUrl = url;
-    clearedUrl.setPassword(QString());
-    qnSettings->setLastUsedUrl(clearedUrl);
-}
-
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedSystemId(QString());
-    qnSettings->setLastUsedUrl(QUrl());
+    qnSettings->setLastUsedConnection(QnLocalConnectionData());
 }
 
-QString QnContext::getLastUsedSystemId() const
+QString QnContext::getLastUsedSystemName() const
 {
-    return qnSettings->lastUsedSystemId();
+    return qnSettings->lastUsedConnection().systemName;
 }
 
-QString QnContext::getLastUsedUrl() const
+QUrl QnContext::getLastUsedUrl() const
 {
-    QUrl url = qnSettings->lastUsedUrl();
+    return qnSettings->lastUsedConnection().urlWithPassword();
+}
 
-    if (!url.isValid() || url.userName().isEmpty())
-        return QString();
-
-    if (url.password().isEmpty())
-    {
-        QnRecentLocalConnectionsModel connectionsModel;
-        connectionsModel.setSystemId(getLastUsedSystemId());
-        if (!connectionsModel.hasConnections())
-            return QString();
-
-        const auto firstIndex = connectionsModel.index(0);
-        const auto password = connectionsModel.data(
-            firstIndex, QnRecentLocalConnectionsModel::PasswordRole).toString();
-        if (password.isEmpty())
-            return QString();
-
-        url.setPassword(password);
-    }
-
-    return url.toString();
+QUrl QnContext::getInitialUrl() const
+{
+    return qnSettings->startupParameters().url;
 }
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)
@@ -197,7 +173,7 @@ void QnContext::setCloudCredentials(const QString& login, const QString& passwor
     //TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCloudCredentials(QnCredentials(login, password));
+    cloudStatusWatcher()->setCredentials(QnCredentials(login, password));
     qnClientCoreSettings->save();
 }
 

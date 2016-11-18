@@ -102,7 +102,7 @@ QString QnAppInfo::productName()
 #ifdef _WIN32
     return QStringLiteral("${product.name}");
 #else
-    return QStringLiteral("${namespace.additional}");
+    return QStringLiteral("${product.appName}");
 #endif
 }
 

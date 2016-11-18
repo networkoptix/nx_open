@@ -180,7 +180,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    m_resetDefaultsButton = new QPushButton(tr("Reset Default Rules"));
+    m_resetDefaultsButton = new QPushButton(tr("Restore all Rules to Default"));
     m_resetDefaultsButton->setEnabled(false);
     ui->buttonBox->addButton(m_resetDefaultsButton, QDialogButtonBox::ResetRole);
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);
@@ -235,12 +235,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->clearSelection();
     ui->tableView->horizontalHeader()->setSortIndicator(kSortColumn, Qt::AscendingOrder);
 
-    // TODO: #Elric replace with a single connect call
-    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    ui->tableView->viewport()->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, &QnAbstractEventSignalizer::activated, this, &QnBusinessRulesDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
-
+    installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
+        &QnBusinessRulesDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
 
     //TODO: #GDM #Business show description label if no rules are loaded
 

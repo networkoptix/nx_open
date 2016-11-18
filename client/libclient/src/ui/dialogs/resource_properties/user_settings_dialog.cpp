@@ -60,17 +60,17 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
         [this](const QnResourceAccessSubject& subject)
         {
             if (m_user && subject.user() == m_user)
-                permissionsChanged();
+                updatePermissions();
         });
 
     connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::permissionsChanged);
+        &QnUserSettingsDialog::updatePermissions);
     connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::permissionsChanged);
+        &QnUserSettingsDialog::updatePermissions);
     connect(m_camerasPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::permissionsChanged);
+        &QnUserSettingsDialog::updatePermissions);
     connect(m_layoutsPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::permissionsChanged);
+        &QnUserSettingsDialog::updatePermissions);
 
     connect(m_settingsPage,     &QnUserSettingsWidget::userTypeChanged,          this,
         [this](bool isCloud)
@@ -138,7 +138,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 
-    permissionsChanged();
+    updatePermissions();
 }
 
 QnUserSettingsDialog::~QnUserSettingsDialog()
@@ -150,21 +150,30 @@ QnUserResourcePtr QnUserSettingsDialog::user() const
     return m_user;
 }
 
-void QnUserSettingsDialog::permissionsChanged()
+void QnUserSettingsDialog::updatePermissions()
 {
     updateControlsVisibility();
 
-    auto descriptionHtml = [](QnResourceAccessFilter::Filter filter, bool all, const std::pair<int, int>& counts)
-    {
-        QString name = kCategoryNameByFilter[filter];
-        if (all)
-            return lit("<td colspan=2><b>%1 %2</b></td>").arg(tr("All")).arg(name);
+    auto descriptionHtml =
+        [](QnResourceAccessFilter::Filter filter, bool all, const std::pair<int, int>& counts)
+        {
+            static const QString kHtmlRowTemplate1 =
+                lit("<td><b>%1</b></td><td width=16/><td>%2</td>");
+            static const QString kHtmlRowTemplate2 =
+                lit("<td><b>%1</b> / %2</td><td width=16/><td>%3</td>");
 
-        if (counts.second < 0)
-            return lit("<td><b>%1&nbsp;</b></td><td>%2</td>").arg(counts.first).arg(name);
+            QString name = kCategoryNameByFilter[filter];
+            if (all)
+            {
+                //: This will be a part of "All Cameras & Resources" or "All Shared Layouts"
+                return kHtmlRowTemplate1.arg(tr("All")).arg(name);
+            }
 
-        return lit("<td><b>%1</b> / %2&nbsp;</td><td>%3</td>").arg(counts.first).arg(counts.second).arg(name);
-    };
+            if (counts.second < 0)
+                return kHtmlRowTemplate1.arg(counts.first).arg(name);
+
+            return kHtmlRowTemplate2.arg(counts.first).arg(counts.second).arg(name);
+        };
 
     auto descriptionById =
         [this, descriptionHtml](QnResourceAccessFilter::Filter filter,
@@ -240,6 +249,8 @@ void QnUserSettingsDialog::permissionsChanged()
 
         m_settingsPage->updatePermissionsLabel(permissionsText);
     }
+
+    m_model->updatePermissions();
 }
 
 void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
@@ -264,8 +275,14 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
+    forcedUpdate();
+}
+
+void QnUserSettingsDialog::forcedUpdate()
+{
     loadDataToUi();
-    permissionsChanged();
+    updatePermissions();
+    updateButtonBox();
 }
 
 QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
@@ -356,14 +373,7 @@ void QnUserSettingsDialog::applyChanges()
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         setUser(QnUserResourcePtr());
 
-    updateButtonBox();
-    loadDataToUi();
-}
-
-void QnUserSettingsDialog::showEvent(QShowEvent* event)
-{
-    loadDataToUi();
-    base_type::showEvent(event);
+    forcedUpdate();
 }
 
 void QnUserSettingsDialog::applyChangesInternal()

@@ -427,7 +427,7 @@ api::ResultCode CdbLauncher::bindRandomSystem(
 api::ResultCode CdbLauncher::unbindSystem(
     const std::string& login,
     const std::string& password,
-    const std::string& systemID)
+    const std::string& systemId)
 {
     auto connection = connectionFactory()->createConnection();
     connection->setCredentials(login, password);
@@ -439,7 +439,7 @@ api::ResultCode CdbLauncher::unbindSystem(
             std::bind(
                 &nx::cdb::api::SystemManager::unbindSystem,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
 
     return resCode;
@@ -469,7 +469,7 @@ api::ResultCode CdbLauncher::getSystems(
 api::ResultCode CdbLauncher::getSystem(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     std::vector<api::SystemDataEx>* const systems)
 {
     auto connection = connectionFactory()->createConnection();
@@ -482,7 +482,7 @@ api::ResultCode CdbLauncher::getSystem(
             std::bind(
                 &nx::cdb::api::SystemManager::getSystem,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
     *systems = std::move(systemDataList.systems);
 
@@ -492,11 +492,11 @@ api::ResultCode CdbLauncher::getSystem(
 api::ResultCode CdbLauncher::getSystem(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     api::SystemDataEx* const system)
 {
     std::vector<api::SystemDataEx> systems;
-    const auto res = getSystem(email, password, systemID, &systems);
+    const auto res = getSystem(email, password, systemId, &systems);
     if (res != api::ResultCode::ok)
         return res;
 
@@ -529,7 +529,7 @@ api::ResultCode CdbLauncher::shareSystem(
 api::ResultCode CdbLauncher::shareSystem(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
@@ -538,7 +538,7 @@ api::ResultCode CdbLauncher::shareSystem(
 
     api::SystemSharing systemSharing;
     systemSharing.accountEmail = accountEmail;
-    systemSharing.systemID = systemID;
+    systemSharing.systemId = systemId;
     systemSharing.accessRole = accessRole;
 
     return shareSystem(email, password, std::move(systemSharing));
@@ -547,7 +547,7 @@ api::ResultCode CdbLauncher::shareSystem(
 api::ResultCode CdbLauncher::updateSystemSharing(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
@@ -556,7 +556,7 @@ api::ResultCode CdbLauncher::updateSystemSharing(
 
     api::SystemSharing systemSharing;
     systemSharing.accountEmail = accountEmail;
-    systemSharing.systemID = systemID;
+    systemSharing.systemId = systemId;
     systemSharing.accessRole = newAccessRole;
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -574,13 +574,13 @@ api::ResultCode CdbLauncher::updateSystemSharing(
 api::ResultCode CdbLauncher::removeSystemSharing(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& accountEmail)
 {
     return updateSystemSharing(
         email,
         password,
-        systemID,
+        systemId,
         accountEmail,
         api::SystemAccessRole::none);
 }
@@ -613,7 +613,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
 api::ResultCode CdbLauncher::getAccessRoleList(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     std::set<api::SystemAccessRole>* const accessRoles)
 {
     auto connection = connectionFactory()->createConnection();
@@ -626,7 +626,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
             std::bind(
                 &nx::cdb::api::SystemManager::getAccessRoleList,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
 
     for (const auto& accessRoleData : accessRoleList.accessRoles)
@@ -637,7 +637,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
 api::ResultCode CdbLauncher::renameSystem(
     const std::string& login,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& newSystemName)
 {
     auto connection = connectionFactory()->createConnection();
@@ -649,7 +649,7 @@ api::ResultCode CdbLauncher::renameSystem(
             std::bind(
                 &nx::cdb::api::SystemManager::rename,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 newSystemName,
                 std::placeholders::_1));
     return resCode;
@@ -676,7 +676,7 @@ api::ResultCode CdbLauncher::updateSystem(
 api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     std::vector<api::SystemSharingEx>* const sharings)
 {
     typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
@@ -693,7 +693,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
                 static_cast<GetCloudUsersOfSystemType>(
                     &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
 
     *sharings = std::move(data.sharing);
@@ -701,7 +701,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
 }
 
 api::ResultCode CdbLauncher::getCdbNonce(
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& authKey,
     api::NonceData* const nonceData)
 {
@@ -709,7 +709,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
         (std::function<void(api::ResultCode, api::NonceData)>);
 
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
+    connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *nonceData) =
@@ -724,7 +724,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
 api::ResultCode CdbLauncher::getCdbNonce(
     const std::string& accountEmail,
     const std::string& accountPassword,
-    const std::string& systemID,
+    const std::string& systemId,
     api::NonceData* const nonceData)
 {
     typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
@@ -739,17 +739,17 @@ api::ResultCode CdbLauncher::getCdbNonce(
             std::bind(
                 static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
                 connection->authProvider(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
     return resCode;
 }
 
 api::ResultCode CdbLauncher::ping(
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& authKey)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
+    connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
     nx::cdb::api::ModuleInfo cloudModuleInfo;
@@ -765,13 +765,13 @@ api::ResultCode CdbLauncher::ping(
 const api::SystemSharingEx& CdbLauncher::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const std::string& systemID) const
+    const std::string& systemId) const
 {
     static const api::SystemSharingEx kDummySharing;
 
     for (const auto& sharing : sharings)
     {
-        if (sharing.accountEmail == accountEmail && sharing.systemID == systemID)
+        if (sharing.accountEmail == accountEmail && sharing.systemId == systemId)
             return sharing;
     }
 
@@ -781,9 +781,9 @@ const api::SystemSharingEx& CdbLauncher::findSharing(
 api::SystemAccessRole CdbLauncher::accountAccessRoleForSystem(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const std::string& systemID) const
+    const std::string& systemId) const
 {
-    return findSharing(sharings, accountEmail, systemID).accessRole;
+    return findSharing(sharings, accountEmail, systemId).accessRole;
 }
 
 api::ResultCode CdbLauncher::fetchSystemData(
@@ -812,7 +812,7 @@ api::ResultCode CdbLauncher::recordUserSessionStart(
     const std::string& systemId)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(account.data.email, account.password);
+    connection->setCredentials(account.email, account.password);
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode) =

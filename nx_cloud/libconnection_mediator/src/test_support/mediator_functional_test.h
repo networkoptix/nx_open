@@ -61,7 +61,7 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count, bool bindEndpoint = true);
 
-    std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
+    std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         getListeningPeers() const;
 
 private:

@@ -9,7 +9,10 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/camera_resource_stub.h>
 
 #include <nx/fusion/model_functions.h>
@@ -221,6 +224,17 @@ TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
     checkPermissions(layout, desired, forbidden);
 }
 
+TEST_F(QnResourceAccessManagerTest, checkLockedChanged)
+{
+    loginAs(Qn::NoGlobalPermissions);
+    auto user = m_currentUser;
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+    layout->setLocked(true);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+}
+
 /************************************************************************/
 /* Checking non-own remote layouts                                      */
 /************************************************************************/
@@ -321,6 +335,84 @@ TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsAdmin)
     checkPermissions(layout, desired, forbidden);
 }
 
+/** Check permissions for new shared layout when the user is logged in as admin. */
+TEST_F(QnResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto owner = createUser(Qn::GlobalAdminPermission);
+    owner->setOwner(true);
+    qnResPool->addResource(owner);
+
+    auto layout = createLayout(Qn::remote, false, owner->getId());
+    qnResPool->addResource(layout);
+
+    /* Admin cannot modify owner's layout. */
+    Qn::Permissions desired = Qn::ModifyLayoutPermission;
+    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::SavePermission;
+    checkPermissions(layout, desired, forbidden);
+
+    layout->setParentId(QnUuid());
+
+    /* Admin has full access to shared layouts. */
+    checkPermissions(layout, Qn::FullLayoutPermissions, 0);
+}
+
+TEST_F(QnResourceAccessManagerTest, checkParentChanged)
+{
+    loginAs(Qn::NoGlobalPermissions);
+    auto user = m_currentUser;
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+    layout->setParentId(QnUuid());
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission));
+}
+
+/************************************************************************/
+/* Checking videowall-based layouts                                     */
+/************************************************************************/
+/** Admin can do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Videowall-controller can do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Viewer can't do anything with layout on videowall. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
+{
+    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
+    checkPermissions(layout, desired, forbidden);
+}
+
 /************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/
@@ -337,6 +429,15 @@ TEST_F(QnResourceAccessManagerTest, checkUsedEditHimself)
     checkPermissions(m_currentUser, desired, forbidden);
 }
 
+TEST_F(QnResourceAccessManagerTest, checkEditDisabledAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+    auto user = m_currentUser;
+    auto otherAdmin = createUser(Qn::GlobalAdminPermission);
+    otherAdmin->setEnabled(false);
+    qnResPool->addResource(otherAdmin);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
+}
 
 /************************************************************************/
 /* Checking cameras access rights                                       */
@@ -378,6 +479,7 @@ TEST_F(QnResourceAccessManagerTest, checkUserGroupChange)
 
     user->setUserGroup(role.id);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
@@ -386,9 +488,11 @@ TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     user->setEnabled(false);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
@@ -401,11 +505,13 @@ TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
 
     user->setUserGroup(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     role.permissions = Qn::GlobalAccessAllMediaPermission;
     qnUserRolesManager->addOrUpdateUserRole(role);
 
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkEditAccessChange)
@@ -429,28 +535,180 @@ TEST_F(QnResourceAccessManagerTest, checkRoleRemoved)
 
     user->setUserGroup(role.id);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 
     qnUserRolesManager->removeUserRole(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_F(QnResourceAccessManagerTest, checkParentChanged)
+TEST_F(QnResourceAccessManagerTest, checkCameraOnVideoWall)
 {
-    loginAs(Qn::NoGlobalPermissions);
-    auto user = m_currentUser;
-    auto layout = createLayout(Qn::remote);
+    loginAs(Qn::GlobalAdminPermission);
+    auto target = addCamera();
+    auto videoWall = addVideoWall();
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto layout = createLayout(Qn::remote, false, videoWall->getId());
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    item.resource.uniqueId = target->getUniqueId();
+    layout->addItem(item);
+    qnResPool->markLayoutAutoGenerated(layout);
     qnResPool->addResource(layout);
-    layout->setParentId(QnUuid());
-    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_F(QnResourceAccessManagerTest, checkLockedChanged)
+/************************************************************************/
+/* Checking servers access rights                                       */
+/************************************************************************/
+
+/* Admin must have full permissions for servers. */
+TEST_F(QnResourceAccessManagerTest, checkServerAsAdmin)
 {
-    loginAs(Qn::NoGlobalPermissions);
-    auto user = m_currentUser;
-    auto layout = createLayout(Qn::remote);
-    qnResPool->addResource(layout);
-    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
-    layout->setLocked(true);
-    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+    loginAsOwner();
+
+    auto server = addServer();
+
+    Qn::Permissions desired = Qn::FullServerPermissions;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(server, desired, forbidden);
 }
+
+/* All users has read-only access to server by default. */
+TEST_F(QnResourceAccessManagerTest, checkServerAsViewer)
+{
+    loginAs(Qn::GlobalCustomUserPermission);
+
+    auto server = addServer();
+
+    Qn::Permissions desired = Qn::ReadPermission;
+    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    forbidden &= ~desired;
+
+    checkPermissions(server, desired, forbidden);
+}
+
+/* User can view health monitor if server is shared to him. */
+TEST_F(QnResourceAccessManagerTest, checkAccessibleServerAsViewer)
+{
+    loginAs(Qn::GlobalLiveViewerPermissionSet);
+
+    auto server = addServer();
+
+    Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
+    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    forbidden &= ~desired;
+
+    checkPermissions(server, desired, forbidden);
+}
+
+/************************************************************************/
+/* Checking storages access rights                                       */
+/************************************************************************/
+
+/* Admin must have full permissions for storages. */
+TEST_F(QnResourceAccessManagerTest, checkStoragesAsAdmin)
+{
+    loginAsOwner();
+
+    auto server = addServer();
+    auto storage = addStorage(server);
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(storage, desired, forbidden);
+}
+
+/* Non-admin users should not have access to storages. */
+TEST_F(QnResourceAccessManagerTest, checkStoragesAsCustom)
+{
+    loginAs(Qn::GlobalCustomUserPermission);
+
+    auto server = addServer();
+    auto storage = addStorage(server);
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+
+    /* We do have access to server. */
+    checkPermissions(server, Qn::ReadPermission, 0);
+
+    /* But no access to its storages. */
+    checkPermissions(storage, desired, forbidden);
+}
+
+/************************************************************************/
+/* Checking videowall access rights                                     */
+/************************************************************************/
+
+/* Admin must have full permissions for videowalls. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsAdmin)
+{
+    loginAsOwner();
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = 0;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+/* Check admin permissions for videowalls in safe mode. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsAdminInSafeMode)
+{
+    loginAsOwner();
+    qnCommon->setReadOnly(true);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadPermission | Qn::WritePermission;
+    Qn::Permissions forbidden = Qn::SavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+
+/* Videowall control user must have almost full permissions for videowalls. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsController)
+{
+    loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+/* Videowall control user in safe mode. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsControllerInSafeMode)
+{
+    loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
+    qnCommon->setReadOnly(true);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = Qn::ReadPermission | Qn::WritePermission;
+    Qn::Permissions forbidden = Qn::SavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+
+/* Videowall is inaccessible for default user. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallAsViewer)
+{
+    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+
+    auto videowall = addVideoWall();
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    checkPermissions(videowall, desired, forbidden);
+}
+

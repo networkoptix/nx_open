@@ -376,7 +376,7 @@
                 </function>
                 <function proprietary="true">
                     <name>execAction</name>
-                    <description>Execute an action. Action data should be in a internal
+                    <description>Execute an action. Action data should be in the internal
                         binary format. This method is going to be refactored in the next
                         version.</description>
                     <method>POST</method>
@@ -424,6 +424,7 @@
                 <function proprietary="true">
                     <name>restoreState</name>
                     <description>Restore server state to default. Cleans database and system name.</description>
+                    <permissions>Administrator.</permissions>
                     <method>POST</method>
                     <params>
                         <param>
@@ -440,8 +441,9 @@
                     <name>detachFromCloud</name>
                     <description>
                         Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
-					              Function can be called either via GET or POST method. POST data should be a json object.
-					          </description>
+                        Function can be called either via GET or POST method. POST data should be a json object.
+                    </description>
+                    <permissions>Administrator.</permissions>
                     <method>GET, POST</method>
                     <params>
                         <param>
@@ -457,9 +459,10 @@
               <function>
                 <name>setupLocalSystem</name>
                 <description>
-				  Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
-                  This method requires owner permissions.
+                    Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
+                    This method requires owner permissions.
                 </description>
+                <permissions>Administrator.</permissions>
                 <method>POST</method>
                 <params>
                   <param>
@@ -480,9 +483,10 @@
               <function>
                 <name>setupCloudSystem</name>
                 <description>
-                  Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
-				  This method requires owner permissions.
+                    Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
+                    This method requires owner permissions.
                 </description>
+                <permissions>Administrator.</permissions>
                 <method>POST</method>
                 <params>
                   <param>
@@ -544,7 +548,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return XML with parameter value</caption>
+                        <caption>Return JSON object with error code, error message and diagnostics result.</caption>
                     </result>
                 </function>
                 <function>
@@ -738,6 +742,7 @@
                 <function>
                     <name>getEvents</name>
                     <description>Returns event log information in the requested format.</description>
+                    <permissions>At least Advanced Viewer.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -809,53 +814,60 @@
                 </function>
                 <function>
                     <name>manualCamera/search</name>
-                    <description>Search cameras in manual mode</description>
+                    <description>Start searching for the cameras in manual mode.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>start_ip</name>
-                            <description>First IP address in range to scan.</description>
+                            <description>First IP address in the range to scan.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>end_ip</name>
-                            <description>Last IP address in range to scan.</description>
+                            <description>Last IP address in the range to scan.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Camera(s) port to check. Port is auto-detected if parameter
-                                is absent.</description>
+                            <description>Camera(s) IP port to check. Port is auto-detected if this
+                                parameter is omitted.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>user</name>
-                            <description>Username for the cameras</description>
+                            <description>Camera(s) username.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Password for the cameras</description>
+                            <description>Camera(s) password.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with camera names, manufacturers and urls.</caption>
+                        <caption>JSON object with the initial status of camera search process,
+                            including processUuid used for other /api/manualCamera calls, and the
+                            list of objects describing cameras found to the moment.</caption>
                     </result>
                 </function>
                 <function>
                     <name>manualCamera/status</name>
-                    <description>Get manual adding progress.</description>
+                    <description>Get the current status of the process of searching for the cameras.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique id.</description>
+                            <description>Process unique id, can be obtained from "processUuid"
+                                field in the result of /api/manualCamera/search.</description>
                             <optional>false</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with progress value.</caption>
+                      <caption>
+                        JSON object with the initial status of camera search process,
+                        including processUuid used for other /api/manualCamera calls, and the
+                        list of objects describing cameras found to the moment.
+                      </caption>
                     </result>
                 </function>
                 <function>
@@ -865,45 +877,138 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique id.</description>
+                            <description>
+                              Process unique id, can be obtained from "processUuid"
+                              field in the result of /api/manualCamera/search.
+                            </description>
                             <optional>false</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with OK message or error code.</caption>
+                        <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>manualCamera/add</name>
                     <description>Manually add camera(s). If several cameras are added, parameters
-                        "url" and "manufacturer" must be defined several times.</description>
-                    <method>POST</method>
+                        "url" and "manufacturer" must be defined several times with incrementing
+                        suffix "0", "1", etc.</description>
+                    <method>GET</method>
                     <params>
                         <param>
-                            <name>url</name>
-                            <description>Camera url returned by scan request.</description>
+                            <name>url0</name>
+                            <description>
+                              Camera url, can be obtained from
+                              "reply.cameras[].url" field in the result of
+                              /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>manufacturer</name>
-                            <description>Camera manufacturer.</description>
+                            <name>uniqueId0</name>
+                            <description>Camera physical id, can be obtained from
+                                "reply.cameras[].uniqueId" field in the result of
+                                /api/manualCamera/status.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>manufacturer0</name>
+                            <description>
+                              Camera manufacturer, can be obtained from
+                              "reply.cameras[].manufacturer" field in the result of
+                              /api/manualCamera/status.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>user</name>
-                            <description>Username for the cameras</description>
+                            <description>Username for the cameras.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Password for the cameras</description>
+                            <description>Password for the cameras.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with OK message or error code.</caption>
+                        <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
+              <function>
+                <name>manualCamera/add</name>
+                <description>
+                  Manually add camera(s). If several cameras are added, parameters
+                  "url" and "manufacturer" must be defined several times with incrementing
+                  suffix "0", "1", etc.
+<p>
+Parameters should be passed as a JSON object in POST message body with
+content type "application/json". Example of such object:
+<pre><code>
+{
+    "user": "some_user",
+    "password: "some_password",
+    "cameras":
+    [
+        {
+            "uniqueId": "00-1A-07-00-FF-FF",
+            "url": "192.168.0.100"
+            "manufacturer": "3100",
+        }
+    ]
+}
+</code></pre>
+</p>
+              </description>
+                <method>POST</method>
+                <params>
+                  <param>
+                    <name>user</name>
+                    <description>Username for the cameras.</description>
+                    <optional>true</optional>
+                  </param>
+                  <param>
+                    <name>password</name>
+                    <description>Password for the cameras.</description>
+                    <optional>true</optional>
+                  </param>
+                  <param>
+                    <name>cameras</name>
+                    <description>
+                      List of objects with fields defined below.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cameras[].url</name>
+                    <description>
+                      Camera url, can be obtained from
+                      "reply.cameras[].url" field in the result of
+                      /api/manualCamera/status.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cameras[].uniqueId</name>
+                    <description>
+                      Camera physical id, can be obtained from
+                      "reply.cameras[].uniqueId" field in the result of
+                      /api/manualCamera/status.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cameras[].manufacturer</name>
+                    <description>
+                      Camera manufacturer, can be obtained from
+                      "reply.cameras[].manufacturer" field in the result of
+                      /api/manualCamera/status.
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+                <result>
+                  <caption>JSON object with error message and error code (0 means OK).</caption>
+                </result>
+              </function>
                 <function>
                     <name>ping</name>
                     <description>Ping the server</description>
@@ -1008,7 +1113,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON message with error code and error message.</caption>
+                        <caption>JSON message with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
                 <function>
@@ -1147,175 +1252,183 @@
                 <function>
                     <name>restart</name>
                     <description>Restarts the server.</description>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code.</caption>
+                      <caption>JSON with error code.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>statistics</name>
                     <description>Returns server info: CPU usage, HDD usage e.t.c.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>XML data with statistics.</caption>
+                      <caption>XML data with statistics.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>storageSpace</name>
                     <description>Returns a list of all server storages.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>XML with server storages.</caption>
+                      <caption>XML with server storages.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>storageStatus</name>
                     <description>Check if specified folder can be used as a server storage.</description>
                     <method>GET</method>
                     <params>
-                        <param>
-                            <name>path</name>
-                            <description>Folder to check.</description>
-                            <optional>false</optional>
-                        </param>
+                      <param>
+                        <name>path</name>
+                        <description>Folder to check.</description>
+                        <optional>false</optional>
+                      </param>
                     </params>
                     <result>
-                        <caption>JSON data. "OK" if specified folder may be used for writing on
-                        the server. Otherwise returns "FAIL" </caption>
+                      <caption>
+                        JSON data. "OK" if specified folder may be used for writing on
+                        the server. Otherwise returns "FAIL"
+                      </caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>gettime</name>
                     <description>Returns server UTC time (in milliseconds), time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON data.</caption>
+                      <caption>JSON data.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>saveCloudSystemCredentials</name>
                     <description>Sets or resets cloud credentials (systemId and authorization key) to be used by system</description>
                     <method>POST</method>
                     <params>
-                        <param>
-                            <name>cloudSystemId</name>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>cloudAuthenticationKey</name>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>reset</name>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>true</name>
-                                    <description>If specified, removes cloud credentials from DB. System will not connect to cloud anymore</description>
-                                </value>
-                            </values>
-                        </param>
+                      <param>
+                        <name>cloudSystemId</name>
+                        <optional>true</optional>
+                        <values/>
+                      </param>
+                      <param>
+                        <name>cloudAuthenticationKey</name>
+                        <optional>true</optional>
+                        <values/>
+                      </param>
+                      <param>
+                        <name>reset</name>
+                        <optional>true</optional>
+                        <values>
+                          <value>
+                            <name>true</name>
+                            <description>If specified, removes cloud credentials from DB. System will not connect to cloud anymore</description>
+                          </value>
+                        </values>
+                      </param>
                     </params>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>activateLicense</name>
                     <description>Activate new license and return license JSON data if success</description>
                     <method>GET</method>
                     <params>
-                        <param>
-                            <name>key</name>
-                            <description>License serial number</description>
-                            <optional>false</optional>
-                        </param>
+                      <param>
+                        <name>key</name>
+                        <description>License serial number</description>
+                        <optional>false</optional>
+                      </param>
                     </params>
                     <result>
-                        <caption>JSON data.</caption>
+                      <caption>JSON data.</caption>
                     </result>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>installUpdate</name>
                     <description>Updates server by the package contained in POST body</description>
                     <method>POST</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code
+                      <caption>
+                        JSON with error code
                         When all is OK errorString will be empty. In case of error errorString will contain:
                         UP_TO_DATE if the provided version is already installed;
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
                         INCOMPATIBLE_SYSTEM if the update file is targeted for another system;
                         EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
-                        INSTALLATION_ERROR if the server could not execute installation script.</caption>
+                        INSTALLATION_ERROR if the server could not execute installation script.
+                      </caption>
                     </result>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>installUpdate</name>
                     <description>Install update from zip package which should be in the request body.</description>
                     <method>POST</method>
                     <params/>
                     <result/>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>onEvent</name>
-                    <description>Process an event from an external system. Reserved for future
-                        use.</description>
+                    <description>
+                      Process an event from an external system. Reserved for future
+                      use.
+                    </description>
                     <method>POST</method>
                     <params/>
                     <result/>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>discoveredPeers</name>
                     <description>Returns a list of the discovered peers.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with a list of the discovered peers</caption>
+                      <caption>JSON with a list of the discovered peers</caption>
                     </result>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>restart</name>
                     <description>Restart the server.</description>
                     <method>GET</method>
                     <params/>
                     <result/>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>moduleInformation</name>
                     <description>Get information about the server.</description>
                     <method>GET</method>
                     <params>
-                        <param>
-                            <name>allModules</name>
-                            <description>Set it to true to get all modules from the system.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>showAddresses</name>
-                            <description>Set it to true to show server addresses.</description>
-                            <optional>true</optional>
-                        </param>
+                      <param>
+                        <name>allModules</name>
+                        <description>Set it to true to get all modules from the system.</description>
+                        <optional>true</optional>
+                      </param>
+                      <param>
+                        <name>showAddresses</name>
+                        <description>Set it to true to show server addresses.</description>
+                        <optional>true</optional>
+                      </param>
                     </params>
                     <result>
-                        <caption>JSON object with module information.</caption>
+                      <caption>JSON object with module information.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>moduleInformationAuthenticated</name>
                     <description>The same as moduleInformation but requires authentication. Useful to test connection.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON object with module information.</caption>
+                      <caption>JSON object with module information.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>configure</name>
                     <description>Configure server parameters.</description>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1354,6 +1467,7 @@
                 <function>
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1470,15 +1584,6 @@
                     <result/>
                 </function>
                 <function>
-                    <name>iflist</name>
-                    <description>Returns detail information about server network interfaces</description>
-                    <method>GET</method>
-                    <params/>
-                    <result>
-                        <caption>JSON data.</caption>
-                    </result>
-                </function>
-                <function>
                     <name>aggregator</name>
                     <description>This function allows to execute several requests with json content type and returns result as a single JSON object</description>
                     <method>GET</method>
@@ -1520,6 +1625,7 @@
                     <description>Execute any script from subfolder "scripts" of media server. Script name provides directly in a URL path like "/api/execute/script1.sh".
                                  All URL parameters are passed directly to a script as an parameters.
                     </description>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1529,6 +1635,7 @@
                 <function proprietary="true">
                     <name>scriptList</name>
                     <description>Returns list of scripts to execute.</description>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1635,6 +1742,154 @@ http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=Cre
                     <result>
                         <caption>JSON result with error code.</caption>
                     </result>
+                </function>
+                <function>
+                    <name>iflist</name>
+                    <description>Get network settings (list of interfaces) for the server.
+                        Can be called only if server flags include "SF_IfListCtrl"
+                        (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+                    </description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>List of objects with interface parameters.</caption>
+                        <params>
+                          <param>
+                            <name>name</name>
+                            <description>Interface name.</description>
+                          </param>
+                          <param>
+                            <name>ipAddr</name>
+                            <description>IP address with dot-separated decimal components.</description>
+                          </param>
+                          <param>
+                            <name>netMask</name>
+                            <description>Network mask with dot-separated decimal components.</description>
+                          </param>
+                          <param>
+                            <name>mac</name>
+                            <description>MAC address with colon-separated upper-case hex components.</description>
+                          </param>
+                          <param>
+                            <name>gateway</name>
+                            <description>IP address of the gateway with dot-separated decimal components. Can be empty.</description>
+                          </param>
+                          <param>
+                            <name>dhcp</name>
+                            <description></description>
+                            <values>
+                                <value>
+                                    <name>false</name>
+                                    <description>DHCP is not used, IP address and other parameters
+should be specified in the respective JSON fields.</description>
+                                </value>
+                                <value>
+                                    <name>true</name>
+                                    <description>IP address and other parameters assigned via DHCP,
+the respective JSON fields can be empty.</description>
+                                </value>
+                            </values>
+                          </param>
+                          <param>
+                            <name>extraParams</name>
+                            <description>JSON object with data in the internal format.</description>
+                          </param>
+                          <param>
+                            <name>dns_servers</name>
+                            <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
+                          </param>
+                        </params>
+                    </result>
+                </function>
+                <function>
+                    <name>ifconfig</name>
+                    <description>Set new network settings (list of interfaces) for the server.
+                        Can be called only if server flags include "SF_IfListCtrl"
+                        (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+<p>
+Parameters should be passed as a JSON array of objects in POST message body with
+content type "application/json". Example of such object can be seen in
+the result of GET /api/iflist function.
+</p>
+                    </description>
+                    <permissions>Administrator.</permissions>
+                    <method>POST</method>
+                    <params>
+                      <param>
+                        <name>name</name>
+                        <description>Interface name.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>ipAddr</name>
+                        <description>IP address with dot-separated decimal components.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>netMask</name>
+                        <description>Network mask with dot-separated decimal components.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>mac</name>
+                        <description>MAC address with colon-separated upper-case hex components.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>gateway</name>
+                        <description>IP address of the gateway with dot-separated decimal components. Can be empty.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>dhcp</name>
+                        <description></description>
+                        <optional>false</optional>
+                        <values>
+                            <value>
+                                <name>false</name>
+                                <description>DHCP is not used, IP address and other parameters
+should be specified in the respective JSON fields.</description>
+                            </value>
+                            <value>
+                                <name>true</name>
+                                <description>IP address and other parameters assigned via DHCP,
+the respective JSON fields can be empty.</description>
+                            </value>
+                        </values>
+                      </param>
+                      <param>
+                        <name>extraParams</name>
+                        <description>JSON object with data in the internal format.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>dns_servers</name>
+                        <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
+                        <optional>false</optional>
+                      </param>
+                    </params>
+                </function>
+                <function proprietary="true">
+                    <name>settime</name>
+                    <description>
+                      Set current time on the server machine.
+                      Can be called only if server flags include "SF_timeCtrl"
+                      (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+                    </description>
+                    <permissions>Administrator.</permissions>
+                    <method>GET</method>
+                    <params>
+                      <param>
+                        <name>timezone</name>
+                        <description>Time zone name, as a file path located in Linux "/usr/share/zoneinfo".</description>
+                        <optional>true</optional>
+                      </param>
+                      <param>
+                        <name>datetime</name>
+                        <description>Time in milliseconds since UNIX epoch, or formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                        <optional>false</optional>
+                      </param>
+                    </params>
                 </function>
             </functions>
         </group>

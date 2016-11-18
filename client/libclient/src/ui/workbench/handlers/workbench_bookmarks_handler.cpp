@@ -7,6 +7,8 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -23,8 +25,13 @@
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
+#include <ui/graphics/items/controls/time_slider.h>
+
+#include <ui/statistics/modules/controls_statistics_module.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -45,20 +52,85 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     QnWorkbenchContextAware(parent),
     m_hintDisplayed(false)
 {
-    connect(action(QnActions::AddCameraBookmarkAction),     &QAction::triggered, this, &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
-    connect(action(QnActions::EditCameraBookmarkAction),    &QAction::triggered, this, &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
-    connect(action(QnActions::RemoveCameraBookmarkAction),  &QAction::triggered, this, &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
-    connect(action(QnActions::RemoveBookmarksAction),       &QAction::triggered, this, &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
-    connect(action(QnActions::BookmarksModeAction),         &QAction::toggled,   this, &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
+    connect(action(QnActions::AddCameraBookmarkAction),     &QAction::triggered, this,
+        &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
+    connect(action(QnActions::EditCameraBookmarkAction),    &QAction::triggered, this,
+        &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
+    connect(action(QnActions::RemoveCameraBookmarkAction),  &QAction::triggered, this,
+        &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
+    connect(action(QnActions::RemoveBookmarksAction),       &QAction::triggered, this,
+        &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
+    connect(action(QnActions::BookmarksModeAction),         &QAction::toggled,   this,
+        &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
     /* Reset hint flag for each user. */
     connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
+
+    const auto getActionParamsFunc =
+        [this](const QnCameraBookmark &bookmark) -> QnActionParameters
+        {
+            QnActionParameters bookmarkParams(navigator()->currentParameters(Qn::TimelineScope));
+            bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
+            return bookmarkParams;
+        };
+
+    const auto bookmarksViewer = navigator()->timeSlider()->bookmarksViewer();
+
+    const auto updateBookmarkActionsAvailability =
+        [this, bookmarksViewer]()
+        {
+            const bool readonly = qnCommon->isReadOnly()
+                || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
+
+            bookmarksViewer->setReadOnly(readonly);
+        };
+
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+        updateBookmarkActionsAvailability);
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, updateBookmarkActionsAvailability);
+    connect(context(), &QnWorkbenchContext::userChanged, this, updateBookmarkActionsAvailability);
+
+    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,
+        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        {
+            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_edit"));
+            menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction,
+                getActionParamsFunc(bookmark));
+        });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this,
+        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        {
+            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
+            menu()->triggerIfPossible(QnActions::RemoveCameraBookmarkAction,
+                getActionParamsFunc(bookmark));
+        });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
+        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        {
+            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
+
+            static const int kMicrosecondsFactor = 1000;
+            navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
+            navigator()->setPlaying(true);
+        });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this,
+        [this, bookmarksViewer](const QString &tag)
+        {
+            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
+
+            QnActionParameters params;
+            params.setArgument(Qn::BookmarkTagRole, tag);
+            menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
+        });
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;

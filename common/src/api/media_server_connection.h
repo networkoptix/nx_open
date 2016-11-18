@@ -46,28 +46,6 @@ public:
         const char* slot);
 
     /**
-     * Get camera thumbnail for specified time.
-     *
-     * Returns immediately. On request completion \a slot of object \a target
-     * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @param timeUsec Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for
-     *     request latest available image.
-     * @param rotate Image rotation in degrees. Value -1 means use default.
-     * @param size Can be filled partially: only width or height. In this case other dimension is
-     *      auto-detected.
-     * @param imageFormat Can be 'jpeg', 'tiff', 'png', etc.
-     * @param method If parameter is 'before' or 'after', the server returns nearest I-frame before
-     *     or after the time.
-     * @return Request handle.
-     */
-    int getThumbnailAsync(
-        const QnNetworkResourcePtr& camera, qint64 timeUsec, int rotation, const QSize& size,
-        const QString& imageFormat, QnThumbnailRequestData::RoundMethod method, QObject* target,
-        const char* slot);
-
-    /**
      * Check the list of cameras for discovery. Forms a new list which contains only accessible
      * cameras.
      *

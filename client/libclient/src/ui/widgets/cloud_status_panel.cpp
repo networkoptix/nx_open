@@ -153,7 +153,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     switch (qnCloudStatusWatcher->status())
     {
         case QnCloudStatusWatcher::LoggedOut:
-            q->setText(QnCloudStatusPanel::tr("Login to %1...").arg(QnAppInfo::cloudName()));
+            q->setText(QnCloudStatusPanel::tr("Log in to %1...").arg(QnAppInfo::cloudName()));
             q->setIcon(QIcon());
             font.setWeight(QFont::Normal);
             palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));

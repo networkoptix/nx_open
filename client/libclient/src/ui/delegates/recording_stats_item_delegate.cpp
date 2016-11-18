@@ -73,12 +73,10 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     QnScopedPainterPenRollback penRollback(painter, opt.palette.color(QPalette::Text));
     QnScopedPainterFontRollback fontRollback(painter, opt.font);
 
-    int textFlags = opt.displayAlignment | Qt::TextHideMnemonic | Qt::TextSingleLine;
-
     if (index.column() == QnRecordingStatsModel::CameraNameColumn)
-        label = opt.fontMetrics.elidedText(label, Qt::ElideRight, textRect.width(), textFlags);
+        label = opt.fontMetrics.elidedText(label, Qt::ElideRight, textRect.width());
 
-    painter->drawText(textRect, textFlags, label);
+    painter->drawText(textRect, opt.displayAlignment | Qt::TextSingleLine, label);
 }
 
 QSize QnRecordingStatsItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const

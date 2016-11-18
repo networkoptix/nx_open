@@ -8,29 +8,29 @@ namespace nx_http {
 //-------------------------------------------------------------------------------------------------
 // RequestResult
 
-RequestResult::RequestResult(StatusCode::Value _statusCode):
-    statusCode(_statusCode)
+RequestResult::RequestResult(StatusCode::Value statusCode):
+    statusCode(statusCode)
 {
 }
 
 RequestResult::RequestResult(
-    nx_http::StatusCode::Value _statusCode,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> _dataSource)
+    nx_http::StatusCode::Value statusCode,
+    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
     :
-    statusCode(_statusCode),
-    dataSource(std::move(_dataSource))
+    statusCode(statusCode),
+    dataSource(std::move(dataSource))
 {
 }
 
 
 RequestResult::RequestResult(
-    nx_http::StatusCode::Value _statusCode,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> _dataSource,
-    ConnectionEvents _connectionEvents)
+    nx_http::StatusCode::Value statusCode,
+    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+    ConnectionEvents connectionEvents)
     :
-    statusCode(_statusCode),
-    dataSource(std::move(_dataSource)),
-    connectionEvents(std::move(_connectionEvents))
+    statusCode(statusCode),
+    dataSource(std::move(dataSource)),
+    connectionEvents(std::move(connectionEvents))
 {
 }
 

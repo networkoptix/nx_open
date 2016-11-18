@@ -33,14 +33,18 @@ Item
         Column
         {
             width: parent.width
+            leftPadding: 8
+            rightPadding: 8
             topPadding: 24
             bottomPadding: 24
+
+            property real availableWidth: width - leftPadding - rightPadding
 
             TextField
             {
                 id: emailField
                 placeholderText: qsTr("Email")
-                width: parent.width
+                width: parent.availableWidth
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
                 inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhPreferLatin
@@ -60,7 +64,7 @@ Item
                 echoMode: TextInput.Password
                 passwordMaskDelay: 1500
                 placeholderText: qsTr("Password")
-                width: parent.width
+                width: parent.availableWidth
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
                 onAccepted: login()
@@ -78,14 +82,14 @@ Item
             FieldWarning
             {
                 id: warningPanel
-                width: parent.width
+                width: parent.availableWidth
             }
         }
 
         LoginButton
         {
             id: loginButton
-            text: "Login"
+            text: "Log in"
             width: parent.width
             showProgress: d.connecting
             onClicked: login()

@@ -7,12 +7,6 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}MediaServerDir" Name="MediaServer">
-                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2">
-                    <Component Id="dbsync221versionpy">
-                        <File Id="version221.py" Name="version.py" Source="${libdir}/version.py" KeyPath="yes"/>
-                    </Component>
-                </Directory>
-
                 <Component Id="ServerExecutable">
                     <File Id="mediaserver.exe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes" DiskId="11">
                         <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
@@ -30,6 +24,10 @@
 
                     <ServiceControl Id="Start${customization}ServerService" Name="${customization}MediaServer" Start="install" Wait="no" />
                     <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
+                </Component>
+
+                <Component Id="ServerVersion">
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='${release.version}.${buildNumber}'/>
                 </Component>
 
                 <Component Id="ServerConfiguration">
@@ -207,13 +205,10 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
-            <ComponentGroupRef Id="DbSync22FilesComponent" />
-
-            <ComponentRef Id="dbsync221versionpy"/>
+            <ComponentRef Id='ServerVersion'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
-            <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentGroupRef Id="ServerWeb"/>
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerLibs"/>
@@ -236,6 +231,7 @@
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolLibs"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
             <ComponentGroupRef Id="TraytoolPlatforms" />
 
         </Feature>

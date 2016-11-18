@@ -619,11 +619,13 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         }
     }
 
+    QnEmailAddress supportEmail(emailSettings.supportEmail);
+
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
-    contextMap[tpSupportLink] = QnEmailAddress::isValid(emailSettings.supportEmail)
-        ? lit("mailto:%1").arg(emailSettings.supportEmail)
+    contextMap[tpSupportLink] = supportEmail.isValid()
+        ? lit("mailto:%1").arg(supportEmail.value())
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
     contextMap[tpSystemName] = qnGlobalSettings->systemName();
@@ -647,7 +649,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         attachments
         );
 
-    if (!m_emailManager->sendEmail(data))
+    if (!m_emailManager->sendEmail(emailSettings, data))
     {
         QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
         broadcastBusinessAction(action);
@@ -957,13 +959,12 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusine
         }
     }
 
-    auto recipientsFilter = [](const QString& email)
-    {
-        QString trimmed = email.trimmed();
-        return !trimmed.isEmpty() && QnEmailAddress::isValid(trimmed);
-    };
-
     QStringList recipients;
-    std::copy_if(unfiltered.cbegin(), unfiltered.cend(), std::back_inserter(recipients), recipientsFilter);
+    for (const auto &addr: unfiltered)
+    {
+        QnEmailAddress email(addr);
+        if (email.isValid())
+            recipients << email.value();
+    }
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }

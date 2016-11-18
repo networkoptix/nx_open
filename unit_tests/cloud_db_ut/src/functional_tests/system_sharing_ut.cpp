@@ -62,10 +62,10 @@ TEST_F(SystemSharing, get_users)
 
     //sharing system1 with account2 as viewer
     api::SystemSharing system1ToAccount2SharingData;
-    system1ToAccount2SharingData.systemID = system1.id;
+    system1ToAccount2SharingData.systemId = system1.id;
     system1ToAccount2SharingData.accountEmail = account2.email;
     system1ToAccount2SharingData.accessRole = api::SystemAccessRole::viewer;
-    system1ToAccount2SharingData.groupID = "customGroupID";
+    system1ToAccount2SharingData.groupId = "customGroupID";
     system1ToAccount2SharingData.customPermissions = "customPermissions123123";
     system1ToAccount2SharingData.isEnabled = false;
     ASSERT_EQ(
@@ -172,13 +172,13 @@ TEST_F(SystemSharing, get_users)
         bool found = false;
         for (const auto& sharingData : sharings)
         {
-            if (sharingData.systemID == system1ToAccount2SharingData.systemID &&
+            if (sharingData.systemId == system1ToAccount2SharingData.systemId &&
                 sharingData.accountEmail == system1ToAccount2SharingData.accountEmail)
             {
                 found = true;
                 ASSERT_TRUE((const api::SystemSharing&)sharingData == system1ToAccount2SharingData);
                 ASSERT_EQ(account2.fullName, sharingData.accountFullName);
-                ASSERT_EQ(account2.id, sharingData.accountID);
+                ASSERT_EQ(account2.id, sharingData.accountId);
             }
         }
         ASSERT_TRUE(found);
@@ -1095,10 +1095,10 @@ TEST_F(SystemSharing, changing_own_rights_on_system)
             ASSERT_EQ(
                 api::ResultCode::forbidden,
                 updateSystemSharing(
-                    account2.data.email,
+                    account2.email,
                     account2.password,
                     system1.id,
-                    account2.data.email,
+                    account2.email,
                     role));
         }
 
@@ -1132,7 +1132,7 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     api::SystemData system1;
     ASSERT_EQ(
         api::ResultCode::ok,
-        bindRandomSystem(account1.data.email, account1.password, &system1));
+        bindRandomSystem(account1.email, account1.password, &system1));
 
     const std::string newAccountEmail = generateRandomEmailAddress();
     std::string newAccountPassword = "new_password";
@@ -1142,13 +1142,13 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
 
     std::vector<api::SystemSharingEx> sharings;
     ASSERT_EQ(
-        getSystemSharings(account1.data.email, account1.password, &sharings),
+        getSystemSharings(account1.email, account1.password, &sharings),
         api::ResultCode::ok);
     ASSERT_EQ(sharings.size(), 2);
 
     ASSERT_EQ(
         api::SystemAccessRole::owner,
-        accountAccessRoleForSystem(sharings, account1.data.email, system1.id));
+        accountAccessRoleForSystem(sharings, account1.email, system1.id));
     ASSERT_EQ(
         api::SystemAccessRole::cloudAdmin,
         accountAccessRoleForSystem(sharings, newAccountEmail, system1.id));
@@ -1235,12 +1235,12 @@ TEST_F(SystemSharing, remove_sharing)
     api::SystemDataEx systemData;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystem(account2.data.email, account2.password, system1.id, &systemData));
+        getSystem(account2.email, account2.password, system1.id, &systemData));
 
     shareSystemEx(account1, system1, account2, api::SystemAccessRole::none);
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        getSystem(account2.data.email, account2.password, system1.id, &systemData));
+        getSystem(account2.email, account2.password, system1.id, &systemData));
 }
 
 } // namespace cdb

@@ -65,7 +65,6 @@ TEST_F(TcpReverseConnectTest, SimpleSyncClientServer)
     network::test::socketSimpleSync(
         [&](){ return std::move(serverSocket); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
 }
 
@@ -80,7 +79,6 @@ TEST_F(TcpReverseConnectTest, SimpleSyncServerClient)
     network::test::socketSimpleSync(
         [&](){ return std::move(serverSocket); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
 }
 
@@ -95,7 +93,6 @@ TEST_F(TcpReverseConnectTest, SimpleSyncClientSystem)
     network::test::socketSimpleSync(
         [&](){ return std::move(serverSocket); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_system.id));
 }
 
@@ -110,7 +107,6 @@ TEST_F(TcpReverseConnectTest, SimpleAsyncClientSystem)
     network::test::socketSimpleAsync(
         [&](){ return std::move(serverSocket); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_system.id));
 }
 

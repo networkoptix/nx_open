@@ -91,7 +91,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            nx_http::HttpRequestProcessedHandler completionHandler);
+            nx_http::RequestProcessedHandler completionHandler);
 
         CustomHttpHandler(
             ManagerType* manager,
@@ -108,7 +108,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            nx_http::HttpRequestProcessedHandler completionHandler) override
+            nx_http::RequestProcessedHandler completionHandler) override
         {
             (m_manager->*m_managerFuncPtr)(
                 connection,
@@ -126,7 +126,6 @@ private:
     int m_argc;
     char** m_argv;
     std::atomic<bool> m_terminated;
-    int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
     nx::utils::promise<void> m_processTerminationEvent;

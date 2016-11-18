@@ -32,7 +32,8 @@ namespace {
 
 static const int kSystemNameFontSizePixels = 24;
 static const int kSystemNameFontWeight = QFont::DemiBold;
-static const int kMaxSystemNameLength = 20;
+static const int kMaxSystemNameLabelWidth = 1000;
+static const int kMaxSystemNameLength = 64;
 
 static const int kPreferencesButtonSize = 104;
 static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
@@ -50,23 +51,19 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     font.setPixelSize(kSystemNameFontSizePixels);
     font.setWeight(kSystemNameFontWeight);
     ui->systemNameLabel->setFont(font);
-    ui->systemNameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
-    ui->systemNameLabel->setForegroundRole(QPalette::Text);
-    ui->systemNameEdit->setFont(font);
-    ui->systemNameEdit->setProperty(style::Properties::kDontPolishFontProperty, true);
-
-    connect(ui->systemNameEdit, &QLineEdit::textChanged, this,
-        [this](const QString& text)
+    ui->systemNameLabel->setButtonIcon(qnSkin->icon("system_settings/edit.png"));
+    ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
+    ui->systemNameLabel->setValidator(
+        [this](QString& text) -> bool
         {
-            ui->systemNameLabel->setText(nx::utils::elideString(text, kMaxSystemNameLength));
-            emit hasChangesChanged();
+            text = text.trimmed().left(kMaxSystemNameLength);
+            return !text.isEmpty();
         });
 
-    connect(ui->systemNameEdit, &QLineEdit::editingFinished, this,
-        [this]
-        {
-            ui->systemNameStackedWidget->setCurrentWidget(ui->labelPage);
-        });
+    connect(ui->systemNameLabel, &QnEditableLabel::textChanging,
+        this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
+    connect(ui->systemNameLabel, &QnEditableLabel::editingFinished,
+        this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
     buttonLayout->setSpacing(0);
@@ -142,49 +139,25 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
-
-    auto editSystemName =
-        [this]()
-        {
-            ui->systemNameStackedWidget->setCurrentWidget(ui->editPage);
-            ui->systemNameEdit->setFocus();
-        };
-
-    auto clickSignalizer = new QnSingleEventSignalizer(this);
-    clickSignalizer->setEventType(QEvent::MouseButtonPress);
-    ui->systemNameLabel->installEventFilter(clickSignalizer);
-    connect(clickSignalizer, &QnSingleEventSignalizer::activated, this,
-        [editSystemName](QObject* sender, QEvent* event)
-        {
-            Q_UNUSED(sender);
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
-                editSystemName();
-        });
-
-    connect(ui->systemNameEditButton, &QToolButton::clicked, this, editSystemName);
-    ui->systemNameEditButton->setIcon(qnSkin->icon("system_settings/edit.png"));
-    ui->systemNameEditButton->setFixedSize(QnSkin::maximumSize(ui->systemNameEditButton->icon()));
-    ui->systemNameLabel->setCursor(Qt::IBeamCursor);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
-    ui->systemNameEdit->setText(qnGlobalSettings->systemName());
+    ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
-    ui->systemNameStackedWidget->setCurrentWidget(ui->labelPage);
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
-    ui->systemNameStackedWidget->setCurrentWidget(ui->labelPage);
-    qnGlobalSettings->setSystemName(ui->systemNameEdit->text().trimmed());
+    ui->systemNameLabel->setEditing(false);
+    qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-    if (ui->systemNameEdit->text().trimmed() != qnGlobalSettings->systemName())
+    if (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
         return true;
 
     return ui->systemSettingsWidget->hasChanges();

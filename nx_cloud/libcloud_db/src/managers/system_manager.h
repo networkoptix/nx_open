@@ -100,7 +100,7 @@ public:
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(api::ResultCode)> completionHandler);
     //!Fetches systems satisfying specified \a filter
     /*!
@@ -125,7 +125,7 @@ public:
 
     void getAccessRoleList(
         const AuthorizationInfo& authzInfo,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
     void updateSystem(
@@ -140,15 +140,15 @@ public:
 
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
-        - \a accountEmail has no rights for \a systemID
-        - \a accountEmail or \a systemID is unknown
+        - \a accountEmail has no rights for \a systemId
+        - \a accountEmail or \a systemId is unknown
     */
     api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
-        const std::string& systemID) const;
+        const std::string& systemId) const;
     boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
-        const std::string& systemID) const;
+        const std::string& systemId) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(
@@ -158,6 +158,11 @@ public:
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
         
+    nx::db::DBResult fetchUserSharings(
+        nx::db::QueryContext* const queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<api::SystemSharingEx>* const sharings);
+
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
@@ -191,7 +196,7 @@ private:
                 api::SystemSharing, std::string, &api::SystemSharing::accountEmail>>,
             //indexing by system
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
-                api::SystemSharing, std::string, &api::SystemSharing::systemID>>,
+                api::SystemSharing, std::string, &api::SystemSharing::systemId>>,
             //indexing by pair<systemId, vmsUserId>
             boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
                 const api::SystemSharing&,
@@ -273,12 +278,12 @@ private:
 
     nx::db::DBResult deleteSystemFromDB(
         nx::db::QueryContext* const queryContext,
-        const data::SystemID& systemID);
+        const data::SystemId& systemId);
     void systemDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
     //---------------------------------------------------------------------------------------------
@@ -316,11 +321,6 @@ private:
         const std::string& accountEmail,
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
-
-    nx::db::DBResult fetchUserSharings(
-        nx::db::QueryContext* const queryContext,
-        const nx::db::InnerJoinFilterFields& filter,
-        std::vector<api::SystemSharingEx>* const sharings);
 
     nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
@@ -365,6 +365,25 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand);
+    
+    nx::db::DBResult generateSaveUserTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing,
+        const api::AccountData& account);
+    nx::db::DBResult generateUpdateFullNameTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing,
+        const std::string& newFullName);
+    nx::db::DBResult generateRemoveUserTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing);
+    nx::db::DBResult generateRemoveUserFullNameTransaction(
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing);
+
+    nx::db::DBResult placeUpdateUserTransactionToEachSystem(
+        nx::db::QueryContext* const queryContext,
+        const data::AccountUpdateDataWithEmail& accountData);
     void updateSharingInCache(data::SystemSharing sharing);
     void updateSharingInCache(
         api::SystemSharingEx sharing,
@@ -472,6 +491,14 @@ private:
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemAttributesUpdate systemNameUpdate);
+
+    nx::db::DBResult processRemoveResourceParam(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data);
+    void onEc2RemoveResourceParamDone(
+        nx::db::QueryContext* /*queryContext*/,
+        nx::db::DBResult dbResult);
 
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* const queryContext,

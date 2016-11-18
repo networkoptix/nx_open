@@ -44,7 +44,6 @@ public:
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     bool isIOModule() const;
-    Qn::MotionType getCameraBasedMotionType() const;
     Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;

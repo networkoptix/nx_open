@@ -97,7 +97,7 @@ int QnAuditManager::registerNewConnection(const QnAuthSession& authInfo, bool ex
         updateAuditRecord(connection.internalId, connection.record); // make database record opened again
     }
 
-    int endTime = explicitCall ? INT_MAX : qnSyncTime->currentMSecsSinceEpoch() / 1000; // do not auto delete if explicit login (logout is expected);
+    int endTime = explicitCall ? INT_MAX : qnSyncTime->currentMSecsSinceEpoch() / 1000; // do not auto delete if explicit log in (log out is expected);
     connection.record.rangeEndSec = qMax(endTime, connection.record.rangeEndSec);
     return connection.internalId;
 }

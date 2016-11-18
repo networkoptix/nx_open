@@ -35,11 +35,20 @@ QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_networkFaultsCounter(0)
 {
     initializeIO();
+
+    Qn::directConnect(
+        &m_client, &nx::modbus::QnModbusAsyncClient::done,
+        this, &QnAdamModbusIOManager::routeMonitoringFlow);
+
+    Qn::directConnect(
+        &m_client, &nx::modbus::QnModbusAsyncClient::error,
+        this, &QnAdamModbusIOManager::handleMonitoringError);
 }
 
 QnAdamModbusIOManager::~QnAdamModbusIOManager()
 {
-    stopIOMonitoring();
+    terminate();
+    directDisconnectAll();
 }
 
 bool QnAdamModbusIOManager::startIOMonitoring()
@@ -69,14 +78,6 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     m_debouncedValues.clear();
 
-    Qn::directConnect(
-        &m_client, &nx::modbus::QnModbusAsyncClient::done,
-        this, &QnAdamModbusIOManager::routeMonitoringFlow);
-
-    Qn::directConnect(
-        &m_client, &nx::modbus::QnModbusAsyncClient::error,
-        this, &QnAdamModbusIOManager::handleMonitoringError);
-
     m_monitoringIsInProgress = true;
 
     QUrl url(m_resource->getUrl());
@@ -95,14 +96,17 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
 void QnAdamModbusIOManager::stopIOMonitoring()
 {
-    QnMutexLocker lock(&m_mutex);
     m_monitoringIsInProgress = false;
 
-    lock.unlock();
-    nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
-    lock.relock();
+    nx::utils::TimerId timerId = 0;
 
-    directDisconnectAll();
+    {
+        QnMutexLocker lock(&m_mutex);
+        timerId = m_inputMonitorTimerId;
+    }
+
+    if (timerId)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 
 bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isActive)
@@ -421,10 +425,10 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
     {
         m_inputMonitorTimerId = nx::utils::TimerManager::instance()->addTimer(
             [this](quint64 timerId)
-        {
-            if (timerId == m_inputMonitorTimerId)
-                fetchAllPortStates();
-        },
+            {
+                if (timerId == m_inputMonitorTimerId)
+                    fetchAllPortStates();
+            },
             std::chrono::milliseconds(kInputPollingIntervalMs));
     }
 }

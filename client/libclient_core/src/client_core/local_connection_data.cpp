@@ -1,150 +1,60 @@
-
 #include "local_connection_data.h"
 
-#include <QtCore/QSettings>
-
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/string.h>
 
-namespace
-{
-    const auto kXorKey = lit("thereIsSomeKeyForXorOperation");
+#include <client_core/client_core_settings.h>
 
-    const auto kUrlNameTag = lit("url");
-    const auto kPasswordTag = lit("password");
-    const auto kSystemNameTag = lit("systemName");
-    const auto kSystemIdTag = lit("systemId");
-    const auto kStoredPasswordTag = lit("storedPassword");
-    const auto kNameTag = lit("name");
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnLocalConnectionData)(QnWeightData), (datastream)(eq)(json), _Fields)
 
-    const auto kLastConnected = lit("lastConnectedUtcMs");
-    const auto kWeight = lit("weight");
-}
+QnLocalConnectionData::QnLocalConnectionData() {}
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData), (datastream)(eq), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnWeightData), (datastream)(eq), _Fields)
-
-QnLocalConnectionData::QnLocalConnectionData() :
-    name(),
-    systemName(),
-    systemId(),
-    url(),
-    isStoredPassword(false)
-{}
-
-QnLocalConnectionData::QnLocalConnectionData(const QString& name,
+QnLocalConnectionData::QnLocalConnectionData(
     const QString& systemName,
-    const QString& systemId,
-    const QUrl& url,
-    bool isStoredPassword)
+    const QnUuid& localId,
+    const QUrl& url)
     :
-    name(name),
     systemName(systemName),
-    systemId(systemId),
+    localId(localId),
     url(url),
-    isStoredPassword(isStoredPassword)
-{}
-
-void QnLocalConnectionData::writeToSettings(QSettings* settings) const
+    password(url.password())
 {
-    QUrl fixedUrl = url;
-    const auto encryptedPass = nx::utils::xorEncrypt(url.password(), kXorKey);
-    fixedUrl.setPassword(QString());
-    settings->setValue(kUrlNameTag, fixedUrl.toString());
-    settings->setValue(kPasswordTag, encryptedPass);
-    settings->setValue(kSystemNameTag, systemName);
-    settings->setValue(kSystemIdTag, systemId);
-    settings->setValue(kStoredPasswordTag, isStoredPassword);
-    settings->setValue(kNameTag, name);
+    this->url.setPassword(QString());
 }
 
-QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
+bool QnLocalConnectionData::isStoredPassword() const
 {
-    QnLocalConnectionData data;
-
-    data.url = QUrl(settings->value(kUrlNameTag).toString());
-    data.systemName = settings->value(kSystemNameTag).toString();
-    data.systemId = settings->value(kSystemIdTag).toString();
-    data.isStoredPassword = settings->value(kStoredPasswordTag).toBool();
-    data.name = settings->value(kNameTag).toString();
-    const auto encryptedPass = settings->value(kPasswordTag).toString();
-    if (!encryptedPass.isEmpty())
-        data.url.setPassword(nx::utils::xorDecrypt(encryptedPass, kXorKey));
-
-    return data;
+    return !password.isEmpty();
 }
 
-///
-
-QnLocalConnectionDataList::QnLocalConnectionDataList()
-    : base_type()
-{}
-
-QnLocalConnectionDataList::QnLocalConnectionDataList(const base_type& data):
-    base_type(data)
+QUrl QnLocalConnectionData::urlWithPassword() const
 {
+    auto url = this->url;
+    url.setPassword(password.value());
+    return url;
 }
 
-QnLocalConnectionDataList::~QnLocalConnectionDataList()
-{}
-
-int QnLocalConnectionDataList::getIndexByName(const QString& name) const
+QnLocalConnectionData helpers::storeLocalSystemConnection(
+    const QString& systemName,
+    const QnUuid& localSystemId,
+    const QUrl& url)
 {
-    const auto it = std::find_if(begin(), end(), [name](const QnLocalConnectionData &data)
+    // TODO: #ynikitenkov remove outdated connection data
+
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
+        [localSystemId, userName = url.userName()](const QnLocalConnectionData& connection)
     {
-        return (data.name == name);
-    });
-    return (it == end() ? -1 : it - begin());
-}
-
-QnLocalConnectionData QnLocalConnectionDataList::getByName(const QString& name) const
-{
-    const auto index = getIndexByName(name);
-    return (index == -1 ? QnLocalConnectionData() : at(index));
-}
-
-bool QnLocalConnectionDataList::contains(const QString& name) const
-{
-    return (getIndexByName(name) != -1);
-}
-
-QString QnLocalConnectionDataList::generateUniqueName(const QString &base) const
-{
-    int counter = 0;
-    QString uniqueName;
-    QString counterString(QLatin1String("(%1)"));
-
-    while (contains(uniqueName));
-        uniqueName = base + counterString.arg(++counter);
-
-    return uniqueName;
-}
-
-bool QnLocalConnectionDataList::remove(const QString &name)
-{
-    const auto newEnd = std::remove_if(begin(), end(),
-        [name](const QnLocalConnectionData &data)
-    {
-        return (data.name == name);
+        return (connection.localId == localSystemId)
+            && QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0;
     });
 
-    const bool removed = (newEnd != end());
-    erase(newEnd, end());
-    return removed;
-}
+    recentConnections.erase(itEnd, recentConnections.end());
 
-QnWeightData QnWeightData::fromSettings(QSettings* settings)
-{
-    QnWeightData data;
-    data.systemId = settings->value(kSystemIdTag).toString();
-    data.weight = settings->value(kWeight, QVariant::fromValue<qreal>(0)).toReal();
-    data.lastConnectedUtcMs = settings->value(kLastConnected, QVariant::fromValue<qint64>(0)).toLongLong();
-    return data;
-}
+    const QnLocalConnectionData connectionData(systemName, localSystemId, url);
+    recentConnections.prepend(connectionData);
 
-void QnWeightData::writeToSettings(QSettings* settings) const
-{
-    settings->setValue(kSystemIdTag, systemId);
-    settings->setValue(kWeight, weight);
-    settings->setValue(kLastConnected, lastConnectedUtcMs);
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+
+    return connectionData;
 }

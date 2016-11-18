@@ -19,6 +19,7 @@ QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags window
     m_submitting(false)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    setAcceptedMouseButtons(Qt::NoButton);
 
     m_layout = new QGraphicsLinearLayout(orientation);
     m_layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -26,8 +27,8 @@ QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags window
     setLayout(m_layout);
 }
 
-QnImageButtonBar::~QnImageButtonBar() {
-    return;
+QnImageButtonBar::~QnImageButtonBar()
+{
 }
 
 void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
@@ -167,7 +168,7 @@ void QnImageButtonBar::setUniformButtonSize(const QSizeF &uniformButtonSize) {
 
     m_uniformButtonSize = uniformButtonSize;
 
-    foreach(QnImageButtonWidget *button, m_buttonByMask) 
+    foreach(QnImageButtonWidget *button, m_buttonByMask)
         submitButtonSize(button);
 }
 
@@ -182,7 +183,7 @@ int QnImageButtonBar::unusedMask() const {
             return mask;
         mask <<= 1;
     }
-    
+
     return 0;
 }
 

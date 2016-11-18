@@ -17,7 +17,7 @@ TestHttpServer::TestHttpServer()
             nullptr,
             &m_httpMessageDispatcher,
             true,
-            SocketFactory::NatTraversalType::nttDisabled ) );
+            nx::network::NatTraversalSupport::disabled ) );
 }
 
 TestHttpServer::~TestHttpServer()
@@ -53,7 +53,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler )
     {
         completionHandler(
             nx_http::RequestResult(
@@ -66,9 +66,9 @@ private:
     const QByteArray m_response;
 };
 
-void TestHttpServer::setForceConnectionClose(bool value)
+void TestHttpServer::setPersistentConnectionEnabled(bool value)
 {
-    m_httpServer->setForceConnectionClose(value);
+    m_httpServer->setPersistentConnectionEnabled(value);
 }
 
 bool TestHttpServer::registerStaticProcessor(

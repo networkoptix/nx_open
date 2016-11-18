@@ -19,6 +19,9 @@ public:
 
     void setLogin(const QString& login);
 
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+
 private:
     QScopedPointer<Ui::QnLoginToCloudDialog> ui;
     QScopedPointer<QnLoginToCloudDialogPrivate> d_ptr;

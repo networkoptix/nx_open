@@ -42,7 +42,7 @@ void MaintenanceManager::getVmsConnections(
 
 void MaintenanceManager::getTransactionLog(
     const AuthorizationInfo& /*authzInfo*/,
-    data::SystemID systemID,
+    data::SystemId systemId,
     std::function<void(
         api::ResultCode,
         ::ec2::ApiTransactionDataList)> completionHandler)
@@ -55,13 +55,13 @@ void MaintenanceManager::getTransactionLog(
     maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
 
     m_syncronizationEngine->transactionLog().readTransactions(
-        systemID.systemID.c_str(),
+        systemId.systemId.c_str(),
         ::ec2::QnTranState(),
         maxTranState,
         std::numeric_limits<int>::max(),
         std::bind(&MaintenanceManager::onTransactionLogRead, this, 
             m_startedAsyncCallsCounter.getScopedIncrement(),
-            systemID.systemID,
+            systemId.systemId,
             _1, _2, _3, std::move(completionHandler)));
 }
 
@@ -69,7 +69,7 @@ void MaintenanceManager::onTransactionLogRead(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
     api::ResultCode resultCode,
-    std::vector<ec2::TransactionData> serializedTransactions,
+    std::vector<ec2::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,
@@ -94,7 +94,7 @@ void MaintenanceManager::onTransactionLogRead(
         ::ec2::ApiTransactionData tran(m_moduleGuid);
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
-            transactionContext.serializer->serialize(Qn::UbjsonFormat);
+            transactionContext.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
         QnUbjsonReader<nx::Buffer> stream(&serializedTransaction);
         if (QnUbjson::deserialize(&stream, &tran.tran))
         {

@@ -12,6 +12,8 @@ class AnimatorGroup;
 
 namespace NxUi {
 
+class CalendarWorkbenchPanel;
+
 class TimelineWorkbenchPanel: public AbstractWorkbenchPanel
 {
     using base_type = AbstractWorkbenchPanel;
@@ -23,12 +25,16 @@ public:
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
 
+    virtual ~TimelineWorkbenchPanel();
+
     QnNavigationItem* item;
 
     bool zoomingIn;
     bool zoomingOut;
 
     qreal lastThumbnailsHeight;
+
+    void setCalendarPanel(CalendarWorkbenchPanel* calendar);
 
 public:
     virtual bool isPinned() const override;
@@ -70,6 +76,10 @@ private:
     bool m_resizing;
 
     bool m_updateResizerGeometryLater;
+
+    int m_autoHideHeight;
+
+    QPointer<CalendarWorkbenchPanel> m_calendar;
 
     QnImageButtonWidget* m_showButton;
 

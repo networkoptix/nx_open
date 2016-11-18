@@ -55,7 +55,7 @@ bool setDateTime(qint64 value)
 }
 #endif
 
-int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     QString timezone = params.value("timezone");
@@ -81,7 +81,7 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
         result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support time control"));
         return CODE_OK;
     }
-    
+
 #ifdef Q_OS_LINUX
     if (!timezone.isEmpty()) {
         if (!setTimeZone(timezone)) {

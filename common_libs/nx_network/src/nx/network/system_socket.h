@@ -32,30 +32,20 @@ typedef CommonSocketImpl PollableSystemSocketImpl;
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
-}   //aio
+} // namespace aio
 
 #ifdef Q_OS_WIN
 typedef int socklen_t;
 #endif
 
-struct SockAddrPtr
+struct NX_NETWORK_API SystemSocketAddress
 {
     std::shared_ptr<const sockaddr> ptr;
     socklen_t size;
 
-    SockAddrPtr():
-        ptr(nullptr),
-        size(0)
-    {
-    }
-
-    template<typename T>
-    SockAddrPtr(T* addr):
-        ptr((sockaddr*)addr),
-        size(sizeof(T))
-    {
-        memset(addr, 0, size);
-    }
+    SystemSocketAddress();
+    SystemSocketAddress(SocketAddress address, int ipVersion);
+    operator SocketAddress() const;
 };
 
 /**
@@ -68,18 +58,6 @@ class Socket
     public nx::network::Pollable
 {
 public:
-    Socket(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-        int type,
-        int protocol,
-        int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
-    Socket(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
-        int sockDesc,
-        int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
-    //TODO #ak remove following two constructors
     Socket(
         int type,
         int protocol,
@@ -151,11 +129,9 @@ public:
         const QString &service,
         const QString &protocol = QLatin1String("tcp"));
 
-    SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
 
 protected:
-    aio::BaseAsyncSocketImplHelper<Pollable>* m_baseAsyncHelper;
     const int m_ipVersion;
 
 private:
@@ -170,16 +146,16 @@ class CommunicatingSocket
 :
     public Socket<InterfaceToImplement>
 {
+    typedef CommunicatingSocket<InterfaceToImplement> SelfType;
+
 public:
     CommunicatingSocket(
-        bool natTraversal,
         int type,
         int protocol,
         int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
 
     CommunicatingSocket(
-        bool natTraversal,
         int newConnSD,
         int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
@@ -190,6 +166,7 @@ public:
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
+
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -223,8 +200,10 @@ public:
     virtual bool close() override;
     virtual bool shutdown() override;
 
-private:
-    aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;
+protected:
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
+    std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
 };
 
@@ -239,12 +218,9 @@ class NX_NETWORK_API TCPSocket
 
 public:
     /**
-     *   Construct a TCP socket with no connection
+     * Construct a TCP socket with no connection.
      */
-    TCPSocket(bool natTraversal, int ipVersion);
-
-    //!User by \a TCPServerSocket class
-    TCPSocket(int newConnSD, int ipVersion);
+    TCPSocket(int ipVersion);
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -274,11 +250,14 @@ public:
 
 private:
     // Access for TCPServerSocket::accept() connection creation
-    friend class TCPServerSocket;
+    friend class TCPServerSocketPrivate;
 
     #if defined(Q_OS_WIN)
         KeepAliveOptions m_keepAlive;
     #endif
+
+    /** Used by TCPServerSocket class. */
+    TCPSocket(int newConnSD, int ipVersion);
 };
 
 /**
@@ -341,7 +320,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket(bool natTraversal = true, int ipVersion = AF_INET);
+    UDPSocket(int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
@@ -384,6 +363,7 @@ public:
 
     //!Implementation of AbstractDatagramSocket::setDestAddr
     virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
+
     //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
@@ -420,7 +400,7 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    SockAddrPtr m_destAddr;
+    SystemSocketAddress m_destAddr;
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();

@@ -1,19 +1,13 @@
-/**********************************************************
-* May 4, 2016
-* akolesnikov
-***********************************************************/
-
 #include "listening_peer.h"
 
 #include <nx/fusion/model_functions.h>
-
 
 namespace nx {
 namespace hpm {
 namespace data {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ListeningPeer)(ListeningPeerList)(ListeningPeersBySystem),
+    (ListeningPeer)(BoundClient)(ListeningPeers),
     (json),
     _Fields);
 

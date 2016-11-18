@@ -1,50 +1,58 @@
-#ifndef QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H
-#define QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H
+#pragma once
 
 #include <nx/utils/uuid.h>
-
-#include <QtNetwork/QHostAddress>
-#include <QtNetwork/QHostInfo>
 
 #include <core/resource_management/manual_camera_searcher.h>
 #include <rest/server/json_rest_handler.h>
 #include <utils/common/concurrent.h>
+#include <api/model/manual_camera_data.h>
 
-
-class QnManualCameraAdditionRestHandler: public QnJsonRestHandler {
+class QnManualCameraAdditionRestHandler: public QnJsonRestHandler
+{
     Q_OBJECT
+
 public:
     QnManualCameraAdditionRestHandler();
     ~QnManualCameraAdditionRestHandler();
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+    virtual int executeGet(
+        const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
+        const QnRestConnectionProcessor*) override;
+
+    virtual int executePost(
+        const QString& path, const QnRequestParams& params, const QByteArray& body,
+        QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
 
 private:
-    int searchStartAction(const QnRequestParams &params, QnJsonRestResult &result);
-    int searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result);
-    int searchStopAction(const QnRequestParams &params, QnJsonRestResult &result);
-    int addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
+    int searchStartAction(const QnRequestParams& params, QnJsonRestResult& result);
+    int searchStatusAction(const QnRequestParams& params, QnJsonRestResult& result);
+    int searchStopAction(const QnRequestParams& params, QnJsonRestResult& result);
+    int addCamerasAction(const QnRequestParams& params, QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
 
     /**
-     * @brief getSearchStatus               Get status of the manual camera search process. Thread-safe.
-     * @param searchProcessUuid             Uuid of the process.
-     * @return                              Status of the process.
+     * Get status of the manual camera search process. Thread-safe.
+     * @param searchProcessUuid Uuid of the process.
+     * @return Status of the process.
      */
-    QnManualCameraSearchProcessStatus getSearchStatus(const QnUuid &searchProcessUuid);
+    QnManualCameraSearchProcessStatus getSearchStatus(const QnUuid& searchProcessUuid);
 
     /**
-     * @brief isSearchActive                Check if there is running manual camera search process with the uuid provided.
-     * @param searchProcessUuid             Uuid of the process.
-     * @return                              True if process is running, false otherwise.
+     * Check if there is running manual camera search process with the uuid provided.
+     * @param searchProcessUuid Uuid of the process.
+     * @return True if process is running, false otherwise.
      */
-    bool isSearchActive(const QnUuid &searchProcessUuid);
+    bool isSearchActive(const QnUuid& searchProcessUuid);
+
+    int addCameras(
+        const AddManualCameraData& data,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
 
 private:
-    /** Mutex that is used to synchronize access to manual camera addition progress. */
+    // Mutex that is used to synchronize access to manual camera addition progress.
     QnMutex m_searchProcessMutex;
 
     QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QnUuid, QnConcurrent::QnFuture<bool> > m_searchProcessRuns;
+    QHash<QnUuid, QnConcurrent::QnFuture<bool>> m_searchProcessRuns;
 };
-
-#endif // QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H

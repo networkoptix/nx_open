@@ -54,15 +54,14 @@ UDPClient::UDPClient(SocketAddress serverAddress)
 
 UDPClient::~UDPClient()
 {
-    //if not in aio thread and pleaseStop has not been called earlier - 
-        //undefined behavior can occur
     cleanupWhileInAioThread();
 }
 
 void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(
-        [handler = std::move(handler), this](){
+        [handler = std::move(handler), this]()
+        {
             cleanupWhileInAioThread();
             handler();
         });
@@ -129,18 +128,16 @@ void UDPClient::messageReceived(SocketAddress sourceAddress, Message message)
     auto requestContextIter = m_ongoingRequests.find(message.header.transactionId);
     if (requestContextIter == m_ongoingRequests.end())
     {
-        //this may be late response
-        NX_LOGX(lm("Received message with from %1 with unexpected transaction id %2").
-            arg(sourceAddress.toString()).arg(message.header.transactionId),
-            cl_logDEBUG1);
+        // This may be late response.
+        NX_LOGX(lm("Received message from %1 with unexpected transaction id %2")
+            .strs(sourceAddress, message.header.transactionId.toHex()), cl_logDEBUG1);
         return;
     }
 
     if (sourceAddress != requestContextIter->second.resolvedServerAddress)
     {
-        NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2").
-            arg(message.header.transactionId).arg(sourceAddress.toString()),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2")
+            .strs(message.header.transactionId.toHex(), sourceAddress), cl_logDEBUG1);
         return;
     }
 
@@ -260,20 +257,8 @@ void UDPClient::timedOut(nx::Buffer transactionId)
 
 void UDPClient::cleanupWhileInAioThread()
 {
-    //reporting failure for all ongoing requests
-    std::vector<RequestCompletionHandler> completionHandlers;
-    for (auto& requestData : m_ongoingRequests)
-    {
-        completionHandlers.push_back(
-            std::move(requestData.second.completionHandler));
-    }
-    //timers can be safely removed since we are in aio thread
+    // Timers can be safely removed since we are in aio thread.
     m_ongoingRequests.clear();
-
-    for (auto& completionHandler : completionHandlers)
-        completionHandler(
-            SystemError::interrupted,
-            Message());
 }
 
 }   //stun

@@ -9,6 +9,7 @@ namespace Qn
     //dynamic parameters of resource
 
     static const QString POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME = lit("possibleDefaultCredentials");
+    static const QString FORCED_DEFAULT_CREDENTIALS_PARAM_NAME = lit("forcedDefaultCredentials");
     static const QString PREFERRED_AUTH_SCHEME_PARAM_NAME = lit("preferredAuthScheme");
     static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
     static const QString DTS_PARAM_NAME = lit("dts");
@@ -23,6 +24,7 @@ namespace Qn
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
     static const QString DESIRED_TRANSPORT_PARAM_NAME = lit("desiredTransport");
+    static const QString ONVIF_INPUT_PORT_ALIASES_PARAM_NAME = lit("onvifInputPortAliases");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver
@@ -54,6 +56,8 @@ namespace Qn
     static const QString LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME = lit("lowStreamAvailableBitrates");
     static const QString HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("highStreamBitrateBounds");
     static const QString LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("lowStreamBitrateBounds");
+
+    static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 

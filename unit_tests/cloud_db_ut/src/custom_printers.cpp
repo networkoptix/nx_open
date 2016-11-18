@@ -35,9 +35,9 @@ void PrintTo(ResultCode val, ::std::ostream* os) {
     *os << QnLexical::serialized(val).toStdString();
 }
 
-}   //namespace api
-}   //namespace cdb
-}   //namespace nx
+} // namespace api
+} // namespace cdb
+} // namespace nx
 
 
 namespace std {
@@ -68,5 +68,14 @@ void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os)
     *os << val.time_since_epoch().count() << "ns (utc)";
 }
 
-}   //chrono
-}   //std
+} // namespace chrono
+} // namespace std
+
+namespace ec2 {
+
+void PrintTo(ErrorCode val, ::std::ostream* os)
+{
+    *os << toString(val).toStdString();
+}
+
+} // namespace ec2

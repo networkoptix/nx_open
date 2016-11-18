@@ -1,9 +1,6 @@
-/**********************************************************
-* Jan 27, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
+
+#include <queue>
 
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
@@ -14,7 +11,6 @@
 #include "nx/network/abstract_socket.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
-
 
 namespace nx {
 namespace network {
@@ -85,18 +81,16 @@ private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
         SocketResultPrimisePtr;
 
-    void onAddressResolved(
-        std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,
-        int remotePort,
-        SystemError::ErrorCode osErrorCode,
-        std::vector<AddressEntry> dnsEntries);
-    bool startAsyncConnect(
-        //const SocketAddress& originalAddress,
-        std::vector<AddressEntry> dnsEntries,
-        int port);
-    SystemError::ErrorCode applyRealNonBlockingMode(
-        AbstractStreamSocket* streamSocket);
-    void directConnectDone(SystemError::ErrorCode errorCode);
+    void connectToEntriesAsync(
+        std::deque<AddressEntry> dnsEntries, int port,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    void connectToEntryAsync(
+        const AddressEntry& dnsEntry, int port,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
+    void onDirectConnectDone(SystemError::ErrorCode errorCode);
     void onCloudConnectDone(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
@@ -107,8 +101,7 @@ private:
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */
     std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
-    std::atomic<SocketResultPrimisePtr> m_recvPromisePtr;
-    std::atomic<SocketResultPrimisePtr> m_sendPromisePtr;
+    std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
 
     QnMutex m_mutex;
     bool m_terminated;

@@ -18,6 +18,9 @@ QT_VERSION="${qt.version}"
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$SRC/${display.product.name}.app"
+mkdir -p "$SRC/Nx Witness.app/Contents/Resources"
+cp logo.icns "$SRC/Nx Witness.app/Contents/Resources/appIcon.icns"
+cp logo.icns .VolumeIcon.icns
 
 function hexify
 {
@@ -89,6 +92,7 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DM
 
 [ "$1" == "rwonly" ] && exit 0
 
+mv update.json $SRC
 cd dmg-folder
 zip -y -r ../client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*.app *.json
 cd ..

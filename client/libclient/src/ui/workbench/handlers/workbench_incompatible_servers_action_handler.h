@@ -1,37 +1,34 @@
 #pragma once
 
-#include <QtCore/QObject>
-
-#include <core/resource/resource_fwd.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-
 
 class QnConnectToCurrentSystemTool;
 class QnProgressDialog;
 class QnMergeSystemsDialog;
 
-class QnWorkbenchIncompatibleServersActionHandler : public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchIncompatibleServersActionHandler:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
-    explicit QnWorkbenchIncompatibleServersActionHandler(QObject *parent = 0);
+    QnWorkbenchIncompatibleServersActionHandler(QObject* parent = nullptr);
     ~QnWorkbenchIncompatibleServersActionHandler();
 
-protected slots:
+private:
+    void connectToCurrentSystem(const QnUuid& target, const QString& initialPassword = QString());
+    bool validateStartLicenses(const QnUuid& target, const QString& adminPassword);
+    bool serverHasStartLicenses(
+        const QnMediaServerResourcePtr& server,
+        const QString& adminPassword);
+
     void at_connectToCurrentSystemAction_triggered();
     void at_mergeSystemsAction_triggered();
-
-private:
-    void connectToCurrentSystem(const QSet<QnUuid> &targets, const QString &initialPassword = QString());
-    bool validateStartLicenses(const QSet<QnUuid> &targets, const QString &adminPassword);
-    bool serverHasStartLicenses(const QnMediaServerResourcePtr &server, const QString &adminPassword);
-
-private slots:
     void at_connectTool_finished(int errorCode);
 
 private:

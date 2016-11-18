@@ -2,12 +2,6 @@
 
 #include <common/common_meta_types.h>
 
-typedef QHash<QnUuid, qreal> QnAspectRatioHash;
-Q_DECLARE_METATYPE(QnAspectRatioHash)
-
-typedef QSet<QString> QnStringSet;
-Q_DECLARE_METATYPE(QnStringSet)
-
 enum class LiteModeType
 {
     LiteModeAuto = -1,

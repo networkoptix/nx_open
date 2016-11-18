@@ -41,7 +41,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler handler) override
+        nx_http::RequestProcessedHandler handler) override
     {
         QnModuleInformation moduleInformation;
         if (m_serverIdForModuleInformation)
@@ -71,7 +71,7 @@ MediaServerEmulator::MediaServerEmulator(
         nullptr,
         &m_httpMessageDispatcher,
         false,
-        SocketFactory::NatTraversalType::nttDisabled),
+        nx::network::NatTraversalSupport::disabled),
     m_systemData(std::move(systemData)),
     m_serverId(
         serverName.isEmpty()

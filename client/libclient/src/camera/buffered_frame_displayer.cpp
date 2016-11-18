@@ -5,6 +5,7 @@
 #include "abstract_renderer.h"
 
 QnBufferedFrameDisplayer::QnBufferedFrameDisplayer():
+    base_type(),
     m_queue(11)
 {
     m_currentTime = AV_NOPTS_VALUE;
@@ -88,9 +89,16 @@ void QnBufferedFrameDisplayer::overrideTimestampOfNextFrameToRender(qint64 value
     m_lastDisplayedTime = value;
 }
 
+void QnBufferedFrameDisplayer::pleaseStop()
+{
+    base_type::pleaseStop();
+    m_queue.setTerminated(true);
+}
+
 void QnBufferedFrameDisplayer::run()
 {
     QSharedPointer<CLVideoDecoderOutput> frame;
+    m_queue.setTerminated(false);
     while (!needToStop())
     {
         {
@@ -161,7 +169,8 @@ void QnBufferedFrameDisplayer::run()
             }
             //m_drawer->waitForFrameDisplayed(0);
             syncLock.relock();
-            m_queue.pop(frame);
+            if (m_queue.size() > 0)
+                m_queue.pop(frame); //< queue clear could be called from other thread
             syncLock.unlock();
             //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
         }

@@ -53,6 +53,9 @@ public:
     static int main(int argc, char* argv[]);
 
     void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
+    void setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint);
+    void setEngineVersion(const QnSoftwareVersion& version);
+
 signals:
     void started();
 public slots:
@@ -84,6 +87,7 @@ private:
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
+    void registerRestHandlers(CloudConnectionManager* const cloudConnectionManager);
     bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
@@ -117,6 +121,8 @@ private:
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
     QVector<QString> m_hardwareGuidList;
+    QString m_enforcedMediatorEndpoint;
+    QnSoftwareVersion m_engineVersion;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

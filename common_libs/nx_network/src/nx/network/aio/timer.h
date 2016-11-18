@@ -13,14 +13,12 @@
 #include "abstract_pollable.h"
 #include "nx/network/system_socket.h"
 
-
 namespace nx {
 namespace network {
 namespace aio {
 
 /**
  * Single-shot timer that runs in aio thread.
- //TODO #ak introduce implementation without socket handle
  */
 class NX_NETWORK_API Timer
 :
@@ -39,16 +37,17 @@ public:
     virtual void bindToAioThread(AbstractAioThread* aioThread) override;
 
     /** 
-        \note If timer is already started, this method overwrites timer, not adds a new one!
-    */
+     * @note If timer is already started, this method overwrites timer, not adds a new one!
+     */
     void start(
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> timerFunc);
     std::chrono::nanoseconds timeToEvent() const;
     void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
-    /** Cancels timer waiting for \a timerFunc to complete.
-        Can be safely called within timer's aio thread
-    */
+    /**
+     * Cancels timer waiting for timerFunc to complete.
+     * Can be safely called within timer's aio thread.
+     */
     void cancelSync();
 
     bool isInSelfAioThread() const;
@@ -59,6 +58,6 @@ private:
     UDPSocket m_internalSocket;
 };
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

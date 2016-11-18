@@ -91,17 +91,8 @@ protected:
         }
     }
 
-
     static const int CONCURRENT_CONNECTIONS = 30;
     static const int TOTAL_CONNECTIONS = 3000;
-
-    static void SetUpTestCase()
-    {
-    }
-
-    static void TearDownTestCase()
-    {
-    }
 };
 
 /*!
@@ -109,52 +100,51 @@ protected:
 */
 TEST( Socket, AsyncOperationCancellation )
 {
-    static const std::chrono::milliseconds TEST_DURATION(
-        300 * nx::utils::TestOptions::timeoutMultiplier());
+    static const std::chrono::milliseconds TEST_DURATION( 200 );
+    static const int TEST_RUNS = 8;
+    static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
+    static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
 
-    static const int kTestRuns = 5;
-    static const int THREADS = 3;
+    const QString kTestHost = QLatin1String("some-test-host-456233.com");
+    std::vector<HostAddress> kTestAddresses;
+    kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
+    kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd"));
+    kTestAddresses.push_back(*HostAddress::ipV4from("127.0.0.1"));
 
-    std::vector<nx::utils::thread> threads(THREADS);
-    for (size_t i = 0; i < threads.size(); ++i)
+    auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
+    dnsResolver.addEtcHost(kTestHost, kTestAddresses);
+    auto onExit = [&]( void* ) { dnsResolver.removeEtcHost(kTestHost); };
+    std::unique_ptr<void, decltype(onExit)> guard(this, std::move(onExit));
+
+    for( int i = 0; i < TEST_RUNS; ++i )
     {
-        threads[i] = nx::utils::thread(
-            [](){
-                for (int j = 0; j < kTestRuns; ++j)
-                {
-                    static const int MAX_SIMULTANEOUS_CONNECTIONS = 25;
-                    static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
+        std::vector<HostAddress> kConnectAddresses;
+        kConnectAddresses.push_back(HostAddress("localhost"));
+        kConnectAddresses.push_back(kTestHost);
+        for (const auto host: kConnectAddresses)
+        {
+            RandomDataTcpServer server(
+                TestTrafficLimitType::none,
+                BYTES_TO_SEND_THROUGH_CONNECTION,
+                SocketFactory::isSslEnforced()
+                    ? TestTransmissionMode::pong
+                    : TestTransmissionMode::spam);
+            ASSERT_TRUE(server.start());
 
-                    RandomDataTcpServer server(
-                        TestTrafficLimitType::none,
-                        BYTES_TO_SEND_THROUGH_CONNECTION,
-                        SocketFactory::isSslEnforced()
-                            ? TestTransmissionMode::pong
-                            : TestTransmissionMode::spam);
-                    ASSERT_TRUE(server.start());
+            ConnectionsGenerator connectionsGenerator(
+                SocketAddress(host, server.addressBeingListened().port),
+                MAX_SIMULTANEOUS_CONNECTIONS,
+                TestTrafficLimitType::incoming,
+                BYTES_TO_SEND_THROUGH_CONNECTION,
+                ConnectionsGenerator::kInfiniteConnectionCount,
+                TestTransmissionMode::spam);
+            connectionsGenerator.start();
 
-                    ConnectionsGenerator connectionsGenerator(
-                        SocketAddress(QString::fromLatin1("localhost"), server.addressBeingListened().port),
-                        MAX_SIMULTANEOUS_CONNECTIONS,
-                        TestTrafficLimitType::incoming,
-                        BYTES_TO_SEND_THROUGH_CONNECTION,
-                        ConnectionsGenerator::kInfiniteConnectionCount,
-                        TestTransmissionMode::spam);
-                    connectionsGenerator.start();
-
-                    std::this_thread::sleep_for(TEST_DURATION);
-
-                    connectionsGenerator.pleaseStopSync();
-                    server.pleaseStopSync();
-
-                    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
-                    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
-                }
-            });
+            std::this_thread::sleep_for(TEST_DURATION);
+            connectionsGenerator.pleaseStopSync();
+            server.pleaseStopSync();
+        }
     }
-
-    for (size_t i = 0; i < threads.size(); ++i)
-        threads[i].join();
 
     //waiting for some calls to deleted objects
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
@@ -276,48 +266,44 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 
 TEST( Socket, HostNameResolve3 )
 {
-    nx::network::DnsResolver dnsResolver;
-
+    auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     {
-        HostAddress resolvedAddress;
-        EXPECT_TRUE(
-            dnsResolver.resolveAddressSync(
-                QLatin1String("ya.ru"),
-                &resolvedAddress,
-                AF_INET));
-
-        ASSERT_TRUE((bool)resolvedAddress.ipV4() != 0);
-        EXPECT_NE(resolvedAddress.ipV4()->s_addr, 0);
+        const auto ips = dnsResolver.resolveSync(QLatin1String("ya.ru"), AF_INET);
+        ASSERT_GE(ips.size(), 1);
+        ASSERT_TRUE(ips.front().isIpAddress());
+        ASSERT_TRUE((bool)ips.front().ipV4());
+        ASSERT_TRUE((bool)ips.front().ipV6());
+        ASSERT_NE(0, ips.front().ipV4()->s_addr);
     }
-
     {
-        HostAddress resolvedAddress;
-        ASSERT_FALSE(
-            dnsResolver.resolveAddressSync(
-                QLatin1String("hren2349jf234.ru"),
-                &resolvedAddress,
-                AF_INET));
+        const auto ips = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET);
+        ASSERT_EQ(0, ips.size());
+        ASSERT_EQ(SystemError::hostNotFound, SystemError::getLastOSErrorCode());
     }
-
     {
-        HostAddress resolvedAddress("ya.ru");
-        ASSERT_TRUE(
-            dnsResolver.resolveAddressSync(
-                resolvedAddress.toString(),
-                &resolvedAddress,
-                AF_INET));
+        const QString kTestHost = QLatin1String("some-test-host-543242145.com");
+        std::vector<HostAddress> kTestAddresses;
+        kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
+        kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd"));
 
-        ASSERT_TRUE((bool)resolvedAddress.ipV4());
-        ASSERT_TRUE((bool)resolvedAddress.ipV6());
-        ASSERT_NE(resolvedAddress.ipV4()->s_addr, 0);
+        dnsResolver.addEtcHost(kTestHost, kTestAddresses);
+        const auto ip4s = dnsResolver.resolveSync(kTestHost, AF_INET);
+        const auto ip6s = dnsResolver.resolveSync(kTestHost, AF_INET6);
+        dnsResolver.removeEtcHost(kTestHost);
+
+        ASSERT_EQ(1, ip4s.size());
+        ASSERT_EQ(kTestAddresses.front(), ip4s.front());
+        ASSERT_EQ(2, ip6s.size());
+        ASSERT_EQ(kTestAddresses.front(), ip6s.front());
+        ASSERT_EQ(kTestAddresses.back(), ip6s.back());
     }
 }
 
 TEST( Socket, HostNameResolveCancellation )
 {
-    static const int kTestRuns = 100;
+    static const int TEST_RUNS = 100;
 
-    for( int i = 0; i < kTestRuns; ++i )
+    for( int i = 0; i < TEST_RUNS; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
         SystemError::ErrorCode connectErrorCode = SystemError::noError;
@@ -328,15 +314,13 @@ TEST( Socket, HostNameResolveCancellation )
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
         connection->connectAsync(
             SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
-            [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](
-                SystemError::ErrorCode errorCode) mutable
-            {
+            [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
                 std::unique_lock<std::mutex> lk( mutex );
                 connectErrorCode = errorCode;
                 cond.notify_all();
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
-            });
+            } );
         connection->pleaseStopSync();
     }
 }

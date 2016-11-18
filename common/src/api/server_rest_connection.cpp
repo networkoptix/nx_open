@@ -383,7 +383,6 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     request.headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
     request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toLower().toUtf8());
-    request.headers.emplace("User-Agent", nx_http::userAgentString());
 
     QnRoute route = QnRouter::instance()->routeTo(server->getId());
     if (route.reverseConnect)
@@ -415,9 +414,8 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
 Handle ServerConnection::sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback)
 {
     auto httpPool = nx_http::ClientPool::instance();
-    Handle requestId = httpPool->sendRequest(request);
-
     QnMutexLocker lock(&m_mutex);
+    Handle requestId = httpPool->sendRequest(request);
     m_runningRequests.insert(requestId, callback);
     return requestId;
 }

@@ -15,6 +15,7 @@
 #include <common/common_module.h>
 #include <utils/media/ffmpeg_initializer.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 // Config for debugging the tests.
 static const struct
@@ -337,6 +338,10 @@ public:
             {
                 checkActualValues(MEDIA_Quality_High, QSize());
             }
+            else if (expectedQuality == media_player_quality_chooser::kQualityLowIframesOnly)
+            {
+                checkActualValues(MEDIA_Quality_LowIframesOnly, QSize());
+            }
             else
             {
                 checkActualValues(MEDIA_Quality_CustomResolution,
@@ -353,8 +358,8 @@ private:
         if (expectedMediaQuality != m_actualQuality)
         {
             ADD_FAILURE() << "MediaQuality: "
-                << "expected " << mediaQualityToString(expectedMediaQuality)
-                << ", actual " << mediaQualityToString(m_actualQuality);
+                << "expected " << QnLexical::serialized(expectedMediaQuality).toUtf8().constData()
+                << ", actual " << QnLexical::serialized(m_actualQuality).toUtf8().constData();
         }
 
         if (expectedResolution != m_actualResolution)
@@ -373,7 +378,7 @@ private:
         m_calledSetQuality = true;
 
         LOG(lit("setQuality(%1, fastSwitch: %2, %3 x %4);")
-            .arg(mediaQualityToString(quality))
+            .arg(QnLexical::serialized(quality))
             .arg(fastSwitch)
             .arg(resolution.width())
             .arg(resolution.height()));
@@ -437,8 +442,10 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     static const QSize none{};
     static const QSize high{media_player_quality_chooser::kQualityHigh};
     static const QSize low{media_player_quality_chooser::kQualityLow};
+    static const QSize lowIframes{media_player_quality_chooser::kQualityLowIframesOnly};
     static const Player::VideoQuality hi{Player::HighVideoQuality};
     static const Player::VideoQuality lo{Player::LowVideoQuality};
+    static const Player::VideoQuality li{Player::LowIframesOnlyVideoQuality};
     static const bool no = false;
     static const bool yes = true;
     #define T(...) test.test(__LINE__, #__VA_ARGS__, __VA_ARGS__)
@@ -489,6 +496,9 @@ TEST_F(NxMediaPlayerTest, SetQuality)
 
     // Panoramic camera: transcoding is not supported, thus, low quality should be chosen.
     T(4, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, low        );
+
+    // Low stream I-frames only requested.
+    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},   li, lowIframes );
 
     #undef T
 

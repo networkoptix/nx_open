@@ -176,7 +176,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             // estabilish new connection
             m_connectingSocket = 
                 SocketFactory::createStreamSocket(
-                    m_useSsl, SocketFactory::NatTraversalType::nttDisabled );
+                    m_useSsl, nx::network::NatTraversalSupport::disabled );
             m_connectingSocket->bindToAioThread(m_timer.getAioThread());
 
             auto onComplete = [ this ]( SystemError::ErrorCode code )

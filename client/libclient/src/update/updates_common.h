@@ -38,6 +38,9 @@ Q_DECLARE_METATYPE(QnCheckForUpdateResult)
 
 struct QnUpdateResult
 {
+    Q_DECLARE_TR_FUNCTIONS(QnUpdateResult)
+public:
+
     enum Value
     {
         Successful,
@@ -57,10 +60,14 @@ struct QnUpdateResult
     };
 
     QnUpdateResult():
-        result(Cancelled) {}
+        result(Cancelled)
+    {}
 
     explicit QnUpdateResult(Value result):
-        result(result) {}
+        result(result)
+    {}
+
+    QString errorMessage() const;
 
     Value result;
     QnSoftwareVersion targetVersion;

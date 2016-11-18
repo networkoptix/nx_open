@@ -65,11 +65,10 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <failOnError>false</failOnError>
                             <skip>skip-deb</skip>                        
                             <target>							
                                 <chmod file="${project.build.directory}/*.sh" perm="755"/>							
-                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build-dist.sh" failifexecutionfails="true" />                                        
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build-dist.sh"  failonerror="true" failifexecutionfails="true" />                                        
                             </target>
                         </configuration>
                     </execution>					

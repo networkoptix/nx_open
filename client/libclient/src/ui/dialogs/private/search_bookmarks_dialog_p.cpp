@@ -305,7 +305,7 @@ QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() c
     return qnResPool->getAllCameras(QnResourcePtr(), true).filtered(
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            return accessController()->hasPermissions(camera, Qn::ReadPermission);
+            return accessController()->hasPermissions(camera, Qn::ViewContentPermission);
         }
     );
 }
@@ -337,33 +337,10 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 
     m_model->setCameras(correctCameras);
 
-    const bool hasAllCameras = currentUserHasAllCameras();
-   // setReadOnly(m_ui->cameraButton, !hasAllCameras);
-
-    if (cameras.empty())
-    {
-        static const auto kAnyDevicesStringsSet = QnCameraDeviceStringSet(
-            tr("<Any Device>"), tr("<Any Camera>"), tr("<Any I/O Module>"));
-        static const auto kAnyMyDevicesStringsSet = QnCameraDeviceStringSet(
-            tr("<All My Devices>"), tr("<All My Cameras>"), tr("<All My I/O Modules>"));
-
-        const auto &devicesStringsSet = (hasAllCameras
-            ? kAnyDevicesStringsSet : kAnyMyDevicesStringsSet);
-
-        m_ui->cameraButton->setText(QnDeviceDependentStrings::getNameFromSet(
-            devicesStringsSet, correctCameras));
-        return;
-    }
-
-    const auto devicesStringSet = QnCameraDeviceStringSet(
-          tr("<%n device(s)>",      "", cameras.size())
-        , tr("<%n camera(s)>",      "", cameras.size())
-        , tr("<%n I/O module(s)>",  "", cameras.size()));
-
-    const auto caption = QnDeviceDependentStrings::getNameFromSet(
-        devicesStringSet, cameras);
-
-    m_ui->cameraButton->setText(caption);
+    if (m_allCamerasChoosen)
+        m_ui->cameraButton->selectAll();
+    else
+        m_ui->cameraButton->selectDevices(cameras);
 }
 
 void QnSearchBookmarksDialogPrivate::chooseCamera()

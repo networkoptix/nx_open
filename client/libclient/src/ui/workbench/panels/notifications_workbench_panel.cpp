@@ -1,5 +1,7 @@
 #include "notifications_workbench_panel.h"
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -22,14 +24,6 @@
 #include <ui/workbench/panels/buttons.h>
 
 #include <utils/common/scoped_value_rollback.h>
-
-
-namespace {
-
-static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 300;
-
-}
 
 namespace NxUi {
 
@@ -99,7 +93,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
             if (!isPinned())
@@ -140,6 +134,8 @@ bool NotificationsWorkbenchPanel::isOpened() const
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 {
+    using namespace nx::client::ui::workbench;
+
     ensureAnimationAllowed(&animate);
 
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
@@ -148,11 +144,9 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
     action(QnActions::ToggleNotificationsAction)->setChecked(opened);
 
     xAnimator->stop();
-    if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
-    else
-        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
-    xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
+    qnWorkbenchAnimations->setupAnimator(xAnimator, opened
+        ? Animations::Id::NotificationsPanelExpand
+        : Animations::Id::NotificationsPanelCollapse);
 
     qreal width = item->size().width();
     qreal newX = m_parentWidget->rect().right()

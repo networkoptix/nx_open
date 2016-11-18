@@ -10,10 +10,11 @@ var Config = {
 
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
+    globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
 
-    productName: 'Nx Witness',
+    productName: 'VMS NAME',
     cloud: {
-        productName: 'Nx Cloud',
+        productName: 'CLOUD NAME',
         webadminSetupContext: '?from=webadmin&context=setup',
         clientSetupContext: '?from=client&context=setup',
         webadminContext: '?from=webadmin&context=settings',

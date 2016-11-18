@@ -126,6 +126,7 @@ public:
 
     /** Enables outgoing transaction channel. */
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
+    void monitorConnectionForClosure();
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
     int keepAliveProbeCount() const;
@@ -155,6 +156,7 @@ public:
     const ec2::ApiPeerData& remotePeer() const;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
+    int remotePeerProtocolVersion() const;
 
     nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
 
@@ -349,6 +351,7 @@ private:
     std::unique_ptr<nx::network::aio::Timer> m_timer;
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
+    int m_remotePeerEcProtoVersion;
 
 private:
     QnTransactionTransportBase(
@@ -378,7 +381,7 @@ private:
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
-    void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onMonitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
     QUrl generatePostTranUrl();
     void aggregateOutgoingTransactionsNonSafe();
 

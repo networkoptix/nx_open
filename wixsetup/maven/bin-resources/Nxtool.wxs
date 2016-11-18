@@ -147,7 +147,6 @@
             <ComponentRef Id="NxtoolExecutable" />
             <ComponentRef Id="nxtoolShortcutDesktop"/>
             <ComponentRef Id="NxtoolConfiguration" />
-            <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentGroupRef Id="NxtoolQTLibraries" />
             <ComponentGroupRef Id="NxtoolQuickControlsComponent"/>
             <ComponentGroupRef Id="QtQuickDialogsFiles" />
@@ -155,6 +154,7 @@
             <ComponentGroupRef Id="QtQuickWindow2Files" />
             <ComponentGroupRef Id="QtQuick2Files" />
             <ComponentGroupRef Id="Platforms" />
+            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>

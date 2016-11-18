@@ -123,8 +123,11 @@ int QnSetupCloudSystemRestHandler::execute(
 
 
     QString errStr;
+    PasswordData adminPasswordData;
+    // reset admin password to random value to prevent NX1 root login via default password
+    adminPasswordData.password = QnUuid::createUuid().toString();
     if (!updateUserCredentials(
-        PasswordData(),
+        adminPasswordData,
         QnOptionalBool(false),
         qnResPool->getAdministrator(),
         &errStr))

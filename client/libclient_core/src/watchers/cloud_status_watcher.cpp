@@ -11,15 +11,18 @@
 
 #include <client_core/client_core_settings.h>
 
-#include <cdb/connection.h>
+#include <cloud/cloud_connection.h>
 
 #include <utils/common/delayed.h>
+
+#include <nx_ec/data/api_cloud_system_data.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
+
+#include <network/cloud_system_data.h>
 
 using namespace nx::cdb;
 
@@ -36,18 +39,6 @@ const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
-QString getLocalSystemId(const std::string& opaque)
-{
-    QMap<QByteArray, QByteArray> params;
-    nx::utils::parseNameValuePairs(QByteArray::fromStdString(opaque), ',', &params);
-
-    static const auto kOpaqueLocalSystemIdTag = QByteArray("localSystemId");
-    if (!params.contains(kOpaqueLocalSystemIdTag))
-        return QString();
-
-    return QString::fromUtf8(params.value(kOpaqueLocalSystemIdTag));
-}
-
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 {
     QnCloudSystemList result;
@@ -57,11 +48,15 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         if (systemData.status != api::SystemStatus::ssActivated)
             continue;
 
+        auto data = QJson::deserialized<ec2::ApiCloudSystemData>(
+            QByteArray::fromStdString(systemData.opaque));
+
         QnCloudSystem system;
         system.cloudId = QString::fromStdString(systemData.id);
-        system.localId = getLocalSystemId(systemData.opaque);
-        if (system.localId.isEmpty())
-            system.localId = system.cloudId;
+
+        system.localId = data.localSystemId;
+        if (system.localId.isNull())
+            system.localId = guidFromArbitraryData(system.cloudId);
 
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
@@ -77,8 +72,6 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 }
 
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCloudSystem), (json), _Fields)
 
 class QnCloudStatusWatcherPrivate : public QObject
 {
@@ -97,7 +90,6 @@ public:
 
     QTimer *updateTimer;
 
-    std::unique_ptr<api::ConnectionFactory, decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> temporaryConnection;
 
@@ -157,6 +149,8 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     Q_D(QnCloudStatusWatcher);
     connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
         d, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
+    connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
+        d, &QnCloudStatusWatcherPrivate::setRecentCloudSystems);
     connect(this, &QnCloudStatusWatcher::recentCloudSystemsChanged, this,
         [this]()
         {
@@ -164,9 +158,8 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
             qnClientCoreSettings->save();
         });
 
-    setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
     //TODO: #GDM store temporary credentials
-    setCloudCredentials(QnCredentials(
+    setCredentials(QnCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -187,24 +180,6 @@ QnCredentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
     return d->credentials;
-}
-
-void QnCloudStatusWatcher::setCredentials(const QnCredentials& value)
-{
-    Q_D(QnCloudStatusWatcher);
-    if (d->credentials == value)
-        return;
-
-    bool isUserChanged = d->credentials.user != value.user;
-    bool isPasswordChanged = d->credentials.password != value.password;
-
-    d->credentials = value;
-    d->updateConnection();
-
-    if (isUserChanged)
-        emit loginChanged();
-    if (isPasswordChanged)
-        emit passwordChanged();
 }
 
 QString QnCloudStatusWatcher::cloudLogin() const
@@ -269,23 +244,34 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
         });
 }
 
-void QnCloudStatusWatcher::resetCloudCredentials()
+void QnCloudStatusWatcher::resetCredentials()
 {
-    setCloudCredentials(QnCredentials());
+    setCredentials(QnCredentials());
 }
 
-void QnCloudStatusWatcher::setCloudCredentials(const QnCredentials& credentials, bool initial)
+void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
-    if (d->credentials == credentials)
+    const auto loweredCredentials =
+        QnCredentials(credentials.user.toLower(), credentials.password);
+
+    if (d->credentials == loweredCredentials)
         return;
 
-    d->credentials = credentials;
+    const bool userChanged = (d->credentials.user != loweredCredentials.user);
+    const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
+
+    d->credentials = loweredCredentials;
 
     d->updateConnection(initial);
-    emit loginChanged();
-    emit passwordChanged();
+
+    emit credentialsChanged();
+
+    if (userChanged)
+        emit this->loginChanged();
+    if (passwordChanged)
+        emit this->passwordChanged();
 }
 
 QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
@@ -294,32 +280,6 @@ QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
     return QnCredentials(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
-}
-
-QString QnCloudStatusWatcher::cloudEndpoint() const
-{
-    Q_D(const QnCloudStatusWatcher);
-    return lit("%1:%2").arg(QString::fromStdString(d->cloudHost)).arg(d->cloudPort);
-}
-
-void QnCloudStatusWatcher::setCloudEndpoint(const QString &endpoint)
-{
-    Q_D(QnCloudStatusWatcher);
-
-    QUrl url = QUrl::fromUserInput(endpoint);
-
-    if (!url.isValid())
-        return;
-
-    d->cloudHost = url.host().toStdString();
-    d->cloudPort = url.port();
-
-    if (!d->cloudHost.empty() || d->cloudPort <= 0)
-        return;
-
-    d->connectionFactory->setCloudEndpoint(d->cloudHost, d->cloudPort);
-
-    d->updateConnection();
 }
 
 QnCloudStatusWatcher::ErrorCode QnCloudStatusWatcher::error() const
@@ -354,17 +314,8 @@ void QnCloudStatusWatcher::updateSystems()
             if (!guard)
                 return;
 
-            Q_D(QnCloudStatusWatcher);
-            if (!d->cloudConnection)
-                return;
-
-            QnCloudSystemList cloudSystems;
-
-            if (result == api::ResultCode::ok)
-                cloudSystems = getCloudSystemList(systemsList);
-
             const auto handler =
-                [this, guard, result, cloudSystems]()
+                [this, guard, result, systemsList]()
                 {
                     if (!guard)
                         return;
@@ -372,6 +323,10 @@ void QnCloudStatusWatcher::updateSystems()
                     Q_D(QnCloudStatusWatcher);
                     if (!d->cloudConnection)
                         return;
+
+                    QnCloudSystemList cloudSystems;
+                    if (result == api::ResultCode::ok)
+                        cloudSystems = getCloudSystemList(systemsList);
 
                     d->setCloudEnabled((result != api::ResultCode::networkError)
                         && (result != api::ResultCode::serviceUnavailable));
@@ -420,7 +375,6 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     stayConnected(false),
     errorCode(QnCloudStatusWatcher::NoError),
     updateTimer(new QTimer(this)),
-    connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
     status(QnCloudStatusWatcher::LoggedOut),
     cloudSystems(),
     recentCloudSystems(qnClientCoreSettings->recentCloudSystems()),
@@ -437,7 +391,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
-    connect(m_pingTimer, &QTimer::timeout, this, &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
+    connect(m_pingTimer, &QTimer::timeout, this,
+        &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
 }
 
 bool QnCloudStatusWatcherPrivate::cloudIsEnabled() const
@@ -455,7 +410,6 @@ void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
     m_cloudIsEnabled = enabled;
     emit q->isCloudEnabledChanged();
 }
-
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 {
@@ -480,7 +434,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         return;
     }
 
-    cloudConnection = connectionFactory->createConnection();
+    cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(credentials.user.toStdString(),
         credentials.password.toStdString());
 
@@ -524,9 +478,11 @@ void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCl
     if (cloudSystems == newCloudSystems)
         return;
 
+    Q_Q(QnCloudStatusWatcher);
+    emit q->beforeCloudSystemsChanged(newCloudSystems);
+
     cloudSystems = newCloudSystems;
 
-    Q_Q(QnCloudStatusWatcher);
     emit q->cloudSystemsChanged(cloudSystems);
 
     updateCurrentSystem();
@@ -577,13 +533,25 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
             Q_Q(QnCloudStatusWatcher);
             q->setEffectiveUserName(value);
         };
-    auto targetThread = QThread::currentThread();
 
-    cloudConnection->accountManager()->getAccount(
-        [callback, targetThread](api::ResultCode result, api::AccountData accountData)
-    {
-        executeDelayed([callback, result, accountData] { callback(result, accountData); }, 0, targetThread);
-    });
+    const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
+    const auto completionHandler =
+        [callback, guard, thread](api::ResultCode result, api::AccountData accountData)
+        {
+            if (!guard)
+                return;
+
+            const auto timerCallback =
+                [callback, result, accountData, guard]()
+                {
+                    if (guard)
+                        callback(result, accountData);
+                };
+            executeDelayed(timerCallback, 0, thread);
+        };
+
+    cloudConnection->accountManager()->getAccount(completionHandler);
 }
 
 void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
@@ -613,13 +581,26 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
             m_pingTimer->setInterval(keepAliveMs);
             m_pingTimer->start();
         };
-    auto targetThread = QThread::currentThread();
 
-    cloudConnection->accountManager()->createTemporaryCredentials(params,
-        [callback, targetThread](api::ResultCode result, api::TemporaryCredentials credentials)
+
+    const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
+    const auto completionHandler =
+        [callback, guard, thread](api::ResultCode result, api::TemporaryCredentials credentials)
         {
-            executeDelayed([callback, result, credentials]{ callback(result, credentials); }, 0, targetThread);
-        });
+            if (!guard)
+                return;
+
+            const auto timerCallback =
+                [callback, result, credentials, guard]
+                {
+                    if (guard)
+                        callback(result, credentials);
+                };
+            executeDelayed(timerCallback, 0, thread);
+        };
+
+    cloudConnection->accountManager()->createTemporaryCredentials(params, completionHandler);
 }
 
 void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
@@ -631,7 +612,7 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
     if (!temporaryConnection)
     {
         TRACE("Creating new temporary connection");
-        temporaryConnection = connectionFactory->createConnection();
+        temporaryConnection = qnCloudConnectionProvider->createConnection();
         temporaryConnection->setCredentials(temporaryCredentials.login, temporaryCredentials.password);
     }
 
@@ -651,50 +632,25 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
                 createTemporaryCredentials();
             }
         };
-    auto targetThread = QThread::currentThread();
 
     TRACE("Ping...");
-    temporaryConnection->ping(
-        [callback, targetThread](api::ResultCode result, api::ModuleInfo info)
+    const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
+    const auto completionHandler =
+        [callback, guard, thread](api::ResultCode result, api::ModuleInfo info)
         {
             Q_UNUSED(info);
-            executeDelayed([callback, result]{ callback(result); }, 0, targetThread);
-        });
-}
+            if (!guard)
+                return;
 
-bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
-{
-    return ((cloudId == other.cloudId)
-        && (localId == other.localId)
-        && (name == other.name)
-        && (authKey == other.authKey)
-        && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
-        && qFuzzyEquals(weight, other.weight));
-}
+            const auto timerCallback =
+                [callback, result, guard]()
+                {
+                    if (guard)
+                        callback(result);
+                };
+            executeDelayed(timerCallback, 0, thread);
+        };
 
-bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const
-{
-    return (cloudId == other.cloudId
-        && (localId == other.localId)
-        && (name == other.name)
-        && (authKey == other.authKey)
-        && (ownerAccountEmail == other.ownerAccountEmail)
-        && (ownerFullName == other.ownerFullName));
-}
-
-void QnCloudSystem::writeToSettings(QSettings* settings) const
-{
-
-    QByteArray json;
-    QJson::serialize(*this, &json);
-    const auto value = QVariant::fromValue(json);
-    settings->setValue(kCloudSystemJsonHolderTag, value);
-}
-
-QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
-{
-    QnCloudSystem result;
-    const auto json = settings->value(kCloudSystemJsonHolderTag).toByteArray();
-    QJson::deserialize(json, &result);
-    return result;
+    temporaryConnection->ping(completionHandler);
 }

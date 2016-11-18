@@ -8,7 +8,7 @@ properties_dir='${root.dir}/wixsetup/${arch}'
 #    os.makedirs(properties_dir)
 #os.system("echo ${install.type}=${finalName}.msi >> %s/installer.properties " % properties_dir)
 
-generated_items = ['vs2015crt', 'fonts', 'qml', 'dbsync', 'help', 'vox', 'bg']
+generated_items = ['fonts', 'qml', 'help', 'vox', 'bg', 'vcrt14']
 
 if '${nxtool}' == 'true':
     generated_items += ['qtquickcontrols']
@@ -19,6 +19,6 @@ for wxs in generated_items:
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
     print out
     p.wait()
-    if p.returncode:  
-        print "failed with code: %s" % str(p.returncode) 
+    if p.returncode:
+        print "failed with code: %s" % str(p.returncode)
         sys.exit(1)

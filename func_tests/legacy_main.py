@@ -11,7 +11,7 @@ import threading
 
 from functest_util import *
 from generator import *
-from testbase import RunTests as RunBoxTests, LegacyTestWrapper, FuncTestMaster, getTestMaster
+from testbase import FuncTestMaster, getTestMaster
 
 testMaster = getTestMaster()  # it's a singleton
 
@@ -99,7 +99,7 @@ class _pvt(object):
 
         def test(self):
             print "\n==================================="
-            print "Test %s start!\n" % (self._getMethodName(),)
+            print "Test %s start\n" % (self._getMethodName(),)
 
             postDataList = self._generateModifySeq()
 
@@ -127,7 +127,7 @@ class _pvt(object):
                 else:
                     break
 
-            print "Test %s done!" % (self._getMethodName())
+            print "Test %s done" % (self._getMethodName())
             print "===================================\n"
 
 
@@ -318,7 +318,7 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
         print "Confilication data generation done"
 
         self._testCase = testMaster.testCaseSize
-        self._conflictList = [("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
+        self._conflictList = [ ("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
             ("removeResource","saveUser",UserConflictionDataGenerator(dataGen)),
             ("removeResource","saveCameras",CameraConflictionDataGenerator(dataGen))]
 
@@ -340,8 +340,8 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
     def test(self):
         workerQueue = ClusterWorker(testMaster.threadNumber, self._testCase * 2)
 
-        print "===================================\n"
-        print "Test:ResourceConfliction start!\n"
+        print "==================================="
+        print "Test: ResourceConfliction start\n"
 
         for _ in xrange(self._testCase):
             conf = self._generateResourceConfliction()
@@ -349,15 +349,14 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
             data = conf[2].generateData()
 
             # modify the resource
-            workerQueue.enqueue(self._sendRequest , (conf[1],data[0][0],s1,))
-            # remove the resource
-            workerQueue.enqueue(self._sendRequest , (conf[0],data[0][1],s2,))
+            workerQueue.enqueue(self._sendRequest, (conf[1],data[0][0],s1,))
+            workerQueue.enqueue(self._sendRequest, (conf[0],data[0][1],s2,))
 
         workerQueue.join()
 
         self._checkStatus()
 
-        print "Test:ResourceConfliction finish!\n"
+        print "Test: ResourceConfliction done"
         print "===================================\n"
 
 

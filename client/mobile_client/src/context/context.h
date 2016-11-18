@@ -12,11 +12,13 @@ class QnCloudStatusWatcher;
 class QnMobileClientUiController;
 class QnUserWatcher;
 class QnCloudUrlHelper;
+class NxGlobalsObject;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
+    Q_PROPERTY(NxGlobalsObject* Nx MEMBER m_nxGlobals CONSTANT)
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnContextSettings* settings MEMBER m_settings CONSTANT)
@@ -59,10 +61,10 @@ public:
 
     Q_INVOKABLE void removeSavedConnection(const QString& systemName);
 
-    Q_INVOKABLE void setLastUsedConnection(const QString& systemId, const QUrl& url);
     Q_INVOKABLE void clearLastUsedConnection();
-    Q_INVOKABLE QString getLastUsedSystemId() const;
-    Q_INVOKABLE QString getLastUsedUrl() const;
+    Q_INVOKABLE QString getLastUsedSystemName() const;
+    Q_INVOKABLE QUrl getLastUsedUrl() const;
+    Q_INVOKABLE QUrl getInitialUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 
@@ -70,6 +72,7 @@ public:
     void setLocalPrefix(const QString& prefix);
 
 private:
+    NxGlobalsObject* m_nxGlobals;
     QnConnectionManager *m_connectionManager;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;

@@ -64,7 +64,7 @@ protected:
     }
 
     SocketAddress startServer(
-        const SocketAddress& address = SocketAddress::anyAddress)
+        const SocketAddress& address = SocketAddress(HostAddress::localhost, 0))
     {
         server = std::make_unique<TestServer>(dispatcher);
 

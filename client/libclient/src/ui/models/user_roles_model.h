@@ -5,6 +5,8 @@
 
 #include <utils/common/connective.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx_ec/data/api_fwd.h>
 
 #include <nx/utils/scoped_model_operations.h>
@@ -31,7 +33,12 @@ public:
 
     /* Role-specific stuff: */
 
+    int rowForUser(const QnUserResourcePtr& user) const;
+
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);
+
+    /* If we want to override "Custom" role name and tooltip: */
+    void setCustomRoleStrings(const QString& name, const QString& description);
 
     /* QAbstractItemModel implementation: */
 
@@ -47,3 +54,5 @@ private:
     QScopedPointer<QnUserRolesModelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnUserRolesModel)
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserRolesModel::DisplayRoleFlags);

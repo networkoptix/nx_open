@@ -3,12 +3,45 @@
 
 #include <utils/common/instance_storage.h>
 #include <network/system_description_aggregator.h>
+#include <finders/direct_systems_finder.h>
+#include <finders/cloud_systems_finder.h>
+#include <finders/recent_local_systems_finder.h>
 
 QnSystemsFinder::QnSystemsFinder(QObject *parent)
     : base_type(parent)
     , m_finders()
     , m_systems()
 {
+    enum
+    {
+        kCloudPriority,
+        kDirectFinder,
+        kRecentFinder,
+    };
+
+    auto cloudSystemsFinder = new QnCloudSystemsFinder(this);
+    addSystemsFinder(cloudSystemsFinder, kCloudPriority);
+
+    auto directSystemsFinder = new QnDirectSystemsFinder(this);
+    addSystemsFinder(directSystemsFinder, kDirectFinder);
+
+    auto recentLocalSystemsFinder = new QnRecentLocalSystemsFinder(this);
+    addSystemsFinder(recentLocalSystemsFinder, kRecentFinder);
+
+    const auto initRecentFinderBy =
+        [recentLocalSystemsFinder](const QnAbstractSystemsFinder* finder)
+        {
+            connect(finder, &QnAbstractSystemsFinder::systemDiscovered,
+                recentLocalSystemsFinder, &QnRecentLocalSystemsFinder::processSystemAdded);
+            connect(finder, &QnAbstractSystemsFinder::systemLostInternal,
+                recentLocalSystemsFinder, &QnRecentLocalSystemsFinder::processSystemRemoved);
+
+            for (const auto& system: finder->systems())
+                recentLocalSystemsFinder->processSystemAdded(system);
+        };
+
+    initRecentFinderBy(cloudSystemsFinder);
+    initRecentFinderBy(directSystemsFinder);
 }
 
 QnSystemsFinder::~QnSystemsFinder()
@@ -33,7 +66,7 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder,
     *connectionHolder << discovered << lostConnection << destroyedConnection;
 
     m_finders.insert(finder, connectionHolder);
-    for (const auto system : finder->systems())
+    for (const auto& system: finder->systems())
         onSystemDiscovered(system, priority);
 }
 

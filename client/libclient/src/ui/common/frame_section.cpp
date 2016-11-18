@@ -5,6 +5,14 @@
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
 
+namespace {
+
+/* If the cursor is on the border, but in less than 20% of its length far from corner, use
+   diagonal frame section. */
+static const qreal kDiagonalCoeff = 0.2;
+
+}
+
 Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections sections) {
     if(sections == 0) { /* Filter out the most common case first. */
         return Qt::NoSection;
@@ -47,7 +55,7 @@ Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections secti
 Qn::WindowFrameSection Qn::toQnFrameSection(Qt::WindowFrameSection section) {
     if(section == Qt::NoSection)
         return Qn::NoSection;
-    
+
     return static_cast<Qn::WindowFrameSection>(1 << section);
 }
 
@@ -123,6 +131,52 @@ namespace {
         for(int r = rl; r <= rh; r++)
             for(int c = cl; c <= ch; c++)
                 result |= frameSectionTable[r][c];
+
+        if (result == Qn::LeftSection)
+        {
+            T qyCenter = (qy0 + qy1) / 2;
+            T yDiagOffset = (y2 - y1) * kDiagonalCoeff;
+
+            if (qyCenter < y1 + yDiagOffset)
+                return (result | Qn::TopSection | Qn::TopLeftSection);
+
+            if (qyCenter > y2 - yDiagOffset)
+                return (result | Qn::BottomSection | Qn::BottomLeftSection);
+        }
+        else if (result == Qn::RightSection)
+        {
+            T qyCenter = (qy0 + qy1) / 2;
+            T yDiagOffset = (y2 - y1) * kDiagonalCoeff;
+
+            if (qyCenter < y1 + yDiagOffset)
+                return (result | Qn::TopSection | Qn::TopRightSection);
+
+            if (qyCenter > y2 - yDiagOffset)
+                return (result | Qn::BottomSection | Qn::BottomRightSection);
+        }
+        else if (result == Qn::TopSection)
+        {
+            T qxCenter = (qx0 + qx1) / 2;
+            T xDiagOffset = (x2 - x1) * kDiagonalCoeff;
+
+            if (qxCenter < x1 + xDiagOffset)
+                return (result | Qn::LeftSection | Qn::TopLeftSection);
+
+            if (qxCenter > x2 - xDiagOffset)
+                return (result | Qn::RightSection | Qn::TopRightSection);
+        }
+        else if (result == Qn::BottomSection)
+        {
+            T qxCenter = (qx0 + qx1) / 2;
+            T xDiagOffset = (x2 - x1) * kDiagonalCoeff;
+
+            if (qxCenter < x1 + xDiagOffset)
+                return (result | Qn::LeftSection | Qn::BottomLeftSection);
+
+            if (qxCenter > x2 - xDiagOffset)
+                return (result | Qn::RightSection | Qn::BottomRightSection);
+        }
+
         return result;
     }
 
@@ -172,23 +226,23 @@ namespace {
         switch (section) {
         case Qt::LeftSection:
             return Rect(
-                rect.left() + rect.width() - size.width(), 
+                rect.left() + rect.width() - size.width(),
                 rect.top(),
                 size.width(),
                 rect.height()
             );
         case Qt::TopLeftSection:
             return Rect(
-                rect.left() + rect.width() - size.width(), 
+                rect.left() + rect.width() - size.width(),
                 rect.top() + rect.height() - size.height(),
-                size.width(), 
+                size.width(),
                 size.height()
             );
         case Qt::TopSection:
             return Rect(
-                rect.left(), 
+                rect.left(),
                 rect.top() + rect.height() - size.height(),
-                rect.width(), 
+                rect.width(),
                 size.height()
             );
         case Qt::TopRightSection:
@@ -221,9 +275,9 @@ namespace {
             );
         case Qt::BottomLeftSection:
             return Rect(
-                rect.left() + rect.width() - size.width(), 
+                rect.left() + rect.width() - size.width(),
                 rect.top(),
-                size.width(), 
+                size.width(),
                 size.height()
             );
         case Qt::TitleBarArea:

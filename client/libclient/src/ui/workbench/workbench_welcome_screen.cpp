@@ -24,68 +24,84 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+#include <client/startup_tile_manager.h>
+#include <client/forgotten_systems_manager.h>
+#include <client_core/client_core_settings.h>
+#include <finders/systems_finder.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/util.h>
 
 namespace
 {
-    typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
+typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
 
-    QWidget* createMainView(QObject* context, QQuickView* quickView)
-    {
-        static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
-        static const auto kContextVariableName = lit("context");
+QWidget* createMainView(QObject* context, QQuickView* quickView)
+{
+    static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
+    static const auto kContextVariableName = lit("context");
 
-        qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
-        qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
-        qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
+    qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
+    qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
+    qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
 
-        auto holder = new QStackedWidget();
-        holder->addWidget(new QWidget());
-        holder->addWidget(QWidget::createWindowContainer(quickView));
+    auto holder = new QStackedWidget();
+    holder->addWidget(new QWidget());
+    holder->addWidget(QWidget::createWindowContainer(quickView));
 
-        const auto loadQmlData = [quickView, context, holder]()
-            {
-                const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
-                    {
-                        if (status != QQuickView::Ready)
-                            return false;
+    const auto loadQmlData = [quickView, context, holder]()
+        {
+            const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
+                {
+                    if (status != QQuickView::Ready)
+                        return false;
 
-                        enum { kQmlViewIndex = 1 };
-                        holder->setCurrentIndex(kQmlViewIndex);
-                        return true;
-                    };
+                    enum { kQmlViewIndex = 1 };
+                    holder->setCurrentIndex(kQmlViewIndex);
+                    return true;
+                };
 
-                QObject::connect(quickView, &QQuickView::statusChanged,
-                    quickView, updateQmlViewVisibility);
+            QObject::connect(quickView, &QQuickView::statusChanged,
+                quickView, updateQmlViewVisibility);
 
-                quickView->rootContext()->setContextProperty(
-                    kContextVariableName, context);
-                quickView->setSource(kWelcomeScreenSource);
-            };
+            quickView->rootContext()->setContextProperty(
+                kContextVariableName, context);
+            quickView->setSource(kWelcomeScreenSource);
+        };
 
-        // Async load of qml data
-        executeDelayedParented(loadQmlData, 0, quickView);
-        return holder;
-    }
-
-    QnGenericPalette extractPalette()
-    {
-        const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
-        NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
-        const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
-        NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
-        return (style ? style->genericPalette() : QnGenericPalette());
-    }
-
-
-    QnResourceList extractResources(const UrlsList& urls)
-    {
-        QMimeData data;
-        data.setUrls(urls);
-        return QnWorkbenchResource::deserializeResources(&data);
-    }
+    // Async load of qml data
+    executeDelayedParented(loadQmlData, 0, quickView);
+    return holder;
 }
+
+QnGenericPalette extractPalette()
+{
+    const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
+    NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
+    const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
+    NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
+    return (style ? style->genericPalette() : QnGenericPalette());
+}
+
+
+QnResourceList extractResources(const UrlsList& urls)
+{
+    QMimeData data;
+    data.setUrls(urls);
+    return QnWorkbenchResource::deserializeResources(&data);
+}
+
+// Extracts url from string and changes port to default if it is invalid
+QUrl urlFromUserInput(const QString& value)
+{
+    auto result = QUrl::fromUserInput(value);
+    if (result.port() <= 0)
+        result.setPort(DEFAULT_APPSERVER_PORT);
+
+    return result;
+}
+
+} // namespace
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     :
@@ -103,6 +119,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_message(),
     m_appInfo(new QnAppInfo(this))
 {
+    NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
@@ -115,28 +132,108 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_widget->installEventFilter(this);
     m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
-    connect(action(QnActions::DisconnectAction), &QAction::triggered,
-        this, &QnWorkbenchWelcomeScreen::showScreen);
 
-    connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
-    {
-        if (!m_visible)
-            setGlobalPreloaderVisible(false);   ///< Auto toggle off preloader
+    connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this,
+        [this]()
+        {
+            if (!m_visible)
+            {
+                setGlobalPreloaderVisible(false);         //< Auto toggle off preloader
+                qnStartupTileManager->skipTileAction(); //< available only on first show
+            }
 
-        context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
-    });
+            context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
+        });
+
+    connect(this, &QnWorkbenchWelcomeScreen::globalPreloaderVisibleChanged, this,
+        [this]()
+        {
+            if (globalPreloaderVisible())
+                setVisibleControls(true);
+        });
 
     setVisible(true);
-
+    setVisibleControls(false);
     connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
     {
         if (valueId == QnClientSettings::AUTO_LOGIN)
             emit resetAutoLogin();
     });
+
+    connect(qnStartupTileManager, &QnStartupTileManager::tileActionRequested,
+        this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
 {}
+
+void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, bool initial)
+{
+    const auto system = qnSystemsFinder->getSystem(systemId);
+    NX_ASSERT(system, "System is empty");
+    if (!system)
+        return;
+
+    if (qnSettings->autoLogin())
+        return; // Do nothing in case of auto-login option set
+
+    if (system->isCloudSystem() || !system->isOnline())
+        return; // Do nothing with cloud and offline (recent) systems
+
+    static const auto wrongServers =
+        [](const QnSystemDescriptionPtr& system) -> bool
+        {
+            const bool wrong = system->servers().isEmpty();
+            NX_ASSERT(!wrong, "Wrong local system - at least one server should exist");
+            return wrong;
+        };
+
+    if (system->isNewSystem())
+    {
+        if (!initial)
+            return; // We found system after initial discovery
+
+        if (wrongServers(system))
+            return;
+
+        const auto firstServerId = system->servers().first().id;
+        const auto host = system->getServerHost(firstServerId);
+        setupFactorySystem(host.toString());
+        return;
+    }
+
+    // Here we have online local system.
+
+    if (initial)
+    {
+        const auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+        const auto itConnection = std::find_if(recentConnections.begin(), recentConnections.end(),
+            [localId = system->localId()](const QnLocalConnectionData& data)
+            {
+                return (localId == data.localId);
+            });
+
+        if (wrongServers(system))
+            return;
+
+        if ((itConnection != recentConnections.end()) && !itConnection->password.isEmpty())
+        {
+            static const bool kNeverAutologin = false;
+            static const bool kAlwaysStorePassword = true;
+
+            const auto firstServerId = system->servers().first().id;
+            const auto serverHost = system->getServerHost(firstServerId);
+            connectToLocalSystem(system->id(), serverHost.toString(),
+                itConnection->url.userName(), itConnection->password.value(),
+                kAlwaysStorePassword, kNeverAutologin);
+
+            return;
+        }
+    }
+
+    // Just expand online local tile
+    executeDelayedParented([this, system]() { emit openTile(system->id());  }, 0, this);
+}
 
 QWidget* QnWorkbenchWelcomeScreen::widget()
 {
@@ -206,6 +303,14 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
+void QnWorkbenchWelcomeScreen::openConnectingTile()
+{
+    const auto systemId = connectingToSystem();
+    if (systemId.isEmpty())
+        return;
+
+    executeDelayedParented([this, systemId]() { emit openTile(systemId);  }, 0, this);
+}
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
     const auto systemId = connectingToSystem();
@@ -213,7 +318,6 @@ void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
         return;
 
     setConnectingToSystem(QString());
-    emit openTile(systemId);
 }
 
 void QnWorkbenchWelcomeScreen::handleConnectingToSystem()
@@ -276,12 +380,12 @@ QnAppInfo* QnWorkbenchWelcomeScreen::appInfo() const
     return m_appInfo;
 }
 
-bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
+bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
     return !extractResources(urls).isEmpty();
 }
 
-void QnWorkbenchWelcomeScreen::makeDrop(const UrlsList& urls)
+void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
 {
     const auto resources = extractResources(urls);
     if (resources.isEmpty())
@@ -300,7 +404,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
 {
     connectToSystemInternal(
         systemId,
-        QUrl::fromUserInput(serverUrl),
+        urlFromUserInput(serverUrl),
         QnCredentials(userName, password),
         storePassword,
         autoLogin);
@@ -338,7 +442,6 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             QnActionParameters params;
             params.setArgument(Qn::UrlRole, url);
             params.setArgument(Qn::StorePasswordRole, storePassword);
-            params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
             menu()->trigger(QnActions::ConnectAction, params);
         };
@@ -388,8 +491,14 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             }
             else if (dialog->cloudCredentials().isValid())
             {
-                qnCloudStatusWatcher->setCloudCredentials(dialog->cloudCredentials(), true);
-                connectToSystemInternal(QString(), serverUrl, dialog->cloudCredentials(),
+                const auto cloudCredentials = dialog->cloudCredentials();
+
+                // We suppose that connection to cloud from new systems is always permanent
+                qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
+                qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
+
+                qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
+                connectToSystemInternal(QString(), serverUrl, cloudCredentials,
                     false, false, controlsGuard);
             }
 
@@ -445,9 +554,9 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
     return color;
 }
 
-void QnWorkbenchWelcomeScreen::showScreen()
+void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
 {
-    setVisible(true);
+    qnForgottenSystemsManager->forgetSystem(systemId);
 }
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)

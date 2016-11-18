@@ -27,6 +27,7 @@ public:
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* hidingProcessor;
+
 public:
     bool isEnabled() const;
     void setEnabled(bool enabled, bool animated);
@@ -50,6 +51,9 @@ public:
     virtual QRectF effectiveGeometry() const override;
 
     void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
+    //TODO: #gdm Probably make this AbstractWorkbenchPanel interface function
+    QList<QGraphicsItem*> activeItems() const;
 
 protected:
     void setProxyUpdatesEnabled(bool updatesEnabled) override;

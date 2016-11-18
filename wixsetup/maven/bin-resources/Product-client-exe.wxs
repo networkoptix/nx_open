@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <?include BuildVars.wxi ?>
+
+    <Bundle Name="$(var.productName) Client" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.clientBundleUpgradeCode)" DisableModify="yes">
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+            <bal:WixStandardBootstrapperApplication
+                LicenseFile="License.rtf"
+                LogoFile="logo-64x64.png"
+                SuppressRepair="yes"
+                SuppressOptionsUI="yes"
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
+            />
+        </BootstrapperApplicationRef>
+
+        <Chain>
+            <PackageGroupRef Id="VC12RedistPackageGroup"/>
+<!--            <PackageGroupRef Id="VC14RedistPackageGroup"/> -->
+
+            <RollbackBoundary />
+
+            <PackageGroupRef Id="ClientPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

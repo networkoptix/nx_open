@@ -38,6 +38,7 @@ QnGraphicsWebView::QnGraphicsWebView(const QUrl &url
     , m_canGoBack(false)
 {
     setRenderHints(0);
+    setAcceptDrops(false);
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
     settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true);
 

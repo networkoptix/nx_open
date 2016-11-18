@@ -67,6 +67,7 @@ namespace style
         static const char* kMenuAsDropdown;         /**< Name of a property to change menu appearance to dropdown (bool). */
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
         static const char* kItemViewRadioButtons;   /**< Name of a property to change item view checkboxes to radio buttons (bool). */
+        static const char* kPushButtonMargin;       /**< Name of a property to hold custom push button margin (int). Buttons with custom margin are left-aligned. */
     };
 
     /** Flags of additional slider features */

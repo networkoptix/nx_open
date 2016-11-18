@@ -217,7 +217,7 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     // step 1: check 2 requests in a row via same connection
     for (int i = 0; i < 2; ++i)
     {
-        testHttpServer()->setForceConnectionClose(i == 0);
+        testHttpServer()->setPersistentConnectionEnabled(i != 0);
 
         {
             QnMutexLocker lock(&mutex);
@@ -249,15 +249,13 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     }
 }
 
-static QByteArray kBrokenResponse
-(
-    "HTTP/1.1 200 OK\r\n"
-    "Content-Length: 100\r\n\r\n"
-    "not enough content"
-);
-
 TEST_F(AsyncHttpClientTest, ConnectionBreak)
 {
+    static const QByteArray kResponse(
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Length: 100\r\n\r\n"
+        "not enough content");
+
     nx::utils::promise<int> serverPort;
     std::thread serverThread(
         [&]()
@@ -272,7 +270,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
 
             QByteArray buffer(1024, Qt::Uninitialized);
             int size = 0;
-            while (!buffer.contains(QByteArray("\r\n\r\n", 4)))
+            while (!buffer.left(size).contains("\r\n\r\n"))
             {
                 auto recv = client->recv(buffer.data() + size, buffer.size() - size);
                 ASSERT_GT(recv, 0);
@@ -280,8 +278,8 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
             }
 
             buffer.resize(size);
-            ASSERT_EQ(client->send(kBrokenResponse.data(), kBrokenResponse.size()), kBrokenResponse.size());
-        });
+            ASSERT_EQ(kResponse.size(), client->send(kResponse.data(), kResponse.size()));
+    });
 
     auto client = nx_http::AsyncHttpClient::create();
     nx::utils::promise<void> clientDone;
@@ -290,8 +288,8 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
         [&](nx_http::AsyncHttpClientPtr client)
         {
             EXPECT_TRUE(client->failed());
-            EXPECT_EQ(client->fetchMessageBodyBuffer(), QByteArray("not enough content"));
-            EXPECT_EQ(client->lastSysErrorCode(), SystemError::connectionReset);
+            EXPECT_EQ(QByteArray("not enough content"), client->fetchMessageBodyBuffer());
+            EXPECT_EQ(SystemError::connectionReset, client->lastSysErrorCode());
             clientDone.set_value();
         });
 
@@ -317,7 +315,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler completionHandler)
+        nx_http::RequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
             connection->closeConnection(SystemError::connectionReset);
@@ -364,7 +362,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
 TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
 {
     static const char* testPath = "/ReusingExistingConnection";
-    testHttpServer()->setForceConnectionClose(true);
+    testHttpServer()->setPersistentConnectionEnabled(false);
     ASSERT_TRUE(
         testHttpServer()->registerStaticProcessor(
             testPath,

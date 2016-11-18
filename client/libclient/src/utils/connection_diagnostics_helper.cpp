@@ -138,27 +138,41 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
     return result;
 }
 
-bool QnConnectionDiagnosticsHelper::checkApplaucherRunning()
+bool QnConnectionDiagnosticsHelper::getInstalledVersions(
+    QList<QnSoftwareVersion>* versions)
 {
-    using namespace applauncher;
-    QList<QnSoftwareVersion> versions;
-
     /* Try to run applauncher if it is not running. */
-    if (getInstalledVersions(&versions) == api::ResultType::connectError)
-    {
-        if (!nx::vms::client::SelfUpdater::runMinilaucher())
-            return false;
-    }
+    if (!applauncher::checkOnline())
+        return false;
+
+    const auto result = applauncher::getInstalledVersions(versions);
+    if (result == applauncher::api::ResultType::ok)
+        return true;
 
     static const int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (getInstalledVersions(&versions) == api::ResultType::ok)
+        if (applauncher::getInstalledVersions(versions) == applauncher::api::ResultType::ok)
             return true;
     }
     return false;
+}
+
+Qn::ConnectionResult QnConnectionDiagnosticsHelper::showApplauncherError(QWidget* parentWidget,
+    const QString& details)
+{
+    QnMessageBox::warning(
+        parentWidget,
+        helpTopic(Qn::IncompatibleProtocolConnectionResult),
+        getErrorString(ErrorStrings::UnableConnect),
+        tr("Selected Server has a different version:") + L'\n'
+        + details
+        + tr("An error has occurred while trying to restart in compatibility mode.") + L'\n'
+        + tr("Please close the application and start it again using the shortcut in the start menu."),
+        QDialogButtonBox::Ok);
+    return Qn::IncompatibleVersionConnectionResult;
 }
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
@@ -174,41 +188,14 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         + tr(" - Server version: %1.").arg(connectionInfo.version.toString())
         + L'\n';
 
-    if (!checkApplaucherRunning())
-    {
-        QnMessageBox::critical(
-            parentWidget,
-            tr("Launcher process not found."),
-            tr("Please close the application and start it again using the shortcut in the start menu.")
-        );
-        return Qn::IncompatibleVersionConnectionResult;
-    }
-
-    bool haveExactVersion = false;
     QList<QnSoftwareVersion> versions;
-    if (applauncher::getInstalledVersions(&versions) == applauncher::api::ResultType::ok)
-        haveExactVersion = versions.contains(connectionInfo.version);
+    if (!getInstalledVersions(&versions))
+        return showApplauncherError(parentWidget, versionDetails);
+    bool isInstalled = versions.contains(connectionInfo.version);
 
     while (true)
     {
-        bool isInstalled = false;
-        int errCode = applauncher::isVersionInstalled(connectionInfo.version, &isInstalled);
-        if (errCode != applauncher::api::ResultType::ok)
-        {
-            QnMessageBox::warning(
-                parentWidget,
-                helpTopicId,
-                getErrorString(ErrorStrings::UnableConnect),
-                tr("Selected Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("An error has occurred while trying to restart in compatibility mode (%1).")
-                .arg(errCode),
-                QDialogButtonBox::Ok
-            );
-            return Qn::IncompatibleVersionConnectionResult;
-        }
-
-        if (!isInstalled || !haveExactVersion)
+        if (!isInstalled)
         {
             QString versionString = connectionInfo.version.toString(
                 CompatibilityVersionInstallationDialog::useUpdate(connectionInfo.version)
@@ -237,7 +224,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 installationDialog->exec();
                 if (installationDialog->installationSucceeded())
                 {
-                    haveExactVersion = true;
+                    isInstalled = true;
                     continue;   //offering to start newly-installed compatibility version
                 }
             }

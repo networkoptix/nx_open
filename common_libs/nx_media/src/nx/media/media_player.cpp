@@ -28,6 +28,7 @@
 #include <nx/utils/debug_utils.h>
 
 #include "media_player_quality_chooser.h"
+#include <utils/common/long_runable_cleanup.h>
 
 namespace nx {
 namespace media {
@@ -70,6 +71,7 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
     NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
     NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
     NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
+    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
 };
 NxMediaFlagConfig conf("nx_media");
 
@@ -150,6 +152,8 @@ public:
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs;
 
+    bool waitWhileJumpFinished;
+
     // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
     int liveBufferMs;
 
@@ -187,6 +191,7 @@ private:
     PlayerPrivate(Player* parent);
 
     void at_hurryUp();
+    void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
     void presentNextFrameDelayed();
 
@@ -210,6 +215,8 @@ private:
     void doPeriodicTasks();
 
     void log(const QString& message) const;
+
+    bool isCoarseFrame(const QVideoFramePtr& frame) const;
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -226,6 +233,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     execTimer(new QTimer(this)),
     miscTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
+    waitWhileJumpFinished(false),
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
@@ -311,6 +319,21 @@ void PlayerPrivate::at_hurryUp()
     }
 }
 
+void PlayerPrivate::at_jumpOccurred(int sequence)
+{
+    waitWhileJumpFinished = false;
+    if (!videoFrameToRender)
+        return;
+    FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+    if (sequence && sequence != metadata.sequence)
+    {
+        // Drop deprecate frame
+        execTimer->stop();
+        videoFrameToRender.reset();
+        at_gotVideoFrame();
+    }
+}
+
 void PlayerPrivate::at_gotVideoFrame()
 {
     if (state == Player::State::Stopped)
@@ -326,7 +349,7 @@ void PlayerPrivate::at_gotVideoFrame()
     if (state == Player::State::Paused)
     {
         FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
-        if (!metadata.noDelay)
+        if (!metadata.noDelay && !isCoarseFrame(videoFrameToRender))
             return; //< Display regular frames only if the player is playing.
     }
 
@@ -441,7 +464,9 @@ void PlayerPrivate::presentNextFrame()
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
-        setPosition(videoFrameToRender->startTime());
+        bool ignoreFrameTime = metadata.noDelay || waitWhileJumpFinished;
+        if (!ignoreFrameTime)
+            setPosition(videoFrameToRender->startTime());
         setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
     videoFrameToRender.reset();
@@ -530,7 +555,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     if (!lastVideoPtsMs.is_initialized() || //< first time
         !qBetween(*lastVideoPtsMs, ptsMs, *lastVideoPtsMs + kMaxFrameDurationMs) || //< pts discontinuity
         metadata.noDelay || //< jump occurred
-        ptsMs < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
+        isCoarseFrame(frame) || //< 'coarse' frame. Frame time is less than required jump pos.
         frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
         liveBufferUnderflow ||
         liveBufferOverflow //< live buffer overflow
@@ -573,12 +598,17 @@ void PlayerPrivate::applyVideoQuality()
     {
         archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
     }
+    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
+    {
+        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+    }
     else
     {
         NX_ASSERT(quality.isValid());
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
             QSize(/*width*/ 0, quality.height())); //< Use "auto" width.
     }
+    at_hurryUp(); //< skip waiting for current frame
 }
 
 bool PlayerPrivate::createArchiveReader()
@@ -635,6 +665,8 @@ bool PlayerPrivate::initDataProvider()
         this, &PlayerPrivate::at_gotVideoFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
         this, &PlayerPrivate::at_hurryUp);
+    connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
+        this, &PlayerPrivate::at_jumpOccurred);
     connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
         [this]()
         {
@@ -659,6 +691,11 @@ void PlayerPrivate::log(const QString& message) const
     NX_LOG(lit("[media_player @%1] %2")
         .arg(reinterpret_cast<uintptr_t>(this), 8, 16, QLatin1Char('0'))
         .arg(message), cl_logDEBUG1);
+}
+
+bool PlayerPrivate::isCoarseFrame(const QVideoFramePtr& frame) const
+{
+    return frame->startTime() < lastSeekTimeMs;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -708,7 +745,9 @@ QAbstractVideoSurface* Player::videoSurface(int channel) const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    return d->positionMs;
+    // positionMs is real value from video frame. It coud containt 'coarse' timestamp
+	// a bit less then user requested position (inside of current GOP)
+    return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
 void Player::setPosition(qint64 value)
@@ -716,11 +755,12 @@ void Player::setPosition(qint64 value)
     Q_D(Player);
     d->log(lit("setPosition(%1)").arg(value));
 
-    d->lastSeekTimeMs = value;
+    d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
+    {
         d->archiveReader->jumpTo(msecToUsec(value), 0);
-    else
-        d->positionMs = value;
+        d->waitWhileJumpFinished = true;
+    }
 
     d->setLiveMode(value == kLivePosition);
 
@@ -781,11 +821,15 @@ void Player::stop()
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
     if (d->dataConsumer)
         d->dataConsumer->pleaseStop();
-    if (d->archiveReader)
-        d->archiveReader->pleaseStop();
 
     d->dataConsumer.reset();
-    d->archiveReader.reset();
+    if (d->archiveReader)
+    {
+        if (QnLongRunableCleanup::instance())
+            QnLongRunableCleanup::instance()->cleanupAsync(std::move(d->archiveReader));
+        else
+            d->archiveReader.reset();
+    }
     d->videoFrameToRender.reset();
 
     d->setState(State::Stopped);
@@ -874,6 +918,14 @@ int Player::videoQuality() const
 void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
+
+    if (conf.forceIframesOnly && videoQuality == LowVideoQuality)
+    {
+        d->log(lit("setVideoQuality(%1): config forceIframesOnlyis true => use value %2")
+            .arg(videoQuality).arg(LowIframesOnlyVideoQuality));
+        videoQuality = LowIframesOnlyVideoQuality;
+    }
+
     if (d->videoQuality == videoQuality)
     {
         d->log(lit("setVideoQuality(%1): no change, ignoring").arg(videoQuality));

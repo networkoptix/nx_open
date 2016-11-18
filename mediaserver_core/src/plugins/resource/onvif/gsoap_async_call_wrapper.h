@@ -142,7 +142,9 @@ public:
 
         //NOTE not locking mutex because all public method calls are synchronized
             //by caller and no request interleaving is allowed
-        m_socket = SocketFactory::createStreamSocket( false, SocketFactory::NatTraversalType::nttDisabled );
+        m_socket = SocketFactory::createStreamSocket(
+            false,
+            nx::network::NatTraversalSupport::disabled);
 
         m_syncWrapper->getProxy()->soap->user = this;
         m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
@@ -197,6 +199,8 @@ private:
         receivingResponse,
         done
     };
+
+    static const int kMaxMessageLength = 1024 * 200; //< 200 KB should be enough
 
     virtual int onGsoapSendData(const char* data, size_t size) override
     {
@@ -274,7 +278,7 @@ private:
 
         NX_ASSERT( m_state == receivingResponse );
 
-        if( errorCode || bytesRead == 0 )
+        if( errorCode || bytesRead == 0 || m_responseBuffer.size() > kMaxMessageLength)
         {
             m_state = done;
             int resultCode = m_responseBuffer.isEmpty()

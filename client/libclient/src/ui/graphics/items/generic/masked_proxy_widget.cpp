@@ -49,7 +49,9 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
     {
         const auto widgetRect = this->widget()->rect();
         const int ratio = painter->device()->devicePixelRatio();
-        m_pixmap = QPixmap(widgetRect.size() * ratio);
+        const QSize targetSize = widgetRect.size() * ratio;
+        if (m_pixmap.size() != targetSize)
+            m_pixmap = QPixmap(targetSize);
         m_pixmap.fill(Qt::transparent);
         m_pixmap.setDevicePixelRatio(ratio);
         widget()->render(&m_pixmap, QPoint(), widgetRect);

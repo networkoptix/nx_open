@@ -14,6 +14,9 @@ import traceback as TB
 from collections import deque
 from subprocess import Popen, PIPE
 
+#from requests.packages.urllib3.connectionpool import HTTPSConnectionPool, HTTPConnectionPool
+#HTTPSConnectionPool._validate_conn = HTTPConnectionPool._validate_conn
+
 DEFAULT_THREADS = 10
 AUTH = ('admin', 'admin')
 URI = "/api/gettime" # "/ec2/getCurrentTime", /api/moduleInformation, /api/ping, /api/statistics,
@@ -92,6 +95,7 @@ class RequestWorker(BaseWorker):
         super(RequestWorker, self).__init__(master, num)
         self.fails = _init_fails() # failures, groupped by error message
         self._session = requests.Session()
+        #self._session.verify = False
         if mix:
             self._url = None
             self._prep = [
@@ -169,7 +173,7 @@ class StressTestRunner(object):
     _stop = False
     _threadNum = DEFAULT_THREADS
 
-    def __init__(self, args):
+    def __init__(self, args, handleSigInt=True):
         self._threads = []
         self._workers = []
         self._fails = _init_fails() # failures, groupped by error message
@@ -182,7 +186,8 @@ class StressTestRunner(object):
         self._nostat = False
         self._full = args.full
         self._logexc = args.logexc
-        signal.signal(signal.SIGINT,self._onInterrupt)
+        if handleSigInt:
+            signal.signal(signal.SIGINT,self._onInterrupt)
 
     def need_logexc(self):
         return self._logexc
@@ -215,7 +220,6 @@ class StressTestRunner(object):
         if not self._nostat:
             self._tail.append((passed, fails))
         return passed, fails
-
 
     @staticmethod
     def _stat_str(passed, fails):

@@ -14,6 +14,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/dialogs/common/message_box.h>
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -26,6 +27,7 @@
 #include <api/global_settings.h>
 
 #include <nx/utils/string.h>
+#include <network/system_helpers.h>
 
 namespace {
 
@@ -208,6 +210,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     m_remoteOwnerCredentials.setUser(login);
     m_remoteOwnerCredentials.setPassword(password);
     m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
+    ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -229,69 +232,65 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
-void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode) {
+void QnMergeSystemsDialog::at_mergeTool_systemFound(
+    utils::MergeSystemsStatus::Value mergeStatus,
+    const QnModuleInformation& moduleInformation,
+    const QnMediaServerResourcePtr& discoverer)
+{
     ui->buttonBox->hideProgress();
+    ui->credentialsGroupBox->setEnabled(true);
 
-    switch (errorCode) {
-    case QnMergeSystemsTool::NoError:
-    case QnMergeSystemsTool::StarterLicenseError:
+    if (mergeStatus != utils::MergeSystemsStatus::ok
+        && mergeStatus != utils::MergeSystemsStatus::starterLicense)
     {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
-        if (server && server->getStatus() == Qn::Online && moduleInformation.localSystemId == qnGlobalSettings->localSystemId())
-        {
-            if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
-                updateErrorLabel(tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));
-            else
-                updateErrorLabel(tr("This is the current system URL."));
-            break;
-        }
-        m_discoverer = discoverer;
-        ui->remoteSystemLabel->setText(moduleInformation.systemName);
-        m_mergeButton->setText(tr("Merge with %1").arg(moduleInformation.systemName));
-        m_mergeButton->show();
-        ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
-        updateErrorLabel(QString());
-        if (errorCode == QnMergeSystemsTool::StarterLicenseError)
-            updateErrorLabel(
-            tr("Warning: You are about to merge Systems with START licenses.\n"\
-               "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
-               "If you understand this and would like to proceed please click Merge to continue.\n")
-            );
-        break;
+        updateErrorLabel(
+            utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation));
+        updateConfigurationBlock();
+        return;
     }
-    case QnMergeSystemsTool::AuthentificationError:
-        updateErrorLabel(tr("The password or user name is invalid."));
-        break;
-    case QnMergeSystemsTool::ForbiddenError:
-        updateErrorLabel(tr("This user have not permissions for requested operation."));
-        break;
-    case QnMergeSystemsTool::VersionError:
-        updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
-        break;
-    case QnMergeSystemsTool::notLocalOwner:
-        updateErrorLabel(tr("Can't connect to the other system because current system is already connected to %1.").arg(QnAppInfo::cloudName()));
-        break;
-    case QnMergeSystemsTool::SafeModeError:
-        updateErrorLabel(tr("The discovered system %1 is in safe mode.").arg(moduleInformation.systemName));
-        break;
-    default:
-        updateErrorLabel(tr("The system was not found."));
-        break;
+
+    const auto server = qnResPool->getResourceById<QnMediaServerResource>(
+        moduleInformation.id);
+    if (server && server->getStatus() == Qn::Online
+        && helpers::serverBelongsToCurrentSystem(moduleInformation))
+    {
+        if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
+        {
+            updateErrorLabel(
+                tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));
+        }
+        else
+        {
+            updateErrorLabel(tr("This is the current system URL."));
+        }
+
+        return;
+    }
+
+    m_discoverer = discoverer;
+    ui->remoteSystemLabel->setText(moduleInformation.systemName);
+    m_mergeButton->setText(tr("Merge with %1").arg(moduleInformation.systemName));
+    m_mergeButton->show();
+    ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
+    updateErrorLabel(QString());
+
+    if (mergeStatus == utils::MergeSystemsStatus::starterLicense)
+    {
+        updateErrorLabel(
+            utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation));
     }
 
     updateConfigurationBlock();
 }
 
 void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
-        int errorCode,
-        const QnModuleInformation &moduleInformation)
+    utils::MergeSystemsStatus::Value mergeStatus,
+    const QnModuleInformation& moduleInformation)
 {
-    Q_UNUSED(moduleInformation)
-
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);
 
-    if (errorCode == QnMergeSystemsTool::NoError)
+    if (mergeStatus == utils::MergeSystemsStatus::ok)
     {
         m_mergeButton->hide();
         ui->buttonBox->button(QDialogButtonBox::Cancel)->hide();
@@ -304,61 +303,16 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         ui->reconnectLabel->setVisible(reconnectNeeded);
         ui->stackedWidget->setCurrentWidget(ui->finalPage);
         m_successfullyFinished = true;
+        return;
     }
-    else
-    {
-        QString message;
 
-        switch (errorCode)
-        {
-        case QnMergeSystemsTool::AuthentificationError:
-            message = tr("The password or user name is invalid.");
-            break;
-        case QnMergeSystemsTool::VersionError:
-            message = tr("System has an incompatible version.");
-            break;
-        case QnMergeSystemsTool::notLocalOwner:
-            /* User type is just 'cloud'. */
-            message = tr("Taking remote settings is not allowed because system owner is cloud user.");
-            break;
-        case QnMergeSystemsTool::BackupError:
-            message = tr("Could not create a backup of the server database.");
-            break;
-        case QnMergeSystemsTool::NotFoundError:
-            message = tr("System was not found.");
-            break;
-        case QnMergeSystemsTool::ForbiddenError:
-            message = tr("Operation is not permitted.");
-            break;
-        case QnMergeSystemsTool::SafeModeError:
-            message = tr("System is in safe mode.");
-            break;
-        case QnMergeSystemsTool::ConfigurationError:
-            message = tr("Could not configure remote system.");
-            break;
-        case QnMergeSystemsTool::DependentSystemBoundToCloudError:
-            message = tr("System being merged cannot be connected to %1.").arg(QnAppInfo::cloudName());
-            break;
-        case QnMergeSystemsTool::BothSystemBoundToCloudError:
-            message = tr("Both systems are connected to %1. Merge is not allowed.").arg(QnAppInfo::cloudName());
-            break;
-        case QnMergeSystemsTool::differentCloudHostError:
-            message = tr("These systems are built with different %1 URL. Merge is not allowed.").arg(QnAppInfo::cloudName());
-            break;
-        case QnMergeSystemsTool::UnconfiguredSystemError:
-            message = tr("System name is not configured yet.");
-            break;
-        default:
-            break;
-        }
+    auto message = utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
+    if (!message.isEmpty())
+        message.prepend(lit("\n"));
 
-        if (!message.isEmpty())
-            message.prepend(lit("\n"));
+    QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
 
-        QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+    context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
-        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
-
-        updateConfigurationBlock();
-    }
+    updateConfigurationBlock();
 }

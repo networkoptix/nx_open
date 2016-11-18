@@ -148,7 +148,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
     m_state = state;
 
     ui->validateLabelSearch->setVisible(false);         // hide on every state change
-    ui->progressWidget->setVisible(m_state == Searching || m_state == Stopping || m_state == Adding);
+    ui->progressWidget->setVisible(m_state == Searching || m_state == Stopping);
     ui->scanParamsWidget->setEnabled(m_state == Initial);
     ui->serverOfflineLabel->setVisible(m_state == InitialOffline || m_state == CamerasOffline);
 

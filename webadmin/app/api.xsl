@@ -139,9 +139,15 @@
                                                     </xsl:if>
 
 
-                                                </h4> <div class="well">
+                                                </h4>
+                                                <div class="well">
                                                     <xsl:copy-of select="description"/>
-                                                </div> <dl>
+                                                    <xsl:if test="permissions">
+                                                        <p><b>Permissions: </b><xsl:copy-of select="permissions"/></p>
+                                                    </xsl:if>
+                                                </div>
+
+                                                <dl>
                                                     <dt>Parameters</dt>
                                                     <dd><xsl:apply-templates select="params"/></dd>
                                                     <dt>Result</dt>

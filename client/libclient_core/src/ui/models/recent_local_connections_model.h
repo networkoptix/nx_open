@@ -8,7 +8,7 @@ class QnRecentLocalConnectionsModel : public QAbstractListModel
     Q_OBJECT
     typedef QAbstractListModel base_type;
 
-    Q_PROPERTY(QString systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
+    Q_PROPERTY(QUuid systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
     Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
 
@@ -29,9 +29,9 @@ public:
     virtual ~QnRecentLocalConnectionsModel();
 
 public: // properties
-    QString systemId() const;
+    QUuid systemId() const;
 
-    void setSystemId(const QString &id);
+    void setSystemId(const QUuid& localId);
 
     bool hasConnections() const;
 
@@ -56,6 +56,6 @@ signals:
     void firstUserChanged();
 
 private:
-    QString m_systemId;
+    QUuid m_systemId;
     QnLocalConnectionDataList m_data;
 };

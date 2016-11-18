@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 15, 2015
-* akolesnikov
-***********************************************************/
-
 #include "temporary_account_password_manager.h"
 
 #include <QtSql/QSqlQuery>
@@ -19,7 +14,6 @@
 
 #include "stree/cdb_ns.h"
 
-
 namespace nx {
 namespace cdb {
 
@@ -27,7 +21,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountCredentialsEx),
     (sql_record),
     _Fields)
-
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const conf::Settings& settings,
@@ -42,62 +35,40 @@ TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
 
 TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 {
-    //waiting for async calls to complete
+    // Waiting for async calls to complete.
     m_startedAsyncCallsCounter.wait();
 }
 
 void TemporaryAccountPasswordManager::authenticateByName(
     const nx_http::StringType& username,
-    std::function<bool(const nx::Buffer&)> validateHa1Func,
+    std::function<bool(const nx::Buffer&)> checkPasswordHash,
     const stree::AbstractResourceReader& authSearchInputData,
     stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    api::ResultCode result = api::ResultCode::notAuthorized;
-    auto scopedGuard = makeScopedGuard(
-        [/*std::move*/ &completionHandler, &result]()
-        {
-            completionHandler(result);
-        });
-
     QnMutexLocker lk(&m_mutex);
 
-    auto tmpPasswordsRange = m_temporaryCredentialsByLogin.equal_range(toStdString(username));
-    if (tmpPasswordsRange.first == m_temporaryCredentialsByLogin.end())
-        return;
+    boost::optional<const TemporaryAccountCredentialsEx&> credentials =
+        findMatchingCredentials(lk, username.toStdString(), checkPasswordHash);
 
-    for (auto it = tmpPasswordsRange.first; it != tmpPasswordsRange.second; )
-    {
-        auto curIt = it++;
-        if (!checkTemporaryPasswordForExpiration(&lk, curIt))
-            continue;
+    if (!credentials)
+        return completionHandler(api::ResultCode::notAuthorized);
 
-        if (!validateHa1Func(curIt->second.passwordHa1.c_str()))
-            continue;
+    // TODO: #ak Currently, checking password permissions here, 
+    // but should move it to authorization phase.
+    if (!credentials->accessRights.authorize(authSearchInputData))
+        return completionHandler(api::ResultCode::forbidden);
 
-        //currently, checking password permissions here, but should move it to authorization phase
-        if (!curIt->second.accessRights.authorize(authSearchInputData))
-        {
-            result = api::ResultCode::forbidden;
-            return;
-        }
+    // Preparing output data.
+    authProperties->put(
+        cdb::attr::authAccountEmail,
+        QString::fromStdString(credentials->accountEmail));
+    if (credentials->isEmailCode)
+        authProperties->put(cdb::attr::authenticatedByEmailCode, true);
 
-        authProperties->put(
-            cdb::attr::authAccountEmail,
-            QString::fromStdString(curIt->second.accountEmail));
-        if (curIt->second.isEmailCode)
-            authProperties->put(
-                cdb::attr::authenticatedByEmailCode,
-                true);
+    runExpirationRulesOnSuccessfulLogin(lk, *credentials);
 
-        result = api::ResultCode::ok;
-
-        ++curIt->second.useCount;
-        //TODO #ak prolonging expiration period if present
-
-        checkTemporaryPasswordForExpiration(&lk, curIt);
-        return;
-    }
+    completionHandler(api::ResultCode::ok);
 }
 
 void TemporaryAccountPasswordManager::registerTemporaryCredentials(
@@ -177,7 +148,8 @@ void TemporaryAccountPasswordManager::removeTemporaryPasswordsFromCacheByAccount
     std::string accountEmail)
 {
     QnMutexLocker lk(&m_mutex);
-    m_temporaryCredentialsByLogin.erase(accountEmail);
+    auto& temporaryCredentialsByEmail = m_temporaryCredentials.get<kIndexByAccountEmail>();
+    temporaryCredentialsByEmail.erase(accountEmail);
 }
 
 nx::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCredentials(
@@ -199,35 +171,37 @@ boost::optional<TemporaryAccountCredentialsEx>
         const std::string& login) const
 {
     QnMutexLocker lk(&m_mutex);
-    auto it = m_temporaryCredentialsByLogin.find(login);
-    if (it == m_temporaryCredentialsByLogin.cend())
+    const auto& temporaryCredentialsByLogin = m_temporaryCredentials.get<kIndexByLogin>();
+    auto it = temporaryCredentialsByLogin.find(login);
+    if (it == temporaryCredentialsByLogin.cend())
         return boost::none;
-    return it->second;
+    return *it;
 }
 
-bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
-    QnMutexLockerBase* const /*lk*/,
-    std::multimap<std::string, TemporaryAccountCredentialsEx>::iterator passwordIter)
+bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(
+    const TemporaryAccountCredentialsEx& temporaryCredentials) const
 {
-    if (passwordIter->second.useCount >= passwordIter->second.maxUseCount ||
-        (passwordIter->second.expirationTimestampUtc > 0 &&
-            passwordIter->second.expirationTimestampUtc <= nx::utils::timeSinceEpoch().count()))
-    {
-        std::string tmpPasswordID = passwordIter->second.id;
-        m_temporaryCredentialsByLogin.erase(passwordIter);
+    const bool isExpired = 
+        (temporaryCredentials.expirationTimestampUtc > 0) &&
+        (temporaryCredentials.expirationTimestampUtc <= nx::utils::timeSinceEpoch().count());
 
-        //removing password from DB
-        using namespace std::placeholders;
-        m_dbManager->executeUpdate<std::string>(
-            std::bind(&TemporaryAccountPasswordManager::deleteTempPassword, this, _1, _2),
-            std::move(tmpPasswordID),
-            std::bind(&TemporaryAccountPasswordManager::tempPasswordDeleted, this,
-                m_startedAsyncCallsCounter.getScopedIncrement(),
-                _1, _2, _3, std::function<void(api::ResultCode)>()));
-        return false;
-    }
+    return isExpired
+        || temporaryCredentials.useCount >= temporaryCredentials.maxUseCount;
+}
 
-    return true;
+void TemporaryAccountPasswordManager::removeTemporaryCredentialsFromDbDelayed(
+    const TemporaryAccountCredentialsEx& temporaryCredentials)
+{
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<std::string>(
+        std::bind(&TemporaryAccountPasswordManager::deleteTempPassword, this, _1, _2),
+        temporaryCredentials.id,
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            nx::db::QueryContext* /*queryContext*/,
+            nx::db::DBResult /*resultCode*/,
+            std::string /*tempPasswordId*/)
+        {
+        });
 }
 
 db::DBResult TemporaryAccountPasswordManager::fillCache()
@@ -282,9 +256,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
     {
         tmpPassword.accessRights.parse(tmpPassword.accessRightsStr);
         std::string login = tmpPassword.login;
-        m_temporaryCredentialsByLogin.emplace(
-            std::move(login),
-            std::move(tmpPassword));
+        m_temporaryCredentials.insert(std::move(tmpPassword));
     }
 
     return db::DBResult::ok;
@@ -330,9 +302,7 @@ void TemporaryAccountPasswordManager::saveTempPasswordToCache(
 {
     QnMutexLocker lk(&m_mutex);
     std::string login = tempPasswordData.login;
-    m_temporaryCredentialsByLogin.emplace(
-        std::move(login),
-        std::move(tempPasswordData));
+    m_temporaryCredentials.insert(std::move(tempPasswordData));
 }
 
 nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
@@ -353,16 +323,69 @@ nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
     return db::DBResult::ok;
 }
 
-void TemporaryAccountPasswordManager::tempPasswordDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    nx::db::QueryContext* /*queryContext*/,
-    nx::db::DBResult resultCode,
-    std::string /*tempPasswordID*/,
-    std::function<void(api::ResultCode)> completionHandler)
+boost::optional<const TemporaryAccountCredentialsEx&> 
+    TemporaryAccountPasswordManager::findMatchingCredentials(
+        const QnMutexLockerBase& /*lk*/,
+        const std::string& username,
+        std::function<bool(const nx::Buffer&)> checkPasswordHash)
 {
-    if (completionHandler)
-        completionHandler(dbResultToApiResult(resultCode));
+    auto& temporaryCredentialsByLogin = m_temporaryCredentials.get<kIndexByLogin>();
+    auto tmpPasswordsRange = temporaryCredentialsByLogin.equal_range(username);
+    if (tmpPasswordsRange.first == temporaryCredentialsByLogin.end())
+        return boost::none;
+
+    for (auto it = tmpPasswordsRange.first; it != tmpPasswordsRange.second; )
+    {
+        auto curIt = it++;
+        if (isTemporaryPasswordExpired(*curIt))
+        {
+            // TODO: #ak It is not intuitive that credentials are removed in this method.
+            removeTemporaryCredentialsFromDbDelayed(*curIt);
+            temporaryCredentialsByLogin.erase(curIt);
+            continue;
+        }
+
+        if (!checkPasswordHash(curIt->passwordHa1.c_str()))
+            continue;
+
+        return *curIt;
+    }
+
+    return boost::none;
 }
 
-}   //cdb
-}   //nx
+void TemporaryAccountPasswordManager::runExpirationRulesOnSuccessfulLogin(
+    const QnMutexLockerBase& lk,
+    const TemporaryAccountCredentialsEx& temporaryCredentials)
+{
+    auto& uniqueIndexById = m_temporaryCredentials.get<kIndexById>();
+    auto it = uniqueIndexById.find(temporaryCredentials.id);
+    if (it == uniqueIndexById.end())
+    {
+        NX_ASSERT(false);
+        return;
+    }
+
+    updateExpirationRulesAfterSuccessfulLogin(lk, uniqueIndexById, it);
+    if (isTemporaryPasswordExpired(*it))
+    {
+        removeTemporaryCredentialsFromDbDelayed(*it);
+        uniqueIndexById.erase(it);
+    }
+}
+
+template<typename Index, typename Iterator>
+void TemporaryAccountPasswordManager::updateExpirationRulesAfterSuccessfulLogin(
+    const QnMutexLockerBase& /*lk*/,
+    Index& index,
+    Iterator it)
+{
+    index.modify(
+        it,
+        [](TemporaryAccountCredentialsEx& value) { ++value.useCount; });
+
+    // TODO: #ak prolonging expiration period if present.
+}
+
+} // namespace cdb
+} // namespace nx

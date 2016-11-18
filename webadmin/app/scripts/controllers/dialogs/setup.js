@@ -84,15 +84,21 @@ angular.module('webadminApp')
             }
         }
 
-        function checkInternet(reload){
-            $log.log("check internet connection");
+        function checkInternetOnServer(reload){
+            $log.log("check internet connection on server");
 
-            mediaserver.checkInternet(reload).then(function(hasInternetOnServer){
+            return mediaserver.checkInternet(reload).then(function(hasInternetOnServer){
                 $scope.hasInternetOnServer = hasInternetOnServer;
                 $log.log("internet on server: " + $scope.hasInternetOnServer);
+                if(!hasInternetOnServer){
+                    return $q.reject();
+                }
             });
+        }
 
-            cloudAPI.checkConnection(reload).then(function(){
+        function checkInternetOnClient(reload){
+            $log.log("check internet connection on client");
+            return cloudAPI.checkConnection(reload).then(function(){
                 $scope.hasInternetOnClient = true;
             },function(error){
                 $scope.hasInternetOnClient = false;
@@ -103,6 +109,12 @@ angular.module('webadminApp')
                     logMediaserverError(error, "Failed to check internet on client:");
                 }
             });
+        }
+        function checkInternet(reload){
+            $log.log("check internet connection");
+
+            checkInternetOnServer(reload);
+            return checkInternetOnClient(reload);
         }
 
         /* Common helpers: error handling, check current system, error handler */
@@ -583,16 +595,20 @@ angular.module('webadminApp')
             },
             noInternetOnServer:{
                 retry:function(){
-                    checkInternet(true);
+                    checkInternetOnServer(true).then(function(){
+                        $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
+                    });
                 },
-                back:'systemName',
+                back:'chooseCloud',
                 skip:'localLogin'
             },
             noInternetOnClient:{
                 retry:function(){
-                    checkInternet(true);
+                    checkInternetOnClient(true).then(function(){
+                        $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
+                    });
                 },
-                back:'systemName',
+                back:'chooseCloud',
                 skip:'localLogin'
             },
 
@@ -620,11 +636,11 @@ angular.module('webadminApp')
             },
 
             cloudIntro:{
-                back: 'systemName',
+                back: 'chooseCloud',
                 skip: 'localLogin'
             },
             cloudAuthorizedIntro:{
-                back: 'systemName',
+                back: 'chooseCloud',
                 skip: 'localLogin',
                 next: function(){
                     $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
@@ -672,7 +688,11 @@ angular.module('webadminApp')
             },
 
             localLogin:{
-                back: 'systemName',
+                back: function(){
+                    $scope.settings.localPassword = '';
+                    $scope.settings.localPasswordConfirmation = '';
+                    $scope.next('chooseLocal',true);
+                },
                 next: initOfflineSystem,
                 valid: function(){
                     return checkForm($scope.forms.localForm) &&

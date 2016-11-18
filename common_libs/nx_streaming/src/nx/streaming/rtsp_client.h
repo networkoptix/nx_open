@@ -332,7 +332,6 @@ private:
     qint64 m_endTime;
     float m_scale;
     int m_tcpTimeout;
-    int m_proxyPort;
     int m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
@@ -359,7 +358,7 @@ private:
     friend class QnRtspIoDevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     QAuthenticator m_auth;
-    QString m_proxyAddr;
+    boost::optional<SocketAddress> m_proxyAddress;
     QString m_contentBase;
     TransportType m_prefferedTransport;
 

@@ -4,8 +4,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/updatable.h>
 
 class QnLicenseUsageHelper;
 
@@ -21,6 +22,8 @@ public:
 
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
+
+    void updateFromResources();
 
     Qt::CheckState state() const;
     void setState(Qt::CheckState value);

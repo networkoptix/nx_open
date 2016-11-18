@@ -185,10 +185,12 @@ namespace nx_hls
 
         if( request.requestLine.version == nx_http::http_1_1 )
         {
-            if( (response.statusLine.statusCode / 100 == 2) && (response.headers.find("Transfer-Encoding") == response.headers.end()) )
-                response.headers.insert( std::make_pair(
-                    "Transfer-Encoding",
-                    response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
+            if( (response.statusLine.statusCode / 100 == 2) && 
+                (response.headers.find("Transfer-Encoding") == response.headers.end()) &&
+                (response.headers.find("Content-Length") == response.headers.end()) )
+            {
+                response.headers.emplace("Transfer-Encoding", "chunked");
+            }
             response.headers.emplace( "Connection", "close" ); //no persistent connections support
         }
         if( response.statusLine.statusCode == nx_http::StatusCode::notFound )
@@ -797,6 +799,10 @@ namespace nx_hls
             ? nx_http::StringType()
             : acceptEncodingHeaderIter->second);
 
+        //in case of hls enabling caching of full chunk since it may be required by hls client
+        if (requestIsAPartOfHlsSession)
+            m_currentChunk->disableInternalBufferLimit();
+
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
         if( acceptEncoding.encodingIsAllowed("chunked")
             || (acceptEncodingHeaderIter == request.headers.end() 
@@ -808,10 +814,6 @@ namespace nx_hls
         }
         else if( acceptEncoding.encodingIsAllowed("identity") )
         {
-            //in case of hls enabling caching of full chunk since it may be required by hls client
-            if (requestIsAPartOfHlsSession)
-                m_currentChunk->disableInternalBufferLimit();
-
             //if chunk exceeds maximum allowed size then proving 
             //  it in streaming mode. That means no Content-Length in response
             const bool chunkCompleted = m_currentChunk->waitForChunkReadyOrInternalBufferFilled();
@@ -826,11 +828,17 @@ namespace nx_hls
             if( rangeIter == request.headers.end() || !chunkCompleted )
             {
                 // < If whole chunk does not fit in memory then disabling partial request support.
-                response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
                 if (chunkCompleted)
+                {
                     response->headers.insert( make_pair(
                         "Content-Length",
                         nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
+                }
+                else
+                {
+                    // This means end-of-file will be signalled by closing connection.
+                    response->headers.insert(make_pair("Transfer-Encoding", "identity"));
+                }
                 response->statusLine.version = request.requestLine.version; //do not require HTTP/1.1 here
                 return nx_http::StatusCode::ok;
             }
@@ -852,7 +860,6 @@ namespace nx_hls
             if( range.rangeSpecList.size() > 0 )
                 contentRange.rangeSpec = range.rangeSpecList.front();
 
-            response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
             response->headers.insert( make_pair( "Content-Range", contentRange.toString() ) );
             response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(contentRange.rangeLength()) ) );
 

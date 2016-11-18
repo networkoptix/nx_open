@@ -17,12 +17,12 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
-
 #include <utils/common/html.h>
 
 namespace
 {
     const int kWelcomeFontPixelSize = 24;
+    const int kWelcomeFontWeight = QFont::Light;
 }
 
 class QnLoginToCloudDialogPrivate : public QObject
@@ -45,13 +45,15 @@ public:
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
-    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
+    base_type(parent),
     ui(new Ui::QnLoginToCloudDialog),
     d_ptr(new QnLoginToCloudDialogPrivate(this))
 {
     ui->setupUi(this);
 
     Q_D(QnLoginToCloudDialog);
+
+    setWindowTitle(tr("Log in to %1").arg(QnAppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
@@ -73,13 +75,15 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
-
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
+
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
+    welcomeFont.setWeight(kWelcomeFontWeight);
+    ui->cloudWelcomeLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->cloudWelcomeLabel->setFont(welcomeFont);
 
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
@@ -96,13 +100,12 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
 
-    ui->loginInputField->setFocus();
     d->updateUi();
     d->lockUi(false);
 
     ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 
-    setResizeToContentsMode(Qt::Vertical);
+    setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 }
 
 QnLoginToCloudDialog::~QnLoginToCloudDialog()
@@ -112,6 +115,15 @@ QnLoginToCloudDialog::~QnLoginToCloudDialog()
 void QnLoginToCloudDialog::setLogin(const QString& login)
 {
     ui->loginInputField->setText(login);
+}
+
+void QnLoginToCloudDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    if (ui->loginInputField->text().isEmpty())
+        ui->loginInputField->setFocus();
+    else
+        ui->passwordInputField->setFocus();
 }
 
 void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)
@@ -166,14 +178,14 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     showCredentialsError(false);
 
-    qnCloudStatusWatcher->resetCloudCredentials();
+    qnCloudStatusWatcher->resetCredentials();
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
 
-    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+    qnCloudStatusWatcher->setCredentials(QnCredentials(
         q->ui->loginInputField->text().trimmed(),
         q->ui->passwordInputField->text().trimmed()));
 }

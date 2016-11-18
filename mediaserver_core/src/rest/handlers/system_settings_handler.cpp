@@ -25,9 +25,12 @@ int QnSystemSettingsHandler::executeGet(
     bool dirty = false;
     const auto& settings = QnGlobalSettings::instance()->allSettings();
 
+    QnRequestParams filteredParams(params);
+    filteredParams.remove("auth");
+
     namespace ahlp = ec2::access_helpers;
 
-    for (QnAbstractResourcePropertyAdaptor* setting: settings)
+    for (QnAbstractResourcePropertyAdaptor* setting : settings)
     {
         bool readAllowed = ahlp::kvSystemOnlyFilter(
             ahlp::Mode::read,
@@ -43,10 +46,10 @@ int QnSystemSettingsHandler::executeGet(
             owner->accessRights(),
             Qn::GlobalPermission::GlobalAdminPermission);
 
-        if (!params.isEmpty())
+        if (!filteredParams.isEmpty())
         {
-            auto paramIter = params.find(setting->key());
-            if (paramIter == params.end())
+            auto paramIter = filteredParams.find(setting->key());
+            if (paramIter == filteredParams.end())
                 continue;
 
             if (!writeAllowed)

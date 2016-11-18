@@ -13,3 +13,4 @@ if '${platform}' == 'windows':
                 if not os.path.exists(target_plugins):
                     os.makedirs(target_plugins)
                 shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', target_plugins)
+shutil.copy2('logo.png', 'resources/skin/logo.png')

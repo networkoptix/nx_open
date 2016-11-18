@@ -89,8 +89,10 @@ QUrl QnHelpHandler::urlForTopic(int topic) const {
 
     if (!m_onlineHelpRoot.isEmpty())
         return QUrl(m_onlineHelpRoot + lit("/") + topicPath);
-    else
-        QnMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
+
+    QnMessageBox::warning(0,
+        tr("Error"),
+        tr("Help page for the given topic could not be found")); // TODO: #dklychkov place something more detailed in the future
 
     return QUrl();
 }
@@ -125,7 +127,7 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
     }
     case QEvent::MouseButtonPress: {
         QMouseEvent *e = static_cast<QMouseEvent *>(event);
-        
+
         if(e->button() == Qt::RightButton && QWhatsThis::inWhatsThisMode()) {
             QWhatsThis::leaveWhatsThisMode();
             return true;

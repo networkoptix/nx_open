@@ -32,6 +32,7 @@ private:
 	QTreeWidget* m_groupWidget;
 	QStackedWidget* m_contentsWidget;
 	QHash<QString, QnAbstractCameraAdvancedParamWidget*> m_paramWidgetsById;
+    QHash<QString, QWidget*> m_paramLabelsById;
 };
 
 #endif //QN_CAMERA_ADVANCED_PARAM_WIDGETS_MANAGER_H

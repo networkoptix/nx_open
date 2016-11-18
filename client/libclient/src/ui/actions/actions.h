@@ -142,15 +142,6 @@ enum IDType
     EscapeHotkeyAction,
 
     /**
-     * Displays message box with the text provided.
-     *
-     * Parameters:
-     * <tt>QString TitleRole</tt> --- title for the messagebox.
-     * <tt>QString TextRole</tt> --- displayed text. If not provided, title will be used.
-     */
-    MessageBoxAction,
-
-    /**
      * Displays version mismatch dialog, pulling mismatch data from
      * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
      * is no mismatches.
@@ -233,8 +224,6 @@ enum IDType
     /**
      * Tries to restart the application as soon as all modal dialogs are closed.
      * Parameters:
-     * <tt>QnSoftwareVersion  SoftwareVersionRole</tt>  --- application version that should be started.
-     *                                                      If not provided, current version will be used.
      * <tt>QUrl UrlRole</tt>                            --- url the application should connect to.
      *                                                      If not provided, current connection info will be used.
      */
@@ -846,11 +835,6 @@ enum IDType
      * Detaches selected layout(s) from the videowall.
      */
     DetachFromVideoWallAction,
-
-    /**
-     * Update selected videowall item(s) with the current layout.
-     */
-    ResetVideoWallLayoutAction,
 
     /**
      * Deletes selected videowall item(s).

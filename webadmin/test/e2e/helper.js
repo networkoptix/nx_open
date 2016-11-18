@@ -16,10 +16,14 @@ var Helper = function () {
 
     var self = this;
 
-    this.activeSystem = 'http://10.0.3.196:7001';
-    this.incompatibleSystem = 'http://10.0.3.202:7001';
+    this.activeSystem = 'http://10.0.2.15:7001';
+    this.incompatibleSystem = 'http://10.0.3.52:7001';
+    this.admin = 'admin';
     this.password = 'qweasd123';
     this.cloudEmail = 'noptixqa+owner@gmail.com';
+
+    this.elementAbsentMessage = 'Element is not present, but this was expected!';
+    this.stringAbsentMessage = 'Element does not contain such string, but this was expected!';
 
     this.checkElementFocusedBy = function(element, attribute) {
         expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
@@ -33,7 +37,7 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
         elem.isPresent().then( function(isPresent) {
             if(isPresent)   deferred.fulfill();
-            else            deferred.reject('(Custom NX message) Element is not present');
+            else            deferred.reject(self.elementAbsentMessage);
         });
 
         return deferred.promise;
@@ -43,7 +47,17 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
         elem.isDisplayed().then( function(isDisplayed) {
             if(isDisplayed)   deferred.fulfill();
-            else            deferred.reject('(Custom NX Message) Element is not displayed');
+            else            deferred.reject(self.elementAbsentMessage);
+        });
+
+        return deferred.promise;
+    };
+
+    this.checkContainsString = function(elem, string) {
+        var deferred = protractor.promise.defer();
+        elem.getText().then( function(text) {
+            if(self.isSubstr(text, string))   deferred.fulfill();
+            else            deferred.reject(self.stringAbsentMessage);
         });
 
         return deferred.promise;
@@ -97,8 +111,6 @@ var Helper = function () {
         var setupDialog = element(by.css('.modal')).element(by.css('.panel'));
         var nextButton = self.setupWizardDialog.element(by.cssContainingText('button', 'Next'));
         var systemNameInput = self.setupWizardDialog.element(by.model('settings.systemName'));
-        // skipCloud is sometimes a link, and sometimes a button, so 'by.linkText' won't work
-        var skipCloud = self.setupWizardDialog.element(by.xpath('.//*[.="Skip this step for now"]'));
         var localPasswordInput = self.setupWizardDialog.element(by.model('ngModel'));
         //var localPasswordInput = self.setupWizardDialog.element(by.model('settings.localPassword'));
         var localPasswordConfInput = self.setupWizardDialog.element(by.model('settings.localPasswordConfirmation'));
@@ -106,15 +118,38 @@ var Helper = function () {
 
         expect(setupDialog.isDisplayed()).toBe(true);
         nextButton.click();
-        systemNameInput.sendKeys('autotest-system');
+        systemNameInput.clear().sendKeys('autotest-system');
         nextButton.click();
-        skipCloud.click();
+        nextButton.click();
         localPasswordInput.sendKeys(self.password);
         localPasswordConfInput.sendKeys(self.password);
         expect(setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
         nextButton.click();
         finishButton.click();
         self.checkPresent(setupDialog).then( function(){ finishButton.click() }, function(){});
+    };
+
+    this.completeSetupWithCloud = function() {
+        var setupDialog = element(by.css('.modal')).element(by.css('.panel'));
+        var nextButton = self.setupWizardDialog.element(by.cssContainingText('button', 'Next'));
+        var systemNameInput = self.setupWizardDialog.element(by.model('settings.systemName'));
+        var finishButton = self.setupWizardDialog.element(by.buttonText('Finish'));
+        var useCloudAccButton = self.setupWizardDialog.element(by.buttonText('Use existing'));
+        var cloudEmailInput = self.setupWizardDialog.element(by.model('settings.cloudEmail'));
+        var cloudPassInput = self.setupWizardDialog.element(by.model('settings.cloudPassword'));
+        var systemTypeRightButton = self.setupWizardDialog.element(by.css('.pull-right'));
+
+        expect(setupDialog.isDisplayed()).toBe(true);
+        nextButton.click();
+        systemNameInput.clear().sendKeys('autotest-system');
+        nextButton.click();
+        systemTypeRightButton.click();  // choose cloud system type
+        nextButton.click();
+        useCloudAccButton.click();
+        cloudEmailInput.sendKeys(self.cloudEmail);
+        cloudPassInput.sendKeys(self.password);
+        nextButton.click();
+        finishButton.click();
     };
 
     this.logout = function() {
@@ -127,13 +162,42 @@ var Helper = function () {
         element(by.model('user.username')).isPresent().then( function(isPresent) {
             if(isPresent) {
                 // if there's login dialog
-                element(by.model('user.username')).sendKeys(username);
-                element(by.model('user.password')).sendKeys(passwd);
+                element(by.model('user.username')).clear().sendKeys(username);
+                element(by.model('user.password')).clear().sendKeys(passwd);
                 element(by.buttonText('Log in')).click();
 
                 browser.sleep(500);
             }
         });
+    };
+
+    // accepts array with objects, like [['login1', 'password1'], ['login2', 'password2']]
+    this.attemptLogin = function (credentialsArray) {
+        var closeButton = element(by.buttonText('Close'));
+        var incorrectPassMess = "Login or password is incorrect";
+
+        var args = Array.prototype.slice.call(arguments);
+
+        (function process(i) {
+            // finish loop when range is finished
+            if (i >= args.length) return;
+
+            // reject if credentials are not strings or not full
+            if ((typeof(args[i][0]) != "string" || typeof(args[i][1]) != "string") &&
+                (typeof(args[i][0]) == "undefined" || typeof(args[i][1]) == "undefined")) {
+                console.log('Skipping this credentials pair, because login or password are not strings or missing: '
+                    + args[i][0] + ' (login) is "' + typeof(args[i][0]) + '"; and ' + args[i][1] + ' (password) is "' + typeof(args[i][1]) + '".' );
+                process(i + 1);
+            }
+
+            self.login(args[i][0], args[i][1]);
+            self.checkContainsString(element(by.css('body')), incorrectPassMess) // if page contains message about wrong credentials
+                .then( function () {
+                    closeButton.click();                      // close error message
+                    process(i + 1);
+                }, function () {}); // if string is not contained, skip silently
+        })(0);
+
     };
 
     this.getTab = function(tab) {

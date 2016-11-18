@@ -44,6 +44,8 @@
 #include <utils/common/qtimespan.h>
 #include <utils/common/unused.h>
 
+#include <utils/math/color_transformations.h>
+
 #include <common/common_globals.h>
 
 namespace
@@ -103,8 +105,6 @@ namespace
 
         virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
         {
-            QnScopedPainterOpacityRollback opacityRollback(painter);
-
             QStyleOptionViewItem opt(option);
             initStyleOption(&opt, index);
 
@@ -117,9 +117,11 @@ namespace
 
             auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
-            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
-                opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
+            /* Set disabled style for unchecked rows: */
+            if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
+                opt.state &= ~QStyle::State_Enabled;
 
+            /* Set proper color for links: */
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
             {
                 if (auto style = QnNxStyle::instance())
@@ -135,19 +137,21 @@ namespace
                 }
             }
 
-            if (editableColumn && hovered)
-            {
-                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
-            }
-            else if (index.column() < QnStorageListModel::RemoveActionColumn
-                 && !index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
-            {
-                painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
-            }
+            /* Set warning color for inaccessible storages: */
+            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
+                opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
 
+            /* Set proper color for hovered storage type column: */
+            if (!opt.state.testFlag(QStyle::State_Enabled))
+                opt.palette.setCurrentColorGroup(QPalette::Disabled);
+            if (editableColumn && hovered)
+                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
+
+            /* Draw item: */
             QStyle* style = option.widget ? option.widget->style() : QApplication::style();
             style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, option.widget);
 
+            /* Draw arrow if editable storage type column: */
             if (editableColumn)
             {
                 QStyleOption arrowOption = opt;
@@ -158,7 +162,9 @@ namespace
 
                 arrowOption.rect.setWidth(style::Metrics::kArrowSize);
 
-                auto arrow = beingEdited ? QStyle::PE_IndicatorArrowUp : QStyle::PE_IndicatorArrowDown;
+                auto arrow = beingEdited
+                    ? QStyle::PE_IndicatorArrowUp
+                    : QStyle::PE_IndicatorArrowDown;
 
                 QStyle* style = option.widget ? option.widget->style() : QApplication::style();
                 style->drawPrimitive(arrow, &arrowOption, painter);
@@ -257,8 +263,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
-    ui->storageView->setItemDelegateForColumn(QnStorageListModel::CheckBoxColumn,
-        new QnSwitchItemDelegate(this));
+
+    auto switchItemDelegate = new QnSwitchItemDelegate(this);
+    switchItemDelegate->setHideDisabledItems(true);
+    ui->storageView->setItemDelegateForColumn(
+        QnStorageListModel::CheckBoxColumn, switchItemDelegate);
 
     StoragesSortModel* sortModel = new StoragesSortModel(this);
     sortModel->setSourceModel(m_model.data());
@@ -361,10 +370,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
         &QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
 
     /* By [Left] disable storage, by [Right] enable storage: */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->storageView->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this,
+    installEventHandler(ui->storageView, QEvent::KeyPress, this,
         [this, itemClicked](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);
@@ -684,16 +690,6 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
-    /* Make sure scheduled backup will stop in no backup storages left after 'Apply' button. */
-    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo& info)
-    {
-        return info.isBackup;
-    });
-    if (!backupStoragesExist)
-    {
-        m_backupSchedule.backupType = Qn::Backup_Manual;
-    }
-
     if (m_backupSchedule != m_server->getBackupSchedule())
     {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr& server)
@@ -728,11 +724,6 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
 
     if (!qnServerStorageManager->rebuildServerStorages(m_server, isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
         return;
-
-    if (isMain)
-        ui->rebuildMainButton->setEnabled(false);
-    else
-        ui->rebuildBackupButton->setEnabled(false);
 
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     storagePool.rebuildCancelled = false;
@@ -868,7 +859,9 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
     const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
-    return lit("%1 %2").arg(backupDateTime.date().toString()).arg(backupDateTime.time().toString(Qt::SystemLocaleLongDate));
+    return lit("%1 %2").arg(
+        backupDateTime.date().toString(Qt::DefaultLocaleLongDate)).arg(
+        backupDateTime.time().toString(Qt::DefaultLocaleShortDate));
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
@@ -1038,7 +1031,7 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
     bool canStartRebuild =
             m_server
         &&  reply.state == Qn::RebuildState_None
-        &&  !hasChanges()
+        &&  !hasStoragesChanges(m_model->storages())
         &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo& info) {
                 return info.isWritable
                     && info.isBackup != isMainPool

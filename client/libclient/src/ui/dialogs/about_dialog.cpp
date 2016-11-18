@@ -137,22 +137,21 @@ void QnAboutDialog::retranslateUi()
     if (servers.isEmpty())
         servers = tr("Client is not connected to any system");
 
-    QString appName = lit("<b>%1%2 %3</b>")
+    QString appName = lit("<b>%1&trade; %2</b>")
         .arg(QnAppInfo::organizationName())
-        .arg(lit("(tm)"))
         .arg(qApp->applicationDisplayName());
 
     QStringList credits;
     credits << tr("%1 uses the following external libraries:").arg(appName);
+    credits << lit("<b>Qt v.%1</b> - Copyright &copy; 2012 Nokia Corporation.").arg(QLatin1String(QT_VERSION_STR));
     credits << QString();
-    credits << lit("<b>Qt v.%1</b> - Copyright (c) 2012 Nokia Corporation.").arg(QLatin1String(QT_VERSION_STR));
-    credits << lit("<b>FFMpeg %1</b> - Copyright (c) 2000-2012 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
-    credits << lit("<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.");
-    credits << lit("<b>OpenAL %1</b> - Copyright (c) 2000-2006 %2.")
+    credits << lit("<b>FFMpeg %1</b> - Copyright &copy; 2000-2012 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
+    credits << lit("<b>LAME 3.99.0</b> - Copyright &copy; 1998-2012 LAME developers.");
+    credits << lit("<b>OpenAL %1</b> - Copyright &copy; 2000-2006 %2.")
         .arg(nx::audio::AudioDevice::instance()->versionString())
         .arg(nx::audio::AudioDevice::instance()->company());
-    credits << lit("<b>SIGAR %1</b> - Copyright (c) 2004-2011 VMware Inc.").arg(versionString(QnAppInfo::sigarVersion()));
-    credits << lit("<b>Boost %1</b> - Copyright (c) 2000-2012 Boost developers.").arg(versionString(QnAppInfo::boostVersion()));
+    credits << lit("<b>SIGAR %1</b> - Copyright &copy; 2004-2011 VMware Inc.").arg(versionString(QnAppInfo::sigarVersion()));
+    credits << lit("<b>Boost %1</b> - Copyright &copy; 2000-2012 Boost developers.").arg(versionString(QnAppInfo::boostVersion()));
 
     int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
 
@@ -173,8 +172,9 @@ void QnAboutDialog::retranslateUi()
 
     QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
     QString supportLink = supportAddress;
-    if (QnEmailAddress::isValid(supportAddress))
-        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportAddress);
+    QnEmailAddress supportEmail(supportAddress);
+    if (supportEmail.isValid())
+        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportEmail.value());
     else if (!supportAddress.isEmpty())
         supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
     ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Support")).arg(supportLink));

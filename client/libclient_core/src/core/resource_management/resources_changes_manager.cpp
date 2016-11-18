@@ -374,7 +374,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     });
 }
 
-void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userGroup)
+void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserGroupData& role)
 {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
@@ -382,11 +382,11 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    auto backup = qnUserRolesManager->userRole(userGroup.id);
-    qnUserRolesManager->addOrUpdateUserRole(userGroup);
+    auto backup = qnUserRolesManager->userRole(role.id);
+    qnUserRolesManager->addOrUpdateUserRole(role);
 
-    connection->getUserManager(Qn::kSystemAccess)->saveUserGroup(userGroup, this,
-        [backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+    connection->getUserManager(Qn::kSystemAccess)->saveUserGroup(role, this,
+        [backup, role, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -399,13 +399,13 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
             return;
 
         if (backup.id.isNull())
-            qnUserRolesManager->removeUserRole(userGroup.id);  /*< New group was not added */
+            qnUserRolesManager->removeUserRole(role.id);  /*< New group was not added */
         else
             qnUserRolesManager->addOrUpdateUserRole(backup);
     });
 }
 
-void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
+void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
 {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
@@ -413,10 +413,10 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    auto backup = qnUserRolesManager->userRole(groupId);
-    qnUserRolesManager->removeUserRole(groupId);
+    auto backup = qnUserRolesManager->userRole(id);
+    qnUserRolesManager->removeUserRole(id);
 
-    connection->getUserManager(Qn::kSystemAccess)->removeUserGroup(groupId, this,
+    connection->getUserManager(Qn::kSystemAccess)->removeUserGroup(id, this,
         [backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);

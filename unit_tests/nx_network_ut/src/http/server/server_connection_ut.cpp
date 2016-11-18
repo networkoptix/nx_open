@@ -55,7 +55,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler )
     {
         m_timer.start(
             std::chrono::seconds(5),
@@ -117,7 +117,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler )
     {
         response->headers.emplace(
             "Seq",
@@ -240,7 +240,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
 
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock(false, AF_INET);
+    nx::network::TCPSocket sock(AF_INET);
     ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
     ASSERT_EQ(sizeof(testData) - 1, sock.send(testData, sizeof(testData)-1));
 }
@@ -257,15 +257,15 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     m_testHttpServer->server().setConnectionInactivityTimeout(kTimeout);
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock(false, AF_INET);
+    nx::network::TCPSocket sock(AF_INET);
     ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
-    ASSERT_EQ(sock.send(kQuery.data(), kQuery.size()), kQuery.size());
+    ASSERT_EQ(kQuery.size(), sock.send(kQuery.data(), kQuery.size()));
 
     nx::Buffer buffer(1024, Qt::Uninitialized);
     ASSERT_GT(sock.recv(buffer.data(), buffer.size(), 0), 0);
 
     const auto start = std::chrono::steady_clock::now();
-    ASSERT_EQ(sock.recv(buffer.data(), buffer.size(), 0), 0);
+    ASSERT_EQ(0, sock.recv(buffer.data(), buffer.size(), 0));
     ASSERT_LT(std::chrono::steady_clock::now() - start, kTimeout * 2);
 }
 

@@ -10,9 +10,9 @@ import Queue
 import threading
 import difflib
 
-__all__ = ['JsonDiff', 'FtConfigParser', 'compareJson', 'showHelp', 'ManagerAddPassword',
-           'SafeJsonLoads', 'TestJsonLoads', 'checkResultsEqual',
-           'textdiff',
+__all__ = ['JsonDiff', 'FtConfigParser', 'compareJson', 'showHelp', 'getHelpDesc',
+           'TestDigestAuthHandler', 'ManagerAddPassword',
+           'SafeJsonLoads', 'TestJsonLoads', 'checkResultsEqual', 'textdiff',
            'ClusterWorker', 'ClusterLongWorker', 'parse_size', 'real_caps',
            'CAMERA_ATTR_EMPTY', 'FULL_SCHEDULE_TASKS',
            'sendRequest', 'TestRequestError', 'LegacyTestFailure', 'ServerCompareFailure']
@@ -488,17 +488,6 @@ _helpMenu = {
         "It is used to delete specific resource. \n"
         "Optionally, you could specify --fake flag , if this flag is on, then the remove will only \n"
         "remove resource that has name prefixed with \"ec2_test\" which typically means fake resource")),
-    "auto-test":("Automatic test",(
-        "Usage: python main.py \n\n"
-        "This command is used to run built-in automatic test.\n"
-        "The automatic test includes 11 types of test and they will be runed automatically."
-        "The configuration parameter is as follow: \n"
-        "threadNumber                  The thread number that will be used to fire operations\n"
-        "mergeTestTimeout              The timeout for merge test\n"
-        "clusterTestSleepTime          The timeout for other auto test\n"
-        "All the above configuration parameters needs to be defined in the General section.\n"
-        "The test will try to rollback afterwards and try to recover at first.\n"
-        "Also the sync operation will be performed before any test\n")),
     "rtsp-perf":("Rtsp performance test",(
         "Usage: python main.py --rtsp-perf \n\n"
         "Usage: python main.py --rtsp-perf --dump \n\n"
@@ -526,38 +515,64 @@ _helpMenu = {
         "This command will perform system name test for each server.\n"
         "The system name test is , change each server in cluster to another system name,\n"
         "and check each server that whether all the other server is offline and only this server is online.\n"
-        ))
+        )),
+    "log": ("Log redirection option", (
+        "With --log FILE all tests' output is redirected into a file.\n"
+        "Only short test result message is sent to stdout.\n"
+        "Using --log without a  FILE name makes it print all output in the end of test\n"
+        "only if the test fails.\n"
+        )),
     }
 
-def showHelp(argv):
-    if len(argv) == 2:
-        helpStrHeader=("Help for auto test tool\n\n"
-                 "*****************************************\n"
-                 "**************Function Menu**************\n"
-                 "*****************************************\n"
-                 "Entry            Introduction            \n")
+def showHelp(arg):
+    if not arg:
+        print """Help for auto test tool
 
-        print helpStrHeader
-
-        maxitemlen = max(len(s) for s in _helpMenu.iterkeys())+1
+*****************************************
+************* Function Menu *************
+*****************************************
+Entry            Introduction
+"""
+        maxitemlen = max(len(s) for s in _helpMenu.iterkeys())
         for k,v in _helpMenu.iteritems():
-            print "%s   %s" % ( (k+':').ljust(maxitemlen), v[0])
+            print "%s  %s" % ( k.ljust(maxitemlen) + ':', v[0])
 
-        helpStrFooter = ("\n\nTo see detail help information, please run command:\n"
-               "python main.py --help Entry\n\n"
-               "Eg: python main.py --help auto-test\n"
-               "This will list detail information about auto-test\n")
+        print """
 
-        print helpStrFooter
+To see detail help information, please run command:
+python main.py --help Entry
+
+Eg: python main.py --help auto-test
+This will list detail information about auto-test
+"""
     else:
-        option = argv[2]
-        if option in _helpMenu:
+        if arg in _helpMenu:
             print "==================================="
-            print option
-            print "===================================\n\n"
-            print _helpMenu[option][1]
+            print arg
+            print "===================================\n"
+            print _helpMenu[arg][1]
+            print
         else:
-            print "Option: %s is not found !"%(option)
+            print "Option: %s is not found !" % (arg,)
+
+
+def getHelpDesc(topic, full=False):
+    if topic in _helpMenu:
+        return _helpMenu[topic][int(full)]
+    else:
+        return "<description not found>"
+
+###########################################
+
+class TestDigestAuthHandler(urllib2.HTTPDigestAuthHandler):
+    "Used to avoid AbstractDigestAuthHandler.retried counter usage in http_error_auth_reqed"
+
+    def http_error_auth_reqed(self, auth_header, host, req, headers):
+        authreq = headers.get(auth_header, None)
+        if authreq:
+            scheme = authreq.split()[0]
+            if scheme.lower() == 'digest':
+                return self.retry_http_digest_auth(req, authreq)
 
 
 # A helper function to unify pasword managers' configuration
@@ -667,8 +682,11 @@ class ClusterWorker(object):
                 print "ERROR: ClusterWorker call " + msg
                 self._oks.append(False)
                 self._fails.append(msg)
-            except Exception:
-                print "ERROR: ClusterWorker call to %s got an Exception: %s" % (func.__name__, traceback.format_exc())
+            except Exception as err:
+                etype, value, tb = sys.exc_info()
+                print "ERROR: ClusterWorker call to %s failed with %s: %s\nTraceback:\n%s" % (
+                    func.__name__, type(err).__name__, getattr(err, 'message', str(err)),
+                    ''.join(traceback.format_tb(tb)))
                 self._oks.append(False)
             else:
                 self._oks.append(True)
@@ -678,6 +696,7 @@ class ClusterWorker(object):
     def startThreads(self):
         for _ in xrange(self._threadNum):
             t = threading.Thread(target=self._worker, args=(_,))
+            t.daemon = False
             t.start()
             self._threadList.append(t)
 
@@ -803,7 +822,7 @@ def real_caps(str):
 
 def textdiff(data0, data1, src0, src1):
     ud = difflib.unified_diff(data0.splitlines(True), data1.splitlines(True), src0, src1, n=5)
-    return ''.join(ud)
+    return ''.join(line if line.endswith('\n') else line+'\n' for line in ud)
 
 
 def sendRequest(lock, url, data, notify=False):
@@ -820,3 +839,24 @@ def sendRequest(lock, url, data, notify=False):
     response.close()
 
 
+# Create keys for api/mergeSystems call
+
+import hashlib, base64, urllib
+def generateMehodKey(method, user, digest, nonce):
+    m = hashlib.md5()
+    nedoHa2 = m.update("%s:" % method)
+    nedoHa2 = m.hexdigest()
+    m = hashlib.md5()
+    m.update(digest)
+    m.update(':')
+    m.update(nonce)
+    m.update(':')
+    m.update(nedoHa2)
+    authDigest = m.hexdigest()
+    return urllib.quote(base64.urlsafe_b64encode("%s:%s:%s" % (user.lower(), nonce, authDigest)))
+
+def generateKey(method, user, password, nonce, realm):
+    m = hashlib.md5()
+    m.update("%s:%s:%s" % (user.lower(), realm, password) )
+    digest = m.hexdigest()
+    return generateMehodKey(method, user, digest, nonce)

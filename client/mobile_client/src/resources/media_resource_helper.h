@@ -12,6 +12,8 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(qreal customAspectRatio READ customAspectRatio NOTIFY customAspectRatioChanged)
     Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
+    Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
+    Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -28,6 +30,9 @@ public:
     QString resourceName() const;
     qreal customAspectRatio() const;
     int customRotation() const;
+    int channelCount() const;
+    QSize layoutSize() const;
+    Q_INVOKABLE QPoint channelPosition(int channel) const;
 
 signals:
     void resourceIdChanged();
@@ -35,6 +40,7 @@ signals:
     void resourceNameChanged();
     void customAspectRatioChanged();
     void customRotationChanged();
+    void videoLayoutChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;

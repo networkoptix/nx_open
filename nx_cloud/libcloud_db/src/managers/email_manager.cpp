@@ -23,34 +23,12 @@
 namespace nx {
 namespace cdb {
 
-EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_error)
+EMailManager::EMailManager( const conf::Settings& settings )
 :
     m_settings( settings ),
     m_terminated( false )
 {
-    if (!m_settings.notification().serviceEndpoint.isEmpty())
-    {
-        m_notificationModuleEndpoint = SocketAddress(m_settings.notification().serviceEndpoint);
-        return;
-    }
-
-    nx::network::cloud::CloudModuleEndPointFetcher endPointFetcher(
-        "notification_module",
-        std::make_unique<nx::network::cloud::RandomEndpointSelector>());
-    std::promise<nx_http::StatusCode::Value> endpointPromise;
-    auto endpointFuture = endpointPromise.get_future();
-    endPointFetcher.get(
-        [&endpointPromise, this](
-            nx_http::StatusCode::Value resCode,
-            SocketAddress endpoint)
-        {
-            endpointPromise.set_value(resCode);
-            m_notificationModuleEndpoint = std::move(endpoint);
-        });
-    const auto result = endpointFuture.get();
-    endPointFetcher.pleaseStopSync();
-    if (result != nx_http::StatusCode::ok)
-        throw std::runtime_error("Failed to find out notification module address");
+    m_notificationModuleUrl = m_settings.notification().url;
 }
 
 EMailManager::~EMailManager()
@@ -77,12 +55,6 @@ void EMailManager::sendAsync(
         return;
     }
 
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(m_notificationModuleEndpoint.address.toString());
-    url.setPort(m_notificationModuleEndpoint.port);
-    url.setPath("/notifications/send");
-
     auto httpClient = nx_http::AsyncHttpClient::create();
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
@@ -102,7 +74,7 @@ void EMailManager::sendAsync(
     }
 
     httpClient->doPost(
-        url,
+        m_notificationModuleUrl,
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         notification.serializeToJson());
 }

@@ -46,6 +46,7 @@ class ResourceTreeWorkbenchPanel;
 class NotificationsWorkbenchPanel;
 class TimelineWorkbenchPanel;
 class CalendarWorkbenchPanel;
+class TitleWorkbenchPanel;
 
 }
 
@@ -150,7 +151,11 @@ public slots:
 protected:
     virtual void tick(int deltaMSecs) override;
 
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX);
+    QMargins calculateViewportMargins(
+        const QRectF& treeGeometry,
+        const QRectF& titleGeometry,
+        const QRectF& timelineGeometry,
+        const QRectF& notificationsGeometry);
     void updateViewportMargins();
 
     void updateTreeGeometry();
@@ -162,8 +167,6 @@ protected:
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry);
     void updateActivityInstrumentState();
-
-    void setTitleOpacity(qreal opacity, bool animate);
 
     bool isHovered() const;
 
@@ -192,13 +195,12 @@ private:
 
     void updateCursor();
 
-private slots:
-    void updateTitleOpacity(bool animate = true);
+    bool calculateTimelineVisible(QnResourceWidget* widget) const;
 
+private slots:
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateTitleOpacityAnimated();
     void updateCalendarVisibilityAnimated();
     void updateControlsVisibilityAnimated();
 
@@ -209,8 +211,6 @@ private slots:
     void at_display_widgetChanged(Qn::ItemRole role);
 
     void at_controlsWidget_geometryChanged();
-
-    void at_titleItem_geometryChanged();
 
 private:
     /* Global state. */
@@ -236,12 +236,6 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
-    bool m_titleUsed;
-
-    bool m_titleVisible;
-
-    bool m_ignoreClickEvent;
-
     bool m_inactive;
 
     QPointer<QnProxyLabel> m_fpsItem;
@@ -261,18 +255,7 @@ private:
     QPointer<NxUi::ResourceTreeWorkbenchPanel> m_tree;
 
     /* Title-related state. */
-
-    /** Title bar widget. */
-    QPointer<QGraphicsProxyWidget> m_titleItem;
-
-    QPointer<QnImageButtonWidget> m_titleShowButton;
-
-    QPointer<AnimatorGroup> m_titleOpacityAnimatorGroup;
-
-    /** Animator for title's position. */
-    QPointer<VariantAnimator> m_titleYAnimator;
-
-    QPointer<HoverFocusProcessor> m_titleOpacityProcessor;
+    QPointer<NxUi::TitleWorkbenchPanel> m_title;
 
     /* Notifications window-related state. */
     QPointer<NxUi::NotificationsWorkbenchPanel> m_notifications;

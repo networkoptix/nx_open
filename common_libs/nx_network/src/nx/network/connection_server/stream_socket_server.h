@@ -115,9 +115,13 @@ template<class CustomServerType, class ConnectionType>
 
 public:
     //!Initialization
-    StreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+    StreamSocketServer(
+        bool sslRequired,
+        nx::network::NatTraversalSupport natTraversalSupport)
     :
-        m_socket( SocketFactory::createStreamServerSocket( sslRequired, natTraversalRequired ) )
+        m_socket(SocketFactory::createStreamServerSocket(
+            sslRequired,
+            natTraversalSupport))
     {
     }
 

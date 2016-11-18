@@ -101,6 +101,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
 
     q->ui->testProgressBar->setValue(0);
     q->ui->testStackWidget->setCurrentWidget(q->ui->testProgressPage);
+    q->ui->testStackWidget->show();
 
     timeoutTimer->setInterval(testLdapTimeoutMSec / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
@@ -162,6 +163,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     QUrl url = settings.uri;
     if (url.port() == QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")))
         url.setPort(-1);
+
     q->ui->serverLineEdit->setText(url.toString());
     q->ui->adminDnLineEdit->setText(settings.adminDn.trimmed());
     q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
@@ -169,6 +171,9 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     q->ui->searchFilterLineEdit->setText(settings.searchFilter.trimmed());
     q->ui->testStackWidget->setCurrentWidget(q->ui->testResultPage);
     q->ui->testResultLabel->setText(QString());
+    q->ui->testStackWidget->hide();
+
+    q->resize(q->width(), q->minimumSizeHint().height());
 }
 
 void QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout() {

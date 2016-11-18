@@ -14,7 +14,7 @@
             <pubDate>Mon, 23 Dec 2014 11:59:59 +0800</pubDate>
             <sparkle:enclosure sparkle:os="windows-x86" url="${update.url}" sparkle:version="2.2.1" sparkle:engineVersion="2.2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
             <sparkle:enclosure sparkle:os="windows-x64" url="${update.url}" sparkle:version="2.2.1" sparkle:engineVersion="2.2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
-        </item> 
+        </item>
         <item>
             <title>Version 2.2 (30 bugs fixed; 6 new features)</title>
             <description>
@@ -24,7 +24,7 @@
             <pubDate>Tue, 31 Dec 2013 23:59:59 +0800</pubDate>
             <sparkle:enclosure sparkle:os="windows-x86" url="http://hdwitness.com/download" sparkle:version="2.2" sparkle:engineVersion="2.2" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
             <sparkle:enclosure sparkle:os="windows-x64" url="http://hdwitness.com/download" sparkle:version="2.2" sparkle:engineVersion="2.2" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
-        </item>                
+        </item>
         <item>
             <title>Version 2.1 (30 bugs fixed; 6 new features)</title>
             <description>
@@ -34,7 +34,7 @@
             <pubDate>Tue, 31 Dec 2013 23:59:59 +0800</pubDate>
             <sparkle:enclosure sparkle:os="windows-x86" url="http://networkoptix.com/hd-witness-for-windows/" sparkle:version="2.1" sparkle:engineVersion="2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
             <sparkle:enclosure sparkle:os="windows-x64" url="http://networkoptix.com/hd-witness-for-windows/" sparkle:version="2.1" sparkle:engineVersion="2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
-        </item>        
+        </item>
         <item>
             <title>Version 2.0.2 (8 bugs fixed; 0 new features)</title>
             <description>

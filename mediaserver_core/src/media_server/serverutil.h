@@ -78,7 +78,8 @@ struct ConfigureSystemData : public PasswordData
         PasswordData(),
         wholeSystem(false),
         sysIdTime(0),
-        port(0)
+        port(0),
+        rewriteLocalSettings(false)
     {
     }
 
@@ -100,8 +101,10 @@ struct ConfigureSystemData : public PasswordData
     ec2::Timestamp tranLogTime;
     int port;
     ec2::ApiMediaServerData foreignServer;
-    ec2::ApiUserData foreignUser;
+    std::vector<ec2::ApiUserData> foreignUsers;
     ec2::ApiResourceParamDataList foreignSettings;
+    ec2::ApiResourceParamWithRefDataList additionParams;
+    bool rewriteLocalSettings;
 };
 
 /*
@@ -117,7 +120,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data);
 bool resetSystemToStateNew();
 
 
-#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUser)(foreignSettings)
+#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (ConfigureSystemData),

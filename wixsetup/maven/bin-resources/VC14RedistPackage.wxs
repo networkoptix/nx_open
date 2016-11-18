@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Fragment Id='FragmentVC14Redist'>
+        <?include BuildVars.wxi ?>
+
+        <util:ProductSearch Id="VCREDIST_140_x86"
+            UpgradeCode="65E5BD06-6392-3027-8C26-853107D3CF1A"
+            Result="version"
+            Variable="VCREDIST_140_x86" />
+
+        <util:ProductSearch Id="VCREDIST_140_x64"
+            UpgradeCode="36F68A90-239C-34DF-B58C-64B30153CE35"
+            Result="version"
+            Variable="VCREDIST_140_x64" />
+
+        <PackageGroup Id="VC14RedistPackageGroup">
+            <ExePackage
+                Cache="no"
+                Compressed="yes"
+                PerMachine="yes"
+                Permanent="yes"
+                Vital="yes"
+                DetectCondition="VCREDIST_140_$(var.arch) &gt;= v14.0.24215"
+                Name="Redist\vcredist14_$(var.arch).exe"
+                SourceFile="$(var.VC14RedistPath)\vcredist_24215_$(var.arch).exe"
+                InstallCommand="/install /quiet /norestart">
+
+                <!-- -->
+                <ExitCode Value="3010" Behavior="forceReboot"/>
+
+                <!-- Ignore "Newer version installed" error -->
+                <ExitCode Value="1638" Behavior="success"/>
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

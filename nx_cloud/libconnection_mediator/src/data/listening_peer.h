@@ -1,8 +1,3 @@
-/**********************************************************
-* May 4, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <map>
@@ -14,39 +9,39 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-
 namespace nx {
 namespace hpm {
 namespace data {
 
 struct ListeningPeer
 {
-    QString id;
-    QString endpoint;
-    std::vector<QString> forwardedEndpoints;
+    QString connectionEndpoint;
+    std::vector<QString> directTcpEndpoints;
 };
 
-#define ListeningPeer_Fields (id)(endpoint)(forwardedEndpoints)
+#define ListeningPeer_Fields (connectionEndpoint)(directTcpEndpoints)
+typedef std::map<QString /*peerId*/, ListeningPeer> ListeningPeersById;
+typedef std::map<QString /*systemId*/, ListeningPeersById> ListeningPeersBySystem;
 
-
-struct ListeningPeerList
+struct BoundClient
 {
-    std::vector<ListeningPeer> peers;
+    QString connectionEndpoint;
+    std::vector<QString> tcpReverseEndpoints;
 };
 
-#define ListeningPeerList_Fields (peers)
+#define BoundClient_Fields (connectionEndpoint)(tcpReverseEndpoints)
+typedef std::map<QString /*clientId*/, BoundClient> BoundClientById;
 
-
-struct ListeningPeersBySystem
+struct ListeningPeers
 {
-    /** system id,  */
-    std::map<QString, ListeningPeerList> systems;
+    ListeningPeersBySystem systems;
+    BoundClientById clients;
 };
 
-#define ListeningPeersBySystem_Fields (systems)
+#define ListeningPeers_Fields (systems)(clients)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (ListeningPeer)(ListeningPeerList)(ListeningPeersBySystem),
+    (ListeningPeer)(BoundClient)(ListeningPeers),
     (json));
 
 } // namespace data

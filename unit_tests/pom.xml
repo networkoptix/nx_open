@@ -29,6 +29,7 @@
         <module>mediaserver_core_ut</module>
         <module>vms_utils_ut</module>
         <module>nx_media_ut</module>
+        <module>nx_fusion_ut</module>
     </modules>
 
     <profiles>

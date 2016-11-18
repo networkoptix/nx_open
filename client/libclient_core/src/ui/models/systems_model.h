@@ -21,11 +21,12 @@ public:
         SearchRoleId = FirstRoleId,
         SystemNameRoleId,
         SystemIdRoleId,
+        LocalIdRoleId,
 
         OwnerDescriptionRoleId,
-        LastPasswordRoleId,
 
         IsFactorySystemRoleId,
+        SafeModeRoleId,
 
         IsCloudSystemRoleId,
         IsOnlineRoleId,
@@ -35,9 +36,6 @@ public:
 
         WrongVersionRoleId,
         CompatibleVersionRoleId,
-
-        // For local systems
-        LastPasswordsModelRoleId,
 
         RolesCount
     };
@@ -53,6 +51,8 @@ public: // overrides
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
+
+    int getRowIndex(const QString& systemId) const;
 
 signals:
     void minimalVersionChanged();

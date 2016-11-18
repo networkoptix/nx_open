@@ -1590,6 +1590,7 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& co
     {
         if (connection->connectionGuid() == connectionGuid)
         {
+            connection->monitorConnectionForClosure();
             connection->setState(QnTransactionTransport::Connected);
             return true;
         }
@@ -1818,10 +1819,8 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers
     AlivePeersMap result;
     for (AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr->peer.isClient())
-            continue;
-
-        result.insert(itr.key(), itr.value());
+        if (itr->peer.isServer())
+            result.insert(itr.key(), itr.value());
     }
 
     return result;

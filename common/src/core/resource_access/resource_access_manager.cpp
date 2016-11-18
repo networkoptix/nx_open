@@ -7,6 +7,7 @@
 
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -25,17 +26,16 @@
 #include <nx_ec/data/api_webpage_data.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/raii_guard.h>
 
-//#define DEBUG_PERMISSIONS
-#ifdef DEBUG_PERMISSIONS
-#define TRACE(...) qDebug() << "QnResourceAccessManager: " << __VA_ARGS__;
-#else
-#define TRACE(...)
-#endif
+#include <nx/fusion/model_functions.h>
+
+#include <utils/common/scoped_timer.h>
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
+    QnUpdatable(),
     m_mutex(QnMutex::NonRecursive),
     m_permissionsCache()
 {
@@ -67,15 +67,15 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
         return;
 
     auto isValid = [&]
-    {
-        if (!resource->resourcePool())
-            return false;
+        {
+            if (!resource->resourcePool())
+                return false;
 
-        if (subject.user())
-            return subject.user()->resourcePool() != nullptr;
+            if (subject.user())
+                return subject.user()->resourcePool() != nullptr;
 
-        return qnUserRolesManager->hasRole(subject.role().id);
-    };
+            return qnUserRolesManager->hasRole(subject.role().id);
+        };
 
     PermissionKey key(subject.id(), resource->getId());
     if (isValid())
@@ -94,6 +94,13 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
         if (m_permissionsCache.value(key) == permissions)
             return;
     }
+
+    NX_LOG(QnLog::PERMISSIONS_LOG,
+        lit("QnResourceAccessManager: %1 -> %2: %3")
+        .arg(subject.name())
+        .arg(resource->getName())
+        .arg(QnLexical::serialized(permissions)),
+        cl_logDEBUG1);
     emit permissionsChanged(subject, resource, permissions);
 }
 
@@ -120,6 +127,8 @@ bool QnResourceAccessManager::hasGlobalPermission(
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
+    NX_EXPECT(!isUpdating());
+
     if (!subject.isValid() || !resource)
         return Qn::NoPermissions;
 
@@ -160,6 +169,7 @@ bool QnResourceAccessManager::hasPermission(
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
+
     if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources
         && permissions == Qn::ReadPermission)
     {
@@ -178,6 +188,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 {
     NX_ASSERT(subject.isValid());
     NX_ASSERT(target);
+    NX_EXPECT(!isUpdating());
 
     if (!subject.isValid())
         return false;
@@ -208,18 +219,21 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const ec2::ApiStorageData& data) const
 {
+    NX_EXPECT(!isUpdating());
     return canCreateStorage(subject, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const ec2::ApiLayoutData& data) const
 {
+    NX_EXPECT(!isUpdating());
     return canCreateLayout(subject, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const ec2::ApiUserData& data) const
 {
+    NX_EXPECT(!isUpdating());
     if (!data.groupId.isNull() && !qnUserRolesManager->hasRole(data.groupId))
         return false;
 
@@ -227,66 +241,103 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiVideowallData& data) const
+    const ec2::ApiVideowallData& /*data*/) const
 {
-    Q_UNUSED(data);
+    NX_EXPECT(!isUpdating());
     return canCreateVideoWall(subject);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiWebPageData& data) const
+    const ec2::ApiWebPageData& /*data*/) const
 {
-    Q_UNUSED(data);
+    NX_EXPECT(!isUpdating());
     return canCreateWebPage(subject);
+}
+
+void QnResourceAccessManager::beforeUpdate()
+{
+    /* We must clear cache here because otherwise there can stay resources, which were removed
+     * during update. */
+    QnMutexLocker lk(&m_mutex);
+    m_permissionsCache.clear();
+}
+
+void QnResourceAccessManager::afterUpdate()
+{
+    recalculateAllPermissions();
 }
 
 void QnResourceAccessManager::recalculateAllPermissions()
 {
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    QN_LOG_TIME(Q_FUNC_INFO);
+
+    if (isUpdating())
+        return;
+
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updatePermissionsBySubject(subject);
 }
 
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& target)
 {
+    if (isUpdating())
+        return;
+
     setPermissionsInternal(subject, target, calculatePermissions(subject, target));
 }
 
 void QnResourceAccessManager::updatePermissionsToResource(const QnResourcePtr& resource)
 {
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    if (isUpdating())
+        return;
+
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
         updatePermissions(subject, resource);
 }
 
 void QnResourceAccessManager::updatePermissionsBySubject(const QnResourceAccessSubject& subject)
 {
+    if (isUpdating())
+        return;
+
     for (const QnResourcePtr& resource : qnResPool->getResources())
         updatePermissions(subject, resource);
 }
 
 void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 {
-    updatePermissionsToResource(resource);
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-        updatePermissionsBySubject(user);
-
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
+        /* If layout become shared AND user is admin - he will not receive access notification
+         * (because he already had access) but permissions must be recalculated. */
+         connect(layout, &QnResource::parentIdChanged, this,
+             &QnResourceAccessManager::updatePermissionsToResource);
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
     }
+
+    if (isUpdating())
+        return;
+
+    updatePermissionsToResource(resource);
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        updatePermissionsBySubject(user);
 }
 
 void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
     disconnect(resource, nullptr, this, nullptr);
 
+    if (isUpdating())
+        return;
+
     auto resourceId = resource->getId();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
     {
         PermissionKey key(subject.id(), resourceId);
         {
@@ -302,6 +353,9 @@ void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resourc
 
 void QnResourceAccessManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    if (isUpdating())
+        return;
+
     auto id = subject.id();
 
     QSet<QnResourcePtr> resorces;
@@ -371,7 +425,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject,
     const QnVirtualCameraResourcePtr& camera) const
 {
-    TRACE("Calculate permissions of " << subject << " to camera " << camera->getName());
     NX_ASSERT(camera);
 
     Qn::Permissions result = Qn::NoPermissions;
@@ -383,7 +436,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (!qnResourceAccessProvider->hasAccess(subject, camera))
         return result;
 
-    result |= Qn::ReadPermission;
+    result |= Qn::ReadPermission | Qn::ViewContentPermission;
     if (hasGlobalPermission(subject, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
@@ -404,13 +457,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 {
     NX_ASSERT(server);
 
-    Qn::Permissions result = Qn::NoPermissions;
+    Qn::Permissions result = Qn::ReadPermission;
     if (!qnResourceAccessProvider->hasAccess(subject, server))
         return result;
 
-    result |= Qn::ReadPermission;
+    result |= Qn::ViewContentPermission;
     if (hasGlobalPermission(subject, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
-        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        result |= Qn::FullServerPermissions;
 
     return result;
 }
@@ -430,9 +483,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (serverPermissions.testFlag(Qn::SavePermission))
         return Qn::ReadWriteSavePermission;
 
-    if (serverPermissions.testFlag(Qn::ReadPermission))
-        return Qn::ReadPermission;
-
     return Qn::NoPermissions;
 }
 
@@ -440,14 +490,19 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnVideoWallResourcePtr& videoWall) const
 {
     NX_ASSERT(videoWall);
+    Qn::Permissions result = Qn::NoPermissions;
+    if (!hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+        return result;
 
-    if (hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
-    {
-        if (qnCommon->isReadOnly())
-            return Qn::ReadPermission;
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
-    }
-    return Qn::NoPermissions;
+    result = Qn::ReadPermission | Qn::WritePermission;
+    if (qnCommon->isReadOnly())
+        return result;
+
+    result |= Qn::SavePermission | Qn::WriteNamePermission;
+    if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+        result |= Qn::RemovePermission;
+
+    return result;
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
@@ -458,7 +513,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (!qnResourceAccessProvider->hasAccess(subject, webPage))
         return Qn::NoPermissions;
 
-    Qn::Permissions result = Qn::ReadPermission;
+    Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
     if (qnCommon->isReadOnly())
         return result;
 
@@ -472,104 +527,109 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnLayoutResourcePtr& layout) const
 {
-    TRACE("Calculate permissions of " << subject << " to layout " << layout->getName());
-
     NX_ASSERT(layout);
     if (!subject.isValid() || !layout)
         return Qn::NoPermissions;
 
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
-    auto checkReadOnly = [this](Qn::Permissions permissions)
-    {
-        if (!qnCommon->isReadOnly())
-            return permissions;
-        return permissions& ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
-    };
+    auto checkReadOnly =
+        [this](Qn::Permissions permissions)
+        {
+            if (!qnCommon->isReadOnly())
+                return permissions;
+            return permissions& ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
+        };
 
-    auto checkLocked = [this, layout](Qn::Permissions permissions)
-    {
-        if (!layout->locked())
-            return permissions;
-        return permissions& ~(Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
-    };
+    auto checkLocked =
+        [this, layout](Qn::Permissions permissions)
+        {
+            if (!layout->locked())
+                return permissions;
+            return permissions& ~(Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
+        };
 
     /* Layouts with desktop cameras are not to be modified but can be removed. */
-    if (qnResPool->isAutoGeneratedLayout(layout))
-    {
-        const auto items = layout->getItems();
-        bool hasDesktopCamera = std::any_of(items.cbegin(), items.cend(), [this](const QnLayoutItemData& item)
+    const auto resources = layout->layoutResources();
+    bool hasDesktopCamera = std::any_of(resources.cbegin(), resources.cend(),
+        [this](const QnResourcePtr& resource)
         {
-            QnResourcePtr childResource = qnResPool->getResourceById(item.resource.id);
-            return childResource && childResource->hasFlags(Qn::desktop_camera);
+            return resource->hasFlags(Qn::desktop_camera);
         });
 
-        if (hasDesktopCamera)
-            return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
-    }
+    if (hasDesktopCamera)
+        return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
 
 
     /* Calculate base layout permissions */
     auto base = [&]() -> Qn::Permissions
-    {
-        /* Owner can do anything. */
-        if (subject.user() && subject.user()->isOwner())
-            return Qn::FullLayoutPermissions;
-
-        /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
-        if (layout->isShared())
         {
-            if (!qnResourceAccessProvider->hasAccess(subject, layout))
-                return Qn::NoPermissions;
-
-            /* Global layouts editor. */
-            if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+            /* Owner can do anything. */
+            if (subject.user() && subject.user()->isOwner())
                 return Qn::FullLayoutPermissions;
 
-            /* Ability to cleanup unused autogenerated layouts. */
-            if (hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission)
-                && qnResPool->isAutoGeneratedLayout(layout))
-                return Qn::FullLayoutPermissions;
-
-            return Qn::ModifyLayoutPermission;
-        }
-
-        /* Checking other user's layout. Only users can have access to them. */
-        if (auto user = subject.user())
-        {
             QnUuid ownerId = layout->getParentId();
-            if (ownerId != user->getId())
+
+            /* Access to videowall layouts. */
+            const auto videowall = qnResPool->getResourceById<QnVideoWallResource>(ownerId);
+            if (videowall)
             {
-                QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
+                /* Videowall layout. */
+                return hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission)
+                    ? Qn::FullLayoutPermissions
+                    : Qn::NoPermissions;
+            }
 
-                if (!owner)
-                {
-                    /* Everybody can modify lite client layout. */
-                    const auto server = qnResPool->getResourceById<QnMediaServerResource>(ownerId);
-                    if (server)
-                        return Qn::FullLayoutPermissions;
 
-                    /* Layout of user, which we don't know of. */
-                    return hasGlobalPermission(subject, Qn::GlobalAdminPermission)
-                        ? Qn::FullLayoutPermissions
-                        : Qn::NoPermissions;
-                }
+            /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
+            if (layout->isShared())
+            {
+                if (!qnResourceAccessProvider->hasAccess(subject, layout))
+                    return Qn::NoPermissions;
 
-                /* We can modify layout for user if we can modify this user. */
-                Qn::Permissions userPermissions = permissions(subject, owner);
-                if (userPermissions.testFlag(Qn::SavePermission))
+                /* Global layouts editor. */
+                if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
                     return Qn::FullLayoutPermissions;
 
-                /* We can see layouts for another users if we are able to see these users. */
-                if (userPermissions.testFlag(Qn::ReadPermission))
-                    return Qn::ModifyLayoutPermission;
-
-                return Qn::NoPermissions;
+                return Qn::ModifyLayoutPermission;
             }
-        }
 
-        /* User can do whatever he wants with own layouts. */
-        return Qn::FullLayoutPermissions;
-    };
+            /* Checking other user's layout. Only users can have access to them. */
+            if (auto user = subject.user())
+            {
+
+                if (ownerId != user->getId())
+                {
+                    QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
+
+                    if (!owner)
+                    {
+                        /* Everybody can modify lite client layout. */
+                        const auto server = qnResPool->getResourceById<QnMediaServerResource>(ownerId);
+                        if (server)
+                            return Qn::FullLayoutPermissions;
+
+                        /* Layout of user, which we don't know of. */
+                        return hasGlobalPermission(subject, Qn::GlobalAdminPermission)
+                            ? Qn::FullLayoutPermissions
+                            : Qn::NoPermissions;
+                    }
+
+                    /* We can modify layout for user if we can modify this user. */
+                    Qn::Permissions userPermissions = permissions(subject, owner);
+                    if (userPermissions.testFlag(Qn::SavePermission))
+                        return Qn::FullLayoutPermissions;
+
+                    /* We can see layouts for another users if we are able to see these users. */
+                    if (userPermissions.testFlag(Qn::ReadPermission))
+                        return Qn::ModifyLayoutPermission;
+
+                    return Qn::NoPermissions;
+                }
+            }
+
+            /* User can do whatever he wants with own layouts. */
+            return Qn::FullLayoutPermissions;
+        };
 
     return checkLocked(checkReadOnly(base()));
 }
@@ -623,7 +683,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             auto isOwner = subject.user() && subject.user()->isOwner();
 
             /* Admins can only be edited by owner, other users - by all admins. */
-            if (isOwner || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
+            bool targetIsAdmin = targetUser->getRawPermissions().testFlag(Qn::GlobalAdminPermission);
+            if (isOwner || !targetIsAdmin)
                 result |= Qn::FullUserPermissions;
         }
     }
@@ -651,18 +712,18 @@ bool QnResourceAccessManager::canCreateLayout(const QnResourceAccessSubject& sub
     if (subject.user() && layoutParentId == subject.user()->getId())
         return true;
 
-    /* Only admins and videowall-admins can create global layouts. */
+    /* Only admins can create global layouts. */
     if (layoutParentId.isNull())
-    {
-        return hasGlobalPermission(subject, Qn::GlobalAdminPermission)
-            || hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission);
-    }
+        return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+
+    /* Videowall-admins can create layouts on videowall. */
+    if (qnResPool->getResourceById<QnVideoWallResource>(layoutParentId))
+        return hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission);
 
     const auto ownerResource = qnResPool->getResourceById(layoutParentId);
 
     /* Everybody can create layout for lite client. */
-    const auto parentServer = ownerResource.dynamicCast<QnMediaServerResource>();
-    if (parentServer)
+    if (const auto& parentServer = ownerResource.dynamicCast<QnMediaServerResource>())
     {
         if (!parentServer->getServerFlags().testFlag(Qn::SF_HasLiteClient))
             return false;

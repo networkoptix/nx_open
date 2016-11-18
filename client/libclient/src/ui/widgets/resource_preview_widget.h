@@ -10,7 +10,6 @@ class QLabel;
 class QStackedWidget;
 class QnBusyIndicatorWidget;
 class QnCameraThumbnailManager;
-class QnBusyIndicatorWidget;
 
 class QnResourcePreviewWidget : public Connective<QWidget>
 {
@@ -44,7 +43,7 @@ private:
     QnResourcePtr m_target;
     mutable QSize m_cachedSizeHint;
     QSize m_resolutionHint;
-    qreal m_aspectRatio;
+    qreal m_aspectRatio; //TODO: Refactor to QnAspectRatio
     QLabel* m_preview;
     QLabel* m_placeholder;
     QnBusyIndicatorWidget* m_indicator;

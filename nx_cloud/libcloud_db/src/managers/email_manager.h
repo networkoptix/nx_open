@@ -12,6 +12,7 @@
 #include <set>
 
 #include <QtCore/QString>
+#include <QtCore/QUrl>
 
 #include <nx_ec/data/api_email_data.h>
 #include <utils/common/threadqueue.h>
@@ -49,7 +50,7 @@ class EMailManager
     public AbstractEmailManager
 {
 public:
-    EMailManager(const conf::Settings& settings) throw(std::runtime_error);
+    EMailManager(const conf::Settings& settings);
     virtual ~EMailManager();
 
 protected:
@@ -67,7 +68,7 @@ private:
     const conf::Settings& m_settings;
     bool m_terminated;
     mutable QnMutex m_mutex;
-    SocketAddress m_notificationModuleEndpoint;
+    QUrl m_notificationModuleUrl;
     std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
     QnCounter m_startedAsyncCallsCounter;
 

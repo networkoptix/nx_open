@@ -23,7 +23,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler) override;
+        nx_http::RequestProcessedHandler completionHandler) override;
 
 private:
     const nx_http::StringType m_mimeType;

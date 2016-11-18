@@ -21,6 +21,8 @@ public:
     const ec2::ApiUserGroupData& role() const;
 
     bool isValid() const;
+    bool isUser() const;
+    bool isRole() const;
 
     QnUuid id() const;
 

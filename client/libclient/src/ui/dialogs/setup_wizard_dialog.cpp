@@ -22,7 +22,7 @@ namespace
 }
 
 QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
-    : base_type(parent)
+    : base_type(parent, Qt::MSWindowsFixedSizeDialogHint)
     , d_ptr(new QnSetupWizardDialogPrivate(this))
 {
     Q_D(QnSetupWizardDialog);

@@ -39,7 +39,7 @@ public:
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
-    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq);
+    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly);
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
@@ -149,26 +149,46 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
     return true;
 }
 
-int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
+int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly)
 {
-    int rez = 0;
-    auto randomAccess = m_dataQueue.lock();
-    for (int i = 0; i < randomAccess.size(); ++i)
-    {
-        const QnConstAbstractDataPacketPtr& data = randomAccess.at(i);
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
-        if (video)
+    auto addData = 
+        [&](const QnConstAbstractDataPacketPtr& data)
         {
-            QnCompressedVideoData* newData = video->clone();
-            if (skipTime && video->timestamp <= skipTime)
-                newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
-            newData->opaque = cseq;
-            dstQueue.push(QnAbstractMediaDataPtr(newData));
+            const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
+            if (video)
+            {
+                QnCompressedVideoData* newData = video->clone();
+                if (skipTime && video->timestamp <= skipTime)
+                    newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+                newData->opaque = cseq;
+                dstQueue.push(QnAbstractMediaDataPtr(newData));
+            }
+            else {
+                dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data)); //TODO: #ak remove const_cast
+            }
+        };
+    
+    int rez = 0;
+    if (iFramesOnly)
+    {
+        QnMutexLocker lock(&m_queueMtx);
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        {
+            if (m_lastKeyFrame[i])
+            {
+                addData(m_lastKeyFrame[i]);
+                ++rez;
+            }
         }
-        else {
-            dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data));    //TODO: #ak remove const_cast
+    }
+    else
+    {
+        auto randomAccess = m_dataQueue.lock();
+        for (int i = 0; i < randomAccess.size(); ++i)
+        {
+            addData(randomAccess.at(i));
+            ++rez;
         }
-        rez++;
     }
     return rez;
 }
@@ -431,12 +451,17 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog cat
     return getLiveReaderNonSafe( catalog );
 }
 
-int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
+int QnVideoCamera::copyLastGop(
+    bool primaryLiveStream, 
+    qint64 skipTime, 
+    QnDataPacketQueue& dstQueue, 
+    int cseq,
+    bool iFramesOnly)
 {
     if (primaryLiveStream)
-        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq);
+        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
     else
-        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq);
+        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
 }
 
 /*

@@ -87,9 +87,8 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
     ec2::ApiUserGroupData role;
     {
         QnMutexLocker lk(&m_mutex);
-        NX_ASSERT(m_roles.contains(id));
         if (!m_roles.contains(id))
-            return;
+            return; /*< Perfectly valid outcome when we have deleted the role by ourselves. */
 
         role = m_roles.take(id);
     }
@@ -185,8 +184,10 @@ Qn::GlobalPermissions QnUserRolesManager::userRolePermissions(Qn::UserRole userR
         case Qn::UserRole::LiveViewer:
             return Qn::GlobalLiveViewerPermissionSet;
 
-        case Qn::UserRole::CustomUserGroup:
         case Qn::UserRole::CustomPermissions:
+            return Qn::GlobalCustomUserPermission;
+
+        case Qn::UserRole::CustomUserGroup:
             return Qn::NoGlobalPermissions;
     }
 

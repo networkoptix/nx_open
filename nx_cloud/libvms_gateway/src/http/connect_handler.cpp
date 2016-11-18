@@ -29,7 +29,7 @@ void ConnectHandler::processRequest(
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     static_cast<void>(authInfo);
     static_cast<void>(response);
