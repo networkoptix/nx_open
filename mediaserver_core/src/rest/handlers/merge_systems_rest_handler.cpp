@@ -413,6 +413,18 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
         data.foreignSettings.push_back(param);
     }
 
+    if (!executeRemoteConfigure(data, remoteUrl, postKey, owner))
+        return false;
+
+    return true;
+}
+
+bool QnMergeSystemsRestHandler::executeRemoteConfigure(
+    const ConfigureSystemData& data,
+    const QUrl &remoteUrl,
+    const QString& postKey,
+    const QnRestConnectionProcessor* owner)
+{
     QByteArray serializedData = QJson::serialized(data);
 
     nx_http::HttpClient client;
@@ -429,7 +441,6 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     {
         return false;
     }
-
     return true;
 }
 
@@ -474,13 +485,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
 
-    QnJsonRestResult settingsRestResult;
-    if (!executeRequest(remoteUrl, getKey, settingsRestResult, lit("/api/systemSettings")))
-        return false;
-
-    QnSystemSettingsReply settings;
-    if (!QJson::deserialize(settingsRestResult.reply, &settings))
-        return false;
 
     QnJsonRestResult pingRestResult;
     if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
@@ -494,6 +498,51 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
         return false;
 
+
+    // 1. update settings in remove database to ensure they have priority while merge
+    {
+        ConfigureSystemData data;
+        data.localSystemId = systemId;
+        data.wholeSystem = true;
+        data.sysIdTime = qnCommon->systemIdentityTime();
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        data.tranLogTime = ec2Connection->getTransactionLogTime();
+        data.rewriteLocalSettings = true;
+
+        if (!executeRemoteConfigure(data, remoteUrl, postKey, owner))
+            return false;
+
+    }
+
+    // 2. update local data
+    ConfigureSystemData data;
+    data.localSystemId = systemId;
+    data.wholeSystem = true;
+    data.sysIdTime = pingReply.sysIdTime;
+    data.tranLogTime = pingReply.tranLogTime;
+
+    //for (auto itr = settings.settings.begin(); itr != settings.settings.end(); ++itr)
+    //    data.foreignSettings.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
+    data.foreignUsers = users;
+
+    for (const auto& userData: users)
+    {
+        QnUserResourcePtr user = fromApiToResource(userData);
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            data.foreignUsers.push_back(userData);
+            for (const auto& param: user->params())
+                data.additionParams.push_back(param);
+        }
+    }
+
+    if (!changeLocalSystemId(data))
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
+        return false;
+    }
+
+    // put current server info to a foreign system to allow authorization via server key
     {
         QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (!mServer)
@@ -516,55 +565,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         {
             return false;
         }
-    }
-
-    auto userManager = ec2Connection()->getUserManager(owner->accessRights());
-    for (const auto& userData: users)
-    {
-        QnUserResourcePtr user = fromApiToResource(userData);
-        if (user->isCloud() || user->isBuiltInAdmin())
-        {
-            ec2::ErrorCode errorCode = userManager->saveSync(userData);
-            NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-            if (errorCode != ec2::ErrorCode::ok)
-            {
-                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")
-                    .arg(ec2::toString(errorCode)), cl_logDEBUG1);
-                return false;
-            }
-
-            auto resourceManager = ec2Connection()->getResourceManager(owner->accessRights());
-            ec2::ApiResourceParamWithRefDataList dummyData;
-            errorCode = resourceManager->saveSync(user->params(), &dummyData);
-            if (errorCode != ec2::ErrorCode::ok)
-            {
-                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save user parameters: %1")
-                    .arg(ec2::toString(errorCode)), cl_logDEBUG1);
-                return false;
-            }
-        }
-    }
-
-    QnSystemSettingsHandler settingsSubHandler;
-    const QnRequestParams settingsParams;
-    QnJsonRestResult restSubResult;
-    settingsSubHandler.executeGet(
-        QString() /*path*/,
-        settings.settings,
-        restSubResult,
-        owner);
-
-
-    ConfigureSystemData data;
-    data.localSystemId = systemId;
-    data.sysIdTime = pingReply.sysIdTime;
-    data.tranLogTime = pingReply.tranLogTime;
-    data.wholeSystem = true;
-
-    if (!changeLocalSystemId(data))
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
-        return false;
     }
 
     auto miscManager = ec2Connection()->getMiscManager(Qn::kSystemAccess);
