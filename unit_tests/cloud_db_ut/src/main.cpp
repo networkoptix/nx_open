@@ -14,7 +14,7 @@
 
 int main(int argc, char **argv)
 {
-    // Making legacy code happy.
+    // QCoreApplication::applicationdirPath() is used throughout code (common, appserver2, etc...)
     QCoreApplication application(argc, argv);
 
     Q_INIT_RESOURCE(cloud_db_ut);
