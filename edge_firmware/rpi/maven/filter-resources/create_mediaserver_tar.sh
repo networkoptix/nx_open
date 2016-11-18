@@ -202,6 +202,11 @@ if [[ "${box}" == "bpi" ]]; then
   
   #additional platform specific files
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
+  cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
+  cp -Rf ${qt.dir}/translations $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -Rf ${qt.dir}/resources $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -f ${qt.dir}/resources/* $BUILD_DIR/$PREFIX_DIR/lite_client/bin/libexec
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
   cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
