@@ -102,7 +102,7 @@ namespace
                 break;
         }
 
-        QPen pen(color, dpr(width));
+        QPen pen(color, width);
         pen.setJoinStyle(Qt::MiterJoin);
         pen.setCapStyle(Qt::FlatCap);
 
@@ -125,7 +125,7 @@ namespace
         path.lineTo(rc.x(0.2), rc.y(0.8));
         path.lineTo(rc.x(0.65), rc.y(0.35));
 
-        QPen pen(color, dpr(1.5));
+        QPen pen(color, 1.5);
         pen.setJoinStyle(Qt::MiterJoin);
         pen.setCapStyle(Qt::FlatCap);
 
@@ -1034,7 +1034,7 @@ void QnNxStyle::drawPrimitive(
                         /* Other tabs fall back to vector drawing of the arrows: */
                         case TabShape::Default:
                         case TabShape::Compact:
-                            size = dp(14);
+                            size = 14;
                             color = findColor(option->palette.light().color()).darker(2);
                             width = 1.5;
                             break;
@@ -1303,7 +1303,7 @@ void QnNxStyle::drawComplexControl(
 
                     fillColor.setAlphaF(1.0);
 
-                    painter->setPen(QPen(borderColor, dp(2)));
+                    painter->setPen(QPen(borderColor, 2));
                     painter->setBrush(QBrush(fillColor));
 
                     QnScopedPainterAntialiasingRollback rollback(painter, true);
@@ -1676,7 +1676,7 @@ void QnNxStyle::drawControl(
             if (auto comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option))
             {
                 QStyleOptionComboBox opt = *comboBox;
-                opt.rect.setLeft(opt.rect.left() + dp(6));
+                opt.rect.setLeft(opt.rect.left() + 6);
                 base_type::drawControl(element, &opt, painter, widget);
                 return;
             }
@@ -1987,7 +1987,7 @@ void QnNxStyle::drawControl(
                     NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawMenuCheckMark(
                             painter,
-                            QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
+                            QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), 16, menuItem->rect.height()),
                             textColor);
                 }
 
@@ -2358,7 +2358,7 @@ QRect QnNxStyle::subControlRect(
 
                     case SC_SliderGroove:
                     {
-                        const int kGrooveWidth = dp(4);
+                        const int kGrooveWidth = 4;
 
                         QPoint grooveCenter = slider->rect.center();
 
@@ -2690,8 +2690,8 @@ QRect QnNxStyle::subElementRect(
         case SE_LineEditContents:
         {
             if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
-                //TODO #vkutin See why this ugly "dp(6)" is here and not somewhere else
-                return base_type::subElementRect(subElement, option, widget).adjusted(dp(6), 0, 0, 0);
+                //TODO #vkutin See why this ugly "6" is here and not somewhere else
+                return base_type::subElementRect(subElement, option, widget).adjusted(6, 0, 0, 0);
             break;
         }
 
@@ -2720,7 +2720,7 @@ QRect QnNxStyle::subElementRect(
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
                 const bool hasText = progressBar->textVisible;
-                const int kProgressBarWidth = dp(4);
+                const int kProgressBarWidth = 4;
                 QSize size = progressBar->rect.size();
 
                 if (progressBar->orientation == Qt::Horizontal)
@@ -2758,9 +2758,9 @@ QRect QnNxStyle::subElementRect(
                     break;
 
                 if (progressBar->orientation == Qt::Horizontal)
-                    return progressBar->rect.adjusted(0, 0, 0, -dp(8));
+                    return progressBar->rect.adjusted(0, 0, 0, -8);
                 else
-                    return progressBar->rect.adjusted(dp(8), 0, 0, 0);
+                    return progressBar->rect.adjusted(8, 0, 0, 0);
             }
             break;
         }
@@ -3026,8 +3026,8 @@ QSize QnNxStyle::sizeFromContents(
             {
                 TabShape shape = tabShape(widget);
 
-                const int kRoundedSize = dp(36) + dp(1); /* shadow */
-                const int kCompactSize = dp(32);
+                const int kRoundedSize = 36 + 1; /* shadow */
+                const int kCompactSize = 32;
 
                 int width = size.width();
                 int height = size.height();
@@ -3052,7 +3052,7 @@ QSize QnNxStyle::sizeFromContents(
                     size.height() + 2 * Metrics::kMenuItemVPadding);
             }
 
-            return QSize(size.width() + dp(24) + 2 * Metrics::kMenuItemHPadding,
+            return QSize(size.width() + 24 + 2 * Metrics::kMenuItemHPadding,
                 size.height() + 2 * Metrics::kMenuItemVPadding);
         }
 
@@ -3180,14 +3180,14 @@ int QnNxStyle::pixelMetric(
 
         case PM_FocusFrameHMargin:
         case PM_FocusFrameVMargin:
-            return dp(1);
+            return 1;
 
         case PM_HeaderDefaultSectionSizeVertical:
             return Metrics::kViewRowHeight;
         case PM_HeaderMarkSize:
             return Metrics::kSortIndicatorSize;
         case PM_HeaderMargin:
-            return dp(6);
+            return 6;
 
         case PM_LayoutBottomMargin:
         case PM_LayoutLeftMargin:
@@ -3222,14 +3222,14 @@ int QnNxStyle::pixelMetric(
             return 20 + Metrics::kMenuButtonIndicatorMargin;
 
         case PM_MenuVMargin:
-            return dp(2);
+            return 2;
         case PM_SubMenuOverlap:
-            return dp(1);
+            return 1;
 
         case PM_SliderControlThickness:
-            return dp(16);
+            return 16;
         case PM_SliderThickness:
-            return dp(20);
+            return 20;
         case PM_SliderLength:
         {
             if (option && option->styleObject)
@@ -3239,33 +3239,33 @@ int QnNxStyle::pixelMetric(
                 if (ok && result >= 0)
                     return result;
             }
-            return dp(16);
+            return 16;
         }
 
         case PM_ScrollBarExtent:
-            return dp(8);
+            return 8;
         case PM_ScrollBarSliderMin:
-            return dp(24);
+            return 24;
 
         case PM_SplitterWidth:
-            return dp(5);
+            return 5;
 
         case PM_TabBarTabHSpace:
         case PM_TabBarTabVSpace:
-            return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
+            return tabShape(widget) == TabShape::Rectangular ? 8 : 20;
 
         case PM_TabBarScrollButtonWidth:
             return 24 + 1;
 
         case PM_TabCloseIndicatorWidth:
         case PM_TabCloseIndicatorHeight:
-            return dp(24);
+            return 24;
 
         case PM_ToolBarIconSize:
-            return dp(32);
+            return 32;
 
         case PM_ToolTipLabelFrameWidth:
-            return dp(1);
+            return 1;
 
         case PM_SmallIconSize:
         case PM_ListViewIconSize:
@@ -3415,7 +3415,7 @@ void QnNxStyle::polish(QWidget *widget)
         {
             QFont font = widget->font();
             font.setWeight(QFont::DemiBold);
-            font.setPixelSize(dp(14));
+            font.setPixelSize(14);
             widget->setFont(font);
         }
         widget->setAttribute(Qt::WA_Hover);
@@ -3433,7 +3433,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
         {
             QFont font = widget->font();
-            font.setPixelSize(dp(14));
+            font.setPixelSize(14);
             widget->setFont(font);
         }
     }
@@ -3456,14 +3456,14 @@ void QnNxStyle::polish(QWidget *widget)
 
             const int kTextDocumentDefaultMargin = 4; // in Qt
             int h = style::Metrics::kStandardPadding - kTextDocumentDefaultMargin;
-            int v = dp(6) - kTextDocumentDefaultMargin;
+            int v = 6 - kTextDocumentDefaultMargin;
             area->setViewportMargins(QMargins(h, v, h, v));
         }
 
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
             QFont font = widget->font();
-            font.setPixelSize(dp(14));
+            font.setPixelSize(14);
             widget->setFont(font);
         }
     }
@@ -3533,7 +3533,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
             QFont font = widget->font();
-            font.setPixelSize(dp(12));
+            font.setPixelSize(12);
             if (tabShape(widget) == TabShape::Rectangular)
                 font.setWeight(QFont::DemiBold);
             widget->setFont(font);
@@ -3556,7 +3556,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (button->arrowType() == Qt::LeftArrow && isWidgetOwnedBy<QTabBar>(button))
         {
             auto effect = new QGraphicsDropShadowEffect(button);
-            effect->setXOffset(-dp(4.0));
+            effect->setXOffset(-4.0);
             effect->setYOffset(0);
 
             QColor shadowColor = mainColor(Colors::kBase);

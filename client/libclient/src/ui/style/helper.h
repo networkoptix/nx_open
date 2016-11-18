@@ -78,9 +78,6 @@ namespace style
 
     Q_DECLARE_FLAGS(SliderFeatures, SliderFeature)
 
-    qreal dpr(qreal value);
-    int dp(qreal value);
-
     bool isDark(const QColor &color);
 
     class RectCoordinates
