@@ -6,6 +6,7 @@ angular.module('webadminApp')
 
         function updateActive(){
             $scope.active={
+                device: $location.path() === '/settings/device',
                 system: $location.path() === '/settings/system',
                 server: $location.path() === '/settings/server'
             };
@@ -39,6 +40,11 @@ angular.module('webadminApp')
                     return false;
                 }
 
+                $scope.$watch("active.device",function(){
+                    if( $scope.active.device){
+                        $location.path('/settings/device');
+                    }
+                });
                 $scope.$watch("active.system",function(){
                     if( $scope.active.system){
                         $location.path('/settings/system');
@@ -165,6 +171,10 @@ angular.module('webadminApp')
         function requestScripts() {
             return mediaserver.getScripts().then(function (data) {
                 if (data.data && data.data.reply) {
+
+                    // Has any scripts
+                    $scope.controlDevice = !!data.data.reply;
+
                     $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                     $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                     $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;

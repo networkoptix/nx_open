@@ -14,6 +14,19 @@
                 Please connect it to your local network ot Internet
             </alert>
             <tabset ng-hide="settings.flags.noHDD">
+                <tab heading="Device" active="active.device" ng-if="controlDevice">
+                    <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
+                        <h3>Restore Server Settings</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Full Restore</button>
+                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restore Everything But Network</button></p>
+                    </div>
+                    <div ng-if="canRunClient || canStopClient">
+                        <h3>Run client application on server</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Run client</button>
+                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Stop client</button></p>
+                        <p>Use mobile application or a keyboard and a mouse to control your nx1</p>
+                    </div>
+                </tab>
                 <tab heading="Server" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
@@ -59,17 +72,6 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
-                    <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
-                        <h3>Restore Server Settings</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Full Restore</button>
-                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restore Everything But Network</button></p>
-                    </div>
-                    <div ng-if="canRunClient || canStopClient">
-                        <h3>Run client application on server</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Run client</button>
-                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Stop client</button></p>
-                        <p>Use mobile application or a keyboard and a mouse to control your nx1</p>
                     </div>
                 </tab>
 
