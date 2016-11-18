@@ -1105,10 +1105,7 @@ private:
 
 void QnResource::stopAsyncTasks()
 {
-    {
-        QnMutexLocker lock(&m_initAsyncMutex);
-        m_appStopping = true;
-    }
+    pleaseStopAsyncTasks();
     initResPool()->waitForDone();
 }
 
