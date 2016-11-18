@@ -34,9 +34,11 @@ public:
     ~QnLocalSettingsDialog();
 
 protected:
+    virtual bool canApplyChanges() const override;
     virtual void applyChanges() override;
     virtual void updateButtonBox() override;
 
+    virtual void accept() override;
 private:
     bool isRestartRequired() const;
 

@@ -270,10 +270,10 @@
     "QListView": {
         "palette": {
             "default": {
-                "base":             "dark4"
+                "base":             "dark6"
             },
             "disabled": {
-                "base":             "dark4.setAlpha(77)"
+                "base":             "dark6.setAlpha(77)"
             }
         }
     },

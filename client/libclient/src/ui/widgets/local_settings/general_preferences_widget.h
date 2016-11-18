@@ -9,37 +9,45 @@ namespace Ui {
 class GeneralPreferencesWidget;
 }
 
+class QnVideoRecorderSettings;
+
 class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit QnGeneralPreferencesWidget(QWidget *parent = 0);
+    explicit QnGeneralPreferencesWidget(QnVideoRecorderSettings* settings, QWidget *parent = 0);
     ~QnGeneralPreferencesWidget();
 
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
 
-private slots:
-    void at_browseMainMediaFolderButton_clicked();
-    void at_addExtraMediaFolderButton_clicked();
-    void at_removeExtraMediaFolderButton_clicked();
-    void at_extraMediaFoldersList_selectionChanged();
+signals:
+    void recordingSettingsChanged();
 
 private:
-    QString mainMediaFolder() const;
-    void setMainMediaFolder(const QString& value);
+    void at_addMediaFolderButton_clicked();
+    void at_removeMediaFolderButton_clicked();
+    void at_mediaFoldersList_selectionChanged();
 
-    QStringList extraMediaFolders() const;
-    void setExtraMediaFolders(const QStringList& value);
+private:
+    QStringList mediaFolders() const;
+    void setMediaFolders(const QStringList& value);
 
     quint64 userIdleTimeoutMs() const;
     void setUserIdleTimeoutMs(quint64 value);
 
     bool autoStart() const;
     void setAutoStart(bool value);
+
+    QString primaryAudioDeviceName() const;
+    void setPrimaryAudioDeviceName(const QString &name);
+
+    QString secondaryAudioDeviceName() const;
+    void setSecondaryAudioDeviceName(const QString &name);
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
+    QnVideoRecorderSettings* m_recorderSettings;
 };

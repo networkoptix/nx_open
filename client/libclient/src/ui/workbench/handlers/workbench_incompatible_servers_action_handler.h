@@ -9,6 +9,7 @@ class QnConnectToCurrentSystemTool;
 class QnProgressDialog;
 class QnMergeSystemsDialog;
 
+// TODO: #ynikitenkov Rename class. Change "incompatible" to something more sensible
 class QnWorkbenchIncompatibleServersActionHandler:
     public Connective<QObject>,
     public QnWorkbenchContextAware

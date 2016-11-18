@@ -39,6 +39,7 @@ private slots:
 private:
     void updateModuleFinder();
     void mergeForcedUrls();
+    void removeForcedUrls(QObject* requester);
 
 private:
     /** When the helper works in client mode it does not use ignoredUrls from database. */

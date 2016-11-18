@@ -70,7 +70,18 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
 
 void QnDirectModuleFinderHelper::addForcedUrl(QObject* requester, const QUrl& url)
 {
+    NX_ASSERT(requester);
+    if (!requester)
+        return;
+
     auto& urls = m_forcedUrlsByRequester[requester];
+
+    if (urls.isEmpty())
+    {
+        connect(requester, &QObject::destroyed,
+            this, &QnDirectModuleFinderHelper::removeForcedUrls);
+    }
+
     const auto cleanUrl = clearUrl(url);
     if (urls.contains(cleanUrl))
         return;
@@ -81,6 +92,10 @@ void QnDirectModuleFinderHelper::addForcedUrl(QObject* requester, const QUrl& ur
 
 void QnDirectModuleFinderHelper::removeForcedUrl(QObject* requester, const QUrl& url)
 {
+    NX_ASSERT(requester);
+    if (!requester)
+        return;
+
     auto it = m_forcedUrlsByRequester.find(requester);
     if (it == m_forcedUrlsByRequester.end())
         return;
@@ -89,7 +104,7 @@ void QnDirectModuleFinderHelper::removeForcedUrl(QObject* requester, const QUrl&
         return;
 
     if (it->isEmpty())
-        m_forcedUrlsByRequester.erase(it);
+        removeForcedUrls(requester);
 
     mergeForcedUrls();
 }
@@ -234,4 +249,11 @@ void QnDirectModuleFinderHelper::mergeForcedUrls()
         m_forcedUrls.unite(urls);
 
     updateModuleFinder();
+}
+
+void QnDirectModuleFinderHelper::removeForcedUrls(QObject* requester)
+{
+    m_forcedUrlsByRequester.remove(requester);
+    disconnect(requester, &QObject::destroyed,
+        this, &QnDirectModuleFinderHelper::removeForcedUrls);
 }

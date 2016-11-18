@@ -145,4 +145,4 @@ struct QnBackgroundImage
 };
 #define QnBackgroundImage_Fields (enabled)(name)(originalName)(mode)(opacity)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json)(metatype)(eq));

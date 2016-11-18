@@ -2,6 +2,7 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <?include BuildVars.wxi ?>
+
     <Fragment Id='FragmentClient'>
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="$(var.customization)ClientDir" Name="Client">
@@ -318,6 +319,7 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>
             <ComponentRef Id="ClientVsRedistributable"/>
+            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>

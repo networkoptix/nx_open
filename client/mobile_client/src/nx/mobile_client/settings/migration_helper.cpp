@@ -31,7 +31,7 @@ public:
         auto savedSessions = qnSettings->savedSessions();
         bool recentConnectionsChanged = false;
 
-        for (;;)
+        while (!migratedSessionIds.empty())
         {
             // There could be multiple sessions with the same URL and even same credentials.
             auto migratedIt = boost::find_if(recentConnections,

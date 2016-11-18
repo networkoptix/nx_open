@@ -14,11 +14,45 @@
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
 
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
     const qreal kDefaultAspectRatio = 4.0 / 3.0;
-    const QMargins kMinPlaceholderMargins(4, 2, 4, 2);
+    const QMargins kMinIndicationMargins(4, 2, 4, 2);
+
+    /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
+     * This descendant when it is downscaled draws dots generally not snapped. */
+    class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
+    {
+        using base_type = QnBusyIndicatorWidget;
+
+    public:
+        QnAutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
+            base_type(parent)
+        {
+        }
+
+        virtual void paint(QPainter* painter) override
+        {
+            auto sourceRect = indicatorRect();
+            auto targetRect = contentsRect();
+
+            qreal scale = qMin(
+                static_cast<qreal>(targetRect.width()) / sourceRect.width(),
+                static_cast<qreal>(targetRect.height()) / sourceRect.height());
+
+            QnScopedPainterTransformRollback transformRollback(painter);
+            if (scale < 1.0)
+            {
+                painter->translate(targetRect.center());
+                painter->scale(scale, scale);
+                painter->translate(-targetRect.center());
+            }
+
+            base_type::paint(painter);
+        }
+    };
 
 } // namespace
 
@@ -31,7 +65,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     m_aspectRatio(kDefaultAspectRatio),
     m_preview(new QLabel(this)),
     m_placeholder(new QnAutoscaledPlainText(this)),
-    m_indicator(new QnBusyIndicatorWidget(this)),
+    m_indicator(new QnAutoscaledBusyIndicatorWidget(this)),
     m_pages(new QStackedWidget(this)),
     m_status(QnCameraThumbnailManager::None)
 {
@@ -47,7 +81,9 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     setProperty(style::Properties::kDontPolishFontProperty, true);
 
     m_placeholder->setAlignment(Qt::AlignCenter);
-    m_placeholder->setContentsMargins(kMinPlaceholderMargins);
+    m_placeholder->setContentsMargins(kMinIndicationMargins);
+
+    m_indicator->setContentsMargins(kMinIndicationMargins);
 
     m_preview->setAlignment(Qt::AlignCenter);
 
