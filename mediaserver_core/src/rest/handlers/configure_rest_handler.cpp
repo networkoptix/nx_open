@@ -83,7 +83,7 @@ int QnConfigureRestHandler::execute(
 
     /* set system id and move tran log time */
     const auto oldSystemId = qnGlobalSettings->localSystemId();
-    if (!data.localSystemId.isNull())
+    if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemId())
     {
         if (!backupDatabase())
         {
@@ -107,10 +107,13 @@ int QnConfigureRestHandler::execute(
                 ec2::DummyHandler::instance(),
                 &ec2::DummyHandler::onRequestDone);
         }
+    }
 
-        // rewrite system settings to update transaction time
-        if (data.rewriteLocalSettings)
-            qnGlobalSettings->resynchronizeNowSync();
+    // rewrite system settings to update transaction time
+    if (data.rewriteLocalSettings)
+    {
+        QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+        qnGlobalSettings->resynchronizeNowSync();
     }
 
     /* set port */
