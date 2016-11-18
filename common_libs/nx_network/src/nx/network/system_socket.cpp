@@ -89,6 +89,7 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
         if (const auto ip = endpoint.address.ipV4())
         {
             const auto a = new sockaddr_in;
+            memset(a, 0, sizeof(*a));
             ptr.reset((sockaddr*) a);
             size = sizeof(sockaddr_in);
 
@@ -103,6 +104,7 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
         if (const auto ip = endpoint.address.ipV6())
         {
             const auto a = new sockaddr_in6;
+            memset(a, 0, sizeof(*a));
             ptr.reset((sockaddr*) a);
             size = sizeof(sockaddr_in6);
 
