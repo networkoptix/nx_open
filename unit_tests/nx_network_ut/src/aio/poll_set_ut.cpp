@@ -19,36 +19,36 @@ class TestUdtEpollWrapper:
 public:
     virtual int epollWait(
         int /*epollFd*/,
-        std::map<UDTSOCKET, int>* readfds,
-        std::map<UDTSOCKET, int>* writefds,
-        int64_t /*msTimeOut*/,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* lrfds = NULL,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* wrfds = NULL) override
+        std::map<UDTSOCKET, int>* readReadyUdtSockets,
+        std::map<UDTSOCKET, int>* writeReadyUdtSockets,
+        int64_t /*timeoutMillis*/,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) override
     {
         std::size_t numberOfEvents = 0;
 
-        if (lrfds)
+        if (readReadySystemSockets)
         {
             numberOfEvents += m_readableSystemSockets.size();
-            *lrfds = m_readableSystemSockets;
+            *readReadySystemSockets = m_readableSystemSockets;
         }
 
-        if (wrfds)
+        if (writeReadySystemSockets)
         {
             numberOfEvents += m_writableSystemSockets.size();
-            *wrfds = m_writableSystemSockets;
+            *writeReadySystemSockets = m_writableSystemSockets;
         }
 
-        if (readfds)
+        if (readReadyUdtSockets)
         {
             numberOfEvents += m_readableUdtSockets.size();
-            *readfds = m_readableUdtSockets;
+            *readReadyUdtSockets = m_readableUdtSockets;
         }
 
-        if (writefds)
+        if (writeReadyUdtSockets)
         {
             numberOfEvents += m_writableUdtSockets.size();
-            *readfds = m_writableUdtSockets;
+            *writeReadyUdtSockets = m_writableUdtSockets;
         }
 
         return (int)numberOfEvents;
