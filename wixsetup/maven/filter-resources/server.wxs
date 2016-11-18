@@ -231,6 +231,7 @@
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolLibs"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
             <ComponentGroupRef Id="TraytoolPlatforms" />
 
         </Feature>

@@ -17,8 +17,6 @@
     <Fragment Id='FragmentConditions'>
         <?include BuildVars.wxi ?>
 
-        <?define CloudHostIsDifferent="(CloudHost <> "" AND CloudHost <> "$(var.cloudHost)")" ?>
-
         <util:RegistrySearch
           Id='SearchForIsConnectedToCloud' 
           Variable="IsConnectedToCloud" 
@@ -49,6 +47,8 @@
             <![CDATA[ NOT VersionNT64 ]]>
         </bal:Condition>
         <?endif?>
+
+        <?define CloudHostIsDifferent="(CloudHost <> "" AND CloudHost <> "$(var.cloudHost)")" ?>
 
         <!-- Exit if upgrading and cloud hosts differ -->
         <bal:Condition Message="!(loc.Product_CloudHostMismatch)">

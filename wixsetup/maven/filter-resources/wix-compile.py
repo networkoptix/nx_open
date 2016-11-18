@@ -39,9 +39,9 @@ nxtool_exe_name = '${finalName}-servertool.exe'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp']
-server_components = ['ServerVox', 'Server', 'traytool']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls']
+client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'Vcrt14']
+server_components = ['ServerVox', 'Server', 'traytool', 'Vcrt14']
+nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'Vcrt14']
 
 client_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage']
 server_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ServerPackage']
@@ -74,13 +74,20 @@ def get_candle_command(project, suffix, args, components):
 
     add_components(command, components)
 
+    command.append(r'-dVcrt14SrcDir=${VC14RedistPath}\bin')
+
+    if suffix.startswith('server'):
+        command.append('-dVcrt14DstDir=${customization}MediaServerDir')
+
     if suffix.startswith('client'):
+        command.append('-dVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
         command.append('-dClientQmlDir=${ClientQmlDir}')
         command.append('-dClientHelpSourceDir=${ClientHelpSourceDir}')
         command.append('-dClientFontsDir=${ClientFontsDir}')
         command.append('-dClientBgSourceDir=${ClientBgSourceDir}')
 
     if suffix.startswith('nxtool'):
+        command.append('-dVcrt14DstDir=${customization}NxtoolDir')
         command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
         command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
 
