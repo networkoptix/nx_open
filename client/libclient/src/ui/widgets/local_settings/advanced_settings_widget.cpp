@@ -50,25 +50,28 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->downmixAudioCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->doubleBufferCheckbox, &QCheckBox::toggled, this, [this](bool toggled)
-    {
-        /* Show warning message if the user disables double buffering. */
-        ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
-        emit hasChangesChanged();
-    });
+    connect(ui->doubleBufferCheckbox, &QCheckBox::toggled, this,
+        [this](bool toggled)
+        {
+            /* Show warning message if the user disables double buffering. */
+            ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
+            emit hasChangesChanged();
+        });
 
     /* Live buffer lengths slider/spin logic: */
-    connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this, [this](int value)
-    {
-        ui->maximumLiveBufferLengthSpinBox->setValue(value);
-        emit hasChangesChanged();
-    });
+    connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
+        [this](int value)
+        {
+            ui->maximumLiveBufferLengthSpinBox->setValue(value);
+            emit hasChangesChanged();
+        });
 
-    connect(ui->maximumLiveBufferLengthSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
-    {
-        ui->maximumLiveBufferLengthSlider->setValue(value);
-        emit hasChangesChanged();
-    });
+    connect(ui->maximumLiveBufferLengthSpinBox, QnSpinboxIntValueChanged, this,
+        [this](int value)
+        {
+            ui->maximumLiveBufferLengthSlider->setValue(value);
+            emit hasChangesChanged();
+        });
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()

@@ -42,7 +42,6 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
 
     addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
-
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
@@ -56,7 +55,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     addPage(AdvancedPage, m_advancedSettingsWidget, tr("Advanced"));
 
     setWarningStyle(ui->readOnlyWarningLabel);
-    ui->readOnlyWarningLabel->setVisible(!qnSettings->isWritable());
+    ui->readOnlyWarningWidget->setVisible(!qnSettings->isWritable());
     ui->readOnlyWarningLabel->setText(
 #ifdef Q_OS_LINUX
         tr("Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.")
