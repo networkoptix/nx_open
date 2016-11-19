@@ -548,8 +548,7 @@ angular.module('webadminApp')
                 if(!settings) {
                     return wrapGet(proxy + '/web/api/iflist');
                 }
-                // TODO: replace with wrapPost after VMS-4595
-                return wrapGet(proxy + '/web/api/ifconfig', settings);
+                return wrapPost(proxy + '/web/api/ifconfig', settings);
             }
         };
     });

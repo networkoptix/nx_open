@@ -8,10 +8,7 @@ angular.module('webadminApp')
                 settings:'='
             },
             link: function (scope, element/*, attrs*/) {
-                mediaserver.networkSettings().then(function(r){
-                    scope.settings = scope.settings || {};
-                    _.extend(scope.settings, r.data.reply[0]);
-                });
+
             }
         }
     }]).directive('ipAddress', function ipAddress(){

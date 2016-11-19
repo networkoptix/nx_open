@@ -337,10 +337,11 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(true); //Open Connect Dialog
         };
-        $scope.networkSettings = {};
+        mediaserver.networkSettings().then(function(r){
+            $scope.networkSettings = r.data.reply;
+        });
         $scope.saveNetworkSettings = function(){
-            mediaserver.networkSettings($scope.networkSettings).then(resultHandler, errorHandler);
+            mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
-
 
     });
