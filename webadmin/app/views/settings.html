@@ -102,7 +102,7 @@
                     </div>
                 </tab>
                 <tab heading="Device" active="active.device" ng-if="controlDevice">
-                    <div>
+                    <div ng-if="settings.flags.canSetupNetwork">
                         <h3>Device Network Settings</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
                         <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>

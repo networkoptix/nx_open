@@ -50,6 +50,7 @@ angular.module('webadminApp')
                 data.flags.newSystem = data.serverFlags.indexOf(Config.newServerFlag) >= 0
                 && ! (data.flags.noNetwork || data.flags.noHDD);
 
+                data.flags.canSetupNetwork = data.serverFlags.indexOf(Config.iflistFlag) >= 0;
                 return r;
             });
         }

@@ -7,6 +7,7 @@ var Config = {
     defaultPassword: 'admin',
     newServerFlag: 'SF_NewSystem',
     publicIpFlag: 'SF_HasPublicIP',
+    iflistFlag: 'SF_IfListCtrl',
 
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
