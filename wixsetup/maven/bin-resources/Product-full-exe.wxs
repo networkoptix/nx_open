@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include BuildVars.wxi ?>
 
     <Bundle Name="$(var.productName) Bundle" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.fullBundleUpgradeCode)" DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
