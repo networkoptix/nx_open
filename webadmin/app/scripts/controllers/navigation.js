@@ -5,7 +5,7 @@ angular.module('webadminApp')
         $scope.user = {
             isAdmin: true
         };
-
+        $scope.noPanel = true;
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
             $scope.noPanel = $scope.settings.flags.noHDD;

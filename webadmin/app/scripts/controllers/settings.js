@@ -42,17 +42,17 @@ angular.module('webadminApp')
 
                 $scope.$watch("active.device",function(){
                     if( $scope.active.device){
-                        $location.path('/settings/device');
+                        $location.path('/settings/device',false);
                     }
                 });
                 $scope.$watch("active.system",function(){
                     if( $scope.active.system){
-                        $location.path('/settings/system');
+                        $location.path('/settings/system',false);
                     }
                 });
                 $scope.$watch("active.server",function(){
                     if( $scope.active.server){
-                        $location.path('/settings/server');
+                        $location.path('/settings/server',false);
                     }
                 });
 
@@ -167,7 +167,6 @@ angular.module('webadminApp')
         $scope.canHardwareRestart = false;
         $scope.canRestoreSettings = false;
         $scope.canRestoreSettingsNotNetwork = false;
-
         function requestScripts() {
             return mediaserver.getScripts().then(function (data) {
                 if (data.data && data.data.reply) {
@@ -338,7 +337,10 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(true); //Open Connect Dialog
         };
-
+        $scope.networkSettings = {};
+        $scope.saveNetworkSettings = function(){
+            mediaserver.networkSettings($scope.networkSettings).then(resultHandler, errorHandler);
+        };
 
 
     });

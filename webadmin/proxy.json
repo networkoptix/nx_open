@@ -1,4 +1,4 @@
 {
-    "proxy_server_host": "127.0.0.1",
+    "proxy_server_host": "172.16.1.188",
     "proxy_server_port": "7001"
 }

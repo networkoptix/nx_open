@@ -38,6 +38,10 @@ angular.module('webadminApp', [
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
         })
+        .when('/settings/device', {
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl'
+        })
         .when('/settings/', {
             redirectTo: '/settings/server'
         })

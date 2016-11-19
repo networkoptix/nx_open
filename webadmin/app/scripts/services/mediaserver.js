@@ -23,7 +23,35 @@ angular.module('webadminApp')
 
         function getModuleInformation(){
             var salt = (new Date().getTime()) + '_' + Math.ceil(Math.random()*1000);
-            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt);
+            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
+                var data = r.data.reply;
+                if(!Config.cloud.portalUrl) {
+                    Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                }
+
+                data.flags = {};
+                data.flags.noHDD = data.ecDbReadOnly;
+
+                var ips = data.remoteAddresses;
+                data.flags.noNetwork = ips.length <= 1;
+                data.flags.wrongNetwork = true;
+                for(var ip in ips){
+                    if(ip == '127.0.0.1'){ // Localhost
+                        continue;
+                    }
+                    if(ip.indexOf('169.254.') == 0){ // No DHCP address
+                        continue;
+                    }
+                    data.flags.wrongNetwork = false;
+                }
+
+                data.flags.hasInternet = data.serverFlags.indexOf(Config.publicIpFlag) >= 0;
+
+                data.flags.newSystem = data.serverFlags.indexOf(Config.newServerFlag) >= 0
+                && ! (data.flags.noNetwork || data.flags.noHDD);
+
+                return r;
+            });
         }
 
         var offlineDialog = null;
@@ -78,8 +106,12 @@ angular.module('webadminApp')
         function wrapPost(url,data){
             return wrapRequest($http.post(url,data));
         }
-        function wrapGet(url){
+        function wrapGet(url, data){
             var canceller = $q.defer();
+            if(data){
+                url += (url.indexOf('?')>0)?'&':'?';
+                url += $.param(data);
+            }
             var obj =  wrapRequest($http.get(url, { timeout: canceller.promise }));
             obj.then(function(){
                 canceller = null;
@@ -251,34 +283,6 @@ angular.module('webadminApp')
                 //Some another server
                 return $http.get(url + '/web/api/moduleInformation?showAddresses=true',{
                     timeout: 3*1000
-                }).then(function(r){
-                    var data = r.data.reply;
-                    if(!url && !Config.cloud.portalUrl) {
-                        Config.cloud.portalUrl = 'https://' + data.cloudHost;
-                    }
-
-                    data.flags = {};
-                    data.flags.noHDD = data.ecDbReadOnly;
-
-                    var ips = data.remoteAddresses;
-                    data.flags.noNetwork = ips.length <= 1;
-                    data.flags.wrongNetwork = true;
-                    for(var ip in ips){
-                        if(ip == '127.0.0.1'){ // Localhost
-                            continue;
-                        }
-                        if(ip.indexOf('169.254.') == 0){ // No DHCP address
-                            continue;
-                        }
-                        data.flags.wrongNetwork = false;
-                    }
-
-                    data.flags.hasInternet = data.serverFlags.indexOf(Config.publicIpFlag) >= 0;
-
-                    data.flags.newSystem = data.serverFlags.indexOf(Config.newServerFlag) >= 0
-                        && ! (data.flags.noNetwork || data.flags.noHDD);
-
-                    return r;
                 });
             },
             systemCloudInfo:function(){
@@ -534,10 +538,18 @@ angular.module('webadminApp')
                 });
             },
             createEvent:function(params){
-                return wrapGet(proxy + '/web/api/createEvent?' +  $.param(params));
+                return wrapGet(proxy + '/web/api/createEvent',params);
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+
+            networkSettings:function(settings){
+                if(!settings) {
+                    return wrapGet(proxy + '/web/api/iflist');
+                }
+                // TODO: replace with wrapPost after VMS-4595
+                return wrapGet(proxy + '/web/api/ifconfig', settings);
             }
         };
     });
