@@ -43,10 +43,10 @@ client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'C
 server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14']
 nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14']
 
-client_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage']
-server_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ServerPackage']
-full_exe_components =   ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage', 'ServerPackage']
-nxtool_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'NxtoolPackage']
+client_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ArchCheck', 'ClientPackage']
+server_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ArchCheck', 'ServerPackage']
+full_exe_components =   ['VC12RedistPackage', 'VC14RedistPackage', 'ArchCheck', 'ClientPackage', 'ServerPackage']
+nxtool_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ArchCheck', 'NxtoolPackage']
 
 def add_wix_extensions(command):
     for ext in wix_extensions:
