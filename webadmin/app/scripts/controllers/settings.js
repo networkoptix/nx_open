@@ -199,9 +199,9 @@ angular.module('webadminApp')
             mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
         };
 
-        $scope.hardwareRestart = function(){
-            dialogs.confirm(L.settings.confirmHardwareRestart).then(function(){
-                mediaserver.execute('reboot').then(resultHandler, errorHandler);
+        $scope.hardwareRestart = function(settingsSaved){
+            dialogs.confirm(settingsSaved?L.settings.restartNeeded:L.settings.confirmHardwareRestart).then(function(){
+                mediaserver.execute('reboot').then(restartServer, errorHandler);
             });
         };
 
@@ -341,7 +341,9 @@ angular.module('webadminApp')
             $scope.networkSettings = r.data.reply;
         });
         $scope.saveNetworkSettings = function(){
-            mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
+            mediaserver.networkSettings($scope.networkSettings).then(function(){
+                $scope.hardwareRestart(true);
+            }, errorHandler);
         };
 
     });
