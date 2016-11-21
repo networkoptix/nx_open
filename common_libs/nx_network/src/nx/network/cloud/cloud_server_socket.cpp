@@ -107,8 +107,8 @@ CloudServerSocket::~CloudServerSocket()
 
         if (m_tunnelPool)
         {
-            // It looksw like IO has been canceled, but it's not enought for
-            // CloudServerSocket becaule of optimization.
+            // It looks like IO has been canceled, but it's not enought for CloudServerSocket
+            // because of acceptAsync (and accept) optimization.
             // It's better to block here, then end up with SIGSEGV isnt it?
             pleaseStopSync();
         }
@@ -433,6 +433,9 @@ void CloudServerSocket::onListenRequestCompleted(
     }
     else
     {
+        NX_LOGX(lm("Listen request has failed: %1")
+            .arg(QnLexical::serialized(resultCode)), cl_logDEBUG1);
+
         // Should retry if failed since system registration data can be propagated to mediator
         // with some delay.
         const auto retry = m_mediatorRegistrationRetryTimer.scheduleNextTry(
@@ -445,9 +448,9 @@ void CloudServerSocket::onListenRequestCompleted(
         if (retry)
             return; //< Another attempt will follow.
 
+        // Is not supposted to happen in production, is it?
+        NX_LOGX(lm("Stop mediator registration retries"), cl_logWARNING);
         m_state = State::readyToListen;
-        NX_LOGX(lm("Listen request has failed: %1")
-            .arg(QnLexical::serialized(resultCode)), cl_logINFO); // TODO: #ak INFO?
 
         auto acceptHandler = std::move(m_savedAcceptHandler);
         m_savedAcceptHandler = nullptr;
