@@ -23,32 +23,39 @@ api::ResultCode RequestProcessor::getMediaserverData(
     MediaserverData* const foundData,
     nx::String* errorMessage)
 {
-    const auto systemAttr = request.getAttribute< stun::cc::attrs::SystemId >();
+    const auto systemAttr = request.getAttribute<stun::cc::attrs::SystemId>();
     if (!systemAttr)
     {
+        NX_LOGX(lm("Ignoring request %1 from %2 without SystemId")
+            .strs(request.header.method, connection->getSourceAddress()), cl_logDEBUG1);
+
         *errorMessage = "Attribute SystemId is required";
         return api::ResultCode::badRequest;
     }
 
-    const auto serverAttr = request.getAttribute< stun::cc::attrs::ServerId >();
-    if( !serverAttr )
+    const auto serverAttr = request.getAttribute<stun::cc::attrs::ServerId>();
+    if (!serverAttr)
     {
+        NX_LOGX(lm("Ignoring request %1 from %2 without ServerId")
+            .strs(request.header.method, connection->getSourceAddress()), cl_logDEBUG1);
+
         *errorMessage = "Attribute ServerId is required";
         return api::ResultCode::badRequest;
     }
 
-    MediaserverData data(
-        systemAttr->getString(),
-        serverAttr->getString());
-    if( !m_cloudData ) // debug mode
+    MediaserverData data(systemAttr->getString(), serverAttr->getString());
+    if (!m_cloudData) // debug mode
     {
         *foundData = data;
         return api::ResultCode::ok;
     }
 
-    const auto system = m_cloudData->getSystem( data.systemId );
-    if( !system )
+    const auto system = m_cloudData->getSystem(data.systemId);
+    if (!system)
     {
+        NX_LOGX(lm("Ignoring request %1 from %2, system %3 could not be found")
+            .strs(request.header.method, connection->getSourceAddress(), data.systemId), cl_logDEBUG1);
+
         *errorMessage = "System could not be found";
         return api::ResultCode::notAuthorized;
     }
@@ -62,9 +69,10 @@ api::ResultCode RequestProcessor::getMediaserverData(
 
     if (!request.verifyIntegrity(data.systemId, system->authKey))
     {
-        NX_LOGX( lm( "Ignoring request (method %1) from %2 with wrong message integrity. Found credentials: %3:%4" )
-                 .arg(request.header.method).arg(connection->getSourceAddress().toString()).arg(data.systemId).arg(system->authKey),
-                 cl_logDEBUG1 );
+        NX_LOGX(lm("Ignoring request %1 from %2 with wrong message integrity, credentials: %3:%4")
+            .strs(request.header.method, connection->getSourceAddress(), data.systemId,
+                system->authKey), cl_logDEBUG1);
+
         *errorMessage = "Wrong message integrity";
         return api::ResultCode::notAuthorized;
     }
