@@ -176,7 +176,6 @@ class Account(object):
 
     @staticmethod
     @validate_response
-    @lower_case_email
     def restore_password(code, new_password):
         temp_password, email = Account.extract_temp_credentials(code)
         return Account.change_password(email, temp_password, new_password)
