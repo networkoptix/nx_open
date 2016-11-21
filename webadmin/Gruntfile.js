@@ -502,6 +502,9 @@ module.exports = function (grunt) {
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
             },
+            merge_release: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
+            },
             version: {
                 command: 'hg parent > static/version.txt'
             },
@@ -825,6 +828,13 @@ module.exports = function (grunt) {
     grunt.registerTask('merge', [
         'shell:merge'
     ]);
+
+
+    grunt.registerTask('merge_release', [
+        'shell:merge_release'
+    ]);
+
+    
 
     grunt.registerTask('deploy', [
         'publish',
