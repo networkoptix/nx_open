@@ -3,5 +3,7 @@
 <cross-domain-policy>
     <allow-access-from domain="%SERVER_IF_LIST%" to-ports="*" />
     <allow-access-from domain="*.%CLOUD_PORTAL_URL%" to-ports="*" />
+
+    <allow-access-from domain="*" to-ports="*" />
     <site-control permitted-cross-domain-policies="all"/>
 </cross-domain-policy>
