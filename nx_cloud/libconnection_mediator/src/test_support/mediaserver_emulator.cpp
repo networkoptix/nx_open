@@ -1,24 +1,19 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
 #include "mediaserver_emulator.h"
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/result_code.h>
-#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
+#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/barrier_handler.h>
 
 #include <common/common_globals.h>
 #include <network/module_information.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <rest/server/json_rest_result.h>
 #include <utils/common/sync_call.h>
-
+#include <utils/crypt/linux_passwd_crypt.h>
 
 namespace nx {
 namespace hpm {
@@ -48,12 +43,15 @@ public:
             moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
         if (m_cloudSystemId)
             moduleInformation.cloudSystemId = m_cloudSystemId.get();
-        handler(
-            nx_http::RequestResult(
-                nx_http::StatusCode::ok,
-                std::make_unique<nx_http::BufferSource>(
-                    Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-                    QJson::serialized(moduleInformation))));
+
+        QnJsonRestResult restResult;
+        restResult.setReply(moduleInformation);
+        std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource =
+            std::make_unique<nx_http::BufferSource>(
+                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                QJson::serialized(restResult));
+
+        handler({nx_http::StatusCode::ok, std::move(bodySource)});
     }
 
 private:
