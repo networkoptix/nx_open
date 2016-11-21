@@ -1040,7 +1040,7 @@ void MediaServerProcess::stopSync()
     qWarning()<<"Stopping server";
     NX_LOG( lit("Stopping server"), cl_logALWAYS );
 
-    const int kStopTimeoutMs = 10000;
+    const int kStopTimeoutMs = 100 * 1000;
 
     if (serviceMainInstance) {
         {
