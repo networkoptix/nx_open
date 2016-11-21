@@ -153,6 +153,19 @@ protected:
             handler(it.socket(), it.eventType());
     }
 
+    void initializeBunchOfSocketsOfRandomType()
+    {
+        constexpr int socketCount = 100;
+
+        for (int i = 0; i < socketCount; ++i)
+        {
+            if (nx::utils::random::number<int>(0, 1) > 0)
+                initializeUdtSocket();
+            else
+                initializeRegularSocket();
+        }
+    }
+
     void runRemoveSocketWithMultipleEventsTest()
     {
         subscribeSocketToEvents(aio::etRead | aio::etWrite);
@@ -195,22 +208,13 @@ private:
 
 TEST_F(UnifiedPollSet, removing_socket_with_multiple_events)
 {
-    constexpr int socketCount = 100;
-
-    for (int i = 0; i < socketCount; ++i)
-    {
-        if (nx::utils::random::number<int>(0, 1) > 0)
-            initializeUdtSocket();
-        else
-            initializeRegularSocket();
-    }
-
+    initializeBunchOfSocketsOfRandomType();
     runRemoveSocketWithMultipleEventsTest();
 }
 
 TEST_F(UnifiedPollSet, multiple_pollset_iterators)
 {
-    const auto it = pollset().end();
+    const auto additionalPollsetIteratorInstance = pollset().end();
 
     initializeRegularSocket();
     runRemoveSocketWithMultipleEventsTest();
