@@ -50,14 +50,6 @@
         <translation>No hay servicios instalados %1</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>Servidor de medios se ha detenido</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>Servidor de medios se ha iniciado</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation> (detenido)</translation>
     </message>
@@ -86,32 +78,40 @@
         <translation>(pausa)</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>Mostrar registro de servidor de los &amp;medios de comunicación</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>Página Web del servidor de medios</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Abandonar</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>Iniciar servidor de medios</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>Detener el servidor de medios</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Ha ocurrido un error al intentar acceder a servicios instalados:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>Se detendrá el servidor multimedia. ¿Desea continuar?</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

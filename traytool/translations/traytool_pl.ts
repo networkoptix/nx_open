@@ -54,14 +54,6 @@
         <translation>%1 zainstalowanych usług</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>Media serwer został zatrzymany</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>Media serwer został uruchomiony</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation>(zatrzymany)</translation>
     </message>
@@ -94,24 +86,32 @@
         <translation>&amp;Wyjście</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>Pokaż Logi &amp;Media Serwera</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Media Server</source>
-        <translation>Uruchom Media Serwer</translation>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop Media Server</source>
-        <translation>Zatrzymaj Media Serwer</translation>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Media Server Web Page</source>
-        <translation>Strona Web Media Serwera</translation>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>Media serwer zostanie zatrzymany. Kontynuować?</translation>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

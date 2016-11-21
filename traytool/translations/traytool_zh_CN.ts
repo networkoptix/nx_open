@@ -66,14 +66,6 @@
         <translation>&amp;退出</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>媒体服务器已停止</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>媒体服务器已启动</translation>
-    </message>
-    <message>
         <source>Access denied.</source>
         <translation>访问被拒绝.</translation>
     </message>
@@ -90,28 +82,36 @@
         <translation>无法访问已安装的服务</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>显示&amp;媒体服务器日志</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>媒体服务网页访问</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>启动媒体服务器</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>停止媒体服务器</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>访问已安装服务时，发生错误.</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>媒体服务器将停止，是否继续？</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

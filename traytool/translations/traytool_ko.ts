@@ -50,14 +50,6 @@
         <translation>%1 서비스 설치 안됨</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>저장 서버 정지</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>저장 서버 시작</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation>(정지)</translation>
     </message>
@@ -86,32 +78,40 @@
         <translation>(정지중)</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>&amp;저장 서버 로그 보기</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>저장 서버 웹페이지</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;나가기</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>저장 서버 시작</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>저장서버 정지</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>설치된 서비스에 접근하는 동안 오류가 발생하였음:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>서버 동작이 멈춥니다. 진행하시겠습니까?</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

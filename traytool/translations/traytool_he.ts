@@ -54,14 +54,6 @@
         <translation>אין שירותי %1 מותקנים</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>שרת המדיה נעצר</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>שרת המדיה הופעל</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation>(נעצר)</translation>
     </message>
@@ -90,28 +82,36 @@
         <translation>(משהה)</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>שרת המדיה יעצר. להמשיך?</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;יציאה</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>&amp;הצג תיעוד שרת מדיה</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Media Server</source>
-        <translation>הפעל שרת מדיה</translation>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop Media Server</source>
-        <translation>עצור שרת מדיה</translation>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Media Server Web Page</source>
-        <translation>דף הבית של שרת המדיה</translation>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

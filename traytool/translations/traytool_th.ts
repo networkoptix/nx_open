@@ -51,14 +51,6 @@
         <translation>ไม่มี %1บริการติดตั้ง</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>มีเดียเซิร์ฟเวอร์หยุดการทำงาน</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>มีเดียเซิร์ฟเวอร์เริ่มการทำงาน</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation> (หยุด)</translation>
     </message>
@@ -91,28 +83,36 @@
         <translation>&amp;ออก</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>แสดง &amp;การบันทึก มีเดียเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>เริ่มต้นมีเดียเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>หยุดมีเดียวเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>มีเดียเซิร์ฟเวอร์  เว็บเพจ</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะเข้าถึงบริการในการติดตั้ง:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>เซิร์ฟเวอร์สื่อจะหยุด ต่อหรือไม่?</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

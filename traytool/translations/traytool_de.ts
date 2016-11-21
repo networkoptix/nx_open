@@ -51,14 +51,6 @@
         <translation>No %1 Dienste wurden installiert</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>Media-Server wurde angehalten</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>Media-Server wurde gestartet</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation> (angehalten)</translation>
     </message>
@@ -93,28 +85,36 @@
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>&amp;Media-Server-Protokoll anzeigen</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>Media-Server starten</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>Media-Server anhalten</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>Media-Server Webseite</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Ein Fehler trat auf beim Versuch auf diese installierten Dienste zuzugreifen:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>Medienserver wird gestoppt. Fortsetzen?</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
