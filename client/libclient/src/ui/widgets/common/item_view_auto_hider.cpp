@@ -82,11 +82,14 @@ public:
         {
             if (view)
                 view->setParent(nullptr);
+
             view = newView;
-            viewPage->layout()->addWidget(view);
+
+            if (view)
+                viewPage->layout()->addWidget(view);
         }
 
-        setModel(view->model());
+        setModel(view ? view->model() : nullptr);
         updateState();
     }
 
@@ -113,10 +116,7 @@ public:
 
     void updateState()
     {
-        bool emptyView = !view
-            || !view->model()
-            || view->model()->rowCount(view->rootIndex()) == 0;
-
+        bool emptyView = !view || !model || model->rowCount(view->rootIndex()) == 0;
         setViewHidden(emptyView);
     }
 
