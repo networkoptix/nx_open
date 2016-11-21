@@ -41,6 +41,7 @@
 
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -90,7 +91,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     setTabShape(ui->mainTabWidget->tabBar(), style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), style::TabShape::Compact);
 
-    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::updateTabWidgetSize);
+    autoResizePagesToContents(ui->mainTabWidget,
+        { QSizePolicy::Fixed, QSizePolicy::Preferred }, true);
 
     /* Setup details label and its aligning by detailsTabWidget: */
     m_detailsLabel = new QLabel(ui->detailsTabWidget);
@@ -495,6 +497,10 @@ void QnAuditLogDialog::at_filterChanged()
         }
         m_camerasModel->setData(cameras);
     }
+
+    ui->mainTabWidget->resize(
+        ui->mainTabWidget->sizeHint().width(),
+        ui->mainTabWidget->height());
 }
 
 void QnAuditLogDialog::at_updateDetailModel()
@@ -534,9 +540,6 @@ void QnAuditLogDialog::at_updateDetailModel()
     }
 
     ui->gridDetails->setUpdatesEnabled(true);
-    ui->gridDetails->update();
-
-    updateTabWidgetSize();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()
@@ -756,12 +759,6 @@ void QnAuditLogDialog::reset()
     auto now = QDateTime::currentMSecsSinceEpoch();
     ui->dateRangeWidget->setRange(now, now);
     enableUpdateData();
-}
-
-void QnAuditLogDialog::updateTabWidgetSize()
-{
-    auto widget = ui->mainTabWidget->currentWidget();
-    ui->mainTabWidget->setFixedWidth(widget->sizeHint().width());
 }
 
 void QnAuditLogDialog::updateData()
