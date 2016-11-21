@@ -24,10 +24,10 @@ var Config = {
         portalSystemUrl: '/systems/{systemId}'
     },
 
-    allowDebugMode: false, // Allow debugging at all. Set to false in production
+    allowDebugMode: true, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//'flashls', // videowindow.js - force video player
+        videoFormat: 'flashls', // videowindow.js - force video player
         chunksOnTimeline: false // timeline.js - draw debug events
     },
     helpLinks: [
