@@ -32,6 +32,7 @@ public:
         base_type(),
         q_ptr(q),
         view(nullptr),
+        model(nullptr),
         label(new QLabel()),
         stackedWidget(new QStackedWidget()),
         viewPage(new QWidget()),
@@ -183,11 +184,7 @@ bool QnItemViewAutoHider::isViewHidden() const
 
 QnItemViewAutoHider* QnItemViewAutoHider::create(QAbstractItemView* view, const QString& message)
 {
-    NX_ASSERT(view);
-    if (!view)
-        return nullptr;
-
-    auto parent = view->parentWidget();
+    auto parent = view ? view->parentWidget() : nullptr;
     auto autoHider = new QnItemViewAutoHider(parent);
 
     if (parent && parent->layout())
