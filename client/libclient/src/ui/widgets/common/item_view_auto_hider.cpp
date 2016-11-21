@@ -77,21 +77,28 @@ public:
         stackedWidget->setCurrentWidget(hidden ? labelPage : viewPage);
     }
 
-    void setView(QAbstractItemView* newView)
+    QAbstractItemView* setView(QAbstractItemView* newView)
     {
+        QAbstractItemView* orphanView = nullptr;
         if (view != newView)
         {
-            if (view)
-                view->setParent(nullptr);
-
+            orphanView = view;
             view = newView;
 
-            if (view)
-                viewPage->layout()->addWidget(view);
+            if (orphanView)
+            {
+                viewPage->layout()->removeWidget(orphanView);
+                orphanView->setParent(nullptr);
+            }
+
+            if (newView)
+                viewPage->layout()->addWidget(newView);
         }
 
         setModel(view ? view->model() : nullptr);
         updateState();
+
+        return orphanView;
     }
 
     void setModel(QAbstractItemModel* newModel)
@@ -152,10 +159,10 @@ QAbstractItemView* QnItemViewAutoHider::view() const
     return d->view;
 }
 
-void QnItemViewAutoHider::setView(QAbstractItemView* view)
+QAbstractItemView* QnItemViewAutoHider::setView(QAbstractItemView* view)
 {
     Q_D(QnItemViewAutoHider);
-    d->setView(view);
+    return d->setView(view);
 }
 
 QLabel* QnItemViewAutoHider::emptyViewMessageLabel() const

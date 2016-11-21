@@ -29,8 +29,9 @@ public:
     /** Sets a new controlled view and takes its ownership.
     * If there was a controlled view already, its ownership is passed to the caller.
     * If a new model object is set to a controlled view via QAbstractItemView::setModel(),
-    * QnItemViewAutoHider::setView() must be called again with the same view. */
-    void setView(QAbstractItemView* view);
+    * QnItemViewAutoHider::setView() must be called again with the same view.
+    * Returns a pointer to the view which ownership is passed to the caller. */
+    QAbstractItemView* setView(QAbstractItemView* view);
 
     /** A text message shown when the view is empty. */
     QString emptyViewMessage() const;
