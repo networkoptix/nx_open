@@ -28,7 +28,7 @@ struct UpdateFileData
     QString modification;
     QString cloudHost;
     QString executable;
-    bool client;
+    bool client = false;
     QnSoftwareVersion minimalVersion;
 };
 
