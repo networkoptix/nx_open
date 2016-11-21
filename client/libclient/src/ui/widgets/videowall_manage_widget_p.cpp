@@ -178,7 +178,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
         }
 #endif
-        paintPixmap(painter, body, qnSkin->pixmap("item/move.png"));
+        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png"));
         paintDeleteButton(painter);
 
         QPainterPath anchorPath;
