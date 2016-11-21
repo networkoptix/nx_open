@@ -30,6 +30,9 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     setWarningStyle(ui->lowQualityWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
 
+    ui->iconLabel->setPixmap(qnSkin->pixmap("legacy/warning.png"));
+    ui->iconLabel->setScaledContents(true);
+
     // if "I have read manual" is set, all controls should be enabled
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureCheckBox, SLOT(setDisabled(bool)));
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureWidget, SLOT(setEnabled(bool)));
@@ -90,7 +93,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     bool isFirstQuality = true;
     bool isFirstControl = true;
-    
+
     int primaryRecorderDisabled = -1;
     int bitratePerGopPresent = -1;
     int secondaryRecorderDisabled = -1;
@@ -103,7 +106,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     QString rtpTransport;
 
     int camCnt = 0;
-    foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
+    foreach(const QnVirtualCameraResourcePtr &camera, cameras)
     {
         if (isArecontCamera(camera))
             arecontCamerasCount++;
@@ -138,7 +141,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             primaryRecorderDisabled = primaryRecDisabled;
         else if (primaryRecorderDisabled != primaryRecDisabled)
             samePrimaryRec = false;
-        
+
         Qn::BitratePerGopType bpgType = camera->bitratePerGopType();
         if (bpgType == Qn::BPG_Predefined)
             enableBitratePerGop = false;
