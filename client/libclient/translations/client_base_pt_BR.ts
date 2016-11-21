@@ -4229,7 +4229,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Apagar conexoes</translation>
     </message>
 </context>
 <context>
@@ -4478,7 +4478,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pedaço Anterior</translation>
     </message>
 </context>
 <context>
@@ -5166,7 +5166,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Selecionar Usuários...</translation>
     </message>
 </context>
 <context>
@@ -5737,7 +5737,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5908,7 +5908,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email inválido</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6998,7 +6998,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email inválido</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7322,7 +7322,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Apagar Recursos</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>

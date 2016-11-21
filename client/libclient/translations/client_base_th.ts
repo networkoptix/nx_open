@@ -1432,7 +1432,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ทรัพยากรนี้จะถูกลบออกไปแล้วจากระบบ</translation>
     </message>
 </context>
 <context>
@@ -1605,7 +1605,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปลี่ยนแปลงการตั้งค่าอีเมล</translation>
     </message>
 </context>
 <context>
@@ -2749,11 +2749,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การกำหนดค่าเซิร์ฟเวอร์ (s)</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การปรับปรุงเซิร์ฟเวอร์ (s)</translation>
     </message>
 </context>
 <context>
@@ -2969,7 +2969,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ฐานข้อมูลกู้คืนสำเร็จจากแฟ้ม &apos;%1&apos; เซิร์ฟเวอร์จะทำการเริ่มต้นใหม่.</translation>
     </message>
 </context>
 <context>
@@ -3395,7 +3395,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การจัดการ เปิดเหตุการณ์/การแจ้งเตือน</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3407,11 +3407,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดรายการอุปกรณ์</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดรายการกล้อง</translation>
     </message>
 </context>
 <context>
@@ -3878,7 +3878,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่พบเซอร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4007,7 +4007,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ได้รับใบอนุญาตการเปิดใช้งาน.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4050,7 +4050,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กรุณาส่งอีเมลที่มีซีรี่คีย์และหมายเลขของฮาร์ดแวร์ให้กับ %1 ที่จะได้รับแฟ้มคีย์การเปิดใช้งาน.</translation>
     </message>
 </context>
 <context>
@@ -4178,7 +4178,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลบการเชื่อมต่อ</translation>
     </message>
 </context>
 <context>
@@ -4426,7 +4426,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หยุดก่อนหน้า</translation>
     </message>
 </context>
 <context>
@@ -5007,7 +5007,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;กล้อง จากเซิร์ฟเวอร์อื่น และลบกล้อง&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5015,11 +5015,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5102,7 +5102,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกผู้ใช้งาน...</translation>
     </message>
 </context>
 <context>
@@ -5624,27 +5624,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังตรวจสอบการอัพเดท... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังดาวโหลดอัพเดท... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังติดตั้งอัพเดทไคลแอนต์... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การติดตั้งโปรแกรมอัพเดทเข้ากันไม่ได้กับเซิร์ฟเวอร์ ... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ส่งการอัพเดทไปยังเซิร์ฟเวอร์ ... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังติดตั้งการอัพเดท... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5665,7 +5665,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5834,7 +5834,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">อีเมล์ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6074,7 +6074,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 ก่อนหน้านี้)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6367,11 +6367,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -6529,7 +6529,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">อุปกรณ์ป้อนข้อมูลไม่ได้เลือก.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6537,7 +6537,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ข้อผิดพลาดของเครือข่าย.</translation>
     </message>
 </context>
 <context>
@@ -6919,7 +6919,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">อีเมล์ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6968,7 +6968,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pc %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7228,7 +7228,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลบทรัพยากร</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7572,11 +7572,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เซิร์ฟเวอร์ที่เลือกได้รับการเชื่อมต่อสำเร็จกับระบบของคุณ!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถปรับปรุงเซิร์ฟเวอร์ที่เลือก.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

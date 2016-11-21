@@ -221,7 +221,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Настройки e-mail</translation>
     </message>
 </context>
 <context>
@@ -348,12 +348,12 @@
     <message>
         <location/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Описание</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Таймаут</translation>
     </message>
     <message>
         <location/>
@@ -525,7 +525,7 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Адрес устройства:</translation>
     </message>
     <message>
         <location/>
@@ -550,12 +550,12 @@
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Сканировать Сеть</translation>
     </message>
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">П&amp;орт:</translation>
     </message>
     <message>
         <location/>
@@ -575,7 +575,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Добавить выбранные</translation>
     </message>
 </context>
 <context>
@@ -745,7 +745,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID тревожного в&amp;ыхода:</translation>
     </message>
     <message>
         <location/>
@@ -874,7 +874,7 @@
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохраните изменения перед копированием</translation>
     </message>
 </context>
 <context>
@@ -1061,7 +1061,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;PTZ позиция:</translation>
     </message>
 </context>
 <context>
@@ -1190,7 +1190,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Добавить...</translation>
     </message>
     <message>
         <location/>
@@ -1200,7 +1200,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Run Application when PC Boots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Запустить приложение при загрузке ПК:</translation>
     </message>
 </context>
 <context>
@@ -1312,22 +1312,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Обрезать по соотношению сторон монитора</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Ширина:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Высота:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Прозрачность:</translation>
     </message>
 </context>
 <context>
@@ -1370,7 +1370,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Admin DN:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ad&amp;min DN:</translation>
     </message>
     <message>
         <location/>
@@ -1535,7 +1535,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензионный ключ:</translation>
     </message>
     <message>
         <location/>
@@ -1545,12 +1545,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Аппаратный идентификатор:</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файл с ключом активации:</translation>
     </message>
 </context>
 <context>
@@ -1589,7 +1589,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">П&amp;араметры подключения:</translation>
     </message>
     <message>
         <location/>
@@ -1619,7 +1619,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Запомнить пароль</translation>
     </message>
 </context>
 <context>
@@ -1662,12 +1662,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Язык:</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Шкала времени:</translation>
     </message>
     <message>
         <location/>
@@ -1677,12 +1677,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Tour sequence cycle time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Время переключения в режиме тура:</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Изображение:</translation>
     </message>
     <message>
         <location/>
@@ -1692,7 +1692,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Intensity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Непрозрачность:</translation>
     </message>
 </context>
 <context>
@@ -2010,17 +2010,17 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Добавить...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Переименовать...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Удалить...</translation>
     </message>
 </context>
 <context>
@@ -2181,7 +2181,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Удалить...</translation>
     </message>
     <message>
         <location/>
@@ -2368,22 +2368,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Разрешение:</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Качество записи:</translation>
     </message>
     <message>
         <location/>
         <source>Primary Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Основное устройство:</translation>
     </message>
     <message>
         <location/>
         <source>External Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Внешнее устройство:</translation>
     </message>
 </context>
 <context>
@@ -2432,12 +2432,12 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Дополнительные получатели:</translation>
     </message>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Настройки e-mail...</translation>
     </message>
 </context>
 <context>
@@ -2470,7 +2470,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP адрес:</translation>
     </message>
     <message>
         <location/>
@@ -2622,12 +2622,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Firmware</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Версия прошивки:</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Производитель:</translation>
     </message>
     <message>
         <location/>
@@ -2647,22 +2647,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP адрес:</translation>
     </message>
     <message>
         <location/>
         <source>Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Веб-интерфейс:</translation>
     </message>
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MAC адрес:</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Чувствительность:</translation>
     </message>
     <message>
         <location/>
@@ -2842,7 +2842,8 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отмена выбора хранилища приведёт только к остановке записи.
+Это не отменит удаление старых записей с диска.</translation>
     </message>
     <message>
         <location/>

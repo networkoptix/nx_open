@@ -6024,7 +6024,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

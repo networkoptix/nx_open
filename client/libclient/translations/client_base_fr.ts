@@ -1442,7 +1442,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ces ressources sont déjà retirées du système</translation>
     </message>
 </context>
 <context>
@@ -1616,7 +1616,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paramètres courriel changé</translation>
     </message>
 </context>
 <context>
@@ -2794,11 +2794,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configuration Serveur(s)</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mise à jour Serveur(s)</translation>
     </message>
 </context>
 <context>
@@ -3014,7 +3014,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Base de données restaurée avec succès depuis le fichier &apos;%1&apos;. Serveur Média va être redémarré.</translation>
     </message>
 </context>
 <context>
@@ -3444,7 +3444,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ouvrir Règles de Gestion Alarme/Événement</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3456,11 +3456,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ouvrir Liste Périphériques</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ouvrir Liste Caméras</translation>
     </message>
 </context>
 <context>
@@ -3934,7 +3934,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Server non disponible&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4066,7 +4066,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licence a déjà été activée.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4109,7 +4109,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">S.V.P. envoyez un courriel avec le numéro de série et l&apos;ID matériel fournis à %1 pour obtenir une clé d&apos;activation.</translation>
     </message>
 </context>
 <context>
@@ -4242,7 +4242,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Effacer Connexions</translation>
     </message>
 </context>
 <context>
@@ -4492,7 +4492,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Morceau précédent</translation>
     </message>
 </context>
 <context>
@@ -5089,7 +5089,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Cameras des autres serveurs et caméras retirées&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5097,11 +5097,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5184,7 +5184,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sélectionner Utlisateurs...</translation>
     </message>
 </context>
 <context>
@@ -5713,27 +5713,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vérification des MàJ... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Téléchargement des MàJ... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installation MàJ client... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installation MàJ sur les serveurs incompatibles... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Envoi de MàJ aux serveurs... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installation de MàJ... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5755,7 +5755,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5927,7 +5927,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Courriel invalide</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6166,7 +6166,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 avant maintenant)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6459,11 +6459,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Laisser le système optimiser les paramètres périphérique</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Laisser le système optimiser les paramètres caméras</translation>
     </message>
 </context>
 <context>
@@ -6621,7 +6621,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Périphérique d&apos;entré non sélectionné.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6629,7 +6629,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur Réseau.</translation>
     </message>
 </context>
 <context>
@@ -7017,7 +7017,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Courriel invalide</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7066,7 +7066,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PC %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7341,7 +7341,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Effacer les ressources</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7688,11 +7688,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réjouissez-vous! Les serveurs sélectionnés ont été connectés à votre système avec succès!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ne peut pas faire la MàJ des serveurs sélectionnées.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

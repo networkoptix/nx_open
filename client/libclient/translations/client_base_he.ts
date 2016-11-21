@@ -1443,7 +1443,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">משאבים אלו הוסרו כבר מהמערכת</translation>
     </message>
 </context>
 <context>
@@ -1617,7 +1617,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הגדרות האימייל שונו</translation>
     </message>
 </context>
 <context>
@@ -2785,11 +2785,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מגדיר שרת/ים</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מעדכן שרת/ים</translation>
     </message>
 </context>
 <context>
@@ -3005,7 +3005,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מסד הנתונים שוחזר בהצלחה מקובץ &apos;%1&apos;. שרת המדיה יאותחל.</translation>
     </message>
 </context>
 <context>
@@ -3435,7 +3435,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">פתח ממשק ניהול אזעקות/אירועים</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3447,11 +3447,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">פתח רשימת התקנים</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">פתח רשימת מצלמות</translation>
     </message>
 </context>
 <context>
@@ -3925,7 +3925,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;השרת לא נמצא&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4057,7 +4057,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הרשיון כבר הופעל.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4100,7 +4100,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">אנא שלח אימייל עם המספר הסריאלי ומזהה החומרה שסופק ל%1 על מנת לקבל קובץ מפתח הפעלה.</translation>
     </message>
 </context>
 <context>
@@ -4232,7 +4232,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מחק חיבורים</translation>
     </message>
 </context>
 <context>
@@ -4480,7 +4480,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">למקטע הקודם</translation>
     </message>
 </context>
 <context>
@@ -5073,7 +5073,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;מצלמות משרתים אחרים ומצלמות שהוסרו&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5081,11 +5081,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5168,7 +5168,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">בחר משתמשים...</translation>
     </message>
 </context>
 <context>
@@ -5697,27 +5697,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מחפש עדכונים... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מוריד עדכונים... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מתקין עדכון קליינט... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מתקין עדכונים לשרתים שאינם נתמכים כעת... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מעלה עדכונים לשרתים... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מתקן עדכונים... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5739,7 +5739,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5911,7 +5911,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">כתובת הדואר אינה תקינה</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6150,7 +6150,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 לפני עכשיו)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6443,11 +6443,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">אפשר למערכת לשפר את הגדרות ההתקן</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">אפשר למערכת לשפר את הגדרות המצלמה</translation>
     </message>
 </context>
 <context>
@@ -6605,7 +6605,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">התקן קלט לא נבחר.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6613,7 +6613,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">שגיאת רשת.</translation>
     </message>
 </context>
 <context>
@@ -7001,7 +7001,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">כתובת הדואר אינה תקינה</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7050,7 +7050,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מחשב %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7325,7 +7325,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מחק משאבים</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7671,11 +7671,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">יופי! השרתים שנבחרו חוברו בהצלחה למערכת!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">לא ניתן לעדכן את את השרתים שנבחרו.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

@@ -727,7 +727,7 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
         <source>Couldn&apos;t initialize resampling context, error code: %1</source>
@@ -888,11 +888,11 @@
     </message>
     <message>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無效的簽章</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無效的自定義參數</translation>
     </message>
     <message>
         <source>License is expired</source>
@@ -900,7 +900,7 @@
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無效的類型</translation>
     </message>
 </context>
 <context>

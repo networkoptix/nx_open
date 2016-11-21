@@ -222,7 +222,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הגדרות דואר אלקטרוני</translation>
     </message>
 </context>
 <context>
@@ -349,12 +349,12 @@
     <message>
         <location/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;תיאור</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;זמן קצוב</translation>
     </message>
     <message>
         <location/>
@@ -526,7 +526,7 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">כתובת המכשיר:</translation>
     </message>
     <message>
         <location/>
@@ -551,12 +551,12 @@
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ס&amp;ריקת רשת משנה</translation>
     </message>
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;פורט גילוי:</translation>
     </message>
     <message>
         <location/>
@@ -576,7 +576,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;הוסף את הפריטים שנבחרו</translation>
     </message>
 </context>
 <context>
@@ -746,7 +746,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;מזהה פלט:</translation>
     </message>
     <message>
         <location/>
@@ -875,7 +875,7 @@
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">החלת השינויים לפני העתקת לוח הזמנים</translation>
     </message>
 </context>
 <context>
@@ -1062,7 +1062,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">פריסט &amp;PTZ:</translation>
     </message>
 </context>
 <context>
@@ -1191,7 +1191,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;הוסף...</translation>
     </message>
     <message>
         <location/>
@@ -1201,7 +1201,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Run Application when PC Boots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הפעל את התוכנה כשהמחשב עולה:</translation>
     </message>
 </context>
 <context>
@@ -1313,22 +1313,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;גזור ליחס הגובה-רוחב של המסך</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;רוחב:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;גובה:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;אטימות:</translation>
     </message>
 </context>
 <context>
@@ -1371,7 +1371,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Admin DN:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ש&amp;ם מנהל דומיין:</translation>
     </message>
     <message>
         <location/>
@@ -1536,7 +1536,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מפתח רשיון:</translation>
     </message>
     <message>
         <location/>
@@ -1546,12 +1546,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מזהה-חומרה:</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">קובץ מפתח הפעלה:</translation>
     </message>
 </context>
 <context>
@@ -1590,7 +1590,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;אפשרויות חיבור:</translation>
     </message>
     <message>
         <location/>
@@ -1620,7 +1620,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;כניסה אוטומטית</translation>
     </message>
 </context>
 <context>
@@ -1663,12 +1663,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">שפה:</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מצב זמן:</translation>
     </message>
     <message>
         <location/>
@@ -1678,12 +1678,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Tour sequence cycle time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">זמן מחזור הסיור:</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">תמונה:</translation>
     </message>
     <message>
         <location/>
@@ -1693,7 +1693,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Intensity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">חוזק:</translation>
     </message>
 </context>
 <context>
@@ -2011,17 +2011,17 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;הוסף...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;שנה שם...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;מחק...</translation>
     </message>
 </context>
 <context>
@@ -2182,7 +2182,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;מחק...</translation>
     </message>
     <message>
         <location/>
@@ -2369,22 +2369,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">רזולוציה:</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">איכות הקלטה:</translation>
     </message>
     <message>
         <location/>
         <source>Primary Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מכשיר עקרי:</translation>
     </message>
     <message>
         <location/>
         <source>External Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">מכשיר חיצוני:</translation>
     </message>
 </context>
 <context>
@@ -2433,12 +2433,12 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;נמענים נוספים:</translation>
     </message>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;הגדרות אימייל גלובליות...</translation>
     </message>
 </context>
 <context>
@@ -2471,7 +2471,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">כתובת IP:</translation>
     </message>
     <message>
         <location/>
@@ -2623,12 +2623,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Firmware</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">קושחה:</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ספק:</translation>
     </message>
     <message>
         <location/>
@@ -2648,22 +2648,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">כתובת IP:</translation>
     </message>
     <message>
         <location/>
         <source>Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">דף אינטרנט:</translation>
     </message>
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">כתובת MAC:</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">רגישות:</translation>
     </message>
     <message>
         <location/>
@@ -2843,7 +2843,8 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
+פעולה זו לא תמנע הסרת הקלטות ישנות מהכונן.</translation>
     </message>
     <message>
         <location/>

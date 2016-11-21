@@ -1432,7 +1432,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">このリソースは既にシステムから削除されています</translation>
     </message>
 </context>
 <context>
@@ -1605,7 +1605,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email設定変更</translation>
     </message>
 </context>
 <context>
@@ -2749,11 +2749,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サーバー構成</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サーバー更新</translation>
     </message>
 </context>
 <context>
@@ -2969,7 +2969,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイル &apos;%1&apos;.より正常にリストアされました　メディアサーバーは再起動を行います.</translation>
     </message>
 </context>
 <context>
@@ -3395,7 +3395,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アラーム/イベントルールを開く</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3407,11 +3407,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">デバイスリストを開く</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラリストを開く</translation>
     </message>
 </context>
 <context>
@@ -3878,7 +3878,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Server not found&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4007,7 +4007,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ライセンスは既にアクティベートされています.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4050,7 +4050,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">シリアルキーとハードウェアIDをEmailで %1 に送信して下さい。アクティベーションキーが後で返信されます.</translation>
     </message>
 </context>
 <context>
@@ -4178,7 +4178,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">接続設定の削除</translation>
     </message>
 </context>
 <context>
@@ -4426,7 +4426,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">前のブロック</translation>
     </message>
 </context>
 <context>
@@ -5007,7 +5007,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Cameras from other servers and removed cameras&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5015,11 +5015,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5102,7 +5102,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ユーザー選択...</translation>
     </message>
 </context>
 <context>
@@ -5624,27 +5624,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新確認... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新ダウンロード.. %1%　</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クライアント更新中... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">互換性のないサーバーを更新中... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新確認中... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新インストール中.. %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5665,7 +5665,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5835,7 +5835,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emailは有効ではありません</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6074,7 +6074,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 現在)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6367,11 +6367,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">デバイス設定の最適化有効</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラ設定の最適化有効</translation>
     </message>
 </context>
 <context>
@@ -6529,7 +6529,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">入力デバイスが選択されていません.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6537,7 +6537,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ネットワークエラー.</translation>
     </message>
 </context>
 <context>
@@ -6919,7 +6919,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emailは有効ではありません</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6968,7 +6968,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pc %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7228,7 +7228,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">リソース削除</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7572,11 +7572,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">選択したサーバーは正常にシステムに接続されました！</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">選択したサーバーの更新ができません.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

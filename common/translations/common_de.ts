@@ -738,7 +738,7 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
         <source>Couldn&apos;t initialize resampling context, error code: %1</source>
@@ -900,11 +900,11 @@
     </message>
     <message>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ungültige Signatur</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ungültige Anpassung</translation>
     </message>
     <message>
         <source>License is expired</source>
@@ -912,7 +912,7 @@
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ungültiger Typ</translation>
     </message>
 </context>
 <context>

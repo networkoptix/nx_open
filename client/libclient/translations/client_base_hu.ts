@@ -1433,7 +1433,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ezek a források már el lettek távolítva a rendszerből</translation>
     </message>
 </context>
 <context>
@@ -1606,7 +1606,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Az E-mail beállítások megváltoztak</translation>
     </message>
 </context>
 <context>
@@ -2750,11 +2750,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Szerver(ek) konfigurálása</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Szerver(ek) frissítése</translation>
     </message>
 </context>
 <context>
@@ -2970,7 +2970,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Adatbázis helyreállítása &apos;%1&apos; fájlból sikeresen megtörtént. A Médiaszerver újraindul.</translation>
     </message>
 </context>
 <context>
@@ -3396,7 +3396,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Megnyitás -  Riasztás/esemény szabályok kezelése</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3408,11 +3408,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Megnyitás - Eszközlista</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Megnyitás - Kameralista</translation>
     </message>
 </context>
 <context>
@@ -3879,7 +3879,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Szerver nem található&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4008,7 +4008,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A licence már aktiválva lett.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4051,7 +4051,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kérjük küldje el e-mailen a sorzatszámot és a %1 által megadott hardverazonosítót, az aktiváló fájl megküldéséhez.</translation>
     </message>
 </context>
 <context>
@@ -4179,7 +4179,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kapcsolat törlése</translation>
     </message>
 </context>
 <context>
@@ -4427,7 +4427,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Előző szelet</translation>
     </message>
 </context>
 <context>
@@ -5008,7 +5008,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Kamerák más szervereken és eltávolított kamerák&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5103,7 +5103,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Felhasználó választása...</translation>
     </message>
 </context>
 <context>
@@ -5625,27 +5625,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frissítések ellenőrzése... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frissítések letöltése... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kliens frissítés telepítése... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frissítések telepítése nem kompatibilis szerverkre... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frissítések áttöltése a szerverekre... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frissítések telepítése... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5666,7 +5666,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5836,7 +5836,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem érvényes email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6075,7 +6075,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(eddig %1)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6368,11 +6368,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eszköz beállítások optimalizálásának engedélyezése a rendszer számára</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kamera beállítások optimalizálásának engedélyezése a rendszer számára</translation>
     </message>
 </context>
 <context>
@@ -6530,7 +6530,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nincs bemenneti eszköz kiválasztva.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6538,7 +6538,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hálózati hiba.</translation>
     </message>
 </context>
 <context>
@@ -6920,7 +6920,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem érvényes email</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6969,7 +6969,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pc %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7229,7 +7229,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Források törlése</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7573,11 +7573,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A választott szerverek sikeresen hozzáadva a rendszerhez!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet frissíteni a kiválasztott szervereket.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

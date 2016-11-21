@@ -1450,7 +1450,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Эти ресурсы уже удалены из системы</translation>
     </message>
 </context>
 <context>
@@ -1625,7 +1625,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Настройки e-mail изменены</translation>
     </message>
 </context>
 <context>
@@ -2817,11 +2817,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Настройка сервера(ов)</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обновление сервера(ов)</translation>
     </message>
 </context>
 <context>
@@ -3037,7 +3037,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">База данных была успешно восстановлена из файла &apos;%1&apos;. Медиа сервер будет перезапущен.</translation>
     </message>
 </context>
 <context>
@@ -3471,7 +3471,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Открыть настройку правил связей с событиями</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3483,11 +3483,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Открыть список устройств</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Открыть список камер</translation>
     </message>
 </context>
 <context>
@@ -3968,7 +3968,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Сервер не найден&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4103,7 +4103,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензия уже активирована.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4146,7 +4146,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Для получения лицензионного ключа необходимо отослать сообщение, содержащее серийный номер и Hardware ID, %1.</translation>
     </message>
 </context>
 <context>
@@ -4282,7 +4282,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить соединения</translation>
     </message>
 </context>
 <context>
@@ -4530,7 +4530,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Предыдущий фрагмент</translation>
     </message>
 </context>
 <context>
@@ -5135,7 +5135,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Камеры с других серверов, а также удаленные камеры&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5143,11 +5143,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 ТБ</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 ГБ</translation>
     </message>
 </context>
 <context>
@@ -5230,7 +5230,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите пользователей...</translation>
     </message>
 </context>
 <context>
@@ -5766,27 +5766,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проверка обновлений... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка обновлений... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установка обновлений клиента... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установка обновлений на несовместимые сервера... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отправка обновлений на сервера... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установка обновлений... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5809,7 +5809,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5983,7 +5983,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Некорректный E-Mail</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6222,7 +6222,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 пред.)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6515,11 +6515,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Разрешить системе оптимизировать настройки устройств</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Разрешить системе оптимизировать настройки камер</translation>
     </message>
 </context>
 <context>
@@ -6677,7 +6677,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Устройство ввода не выбрано.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6685,7 +6685,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сетевая ошибка.</translation>
     </message>
 </context>
 <context>
@@ -7079,7 +7079,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Некорректный E-Mail</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7128,7 +7128,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PC %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7419,7 +7419,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить ресурсы</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7767,11 +7767,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбранные сервера были успешно добавлены в систему!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно обновить выбранные серверы.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

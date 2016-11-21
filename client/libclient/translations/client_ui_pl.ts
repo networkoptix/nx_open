@@ -222,7 +222,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ustawienia E-mail</translation>
     </message>
 </context>
 <context>
@@ -349,12 +349,12 @@
     <message>
         <location/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Opis</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Koniec czasu</translation>
     </message>
     <message>
         <location/>
@@ -526,7 +526,7 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Adres urządzenia:</translation>
     </message>
     <message>
         <location/>
@@ -551,22 +551,22 @@
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skanowanie p&amp;odsieci</translation>
     </message>
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Port:</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hasło:</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Login:</translation>
     </message>
     <message>
         <location/>
@@ -576,7 +576,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Dodaj zaznaczone</translation>
     </message>
 </context>
 <context>
@@ -747,7 +747,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID &amp;Wyjścia:</translation>
     </message>
     <message>
         <location/>
@@ -876,7 +876,7 @@
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zachowaj zmiany przed skopiowaniem harmonogramu</translation>
     </message>
 </context>
 <context>
@@ -1045,7 +1045,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Login:</translation>
     </message>
     <message>
         <location/>
@@ -1055,7 +1055,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hasło:</translation>
     </message>
 </context>
 <context>
@@ -1192,7 +1192,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Dodaj...</translation>
     </message>
     <message>
         <location/>
@@ -1202,7 +1202,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Run Application when PC Boots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uruchom aplikację przy starcie komputera:</translation>
     </message>
 </context>
 <context>
@@ -1314,7 +1314,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Przytnij do proporcji monitora</translation>
     </message>
     <message>
         <location/>
@@ -1324,12 +1324,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Height:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Wysokość:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Nieprzezroczystość:</translation>
     </message>
 </context>
 <context>
@@ -1372,7 +1372,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Admin DN:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ad&amp;min DN:</translation>
     </message>
     <message>
         <location/>
@@ -1537,7 +1537,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Klucz licencji:</translation>
     </message>
     <message>
         <location/>
@@ -1547,12 +1547,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID sprzetu:</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plik aktywacji:</translation>
     </message>
 </context>
 <context>
@@ -1591,7 +1591,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Opcje połączenia:</translation>
     </message>
     <message>
         <location/>
@@ -1606,12 +1606,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Login:</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hasło:</translation>
     </message>
     <message>
         <location/>
@@ -1621,7 +1621,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Auto-Logowanie</translation>
     </message>
 </context>
 <context>
@@ -1664,7 +1664,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Język:</translation>
     </message>
     <message>
         <location/>
@@ -1679,12 +1679,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Tour sequence cycle time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Czas cyklu sekwencji:</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Obraz:</translation>
     </message>
     <message>
         <location/>
@@ -1694,7 +1694,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Intensity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intensywność:</translation>
     </message>
 </context>
 <context>
@@ -2012,17 +2012,17 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Dodaj...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Zmień nazwę...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Usuń...</translation>
     </message>
 </context>
 <context>
@@ -2183,7 +2183,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Usuń...</translation>
     </message>
     <message>
         <location/>
@@ -2370,22 +2370,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rozdzielczość:</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jakość nagrywania:</translation>
     </message>
     <message>
         <location/>
         <source>Primary Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Główne urządzenie:</translation>
     </message>
     <message>
         <location/>
         <source>External Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zewnętrzne urządzenie:</translation>
     </message>
 </context>
 <context>
@@ -2434,12 +2434,12 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Dodatkowi Odbiorcy:</translation>
     </message>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Globalne ustawienia poczty Email...</translation>
     </message>
 </context>
 <context>
@@ -2472,7 +2472,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Adres IP:</translation>
     </message>
     <message>
         <location/>
@@ -2624,12 +2624,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Firmware</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Firmware:</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Producent:</translation>
     </message>
     <message>
         <location/>
@@ -2639,32 +2639,32 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Login:</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hasło:</translation>
     </message>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Adres IP:</translation>
     </message>
     <message>
         <location/>
         <source>Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Strona WWW:</translation>
     </message>
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MAC adres:</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Czułość:</translation>
     </message>
     <message>
         <location/>
@@ -2844,7 +2844,8 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Odznaczenie spowoduje zatrzymanie nagrywania.
+Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</translation>
     </message>
     <message>
         <location/>

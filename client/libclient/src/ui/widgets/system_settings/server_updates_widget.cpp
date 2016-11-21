@@ -727,7 +727,7 @@ QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList
 void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 {
     ui->updateProgess->setValue(100);
-    ui->updateProgess->setFormat(tr("Update Finished...\t100%"));
+    ui->updateProgess->setFormat(tr("Update Finished...") + lit("\t100%"));
 
     if (isVisible())
     {

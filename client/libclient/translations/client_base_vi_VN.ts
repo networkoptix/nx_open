@@ -1432,7 +1432,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nguồn tài nguyên này đã được xóa khỏi hệ thống</translation>
     </message>
 </context>
 <context>
@@ -1605,7 +1605,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cài đặt e-mail thay đổi</translation>
     </message>
 </context>
 <context>
@@ -2749,11 +2749,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình máy chủ (s)</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đang cập nhật máy chủ (s)</translation>
     </message>
 </context>
 <context>
@@ -2969,7 +2969,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cơ sở dữ liệu được phục hồi thành công từ tập tin &apos;%1&apos;. Máy chủ Media sẽ được khởi động lại.</translation>
     </message>
 </context>
 <context>
@@ -3395,7 +3395,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mở báo / Quy định Quản lý sự kiện</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3407,11 +3407,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Danh sách mở thiết bị</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mở danh sách ảnh</translation>
     </message>
 </context>
 <context>
@@ -3878,7 +3878,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Server không tìm thấy&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4007,7 +4007,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giấy phép đã arleady được kích hoạt.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4050,7 +4050,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xin vui lòng gửi email với các khóa tiếp và các ID phần cứng cung cấp cho %1  để có được một khóa tập tin kích hoạt.</translation>
     </message>
 </context>
 <context>
@@ -4178,7 +4178,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">xóa kết nối</translation>
     </message>
 </context>
 <context>
@@ -4426,7 +4426,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trước khi một khối</translation>
     </message>
 </context>
 <context>
@@ -5007,7 +5007,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Máy ảnh từ các máy chủ khác và camera loại bỏ&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5015,11 +5015,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5102,7 +5102,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chọn người dùng...</translation>
     </message>
 </context>
 <context>
@@ -5624,27 +5624,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểm tra các bản cập nhật ... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tải bản cập nhật ... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cài đặt cập nhật khách hàng ... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cài đặt bản cập nhật cho các máy chủ không tương thích ... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đẩy mạnh thông tin cập nhật đến các máy chủ ... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cài đặt bản cập nhật ... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5665,7 +5665,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5835,7 +5835,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail vô hiệu</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6074,7 +6074,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 trước khi bây giờ)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6367,11 +6367,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cho phép hệ thống để tối ưu hóa các thiết bị cài đặt</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -6529,7 +6529,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết bị đầu vào không được chọn.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6537,7 +6537,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi mạng.</translation>
     </message>
 </context>
 <context>
@@ -6919,7 +6919,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail vô hiệu</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6968,7 +6968,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PC %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7228,7 +7228,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">xóa tài nguyên</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7572,11 +7572,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các máy chủ đã chọn đã được kết nối thành công với hệ thống của bạn!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể cập nhật các máy chủ đã chọn.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

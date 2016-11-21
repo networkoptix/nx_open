@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버 동작이 멈춥니다. 진행하시겠습니까?</translation>
     </message>
     <message>
         <source>Show Server Log</source>

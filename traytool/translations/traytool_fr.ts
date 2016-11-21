@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le service &apos;Media Serveur&apos; va s&apos;arrêter. Continuer ?</translation>
     </message>
     <message>
         <source>Show Server Log</source>

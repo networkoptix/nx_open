@@ -727,7 +727,7 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
     </message>
     <message>
         <source>Couldn&apos;t initialize resampling context, error code: %1</source>
@@ -888,11 +888,11 @@
     </message>
     <message>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลายเซ็นไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การปรับแต่งไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>License is expired</source>
@@ -900,7 +900,7 @@
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ชนิดไม่ถูกต้อง</translation>
     </message>
 </context>
 <context>

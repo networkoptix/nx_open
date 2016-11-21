@@ -96,7 +96,7 @@
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เซิร์ฟเวอร์สื่อจะหยุด ต่อหรือไม่?</translation>
     </message>
     <message>
         <source>Show Server Log</source>

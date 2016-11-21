@@ -727,7 +727,7 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 codec의 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Couldn&apos;t initialize resampling context, error code: %1</source>
@@ -888,11 +888,11 @@
     </message>
     <message>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">유효하지 않은 서명</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">유효하지 않은 변경</translation>
     </message>
     <message>
         <source>License is expired</source>
@@ -900,7 +900,7 @@
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">유효하지 않은 방식</translation>
     </message>
 </context>
 <context>

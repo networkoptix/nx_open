@@ -1625,7 +1625,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ustawienia E-mail zmienione</translation>
     </message>
 </context>
 <context>
@@ -2817,11 +2817,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konfiguracja serwera(ów)</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktualizacj serwera(ów)</translation>
     </message>
 </context>
 <context>
@@ -3037,7 +3037,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Baza danych zaostała pomyślnie przywrócona z pliku &apos;%1&apos;. Media server zostanie uruchomiony ponownie.</translation>
     </message>
 </context>
 <context>
@@ -3968,7 +3968,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;nie odnaleziono serwera&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4103,7 +4103,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licecnja została aktywowana.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4146,7 +4146,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Proszę wysłać e-mail z kluczem seryjnym i Hardware ID  do%1, aby uzyskać plik klucza aktywacyjnego.</translation>
     </message>
 </context>
 <context>
@@ -4282,7 +4282,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usuń połączenia</translation>
     </message>
 </context>
 <context>
@@ -4530,7 +4530,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poprzedni kawałek</translation>
     </message>
 </context>
 <context>
@@ -5143,11 +5143,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5230,7 +5230,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wybierz użytkowników...</translation>
     </message>
 </context>
 <context>
@@ -5766,27 +5766,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sprawdzanie aktualziacji... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pobieranie aktualizacji... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instalowanie aktualizacji klienta... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instalowanie aktualizacji do niezgodnych serwerów... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dostarczanie aktualizacji do serwerów... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instalowanie aktualizacji... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5809,7 +5809,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5982,7 +5982,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email jest niepoprawny</translation>
     </message>
     <message>
         <source>Password</source>
@@ -7078,7 +7078,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email jest niepoprawny</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7127,7 +7127,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pc %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7417,7 +7417,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usuń zasoby</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7765,11 +7765,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wybrany serwer został pomyślnie dołączony do twojego systemu!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nie zaktualizowano wybranych serwerów.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

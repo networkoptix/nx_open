@@ -1431,7 +1431,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">아 장치는 시스템에서 삭제됨</translation>
     </message>
 </context>
 <context>
@@ -1604,7 +1604,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이메일 설정 변경</translation>
     </message>
 </context>
 <context>
@@ -2748,11 +2748,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버 설정</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버 업데이트</translation>
     </message>
 </context>
 <context>
@@ -2968,7 +2968,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 파일로 부터 데이터 베이스의 복원이 완료 되었습니다. 저장서버를 다시 시작하여 주십시오.</translation>
     </message>
 </context>
 <context>
@@ -3394,7 +3394,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">알람 이벤트 롤 관리 열기</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3406,11 +3406,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">장치 리스트 열기</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 리스트 열기</translation>
     </message>
 </context>
 <context>
@@ -3877,7 +3877,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;서버를 찾을 수 없음&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4006,7 +4006,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이전에 activate된 인증키 입니다.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4049,7 +4049,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인증 키를 얻기 위해 %1에 제공받은 Serial Key와 하드웨어 ID를 이메일로 보내주세요.</translation>
     </message>
 </context>
 <context>
@@ -4177,7 +4177,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">연결 정보 삭제</translation>
     </message>
 </context>
 <context>
@@ -4425,7 +4425,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이전 블럭</translation>
     </message>
 </context>
 <context>
@@ -5006,7 +5006,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Cameras from other servers and removed cameras&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5101,7 +5101,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사용자 선택...</translation>
     </message>
 </context>
 <context>
@@ -5623,27 +5623,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 확인 중... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 다운로드 중... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">클라이언트 설치 중... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">호환되지 않는 서버에 업데이트 버전 설치 중... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버에 업데이트 전송 중... %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 설치 중... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5664,7 +5664,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5834,7 +5834,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이메일 정보가 유효하지 않습니다</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6073,7 +6073,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 before now)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6366,11 +6366,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">장치 설정 자동 변경</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 설정 자동변경</translation>
     </message>
 </context>
 <context>
@@ -6528,7 +6528,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">입력장치가 선택되지 않음</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6536,7 +6536,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">네트워크 문제</translation>
     </message>
 </context>
 <context>
@@ -6918,7 +6918,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이메일 정보가 유효하지 않습니다</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6967,7 +6967,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PC %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7227,7 +7227,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">리소스 삭제</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7571,11 +7571,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">선택된 서버 시스템에 성공적으로 연결되었습니다!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">선택된 서버를 업데이트 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

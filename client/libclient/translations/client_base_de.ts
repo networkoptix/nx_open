@@ -1442,7 +1442,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diese Ressourcen sind bereits vom System entfernt worden</translation>
     </message>
 </context>
 <context>
@@ -1616,7 +1616,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail Einstellungen wurden geändert</translation>
     </message>
 </context>
 <context>
@@ -2785,11 +2785,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konfiguriere Server</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server werden aktualisiert</translation>
     </message>
 </context>
 <context>
@@ -3005,7 +3005,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Datenbank wurde erfolgreich aus Datei &apos;%1&apos; wiederhergestellt. Der Media-Server wird neu gestartet.</translation>
     </message>
 </context>
 <context>
@@ -3435,7 +3435,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Öffne Alarm/Ereignis-Regeln-Einstellungen</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3447,11 +3447,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Öffne Geräteliste</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Öffne Kameraliste</translation>
     </message>
 </context>
 <context>
@@ -3927,7 +3927,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Server nicht gefunden&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4060,7 +4060,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lizenz wurde bereits aktiviert.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4103,7 +4103,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Senden Sie bitte eine Email mit dem Serienschlüssel und der Hardware-ID, die an %1 gesendet wurde, um eine Aktivierungsschlüsseldatei zu bekommen.</translation>
     </message>
 </context>
 <context>
@@ -4235,7 +4235,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verbindungen löschen</translation>
     </message>
 </context>
 <context>
@@ -4483,7 +4483,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vorheriger Block</translation>
     </message>
 </context>
 <context>
@@ -5076,7 +5076,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Kameras von anderen Servern und gelöschte Kameras&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5084,11 +5084,11 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 TB</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 GB</translation>
     </message>
 </context>
 <context>
@@ -5171,7 +5171,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Benutzer wählen...</translation>
     </message>
 </context>
 <context>
@@ -5700,27 +5700,27 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prüfe auf Updates... %1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Updates werden heruntergeladen... %1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installiere Client Update... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installiere Updates auf inkompatiblen Servern... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Updates werden auf die Server geschoben… %1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installiere Updates... %1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5742,7 +5742,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5914,7 +5914,7 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email ist nicht gültig</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6154,7 +6154,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 vor jetzt)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6447,11 +6447,11 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erlauben Sie dem System die Geräteeinstellungen zu optimieren</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erlauben Sie dem System die Kameraeinstellungen zu optimieren</translation>
     </message>
 </context>
 <context>
@@ -6609,7 +6609,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eingabegerät wurde nicht ausgewählt.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6617,7 +6617,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Netzwerkfehler.</translation>
     </message>
 </context>
 <context>
@@ -7005,7 +7005,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email ist nicht gültig</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7054,7 +7054,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pc %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7329,7 +7329,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ressourcen löschen</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7675,11 +7675,11 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der ausgewählte Server wurde erfolgreich mit Ihrem System verbunden!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der ausgewählte Server konnte nicht aktualisiert werden.</translation>
     </message>
     <message>
         <source>Merge failed.</source>

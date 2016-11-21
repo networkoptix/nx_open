@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phương tiện truyền thông máy chủ sẽ được ngừng lại. Tiếp tục?</translation>
     </message>
     <message>
         <source>Show Server Log</source>

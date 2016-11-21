@@ -1431,7 +1431,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">此資源已於系統中移除</translation>
     </message>
 </context>
 <context>
@@ -1604,7 +1604,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-mail設定已變更</translation>
     </message>
 </context>
 <context>
@@ -2748,11 +2748,11 @@ devices</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">設定伺服器</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新伺服器</translation>
     </message>
 </context>
 <context>
@@ -2968,7 +2968,7 @@ devices</source>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">資料庫已成功從檔案 %1 還原. 媒體伺服器將重啟.</translation>
     </message>
 </context>
 <context>
@@ -3394,7 +3394,7 @@ devices</source>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">開啟警報/事件規則管理員</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
@@ -3406,11 +3406,11 @@ devices</source>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">開啟裝置列表</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">開啟攝影機列表</translation>
     </message>
 </context>
 <context>
@@ -3877,7 +3877,7 @@ devices</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;找不到伺服器&gt;</translation>
     </message>
     <message>
         <source>Qnt.</source>
@@ -4006,7 +4006,7 @@ devices</source>
     </message>
     <message>
         <source>License has already been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">授權已經啟用.</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
@@ -4049,7 +4049,7 @@ devices</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">請將序號以及硬體ID email給 %1 以取得啟動檔案.</translation>
     </message>
 </context>
 <context>
@@ -4177,7 +4177,7 @@ devices</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">刪除連線</translation>
     </message>
 </context>
 <context>
@@ -4425,7 +4425,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">前一區塊</translation>
     </message>
 </context>
 <context>
@@ -5006,7 +5006,7 @@ devices</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;其它伺服器的攝影機已被移除&gt;</translation>
     </message>
     <message>
         <source>Bitrate for</source>
@@ -5014,11 +5014,11 @@ devices</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>
@@ -5101,7 +5101,7 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">選擇使用者...</translation>
     </message>
 </context>
 <context>
@@ -5623,27 +5623,27 @@ devices</source>
     </message>
     <message>
         <source>Checking for updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">檢查更新...%1%</translation>
     </message>
     <message>
         <source>Downloading updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">下載更新...%1%</translation>
     </message>
     <message>
         <source>Installing client update...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">安裝客戶端更新...%1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">安裝更新檔至不相容的伺服器...%1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">上傳更新檔到伺服器...%1%</translation>
     </message>
     <message>
         <source>Installing updates...	%1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">安裝更新...%1%</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5664,7 +5664,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...	100%</source>
+        <source>Update Finished...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5834,7 +5834,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail 無效</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6073,7 +6073,7 @@ devices</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%1 before now)</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6366,11 +6366,11 @@ devices</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">允許系統優化裝置設定</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">允許系統優化攝影機設定</translation>
     </message>
 </context>
 <context>
@@ -6528,7 +6528,7 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">輸入裝置未選取.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
@@ -6536,7 +6536,7 @@ devices</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">網路問題.</translation>
     </message>
 </context>
 <context>
@@ -6918,7 +6918,7 @@ devices</source>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail 無效</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6967,7 +6967,7 @@ devices</source>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">主機 %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
@@ -7227,7 +7227,7 @@ devices</source>
     </message>
     <message>
         <source>Delete Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">刪除資源</translation>
     </message>
     <message>
         <source>Do not show this message anymore</source>
@@ -7571,11 +7571,11 @@ devices</source>
     </message>
     <message>
         <source>Rejoice! The selected server has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">所選伺服器已成功與系統連結!</translation>
     </message>
     <message>
         <source>Could not update the selected server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法更新所選伺服器.</translation>
     </message>
     <message>
         <source>Merge failed.</source>
