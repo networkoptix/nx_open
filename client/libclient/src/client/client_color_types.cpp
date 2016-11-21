@@ -8,41 +8,34 @@
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 
-QnTimeSliderColors::QnTimeSliderColors() {
-    positionMarker = QColor(255, 255, 255, 196);
-    indicator = QColor(128, 160, 192, 128);
-
-    selection = QColor(0, 150, 255, 110);
-    selectionMarker = selection.lighter();
-
-    pastBackground = QColor(255, 255, 255, 24);
-    futureBackground = QColor(0, 0, 0, 64);
-
-    pastRecording = QColor(64, 255, 64, 128);
-    futureRecording = QColor(64, 255, 64, 64);
-
-    pastMotion = QColor(255, 0, 0, 128);
-    futureMotion = QColor(255, 0, 0, 64);
-
-    pastBookmark = QColor("#b21083dc");
-    futureBookmark = QColor("#b21083dc");
-    pastBookmarkHover = QColor("#1c8fe7e6");
-    futureBookmarkHover = QColor("#1c8fe7e6");
-    pastBookmarkBound = QColor("#1c8fe7");
-    futureBookmarkBound = QColor("#1c8fe7");
-
-    separator = QColor(255, 255, 255, 64);
-
-    dateBarBackgrounds.push_back(QColor(255, 255, 255, 48));
-    dateBarText = QColor(255, 255, 255, 255);
-
-    pastLastMinuteBackground = QColor(24, 24, 24, 127);
-    futureLastMinuteBackground = QColor(0, 0, 0, 127);
-    pastLastMinuteStripe = QColor(24, 24, 24, 38);
-    futureLastMinuteStripe = QColor(0, 0, 0, 38);
-
-    tickmarkLines.push_back(QColor(255, 255, 255, 255));
-    tickmarkText.push_back(QColor(255, 255, 255, 255));
+QnTimeSliderColors::QnTimeSliderColors():
+    positionMarker(255, 255, 255, 196),
+    indicator(128, 160, 192, 128),
+    selection(0, 150, 255, 110),
+    selectionMarker(selection.lighter()),
+    pastBackground(255, 255, 255, 24),
+    futureBackground(0, 0, 0, 64),
+    pastRecording(64, 255, 64, 128),
+    futureRecording(64, 255, 64, 64),
+    pastMotion(255, 0, 0, 128),
+    futureMotion(255, 0, 0, 64),
+    pastBookmark("#b21083dc"),
+    futureBookmark("#b21083dc"),
+    pastBookmarkHover("#1c8fe7e6"),
+    futureBookmarkHover("#1c8fe7e6"),
+    pastBookmarkBound("#1c8fe7"),
+    futureBookmarkBound("#1c8fe7"),
+    noThumbnailsLabel("#4e6977"),
+    separator(255, 255, 255, 64),
+    dateBarBackgrounds{ QColor(255, 255, 255, 48) },
+    dateBarText(255, 255, 255, 255),
+    pastLastMinuteBackground(24, 24, 24, 127),
+    futureLastMinuteBackground(0, 0, 0, 127),
+    pastLastMinuteStripe(24, 24, 24, 38),
+    futureLastMinuteStripe(0, 0, 0, 38),
+    tickmarkLines{ QColor(255, 255, 255, 255) },
+    tickmarkText{ QColor(255, 255, 255, 255) }
+{
 }
 
 QnBackgroundColors::QnBackgroundColors() {

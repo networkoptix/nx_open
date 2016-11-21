@@ -378,7 +378,7 @@
 
     "QnTimelinePlaceholder": {
         "palette": { "default": {
-            "windowText": "dark11"
+            "windowText": "dark16"
         }}
     },
 
@@ -400,6 +400,8 @@
 
             "pastMotion": "red_d1",
             "futureMotion": "red_d1",
+
+            "noThumbnailsLabel": "dark16",
 
             "separator": "dark6",
 

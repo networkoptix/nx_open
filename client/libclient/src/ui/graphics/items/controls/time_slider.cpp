@@ -60,16 +60,20 @@ namespace
     const int kMaxDisplayedTextLevel = 2;
 
     /** Tickmark lengths for all levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkLengthPixels = { 15, 10, 5, 5, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkLengthPixels =
+        { 15, 10, 5, 5, 0 };
 
     /** Font pixel heights for all tickmark levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontHeights = { 12, 12, 11, 11, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontHeights =
+        { 12, 12, 11, 11, 0 };
 
     /** Tickmark text pixel heights for all levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkTextHeightPixels = { 20, 20, 20, 20, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkTextHeightPixels =
+        { 20, 20, 20, 20, 0 };
 
     /** Font weights for all tickmark levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontWeights = { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontWeights =
+        { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
 
     /** Minimal distance between tickmarks from the same group for this group to be visible.
      * Note that because of the fact that tickmarks do not disappear instantly, in some cases
@@ -157,6 +161,8 @@ namespace
       * When a marker is dragged to these areas it causes window scroll.
       * Has effect only with DragScrollsWindow option. */
     const qreal kWindowScrollPixelThreshold = 1.0;
+
+    const int kNoThumbnailsFontPixelSize = 16;
 
     QTime msecsToTime(qint64 msecs)
     {
@@ -1536,7 +1542,8 @@ void QnTimeSlider::updatePixmapCache()
     m_pixmapCache->setDateFont(localFont);
     m_pixmapCache->setDateColor(m_colors.dateBarText);
 
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16);
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("No thumbnails available"),
+        kNoThumbnailsFontPixelSize, m_colors.noThumbnailsLabel);
 
     for (int i = 0; i < kNumTickmarkLevels; ++i)
     {
@@ -2554,7 +2561,10 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
         QSizeF labelSizeBound = rect.size();
         labelSizeBound.setHeight(m_noThumbnailsPixmap.height());
 
-        QRectF labelRect = QnGeometry::aligned(QnGeometry::expanded(QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound, Qt::KeepAspectRatio), rect, Qt::AlignCenter);
+        QRect labelRect = QnGeometry::aligned(QnGeometry::expanded(
+            QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
+            Qt::KeepAspectRatio), rect, Qt::AlignCenter).toRect();
+
         drawCroppedPixmap(painter, labelRect, rect, m_noThumbnailsPixmap, m_noThumbnailsPixmap.rect());
         return;
     }
