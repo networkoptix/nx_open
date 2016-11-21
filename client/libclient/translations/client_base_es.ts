@@ -8042,11 +8042,6 @@ devices</source>
         <translation>Otro usuario ya está controlando esta pantalla.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1&apos;s Pantalla</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>Sesión de control ya está funcionando.</translation>
     </message>
@@ -8098,11 +8093,6 @@ devices</source>
         <translation>No se puede aplicar los cambios. Se ha producido un error inesperado.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">Nuevo diseño</translation>
     </message>
@@ -8112,6 +8102,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -7938,11 +7938,6 @@ devices</source>
         <translation>当前屏幕正被其它用户控制.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1&apos;屏幕</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>控制任务正在进行.</translation>
     </message>
@@ -7993,11 +7988,6 @@ devices</source>
         <translation>当前更改未应用,发生未知错误.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">新视窗</translation>
     </message>
@@ -8007,6 +7997,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

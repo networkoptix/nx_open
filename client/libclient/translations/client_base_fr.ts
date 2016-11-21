@@ -8060,11 +8060,6 @@ devices</source>
         <translation>Un autre usager contrôle déjà cet écran.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Écran %1</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>Session de contrôle déjà en fonction.</translation>
     </message>
@@ -8116,11 +8111,6 @@ devices</source>
         <translation>Impossible d&apos;appliquer les changements. Erreur inattendue s&apos;est produite.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">Nouvelle mise en page</translation>
     </message>
@@ -8130,6 +8120,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -87,7 +87,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1&apos;s system</source>
+        <source>Owner: %1</source>
+        <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -110,7 +111,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1&apos;s system</source>
+        <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>

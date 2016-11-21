@@ -8047,11 +8047,6 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
         <translation>Ein anderer Benutzer steuert bereits diesen Bildschirm.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Bildschirm von %1</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>Kontrollsitzung bereits aktiv.</translation>
     </message>
@@ -8103,11 +8098,6 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
         <translation>Die Änderungen können nicht übernommen werden. Unerwarteter Fehler aufgetreten.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">Neues Layout</translation>
     </message>
@@ -8117,6 +8107,16 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

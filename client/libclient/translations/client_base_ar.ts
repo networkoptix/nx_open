@@ -8412,11 +8412,6 @@ devices</source>
         <source>Could not start Video Wall control session.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n items</source>
         <translation type="unfinished">
@@ -8515,11 +8510,6 @@ devices</source>
         </translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8529,6 +8519,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

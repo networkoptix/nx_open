@@ -8039,11 +8039,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation type="unfinished">A control session is already running.</translation>
     </message>
@@ -8095,11 +8090,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">New Layout</translation>
     </message>
@@ -8109,6 +8099,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

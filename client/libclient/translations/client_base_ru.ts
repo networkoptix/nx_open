@@ -8146,11 +8146,6 @@ devices</source>
         <translation>Другой пользователь уже управляет данным экраном.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Экран %1</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>Сессия управления уже запущена.</translation>
     </message>
@@ -8203,11 +8198,6 @@ devices</source>
         <translation>Изменения не сохранены. Произошла неизвестная ошибка.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">Новая раскладка</translation>
     </message>
@@ -8217,6 +8207,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

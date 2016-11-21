@@ -7937,11 +7937,6 @@ devices</source>
         <translation>Một người dùng khác đã được kiểm soát màn hình này.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Màn hình của %1</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>Phiên điều khiển đã chạy.</translation>
     </message>
@@ -7992,11 +7987,6 @@ devices</source>
         <translation>Những thay đổi không thể được áp dụng. Xảy ra lỗi không mong muốn.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">việc bố trí mới</translation>
     </message>
@@ -8006,6 +7996,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

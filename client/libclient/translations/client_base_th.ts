@@ -7937,11 +7937,6 @@ devices</source>
         <translation>มีผู้ใช้อื่นทำการควบคุมหน้าจอนี้.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>หน้าจอ %1 s</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>การควบคุมเซสชั่นกำลังทำงาน.</translation>
     </message>
@@ -7992,11 +7987,6 @@ devices</source>
         <translation>การเปลี่ยนแปลงที่ไม่สามารถนำมาประยุกต์ใช้ ข้อผิดพลาดที่ไม่คาดคิดเกิดขึ้น.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">เปิดรูปแบบใหม่</translation>
     </message>
@@ -8006,6 +7996,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

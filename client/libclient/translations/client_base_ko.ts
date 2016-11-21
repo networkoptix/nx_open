@@ -7936,11 +7936,6 @@ devices</source>
         <translation>다른 사용자가 이 스크린을 제어하고 있습니다.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1의 화면</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>제어 세션이 이미 동작 중입니다.</translation>
     </message>
@@ -7991,11 +7986,6 @@ devices</source>
         <translation>예상치 못한 오류가 발생하여 변경사항적용되지 않습니다.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">새 레이아웃</translation>
     </message>
@@ -8005,6 +7995,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

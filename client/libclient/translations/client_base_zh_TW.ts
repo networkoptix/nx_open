@@ -7936,11 +7936,6 @@ devices</source>
         <translation>其它使用者正在控制此畫面.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1的螢幕</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>控制進程正在執行.</translation>
     </message>
@@ -7991,11 +7986,6 @@ devices</source>
         <translation>變更無法套用. 無預期的錯誤發生.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">新佈局</translation>
     </message>
@@ -8005,6 +7995,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

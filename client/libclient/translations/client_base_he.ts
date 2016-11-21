@@ -8005,11 +8005,6 @@ devices</source>
         <translation>הפעלת שליטה מרחוק בקיר הוידאו נכשלה.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>המסך של %1</translation>
-    </message>
-    <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
         <translation>על מנת לאפשר את השימוש בקיר הוידאו, אנא הפעל לפחות רשיון קיר וידאו אחד.</translation>
     </message>
@@ -8099,11 +8094,6 @@ devices</source>
         <translation>לא ניתן להחיל את השינויים. התרחשה שגיאה בלתי צפויה.</translation>
     </message>
     <message>
-        <source>%1 Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout</source>
         <translation type="unfinished">פריסה חדשה</translation>
     </message>
@@ -8113,6 +8103,16 @@ devices</source>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
