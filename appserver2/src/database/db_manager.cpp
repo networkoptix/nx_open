@@ -528,7 +528,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
             NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
         }
 
-        AdminPasswordData adminPasswordData = qnCommon->adminPasswordData();
+        BeforeRestoreDbData beforeRestoreDbData = qnCommon->beforeRestoreDbData();
 
         QString defaultAdminPassword = qnCommon->defaultAdminPassword();
         if ((userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty())
@@ -552,12 +552,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 updateUserResource = true;
             }
         }
-        if (!adminPasswordData.isEmpty())
+        if (!beforeRestoreDbData.isEmpty())
         {
-            userResource->setHash(adminPasswordData.hash);
-            userResource->setDigest(adminPasswordData.digest);
-            userResource->setCryptSha512Hash(adminPasswordData.cryptSha512Hash);
-            userResource->setRealm(adminPasswordData.realm);
+            userResource->setHash(beforeRestoreDbData.hash);
+            userResource->setDigest(beforeRestoreDbData.digest);
+            userResource->setCryptSha512Hash(beforeRestoreDbData.cryptSha512Hash);
+            userResource->setRealm(beforeRestoreDbData.realm);
             updateUserResource = true;
         }
         if (updateUserResource)

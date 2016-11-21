@@ -95,7 +95,7 @@ private:
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
-    void saveAdminPswdHash();
+    void savePersistentDataBeforeDbRestore();
     bool isStopping() const;
     void migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);

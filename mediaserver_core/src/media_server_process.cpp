@@ -1016,7 +1016,7 @@ void MediaServerProcess::at_databaseDumped()
     if (isStopping())
         return;
 
-    saveAdminPswdHash();
+    savePersistentDataBeforeDbRestore();
     restartServer(500);
 }
 
@@ -1030,8 +1030,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         // If system Id has been changed, reset 'database restore time' variable
-        nx::ServerSetting::setSysIdTime(0);
-        saveAdminPswdHash();
+        savePersistentDataBeforeDbRestore();
         restartServer(0);
     }
 }
@@ -1756,19 +1755,23 @@ bool MediaServerProcess::initTcpListener(
     return true;
 }
 
-void MediaServerProcess::saveAdminPswdHash()
+void MediaServerProcess::savePersistentDataBeforeDbRestore()
 {
     QnUserResourcePtr admin = qnResPool->getAdministrator();
+    BeforeRestoreDbData data;
+
     if (admin)
     {
-        AdminPasswordData data;
         data.digest = admin->getDigest();
         data.hash = admin->getHash();
         data.cryptSha512Hash = admin->getCryptSha512Hash();
         data.realm = admin->getRealm().toUtf8();
-
-        data.saveToSettings(MSSettings::roSettings());
     }
+
+    data.localSystemId = qnGlobalSettings->localSystemId().toByteArray();
+    data.localSystemName = qnGlobalSettings->systemName().toLocal8Bit();
+
+    data.saveToSettings(MSSettings::roSettings());
 }
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
@@ -2085,9 +2088,9 @@ void MediaServerProcess::run()
     qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
     qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
-    AdminPasswordData passwordData;
-    passwordData.loadFromSettings(settings);
-    qnCommon->setAdminPasswordData(passwordData);
+    BeforeRestoreDbData beforeRestoreDbData;
+    beforeRestoreDbData.loadFromSettings(settings);
+    qnCommon->setBeforeRestoreData(beforeRestoreDbData);
 
     qnCommon->setModuleGUID(serverGuid());
     nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("ms", qnCommon->moduleGUID());
@@ -2204,7 +2207,7 @@ void MediaServerProcess::run()
         return;
     }
 
-    AdminPasswordData::clearSettings(settings);
+    BeforeRestoreDbData::clearSettings(settings);
 
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
@@ -2307,7 +2310,8 @@ void MediaServerProcess::run()
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
             server->setName(getDefaultServerName());
-            if (!noSetupWizardFlag)
+
+            if (!noSetupWizardFlag && beforeRestoreDbData.localSystemId.isNull())
                 isNewServerInstance = true;
         }
 
@@ -2505,7 +2509,14 @@ void MediaServerProcess::run()
     qnResourceAccessManager->endUpdate();
     qDebug() << "permissions ready" << tt.elapsed();
 
-	qnGlobalSettings->initialize();
+    qnGlobalSettings->initialize();
+
+    if (!beforeRestoreDbData.localSystemId.isNull())
+        qnGlobalSettings->setLocalSystemId(QnUuid::fromStringSafe(beforeRestoreDbData.localSystemId));
+
+    if (!beforeRestoreDbData.localSystemName.isNull())
+        qnGlobalSettings->setSystemName(QString::fromLocal8Bit(beforeRestoreDbData.localSystemName));
+
     migrateSystemNameFromConfig(cloudConnectionManager);
 
     addFakeVideowallUser();
