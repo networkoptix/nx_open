@@ -29,6 +29,7 @@ public:
     virtual bool isVisible() const = 0;
     virtual void setVisible(bool visible = true, bool animate = true) = 0;
 
+    /* This is visibility-related virtual opacity in range [0.0, 1.0]. */
     virtual qreal opacity() const = 0;
     virtual void setOpacity(qreal opacity, bool animate = true) = 0;
     virtual void updateOpacity(bool animate = true);
