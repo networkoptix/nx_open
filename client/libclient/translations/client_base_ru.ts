@@ -5765,30 +5765,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Checking for updates...	%1%</source>
-        <translation type="unfinished">Проверка обновлений... %1%</translation>
-    </message>
-    <message>
-        <source>Downloading updates...	%1%</source>
-        <translation type="unfinished">Загрузка обновлений... %1%</translation>
-    </message>
-    <message>
-        <source>Installing client update...	%1%</source>
-        <translation type="unfinished">Установка обновлений клиента... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished">Установка обновлений на несовместимые сервера... %1%</translation>
-    </message>
-    <message>
-        <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished">Отправка обновлений на сервера... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates...	%1%</source>
-        <translation type="unfinished">Установка обновлений... %1%</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5810,6 +5786,30 @@ devices</source>
     </message>
     <message>
         <source>Update Finished...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing client update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates to incompatible servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pushing updates to servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

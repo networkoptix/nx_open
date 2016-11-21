@@ -5696,30 +5696,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Checking for updates...	%1%</source>
-        <translation type="unfinished">מחפש עדכונים... %1%</translation>
-    </message>
-    <message>
-        <source>Downloading updates...	%1%</source>
-        <translation type="unfinished">מוריד עדכונים... %1%</translation>
-    </message>
-    <message>
-        <source>Installing client update...	%1%</source>
-        <translation type="unfinished">מתקין עדכון קליינט... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished">מתקין עדכונים לשרתים שאינם נתמכים כעת... %1%</translation>
-    </message>
-    <message>
-        <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished">מעלה עדכונים לשרתים... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates...	%1%</source>
-        <translation type="unfinished">מתקן עדכונים... %1%</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation type="unfinished">אזהרה</translation>
     </message>
@@ -5740,6 +5716,30 @@ devices</source>
     </message>
     <message>
         <source>Update Finished...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing client update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates to incompatible servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pushing updates to servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

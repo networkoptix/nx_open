@@ -5623,30 +5623,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Checking for updates...	%1%</source>
-        <translation type="unfinished">更新確認... %1%</translation>
-    </message>
-    <message>
-        <source>Downloading updates...	%1%</source>
-        <translation type="unfinished">更新ダウンロード.. %1%　</translation>
-    </message>
-    <message>
-        <source>Installing client update...	%1%</source>
-        <translation type="unfinished">クライアント更新中... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates to incompatible servers...	%1%</source>
-        <translation type="unfinished">互換性のないサーバーを更新中... %1%</translation>
-    </message>
-    <message>
-        <source>Pushing updates to servers...	%1%</source>
-        <translation type="unfinished">更新確認中... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates...	%1%</source>
-        <translation type="unfinished">更新インストール中.. %1%</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation type="unfinished">警告</translation>
     </message>
@@ -5666,6 +5642,30 @@ devices</source>
     </message>
     <message>
         <source>Update Finished...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing client update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates to incompatible servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pushing updates to servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
