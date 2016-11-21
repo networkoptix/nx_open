@@ -78,6 +78,8 @@ TEST(UdpSocket, Simple)
 
 TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
 {
+    constexpr int socketCount = 2;
+
     std::vector<SocketContext> sockets;
     const auto socketsCleanupGuard = makeScopedGuard(
         [&sockets]()
@@ -86,9 +88,10 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
                 ctx.socket->pleaseStopSync();
         });
 
-    sockets.resize(2);
-    for (std::size_t i = 0; i < sockets.size(); ++i)
+    for (std::size_t i = 0; i < socketCount; ++i)
     {
+        sockets.push_back(SocketContext());
+
         sockets[i].socket = std::make_unique<UDPSocket>();
         sockets[i].readBuffer.reserve(1024);
         ASSERT_TRUE(sockets[i].socket->setReuseAddrFlag(true));
