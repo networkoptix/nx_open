@@ -15,11 +15,74 @@
     </message>
 </context>
 <context>
-    <name>QnBusinessStringsHelper</name>
+    <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>Motion on Camera</source>
-        <translation>摄像机移动侦测</translation>
+        <source>The system was not found.</source>
+        <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password or user name is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user does not have permissions for the requested operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create database backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you understand this and would like to proceed please click Merge to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System being merged cannot be connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name is not configured yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessStringsHelper</name>
     <message>
         <source>Storage Failure</source>
         <translation>存储故障</translation>
@@ -142,20 +205,6 @@
         <translation>服务器冲突 #%1: %2</translation>
     </message>
     <message>
-        <source>%2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
-        <translation>%2 %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n times, first: %2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
-        <translation>
-            <numerusform>%n次, 首次: %2 %1</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
@@ -257,10 +306,6 @@
         <translation>连接摄像机(子码流)意外关闭.</translation>
     </message>
     <message>
-        <source>Server restarted unexpectedly.</source>
-        <translation>服务器意外重启.</translation>
-    </message>
-    <message>
         <source>Device output</source>
         <translation>设备输出</translation>
     </message>
@@ -269,44 +314,12 @@
         <translation>摄像机输出</translation>
     </message>
     <message>
-        <source>Device output for 30 sec</source>
-        <translation>设备输出30秒</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>摄像机输出30秒</translation>
-    </message>
-    <message>
         <source>Device recording</source>
         <translation>设备录像</translation>
     </message>
     <message>
         <source>Camera recording</source>
         <translation>摄像机录像</translation>
-    </message>
-    <message>
-        <source>Input Signal on Device</source>
-        <translation>设备输入信号</translation>
-    </message>
-    <message>
-        <source>Input Signal on Camera</source>
-        <translation>摄像机输入信号</translation>
-    </message>
-    <message>
-        <source>Device Disconnected</source>
-        <translation>设备离线</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>摄像机离线</translation>
-    </message>
-    <message>
-        <source>Device IP Conflict</source>
-        <translation>设备IP冲突</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>摄像机IP冲突</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
@@ -337,14 +350,6 @@
     <message>
         <source>Connection to device was unexpectedly closed.</source>
         <translation>连接设备被意外关闭.</translation>
-    </message>
-    <message>
-        <source>Recording on devices is disabled:</source>
-        <translation>设备录像无法启用:</translation>
-    </message>
-    <message>
-        <source>Recording on cameras is disabled:</source>
-        <translation>摄像机录像无法启用:</translation>
     </message>
     <message>
         <source>Execute PTZ preset</source>
@@ -415,12 +420,82 @@
         <translation>录像备份已取消,数据保存至 %1</translation>
     </message>
     <message>
-        <source>Recording on I/O modules is disabled:</source>
-        <translation>I/O模块录像已无效:</translation>
-    </message>
-    <message>
         <source>Do HTTP request</source>
         <translation>进行HTTP请求</translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device does not respond to network requests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -635,28 +710,6 @@
     </message>
 </context>
 <context>
-    <name>QnCommandLineParser</name>
-    <message>
-        <source>No value provided for the &apos;%1&apos; argument.</source>
-        <translation>无法提供有效值 &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos;无效值－期望%2, 提供%3。</translation>
-    </message>
-</context>
-<context>
-    <name>QnEnvironment</name>
-    <message>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>启动Windows浏览器时无法找到explorer.exe。</translation>
-    </message>
-    <message>
-        <source>File explorer failed to open.</source>
-        <translation>文件资源管理器打开失败.</translation>
-    </message>
-</context>
-<context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
         <source>Audio context was not specified.</source>
@@ -673,6 +726,30 @@
     <message>
         <source>Could not initialize audio decoder.</source>
         <translation>无法初始化音频解码器。</translation>
+    </message>
+    <message>
+        <source>Could not find decoder for codec %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -740,10 +817,6 @@
         <translation>电视墙</translation>
     </message>
     <message>
-        <source>Expired</source>
-        <translation>过期</translation>
-    </message>
-    <message>
         <source>Only single license is allowed for this device</source>
         <translation>此设备需要单独授权</translation>
     </message>
@@ -800,20 +873,8 @@
         <translation>开始授权</translation>
     </message>
     <message>
-        <source>Invalid Signature</source>
-        <translation>无效签名</translation>
-    </message>
-    <message>
         <source>Server with matching hardware ID not found</source>
         <translation>服务器未找到匹配硬件ID</translation>
-    </message>
-    <message>
-        <source>Invalid Customization</source>
-        <translation>无效定制</translation>
-    </message>
-    <message>
-        <source>Invalid Type</source>
-        <translation>无效类型</translation>
     </message>
     <message>
         <source>Invalid</source>
@@ -826,6 +887,22 @@
     <message>
         <source>This license type requires higher software version.</source>
         <translation>许可类型需要更高软件版本</translation>
+    </message>
+    <message>
+        <source>Invalid signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid customization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -874,13 +951,6 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>激活授权许可时发生错误,收到无效数据,请联系技术支持团队解决此问题.</translation>
-    </message>
-</context>
-<context>
-    <name>QnMediaServerResource</name>
-    <message>
-        <source>Server</source>
-        <translation>服务器</translation>
     </message>
 </context>
 <context>
@@ -1105,6 +1175,21 @@
         <source>File write error. Not enough free space.</source>
         <translation>文件写入错误，没有足够空间.</translation>
     </message>
+    <message>
+        <source>Invalid resource type for data export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemDescription</name>
+    <message>
+        <source>New system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Unnamed system&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -1153,14 +1238,62 @@
     </message>
 </context>
 <context>
-    <name>QnTranslationListModel</name>
+    <name>QnUserRolesManager</name>
     <message>
-        <source>%1 (built-in)</source>
-        <translation>%1 (内建)</translation>
+        <source>Owner</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 (external)</source>
-        <translation>%1 (外部)</translation>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can manage it. Can create users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can manage all cameras and bookmarks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view all cameras and export video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view live video from all cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom user role.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

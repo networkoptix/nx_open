@@ -15,6 +15,73 @@
     </message>
 </context>
 <context>
+    <name>MergeSystemsStatusStrings</name>
+    <message>
+        <source>The system was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password or user name is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user does not have permissions for the requested operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create database backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you understand this and would like to proceed please click Merge to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System being merged cannot be connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name is not configured yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Server Failure</source>
@@ -43,10 +110,6 @@
     <message>
         <source>Server &quot;%1&quot; Started</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion on Camera</source>
-        <translation>Detecção em câmera</translation>
     </message>
     <message>
         <source>Motion on %1</source>
@@ -112,19 +175,6 @@
         <source>Conflicting Server #%1: %2</source>
         <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>%2 %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n times, first: %2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>%n vezes, primeiro: %2 %1</numerusform>
-            <numerusform>%n vezes, primeiros: %2 %1</numerusform>
-        </translation>
     </message>
     <message>
         <source>Time: %1 on %2</source>
@@ -256,10 +306,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server restarted unexpectedly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device output</source>
         <translation type="unfinished"></translation>
     </message>
@@ -268,43 +314,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device output for 30 sec</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input Signal on Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input Signal on Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device IP Conflict</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -335,14 +349,6 @@
     </message>
     <message>
         <source>Connection to device was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording on devices is disabled:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording on cameras is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -414,11 +420,89 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording on I/O modules is disabled:</source>
+        <source>Do HTTP request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device does not respond to network requests.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do HTTP request</source>
+        <source>Server stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -634,28 +718,6 @@
     </message>
 </context>
 <context>
-    <name>QnCommandLineParser</name>
-    <message>
-        <source>No value provided for the &apos;%1&apos; argument.</source>
-        <translation>Não foi indicado valor para o argumento &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Valor inválido para argumento &apos;%1&apos;-esperado %2, provido &apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>QnEnvironment</name>
-    <message>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Não foi possivel encontrar explorer.exe no caminho do Windows Explorer.</translation>
-    </message>
-    <message>
-        <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
         <source>Audio context was not specified.</source>
@@ -671,6 +733,30 @@
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find decoder for codec %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -739,10 +825,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Expired</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Only single license is allowed for this device</source>
         <translation type="unfinished"></translation>
     </message>
@@ -799,19 +881,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid Signature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server with matching hardware ID not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -824,6 +894,22 @@
     </message>
     <message>
         <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid customization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -876,13 +962,6 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnMediaServerResource</name>
-    <message>
-        <source>Server</source>
-        <translation>Servidor</translation>
     </message>
 </context>
 <context>
@@ -1112,6 +1191,21 @@
         <source>File write error. Not enough free space.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid resource type for data export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemDescription</name>
+    <message>
+        <source>New system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Unnamed system&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -1160,14 +1254,62 @@
     </message>
 </context>
 <context>
-    <name>QnTranslationListModel</name>
+    <name>QnUserRolesManager</name>
     <message>
-        <source>%1 (external)</source>
-        <translation>%1 (externo)</translation>
+        <source>Owner</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 (built-in)</source>
-        <translation>%1 (embutido)</translation>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can manage it. Can create users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can manage all cameras and bookmarks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view all cameras and export video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view live video from all cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom user role.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
