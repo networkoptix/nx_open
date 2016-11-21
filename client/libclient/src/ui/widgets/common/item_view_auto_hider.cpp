@@ -113,7 +113,10 @@ public:
 
     void updateState()
     {
-        bool emptyView = !view || !view->model() || view->model()->rowCount() == 0;
+        bool emptyView = !view
+            || !view->model()
+            || view->model()->rowCount(view->rootIndex()) == 0;
+
         setViewHidden(emptyView);
     }
 
