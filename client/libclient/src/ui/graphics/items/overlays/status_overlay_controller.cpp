@@ -239,7 +239,7 @@ QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
             result[toInt(Qn::VideowallWithoutLicenseOverlay)] = kLicenceIconPath;
             result[toInt(Qn::ServerUnauthorizedOverlay)] = lit("item_placeholders/no_access.png");
             result[toInt(Qn::IoModuleDisabledOverlay)] = lit("item_placeholders/disabled.png");
-            result[toInt(Qn::NoVideoDataOverlay)] = lit("item/io_speaker.png");
+            result[toInt(Qn::NoVideoDataOverlay)] = lit("legacy/io_speaker.png");
             result[toInt(Qn::PausedOverlay)] = lit("item_placeholders/pause.png");
             return result;
         }();
