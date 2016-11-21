@@ -62,6 +62,13 @@ TEST(TcpSocket, ErrorHandling)
         []() { return std::make_unique<TCPSocket>(AF_INET); });
 }
 
+TEST(TcpServerSocketIpv6, BindsToLocalAddress)
+{
+    TCPServerSocket socket(AF_INET6);
+    ASSERT_TRUE(socket.bind(SocketAddress::anyPrivateAddress));
+    ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
+}
+
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, TcpSocketV4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
