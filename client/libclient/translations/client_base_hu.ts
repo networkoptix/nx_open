@@ -95,10 +95,6 @@ több könyvjelző megjelenítéséhez</translation>
         <source>All Data</source>
         <translation>Minden adat</translation>
     </message>
-    <message>
-        <source>Bitrate for the Last Recorded</source>
-        <translation>Az utolsó rögzítés bitrátája</translation>
-    </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
@@ -156,6 +152,49 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
+    <name>PasswordInformation</name>
+    <message>
+        <source>Good</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password should contain different types of symbols.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Short</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password must be at least 8 characters long.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This password is in list of the most popular passwords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -191,6 +230,13 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>None</source>
         <translation>Semmi</translation>
+    </message>
+</context>
+<context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
     </message>
 </context>
 <context>
@@ -247,10 +293,6 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnAboutDialog</name>
     <message>
-        <source>Server at %2: v%1</source>
-        <translation>Szerver %2: -%1</translation>
-    </message>
-    <message>
         <source>Copy to Clipboard</source>
         <translation>Másolás vágólapra</translation>
     </message>
@@ -261,10 +303,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Built for %1-%2 with %3.</source>
         <translation>Készítve %1-%2, %3-val/vel.</translation>
-    </message>
-    <message>
-        <source>Client is not connected to any server</source>
-        <translation>A kliens nem csatlakozik egy szerverhez sem</translation>
     </message>
     <message>
         <source>%1 uses the following external libraries:</source>
@@ -291,6 +329,10 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Support</source>
         <translation>Támogatás</translation>
     </message>
+    <message>
+        <source>Client is not connected to any system</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAbstractCameraAdvancedParamWidget</name>
@@ -308,6 +350,30 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Saving...</source>
         <translation>Mentés...</translation>
+    </message>
+</context>
+<context>
+    <name>QnAccessibleResourcesModel</name>
+    <message>
+        <source>Access granted by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>...and %n more</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnAccessibleResourcesWidget</name>
+    <message>
+        <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Cameras &amp; Resources</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -373,10 +439,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Eseménylista...</translation>
     </message>
     <message>
-        <source>Alarm/Event Rules...</source>
-        <translation>Riasztás/Esemény szabályok...</translation>
-    </message>
-    <message>
         <source>Control Video Wall</source>
         <translation>Videofal vezérlése</translation>
     </message>
@@ -409,10 +471,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Csatlakozás szerverhez...</translation>
     </message>
     <message>
-        <source>Logout</source>
-        <translation>Kijelentkezés</translation>
-    </message>
-    <message>
         <source>Start Panic Recording</source>
         <translation>Pánikrögzítés indítása</translation>
     </message>
@@ -423,10 +481,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>New...</source>
         <translation>Új...</translation>
-    </message>
-    <message>
-        <source>Layout...</source>
-        <translation>Elrendezés...</translation>
     </message>
     <message>
         <source>New Layout...</source>
@@ -475,10 +529,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>File(s)...</source>
         <translation>Fájl(ok)...</translation>
-    </message>
-    <message>
-        <source>Layout(s)...</source>
-        <translation>Elrendezés(ek)...</translation>
     </message>
     <message>
         <source>Folder...</source>
@@ -627,10 +677,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Delete</source>
         <translation>Törlés</translation>
-    </message>
-    <message>
-        <source>Update Layout</source>
-        <translation>Elrendezés frissítése</translation>
     </message>
     <message>
         <source>Stop Video Wall</source>
@@ -997,18 +1043,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Figylemeztetések feloldása</translation>
     </message>
     <message>
-        <source>Disable Background Animation</source>
-        <translation>Háttéranimáció tiltása</translation>
-    </message>
-    <message>
-        <source>Enable Background Animation</source>
-        <translation>Háttéranimáció engedélyezése</translation>
-    </message>
-    <message>
-        <source>Ask About Statistics Reporting</source>
-        <translation>Statisztikai jelentések kérése</translation>
-    </message>
-    <message>
         <source>Drop Resources into New Layout</source>
         <translation>Eszköz bedobása új elrednezésre</translation>
     </message>
@@ -1208,6 +1242,73 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Export Rapid Review...</source>
         <translation>Gyors áttekintés exportálása...</translation>
     </message>
+    <message>
+        <source>Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect from Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Local Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Welcome Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Web Page...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in to %1...</source>
+        <comment>Log in to Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log out from %1</source>
+        <comment>Log out from Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 Portal...</source>
+        <comment>Open Nx Cloud Portal</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage account...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create account...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Sharing Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Role Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1218,6 +1319,17 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Image Enhancement - %1</source>
         <translation>Kép javítása - %1</translation>
+    </message>
+</context>
+<context>
+    <name>QnAdvancedSettingsWidget</name>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">Információ</translation>
+    </message>
+    <message>
+        <source>Folder &apos;%1&apos; does not exist.</source>
+        <translation type="unfinished">&apos;%1&apos; mappa nem létezik.</translation>
     </message>
 </context>
 <context>
@@ -1247,11 +1359,26 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
-    <name>QnAuditLogDialog</name>
+    <name>QnAuditItemDelegate</name>
     <message>
-        <source>Play this</source>
-        <translation>Lejátszás</translation>
+        <source>Play</source>
+        <translation type="unfinished">Play</translation>
     </message>
+    <message>
+        <source>User settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server settings...</source>
+        <translation type="unfinished">Szerver beállítások...</translation>
+    </message>
+    <message>
+        <source>Camera settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnAuditLogDialog</name>
     <message>
         <source>Copy Selection to Clipboard</source>
         <translation>Kijelölt rész másolása vágólapra</translation>
@@ -1263,10 +1390,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Select All</source>
         <translation>Mind kijelölése</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation>Keresés</translation>
     </message>
     <message>
         <source>Information</source>
@@ -1301,8 +1424,16 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Kamera műveletek</translation>
     </message>
     <message>
-        <source>This resources are already removed from the system</source>
-        <translation>Ezek a források már el lettek távolítva a rendszerből</translation>
+        <source>Details for %1 session(s) of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details for %1 camera(s) of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These resources are already removed from the system</source>
+        <translation type="unfinished">Ezek a források már el lettek távolítva a rendszerből</translation>
     </message>
 </context>
 <context>
@@ -1368,10 +1499,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Üzleti szabályok frissítve</translation>
     </message>
     <message>
-        <source>E-mail settings changed</source>
-        <translation>Az E-mail beállítások megváltoztak</translation>
-    </message>
-    <message>
         <source>Server removed</source>
         <translation>Szerver eltávolítva</translation>
     </message>
@@ -1390,14 +1517,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Database restored</source>
         <translation>Adatbázis visszaállítva</translation>
-    </message>
-    <message>
-        <source>Play this</source>
-        <translation>Lejátszás</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Beállítások</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
@@ -1446,10 +1565,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Leírás</translation>
     </message>
     <message>
-        <source>View it</source>
-        <translation>Megtekintés</translation>
-    </message>
-    <message>
         <source>Click to expand</source>
         <translation>Kattintson a kibontáshoz</translation>
     </message>
@@ -1489,6 +1604,10 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Red mark means that the archive is still available</source>
         <translation>A vörös jelölés azt jelenti, hogy az adat még elérhető</translation>
     </message>
+    <message>
+        <source>Email settings changed</source>
+        <translation type="unfinished">Az E-mail beállítások megváltoztak</translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1509,16 +1628,46 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
+    <name>QnBackupSettingsDialog</name>
+    <message>
+        <source>Global Settings	(affect all servers in the system)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By Schedule</source>
+        <translation type="unfinished">Ütemezés szerint</translation>
+    </message>
+    <message>
+        <source>Realtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished">Kérésre</translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished">Alacsony felbontású streamek</translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished">Nagy felbontású streamek</translation>
+    </message>
+    <message>
+        <source>All Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
         <source>You have %n notifications</source>
         <translation>
             <numerusform>%n figyelmeztetése van</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>You have new notifications.</source>
-        <translation>Új figyelmeztetése van.</translation>
     </message>
 </context>
 <context>
@@ -1543,16 +1692,28 @@ több könyvjelző megjelenítéséhez</translation>
         <source>year</source>
         <translation>év</translation>
     </message>
+    <message>
+        <source>Name cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
     <message>
-        <source>Error</source>
-        <translation>Hiba</translation>
+        <source>Build Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The password you have entered is not valid.</source>
-        <translation>A megadott jelszó téves.</translation>
+        <source>Invalid build number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>The password is incorrect.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1706,7 +1867,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>to</source>
-        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
         <translation>to</translation>
     </message>
     <message>
@@ -1741,10 +1902,6 @@ több könyvjelző megjelenítéséhez</translation>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
-    <message>
-        <source>Reset Default Rules</source>
-        <translation>Alapértelmezett szabályok visszaállítása</translation>
-    </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?</source>
         <translation>Biztos benne, hogy vissza szeretné állítani az alapértelmezett szabályokat?</translation>
@@ -1817,6 +1974,10 @@ több könyvjelző megjelenítéséhez</translation>
         <source>filter by cameras...</source>
         <translation>szűrés kamerák szerint...</translation>
     </message>
+    <message>
+        <source>Restore all Rules to Default</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
@@ -1886,10 +2047,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Scanning online hosts...</source>
         <translation>Online hostok keresése...</translation>
-    </message>
-    <message>
-        <source>Scanning hosts... (%1)</source>
-        <translation>Hostok keresése... (%1)</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -1974,13 +2131,17 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Eszközök hozzáadása...</translation>
     </message>
     <message>
-        <source>Scanning host... (%1)</source>
-        <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation>Hostok keresése... (%1)</translation>
-    </message>
-    <message>
         <source>Finishing searching...</source>
         <translation>Keresés befejezése...</translation>
+    </message>
+    <message>
+        <source>Scanning hosts...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning host...</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2000,6 +2161,26 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Loading...</source>
         <translation type="unfinished">Beolvasás...</translation>
     </message>
+    <message>
+        <source>Camera ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAudioTransmitPolicy</name>
@@ -2012,6 +2193,10 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>
             <numerusform>%1 nem támodat kétirányú audiót</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Select camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2267,14 +2452,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Figyelem</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation>Figyelem! A magas minimum érték csökkentheti más eszközök rögzítési időtartamát.</translation>
-    </message>
-    <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation>Figyelem! A magas minimum érték csökkentheti más kamerák rögzítési időtartamát.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>Mozgásra rögzítés ki van kapcsolva. Kérem menjen a mozgás beállítás oldalra, hogybeállítsa a kamera mozgás érzékelési területét és érzékenységét.</translation>
     </message>
@@ -2290,33 +2467,45 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
         <translation>Duál-streamimg és mozgásérzékelés nem áll rendelkezésre ebben a kamerában.</translation>
     </message>
+    <message>
+        <source>Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>based on server time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High minimum value can lead to archive length decrease on other devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High minimum value can lead to archive length decrease on other cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses to enable recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License limit exceeded, recording will not be enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on selector at the top of the window to enable recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select areas on the schedule to apply chosen parameters to.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation>Megnyitás új lapon</translation>
-    </message>
-    <message>
-        <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation>A rögzítés változsai nem lettek elmentve. Válassza ki a kívánt típust, FPS-t és minőséget és jelölje ki a változásokat az ütemezőben.</translation>
-    </message>
-    <message>
-        <source>Changes have not been applied.</source>
-        <translation>A változtatások nem lettek elmentve.</translation>
-    </message>
-    <message>
-        <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation>Az aktuális mozgási érzékenység nem változott. A változtatásához jelölje ki a területet a képen.</translation>
-    </message>
-    <message>
-        <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation>Licenchatár túllépve. A változtatások el lesznek memtve nem fognak működni.</translation>
-    </message>
-    <message>
-        <source>Could not apply changes.</source>
-        <translation>A változtatás nem hajthaó végre.</translation>
-    </message>
     <message>
         <source>Device Settings</source>
         <translation>Eszköz beállítások</translation>
@@ -2332,22 +2521,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Cameras Settings</source>
         <translation>Kamerák beállítása</translation>
-    </message>
-    <message>
-        <source>Device Diagnostics</source>
-        <translation>Eszköz diagnosztika</translation>
-    </message>
-    <message>
-        <source>Devices Diagnostics</source>
-        <translation>Eszközök diagnosztikája</translation>
-    </message>
-    <message>
-        <source>Camera Diagnostics</source>
-        <translation>Kamera diagnosztika</translation>
-    </message>
-    <message>
-        <source>Cameras Diagnostics</source>
-        <translation>Kamerák diagnosztikája</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2390,14 +2563,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>I/O modulok beállítása</translation>
     </message>
     <message>
-        <source>I/O Module Diagnostics</source>
-        <translation>I/O modul diagnosztika</translation>
-    </message>
-    <message>
-        <source>I/O Modules Diagnostics</source>
-        <translation>I/O modulok diagnosztika</translation>
-    </message>
-    <message>
         <source>I/O Module Rules</source>
         <translation>I/O modul szabályok</translation>
     </message>
@@ -2410,6 +2575,14 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>
             <numerusform>Változások elfogadása a következő %n I/O modulra?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Show on Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2424,17 +2597,30 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
-    <name>QnCheckableMessageBox</name>
+    <name>QnChangeUserPasswordDialog</name>
     <message>
-        <source>Do not ask again</source>
-        <translation>Ne kérdezze újra</translation>
+        <source>New Password</source>
+        <translation type="unfinished">Új Jelszó</translation>
     </message>
-</context>
-<context>
-    <name>QnClientVideoCamera</name>
     <message>
-        <source>Invalid resource type for data export.</source>
-        <translation>Az eszközadat nem megfelelő az exportáláshoz.</translation>
+        <source>Confirm Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords do not match.</source>
+        <translation type="unfinished">A jelszavak nem egyeznek.</translation>
+    </message>
+    <message>
+        <source>Current Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To modify your password please enter the existing one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid current password.</source>
+        <translation type="unfinished">Érvénytelen jelenlegi jelszó.</translation>
     </message>
 </context>
 <context>
@@ -2449,14 +2635,126 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
-    <name>QnConnectToCurrentSystemTool</name>
+    <name>QnCloudManagementWidget</name>
     <message>
-        <source>Configuring Server(s)</source>
-        <translation>Szerver(ek) konfigurálása</translation>
+        <source>Disconnect System from %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Updating Server(s)</source>
-        <translation>Szerver(ek) frissítése</translation>
+        <source>Open %1 Portal</source>
+        <comment>Open Nx Cloud Portal</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create %1 Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect System to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1. Create %1
+account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2. Connect system
+to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3. Connect to your systems
+from anywhere with any
+devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Learn more about %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCloudStatusPanel</name>
+    <message>
+        <source>Cannot connect to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to System...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logging in...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in to %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCloudUserPanelWidget</name>
+    <message>
+        <source>Manage account</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnConnectToCloudDialog</name>
+    <message>
+        <source>Connect to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter %1 Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forgot password?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnConnectToCloudDialogPrivate</name>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system is successfully connected to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Hiba</translation>
+    </message>
+    <message>
+        <source>Could not connect the system to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnConnectToCurrentSystemTool</name>
+    <message>
+        <source>Configuring Server</source>
+        <translation type="unfinished">Szerver(ek) konfigurálása</translation>
+    </message>
+    <message>
+        <source>Updating Server</source>
+        <translation type="unfinished">Szerver(ek) frissítése</translation>
     </message>
 </context>
 <context>
@@ -2486,20 +2784,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation> - Szerver verzió: %1.</translation>
     </message>
     <message>
-        <source>Server</source>
-        <translation>Szerver</translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation>Kliens</translation>
-    </message>
-    <message>
         <source>You are about to connect to Server which has a different version:</source>
         <translation>Más verziószámú szerverhez poróbál csatlakozni:</translation>
-    </message>
-    <message>
-        <source>These versions are not compatible. Please update your %1.</source>
-        <translation>Ezek a verziók nem kompatibilsek egymással. Kérjük frissítse a %1-t.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -2508,10 +2794,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Selected Server has a different version:</source>
         <translation>A kiválasztott szerver más veriószámmal rendelkezik:</translation>
-    </message>
-    <message>
-        <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>Más verzóval rendelkező kliens szükséges ehhez a szervehez való kapcsolódáshoz.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
@@ -2558,10 +2840,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Indítsa újra a klinest kompatibilis módban.</translation>
     </message>
     <message>
-        <source>You will be asked to update your %1</source>
-        <translation>Frissítsen a %1-t</translation>
-    </message>
-    <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
         <translation>A felhasználónév vagy a jelszó téves, próbálja újra.</translation>
     </message>
@@ -2576,6 +2854,10 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>LDAP Server connection timed out.</source>
         <translation>LDAP szerver kapcsolódási ideje lejárt.</translation>
+    </message>
+    <message>
+        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2671,10 +2953,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Adatbázis feltöltése a szerverre. Kérjük várjon.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>Adatbázis helyreállítása &apos;%1&apos; fájlból sikeresen megtörtént. A Médiaszerver újraindul.</translation>
-    </message>
-    <message>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
         <translation>Hiba történt az adatbázis &apos;%1&apos; fájlból történő helyereállítása során.</translation>
     </message>
@@ -2689,6 +2967,10 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>You need to connect to a server prior to backup start.</source>
         <translation>A biztonsági mentés megkezdése előtt csatlakoznia kell egy szerverhez.</translation>
+    </message>
+    <message>
+        <source>Database was successfully restored from file &apos;%1&apos;. Server will be restarted.</source>
+        <translation type="unfinished">Adatbázis helyreállítása &apos;%1&apos; fájlból sikeresen megtörtént. A Médiaszerver újraindul.</translation>
     </message>
 </context>
 <context>
@@ -2746,50 +3028,75 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
-    <name>QnDesktopFileEncoder</name>
+    <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>44.1Khz és 48Khz audió formátumokat nem témogatja a hangrögzítő rendszer! Válasszon más audió eszközt vagy &apos;semmi&apos; értéket a képernyő rögzítő beállításokban.</translation>
+        <source>Error</source>
+        <translation type="unfinished">Hiba</translation>
     </message>
     <message>
-        <source>Could not find video encoder %1.</source>
-        <translation>Nem található a %1 videó encoder.</translation>
+        <source>Can not disconnect the system from %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation></translation>
+        <source>Disconnect from %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not allocate output stream for video codec.</source>
-        <translation>Nem található kimeneti stream a videó kodekhez.</translation>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Screen width must be a multiplier of 8.</source>
-        <translation>A képernyő széélesség nyolccal osztható kell, legyen.</translation>
+        <source>Disconnect system from %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Videó encoder inicializálása sikertelen.</translation>
+        <source>Internal system error</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not allocate output audio stream.</source>
-        <translation>Nem található kimeneti audió stream.</translation>
+        <source>All %1 users and features will be disabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Nem található a &apos;%1&apos; audió enkóder.</translation>
+        <source>Enter password to continue.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Audió encoder inicializálása sikertelen.</translation>
+        <source>You will be disconnected from this system and able to login again through local network with local account</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>A &apos;%1&apos; audió eszközr inicializálása sikertelen.</translation>
+        <source>Set local owner password</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not start primary audio device.</source>
-        <translation>Elsődelges audió eszköz indítása sikertelen.</translation>
+        <source>You wont be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">Bejelentkezés</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>Internal Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords do not match.</source>
+        <translation type="unfinished">A jelszavak nem egyeznek.</translation>
     </message>
 </context>
 <context>
@@ -2833,14 +3140,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Any Action</source>
         <translation>Bármilyen eljárás</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Minden eszköz&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Minden kamera&gt;</translation>
     </message>
 </context>
 <context>
@@ -2901,9 +3200,9 @@ több könyvjelző megjelenítéséhez</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %n user(s) more...</source>
-        <translation>
-            <numerusform>és még %n felhasználó...</numerusform>
+        <source>and %1 user(s) more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3045,20 +3344,8 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-        <source>Disable only if the client takes too much CPU</source>
-        <translation>Leállítás csak akkor ha a kliens CPU teljesítmény túl nagy</translation>
-    </message>
-    <message>
         <source>Select folder...</source>
         <translation>Mappa választása...</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation>Információ</translation>
-    </message>
-    <message>
-        <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>&apos;%1&apos; mappa nem létezik.</translation>
     </message>
     <message>
         <source>Folder has already been added.</source>
@@ -3072,18 +3359,6 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Devices List...</source>
-        <translation>Eszközlista...</translation>
-    </message>
-    <message>
-        <source>Cameras List...</source>
-        <translation>Kameralista...</translation>
-    </message>
-    <message>
-        <source>Open Alarm/Event Rules Management</source>
-        <translation>Megnyitás -  Riasztás/esemény szabályok kezelése</translation>
-    </message>
-    <message>
         <source>Open Event Log</source>
         <translation>Megnyitás - Esemény log</translation>
     </message>
@@ -3092,12 +3367,52 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Megnyitás - Könyvjelzők</translation>
     </message>
     <message>
-        <source>Open Devices List</source>
-        <translation>Megnyitás - Eszközlista</translation>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Cameras List</source>
-        <translation>Megnyitás - Kameralista</translation>
+        <source>Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Health Monitoring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Rules Management</source>
+        <translation type="unfinished">Megnyitás -  Riasztás/esemény szabályok kezelése</translation>
+    </message>
+    <message>
+        <source>Open Audit Trail Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor All Servers on a Single Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Device List</source>
+        <translation type="unfinished">Megnyitás - Eszközlista</translation>
+    </message>
+    <message>
+        <source>Open Camera List</source>
+        <translation type="unfinished">Megnyitás - Kameralista</translation>
     </message>
 </context>
 <context>
@@ -3120,33 +3435,14 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
-    <name>QnGridWidgetHelper</name>
-    <message>
-        <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
-    </message>
-    <message>
-        <source>Save As</source>
-        <translation>Mentés másként</translation>
-    </message>
-    <message>
-        <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>&apos;%1&apos; fájl már létezik. Felülírja?</translation>
-    </message>
-    <message>
-        <source>Could not overwrite file</source>
-        <translation>Nem lehet felülírni</translation>
-    </message>
-    <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>&apos;%1&apos; fájlt más alkalmazás használja.Próbáljon meg más nevet.</translation>
-    </message>
-</context>
-<context>
     <name>QnHelpHandler</name>
     <message>
         <source>Error</source>
         <translation>Hiba</translation>
+    </message>
+    <message>
+        <source>Help page for the given topic could not be found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3245,20 +3541,16 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnImageControlWidget</name>
     <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
         <source>%1 degrees</source>
         <translation>%1 fok</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+        <source>&lt;multiple values&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3341,6 +3633,93 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;A kép nem tölthető be&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutsHandlerMessages</name>
+    <message>
+        <source>Layout already exists.</source>
+        <translation type="unfinished">Az elrendezés már létezik.</translation>
+    </message>
+    <message>
+        <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
+        <translation type="unfinished">Ezzel a névvel már létezik elrendezés és nincsenek jogai a felülíráshoz.</translation>
+    </message>
+    <message>
+        <source>A layout with the same name already exists. Would you like to overwrite it?</source>
+        <translation type="unfinished">Ezzel a névvel már létezik elrendezés. Szeretné felülírni?</translation>
+    </message>
+    <message>
+        <source>Save Layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>User will keep access to %n removed cameras &amp; resources</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access go to User Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not show this message anymore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will get access to these %n cameras &amp; resources</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will keep access to %n removed cameras &amp; resources</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access go to User Roles Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes will affect many users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This layout is shared. By changing this layout you change it for all users who have it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>User will lose access to the following %n cameras &amp; resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will lose access to the following %n cameras &amp; resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Stop Sharing Layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If sharing layout is stopped some cameras &amp; resources will become inaccessible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Layouts...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n layouts are shared. By deleting these layouts you delete them from all users who have it.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3471,16 +3850,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Típus</translation>
     </message>
     <message>
-        <source>Amount</source>
-        <translation>Mennyiség</translation>
-    </message>
-    <message>
         <source>License Key</source>
         <translation>Licenckulcs</translation>
-    </message>
-    <message>
-        <source>Expiration Date</source>
-        <translation>Lejárat dátuma</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3499,34 +3870,54 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Lejárt</translation>
     </message>
     <message>
-        <source>Today</source>
-        <translation>Ma</translation>
-    </message>
-    <message>
-        <source>Tomorrow</source>
-        <translation>Holnap</translation>
-    </message>
-    <message numerus="yes">
-        <source>In %n days</source>
-        <translation>
-            <numerusform>%n nap múlva</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <source>&lt;Server not found&gt;</source>
-        <translation>&lt;Szerver nem található&gt;</translation>
+        <source>Error</source>
+        <translation type="unfinished">Hiba</translation>
+    </message>
+    <message>
+        <source>Server not found</source>
+        <translation type="unfinished">&lt;Szerver nem található&gt;</translation>
+    </message>
+    <message>
+        <source>Qnt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License expires today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License expires tomorrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>License expires in %n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message>
-        <source>The software is licensed to: </source>
-        <translation>A licence tulajdonosa: </translation>
-    </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
         <translation>
@@ -3588,10 +3979,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Licencek lekérése a szerverről...</translation>
     </message>
     <message>
-        <source>License has arleady been activated.</source>
-        <translation>A licence már aktiválva lett.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
         <translation>Hálózati hiba történt a licenc aktivlása során.</translation>
     </message>
@@ -3615,16 +4002,17 @@ több könyvjelző megjelenítéséhez</translation>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
         <translation>A kiválasztott kézi aktiváló licenc érvénytelen. Válasszon ki egy érvényes licencfájlt. Ha a probléma továbbra is fennáll lépjen kapcsolatba a forgalmazóval.</translation>
     </message>
-</context>
-<context>
-    <name>QnLicenseNotificationDialog</name>
     <message>
-        <source>Some of your licenses are unavailable.</source>
-        <translation>Néhány licenc nem elérhető.</translation>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some of your licenses will soon expire.</source>
-        <translation>Néhány licenc hamarosan lejár.</translation>
+        <source>License has already been activated.</source>
+        <translation type="unfinished">A licence már aktiválva lett.</translation>
+    </message>
+    <message>
+        <source>Export licenses to a file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3638,24 +4026,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Ingyenes licence aktiválása</translation>
     </message>
     <message>
-        <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Kérjük küldje el e-mailen a sorzatszámot és a %1 által megadott hardverazonosítót, az aktiváló fájl megküldéséhez.</translation>
-    </message>
-    <message>
         <source>Success</source>
         <translation>Kész</translation>
     </message>
     <message>
         <source>Hardware ID copied to clipboard.</source>
         <translation>Hardver ID másolása vágólapra.</translation>
-    </message>
-    <message>
-        <source>Activate License</source>
-        <translation>Licenc aktiválása</translation>
-    </message>
-    <message>
-        <source>Activating...</source>
-        <translation>Aktiválás...</translation>
     </message>
     <message>
         <source>Open License File</source>
@@ -3672,6 +4048,10 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Could not open the file %1</source>
         <translation>%1 fájl megnyitása sikertelen</translation>
+    </message>
+    <message>
+        <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished">Kérjük küldje el e-mailen a sorzatszámot és a %1 által megadott hardverazonosítót, az aktiváló fájl megküldéséhez.</translation>
     </message>
 </context>
 <context>
@@ -3702,6 +4082,64 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
+    <name>QnLinkToCloudDialogPrivate</name>
+    <message>
+        <source>Can not login to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Hiba</translation>
+    </message>
+</context>
+<context>
+    <name>QnLocalSettingsDialog</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Általános</translation>
+    </message>
+    <message>
+        <source>Look and Feel</source>
+        <translation type="unfinished">Megjelenés és élmény</translation>
+    </message>
+    <message>
+        <source>Screen Recording</source>
+        <translation type="unfinished">Képernyőfelvétel</translation>
+    </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation type="unfinished">Audióbeállítás</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished">Figylemeztetések</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">Információ</translation>
+    </message>
+    <message>
+        <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
+        <translation type="unfinished">Néhány változás csak az alkalmazás újrainditását követően lép életbe. Szeretné újraindítani az alkalmazást?</translation>
+    </message>
+    <message>
+        <source>Restart required</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLoginDialog</name>
     <message>
         <source>Connect to Server...</source>
@@ -3720,14 +4158,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Automatikusan felderített szerverek</translation>
     </message>
     <message>
-        <source>Invalid Login Information</source>
-        <translation>Érvénytelen belépési adatok</translation>
-    </message>
-    <message>
-        <source>The login information you have entered is not valid.</source>
-        <translation>A megadott adatok érvénytelenek.</translation>
-    </message>
-    <message>
         <source>* Last used connection *</source>
         <translation>* Utoljára használt kapcsolat *</translation>
     </message>
@@ -3736,40 +4166,51 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>&lt;semmi&gt;</translation>
     </message>
     <message>
-        <source>The information you have entered is not valid.</source>
-        <translation>A megadott adatok érvénytelenek.</translation>
-    </message>
-    <message>
-        <source>Entered hostname is not valid.</source>
-        <translation>A megadott hostnén érvénytelen.</translation>
-    </message>
-    <message>
-        <source>Host field cannot be empty.</source>
-        <translation>A Host mező nem lehet üres.</translation>
-    </message>
-    <message>
         <source>%1 at %2</source>
         <translation>%1 at %2</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this connection: %1?</source>
-        <translation>Biztosan törli ezt a kapcsolatot: %1?</translation>
+        <source>Overwrite existing connection?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection already exists.</source>
-        <translation>A kapcsolat már létezik.</translation>
+        <source>There is an another connection with the same name.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation>A kapcsolat ezzel a névvel már létezik. Felülírja?</translation>
+        <source>Delete connection?</source>
+        <translation type="unfinished">Kapcsolat törlése</translation>
+    </message>
+</context>
+<context>
+    <name>QnLoginToCloudDialog</name>
+    <message>
+        <source>Log in to %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete Connections</source>
-        <translation>Kapcsolat törlése</translation>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
     </message>
     <message>
-        <source>Invalid Parameters</source>
-        <translation>Érvénytelen paraméter</translation>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forgot password?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Learn more about</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to %1!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3791,32 +4232,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Kérjük várjon amíg a kép elkészül...</translation>
     </message>
     <message>
-        <source>Dark</source>
-        <translation>Sötét</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>Világos</translation>
-    </message>
-    <message>
         <source>Server Time</source>
         <translation>Szerveridő</translation>
     </message>
     <message>
         <source>Client Time</source>
         <translation>Kliensidő</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>Alapértelmezett</translation>
-    </message>
-    <message>
-        <source>Rainbow</source>
-        <translation>Szivárvány</translation>
-    </message>
-    <message>
-        <source>Custom...</source>
-        <translation>Egyedi...</translation>
     </message>
     <message>
         <source>Stretch</source>
@@ -3933,38 +4354,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Összevonás %1</translation>
     </message>
     <message>
-        <source>The password is invalid.</source>
-        <translation>Téves jelszó.</translation>
-    </message>
-    <message>
-        <source>The system was not found.</source>
-        <translation>A rendszer nem található.</translation>
-    </message>
-    <message>
-        <source>Could not create a backup of the server database.</source>
-        <translation>Nem lehet mentést készíteni a rendszer adatbázisról.</translation>
-    </message>
-    <message>
-        <source>System was not found.</source>
-        <translation>A rendszer nem található.</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
     <message>
         <source>Cannot merge systems.</source>
         <translation>Nem lehet összevonni a rendszeretket.</translation>
-    </message>
-    <message>
-        <source>Warning: You are about to merge Systems with START licenses.
-As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
-If you understand this and would like to proceed please click Merge to continue.
-</source>
-        <translation>Figyelem: A rendszer összevonását választotta START licencekkel.
-Mivel rendszerenként 1 START licenc engedélyezett, az összevonás után 1 START licence fog maradni.
-Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra a folytatáshoz.
-</translation>
     </message>
     <message>
         <source>Testing...</source>
@@ -3975,24 +4370,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>rendszerek összevonása...</translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation>A talált rendszer %1 nem kompatibilis a %2 rendszerekkel.</translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <translation>A %1 felderített rendszer biztonságos módban van.</translation>
-    </message>
-    <message>
-        <source>System has an incompatible version.</source>
-        <translation>A rendszer nem rendelkezik kompatibilis verzióval.</translation>
-    </message>
-    <message>
-        <source>Operation is not permitted.</source>
-        <translation>A művelet nem engedélyezett.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode.</source>
-        <translation>A rendszer biztonsági módban van.</translation>
+        <source>The login cannot be empty.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4035,10 +4414,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Következő kocka</translation>
     </message>
     <message>
-        <source>Previuos Chunk</source>
-        <translation>Előző szelet</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>Elejéhez</translation>
     </message>
@@ -4049,6 +4424,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>To End</source>
         <translation>Végéhez</translation>
+    </message>
+    <message>
+        <source>Previous Chunk</source>
+        <translation type="unfinished">Előző szelet</translation>
     </message>
 </context>
 <context>
@@ -4142,14 +4521,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
-    <name>QnNotificationToolTipWidget</name>
+    <name>QnNotificationWidget</name>
     <message>
         <source>Close</source>
-        <translation>Bezár</translation>
-    </message>
-    <message>
-        <source>Right Click</source>
-        <translation>Jobb kattintás</translation>
+        <translation type="unfinished">Bezár</translation>
     </message>
 </context>
 <context>
@@ -4247,46 +4622,46 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
-    <name>QnPreferencesDialog</name>
+    <name>QnPermissionsWidget</name>
     <message>
-        <source>General</source>
-        <translation>Általános</translation>
+        <source>Edit camera settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Look and Feel</source>
-        <translation>Megjelenés és élmény</translation>
+        <source>This is also required to create/edit PTZ presets and tours.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Screen Recording</source>
-        <translation>Képernyőfelvétel</translation>
+        <source>Control video walls</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Notifications</source>
-        <translation>Figylemeztetések</translation>
+        <source>View event log</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Settings file is read-only. Please contact your system administrator.</source>
-        <translation>A beállítások fájl csak olvasható. Kérem lépjen kapcsolatba a rendszer adminisztrátorral.</translation>
+        <source>View archive</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All changes will be lost after program exit.</source>
-        <translation>A program bezárása után minden változás elveszik.</translation>
+        <source>Export archive</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Settings cannot be saved. Please contact your system administrator.</source>
-        <translation>A beállításokat nem lehet menteni.  Kérem lépjen kapcsolatba a rendszer adminisztrátorral.</translation>
+        <source>View bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Information</source>
-        <translation>Információ</translation>
+        <source>Modify bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation>Néhány változás csak az alkalmazás újrainditását követően lép életbe. Szeretné újraindítani az alkalmazást?</translation>
+        <source>User Input</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio Settings</source>
-        <translation>Audióbeállítás</translation>
+        <source>PTZ, Device Output, 2-way Audio</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4521,13 +4896,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
-    <name>QnReconnectInfoDialog</name>
-    <message>
-        <source>Canceling...</source>
-        <translation>Visszavonás...</translation>
-    </message>
-</context>
-<context>
     <name>QnRecordingSettingsWidget</name>
     <message>
         <source>Screen %1 - %2x%3</source>
@@ -4540,25 +4908,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Select folder...</source>
         <translation>Válasszon mappát...</translation>
-    </message>
-</context>
-<context>
-    <name>QnRecordingStatisticsWidget</name>
-    <message>
-        <source>Copy Selection to Clipboard</source>
-        <translation>Kijelölt rész másolása vágólapra</translation>
-    </message>
-    <message>
-        <source>Export Selection to File...</source>
-        <translation>Kijelölt rész exportálása fájlba...</translation>
-    </message>
-    <message>
-        <source>Select All</source>
-        <translation>Mind kijelölése</translation>
-    </message>
-    <message>
-        <source>Export selected events to file</source>
-        <translation>Kiválasztott események exportálása fájlba</translation>
     </message>
 </context>
 <context>
@@ -4608,14 +4957,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation></translation>
     </message>
     <message>
-        <source>%1 Tb</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 Gb</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>empty</source>
         <translation>üres</translation>
     </message>
@@ -4655,10 +4996,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Camera</source>
         <translation>Kamera</translation>
     </message>
-    <message>
-        <source>&lt;Cameras from other servers and removed cameras&gt;</source>
-        <translation>&lt;Kamerák más szervereken és eltávolított kamerák&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>Total %n I/O modules</source>
         <translation>
@@ -4670,8 +5007,20 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Archivált események naptári napokban az első rögzítés időpontjától</translation>
     </message>
     <message>
-        <source>Bitrate</source>
-        <translation>Bitráta</translation>
+        <source>Cameras from other servers and removed cameras</source>
+        <translation type="unfinished">&lt;Kamerák más szervereken és eltávolított kamerák&gt;</translation>
+    </message>
+    <message>
+        <source>Bitrate for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4729,38 +5078,21 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
-    <name>QnResourcePoolModelNode</name>
+    <name>QnResourceItemDelegate</name>
     <message>
-        <source>Root</source>
-        <translation>Gyökér</translation>
+        <source>Health Monitor</source>
+        <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>QnResourcePreviewWidget</name>
     <message>
-        <source>Local</source>
-        <translation>Helyi</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation>Rendszer</translation>
-    </message>
-    <message>
-        <source>Other Systems</source>
-        <translation>Más rendszerek</translation>
-    </message>
-    <message>
-        <source>Users</source>
-        <translation>Felhasználók</translation>
+        <source>NO DATA</source>
+        <translation type="unfinished">NINCS ADAT</translation>
     </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
-    <message>
-        <source>Select Users...</source>
-        <translation>Felhasználó választása...</translation>
-    </message>
-    <message>
-        <source>Select Resources...</source>
-        <translation>Források választása...</translation>
-    </message>
     <message>
         <source>Select Devices...</source>
         <translation>Eszközök kiválasztása...</translation>
@@ -4768,6 +5100,57 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Select Cameras...</source>
         <translation>Kamerák kiválasztása...</translation>
+    </message>
+    <message>
+        <source>Select users...</source>
+        <translation type="unfinished">Felhasználó választása...</translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceTreeModelNode</name>
+    <message>
+        <source>Local</source>
+        <translation type="unfinished">Helyi</translation>
+    </message>
+    <message>
+        <source>Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Systems</source>
+        <translation type="unfinished">Más rendszerek</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">Felhasználók</translation>
+    </message>
+    <message>
+        <source>Web Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras &amp; Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Cameras &amp; Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Shared Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Unnamed system&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shared Layouts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4811,12 +5194,16 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>This URL is already in the address list.</source>
         <translation>Ez az URL mér szerepel a listában.</translation>
     </message>
+    <message>
+        <source>Server</source>
+        <translation type="unfinished">Szerver</translation>
+    </message>
 </context>
 <context>
-    <name>QnScreenRecorder</name>
+    <name>QnScheduleGridWidget</name>
     <message>
-        <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation>A képernyő rögzítő alrendszer még nem indult el. Kérem próbálja úrjra később.</translation>
+        <source>All</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4824,48 +5211,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Könyvjelzők keresése név, címke, vagy leírás alapján</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Bármyel eszköz&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bármely kamera&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any I/O Module&gt;</source>
-        <translation>&lt;Bármely I/O modul&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;All My Devices&gt;</source>
-        <translation>&lt;Minden saját eszköz&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;All My Cameras&gt;</source>
-        <translation>&lt;Minden saját kamera&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;All My I/O Modules&gt;</source>
-        <translation>&lt;Minden saját I/O modul&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n device(s)&gt;</source>
-        <translation>
-            <numerusform>&lt;%n eszköz&gt;</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation>
-            <numerusform>&lt;%n kamera&gt;</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>
-            <numerusform>&lt;%n I/O modul&gt;</numerusform>
-        </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
@@ -4903,14 +5248,128 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
+    <name>QnSelectDevicesButton</name>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Devices</source>
+        <translation type="unfinished">Össze eszköz</translation>
+    </message>
+    <message>
+        <source>All Cameras</source>
+        <translation type="unfinished">Összes kamera</translation>
+    </message>
+    <message>
+        <source>Select devices...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSelectServersButton</name>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnSelectUsersButton</name>
+    <message>
+        <source>Any User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">Minden felhasználó</translation>
+    </message>
+    <message>
+        <source>Select Users...</source>
+        <translation type="unfinished">Felhasználó választása...</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnSendEmailActionDelegate</name>
+    <message>
+        <source>Select at least one user</source>
+        <translation type="unfinished">Válasszon legalább egy felhasználót</translation>
+    </message>
+    <message>
+        <source>User %1 has invalid email address</source>
+        <translation type="unfinished">%1 felhasználónak érvénytelen az email címe</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid email address</source>
+        <translation type="unfinished">
+            <numerusform>%n a(z) %1 felhasználónak érvénytelen az email címe</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid email address %1</source>
+        <translation type="unfinished">Érvénytelen email cím %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform>%n a(z) %1 további email címből érvénytelen</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send email to %1</source>
+        <translation type="unfinished">Email küldése a %1 címre</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Roles</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n additional</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnServerAddressesModel</name>
     <message>
         <source>Address</source>
         <translation>Cím</translation>
-    </message>
-    <message>
-        <source>In Use</source>
-        <translation>Használatban</translation>
     </message>
 </context>
 <context>
@@ -4974,14 +5433,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Ennek a funkciónak a használatához legalább két szerverre van szükség.</translation>
     </message>
     <message>
-        <source>Enable failover (server will take devices automatically from offline servers)</source>
-        <translation>Feladatátvétel engedélyezése (a szerver automatikusan átvesz eszközöket a nem elérhető szerverektől)</translation>
-    </message>
-    <message>
-        <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation>Feladatátvétel engedélyezése (a szerver automatikusan átvesz kamerákat a nem elérhető szerverektől)</translation>
-    </message>
-    <message>
         <source>Max devices on this server:</source>
         <translation>Maximum eszközök ezen a szerveren:</translation>
     </message>
@@ -5004,6 +5455,18 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>To avoid issues adjust max number of cameras</source>
         <translation>A problémák elkerülése érdekében adja meg a max kameraszámot</translation>
+    </message>
+    <message>
+        <source>server will take devices automatically from offline servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server will take cameras automatically from offline servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5032,46 +5495,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Megjegyzések</translation>
     </message>
     <message>
-        <source>Get a specific build</source>
-        <translation>Specifikus verzió beszerzése</translation>
-    </message>
-    <message>
-        <source>Get the latest version</source>
-        <translation>A legfrissebb verzió beszerzése</translation>
-    </message>
-    <message>
-        <source>Update from Internet...</source>
-        <translation>Frissítés az internetről...</translation>
-    </message>
-    <message>
-        <source>Update from local source...</source>
-        <translation>Frissítés helyi forrásból...</translation>
-    </message>
-    <message>
-        <source>Update from Internet</source>
-        <translation>Frissítés az internetről</translation>
-    </message>
-    <message>
-        <source>Update from local source</source>
-        <translation>Frissítés helyi forrásból</translation>
-    </message>
-    <message>
-        <source>Success</source>
-        <translation>Sikeres</translation>
-    </message>
-    <message>
-        <source>URL copied to clipboard.</source>
-        <translation>Az URL a vágólapra másolva.</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation>Információ</translation>
-    </message>
-    <message>
-        <source>Update is in process now.</source>
-        <translation>A frissítés folyamatban van.</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
@@ -5082,10 +5505,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Please wait until update is finished</source>
         <translation>Kérem várjon amíg a frissítés befejeződik</translation>
-    </message>
-    <message>
-        <source>Update has been successfully finished.</source>
-        <translation>A frissítés sikeresen befejeződött.</translation>
     </message>
     <message>
         <source>The client will be restarted to the updated version.</source>
@@ -5100,66 +5519,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kérem zárja be az alkalmazást és indítsa újra a start menüben található parancsikon segítségével.</translation>
     </message>
     <message>
-        <source>Update has been cancelled.</source>
-        <translation>A frissítés meg lett szakítva.</translation>
-    </message>
-    <message>
-        <source>Could not download updates.</source>
-        <translation>Nem lehet letölteni a frissítéseket.</translation>
-    </message>
-    <message>
-        <source>No free space left on the disk.</source>
-        <translation>Nincs szabad hely a lemezen.</translation>
-    </message>
-    <message>
-        <source>Could not push updates to servers.</source>
-        <translation>Nem lehet áttölteni a frissítéseket a szerverekre.</translation>
-    </message>
-    <message numerus="yes">
-        <source>The problem is caused by %n servers:</source>
-        <translation>
-            <numerusform>A problémát a %n szerver okozza:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>No free space left on %n servers:</source>
-        <translation>
-            <numerusform>Nincs szabad hely a %n szerveren:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n servers are not responding:</source>
-        <translation>
-            <numerusform>A %n szerver nem válaszol:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n servers have gone offline:</source>
-        <translation>
-            <numerusform>A %n szerver nem elérhető:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Could not install an update to the client.</source>
-        <translation>Egy frissítést nem lehet feltelepíteni a kliensre.</translation>
-    </message>
-    <message>
-        <source>Could not install updates on one or more servers.</source>
-        <translation>A frissítéseket nem lehet felteleoíteni egy vagy több szerverre.</translation>
-    </message>
-    <message>
-        <source>Checking for updates...</source>
-        <translation>Frissítések ellenőrzése...</translation>
-    </message>
-    <message>
-        <source>Newer version found.</source>
-        <translation>Újabb verzió található.</translation>
-    </message>
-    <message>
-        <source>You will have to update the client manually.</source>
-        <translation>A klienst kézzel kell frissítenie.</translation>
-    </message>
-    <message>
         <source>You will have to update the client manually using an installer.</source>
         <translation>A klienst kézzel kell frissítenie a telepítő segítségével.</translation>
     </message>
@@ -5172,50 +5531,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Nem lehet frissíteni ebből a fájlból.</translation>
     </message>
     <message>
-        <source>Checking for updates... %1%</source>
-        <translation>Frissítések ellenőrzése... %1%</translation>
-    </message>
-    <message>
-        <source>Downloading updates... %1%</source>
-        <translation>Frissítések letöltése... %1%</translation>
-    </message>
-    <message>
-        <source>Installing client update... %1%</source>
-        <translation>Kliens frissítés telepítése... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates to incompatible servers... %1%</source>
-        <translation>Frissítések telepítése nem kompatibilis szerverkre... %1%</translation>
-    </message>
-    <message>
-        <source>Pushing updates to servers... %1%</source>
-        <translation>Frissítések áttöltése a szerverekre... %1%</translation>
-    </message>
-    <message>
-        <source>Installing updates... %1%</source>
-        <translation>Frissítések telepítése... %1%</translation>
-    </message>
-    <message>
-        <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation>Figyelem: A rendszerfrissítések hétvégi alkalmazása nem ajánlott.</translation>
-    </message>
-    <message>
-        <source>Latest Version:</source>
-        <translation>A legfrissebb verzió:</translation>
-    </message>
-    <message>
-        <source>Target Version:</source>
-        <translation>Cél verzió:</translation>
-    </message>
-    <message>
-        <source>Update Finished...100%</source>
-        <translation>Frissítés befejeződött... 100%</translation>
-    </message>
-    <message>
-        <source>Please update the client manually.</source>
-        <translation>Kérem frissítse a kliens manuálisan.</translation>
-    </message>
-    <message>
         <source>Please update the client manually using an installation package.</source>
         <translation>Kérem frissítse a kliens manuálisan a telepítő csomag használatával.</translation>
     </message>
@@ -5224,46 +5539,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A frissítés sikeres.</translation>
     </message>
     <message>
-        <source>Another user has already started an update.</source>
-        <translation>Valaki már elindított egy frissítést.</translation>
-    </message>
-    <message>
-        <source>Internet Connectivity Problem</source>
-        <translation>Probléma az internet kapcsolattal</translation>
-    </message>
-    <message>
-        <source>Unable to extract update file.</source>
-        <translation>Nem lehet kicsomagolni a frissítő fájét.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Authentication failed for %n servers:</source>
-        <translation>
-            <numerusform>Sikertelen bejelentkezés %n szerveren:</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Update Succeeded</source>
         <translation>Sikeres frissítés</translation>
     </message>
     <message>
-        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
-        <translation>A frissítés nem kezdhető meg. A rendszer korábbi verzióra nem frissíthető.</translation>
-    </message>
-    <message>
         <source>Launcher process was not found.</source>
         <translation>Nem található indítási folyamat.</translation>
-    </message>
-    <message>
-        <source>No such build is available on update server.</source>
-        <translation>A megadott verzió nem található a frissítési szerveren.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Updates for one or more servers were not found.</source>
-        <translation>A frissítés nem kezdhető meg. Frissítés egy vagy több szerverre nem található.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Client update was not found.</source>
-        <translation>A frissítés nem kezdhető meg. A kliensfrissítés nem található.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
@@ -5274,8 +5555,134 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Frissítés nem szükséges.</translation>
     </message>
     <message>
-        <source>All servers are already updated.</source>
-        <translation>Minden szerver naprakész.</translation>
+        <source>Latest Available Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download the Latest Version Update File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Specific Build...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download Update File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse for Update File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Update File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download in External Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Link to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All components in your system are up to this version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown build number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downgrade to an earlier version is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to extract update file. No free space left on the disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible %1 instance. To update disconnect system from %1 first.</source>
+        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Figyelem</translation>
+    </message>
+    <message numerus="yes">
+        <source>Not enough free space at %n servers:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you want to continue?</source>
+        <translation type="unfinished">Szeretné folyatatni?</translation>
+    </message>
+    <message>
+        <source>Force pushing updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Finished...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing client update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates to incompatible servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pushing updates to servers...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSessionAwareTabbedDialog</name>
+    <message>
+        <source>* %1</source>
+        <translation type="unfinished">* %1</translation>
+    </message>
+    <message>
+        <source>Unsaved changes will be lost. Save the following pages?</source>
+        <translation type="unfinished">Az el nem mentett módosítások el fognak veszni. Szeretné menteni a következő lapokat?</translation>
+    </message>
+    <message>
+        <source>Confirm exit</source>
+        <translation type="unfinished">Kilépés jóváhagyása</translation>
     </message>
 </context>
 <context>
@@ -5285,9 +5692,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>&lt;Minden felhasználó&gt;</translation>
     </message>
     <message numerus="yes">
-        <source>%n User(s)</source>
-        <translation>
-            <numerusform>%n Felhasználó</numerusform>
+        <source>%n Users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Roles</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -5348,14 +5761,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A szoftveres mozgásérzékeléshez 2 FPS le lett foglalva a másodlagos streamnek. Jelenlegi FPS az ütemző hálóban %1. FPS le lett csökkentve %2.</translation>
     </message>
     <message>
-        <source>Hardware (camera built-in)</source>
-        <translation>Hardver (Kamerába beépített)</translation>
-    </message>
-    <message>
-        <source>Do Not Record Motion</source>
-        <translation>Ne rögzítse a mozgást</translation>
-    </message>
-    <message>
         <source>Device Settings</source>
         <translation>Eszköz beállítások</translation>
     </message>
@@ -5375,6 +5780,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation>A második stream ki van kapcsolva a kamerában. Mozgás + alacsony felbontás nem fog működni. Válassza az &quot;Igen&quot;-t a folyamatos rögzítéshez, vagy a &quot;Nem&quot;-et a második stream aktiválásához.</translation>
     </message>
+    <message>
+        <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5383,19 +5792,71 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Auto</translation>
     </message>
     <message>
-        <source>E-Mail is not valid</source>
-        <translation>Nem érvényes email</translation>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+        <source>SMTP Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished">Felhasználó</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>System Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter a short system description here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Support Signature</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
-        <source>E-Mail is not valid</source>
-        <translation>Nem érvényes email</translation>
-    </message>
-    <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
         <translation>Nem található preset. Használja a &apos;Haladó&apos; opciót.</translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+        <source>Email is not valid.</source>
+        <translation type="unfinished">Nem érvényes email</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
+        <translation type="unfinished">A jelszó nem lehet üres.</translation>
+    </message>
+    <message>
+        <source>System Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter a short system description here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Support Signature</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5441,8 +5902,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A megadott paraméterek érvénytelenek. A teszt nem hajtható végre.</translation>
     </message>
     <message>
-        <source>Could not perform a test.</source>
-        <translation>Nem lehet a tesztet végrehajtani.</translation>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5457,62 +5918,81 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
-    <name>QnStatusOverlayWidget</name>
+    <name>QnStatusOverlayController</name>
+    <message>
+        <source>NOT ENOUGH LICENCES</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>NO DATA</source>
-        <translation>NINCS ADAT</translation>
+        <translation type="unfinished">NINCS ADAT</translation>
+    </message>
+    <message>
+        <source>UNAUTHORIZED</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
-        <translation>NINCS JEL</translation>
+        <translation type="unfinished">NINCS JEL</translation>
     </message>
     <message>
-        <source>Unauthorized</source>
-        <translation>Azonosítatlan</translation>
+        <source>SERVER UNAVAILABLE</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Activate analog license to remove this message</source>
-        <translation>Aktiválja az analóg licencet az üzenet eltávolításához</translation>
+        <source>NO ACCESS</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Activate Video Wall license to remove this message</source>
-        <translation>Aktiválja a Video Fal licencet az üzenet eltávolításához</translation>
+        <source>DEVICE DISABLED</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading...</source>
-        <translation>Beolvasás...</translation>
+        <source>Device Settings</source>
+        <translation type="unfinished">Eszköz beállítások</translation>
     </message>
     <message>
-        <source>Diagnostics...</source>
-        <translation>Diagnosztizálás...</translation>
+        <source>Camera Settings</source>
+        <translation type="unfinished">Kamera beállítások</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished">I/O modul beállítása</translation>
+    </message>
+    <message>
+        <source>Diagnostics</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation>Engedélyezés</translation>
+        <translation type="unfinished">Engedélyezés</translation>
     </message>
     <message>
-        <source>Activate license...</source>
-        <translation>Licence aktiválása...</translation>
+        <source>Activate License</source>
+        <translation type="unfinished">Licenc aktiválása</translation>
+    </message>
+</context>
+<context>
+    <name>QnStorageAnalyticsWidget</name>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished">Mind kijelölése</translation>
     </message>
     <message>
-        <source>Module is disabled</source>
-        <translation>A modul letiltva</translation>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished">Kijelölt rész exportálása fájlba...</translation>
     </message>
     <message>
-        <source>Server Offline</source>
-        <translation>Szerver nem elérhető</translation>
+        <source>Copy Selection to Clipboard</source>
+        <translation type="unfinished">Kijelölt rész másolása vágólapra</translation>
     </message>
     <message>
-        <source>Please check authentication information in device settings</source>
-        <translation>Kérem ellenőrizze a hitelesítési információkat az eszköz beállításokban</translation>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please check authentication information in camera settings</source>
-        <translation>Kérem ellenőrizze a hitelesítési információkat a kamera beállításokban</translation>
-    </message>
-    <message>
-        <source>Please check authentication information in I/O module settings</source>
-        <translation>Kérem ellenőrizze a hitelesítési információkat az I/O modul beállításokban</translation>
+        <source>Export selected events to file</source>
+        <translation type="unfinished">Kiválasztott események exportálása fájlba</translation>
     </message>
 </context>
 <context>
@@ -5534,67 +6014,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A biztonságimentés már elkezdődött.</translation>
     </message>
     <message>
-        <source>Select at least one backup storage.</source>
-        <translation>Válasszon ki legalább egy tárolót a biztonsági mentéshez.</translation>
-    </message>
-    <message>
-        <source>Apply changes before starting backup.</source>
-        <translation>A binztonsági mentés megkezdése előtt fogadja el a változtatásokat.</translation>
-    </message>
-    <message>
-        <source>(%1 before now)</source>
-        <translation>(eddig %1)</translation>
-    </message>
-    <message>
-        <source>Backup was never started.</source>
-        <translation>Még nem idítottak biztosnági mentés.</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>Kész</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
         <translation>Az archív adatok újraindexelése befejeződött.</translation>
-    </message>
-    <message>
-        <source>By Schedule</source>
-        <translation>Ütemezés szerint</translation>
-    </message>
-    <message>
-        <source>On Demand</source>
-        <translation>Kérésre</translation>
-    </message>
-    <message>
-        <source>Backup Schedule is invalid.</source>
-        <translation>Biztonsági mentés ütemezése érvénytelen.</translation>
-    </message>
-    <message>
-        <source>No devices selected</source>
-        <translation>Nincs eszköz kiválasztva</translation>
-    </message>
-    <message>
-        <source>No cameras selected</source>
-        <translation>Nincs kamera kiválasztva</translation>
-    </message>
-    <message>
-        <source>Real-Time</source>
-        <translation>Real-time</translation>
-    </message>
-    <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation>Alacsony felbontású streamek</translation>
-    </message>
-    <message>
-        <source>Hi-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation>Nagy felbontású streamek</translation>
-    </message>
-    <message>
-        <source>All streams</source>
-        <comment>Cameras Backup</comment>
-        <translation>Minden stream</translation>
     </message>
     <message>
         <source>Warning!</source>
@@ -5617,32 +6042,68 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Nem indítható biztonsági menetés amíg az archív adatok újraindexelése folyik.</translation>
     </message>
     <message>
-        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation>Megjegyzés: Csak az újabb adatok biztonsági mentése lesz lehetséges. A meglévő fájlokat figyelmen kívül fogja hagyni.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n kamera</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Device(s)</source>
-        <translation>
-            <numerusform>%n eszköz</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Backup is finished</source>
         <translation>Biztonsági mentés elkészült</translation>
     </message>
     <message>
-        <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation>Real-time módban minden adat biztonsági mentése is megtörténik.</translation>
+        <source>Backup is in progress...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup is completed up to: %1.</source>
-        <translation>Archív adatok biztonsági mentése: %1.</translation>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add more drives to use them as backup storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 before now</source>
+        <translation type="unfinished">(eddig %1)</translation>
+    </message>
+    <message>
+        <source>Realtime backup is active...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Realtime backup is set up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no backup yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next backup is not scheduled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding backup index is completed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5660,16 +6121,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Eltávolítás</translation>
     </message>
     <message>
-        <source>Use as backup storage</source>
-        <translation>Biztonsági tároló használata</translation>
-    </message>
-    <message>
         <source>Inaccessible</source>
         <translation>Nem elérhető</translation>
-    </message>
-    <message>
-        <source>Use as main storage</source>
-        <translation>Használja fő tárolóként</translation>
     </message>
     <message>
         <source>%1 (Checking...)</source>
@@ -5687,18 +6140,36 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Loading...</source>
         <translation>Beolvasás...</translation>
     </message>
+    <message>
+        <source>Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Fast Archive Scan - %p%</source>
+        <source>Fast Backup Scan... 	%p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Gyors archív szken - %p%</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rebuilding Archive Index - %p%</source>
+        <source>Fast Archive Scan... 	%p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Archív index újraépítése - %p%</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reindexing Backup... 	%p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reindexing Archive... 	%p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5737,6 +6208,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Warning!</source>
         <translation>Figyelem!</translation>
+    </message>
+    <message>
+        <source>Invalid external storage credentials.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5892,12 +6367,35 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kamerák és szerverek automatikus felderítésének engedélyezése</translation>
     </message>
     <message>
-        <source>Allow system to optimize devices settings</source>
-        <translation>Eszköz beállítások optimalizálásának engedélyezése a rendszer számára</translation>
+        <source>Allow system to optimize device settings</source>
+        <translation type="unfinished">Eszköz beállítások optimalizálásának engedélyezése a rendszer számára</translation>
     </message>
     <message>
-        <source>Allow system to optimize cameras settings</source>
-        <translation>Kamera beállítások optimalizálásának engedélyezése a rendszer számára</translation>
+        <source>Allow system to optimize camera settings</source>
+        <translation type="unfinished">Kamera beállítások optimalizálásának engedélyezése a rendszer számára</translation>
+    </message>
+</context>
+<context>
+    <name>QnTableExportHelper</name>
+    <message>
+        <source>HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save As</source>
+        <translation type="unfinished">Mentés másként</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; already exists. Overwrite?</source>
+        <translation type="unfinished">&apos;%1&apos; fájl már létezik. Felülírja?</translation>
+    </message>
+    <message>
+        <source>Could not overwrite file</source>
+        <translation type="unfinished">Nem lehet felülírni a fájlt</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation type="unfinished">&apos;%1&apos; fájlt más alkalmazás használja.Próbáljon meg más nevet.</translation>
     </message>
 </context>
 <context>
@@ -5907,16 +6405,35 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Szerver</translation>
     </message>
     <message>
-        <source>Server Time</source>
-        <translation>Szerveridő</translation>
-    </message>
-    <message>
         <source>Offset</source>
         <translation>Eltolás</translation>
     </message>
     <message>
-        <source>Synchronizing...</source>
-        <translation>Szinkronizálás...</translation>
+        <source>Date</source>
+        <translation type="unfinished">Dátum</translation>
+    </message>
+    <message>
+        <source>Timezone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished">Idő</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds of server time offset</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes of server time offset</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours of server time offset</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5932,12 +6449,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 </context>
 <context>
     <name>QnTimeSlider</name>
-    <message>
-        <source>auto</source>
-        <comment>AM/PM usage based on user&apos;s system locale.</comment>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>auto</translation>
-    </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
@@ -5981,68 +6492,23 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>y</translation>
     </message>
     <message>
-        <source>dd MMMM</source>
-        <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM</translation>
-    </message>
-    <message>
-        <source>MMMM</source>
-        <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM</translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>YYYY</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyy hh:mm</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyy hh:mm ap</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyy hh:mm</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyy h ap</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyy</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>yyyy</translation>
-    </message>
-    <message>
         <source>NO THUMBNAILS AVAILABLE</source>
         <translation>NINCS ELÉRHETŐ MINIATŰR</translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <translation type="unfinished">Élő</translation>
+    </message>
+</context>
+<context>
+    <name>QnTranslationListModel</name>
+    <message>
+        <source>%1 (built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (external)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6059,70 +6525,89 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
-        <source>Input device is not selected.</source>
-        <translation>Nincs bemenneti eszköz kiválasztva.</translation>
-    </message>
-    <message>
-        <source>Streaming is not ready yet, please try again later.</source>
-        <translation>Streamelés nem lehetséges, próbálja meg később.</translation>
-    </message>
-    <message>
-        <source>Network error.</source>
-        <translation>Hálózati hiba.</translation>
-    </message>
-    <message>
         <source>Hold to Speak</source>
         <translation>Tartsa lenyomva a beszédhez</translation>
     </message>
+    <message>
+        <source>Input device is not selected</source>
+        <translation type="unfinished">Nincs bemenneti eszköz kiválasztva.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error</source>
+        <translation type="unfinished">Hálózati hiba.</translation>
+    </message>
 </context>
 <context>
-    <name>QnUpdateStatusItemDelegate</name>
+    <name>QnUpdateResult</name>
     <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
-    </message>
-</context>
-<context>
-    <name>QnUserEmailPolicy</name>
-    <message>
-        <source>Select at least one user</source>
-        <translation>Válasszon legalább egy felhasználót</translation>
+        <source>Update has been successfully finished.</source>
+        <translation type="unfinished">A frissítés sikeresen befejeződött.</translation>
     </message>
     <message>
-        <source>User %1 has invalid email address</source>
-        <translation>%1 felhasználónak érvénytelen az email címe</translation>
+        <source>Update has been cancelled.</source>
+        <translation type="unfinished">A frissítés meg lett szakítva.</translation>
+    </message>
+    <message>
+        <source>Another user has already started an update.</source>
+        <translation type="unfinished">Valaki már elindított egy frissítést.</translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished">Minden szerver naprakész.</translation>
+    </message>
+    <message>
+        <source>Could not download updates.</source>
+        <translation type="unfinished">Nem lehet letölteni a frissítéseket.</translation>
+    </message>
+    <message>
+        <source>No free space left on the disk.</source>
+        <translation type="unfinished">Nincs szabad hely a lemezen.</translation>
+    </message>
+    <message>
+        <source>Could not push updates to servers.</source>
+        <translation type="unfinished">Nem lehet áttölteni a frissítéseket a szerverekre.</translation>
     </message>
     <message numerus="yes">
-        <source>%n of %1 users have invalid email address</source>
-        <translation>
-            <numerusform>%n a(z) %1 felhasználónak érvénytelen az email címe</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid email address %1</source>
-        <translation>Érvénytelen email cím %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional email addresses are invalid</source>
-        <translation>
-            <numerusform>%n a(z) %1 további email címből érvénytelen</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Send email to %1</source>
-        <translation>Email küldése a %1 címre</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n User(s)</source>
-        <translation>
-            <numerusform>%n Felhasználó(k)</numerusform>
+        <source>The problem is caused by %n servers:</source>
+        <translation type="unfinished">
+            <numerusform>A problémát a %n szerver okozza:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%1, %n additional</source>
-        <translation>
-            <numerusform>%1, %n további</numerusform>
+        <source>No free space left on %n servers:</source>
+        <translation type="unfinished">
+            <numerusform>Nincs szabad hely a %n szerveren:</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n servers are not responding:</source>
+        <translation type="unfinished">
+            <numerusform>A %n szerver nem válaszol:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n servers have gone offline:</source>
+        <translation type="unfinished">
+            <numerusform>A %n szerver nem elérhető:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Authentication failed for %n servers:</source>
+        <translation type="unfinished">
+            <numerusform>Sikertelen bejelentkezés %n szerveren:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Could not install an update to the client.</source>
+        <translation type="unfinished">Egy frissítést nem lehet feltelepíteni a kliensre.</translation>
+    </message>
+    <message>
+        <source>Could not install updates on one or more servers.</source>
+        <translation type="unfinished">A frissítéseket nem lehet felteleoíteni egy vagy több szerverre.</translation>
     </message>
 </context>
 <context>
@@ -6130,10 +6615,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>LDAP user</source>
         <translation>LDAP felhasználó</translation>
-    </message>
-    <message>
-        <source>Normal user</source>
-        <translation>Normál felhasználó</translation>
     </message>
     <message>
         <source>Enabled</source>
@@ -6144,20 +6625,24 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Letiltva</translation>
     </message>
     <message>
-        <source>Edit user</source>
-        <translation>Felhasználó szerkesztése</translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation>Név</translation>
     </message>
     <message>
-        <source>Permissions</source>
-        <translation>Engedélyek</translation>
+        <source>Local user</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LDAP</source>
-        <translation></translation>
+        <source>Cloud user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">Bejelentkezés</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6187,10 +6672,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Video exportálás</translation>
     </message>
     <message>
-        <source>Edit Video Walls</source>
-        <translation>Videofalak szerkesztése</translation>
-    </message>
-    <message>
         <source>Adjust device settings</source>
         <translation>Eszközök beállítása</translation>
     </message>
@@ -6198,100 +6679,256 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Adjust camera settings</source>
         <translation>Kamerák beállítása</translation>
     </message>
+    <message>
+        <source>Control Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserManagementWidget</name>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Users...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Delete Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n users?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do not show this message anymore</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserProfileWidget</name>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">Bejelentkezés</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Név</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+</context>
+<context>
+    <name>QnUserRoleSettingsWidget</name>
+    <message>
+        <source>Role name cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Role with same name already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserRoleSettingsWidgetPrivate</name>
+    <message>
+        <source>No users have this role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom with no permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users will have no permissions unless changed later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose an action to do with users who had this role:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Törlés</translation>
+    </message>
+    <message>
+        <source>Assign a new role</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserRolesDialog</name>
+    <message>
+        <source>Role Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished">Engedélyek</translation>
+    </message>
+    <message>
+        <source>Cameras &amp;&amp; Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Role %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
-        <source>New Password</source>
-        <translation>Új Jelszó</translation>
+        <source>Cameras &amp; Resources</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Jelszó</translation>
+        <source>Shared Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished">Engedélyek</translation>
+    </message>
+    <message>
+        <source>Cameras &amp;&amp; Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Invite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to user %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New User...</source>
+        <translation type="unfinished">Új felhasználó...</translation>
+    </message>
+    <message>
+        <source>User Settings - %1 (readonly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserSettingsWidget</name>
+    <message>
+        <source>Local</source>
+        <translation type="unfinished">Helyi</translation>
+    </message>
+    <message>
+        <source>Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">Bejelentkezés</translation>
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation>A bejelentkezési adatokat ki kell tölteni.</translation>
+        <translation type="unfinished">A bejelentkezési adatokat ki kell tölteni.</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
-        <translation>A felhasználó a megadott bejelentkezési adatokkal már létezik.</translation>
-    </message>
-    <message>
-        <source>Invalid current password.</source>
-        <translation>Érvénytelen jelenlegi jelszó.</translation>
-    </message>
-    <message>
-        <source>Passwords do not match.</source>
-        <translation>A jelszavak nem egyeznek.</translation>
-    </message>
-    <message>
-        <source>Password cannot be empty.</source>
-        <translation>A jelszó nem lehet üres.</translation>
-    </message>
-    <message>
-        <source>Choose access rights.</source>
-        <translation>Válasszon hozzáférési jogokat.</translation>
-    </message>
-    <message>
-        <source>Invalid email address.</source>
-        <translation>Érvénytelen email cím.</translation>
-    </message>
-    <message>
-        <source>Owner</source>
-        <translation>Tulajdonos</translation>
-    </message>
-    <message>
-        <source>Administrator</source>
-        <translation>adminisztrátor</translation>
-    </message>
-    <message>
-        <source>Advanced Viewer</source>
-        <translation>haladó megjelenítés</translation>
-    </message>
-    <message>
-        <source>Viewer</source>
-        <translation>megjelenítés</translation>
-    </message>
-    <message>
-        <source>Live Viewer</source>
-        <translation>élőkép</translation>
-    </message>
-    <message>
-        <source>Custom...</source>
-        <translation>egyedi...</translation>
-    </message>
-    <message>
-        <source>Can use PTZ controls</source>
-        <translation>használhatja a PTZ vezérlést</translation>
-    </message>
-    <message>
-        <source>Can view video archives</source>
-        <translation>visszanézheti a video archívumot</translation>
-    </message>
-    <message>
-        <source>Can export video</source>
-        <translation>exportálhat videot</translation>
-    </message>
-    <message>
-        <source>Can edit Video Walls</source>
-        <translation>szerkesztheti a video falakat</translation>
-    </message>
-    <message>
-        <source>To modify your password, please enter existing one.</source>
-        <translation>A jelszó módosításához kérem adja meg a jelenlegit.</translation>
+        <translation type="unfinished">A felhasználó a megadott bejelentkezési adatokkal már létezik.</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation>A felhasználó át lett nevezve. A jelszót frissíteni kell.</translation>
+        <translation type="unfinished">A felhasználó át lett nevezve. A jelszót frissíteni kell.</translation>
     </message>
     <message>
-        <source>Can adjust devices settings</source>
-        <translation>beállíthatja az eszközöket</translation>
+        <source>Name</source>
+        <translation type="unfinished">Név</translation>
     </message>
     <message>
-        <source>Can adjust cameras settings</source>
-        <translation>beállíthatja a kamerákat</translation>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+        <source>Email cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud user with specified email already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Jelszó</translation>
+    </message>
+    <message>
+        <source>Confirm Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords do not match.</source>
+        <translation type="unfinished">A jelszavak nem egyeznek.</translation>
+    </message>
+</context>
+<context>
+    <name>QnValidatorStrings</name>
+    <message>
+        <source>Email cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email is not valid.</source>
+        <translation type="unfinished">Nem érvényes email</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
+        <translation type="unfinished">A jelszó nem lehet üres.</translation>
+    </message>
+    <message>
+        <source>Avoid leading and trailing spaces.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6303,10 +6940,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 </context>
 <context>
     <name>QnVideowallManageWidgetPrivate</name>
-    <message>
-        <source>Desktop %1</source>
-        <translation>Asztal %1</translation>
-    </message>
     <message>
         <source>Screen</source>
         <translation>Képernyő</translation>
@@ -6327,17 +6960,26 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Are you sure you want to delete %1?</source>
         <translation>Biztos vagy benne, hogy szeretnéd töröli a(z) %1?</translation>
     </message>
+    <message>
+        <source>Display %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnVideowallScreenWidget</name>
     <message>
-        <source>Pc %1</source>
-        <translation>Pc %1</translation>
+        <source>PC %1</source>
+        <translation type="unfinished">Pc %1</translation>
+    </message>
+    <message>
+        <source>PC %1 - Display %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Pc %1 - Screens %2</source>
-        <translation>
-            <numerusform>Pc %1.-.Képernyő %2</numerusform>
+        <source>PC %1 - Displays %2</source>
+        <comment>%2 will be substituted by _list_ of displays</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -6353,6 +6995,13 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+        <source>Fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnWorkbenchActionHandler</name>
     <message>
         <source>Error</source>
@@ -6361,14 +7010,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Layout is locked and cannot be changed.</source>
         <translation>Az elrendezés lezárva és nem lehet megváltoztatni.</translation>
-    </message>
-    <message>
-        <source>Cannot add item</source>
-        <translation>Nem lehet hozzáadni az elemet</translation>
-    </message>
-    <message>
-        <source>Cannot add a local file to Multi-Video</source>
-        <translation>Nem lehet hozzáadni a fájlt Multi-Video-hoz</translation>
     </message>
     <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
@@ -6387,14 +7028,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Minden fájl (*.*)</translation>
     </message>
     <message>
-        <source>All Supported (*.layout)</source>
-        <translation>Minden támogatott (*.layout)</translation>
-    </message>
-    <message>
-        <source>Layouts (*.layout)</source>
-        <translation>Elrendezések (*.layout)</translation>
-    </message>
-    <message>
         <source>Select folder...</source>
         <translation>Mappa választása...</translation>
     </message>
@@ -6409,10 +7042,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Delete Files</source>
         <translation>Fájlok törlése</translation>
-    </message>
-    <message>
-        <source>Remove Items</source>
-        <translation>Elemek eltávolítása</translation>
     </message>
     <message>
         <source>User already exists.</source>
@@ -6433,14 +7062,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Enter new name for the selected item:</source>
         <translation>Adja meg a kiválasztott elem új nevét:</translation>
-    </message>
-    <message>
-        <source>Delete Resources</source>
-        <translation>Források törlése</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation>Felhasználó beállítások</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 Mb</source>
@@ -6475,38 +7096,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A rendszer néhány összetevője nincs frissítve</translation>
     </message>
     <message>
-        <source>Client v%1</source>
-        <translation>Kliens v%1</translation>
-    </message>
-    <message>
-        <source>Server v%1 at %2</source>
-        <translation>Szerver v%1 at %2</translation>
-    </message>
-    <message>
-        <source>Server v%1</source>
-        <translation>Szerver v%1</translation>
-    </message>
-    <message>
         <source>Please update all components to the latest version %1.</source>
         <translation>Kérem frissítsen minden összetevőt a %1 végleges verzióra.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
         <translation>Névtelen használtai statisztikák</translation>
-    </message>
-    <message>
-        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
-If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation>A rendszer névtelen használati statisztikákat és összeomlás statisztikákat küld a szoftver fejlesztő csapatnak, hogy segítsen a felhasználói élmény növelésében.
-Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben megteheti.</translation>
-    </message>
-    <message>
-        <source>New Layout</source>
-        <translation>új elrendezés</translation>
-    </message>
-    <message>
-        <source>New Layout %1</source>
-        <translation>új elrendezés %1</translation>
     </message>
     <message>
         <source>Open File</source>
@@ -6571,36 +7166,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         </translation>
     </message>
     <message numerus="yes">
-        <source>Are you sure you want to remove these %n items from layout?</source>
-        <translation>
-            <numerusform>Biztos benne, hogy szeretné eltávolítani ezt a %n elemet az elrendezésről?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>Ezt a(z) %n eszközt a rendszer  automatikusan találta meg a hálózaton. Eltávolítás után újra megjelenhetnek a rendszerben. Biztos benne, hogy törli őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>Ezt a(z) %n kamerát a rendszer  automatikusan találta meg a hálózaton. Eltávolítás után újra megjelenhetnek a rendszerben. Biztos benne, hogy törli őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n eszközt ezekből a rendszer automatikusan talált meg a hálózaton. Eltávolítás után újra megjelenhetnek a rendszerben. Biztos benne, hogy törli őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n kamerát ezekből a rendszer automatikusan talált meg a hálózaton. Eltávolítás után újra megjelenhetnek a rendszerben. Biztos benne, hogy törli őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
         <translation>
             <numerusform>Biztos benne, hogy törölni szeretné a következő %n eszközt?</numerusform>
@@ -6631,18 +7196,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         </translation>
     </message>
     <message numerus="yes">
-        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n I/O modult a rendszer automatikusan találta meg a hálózaton. Eltávolítás után újra megjelenhetnek a rendszerben. Biztos benne, hogy törli őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n I/O modult ezekből a rendszer automatikusan talált meg a hálózaton. Eltávolítás után újra megjelenhetnek a rendszerben. Biztos benne, hogy törli őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
         <translation>
             <numerusform>Biztos benne, hogy törölni szeretné a következő %n I/O modult?</numerusform>
@@ -6653,20 +7206,62 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Az eszköz hozzáadása folyamatban. Szeretné megszakítani a folyamatot?</translation>
     </message>
     <message>
-        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation>%1 nagyfelbontású képernyőt érzékelt, ezért %1 lehet, hogy nem megfelelően jelenik meg.</translation>
+        <source>Cannot move cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices are auto-discovered. They may be auto-discovered again after removing.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras are auto-discovered. They may be auto-discovered again after removing.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules are auto-discovered. They may be auto-discovered again after removing.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation>Ismert hiba.Javítása a 3.0-verzióban várható.</translation>
+        <source>Delete Resources...</source>
+        <translation type="unfinished">Források törlése</translation>
     </message>
     <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation>Ha teheti állítson képernyője felbontásán a jobb felhasználói élmény eléréséhez.</translation>
+        <source>Do not show this message anymore</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HiDpi Screens Support Warning</source>
-        <translation>HiDpi képernyő támogatás jelzése</translation>
+        <source>Confirm files deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client</source>
+        <translation type="unfinished">Kliens</translation>
+    </message>
+    <message>
+        <source>Server</source>
+        <translation type="unfinished">Szerver</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you would like to disable this feature you can do so in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open server web page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not execute initial server query</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6717,52 +7312,21 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Csatlakozás egy másik szerverhez...</translation>
     </message>
     <message>
-        <source>Could not connect to server. Closing in %1...</source>
-        <translation>Nem lehet csatlakozni a szerverhez. Bezárás %1 múlva...</translation>
-    </message>
-    <message>
-        <source>Connecting...</source>
-        <translation>Csatlakozás...</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Csatlakozás szerverhez...</translation>
     </message>
     <message>
-        <source>Could not connect to server...</source>
-        <translation>Nem lehet csatlakozni a szerverhez...</translation>
+        <source>%1 in %2</source>
+        <comment>%1 is user name, %2 is name of system</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to server. Video Wall will be closed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
-    <message>
-        <source>Recording in...%1</source>
-        <translation>Felvétel...%1</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>Figyelem</translation>
-    </message>
-    <message>
-        <source>Recorded Video</source>
-        <translation>Rögzített video</translation>
-    </message>
-    <message>
-        <source>Save Recording As...</source>
-        <translation>Felvétel mentése másként...</translation>
-    </message>
-    <message>
-        <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unable to start recording due to the following error: %1</source>
-        <translation>Nem lehet elindítani a rögzítést a következő hiba miatt: %1</translation>
-    </message>
-    <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>Nem lehet felülírni a %1 fájlt. Kérem adjon meg egy másik nevet.</translation>
-    </message>
     <message>
         <source>Press any key to stop the tour.</source>
         <translation>Nyomjon meg egy gombot a túra megállításához.</translation>
@@ -6831,10 +7395,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     <message>
         <source>AVI format is not recommended</source>
         <translation>Az AVI formátum nem ajánlott</translation>
-    </message>
-    <message>
-        <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation>Az AVI formátum nem ajánlott nem folyamatos felvétel wxportálására, ha audio sáv is jelen van. Szeretné folytatni?</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -6960,6 +7520,18 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
         <translation>A kiválasztott időtartam túl rövid. Nem exportálható gyors áttekintésként.</translation>
     </message>
+    <message>
+        <source>AVI format is not recommended for export of non-continuous recording when audio track is present.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Executable format is not recommended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exported executable file over 4 Gb can&apos;t be opened by double click in Windows Explorer. It&apos;s a Windows limitation. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -6988,32 +7560,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Információ</translation>
     </message>
     <message>
-        <source>Authentication failed.</source>
-        <translation>Sikertelen azonosítás.</translation>
-    </message>
-    <message>
-        <source>Please, check the password you have entered.</source>
-        <translation>Kérem ellenőrizza a megadott jelszót.</translation>
-    </message>
-    <message>
-        <source>Could not configure the selected servers.</source>
-        <translation>Nem lehet konfigurálni a kiválasztott szervereket.</translation>
-    </message>
-    <message>
-        <source>Could not update the selected servers.</source>
-        <translation>Nem lehet frissíteni a kiválasztott szervereket.</translation>
-    </message>
-    <message>
-        <source>Warning: You are about to merge Systems with START licenses.
-As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
-If you understand this and would like to proceed please click Merge to continue.
-</source>
-        <translation>Figyelem: A rendszer összevonását választotta START licencekkel.
-Mivel rendszerenként 1 START licenc engedélyezett, az összevonás után 1 START licence fog maradni.
-Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra a folytatáshoz.
-</translation>
-    </message>
-    <message>
         <source>Merge</source>
         <translation>Összevon</translation>
     </message>
@@ -7022,16 +7568,20 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kérem várjon, amyg az előzőleg kért szerverek hozzá lesznek adva a rendszerhez.</translation>
     </message>
     <message>
-        <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation>A választott szerverek sikeresen hozzáadva a rendszerhez!</translation>
-    </message>
-    <message>
-        <source>You can try to update the servers again in the System Administration dialog.</source>
-        <translation>A szerverek frissítését újrapróbálhatja a Rendszer adminisztráció menüpontban.</translation>
-    </message>
-    <message>
         <source>Warning!</source>
         <translation>Figyelem!</translation>
+    </message>
+    <message>
+        <source>Rejoice! The selected server has been successfully connected to your system!</source>
+        <translation type="unfinished">A választott szerverek sikeresen hozzáadva a rendszerhez!</translation>
+    </message>
+    <message>
+        <source>Could not update the selected server.</source>
+        <translation type="unfinished">Nem lehet frissíteni a kiválasztott szervereket.</translation>
+    </message>
+    <message>
+        <source>Merge failed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7039,30 +7589,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Save Layout As</source>
         <translation>Elrendezés mentése mint</translation>
-    </message>
-    <message>
-        <source>Close Layouts</source>
-        <translation>Elrendezések bezárása</translation>
-    </message>
-    <message numerus="yes">
-        <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation>
-            <numerusform>A következő %n elrendezés nincs mentve. Szeretné menteni őket?</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Saving Layouts</source>
-        <translation>Elrendezések mentése</translation>
-    </message>
-    <message numerus="yes">
-        <source>The following %n layout(s) are being saved.</source>
-        <translation>
-            <numerusform>A következő %n elrendezés elmentve.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Please wait.</source>
-        <translation>Kérem várjon.</translation>
     </message>
     <message>
         <source>New Layout</source>
@@ -7076,72 +7602,35 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
-    <message numerus="yes">
-        <source>Could not save the following %n layout(s) to Server.</source>
-        <translation>
-            <numerusform>Nem lehet menteni a következő %n elrendezést a szerverre.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Do you want to restore these %n layout(s)?</source>
-        <translation>
-            <numerusform>Szeretné visszaállítani ezt a %n elrendezést?</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Layout already exists.</source>
-        <translation>Az elrendezés már létezik.</translation>
-    </message>
-    <message>
-        <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation>Ezzel a névvel már létezik elrendezés és nincsenek jogai a felülíráshoz.</translation>
-    </message>
     <message>
         <source>Enter Layout Name:</source>
         <translation>Adja meg az elrendezés nevét:</translation>
     </message>
     <message>
-        <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation>Ezzel a névvel már létezik elrendezés. Szeretné felülírni?</translation>
-    </message>
-    <message>
         <source>New Layout %1</source>
         <translation>új elrendezés %1</translation>
     </message>
-</context>
-<context>
-    <name>QnWorkbenchNavigator</name>
-    <message>
-        <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>yyyy MMM dd</translation>
+    <message numerus="yes">
+        <source>Are you sure you want to remove these %n items from layout?</source>
+        <translation type="unfinished">
+            <numerusform>Biztos benne, hogy szeretné eltávolítani ezt a %n elemet az elrendezésről?</numerusform>
+        </translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>hh:mm:ss</translation>
+        <source>Remove Items</source>
+        <translation type="unfinished">Elemek eltávolítása</translation>
     </message>
     <message>
-        <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>mm:ss</translation>
+        <source>Confirm items removing</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Live</source>
-        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
-        <translation>Élő</translation>
+        <source>Could not save the following layout to Server. Do you want to restore it?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All Devices</source>
-        <translation>Össze eszköz</translation>
-    </message>
-    <message>
-        <source>All Cameras</source>
-        <translation>Összes kamera</translation>
-    </message>
-    <message>
-        <source>All I/O Modules</source>
-        <translation>Minden I/O modul</translation>
+        <source>Cannot save layout</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7205,12 +7694,55 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
             <numerusform>Nem lehet törölni a következő %n elemet a szerverről.</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Error while saving changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while deleting items</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
         <translation>A rendszer biztonsági módban van</translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchScreenRecordingHandler</name>
+    <message>
+        <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
+        <translation type="unfinished">A képernyő rögzítő alrendszer még nem indult el. Kérem próbálja úrjra később.</translation>
+    </message>
+    <message>
+        <source>Recording in %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded Video</source>
+        <translation type="unfinished">Rögzített video</translation>
+    </message>
+    <message>
+        <source>Save Recording As...</source>
+        <translation type="unfinished">Felvétel mentése másként...</translation>
+    </message>
+    <message>
+        <source>AVI (Audio/Video Interleaved) (*.avi)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
+        <translation type="unfinished">Nem lehet felülírni a %1 fájlt. Kérem adjon meg egy másik nevet.</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Figyelem</translation>
+    </message>
+    <message>
+        <source>Unable to start recording due to the following error: %1</source>
+        <translation type="unfinished">Nem lehet elindítani a rögzítést a következő hiba miatt: %1</translation>
     </message>
 </context>
 <context>
@@ -7293,21 +7825,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
-    <name>QnWorkbenchStateDependentTabbedDialog</name>
-    <message>
-        <source>* %1</source>
-        <translation>* %1</translation>
-    </message>
-    <message>
-        <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation>Az el nem mentett módosítások el fognak veszni. Szeretné menteni a következő lapokat?</translation>
-    </message>
-    <message>
-        <source>Confirm exit</source>
-        <translation>Kilépés jóváhagyása</translation>
-    </message>
-</context>
-<context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
         <source>Would you like to update?</source>
@@ -7324,10 +7841,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Update is strongly recommended.</source>
         <translation>A frissítés erősen ajánlott.</translation>
-    </message>
-    <message>
-        <source>Please update %1 Client.</source>
-        <translation>Kérem frissítse a %1 klienst.</translation>
     </message>
     <message>
         <source>Release Notes</source>
@@ -7425,11 +7938,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         </translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1 képernyője</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation>A munkamenet már fut.</translation>
     </message>
@@ -7478,6 +7986,47 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation>A módosítás nem hajtható végre. Nem várt hiba történt.</translation>
+    </message>
+    <message>
+        <source>New Layout</source>
+        <translation type="unfinished">Új elrendezés</translation>
+    </message>
+    <message>
+        <source>Confirm items deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm matrices deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 - Copy</source>
+        <comment>%1 is original layout name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen of %1</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchWebPageHandler</name>
+    <message>
+        <source>New Web Page...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the url of the Web Page to add:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This Web Page is already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -70,6 +70,74 @@ int getSystemErrCode()
 namespace nx {
 namespace network {
 
+SystemSocketAddress::SystemSocketAddress():
+    size(0)
+{
+}
+
+SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
+    SystemSocketAddress()
+{
+    if (SocketGlobals::config().isAddressDisabled(endpoint.address))
+    {
+        SystemError::setLastErrorCode(SystemError::noPermission);
+        return;
+    }
+
+    if (ipVersion == AF_INET)
+    {
+        if (const auto ip = endpoint.address.ipV4())
+        {
+            const auto a = new sockaddr_in;
+            memset(a, 0, sizeof(*a));
+            ptr.reset((sockaddr*) a);
+            size = sizeof(sockaddr_in);
+
+            a->sin_family = AF_INET;
+            a->sin_addr = *ip;
+            a->sin_port = htons(endpoint.port);
+            return;
+        }
+    }
+    else if (ipVersion == AF_INET6)
+    {
+        if (const auto ip = endpoint.address.ipV6())
+        {
+            const auto a = new sockaddr_in6;
+            memset(a, 0, sizeof(*a));
+            ptr.reset((sockaddr*) a);
+            size = sizeof(sockaddr_in6);
+
+            a->sin6_family = AF_INET6;
+            a->sin6_addr = *ip;
+            a->sin6_port = htons(endpoint.port);
+            return;
+        }
+    }
+
+    SystemError::setLastErrorCode(SystemError::hostNotFound);
+}
+
+SystemSocketAddress::operator SocketAddress() const
+{
+    if (!ptr)
+        return SocketAddress();
+
+    if (ptr->sa_family == AF_INET)
+    {
+        const auto a = reinterpret_cast<const sockaddr_in*>(ptr.get());
+        return SocketAddress(a->sin_addr, ntohs(a->sin_port));
+    }
+    else if (ptr->sa_family == AF_INET6)
+    {
+        const auto a = reinterpret_cast<const sockaddr_in6*>(ptr.get());
+        return SocketAddress(a->sin6_addr, ntohs(a->sin6_port));
+    }
+
+    NX_ASSERT(false, lm("Corupt family: %1").arg(ptr->sa_family));
+    return SocketAddress();
+}
+
 //////////////////////////////////////////////////////////
 // Socket implementation
 //////////////////////////////////////////////////////////
@@ -120,7 +188,7 @@ void Socket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* aioTh
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::bind( const SocketAddress& localAddress )
 {
-    const auto addr = makeAddr(localAddress);
+    const SystemSocketAddress addr(localAddress, m_ipVersion);
     if (!addr.ptr)
         return false;
 
@@ -410,47 +478,6 @@ Socket<InterfaceToImplement>::Socket(
     m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
-}
-
-// Function to fill in address structure given an address and port
-template<typename InterfaceToImplement>
-SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAddress)
-{
-    if (SocketGlobals::config().isAddressDisabled(socketAddress.address))
-    {
-        SystemError::setLastErrorCode(SystemError::noPermission);
-        return SockAddrPtr();
-    }
-
-    if (m_ipVersion == AF_INET)
-    {
-        if (const auto ip = socketAddress.address.ipV4())
-        {
-            const auto addr = new sockaddr_in;
-            SockAddrPtr addrHolder(addr);
-
-            addr->sin_family = AF_INET;
-            addr->sin_addr = *ip;
-            addr->sin_port = htons(socketAddress.port);
-            return addrHolder;
-        }
-    }
-    else if (m_ipVersion == AF_INET6)
-    {
-        if (const auto ip = socketAddress.address.ipV6())
-        {
-            const auto addr = new sockaddr_in6;
-            SockAddrPtr addrHolder(addr);
-
-            addr->sin6_family = AF_INET6;
-            addr->sin6_addr = *ip;
-            addr->sin6_port = htons(socketAddress.port);
-            return addrHolder;
-        }
-    }
-
-    SystemError::setLastErrorCode(SystemError::hostNotFound);
-    return SockAddrPtr();
 }
 
 template<typename InterfaceToImplement>
@@ -786,7 +813,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
     // Get the address of the requested host
     m_connected = false;
 
-    const auto addr = this->makeAddr(remoteAddress);
+    const SystemSocketAddress addr(remoteAddress, this->m_ipVersion);
     if (!addr.ptr)
         return false;
 
@@ -1543,10 +1570,24 @@ int UDPSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractDatagramSocket::setDestAddr
-bool UDPSocket::setDestAddr( const SocketAddress& foreignEndpoint )
+bool UDPSocket::setDestAddr( const SocketAddress& endpoint )
 {
-    m_destAddr = makeAddr(foreignEndpoint);
-    return (bool)m_destAddr.ptr;
+    if (endpoint.address.isIpAddress())
+    {
+        m_destAddr = SystemSocketAddress(endpoint, m_ipVersion);
+    }
+    else
+    {
+        const auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
+            endpoint.address.toString(), m_ipVersion);
+
+        // TODO: Here we select first address with hope it is correct one. This will newer work
+        // for NAT64, so we have to fix it somehow.
+        if (!ips.empty())
+            m_destAddr = SystemSocketAddress(SocketAddress(ips.front(), endpoint.port), m_ipVersion);
+    }
+
+    return (bool) m_destAddr.ptr;
 }
 
 //!Implementation of AbstractDatagramSocket::sendTo
@@ -1560,14 +1601,33 @@ bool UDPSocket::sendTo(
 }
 
 void UDPSocket::sendToAsync(
-    const nx::Buffer& buf,
-    const SocketAddress& foreignEndpoint,
-    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler)
+    const nx::Buffer& buffer,
+    const SocketAddress& endpoint,
+    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
-    setDestAddr(foreignEndpoint);
+    if (endpoint.address.isIpAddress())
+    {
+        setDestAddr(endpoint);
+        return sendAsync(
+            buffer,
+            [endpoint, handler = std::move(handler)](SystemError::ErrorCode code, size_t size)
+            {
+                handler(code, endpoint, size);
+            });
+    }
 
-    using namespace std::placeholders;
-    sendAsync(buf, std::bind(completionHandler, _1, foreignEndpoint, _2));
+    m_aioHelper->resolve(
+        endpoint.address,
+        [this, &buffer, port = endpoint.port, handler = std::move(handler)](
+            SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
+        {
+            if (code != SystemError::noError)
+                return handler(code, SocketAddress(), 0);
+
+            // TODO: Here we select first address with hope it is correct one. This will newer work
+            // for NAT64, so we have to fix it somehow.
+            sendToAsync(buffer, SocketAddress(ips.front(), port), std::move(handler));
+        });
 }
 
 int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )

@@ -72,7 +72,7 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
     to->permissions = 
         QnLexical::deserialized<Qn::GlobalPermissions>(
             QString::fromStdString(from.customPermissions));
-    to->groupId = QnUuid::fromStringSafe(from.groupID);
+    to->groupId = QnUuid::fromStringSafe(from.groupId);
     to->isEnabled = from.isEnabled;
     to->realm = QnAppInfo::realm();
     to->hash = "password_is_in_cloud";
@@ -84,7 +84,7 @@ void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)
 {
     to->accountEmail = from.email.toStdString();
     to->customPermissions = QnLexical::serialized(from.permissions).toStdString();
-    to->groupID = from.groupId.toSimpleString().toStdString();
+    to->groupId = from.groupId.toSimpleString().toStdString();
     to->isEnabled = from.isEnabled;
     to->accessRole =
         from.isAdmin

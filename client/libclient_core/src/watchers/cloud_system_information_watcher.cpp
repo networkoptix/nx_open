@@ -62,7 +62,7 @@ QString QnCloudSystemInformationWatcher::ownerDescription() const
     const bool yourSystem = qnCloudStatusWatcher->effectiveUserName() == d->ownerEmail;
 
     return yourSystem ? tr("Your system")
-                      : tr("%1's system").arg(d->ownerFullName);
+                      : tr("Owner: %1", "%1 is a user name").arg(d->ownerFullName);
 }
 
 QnCloudSystemInformationWatcherPrivate::QnCloudSystemInformationWatcherPrivate(

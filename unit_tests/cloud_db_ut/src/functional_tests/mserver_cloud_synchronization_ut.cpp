@@ -161,7 +161,7 @@ TEST_F(Ec2MserverCloudSynchronization, merging_offline_changes)
         // Adding users to the cloud.
         api::SystemSharing sharing;
         sharing.accountEmail = account.first.email;
-        sharing.systemID = registeredSystemData().id;
+        sharing.systemId = registeredSystemData().id;
         sharing.accessRole = static_cast<api::SystemAccessRole>(
             nx::utils::random::number<int>(
                 static_cast<int>(api::SystemAccessRole::liveViewer),
@@ -217,7 +217,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
 
         api::SystemSharing sharing;
         sharing.accountEmail = testAccount.email;
-        sharing.systemID = registeredSystemData().id;
+        sharing.systemId = registeredSystemData().id;
         sharing.accessRole = api::SystemAccessRole::cloudAdmin;
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -253,7 +253,7 @@ TEST_F(Ec2MserverCloudSynchronization, sync_from_cloud)
 
     api::SystemSharing sharing;
     sharing.accountEmail = testAccount.email;
-    sharing.systemID = registeredSystemData().id;
+    sharing.systemId = registeredSystemData().id;
     sharing.accessRole = api::SystemAccessRole::cloudAdmin;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -280,7 +280,7 @@ TEST_F(Ec2MserverCloudSynchronization, rebinding_system_to_cloud)
     {
         api::SystemSharing sharing;
         sharing.accountEmail = testAccount.email;
-        sharing.systemID = registeredSystemData().id;
+        sharing.systemId = registeredSystemData().id;
         sharing.accessRole = api::SystemAccessRole::cloudAdmin;
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -339,7 +339,7 @@ TEST_F(Ec2MserverCloudSynchronization, new_transaction_timestamp)
 
             api::SystemSharing sharing;
             sharing.accountEmail = testAccount.email;
-            sharing.systemID = registeredSystemData().id;
+            sharing.systemId = registeredSystemData().id;
             sharing.accessRole = api::SystemAccessRole::cloudAdmin;
             ASSERT_EQ(
                 api::ResultCode::ok,

@@ -125,6 +125,9 @@ bool TitleWorkbenchPanel::isVisible() const
 
 void TitleWorkbenchPanel::setVisible(bool visible, bool animate)
 {
+    if (visible && !isUsed())
+        return;
+
     ensureAnimationAllowed(&animate);
 
     bool changed = m_visible != visible;

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
     <?include BuildVars.wxi ?>
 
     <Bundle Name="$(var.productName) Server" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.serverBundleUpgradeCode)" DisableModify="yes">
@@ -17,7 +20,7 @@
         <!-- For some reason vcredist 24215 installs 24210 -->
         <Chain>
             <PackageGroupRef Id="VC12RedistPackageGroup"/>
-            <PackageGroupRef Id="VC14RedistPackageGroup"/>
+<!--            <PackageGroupRef Id="VC14RedistPackageGroup"/> -->
 
             <RollbackBoundary />
 

@@ -34,20 +34,8 @@
         <translation>&amp;Fechar</translation>
     </message>
     <message>
-        <source>Stop Media Server</source>
-        <translation>Parar Servidor de Media</translation>
-    </message>
-    <message>
         <source>No %1 services installed</source>
         <translation>Nenhuns serviços %1 instalados</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>Servidor de media foi iniciado</translation>
-    </message>
-    <message>
-        <source>Media server has been stopped</source>
-        <translation>Servidor de media foi parado</translation>
     </message>
     <message>
         <source>Access denied.</source>
@@ -66,24 +54,12 @@
         <translation>Não foi possível acede aos serviços instalados</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>Mostrar relatório do Servidor de &amp;Media</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>Página web do Servidor Media</translation>
-    </message>
-    <message>
         <source> (stopping)</source>
         <translation> (a parar)</translation>
     </message>
     <message>
         <source> (paused)</source>
         <translation> (pausado)</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>Iniciar Servidor de Media</translation>
     </message>
     <message>
         <source> (starting)</source>
@@ -110,8 +86,32 @@
         <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>O Servidor Media vai ser parado. Continuar?</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished">O Servidor Media vai ser parado. Continuar?</translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
