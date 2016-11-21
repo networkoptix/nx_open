@@ -9,7 +9,7 @@ class QnConnectToCurrentSystemTool;
 class QnProgressDialog;
 class QnMergeSystemsDialog;
 
-// TODO: #ynikitenkov Rename class. Change "incompatible" to something more sensible
+// TODO: #ynikitenkov Rename class. Change "incompatible" to something more sensible (like 'fake')
 class QnWorkbenchIncompatibleServersActionHandler:
     public Connective<QObject>,
     public QnWorkbenchContextAware
