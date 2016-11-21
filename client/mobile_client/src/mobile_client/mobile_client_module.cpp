@@ -60,7 +60,7 @@ QnMobileClientModule::QnMobileClientModule(
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("mc", common->moduleGUID());
+    nx::network::SocketGlobals::outgoingTunnelPool().designateOwnPeerId("mc", common->moduleGUID());
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
