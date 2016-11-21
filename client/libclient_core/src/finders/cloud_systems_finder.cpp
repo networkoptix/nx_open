@@ -179,7 +179,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                 return;
 
             const auto systemDescription = it.value();
-            const auto cleanServers =
+            const auto clearServers =
                 [systemDescription]()
                 {
                     const auto currentServers = systemDescription->servers();
@@ -188,7 +188,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                         systemDescription->removeServer(current.id);
                 };
 
-            auto serversCleanerTask = QnRaiiGuard::createDestructable(cleanServers);
+            auto clearServersTask = QnRaiiGuard::createDestructable(clearServers);
             if (reply->isFailed())
                 return;
 
@@ -207,7 +207,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
             if (cloudSystemId != moduleInformation.cloudSystemId)
                 return;
 
-            serversCleanerTask = QnRaiiGuardPtr();
+            clearServersTask = QnRaiiGuardPtr();
 
             const auto serverId = moduleInformation.id;
             if (systemDescription->containsServer(serverId))
@@ -216,7 +216,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
             }
             else
             {
-                cleanServers();
+                clearServers();
                 systemDescription->addServer(moduleInformation, 0);
             }
 
