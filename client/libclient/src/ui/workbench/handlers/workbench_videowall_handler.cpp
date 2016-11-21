@@ -1319,14 +1319,14 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     layout->setId(m_uuidPool->getFreeId());
     if (sourceLayout)
     {
-        layout->setName(tr("%1 Copy", "%1 is original layout name").arg(sourceLayout->getName()));
+        layout->setName(tr("%1 - Copy", "%1 is original layout name").arg(sourceLayout->getName()));
     }
     else if (filtered.size() == 1)
     {
         QnResourcePtr resource = *filtered.begin();
         QString resourceName = resource->getName();
         if (resource->hasFlags(Qn::desktop_camera))
-            layout->setName(tr("%1's Screen", "%1 means user's name").arg(resourceName));
+            layout->setName(tr("Screen of %1", "%1 means user's name").arg(resourceName));
         else
             layout->setName(resourceName);
     }

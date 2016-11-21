@@ -19,6 +19,7 @@ class QnUserRoleSettingsWidgetPrivate : public Connective<QObject>
 {
     using base_type = Connective<QObject>;
 
+    Q_DECLARE_TR_FUNCTIONS(QnUserRoleSettingsWidgetPrivate)
 public:
     QnUserRoleSettingsWidgetPrivate(QnUserRoleSettingsWidget* parent, QnUserRolesSettingsModel* model) :
         base_type(parent),
