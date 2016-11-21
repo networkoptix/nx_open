@@ -6470,7 +6470,7 @@ devices</source>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הקובץ &apos;%1&apos; נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
     </message>
 </context>
 <context>

@@ -2158,7 +2158,7 @@ to view more bookmarks</source>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังโหลด...</translation>
     </message>
     <message>
         <source>Camera ID</source>
@@ -6390,11 +6390,11 @@ devices</source>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถเขียนทับ ไฟล์ ได้</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ข้อมูล %1 ถูกใช้งานอยู่ กรุณาใช้ชื่ออื่น.</translation>
     </message>
 </context>
 <context>
@@ -7998,7 +7998,7 @@ devices</source>
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดรูปแบบใหม่</translation>
     </message>
     <message>
         <source>Confirm items deleting</source>

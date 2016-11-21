@@ -6391,7 +6391,7 @@ devices</source>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet felülírni a fájlt</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
@@ -7999,7 +7999,7 @@ devices</source>
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Új elrendezés</translation>
     </message>
     <message>
         <source>Confirm items deleting</source>

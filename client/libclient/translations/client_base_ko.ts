@@ -6389,7 +6389,7 @@ devices</source>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">파일을 덮어씌울 수 없음</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>

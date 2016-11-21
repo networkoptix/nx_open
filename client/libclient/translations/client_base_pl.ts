@@ -6138,7 +6138,7 @@ devices</source>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eksportuj zaznaczone zdarzenia do Pliku...</translation>
     </message>
 </context>
 <context>

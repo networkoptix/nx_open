@@ -8131,7 +8131,7 @@ devices</source>
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Novo Layout</translation>
     </message>
     <message>
         <source>Confirm items deleting</source>
