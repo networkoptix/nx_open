@@ -34,7 +34,6 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -45,6 +44,8 @@
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
+#include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -93,7 +94,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     /* Setup details label and its aligning by detailsTabWidget: */
     m_detailsLabel = new QLabel(ui->detailsTabWidget);
-    installEventHandler(ui->detailsTabWidget, QEvent::Resize, this,
+    installEventHandler({ ui->detailsTabWidget, m_detailsLabel }, QEvent::Resize, this,
         [this]()
         {
             m_detailsLabel->move(
@@ -155,6 +156,32 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
         {
             ui->gridDetails->unsetCursor();
         });
+
+    /*
+    * Create auto-hiders which will hide empty tables and show a message instead.
+    * Tables will be reparented. Snapped scrollbars are already created
+    * and will stay in correct parents.
+    */
+    QnItemViewAutoHider::create(ui->gridMaster, tr("No sessions"));
+    QnItemViewAutoHider::create(ui->gridCameras, tr("No cameras"));
+
+    auto detailsAutoHider = QnItemViewAutoHider::create(ui->gridDetails);
+
+    auto updateDetailsEmptyMessage =
+        [detailsAutoHider](int currentTab)
+        {
+            detailsAutoHider->setEmptyViewMessage(currentTab == SessionTab
+                ? tr("Select sessions to see their details")
+                : tr("Select cameras to see their details"));
+        };
+
+    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, updateDetailsEmptyMessage);
+    updateDetailsEmptyMessage(ui->mainTabWidget->currentIndex());
+
+    connect(detailsAutoHider, &QnItemViewAutoHider::viewVisibilityChanged,
+        m_detailsLabel, &QWidget::setHidden);
+
+    m_detailsLabel->setHidden(detailsAutoHider->isViewHidden());
 }
 
 QnAuditLogDialog::~QnAuditLogDialog()
