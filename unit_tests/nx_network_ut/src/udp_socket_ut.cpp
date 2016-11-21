@@ -32,7 +32,6 @@ void onBytesRead(
 
 TEST(UdpSocket, Simple)
 {
-
     static Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
     UDPSocket sender(AF_INET);
@@ -71,6 +70,7 @@ TEST(UdpSocket, Simple)
     ASSERT_EQ(senderEndpoint.toString(), remoteEndpoint.toString());
 
     sendPromise.get_future().wait();
+    sender.pleaseStopSync();
 }
 
 TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
@@ -114,6 +114,9 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
             ctx.readPromise.get_future().wait_for(std::chrono::seconds(1)));
         ASSERT_EQ(testMessage, ctx.readBuffer);
     }
+
+    for (auto& ctx: sockets)
+        ctx.socket->pleaseStopSync();
 }
 
 TEST(UdpSocket, DISABLED_Performance)
