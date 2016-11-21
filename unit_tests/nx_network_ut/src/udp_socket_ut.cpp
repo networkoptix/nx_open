@@ -6,6 +6,8 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace network {
 namespace test {
@@ -32,9 +34,11 @@ void onBytesRead(
 
 TEST(UdpSocket, Simple)
 {
-    static Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
+    static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
     UDPSocket sender(AF_INET);
+    const auto senderCleanupGuard = makeScopedGuard([&sender]() { sender.pleaseStopSync(); });
+
     ASSERT_TRUE(sender.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(sender.setSendTimeout(1000));
 
@@ -70,12 +74,18 @@ TEST(UdpSocket, Simple)
     ASSERT_EQ(senderEndpoint.toString(), remoteEndpoint.toString());
 
     sendPromise.get_future().wait();
-    sender.pleaseStopSync();
 }
 
 TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
 {
     std::vector<SocketContext> sockets;
+    const auto socketsCleanupGuard = makeScopedGuard(
+        [&sockets]()
+        {
+            for (auto& ctx : sockets)
+                ctx.socket->pleaseStopSync();
+        });
+
     sockets.resize(2);
     for (std::size_t i = 0; i < sockets.size(); ++i)
     {
@@ -114,9 +124,6 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
             ctx.readPromise.get_future().wait_for(std::chrono::seconds(1)));
         ASSERT_EQ(testMessage, ctx.readBuffer);
     }
-
-    for (auto& ctx: sockets)
-        ctx.socket->pleaseStopSync();
 }
 
 TEST(UdpSocket, DISABLED_Performance)
