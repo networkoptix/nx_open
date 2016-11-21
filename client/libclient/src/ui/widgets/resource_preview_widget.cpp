@@ -38,9 +38,8 @@ namespace {
             auto sourceRect = indicatorRect();
             auto targetRect = contentsRect();
 
-            qreal scale = qMin(
-                static_cast<qreal>(targetRect.width()) / sourceRect.width(),
-                static_cast<qreal>(targetRect.height()) / sourceRect.height());
+            qreal scale = QnGeometry::scaleFactor(sourceRect.size(), targetRect.size(),
+                Qt::KeepAspectRatio);
 
             QnScopedPainterTransformRollback transformRollback(painter);
             if (scale < 1.0)
