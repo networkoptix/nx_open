@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 26, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <memory>
@@ -12,10 +7,10 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
+
 namespace test {
 
 class TunnelConnector
@@ -40,7 +35,8 @@ protected:
     ConnectResult doSimpleConnectTest(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-        boost::optional<SocketAddress> mediatorAddressForConnector = boost::none);
+        boost::optional<SocketAddress> mediatorAddressForConnector = boost::none,
+        std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig = nullptr);
     ConnectResult doSimpleConnectTest(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,

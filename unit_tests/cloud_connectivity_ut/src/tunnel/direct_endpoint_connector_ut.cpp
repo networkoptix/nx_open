@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 26, 2016
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
@@ -39,6 +34,24 @@ public:
 TEST_F(TcpTunnelConnector, general)
 {
     generalTest();
+}
+
+TEST_F(TcpTunnelConnector, failModuleInformation)
+{
+    //starting mediator
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds(5),
+        MediaServerEmulator::ActionToTake::proceedWithConnection,
+        boost::none,
+        [](MediaServerEmulator* server)
+        {
+            server->setServerIdForModuleInformation(boost::none);
+        });
+
+    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
 }
 
 TEST_F(TcpTunnelConnector, cancellation)

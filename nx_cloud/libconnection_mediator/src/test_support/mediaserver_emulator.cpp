@@ -38,14 +38,22 @@ public:
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override
     {
-        QnModuleInformation moduleInformation;
-        if (m_serverIdForModuleInformation)
-            moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
-        if (m_cloudSystemId)
-            moduleInformation.cloudSystemId = m_cloudSystemId.get();
-
         QnJsonRestResult restResult;
-        restResult.setReply(moduleInformation);
+        if (!m_serverIdForModuleInformation)
+        {
+            restResult.error = QnJsonRestResult::Error::CantProcessRequest;
+            restResult.errorString = lit("I am not a server");
+        }
+        else
+        {
+            QnModuleInformation moduleInformation;
+            moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
+            if (m_cloudSystemId)
+                moduleInformation.cloudSystemId = m_cloudSystemId.get();
+
+            restResult.setReply(moduleInformation);
+        }
+
         std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource =
             std::make_unique<nx_http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
@@ -55,8 +63,8 @@ public:
     }
 
 private:
-    boost::optional<nx::String> m_cloudSystemId;
-    boost::optional<nx::String> m_serverIdForModuleInformation;
+    const boost::optional<nx::String> m_cloudSystemId;
+    const boost::optional<nx::String> m_serverIdForModuleInformation;
 };
 
 MediaServerEmulator::MediaServerEmulator(
