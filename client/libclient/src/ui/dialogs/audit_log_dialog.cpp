@@ -121,7 +121,6 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
-    ui->loadingProgressBar->hide();
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 
@@ -777,11 +776,8 @@ void QnAuditLogDialog::updateData()
 
     if (!m_requests.isEmpty())
     {
-        ui->gridMaster->setDisabled(true);
-        ui->gridCameras->setDisabled(true);
-        ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
-        ui->loadingProgressBar->show();
+        ui->stackedWidget->setCurrentWidget(ui->progressPage);
     }
     else
     {
@@ -887,19 +883,8 @@ void QnAuditLogDialog::requestFinished()
 
     at_filterChanged();
 
-    ui->gridMaster->setDisabled(false);
-    ui->gridCameras->setDisabled(false);
+    ui->stackedWidget->setCurrentWidget(ui->gridPage);
     setCursor(Qt::ArrowCursor);
-    /*
-    if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-        ui->statusLabel->setText(tr("Audit trail for period from %1 to %2 - %n session(s) found", "", m_sessionModel->rowCount())
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
-    else
-        ui->statusLabel->setText(tr("Audit trail for %1 - %n session(s) found", "", m_sessionModel->rowCount())
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
-    */
-    ui->loadingProgressBar->hide();
 }
 
 void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)

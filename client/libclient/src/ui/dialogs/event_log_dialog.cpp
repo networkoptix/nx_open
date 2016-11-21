@@ -134,7 +134,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
-    ui->loadingProgressBar->hide();
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -249,13 +248,13 @@ void QnEventLogDialog::updateData()
     else
         m_resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
 
-    if (!m_requests.isEmpty()) {
-        ui->gridEvents->setDisabled(true);
-        ui->stackedWidget->setCurrentWidget(ui->gridPage);
+    if (!m_requests.isEmpty())
+    {
+        ui->stackedWidget->setCurrentWidget(ui->progressPage);
         setCursor(Qt::BusyCursor);
-        ui->loadingProgressBar->show();
     }
-    else {
+    else
+    {
         requestFinished(); // just clear grid
         ui->stackedWidget->setCurrentWidget(ui->warnPage);
     }
@@ -336,20 +335,24 @@ void QnEventLogDialog::requestFinished()
 {
     m_model->setEvents(m_allEvents);
     m_allEvents.clear();
-    ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
+
     auto start = ui->dateRangeWidget->startDate();
     auto end = ui->dateRangeWidget->endDate();
-
     if (start != end)
+    {
         ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::DefaultLocaleLongDate))
-        .arg(end.toString(Qt::DefaultLocaleLongDate)));
+            .arg(start.toString(Qt::DefaultLocaleLongDate))
+            .arg(end.toString(Qt::DefaultLocaleLongDate)));
+    }
     else
+    {
         ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::DefaultLocaleLongDate)));
-    ui->loadingProgressBar->hide();
+            .arg(start.toString(Qt::DefaultLocaleLongDate)));
+    }
+
     ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    ui->stackedWidget->setCurrentWidget(ui->gridPage);
 }
 
 void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
