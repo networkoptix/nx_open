@@ -14,7 +14,7 @@ namespace aio {
 namespace test {
 
 class TestUdtEpollWrapper:
-    public UdtEpollWrapper
+    public AbstractUdtEpollWrapper
 {
 public:
     virtual int epollWait(

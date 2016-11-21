@@ -15,8 +15,8 @@ namespace aio {
 
 namespace {
 
-class UdtEpollWrapperImpl:
-    public UdtEpollWrapper
+class UdtEpollWrapper:
+    public AbstractUdtEpollWrapper
 {
 public:
     virtual int epollWait(
@@ -251,12 +251,12 @@ UnifiedPollSet::UnifiedPollSet():
 {
 }
 
-UnifiedPollSet::UnifiedPollSet(std::unique_ptr<UdtEpollWrapper> udtEpollWrapper):
+UnifiedPollSet::UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper> udtEpollWrapper):
     m_epollFd(-1),
     m_udtEpollWrapper(std::move(udtEpollWrapper))
 {
     if (!m_udtEpollWrapper)
-        m_udtEpollWrapper = std::make_unique<UdtEpollWrapperImpl>();
+        m_udtEpollWrapper = std::make_unique<UdtEpollWrapper>();
 
     m_epollFd = UDT::epoll_create();
     m_interruptSocket.setNonBlockingMode(true);
