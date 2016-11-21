@@ -31,6 +31,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     setWarningStyle(ui->generalWarningLabel);
 
     ui->iconLabel->setPixmap(qnSkin->pixmap("legacy/warning.png"));
+    ui->iconLabel->setScaledContents(true);
 
     // if "I have read manual" is set, all controls should be enabled
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureCheckBox, SLOT(setDisabled(bool)));
