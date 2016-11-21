@@ -124,7 +124,7 @@ namespace nx_hls
 
         response->headers.emplace("Date", currentTimeInHttpFormat);
         response->headers.emplace("Server", nx_http::serverString());
-        response->headers.emplace("Cache-Control", "no-cache");   //getRequestedFile can override this
+        response->headers.emplace("Cache-Control", "no-cache");
 
         if (request.requestLine.version == nx_http::http_1_1)
         {
@@ -134,7 +134,7 @@ namespace nx_hls
             {
                 response->headers.emplace("Transfer-Encoding", "chunked");
             }
-            response->headers.emplace("Connection", "close"); //no persistent connections support
+            response->headers.emplace("Connection", "close");
         }
         if (response->statusLine.statusCode == nx_http::StatusCode::notFound)
             nx_http::insertOrReplaceHeader(&response->headers, nx_http::HttpHeader("Content-Length", "0"));
