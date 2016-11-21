@@ -7,6 +7,7 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/table_view.h>
 
+#include <utils/common/connective.h>
 #include <utils/common/event_processors.h>
 
 namespace {
@@ -19,14 +20,16 @@ static const int kMessageFontWeight = QFont::Normal;
 /*
 * QnItemViewAutoHiderPrivate
 */
-class QnItemViewAutoHiderPrivate: public QObject
+class QnItemViewAutoHiderPrivate: public Connective<QObject>
 {
+    using base_type = Connective<QObject>;
+
     Q_DECLARE_PUBLIC(QnItemViewAutoHider);
     QnItemViewAutoHider* q_ptr;
 
 public:
     QnItemViewAutoHiderPrivate(QnItemViewAutoHider* q):
-        QObject(),
+        base_type(),
         q_ptr(q),
         view(nullptr),
         label(new QLabel()),
@@ -40,8 +43,9 @@ public:
         font.setPixelSize(kMessageFontPixelSize);
         font.setWeight(kMessageFontWeight);
         label->setFont(font);
+        label->setAlignment(Qt::AlignCenter);
 
-        auto labelLayout = new QVBoxLayout(viewPage);
+        auto labelLayout = new QVBoxLayout(labelPage);
         labelLayout->setContentsMargins(0, 0, 0, 0);
         labelLayout->addWidget(label);
 
@@ -53,38 +57,69 @@ public:
 
         auto mainLayout = new QVBoxLayout(q);
         mainLayout->addWidget(stackedWidget);
+
+        connect(stackedWidget, &QStackedWidget::currentChanged, this,
+            [this]()
+            {
+                Q_Q(QnItemViewAutoHider);
+                emit q->viewVisibilityChanged(isViewHidden());
+            });
+    }
+
+    bool isViewHidden() const
+    {
+        return stackedWidget->currentWidget() != viewPage;
+    }
+
+    void setViewHidden(bool hidden)
+    {
+        stackedWidget->setCurrentWidget(hidden ? labelPage : viewPage);
     }
 
     void setView(QAbstractItemView* newView)
     {
-        if (view == newView)
+        if (view != newView)
+        {
+            if (view)
+                view->setParent(nullptr);
+            view = newView;
+            viewPage->layout()->addWidget(view);
+        }
+
+        setModel(view->model());
+        updateState();
+    }
+
+    void setModel(QAbstractItemModel* newModel)
+    {
+        if (model == newModel)
             return;
 
-        delete view;
-        view = newView;
+        if (model)
+            model->disconnect(this);
 
-        viewPage->layout()->addWidget(view);
-        view->installEventFilter(this);
+        model = newModel;
+
+        if (newModel)
+        {
+            connect(model, &QAbstractItemModel::modelReset,
+                this, &QnItemViewAutoHiderPrivate::updateState);
+            connect(model, &QAbstractItemModel::rowsInserted,
+                this, &QnItemViewAutoHiderPrivate::updateState);
+            connect(model, &QAbstractItemModel::rowsRemoved,
+                this, &QnItemViewAutoHiderPrivate::updateState);
+        }
     }
 
     void updateState()
     {
         bool emptyView = !view || !view->model() || view->model()->rowCount() == 0;
-        stackedWidget->setCurrentWidget(emptyView ? labelPage : viewPage);
-    }
-
-    virtual bool eventFilter(QObject* watched, QEvent* event) override
-    {
-        NX_ASSERT(watched == view);
-        if (event->type() != QEvent::Paint)
-            return false;
-
-        updateState();
-        return false;
+        setViewHidden(emptyView);
     }
 
 public:
-    QAbstractItemView* view;
+    QPointer<QAbstractItemView> view;
+    QPointer<QAbstractItemModel> model;
     QLabel* label;
 
     QStackedWidget* stackedWidget;
@@ -119,20 +154,44 @@ void QnItemViewAutoHider::setView(QAbstractItemView* view)
     d->setView(view);
 }
 
-QLabel* QnItemViewAutoHider::emptyMessageLabel() const
+QLabel* QnItemViewAutoHider::emptyViewMessageLabel() const
 {
     Q_D(const QnItemViewAutoHider);
     return d->label;
 }
 
-QString QnItemViewAutoHider::emptyMessage() const
+QString QnItemViewAutoHider::emptyViewMessage() const
 {
     Q_D(const QnItemViewAutoHider);
     return d->label->text();
 }
 
-void QnItemViewAutoHider::setEmptyMessage(const QString& message)
+void QnItemViewAutoHider::setEmptyViewMessage(const QString& message)
 {
     Q_D(QnItemViewAutoHider);
     d->label->setText(message);
+}
+
+bool QnItemViewAutoHider::isViewHidden() const
+{
+    Q_D(const QnItemViewAutoHider);
+    return d->isViewHidden();
+}
+
+QnItemViewAutoHider* QnItemViewAutoHider::create(QAbstractItemView* view, const QString& message)
+{
+    NX_ASSERT(view);
+    if (!view)
+        return nullptr;
+
+    auto parent = view->parentWidget();
+    auto autoHider = new QnItemViewAutoHider(parent);
+
+    if (parent && parent->layout())
+        parent->layout()->replaceWidget(view, autoHider, Qt::FindDirectChildrenOnly);
+
+    autoHider->setEmptyViewMessage(message);
+    autoHider->setView(view);
+
+    return autoHider;
 }
