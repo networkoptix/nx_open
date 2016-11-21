@@ -648,36 +648,38 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     switch (stage)
     {
         case QnFullUpdateStage::Check:
-            status = tr("Checking for updates...\t%1%");
+            status = tr("Checking for updates...");
             break;
 
         case QnFullUpdateStage::Download:
-            status = tr("Downloading updates...\t%1%");
+            status = tr("Downloading updates...");
             break;
 
         case QnFullUpdateStage::Client:
-            status = tr("Installing client update...\t%1%");
+            status = tr("Installing client update...");
             break;
 
         case QnFullUpdateStage::Incompatible:
-            status = tr("Installing updates to incompatible servers...\t%1%");
+            status = tr("Installing updates to incompatible servers...");
             break;
 
         case QnFullUpdateStage::Push:
-            status = tr("Pushing updates to servers...\t%1%");
+            status = tr("Pushing updates to servers...");
             break;
 
         case QnFullUpdateStage::Servers:
-            status = tr("Installing updates...\t%1%");
+            status = tr("Installing updates...");
             break;
 
         default:
-            status = lit("%1");
             break;
     }
 
+    static const QString kPercentSuffix = lit("\t%1%");
+    status += kPercentSuffix.arg(value);
+
     ui->updateProgess->setValue(value);
-    ui->updateProgess->setFormat(status.arg(value));
+    ui->updateProgess->setFormat(status);
 }
 
 void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning)
@@ -727,7 +729,7 @@ QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList
 void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 {
     ui->updateProgess->setValue(100);
-    ui->updateProgess->setFormat(tr("Update Finished...\t100%"));
+    ui->updateProgess->setFormat(tr("Update Finished...") + lit("\t100%"));
 
     if (isVisible())
     {

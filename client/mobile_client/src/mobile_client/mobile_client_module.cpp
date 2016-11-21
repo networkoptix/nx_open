@@ -45,8 +45,9 @@ QnMobileClientModule::QnMobileClientModule(
     :
     QObject(parent)
 {
-    Q_INIT_RESOURCE(mobile_client);
     Q_INIT_RESOURCE(appserver2);
+    Q_INIT_RESOURCE(libclient_core);
+    Q_INIT_RESOURCE(mobile_client);
 
     QnMobileClientMetaTypes::initialize();
 

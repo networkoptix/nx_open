@@ -54,14 +54,6 @@
         <translation>A(z) %1 szolgáltatások nincsenek telepítve</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>A media szerver leállt</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>A media szerver elindult</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation> (leállítva)</translation>
     </message>
@@ -94,24 +86,32 @@
         <translation>&amp;Kilépés</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>&amp;Media szerver napló megjelenítése</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Media Server</source>
-        <translation>Media szerver indítása</translation>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop Media Server</source>
-        <translation>Media szerver leállítása</translation>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished">A media szerver le fog állni. Folytatja?</translation>
     </message>
     <message>
-        <source>Media Server Web Page</source>
-        <translation>Media szerver Weboldal</translation>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>A media szerver le fog állni. Folytatja?</translation>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
