@@ -89,6 +89,57 @@ namespace nx_hls
             //this should be done automatically by cache: should mark archive chunks as "uncachable"
     }
 
+    void QnHttpLiveStreamingProcessor::processRequest(const nx_http::Request& request)
+    {
+        nx_http::Response response;
+        response.statusLine.version = request.requestLine.version;
+
+        response.statusLine.statusCode = getRequestedFile(request, &response);
+        if (response.statusLine.statusCode == nx_http::StatusCode::forbidden)
+        {
+            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            m_state = sDone;
+            return;
+        }
+
+        prepareResponse(request, &response);
+
+        sendResponse(response);
+    }
+
+    void QnHttpLiveStreamingProcessor::prepareResponse(
+        const nx_http::Request& request,
+        nx_http::Response* const response)
+    {
+        if (response->statusLine.reasonPhrase.isEmpty())
+        {
+            response->statusLine.reasonPhrase = 
+                StatusCode::toString(response->statusLine.statusCode);
+        }
+
+        const auto currentTimeInHttpFormat = 
+            QLocale(QLocale::English).toString(
+                QDateTime::currentDateTime(),
+                lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1();
+
+        response->headers.emplace("Date", currentTimeInHttpFormat);
+        response->headers.emplace("Server", nx_http::serverString());
+        response->headers.emplace("Cache-Control", "no-cache");   //getRequestedFile can override this
+
+        if (request.requestLine.version == nx_http::http_1_1)
+        {
+            if (nx_http::StatusCode::isSuccessCode(response->statusLine.statusCode) &&
+                (response->headers.find("Transfer-Encoding") == response->headers.end()) &&
+                (response->headers.find("Content-Length") == response->headers.end()))
+            {
+                response->headers.emplace("Transfer-Encoding", "chunked");
+            }
+            response->headers.emplace("Connection", "close"); //no persistent connections support
+        }
+        if (response->statusLine.statusCode == nx_http::StatusCode::notFound)
+            nx_http::insertOrReplaceHeader(&response->headers, nx_http::HttpHeader("Content-Length", "0"));
+    }
+
     void QnHttpLiveStreamingProcessor::run()
     {
         Q_D( QnTCPConnectionProcessor );
@@ -160,43 +211,6 @@ namespace nx_hls
                     return;
             }
         }
-    }
-
-    void QnHttpLiveStreamingProcessor::processRequest( const nx_http::Request& request )
-    {
-        nx_http::Response response;
-        response.statusLine.version = request.requestLine.version;
-
-        response.statusLine.statusCode = getRequestedFile( request, &response );
-        if (response.statusLine.statusCode == nx_http::StatusCode::forbidden)
-        {
-            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
-            m_state = sDone;
-            return;
-        }
-        if( response.statusLine.reasonPhrase.isEmpty() )
-            response.statusLine.reasonPhrase = StatusCode::toString( response.statusLine.statusCode );
-
-        response.headers.insert( std::make_pair(
-            "Date",
-            QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.emplace( "Server", nx_http::serverString() );
-        response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
-
-        if( request.requestLine.version == nx_http::http_1_1 )
-        {
-            if( (response.statusLine.statusCode / 100 == 2) && 
-                (response.headers.find("Transfer-Encoding") == response.headers.end()) &&
-                (response.headers.find("Content-Length") == response.headers.end()) )
-            {
-                response.headers.emplace("Transfer-Encoding", "chunked");
-            }
-            response.headers.emplace( "Connection", "close" ); //no persistent connections support
-        }
-        if( response.statusLine.statusCode == nx_http::StatusCode::notFound )
-            nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader( "Content-Length", "0" ) );
-
-        sendResponse( response );
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
