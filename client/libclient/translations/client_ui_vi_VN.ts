@@ -25,13 +25,21 @@
     </message>
     <message>
         <location/>
-        <source>Connected servers</source>
-        <translation>Máy chủ kết nối</translation>
+        <source>Support</source>
+        <translation>ủng hộ</translation>
     </message>
     <message>
         <location/>
-        <source>Support</source>
-        <translation>ủng hộ</translation>
+        <source>System Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AccessibleResourcesWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
+        <source>Filter</source>
+        <translation type="unfinished">Lọc</translation>
     </message>
 </context>
 <context>
@@ -68,6 +76,49 @@
     </message>
 </context>
 <context>
+    <name>AdvancedSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
+        <source>Downmix Audio from 5.1 to 2.1</source>
+        <translation type="unfinished">Những âm thanh từ 5.1 giảm 2.1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Double Buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum Live Buffer Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Browse Logs</source>
+        <translation type="unfinished">lịch sử</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear Local Cache</source>
+        <translation type="unfinished">Bộ nhớ cache của địa phương rõ ràng</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset All Warnings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AggregationWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
@@ -94,11 +145,6 @@
     <name>AuditLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
-        <source>From</source>
-        <translation>từ</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
     </message>
@@ -139,11 +185,6 @@
     </message>
     <message>
         <location/>
-        <source>E-mail settings</source>
-        <translation>Cài đặt e-mail</translation>
-    </message>
-    <message>
-        <location/>
         <source>System actions</source>
         <translation>hành động hệ thống</translation>
     </message>
@@ -169,13 +210,18 @@
     </message>
     <message>
         <location/>
-        <source>To</source>
-        <translation>Đến</translation>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation>Tất cả máy chủ đang offline. dữ liệu kiểm toán là không có sẵn.</translation>
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>Tất cả máy chủ đang offline. dữ liệu kiểm toán là không có sẵn.</translation>
+        <source>Clear Filter</source>
+        <translation type="unfinished">rõ ràng Lọc</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Email settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -210,6 +256,54 @@
         <source>Mbit/s</source>
         <translation>Mbit/s</translation>
     </message>
+    <message>
+        <location/>
+        <source>Bitrate limitation could lead to backup failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BackupSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
+        <source>Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished">Đặt lịch ...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished">Thực hiện sao lưu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Cameras...&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BookmarkBusinessActionWidget</name>
@@ -243,44 +337,39 @@
     <name>BookmarkWidget</name>
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
-        <source>&amp;Name</source>
-        <translation>&amp;tên</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Timeout</source>
-        <translation>&amp;Timeout</translation>
-    </message>
-    <message>
-        <location/>
-        <source>T&amp;ags</source>
-        <translation>T&amp;ags</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Description</source>
-        <translation>&amp;miêu tả</translation>
-    </message>
-    <message>
-        <location/>
-        <source>List of tags divided by commas or spaces</source>
-        <translation>Danh sách thẻ chia bằng dấu phẩy hay dấu cách</translation>
-    </message>
-    <message>
-        <location/>
         <source>Popular tags</source>
         <translation>thẻ phổ biến</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tags</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>List of tags divided by commas</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
     </message>
@@ -298,6 +387,11 @@
         <location/>
         <source>Bookmark Log</source>
         <translation>Bookmark Đăng nhập</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear Filter</source>
+        <translation type="unfinished">rõ ràng Lọc</translation>
     </message>
 </context>
 <context>
@@ -346,11 +440,6 @@
     <name>BusinessRulesDialog</name>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
-        <source>Alarm/Event Rules</source>
-        <translation>Alarm / Quy định tổ chức sự kiện</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add</source>
         <translation>thêm</translation>
     </message>
@@ -374,6 +463,11 @@
         <source>X</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
@@ -384,44 +478,14 @@
     </message>
     <message>
         <location/>
-        <source>S&amp;tart IP:</source>
-        <translation>&amp;bắt đầu IP:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;End IP:</source>
-        <translation>&amp;đầu IP:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;Đăng nhập:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Auto</source>
         <translation>tự động</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Discovery Port:</source>
-        <translation>&amp;cổng truyền thông:</translation>
     </message>
     <message>
         <location/>
         <source>Stop</source>
         <translatorcomment>dừng lại</translatorcomment>
         <translation>dừng lại</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Scan</source>
-        <translation>&amp;quét</translation>
     </message>
     <message>
         <location/>
@@ -437,21 +501,6 @@
         <location/>
         <source>Server is offline</source>
         <translation>máy chủ đang ẩn</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Add selected</source>
-        <translation>&amp;Thêm lựa chọn</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Selected Server:</source>
-        <translation>Máy chủ đã chọn:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>S&amp;ubnet Scan</source>
-        <translation>子&amp;quét mạng</translation>
     </message>
     <message>
         <location/>
@@ -475,13 +524,63 @@
     </message>
     <message>
         <location/>
-        <source>Device Address:</source>
-        <translation>thiết bị Địa chỉ:</translation>
+        <source>Discovered Devices:</source>
+        <translation>Thiết bị phát hiện:</translation>
     </message>
     <message>
         <location/>
-        <source>Discovered Devices:</source>
-        <translation>Thiết bị phát hiện:</translation>
+        <source>Device Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0.0.0.0</source>
+        <translation type="unfinished">0.0.0.0</translation>
+    </message>
+    <message>
+        <location/>
+        <source>End IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0.0.0.255</source>
+        <translation type="unfinished">0.0.0.255</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Subnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Discovery Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation type="unfinished">Mật khẩu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation type="unfinished">Đăng nhập</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -648,48 +747,29 @@
     </message>
 </context>
 <context>
-    <name>CameraListDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
-        <source>Filter:</source>
-        <translatorcomment>Lọc:</translatorcomment>
-        <translation>Lọc:</translation>
-    </message>
-</context>
-<context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-        <source>&amp;Output ID:</source>
-        <translation>&amp;xuất khẩu ID:</translation>
+        <source>Output ID:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;tự động reset (thứ hai):</translation>
+        <source>Fixed duration:</source>
+        <translation type="unfinished">thời gian cố định:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">giây</translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Enable Recording</source>
-        <translation>cho phép video</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get More Licenses...</source>
-        <translation>Nhận quyền nhiều hơn(giấy phép)…</translation>
-    </message>
-    <message>
-        <location/>
         <source>Panic Mode: </source>
         <translation>Chế độ khẩn cấp:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>Lưu ý: Các máy chủ video theo thời gian biểu cho</translation>
     </message>
     <message>
         <location/>
@@ -754,26 +834,6 @@
     </message>
     <message>
         <location/>
-        <source>Apply changes before copying schedule</source>
-        <translation>Áp dụng trước khi thay đổi lịch trình sao chép</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording Schedule</source>
-        <translation>Lịch trình ghi âm</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show Quality on Schedule</source>
-        <translation>Hiện chất lượng đúng tiến độ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show FPS on Schedule</source>
-        <translation>Hiện FPS trên lịch</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion + Low-Res </source>
         <translation>Motion + Low-Res </translation>
     </message>
@@ -791,6 +851,74 @@
         <location/>
         <source>Max. Days</source>
         <translation>Tối đa (ngày)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activate License...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copying Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply changes before copying schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ChangeUserPasswordDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
+        <source>Change password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CloudManagementWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
+        <source>&lt;2. Connect system
+to the cloud&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CloudUserPanelWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/cloud_user_panel_widget.ui"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConnectToCloudDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
+        <source>Email or password is not recognized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stay logged in</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -850,7 +978,7 @@
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
         <source>Create Backup...</source>
         <translation>tạo một bản sao lưu…</translation>
     </message>
@@ -861,21 +989,19 @@
     </message>
 </context>
 <context>
+    <name>DateRangeWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
+        <source>-</source>
+        <translation type="unfinished">-</translation>
+    </message>
+</context>
+<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Alarm/Event Rules</source>
-        <translation>Alarm / Quy định tổ chức sự kiện</translation>
     </message>
     <message>
         <location/>
@@ -891,6 +1017,16 @@
         <location/>
         <source>Clear Filter</source>
         <translation>rõ ràng Lọc</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt; Any camera &gt;</source>
+        <translation type="unfinished">&lt;Bất kỳ máy ảnh&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -930,8 +1066,8 @@
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
-        <source>&amp;PTZ preset:</source>
-        <translation>&amp;PTZ cài sẵn:</translation>
+        <source>PTZ preset:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -966,11 +1102,6 @@
     <name>FisheyeSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
-        <source>Calibration</source>
-        <translation>Hiệu chuẩn</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ceiling Mount</source>
         <translation>Giá treo máy chiếu</translation>
     </message>
@@ -986,36 +1117,56 @@
     </message>
     <message>
         <location/>
-        <source>Camera View Angle Correction</source>
-        <translation>Chỉnh góc độ máy ảnh</translation>
+        <source>Fisheye Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto Calibration</source>
+        <translation type="unfinished">tự động điều chỉnh</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mount Angle Correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>°</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Y Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>X Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ellipticity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
         <source>Main Media Folder</source>
         <translation>Các thư mục phương tiện truyền thông chính</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Duyệt…</translation>
-    </message>
-    <message>
-        <location/>
         <source>Extra Media Folders</source>
         <translation>Thêm thông mục</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Add...</source>
-        <translation>&amp;thêm...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Remove</source>
-        <translation>&amp;tẩy</translation>
     </message>
     <message>
         <location/>
@@ -1029,16 +1180,6 @@
     </message>
     <message>
         <location/>
-        <source>Restart required</source>
-        <translation>Khởi động lại yêu cầu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>Những âm thanh từ 5.1 giảm 2.1</translation>
-    </message>
-    <message>
-        <location/>
         <source>Auto Pause Video</source>
         <translation>Hình ảnh tự động treo</translation>
     </message>
@@ -1049,76 +1190,36 @@
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots:</source>
-        <translation>Với các máy tính bắt đầu thực hiện các phần mềm:</translation>
+        <source>Browse...</source>
+        <translation type="unfinished">Duyệt…</translation>
     </message>
     <message>
         <location/>
-        <source>Double Buffering:</source>
-        <translation>Đôi đệm:</translation>
+        <source>Add...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Browse Logs</source>
-        <translation>lịch sử</translation>
+        <source>Remove</source>
+        <translation type="unfinished">tẩy</translation>
     </message>
     <message>
         <location/>
-        <source>Clear Local Cache</source>
-        <translation>Bộ nhớ cache của địa phương rõ ràng</translation>
+        <source>Run Application when PC Boots</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui"/>
-        <source>Administration</source>
-        <translation>Quản trị</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
         <source>System Settings</source>
         <translation>Cài đặt hệ thống</translation>
     </message>
     <message>
         <location/>
-        <source>Monitor All Servers on a Single Layout</source>
-        <translation>Giám sát tất cả các máy chủ trên một diện đơn</translation>
-    </message>
-    <message>
-        <location/>
-        <source>System Backup and Restore</source>
-        <translation>Sao lưu hệ thống và phục hồi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Alarm/Event Rules...</source>
-        <translation>&amp;Báo động / sự kiện Quy tắc...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log...</source>
-        <translation>&amp;Nhật ký sự kiện...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Health Monitoring...</source>
-        <translation>&amp;Sức khỏe Giám sát ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audit Trail...</source>
-        <translation>Đường mòn kiểm toán...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open Audit Trail Log</source>
-        <translation>Mở kiểm toán log đường mòn</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks...</source>
-        <translation>&amp;Bookmarks ...</translation>
+        <source>Backup and Restore</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1130,18 +1231,13 @@
     </message>
     <message>
         <location/>
-        <source>Force aspect ratio to:</source>
-        <translation>Tỷ lệ màn hình Buộc:</translation>
+        <source>Aspect Ratio</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Đây là một mắt cá (180 độ) camera</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default Rotation:</source>
-        <translation>xoay Mặc định:</translation>
+        <source>Rotation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1165,7 +1261,7 @@
 <context>
     <name>LayoutSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.ui"/>
+        <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
         <source>Layout Settings</source>
         <translation>Giao diện thiết lập</translation>
     </message>
@@ -1196,28 +1292,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;Thay đổi tỉ lệ màn hình</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Width:</source>
-        <translation>&amp;chiều rộng:</translation>
-    </message>
-    <message>
-        <location/>
         <source> cells</source>
         <translation>tế bào</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Height:</source>
-        <translation>&amp;chiều cao:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Opacity:</source>
-        <translation>&amp;tính mờ:</translation>
     </message>
     <message>
         <location/>
@@ -1239,28 +1315,33 @@
         <source>Keep Aspect Ratio</source>
         <translation>Giữ tỉ lệ</translation>
     </message>
+    <message>
+        <location/>
+        <source>Crop to monitor aspect ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Opacity:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
-        <source>Server UR&amp;L:</source>
-        <translation>máy chủ UR&amp;L:</translation>
-    </message>
-    <message>
-        <location/>
         <source>ldap(s)://host:port</source>
         <translation>ldap(s)://host:port</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ad&amp;min DN:</source>
-        <translation>Ad&amp;min DN:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
     </message>
     <message>
         <location/>
@@ -1286,6 +1367,21 @@
         <location/>
         <source>LDAP Settings</source>
         <translation>LDAP Cài đặt</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server URL:</source>
+        <translation type="unfinished">URL máy chủ:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Admin DN:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password:</source>
+        <translation type="unfinished">mật khẩu:</translation>
     </message>
 </context>
 <context>
@@ -1357,7 +1453,7 @@
 <context>
     <name>LicenseManagerWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
         <source>Active Licenses</source>
         <translation>Giấy phép hoạt động (License)</translation>
     </message>
@@ -1368,13 +1464,18 @@
     </message>
     <message>
         <location/>
-        <source>Selected License Details</source>
-        <translation>Chi tiết Giấy phép lựa chọn</translation>
+        <source>New License</source>
+        <translation>ủy quyền mới</translation>
     </message>
     <message>
         <location/>
-        <source>New License</source>
-        <translation>ủy quyền mới</translation>
+        <source>Details...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The software is licensed to</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1384,38 +1485,23 @@
         <source>Warning</source>
         <translation>sự phản đối</translation>
     </message>
+    <message>
+        <location/>
+        <source>License issues:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.ui"/>
-        <source>Automatic Activation via Internet</source>
-        <translation>Bắt đầu tự động thông qua Internet</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
         <source>Manual Activation</source>
         <translation>Kích hoạt bằng tay</translation>
     </message>
     <message>
         <location/>
-        <source>License Key:</source>
-        <translation>License Key:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hardware ID:</source>
-        <translation>Phần cứng ID:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse...</source>
         <translation>Duyệt…</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Activation Key File:</source>
-        <translation>Bắt đầu tập tin quan trọng:</translation>
     </message>
     <message>
         <location/>
@@ -1444,13 +1530,33 @@
     </message>
     <message>
         <location/>
-        <source>License Key is Invalid</source>
-        <translation>Key bản quyền là không hợp lệ</translation>
+        <source>Select License File...</source>
+        <translation>Chọn tập tin giấy phép ...</translation>
     </message>
     <message>
         <location/>
-        <source>Select License File...</source>
-        <translation>Chọn tập tin giấy phép ...</translation>
+        <source>Internet Activation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Invalid License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Hardware ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activation Key File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1462,20 +1568,22 @@
     </message>
     <message>
         <location/>
-        <source>Get More Licenses...</source>
-        <translation>Nhận quyền nhiều hơn(giấy phép)…</translation>
+        <source>Activate License...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocalSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
+        <source>Local Settings</source>
+        <translation type="unfinished">địa phương thiết lập</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui"/>
-        <source>Connect to Server</source>
-        <comment>Groupbox Title</comment>
-        <translation>Kết nối đến Server</translation>
-    </message>
-    <message>
-        <location/>
         <source>Save...</source>
         <translation>cửa hàng...</translation>
     </message>
@@ -1486,66 +1594,46 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Host:</source>
-        <translation>&amp;nơi:</translation>
+        <source>Connection Options:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>P&amp;ort:</source>
-        <translation>&amp;cổng truyền thông:</translation>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;Đăng nhập:</translation>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <source>Login</source>
+        <translation type="unfinished">Đăng nhập</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Test</source>
-        <translation>&amp;Kiểm tra kết nối</translation>
+        <source>Password</source>
+        <translation type="unfinished">Mật khẩu</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Auto-Login</source>
-        <translation>&amp;Ghi nhớ tôi</translation>
+        <source>Test</source>
+        <translation type="unfinished">thử</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Connection Options:</source>
-        <translation>&amp;Lựa chọn kết nối:</translation>
+        <source>Auto-Login</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
         <source>Look and Feel</source>
         <translation>điều chỉnh thị giác</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Language:</source>
-        <translation>ngôn ngữ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show IP in tree:</source>
-        <translation>Hiện IP trong danh sách:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Skin:</source>
-        <translation>Bối cảnh:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time:</source>
-        <translation>Thời gian chu kỳ bánh xe hop:</translation>
     </message>
     <message>
         <location/>
@@ -1559,31 +1647,6 @@
     </message>
     <message>
         <location/>
-        <source>Background Animation</source>
-        <translation>Bối cảnh Animation</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Background Animation</source>
-        <translation>cho phép Bối cảnh Animation</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Color:</source>
-        <translation>màu sắc:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select color...</source>
-        <translation>Chọn màu ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Intensity:</source>
-        <translation>cường độ:</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1591,16 +1654,6 @@
         <location/>
         <source>Background Image</source>
         <translation>hình nền</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Background Image</source>
-        <translation>cho phép hình nền</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Image:</source>
-        <translation>hình ảnh:</translation>
     </message>
     <message>
         <location/>
@@ -1614,13 +1667,38 @@
     </message>
     <message>
         <location/>
-        <source>Mode:</source>
-        <translation>chế độ:</translation>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Time Mode:</source>
-        <translation>chế độ thời gian:</translation>
+        <source>Time Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show extra info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour sequence cycle time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Intensity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1659,6 +1737,11 @@
         <location/>
         <source>Enable Audio</source>
         <translation>cho phép âm thanh</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1700,27 +1783,19 @@
 <context>
     <name>PopupSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/popup_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
         <source>Show all notifications</source>
         <translation>Hiển thị tất cả các thông báo</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Alarms/Events</source>
-        <translation>Báo động / Sự kiện</translation>
     </message>
     <message>
         <location/>
         <source>System Notifications</source>
         <translation>hệ thống Thông báo</translation>
     </message>
-</context>
-<context>
-    <name>PreferencesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui"/>
-        <source>Local Settings</source>
-        <translation>địa phương thiết lập</translation>
+        <location/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1811,23 +1886,8 @@
     <name>QnBuildNumberDialog</name>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
-        <source>99990</source>
-        <translation>99990</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation>mật khẩu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Install a specific build.</source>
-        <translation>Cài đặt xây dựng cụ thể.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Build Number:</source>
-        <translation>Xây dựng số:</translation>
+        <source>Choose a specific build</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1836,6 +1896,14 @@
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
         <source>Bookmark</source>
         <translation>Bookmark</translation>
+    </message>
+</context>
+<context>
+    <name>QnCompatibilityVersionInstallationDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
+        <source>Installing Compatibility Version...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1857,14 +1925,6 @@
     </message>
 </context>
 <context>
-    <name>QnFisheyeCalibrationWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.ui"/>
-        <source>Auto Calibration</source>
-        <translation>tự động điều chỉnh</translation>
-    </message>
-</context>
-<context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -1873,21 +1933,29 @@
     </message>
 </context>
 <context>
+    <name>QnLoginToCloudDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stay logged in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Email or password is not recognized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
         <source>File Settings</source>
         <translation>Cài đặt tập tin</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Picture is not loaded</source>
-        <translation>Hình ảnh không được tải</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This is a fish-eye lens file</source>
-        <translation>Đây là một tập tin ống kính mắt cá</translation>
     </message>
 </context>
 <context>
@@ -1922,6 +1990,16 @@
         <source>You will be reconnected.</source>
         <translation>Bạn sẽ được nối lại.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Login:</source>
+        <translation type="unfinished">Đăng nhập:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>admin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1932,23 +2010,23 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Play</source>
-        <translation>&amp;Broadcast</translation>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Add...</source>
-        <translation>&amp;thêm...</translation>
+        <source>Add...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Rename...</source>
-        <translation>&amp;đổi tên...</translation>
+        <source>Rename...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Delete...</source>
-        <translation>&amp;xóa bỏ...</translation>
+        <source>Delete...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1958,26 +2036,11 @@
         <source>Filter</source>
         <translation>Lọc</translation>
     </message>
-    <message>
-        <location/>
-        <source>Reset Filter</source>
-        <translation>Đặt lại bộ lọc</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.ui"/>
-        <source>Available Server Addresses</source>
-        <translation>Địa chỉ máy chủ có sẵn</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
         <source>Add URL</source>
         <translation>thêm vào URL</translation>
     </message>
@@ -1991,41 +2054,16 @@
         <source>Removing this connection option could lead to system malfunction.</source>
         <translation>Loại bỏ các tùy chọn kết nối này có thể dẫn đến hệ thống bị trục trặc.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Add</source>
+        <translation type="unfinished">thêm</translation>
+    </message>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui"/>
-        <source>Unknown</source>
-        <translation>không biết</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update</source>
-        <translation>Cập nhật</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update from file:</source>
-        <translation>Cập nhật từ tập tin:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Archive url:</source>
-        <translation>Url lưu trữ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
-    </message>
-    <message>
-        <location/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
         <source>Cancel</source>
         <translation>hủy bỏ</translation>
     </message>
@@ -2041,18 +2079,23 @@
     </message>
     <message>
         <location/>
-        <source>Available Update:</source>
-        <translation>Sẵn có:</translation>
+        <source>Applying system updates at the end of the week is not recommended.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation>Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
+        <source>Updating to...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Unable to check updates on the Internet.</source>
-        <translation>Không thể kiểm tra cập nhật trên Internet.</translation>
+        <source>Update System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link copied</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2107,14 +2150,9 @@
 <context>
     <name>QnUserManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/user_management_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
         <source>LDAP Settings...</source>
         <translation>Cài đặt LDAP ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>Lọc...</translation>
     </message>
     <message>
         <location/>
@@ -2128,29 +2166,39 @@
     </message>
     <message>
         <location/>
-        <source>Enable Selected</source>
-        <translation>Cho phép chọn</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Disable Selected</source>
-        <translation>Vô hiệu hoá chọn lọc</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Delete Selected</source>
-        <translation>xóa chọn</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Selection</source>
         <translation>rõ ràng Selection</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Delete...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/videowall_settings_dialog.ui"/>
+        <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
         <source>Video Wall Settings</source>
         <translation>thiết lập bức tường video</translation>
     </message>
@@ -2214,7 +2262,7 @@
 <context>
     <name>RecordingSettings</name>
     <message>
-        <location filename="../src/ui/widgets/settings/recording_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
         <source>Video Recording</source>
         <translation>đầu ghi video</translation>
     </message>
@@ -2222,11 +2270,6 @@
         <location/>
         <source>Temporary Folder</source>
         <translation>thư mục Scratch</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Duyệt…</translation>
     </message>
     <message>
         <location/>
@@ -2265,11 +2308,6 @@
     </message>
     <message>
         <location/>
-        <source>Resolution:</source>
-        <translation>Nghị quyết:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Native</source>
         <translation>nguyên</translation>
     </message>
@@ -2300,11 +2338,6 @@
     </message>
     <message>
         <location/>
-        <source>Recording Quality:</source>
-        <translation>chất lượng video:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Best</source>
         <translation>cao nhất</translation>
     </message>
@@ -2325,86 +2358,38 @@
     </message>
     <message>
         <location/>
-        <source>Primary Device:</source>
-        <translation>các đơn vị chính:</translation>
-    </message>
-    <message>
-        <location/>
         <source>None</source>
         <translation>không ai</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device:</source>
-        <translation>các thiết bị bên ngoài:</translation>
     </message>
     <message>
         <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>Một máy tính mạnh mẽ được khuyến khích cho &quot;Best&quot; chất lượng và độ phân giải.</translation>
     </message>
-</context>
-<context>
-    <name>RecordingStatisticsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/recording_statistics_widget.ui"/>
-        <source>Refresh</source>
-        <translation>Làm mới</translation>
+        <location/>
+        <source>Browse...</source>
+        <translation type="unfinished">Duyệt…</translation>
     </message>
     <message>
         <location/>
-        <source>10 Tb</source>
-        <translation>10 Tb</translation>
+        <source>Resolution</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Forecast for full storage(s) usage</source>
-        <translation>Dự báo dung lượng sử dụng đầy đủ</translation>
+        <source>Recording Quality</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>0 Tb</source>
-        <translation>0 Tb</translation>
+        <source>Primary Device</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Additional storage:</source>
-        <translation>Lưu trữ bổ sung:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 Tb</source>
-        <translation>1000 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 Tb</source>
-        <translation>100 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tb</source>
-        <translation>Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1 Tb</source>
-        <translation>1 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current usage</source>
-        <translation>sử dụng hiện tại</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Forecast</source>
-        <translation>dự báo</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation>Máy chủ đang ẩn. Thống kê là không có sẵn.</translation>
+        <source>External Device</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2418,24 +2403,6 @@
         <location/>
         <source>Search</source>
         <translation>tìm kiếm</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset Filter</source>
-        <translation>Đặt lại bộ lọc</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-</context>
-<context>
-    <name>ResourceListDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/resource_list_dialog.ui"/>
-        <source>Never suggest saving layouts</source>
-        <translation>Không bao giờ đề nghị bố trí tiết kiệm</translation>
     </message>
 </context>
 <context>
@@ -2470,36 +2437,21 @@
     <name>SendmailBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
-        <source>&amp;Additional Recipients:</source>
-        <translation>&amp;Nhận thêm:</translation>
+        <source>Additional Recipients:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Global Email Settings...</source>
-        <translation>&amp;Cài đặt Email trên toàn cầu…</translation>
+        <source>Global Email Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
-        <source>Name:</source>
-        <translation>tên:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address:</source>
-        <translation>IP :</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ping</source>
         <translation>Ping</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port:</source>
-        <translation>port:</translation>
     </message>
     <message>
         <location/>
@@ -2515,6 +2467,21 @@
         <location/>
         <source>Failover Priority...</source>
         <translation>Failover ưu tiên ...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2590,33 +2557,8 @@
     </message>
     <message>
         <location/>
-        <source>Name:</source>
-        <translation>tên:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Model:</source>
-        <translation>kiểu mẫu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Firmware:</source>
-        <translation>firmware:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Vendor:</source>
-        <translation>Nhà cung cấp:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Address</source>
         <translation>địa chỉ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address:</source>
-        <translation>IP :</translation>
     </message>
     <message>
         <location/>
@@ -2625,28 +2567,8 @@
     </message>
     <message>
         <location/>
-        <source>Web Page:</source>
-        <translation>trang Web:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>MAC Address:</source>
-        <translation>MAC :</translation>
-    </message>
-    <message>
-        <location/>
         <source>Authentication</source>
         <translation>xác nhận</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Login:</source>
-        <translation>Đăng nhập:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation>mật khẩu:</translation>
     </message>
     <message>
         <location/>
@@ -2657,21 +2579,6 @@
         <location/>
         <source>Motion</source>
         <translation>vận động</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensitivity:</source>
-        <translation>Độ nhạy:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Maximum sensitivity (9)</source>
-        <translation>độ nhạy tối đa (9)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>URL</source>
-        <translation>nơi</translation>
     </message>
     <message>
         <location/>
@@ -2695,38 +2602,8 @@
     </message>
     <message>
         <location/>
-        <source>Motion Settings</source>
-        <translation>Displacement bộ</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion Detection</source>
         <translation>phát hiện chuyển động</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation>Phần mềm - tối đa FPS có thể giảm nhẹ trên máy chủ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Mask (0)</source>
-        <translation>Không phát hiện di dời (0)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Camera web page:</source>
-        <translation>Máy ảnh trang phát hiện chuyển động:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset Motion Regions</source>
-        <translation>Thiết lập lại khu vực phát hiện chuyển động</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hardware (camera built-in)</source>
-        <translation>Phần cứng (camera built-in)</translation>
     </message>
     <message>
         <location/>
@@ -2738,36 +2615,76 @@
         <source>I/O ports</source>
         <translation>I/O cổng</translation>
     </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Model</source>
+        <translation type="unfinished">kiểu mẫu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation type="unfinished">Đăng nhập</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation type="unfinished">Mật khẩu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MAC Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensitivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmtpAdvancedSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
-        <source>SMTP &amp;Server:</source>
-        <translation>SMTP&amp;máy chủ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;User:</source>
-        <translation>&amp;người sử dụng:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Email:</source>
-        <translation>Email:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>P&amp;ort:</source>
-        <translation>&amp;cổng truyền thông:</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
         <source>Unsecure Connection</source>
         <translation>Dây không an toàn</translation>
     </message>
@@ -2788,24 +2705,14 @@
     </message>
     <message>
         <location/>
-        <source>&amp;System Signature:</source>
-        <translation>&amp;hệ thống Seal:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a short system description here.</source>
-        <translation>Nhập một mô tả ngắn gọn của hệ thống.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Support Signature:</source>
-        <translation>Chữ ký hỗ trợ:</translation>
+        <source>Port:</source>
+        <translation type="unfinished">port:</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
         <source>Advanced settings...</source>
         <translation>Cài đặt nâng cao...</translation>
     </message>
@@ -2821,37 +2728,9 @@
     </message>
 </context>
 <context>
-    <name>SmtpSimpleSettingsWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
-        <source>&amp;Email:</source>
-        <translation>&amp;Email:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;System Signature:</source>
-        <translation>&amp;hệ thống Seal:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a short system description here.</source>
-        <translation>Nhập một mô tả ngắn gọn của hệ thống.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Support Signature:</source>
-        <translation>Chữ ký hỗ trợ:</translation>
-    </message>
-</context>
-<context>
     <name>SmtpTestConnectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
         <translation>máy chủ:</translation>
     </message>
@@ -2892,19 +2771,62 @@
     </message>
 </context>
 <context>
+    <name>StorageAnalyticsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
+        <source>Current Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Forecast for Full Storage Usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1000 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>100 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>10 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Additional storage:</source>
+        <translation type="unfinished">Lưu trữ bổ sung:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servers is offline. Statistics is not available.</source>
+        <translation type="unfinished">Máy chủ đang ẩn. Thống kê là không có sẵn.</translation>
+    </message>
+</context>
+<context>
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Rebuild Archive Index</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup progress</source>
-        <translation>tiến trình sao lưu</translation>
-    </message>
-    <message>
-        <location/>
         <source>Cancel</source>
         <translation>hủy bỏ</translation>
     </message>
@@ -2915,75 +2837,38 @@
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop.
-It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation>Bỏ chọn lưu trữ sẽ gây ra gì, nhưng văn bản dừng.
-Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add External Storage...</source>
         <translation>Lưu trữ bên ngoài mới...</translation>
     </message>
     <message>
         <location/>
-        <source>Main Storage Locations</source>
-        <translation>Địa điểm lưu trữ chính</translation>
+        <source>Storage Locations</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Backup Storage Locations</source>
-        <translation>Địa điểm lưu trữ sao lưu</translation>
+        <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Execute Backup</source>
-        <translation>Thực hiện sao lưu</translation>
+        <source>Reindex Archive</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Set Schedule...</source>
-        <translation>Đặt lịch ...</translation>
+        <source>Reindex Backup</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation>Bạn không cấu hình lưu trữ dự phòng. Backup sẽ không được thực hiện.</translation>
+        <source>Backup Archive</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation>lưu trữ dự phòng có sẵn, nếu có 2 hoặc nhiều ổ đĩa lưu trữ có giá trị trong hệ thống.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Global Backup Settings</source>
-        <translation>v</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Archive From:</source>
-        <translation>Sao lưu Lưu Trữ Từ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Quality:</source>
-        <translation>Chất lượng sao lưu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Select at least one camera&gt; </source>
-        <translation>&lt;Chọn ít nhất một máy ảnh&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Server Backup Settings</source>
-        <translation>cài đặt máy chủ sao lưu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Time Label</source>
-        <translation>nhãn thời gian dự phòng</translation>
+        <source>Backup Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3025,7 +2910,7 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
 <context>
     <name>SystemSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
         <source>(recommended)</source>
         <translation>(đề nghị)</translation>
     </message>
@@ -3048,72 +2933,78 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui"/>
-        <source>Synchronizing...</source>
-        <translation>Đồng bộ hóa ...</translation>
+        <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
+        <source>System Time</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Current System Time:</source>
-        <translation>Thời gian hiện tại:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation>Chọn một máy chủ có sẵn tại địa phương để hoạt động như một máy chủ thời gian nếu hệ thống không có truy cập Internet:</translation>
+        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+Selected server will be used as a time server if the system has no Internet access.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>UserSettingsDialog</name>
+    <name>UserProfileWidget</name>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.ui"/>
-        <source>Create New User</source>
-        <translation>Người dùng mới</translation>
+        <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
+        <source>Change Password...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserRoleSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Advanced...</source>
-        <translation>nâng cao…</translation>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>C&amp;urrent Password:</source>
-        <translation>Đối với doanh nghiệp&amp;mật khẩu:</translation>
+        <source>Delete Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserRolesDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
+        <source>User Roles</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Confirm Password:</source>
-        <translation>&amp;Xác nhận mật khẩu:</translation>
+        <source>There are no custom user roles yet.
+Click &quot;New role&quot; button to create one.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Access Rights:</source>
-        <translation>&amp;quyền:</translation>
+        <source>New role</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <source>User Type</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Access rights</source>
-        <translation>quyền</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;Đăng nhập:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>E&amp;mail:</source>
-        <translation>&amp;Email:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enabled:</source>
-        <translation>được kích hoạt:</translation>
+        <source>Role</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
