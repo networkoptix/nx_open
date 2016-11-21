@@ -3401,7 +3401,7 @@ void QnNxStyle::polish(QWidget *widget)
         * Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
         *  which causes calendar dropdown button to not redraw properly
         */
-        #if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
+        #if QT_VERSION < 0x050600 && QT_VERSION > 0x050602
         #error Check if this workaround is required in current Qt version
         #endif
         if (qobject_cast<QDateTimeEdit*>(widget))
@@ -3430,9 +3430,9 @@ void QnNxStyle::polish(QWidget *widget)
         }
         widget->setAttribute(Qt::WA_Hover);
 
-#if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
-#error Check if this workaround is required in current Qt version
-#endif
+        #if QT_VERSION < 0x050600 && QT_VERSION > 0x050602
+        #error Check if this workaround is required in current Qt version
+        #endif
         /* Fix for Qt 5.6 bug: QHeaderView doesn't resize stretch sections to minimum
          *  if quickly resized down. To overcome this problem we do it ourselves: */
         widget->installEventFilter(this);
