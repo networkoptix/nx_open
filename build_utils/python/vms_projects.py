@@ -33,6 +33,7 @@ translatableProjects = [
     TranslatableProject("client_base", "client/libclient"),
     TranslatableProject("client_ui", "client/libclient").ui(),
     TranslatableProject("client_core", "client/libclient_core"),
+    TranslatableProject("client_qml", "client/libclient").qml(),
     TranslatableProject("mobile_client_base", "client/mobile_client"),
     TranslatableProject("mobile_client_qml", "client/mobile_client").qml()
 ]
