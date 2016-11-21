@@ -15,11 +15,74 @@
     </message>
 </context>
 <context>
-    <name>QnBusinessStringsHelper</name>
+    <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>Motion on Camera</source>
-        <translation>카메라의 모션</translation>
+        <source>The system was not found.</source>
+        <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password or user name is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user does not have permissions for the requested operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create database backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you understand this and would like to proceed please click Merge to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System being merged cannot be connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name is not configured yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessStringsHelper</name>
     <message>
         <source>Storage Failure</source>
         <translation>저장기 오류</translation>
@@ -142,18 +205,6 @@
         <translation>%1 서버 충돌 중: %2</translation>
     </message>
     <message>
-        <source>%2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n times, first: %2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>%n시간, first: %2 %1</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>시간: %2 의 %1</translation>
@@ -253,10 +304,6 @@
         <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
     </message>
     <message>
-        <source>Server restarted unexpectedly.</source>
-        <translation>서버가 예상치 못하게 재시작되었습니다.</translation>
-    </message>
-    <message>
         <source>Device output</source>
         <translation>장치 출력</translation>
     </message>
@@ -265,44 +312,12 @@
         <translation>카메라 출력</translation>
     </message>
     <message>
-        <source>Device output for 30 sec</source>
-        <translation>30초간 장치 출력</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>30초간 카메라 출력</translation>
-    </message>
-    <message>
         <source>Device recording</source>
         <translation>장치 녹화</translation>
     </message>
     <message>
         <source>Camera recording</source>
         <translation>카메라 녹화</translation>
-    </message>
-    <message>
-        <source>Input Signal on Device</source>
-        <translation>장치의 입력 신호</translation>
-    </message>
-    <message>
-        <source>Input Signal on Camera</source>
-        <translation>카메라 입력 신호</translation>
-    </message>
-    <message>
-        <source>Device Disconnected</source>
-        <translation>장치 해제</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>카메라 해제</translation>
-    </message>
-    <message>
-        <source>Device IP Conflict</source>
-        <translation>장치 IP 충돌</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>카메라 IP 충돌</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
@@ -333,14 +348,6 @@
     <message>
         <source>Connection to device was unexpectedly closed.</source>
         <translation>장치 연결이 예상치 못하게 끊김.</translation>
-    </message>
-    <message>
-        <source>Recording on devices is disabled:</source>
-        <translation>장치에서 녹화 가 중지되었습니다:</translation>
-    </message>
-    <message>
-        <source>Recording on cameras is disabled:</source>
-        <translation>카메라에서 녹화가 중지 되었습니다:</translation>
     </message>
     <message>
         <source>Execute PTZ preset</source>
@@ -411,11 +418,81 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording on I/O modules is disabled:</source>
+        <source>Do HTTP request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device does not respond to network requests.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do HTTP request</source>
+        <source>Server stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -631,28 +708,6 @@
     </message>
 </context>
 <context>
-    <name>QnCommandLineParser</name>
-    <message>
-        <source>No value provided for the &apos;%1&apos; argument.</source>
-        <translation>&apos;%1&apos; 인수 값이 없습니다.</translation>
-    </message>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; 인수 값이 유효하지 않습니다. - %2 예상, &apos;%3&apos;제공.</translation>
-    </message>
-</context>
-<context>
-    <name>QnEnvironment</name>
-    <message>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Windows 탐색기를 시작 하는 경로에서 explorer.exe를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
         <source>Audio context was not specified.</source>
@@ -668,6 +723,30 @@
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find decoder for codec %1.</source>
+        <translation type="unfinished">%1 codec의 인코더를 찾을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -736,10 +815,6 @@
         <translation>비디오 월</translation>
     </message>
     <message>
-        <source>Expired</source>
-        <translation>만료</translation>
-    </message>
-    <message>
         <source>Only single license is allowed for this device</source>
         <translation>이 장치는 하나의(단일) 인증키만 허용합니다</translation>
     </message>
@@ -796,20 +871,8 @@
         <translation>라이센스 시작</translation>
     </message>
     <message>
-        <source>Invalid Signature</source>
-        <translation>유효하지 않은 서명</translation>
-    </message>
-    <message>
         <source>Server with matching hardware ID not found</source>
         <translation>서버와 연관된 HW ID 가 일치 하지 않습니다</translation>
-    </message>
-    <message>
-        <source>Invalid Customization</source>
-        <translation>유효하지 않은 변경</translation>
-    </message>
-    <message>
-        <source>Invalid Type</source>
-        <translation>유효하지 않은 방식</translation>
     </message>
     <message>
         <source>Invalid</source>
@@ -822,6 +885,22 @@
     <message>
         <source>This license type requires higher software version.</source>
         <translation>이 라이센스는 상위 버젼의 SW가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>Invalid signature</source>
+        <translation type="unfinished">유효하지 않은 서명</translation>
+    </message>
+    <message>
+        <source>Invalid customization</source>
+        <translation type="unfinished">유효하지 않은 변경</translation>
+    </message>
+    <message>
+        <source>License is expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid type</source>
+        <translation type="unfinished">유효하지 않은 방식</translation>
     </message>
 </context>
 <context>
@@ -869,13 +948,6 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnMediaServerResource</name>
-    <message>
-        <source>Server</source>
-        <translation>서버</translation>
     </message>
 </context>
 <context>
@@ -1099,6 +1171,21 @@
         <source>File write error. Not enough free space.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid resource type for data export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemDescription</name>
+    <message>
+        <source>New system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Unnamed system&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -1147,14 +1234,62 @@
     </message>
 </context>
 <context>
-    <name>QnTranslationListModel</name>
+    <name>QnUserRolesManager</name>
     <message>
-        <source>%1 (built-in)</source>
-        <translation>%1 (내장)</translation>
+        <source>Owner</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 (external)</source>
-        <translation>%1 (외장)</translation>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can manage it. Can create users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can manage all cameras and bookmarks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view all cameras and export video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view live video from all cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom user role.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

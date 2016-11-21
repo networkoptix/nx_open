@@ -50,14 +50,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation></translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation></translation>
     </message>
@@ -90,27 +82,35 @@
         <translation></translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
