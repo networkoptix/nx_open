@@ -26,6 +26,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -40,6 +41,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::OtherSystemsNode
         << Qn::WebPagesNode
         << Qn::ServersNode
+        << Qn::MyCloudNode
         << Qn::UserResourcesNode
         << Qn::RecorderNode
         << Qn::SystemNode
@@ -47,7 +49,6 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::LayoutsNode
         << Qn::SharedLayoutsNode
         << Qn::SharedResourcesNode
-        << Qn::RoleUsersNode
         ;
     return result.contains(nodeType);
 }
@@ -111,6 +112,10 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::UsersNode:
         setName(tr("Users"));
         break;
+    case Qn::MyCloudNode:
+        setName(QnAppInfo::cloudName());
+        m_state = Invalid;
+        break;
     case Qn::WebPagesNode:
         setName(tr("Web Pages"));
         break;
@@ -156,7 +161,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QString &name) :
     QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(nodeType == Qn::SystemNode || nodeType == Qn::RecorderNode);
+    NX_ASSERT(
+        nodeType == Qn::SystemNode
+        || nodeType == Qn::RecorderNode
+        || nodeType == Qn::CloudSystemNode
+    );
     setName(name);
     if (m_displayName.isEmpty())
     {
@@ -165,6 +174,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         case Qn::RecorderNode:
             break;
         case Qn::SystemNode:
+        case Qn::CloudSystemNode:
             m_displayName = tr("<Unnamed system>");
             break;
         default:
@@ -462,6 +472,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::SharedLayoutNode:
         case Qn::RecorderNode:
         case Qn::SystemNode:
+        case Qn::CloudSystemNode:
+        case Qn::MyCloudNode:
             return false;
 
         case Qn::CurrentSystemNode:
@@ -922,6 +934,10 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
         case Qn::LocalResourcesNode:
             return qnResIconCache->icon(QnResourceIconCache::LocalResources);
+
+        case Qn::MyCloudNode:
+        case Qn::CloudSystemNode:
+            return qnSkin->icon("welcome_page/cloud_online.png");
 
         case Qn::CurrentSystemNode:
             return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
