@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
         $scope.Config = Config;
 
@@ -35,11 +35,10 @@ angular.module('webadminApp')
 
         $scope.serverAddress = window.location.host;
 
-        var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var cloudAuthorized = false;
 
         $log.log("check getCredentials from client");
-        if(nativeClientObject && nativeClientObject.getCredentials){
+        nativeClient.getCredentials().then(function(authObject){
             $log.log("request get credentials from client");
             var authObject = nativeClientObject.getCredentials();
             if (typeof authObject === 'string' || authObject instanceof String){
@@ -56,32 +55,22 @@ angular.module('webadminApp')
                 $scope.settings.presetCloudEmail = authObject.cloudEmail;
                 $scope.settings.presetCloudPassword = authObject.cloudPassword;
             }
-        }
+        });
 
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
-            if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
-            }else{
-                window.open(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
-            }
+            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext, true);
             $scope.next('cloudLogin');
         };
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.openLink = function($event){
-            if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext);
-            }else{
-                window.open(Config.cloud.portalUrl + Config.cloud.webadminSetupContext);
-            }
+            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext,true);
             $event.preventDefault();
         };
 
         function sendCredentialsToNativeClient(){
-            if(nativeClientObject && nativeClientObject.updateCredentials){
-                $log.log("Send credentials to client app: " + $scope.activeLogin);
-                nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
-            }
+            $log.log("Send credentials to client app: " + $scope.activeLogin);
+            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
         }
 
         function checkInternetOnServer(reload){
@@ -466,15 +455,12 @@ angular.module('webadminApp')
             return $scope.step == step;
         };
         $scope.finish = function(){
-            if(nativeClientObject) {
-                $log.log("close dialog");
-                window.close();
-            }else{
+            nativeClient.closeDialog().catch(function(){
                 $location.path('/settings');
                 setTimeout(function(){
                     window.location.reload();
                 });
-            }
+            });
         };
 
         $scope.skip = function() {
@@ -496,14 +482,7 @@ angular.module('webadminApp')
             return !!$scope.activeStep.retry && !$scope.activeStep.retried;
         };
         $scope.cancel = function(){
-            if(nativeClientObject) {
-                if(nativeClientObject.cancel){
-                    nativeClientObject.cancel();
-                }
-
-                $log.log("close dialog");
-                window.close();
-            }
+            nativeClient.cancelDialog();
         };
         $scope.back = function(){
             $scope.next($scope.activeStep.back, true);
@@ -572,151 +551,152 @@ angular.module('webadminApp')
 
         /* Wizard workflow */
 
-        $scope.wizardFlow = {
-            0:{
-            },
-            start:{
-                cancel: !!nativeClientObject,
-                next: 'systemName'
-            },
-            systemName:{
-                back: 'start',
-                skip: 'merge',
-                next: function(){
-                    $scope.next(cloudAuthorized?'chooseCloud':'chooseLocal');
+        function initWizardFlow() {
+            $scope.wizardFlow = {
+                0: {},
+                start: {
+                    cancel: $scope.thickClient,
+                    next: 'systemName'
                 },
-                valid: function(){
-                    return checkForm($scope.forms.systemNameForm);
-                }
-            },
-            advanced:{
-                back: 'systemName',
-                next: 'systemName'
-            },
-            noInternetOnServer:{
-                retry:function(){
-                    checkInternetOnServer(true).then(function(){
-                        $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
-                    });
-                },
-                back:'chooseCloud',
-                skip:'localLogin'
-            },
-            noInternetOnClient:{
-                retry:function(){
-                    checkInternetOnClient(true).then(function(){
-                        $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
-                    });
-                },
-                back:'chooseCloud',
-                skip:'localLogin'
-            },
-
-            chooseLocal:{
-                back:'systemName',
-                next:'localLogin',
-                skip:'chooseCloud'
-            },
-            chooseCloud:{
-                back:'systemName',
-                next:function(){
-                    if(!$scope.hasInternetOnServer){
-                        $scope.next('noInternetOnServer');
-                        return;
+                systemName: {
+                    back: 'start',
+                    skip: 'merge',
+                    next: function () {
+                        $scope.next(cloudAuthorized ? 'chooseCloud' : 'chooseLocal');
+                    },
+                    valid: function () {
+                        return checkForm($scope.forms.systemNameForm);
                     }
+                },
+                advanced: {
+                    back: 'systemName',
+                    next: 'systemName'
+                },
+                noInternetOnServer: {
+                    retry: function () {
+                        checkInternetOnServer(true).then(function () {
+                            $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
+                        });
+                    },
+                    back: 'chooseCloud',
+                    skip: 'localLogin'
+                },
+                noInternetOnClient: {
+                    retry: function () {
+                        checkInternetOnClient(true).then(function () {
+                            $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
+                        });
+                    },
+                    back: 'chooseCloud',
+                    skip: 'localLogin'
+                },
 
-                    if(!$scope.hasInternetOnClient){
-                        $scope.next('noInternetOnClient');
-                        return;
+                chooseLocal: {
+                    back: 'systemName',
+                    next: 'localLogin',
+                    skip: 'chooseCloud'
+                },
+                chooseCloud: {
+                    back: 'systemName',
+                    next: function () {
+                        if (!$scope.hasInternetOnServer) {
+                            $scope.next('noInternetOnServer');
+                            return;
+                        }
+
+                        if (!$scope.hasInternetOnClient) {
+                            $scope.next('noInternetOnClient');
+                            return;
+                        }
+
+                        $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
+                    },
+                    skip: 'chooseLocal'
+                },
+
+                cloudIntro: {
+                    back: 'chooseCloud',
+                    skip: 'localLogin'
+                },
+                cloudAuthorizedIntro: {
+                    back: 'chooseCloud',
+                    skip: 'localLogin',
+                    next: function () {
+                        $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
+                        $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
+                        return $scope.next('cloudProcess');
                     }
-
-                    $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
                 },
-                skip:'chooseLocal'
-            },
-
-            cloudIntro:{
-                back: 'chooseCloud',
-                skip: 'localLogin'
-            },
-            cloudAuthorizedIntro:{
-                back: 'chooseCloud',
-                skip: 'localLogin',
-                next: function(){
-                    $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
-                    $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
-                    return $scope.next('cloudProcess');
-                }
-            },
-            cloudLogin:{
-                back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
-                next: 'cloudProcess',
-                valid: function(){
-                    return checkForm($scope.forms.cloudForm);
-                }
-            },
-            cloudProcess:{
-                onShow: connectToCloud
-            },
-            cloudSuccess:{
-                finish: true
-            },
-            cloudFailure:{
-                back: 'cloudLogin',
-                skip: 'localLogin',
-                retry: function(){
-                    $scope.next('cloudLogin');
-                }
-            },
-            merge:{
-                back: 'systemName',
-                // onShow: discoverSystems,
-                next: 'mergeProcess',
-                valid: function(){
-                    return checkForm($scope.forms.remoteSystemForm);
-                }
-            },
-            mergeProcess:{
-                onShow: connectToAnotherSystem
-            },
-            mergeFailure:{
-                back: 'merge',
-                skip: 'systemName',
-                retry: function(){
-                    $scope.next('merge');
-                }
-            },
-
-            localLogin:{
-                back: function(){
-                    $scope.settings.localPassword = '';
-                    $scope.settings.localPasswordConfirmation = '';
-                    $scope.next('chooseLocal',true);
+                cloudLogin: {
+                    back: cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro',
+                    next: 'cloudProcess',
+                    valid: function () {
+                        return checkForm($scope.forms.cloudForm);
+                    }
                 },
-                next: initOfflineSystem,
-                valid: function(){
-                    return checkForm($scope.forms.localForm) &&
-                        $scope.settings.localPassword === $scope.settings.localPasswordConfirmation;
-                }
-            },
-            localSuccess:{
-                finish:true
-            },
-            localFailure:{
-                back:'systemName',
-                finish:true,
-                retry:function(){
-                    $scope.next('start');
-                }
-            },
-            initFailure:{
-                cancel: !!nativeClientObject,
-                retry: function(){
-                    initWizard();
-                }
-            }
+                cloudProcess: {
+                    onShow: connectToCloud
+                },
+                cloudSuccess: {
+                    finish: true
+                },
+                cloudFailure: {
+                    back: 'cloudLogin',
+                    skip: 'localLogin',
+                    retry: function () {
+                        $scope.next('cloudLogin');
+                    }
+                },
+                merge: {
+                    back: 'systemName',
+                    // onShow: discoverSystems,
+                    next: 'mergeProcess',
+                    valid: function () {
+                        return checkForm($scope.forms.remoteSystemForm);
+                    }
+                },
+                mergeProcess: {
+                    onShow: connectToAnotherSystem
+                },
+                mergeFailure: {
+                    back: 'merge',
+                    skip: 'systemName',
+                    retry: function () {
+                        $scope.next('merge');
+                    }
+                },
 
-        };
+                localLogin: {
+                    back: function () {
+                        $scope.settings.localPassword = '';
+                        $scope.settings.localPasswordConfirmation = '';
+                        $scope.next('chooseLocal', true);
+                    },
+                    next: initOfflineSystem,
+                    valid: function () {
+                        return checkForm($scope.forms.localForm) &&
+                            $scope.settings.localPassword === $scope.settings.localPasswordConfirmation;
+                    }
+                },
+                localSuccess: {
+                    finish: true
+                },
+                localFailure: {
+                    back: 'systemName',
+                    finish: true,
+                    retry: function () {
+                        $scope.next('start');
+                    }
+                },
+                initFailure: {
+                    cancel: $scope.thickClient,
+                    retry: function () {
+                        initWizard();
+                    }
+                }
+
+            };
+        }
 
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
@@ -757,6 +737,7 @@ angular.module('webadminApp')
             });
         }
         function initWizard(){
+            initWizardFlow();
             $scope.next(0);
 
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
@@ -781,5 +762,10 @@ angular.module('webadminApp')
             });
         }
 
-        initWizard();
+        nativeClient.init().then(function(result){
+            $scope.thickClient = result.thick;
+            $scope.liteClient = result.lite;
+            $log.log("check client Thick:" + result.thick);
+            $log.log("check client Lite:" + result.lite);
+        }).finally(initWizard);
     });
