@@ -306,8 +306,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
 
 #ifdef Q_OS_WIN
-    common->store<QnIexploreUrlHandler>(new QnIexploreUrlHandler());
-    common->store<QnQtbugWorkaround>(new QnQtbugWorkaround());
+    common->store(new QnIexploreUrlHandler());
+    common->store(new QnQtbugWorkaround());
 #endif
 
 #ifndef DISABLE_FESTIVAL
