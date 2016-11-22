@@ -80,8 +80,9 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
     return pinned ? (opened ? Qn::PaneState::Opened : Qn::PaneState::Closed) : Qn::PaneState::Unpinned;
 }
 
-const int kHideControlsTimeoutMs = 2000;
+constexpr int kHideControlsTimeoutMs = 2000;
 
+constexpr qreal kZoomedTimelineOpacity = 0.9;
 
 } // anonymous namespace
 
@@ -641,7 +642,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
 {
     bool alreadyZoomed = m_widgetByRole[role] != nullptr;
 
-    QnResourceWidget *newWidget = display()->widget(role);
+    QnResourceWidget* newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 
     /* Update activity listener instrument. */
@@ -665,6 +666,12 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
         }
+
+        qreal masterOpacity = newWidget ? kZoomedTimelineOpacity : NxUi::kOpaque;
+        if (m_timeline)
+            m_timeline->setMasterOpacity(masterOpacity);
+        if (m_calendar)
+            m_calendar->setMasterOpacity(masterOpacity);
     }
 
     if (qnRuntime->isVideoWallMode())

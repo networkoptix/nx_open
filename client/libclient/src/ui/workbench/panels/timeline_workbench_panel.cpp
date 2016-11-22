@@ -410,7 +410,7 @@ void TimelineWorkbenchPanel::setVisible(bool visible, bool animate)
 
 qreal TimelineWorkbenchPanel::opacity() const
 {
-    return opacityAnimator(item)->targetValue().toDouble();
+    return opacityAnimator(m_showButton)->targetValue().toDouble();
 }
 
 void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
@@ -420,25 +420,27 @@ void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 
     if (animate)
     {
-        m_opacityAnimatorGroup->pause();
-        for (auto abstractAnimator: m_opacityAnimatorGroup->animators())
-        {
-            auto animator = qobject_cast<VariantAnimator*>(abstractAnimator);
-            NX_ASSERT(animator);
-            if (!animator)
-                continue;
+        auto itemAnimator = opacityAnimator(item);
+        auto buttonAnimator = opacityAnimator(m_showButton);
 
-            animator->setTargetValue(opacity);
+        m_opacityAnimatorGroup->pause();
+
+        itemAnimator->setTargetValue(opacity * masterOpacity());
+        buttonAnimator->setTargetValue(opacity);
+
+        for (auto animator: { itemAnimator, buttonAnimator })
+        {
             qnWorkbenchAnimations->setupAnimator(animator, visible
                 ? Animations::Id::TimelineShow
                 : Animations::Id::TimelineHide);
         }
+
         m_opacityAnimatorGroup->start();
     }
     else
     {
         m_opacityAnimatorGroup->stop();
-        item->setOpacity(opacity);
+        item->setOpacity(opacity * masterOpacity());
         m_showButton->setOpacity(opacity);
     }
 
@@ -459,13 +461,13 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
         qnWorkbenchAnimations->setupAnimator(animator, buttonsVisible
             ? Animations::Id::TimelineButtonsShow
             : Animations::Id::TimelineButtonsHide);
-        animator->animateTo(buttonsOpacity);
+        animator->animateTo(buttonsOpacity * masterOpacity());
     }
     else
     {
         if (hasOpacityAnimator(m_zoomButtonsWidget))
             opacityAnimator(m_zoomButtonsWidget)->stop();
-        m_zoomButtonsWidget->setOpacity(buttonsOpacity);
+        m_zoomButtonsWidget->setOpacity(buttonsOpacity * masterOpacity());
     }
 }
 

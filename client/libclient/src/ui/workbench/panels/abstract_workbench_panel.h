@@ -39,6 +39,11 @@ public:
     /** This geometry the panel will have when all animations are finished. */
     virtual QRectF effectiveGeometry() const = 0;
 
+    /** Master opacity. Descendants should multiply visibility-related opacity by
+      * the master opacity to obtain final effective opacity for graphics items. */
+    qreal masterOpacity() const;
+    void setMasterOpacity(qreal value);
+
 signals:
     void openedChanged(bool value, bool animated);
     void visibleChanged(bool value, bool animated);
@@ -58,6 +63,7 @@ protected:
 
 protected:
     const QGraphicsWidget* m_parentWidget;
+    qreal m_masterOpacity;
 };
 
 }
