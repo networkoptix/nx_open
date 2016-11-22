@@ -226,7 +226,7 @@ public:
         setCheckable(true);
         setProperty(Qn::NoBlockMotionSelection, true);
         setToolTip(m_text);
-        setIcon(qnSkin->icon("item/check.png"));
+        setIcon(qnSkin->icon("health_monitor/check.png"));
     }
 
     virtual ~LegendButtonWidget() {}

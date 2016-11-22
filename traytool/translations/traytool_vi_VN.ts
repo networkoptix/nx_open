@@ -50,14 +50,6 @@
         <translation>không %1 Dịch vụ cài đặt</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>Media Servers ngưng</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>Media Servers bắt đầu</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation>(ngưng)</translation>
     </message>
@@ -86,32 +78,40 @@
         <translation>(tạm ngừng)</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>&amp;Hiển thị Truyền thông các bản ghi máy chủ</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>Media Server trang web</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;đi đi</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>Bắt đầu lên Media Servers</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>dừng lại Media Servers</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Một lỗi đã xảy ra trong khi đang cố gắng truy cập các dịch vụ cài đặt:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>Phương tiện truyền thông máy chủ sẽ được ngừng lại. Tiếp tục?</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished">Phương tiện truyền thông máy chủ sẽ được ngừng lại. Tiếp tục?</translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

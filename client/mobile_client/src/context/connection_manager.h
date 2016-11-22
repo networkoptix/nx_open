@@ -1,10 +1,13 @@
 #pragma once
 
-#include <context/context_aware.h>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
+#include <QtCore/QUrl>
+
 #include <utils/common/software_version.h>
 
 class QnConnectionManagerPrivate;
-class QnConnectionManager: public QObject, public QnContextAware
+class QnConnectionManager: public QObject
 {
     Q_OBJECT
 

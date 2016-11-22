@@ -15,6 +15,73 @@
     </message>
 </context>
 <context>
+    <name>MergeSystemsStatusStrings</name>
+    <message>
+        <source>The system was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password or user name is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user does not have permissions for the requested operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create database backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you understand this and would like to proceed please click Merge to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System being merged cannot be connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name is not configured yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Bookmark</source>
@@ -51,10 +118,6 @@
     <message>
         <source>Unknown (%1)</source>
         <translation>לא ידוע (%1)</translation>
-    </message>
-    <message>
-        <source>Motion on Camera</source>
-        <translation>תנועה במצלמה</translation>
     </message>
     <message>
         <source>Storage Failure</source>
@@ -154,19 +217,6 @@
         <translation>שרת ההתנגשות: %1</translation>
     </message>
     <message>
-        <source>%2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>%2 %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n times, first: %2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>אירע פעם %n, לראשונה: %2 %1</numerusform>
-            <numerusform>אירע %n פעמים, לראשונה: %2 %1</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>מועד: %1 ב%2</translation>
@@ -239,14 +289,6 @@
         <translation>יציאת מצלמה</translation>
     </message>
     <message>
-        <source>Device output for 30 sec</source>
-        <translation>יציאת התקן ל 30 שניות</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>יציאת מצלמה ל 30 שניות</translation>
-    </message>
-    <message>
         <source>Device recording</source>
         <translation>הקלטת התקן</translation>
     </message>
@@ -261,30 +303,6 @@
     <message>
         <source> (%1)</source>
         <translation>(%1)</translation>
-    </message>
-    <message>
-        <source>Input Signal on Device</source>
-        <translation>אות כניסה על ההתקן</translation>
-    </message>
-    <message>
-        <source>Input Signal on Camera</source>
-        <translation>אות כניסה על המצלמה</translation>
-    </message>
-    <message>
-        <source>Device Disconnected</source>
-        <translation>התקן נותק</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>מצלמה נותקה</translation>
-    </message>
-    <message>
-        <source>Device IP Conflict</source>
-        <translation>קונפליקט כתובת רשת של ההתקן</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>קונפליקט כתובת רשת של המצלמה</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
@@ -332,18 +350,6 @@
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
         <translation>החיבור למצלמה (תזרים משני) נסגר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-        <source>Server restarted unexpectedly.</source>
-        <translation>השרת אותחל באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-        <source>Recording on devices is disabled:</source>
-        <translation>ההקלטה על ההתקנים אינה מאופשרת:</translation>
-    </message>
-    <message>
-        <source>Recording on cameras is disabled:</source>
-        <translation>ההקלטה על המצלמות אינה מאופשרת:</translation>
     </message>
     <message>
         <source>Execute PTZ preset</source>
@@ -414,12 +420,90 @@
         <translation>גיבוי ארכיון בוטל על ידי משתמש. המידע גובה ל %1</translation>
     </message>
     <message>
-        <source>Recording on I/O modules is disabled:</source>
-        <translation>הקלטה על מודולי קלט/פלט אינה מאופשרת:</translation>
-    </message>
-    <message>
         <source>Do HTTP request</source>
         <translation>בצע בקשת HTTP</translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Device(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera(s) IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device does not respond to network requests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -634,28 +718,6 @@
     </message>
 </context>
 <context>
-    <name>QnCommandLineParser</name>
-    <message>
-        <source>No value provided for the &apos;%1&apos; argument.</source>
-        <translation>לא סופק ערך לארגומנט ה&apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>ערך שגוי בארגומנט &apos;%1&apos;. נדרש %2, סופק &apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>QnEnvironment</name>
-    <message>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>הקובץ explorer.exe המפעיל את סייר החלונות לא נמצא בנתיב.</translation>
-    </message>
-    <message>
-        <source>File explorer failed to open.</source>
-        <translation>כשלון בפתיחת סייר הקבצים.</translation>
-    </message>
-</context>
-<context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
         <source>Audio context was not specified.</source>
@@ -672,6 +734,30 @@
     <message>
         <source>Could not initialize audio decoder.</source>
         <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
+    </message>
+    <message>
+        <source>Could not find decoder for codec %1.</source>
+        <translation type="unfinished">לא נמצא מקודד לקודק %1.</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -787,24 +873,8 @@
         <translation>רשיונות START</translation>
     </message>
     <message>
-        <source>Invalid Signature</source>
-        <translation>החתימה איננה תקינה</translation>
-    </message>
-    <message>
         <source>Server with matching hardware ID not found</source>
         <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
-    </message>
-    <message>
-        <source>Invalid Customization</source>
-        <translation>ההתאמה האישית אינה תקינה</translation>
-    </message>
-    <message>
-        <source>Expired</source>
-        <translation>פג תוקף</translation>
-    </message>
-    <message>
-        <source>Invalid Type</source>
-        <translation>סוג שגוי</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -825,6 +895,22 @@
     <message>
         <source>This license type requires higher software version.</source>
         <translation>סוג רשיון זה דורש גירסת תוכנה גבוהה יותר.</translation>
+    </message>
+    <message>
+        <source>Invalid signature</source>
+        <translation type="unfinished">החתימה איננה תקינה</translation>
+    </message>
+    <message>
+        <source>Invalid customization</source>
+        <translation type="unfinished">ההתאמה האישית אינה תקינה</translation>
+    </message>
+    <message>
+        <source>License is expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid type</source>
+        <translation type="unfinished">סוג שגוי</translation>
     </message>
 </context>
 <context>
@@ -876,13 +962,6 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. מידע לא תקין התקבל. פנה למרכז התמיכה ודווח על התקלה.</translation>
-    </message>
-</context>
-<context>
-    <name>QnMediaServerResource</name>
-    <message>
-        <source>Server</source>
-        <translation>שרת</translation>
     </message>
 </context>
 <context>
@@ -1112,6 +1191,21 @@
         <source>File write error. Not enough free space.</source>
         <translation>שגיאה בכתיבת קובץ.אין מספיק מקום פנוי.</translation>
     </message>
+    <message>
+        <source>Invalid resource type for data export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemDescription</name>
+    <message>
+        <source>New system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Unnamed system&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -1161,14 +1255,62 @@
     </message>
 </context>
 <context>
-    <name>QnTranslationListModel</name>
+    <name>QnUserRolesManager</name>
     <message>
-        <source>%1 (built-in)</source>
-        <translation>%1 (מובנה)</translation>
+        <source>Owner</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 (external)</source>
-        <translation>%1 (חיצוני)</translation>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole system and can manage it. Can create users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can manage all cameras and bookmarks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view all cameras and export video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view live video from all cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom user role.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

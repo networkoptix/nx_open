@@ -24,3 +24,5 @@ Config.helpLinks.push({
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
+Config.productName = 'EZ Pro';
+Config.cloud.productName = 'EZ Pro Cloud';

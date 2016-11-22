@@ -33,3 +33,5 @@ Config.helpLinks.push({
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
+Config.productName = 'Cox Business Security Solutions';
+Config.cloud.productName = 'Cox Cloud';
