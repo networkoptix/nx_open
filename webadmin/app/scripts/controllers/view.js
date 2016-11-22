@@ -101,8 +101,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
         function browserSupports(type, maybe, native){
-            return type === 'hls'; // ignore everything but hls
-
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
                 return true;//Native support
