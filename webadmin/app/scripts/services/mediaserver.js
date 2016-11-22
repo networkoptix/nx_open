@@ -381,6 +381,13 @@ angular.module('webadminApp')
                         url: url,
                         takeRemoteSettings: !keepMySystem
                     });
+                },function(error){
+                    return $q.reject({
+                        data:{
+                            error:3,
+                            errorString:'INCOMPATIBLE'
+                        }
+                    });
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
@@ -399,6 +406,13 @@ angular.module('webadminApp')
                         postKey: postKey,
                         url: url
                     }));
+                },function(error){
+                    return $q.reject({
+                        data:{
+                            error:3,
+                            errorString:'INCOMPATIBLE'
+                        }
+                    });
                 });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },

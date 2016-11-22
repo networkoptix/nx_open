@@ -290,8 +290,6 @@ void QnProgressDialogPrivate::showInfiniteProgress(bool enable)
   The functions setLabelText() and setCancelButtonText()
   set the texts shown.
 
-  \image plastique-progressdialog.png A progress dialog shown in the Plastique widget style.
-
   \sa QDialog, QProgressBar, {fowler}{GUI Design Handbook: Progress Indicator},
       {Find Files Example}, {Pixelator Example}
 */

@@ -22,16 +22,6 @@
 
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
-namespace {
-    const int ICON_SIZE = 32;
-
-    void setDefaultSoundIcon(QLabel *label)
-    {
-        label->setPixmap(qnSkin->pixmap("microphone.png", QSize(ICON_SIZE, ICON_SIZE), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
-
-} // anonymous namespace
-
 
 QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     base_type(parent),
@@ -100,9 +90,6 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
         &QnRecordingSettingsWidget::recordingSettingsChanged,
         this->context()->instance<QnWorkbenchDesktopCameraWatcher>(),
         &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
-
-    setDefaultSoundIcon(ui->primaryDeviceIconLabel);
-    setDefaultSoundIcon(ui->secondaryDeviceIconLabel);
 
     if (m_screenRecordingSupported)
     {
@@ -375,18 +362,6 @@ void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
 void QnRecordingSettingsWidget::onComboboxChanged(int index)
 {
     additionalAdjustSize();
-#ifdef Q_OS_WIN
-    QComboBox* c = (QComboBox*) sender();
-    QnWinAudioDeviceInfo info(c->itemText(index));
-    QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->primaryDeviceIconLabel : ui->secondaryDeviceIconLabel;
-    QPixmap icon = info.deviceIcon();
-    if (!icon.isNull())
-        l->setPixmap(icon.scaled(ICON_SIZE, ICON_SIZE));
-    else
-        setDefaultSoundIcon(l);
-#else
-    Q_UNUSED(index)
-#endif
 }
 
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked()

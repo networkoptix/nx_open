@@ -128,13 +128,13 @@ void UDPClient::messageReceived(SocketAddress sourceAddress, Message message)
     auto requestContextIter = m_ongoingRequests.find(message.header.transactionId);
     if (requestContextIter == m_ongoingRequests.end())
     {
-        //this may be late response
+        // This may be late response.
         NX_LOGX(lm("Received message from %1 with unexpected transaction id %2")
             .strs(sourceAddress, message.header.transactionId.toHex()), cl_logDEBUG1);
         return;
     }
 
-    if (sourceAddress.toString() != requestContextIter->second.serverAddress.toString())
+    if (sourceAddress != requestContextIter->second.resolvedServerAddress)
     {
         NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2")
             .strs(message.header.transactionId.toHex(), sourceAddress), cl_logDEBUG1);
@@ -206,7 +206,7 @@ void UDPClient::sendRequestAndStartTimer(
 void UDPClient::messageSent(
     SystemError::ErrorCode errorCode,
     nx::Buffer transactionId,
-    SocketAddress serverAddress)
+    SocketAddress resolvedServerAddress)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     if (requestContextIter == m_ongoingRequests.end())
@@ -232,7 +232,7 @@ void UDPClient::messageSent(
     }
 
     //success
-    requestContextIter->second.serverAddress = std::move(serverAddress);
+    requestContextIter->second.resolvedServerAddress = std::move(resolvedServerAddress);
 }
 
 void UDPClient::timedOut(nx::Buffer transactionId)

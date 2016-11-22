@@ -54,22 +54,22 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //// class SystemSharing
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, systemID)
+MAKE_FIELD_NAME_STR_CONST(SystemSharing, systemId)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accountEmail)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accessRole)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, groupID)
+MAKE_FIELD_NAME_STR_CONST(SystemSharing, groupId)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, customPermissions)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, isEnabled)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing)
 {
-    if (!urlQuery.hasQueryItem(SystemSharing_systemID_field) ||
+    if (!urlQuery.hasQueryItem(SystemSharing_systemId_field) ||
         !urlQuery.hasQueryItem(SystemSharing_accountEmail_field))
     {
         return false;
     }
 
-    systemSharing->systemID = urlQuery.queryItemValue(SystemSharing_systemID_field).toStdString();
+    systemSharing->systemId = urlQuery.queryItemValue(SystemSharing_systemId_field).toStdString();
     systemSharing->accountEmail =
         urlQuery.queryItemValue(SystemSharing_accountEmail_field).toStdString();
     bool success = false;
@@ -77,8 +77,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         urlQuery.queryItemValue(SystemSharing_accessRole_field),
         api::SystemAccessRole::none,
         &success);
-    systemSharing->groupID =
-        urlQuery.queryItemValue(SystemSharing_groupID_field).toStdString();
+    systemSharing->groupId =
+        urlQuery.queryItemValue(SystemSharing_groupId_field).toStdString();
     systemSharing->customPermissions =
         urlQuery.queryItemValue(SystemSharing_customPermissions_field).toStdString();
     if (urlQuery.hasQueryItem(SystemSharing_isEnabled_field))
@@ -90,8 +90,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
-        SystemSharing_systemID_field,
-        QString::fromStdString(data.systemID));
+        SystemSharing_systemId_field,
+        QString::fromStdString(data.systemId));
     urlQuery->addQueryItem(
         SystemSharing_accountEmail_field,
         QString::fromStdString(data.accountEmail));
@@ -99,8 +99,8 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
         SystemSharing_accessRole_field,
         QnLexical::serialized(data.accessRole));
     urlQuery->addQueryItem(
-        SystemSharing_groupID_field,
-        QString::fromStdString(data.groupID));
+        SystemSharing_groupId_field,
+        QString::fromStdString(data.groupId));
     urlQuery->addQueryItem(
         SystemSharing_customPermissions_field,
         QString::fromStdString(data.customPermissions));
@@ -119,34 +119,34 @@ bool loadFromUrlQuery(const QUrlQuery& /*urlQuery*/, SystemSharingList* const /*
 
 
 ////////////////////////////////////////////////////////////
-//// class SystemID
+//// class SystemId
 ////////////////////////////////////////////////////////////
 
-SystemID::SystemID()
+SystemId::SystemId()
 {
 }
 
-SystemID::SystemID(std::string systemIDStr)
+SystemId::SystemId(std::string systemIdStr)
 :
-    systemID(std::move(systemIDStr))
+    systemId(std::move(systemIdStr))
 {
 }
 
-MAKE_FIELD_NAME_STR_CONST(SystemID, systemID)
+MAKE_FIELD_NAME_STR_CONST(SystemId, systemId)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemId* const systemId)
 {
-    if (!urlQuery.hasQueryItem(SystemID_systemID_field))
+    if (!urlQuery.hasQueryItem(SystemId_systemId_field))
         return false;
-    systemID->systemID = urlQuery.queryItemValue(SystemID_systemID_field).toStdString();
+    systemId->systemId = urlQuery.queryItemValue(SystemId_systemId_field).toStdString();
     return true;
 }
 
-void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
+void serializeToUrlQuery(const SystemId& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
-        SystemID_systemID_field,
-        QString::fromStdString(data.systemID));
+        SystemId_systemId_field,
+        QString::fromStdString(data.systemId));
 }
 
 
@@ -154,20 +154,20 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 //// class SystemAttributesUpdate
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, systemID)
+MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, systemId)
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, name)
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, opaque)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemAttributesUpdate* const data)
 {
-    return url::deserializeField(urlQuery, SystemAttributesUpdate_systemID_field, &data->systemID)
+    return url::deserializeField(urlQuery, SystemAttributesUpdate_systemId_field, &data->systemId)
         && url::deserializeField(urlQuery, SystemAttributesUpdate_name_field, &data->name)
         && url::deserializeField(urlQuery, SystemAttributesUpdate_opaque_field, &data->opaque);
 }
 
 void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const urlQuery)
 {
-    url::serializeField(urlQuery, SystemAttributesUpdate_systemID_field, data.systemID);
+    url::serializeField(urlQuery, SystemAttributesUpdate_systemId_field, data.systemId);
     url::serializeField(urlQuery, SystemAttributesUpdate_name_field, data.name);
     url::serializeField(urlQuery, SystemAttributesUpdate_opaque_field, data.opaque);
 }
@@ -176,8 +176,8 @@ void serialize(QnJsonContext*, const SystemAttributesUpdate& data, QJsonValue* j
 {
     QJsonObject jsonObject;
     jsonObject.insert(
-        SystemAttributesUpdate_systemID_field,
-        QString::fromStdString(data.systemID));
+        SystemAttributesUpdate_systemId_field,
+        QString::fromStdString(data.systemId));
     if (data.name)
         jsonObject.insert(
             SystemAttributesUpdate_name_field,
@@ -195,10 +195,10 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, SystemAttributesUpdate
         return false;
     const QJsonObject map = value.toObject();
 
-    auto systemIdIter = map.find(SystemAttributesUpdate_systemID_field);
+    auto systemIdIter = map.find(SystemAttributesUpdate_systemId_field);
     if (systemIdIter == map.constEnd())
         return false;
-    data->systemID = systemIdIter.value().toString().toStdString();
+    data->systemId = systemIdIter.value().toString().toStdString();
 
     auto nameIter = map.find(SystemAttributesUpdate_name_field);
     if (nameIter != map.constEnd())
@@ -261,7 +261,7 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, UserSessionDescriptor*
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemId),
     (json),
     _Fields/*,
     (optional, false)*/)

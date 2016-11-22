@@ -690,10 +690,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
         /* We can get connectionOpened while testing connection to another server. */
         NX_ASSERT(m_physicalState == PhysicalState::waiting_peer
             || m_physicalState == PhysicalState::testing);
-    }
-    else if (m_logicalState == LogicalState::reconnecting)
-    {
-        NX_ASSERT(m_physicalState == PhysicalState::waiting_peer);
+        stopReconnecting();
     }
     setPhysicalState(PhysicalState::waiting_resources);
 
@@ -1061,6 +1058,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 
     if (!m_reconnectHelper)
         m_reconnectHelper.reset(new QnReconnectHelper());
+
     if (m_reconnectHelper->servers().isEmpty())
     {
         stopReconnecting();

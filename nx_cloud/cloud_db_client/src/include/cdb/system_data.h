@@ -27,7 +27,7 @@ public:
 class SystemAttributesUpdate
 {
 public:
-    std::string systemID;
+    std::string systemId;
     boost::optional<std::string> name;
     boost::optional<std::string> opaque;
 };
@@ -116,9 +116,9 @@ class SystemSharing
 {
 public:
     std::string accountEmail;
-    std::string systemID;
+    std::string systemId;
     SystemAccessRole accessRole;
-    std::string groupID;
+    std::string groupId;
     std::string customPermissions;
     bool isEnabled;
     //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
@@ -135,14 +135,14 @@ public:
     {
         if (accountEmail != rhs.accountEmail)
             return accountEmail < rhs.accountEmail;
-        return systemID < rhs.systemID;
+        return systemId < rhs.systemId;
     }
     bool operator==(const SystemSharing& rhs) const
     {
         return accountEmail == rhs.accountEmail
-            && systemID == rhs.systemID
+            && systemId == rhs.systemId
             && accessRole == rhs.accessRole
-            && groupID == rhs.groupID
+            && groupId == rhs.groupId
             && customPermissions == rhs.customPermissions
             && isEnabled == rhs.isEnabled;
     }
@@ -169,7 +169,7 @@ public:
     }
 
     /** Globally unique account id. */
-    std::string accountID;
+    std::string accountId;
     std::string accountFullName;
     /** Shows how often user accesses given system in comparison to other user's systems. */
     float usageFrequency;
@@ -178,7 +178,7 @@ public:
     bool operator==(const SystemSharingEx& rhs) const
     {
         return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
-            && accountID == rhs.accountID
+            && accountId == rhs.accountId
             && accountFullName == rhs.accountFullName;
     }
 };
