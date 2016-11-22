@@ -109,10 +109,11 @@ bool SelfUpdater::updateApplauncher()
         + lit("/../applauncher/")
         + QnAppInfo::customizationName());
 
-    if (!targetDir.mkpath(QnClientAppInfo::binDirSuffix()))
+    QString absolutePath = targetDir.absoluteFilePath(QnClientAppInfo::binDirSuffix());
+    if (!QDir(absolutePath).mkpath(lit(".")))
     {
         NX_LOG(lit("Cannot create folder for applaucher: %1")
-            .arg(targetDir.absolutePath()), cl_logERROR);
+            .arg(absolutePath), cl_logERROR);
         return false;
     }
 
