@@ -68,11 +68,13 @@ int runUi(QGuiApplication *application) {
 
     if (qnSettings->isLiteClientModeEnabled())
     {
-        auto prepearingWebChannel = std::make_unique<webchannel::WebChannelServer>();
+        auto prepearingWebChannel = std::make_unique<webchannel::WebChannelServer>(
+            qnSettings->webSocketPort());
 
         if (prepearingWebChannel->isValid())
         {
             auto webChannel = qnCommon->store(prepearingWebChannel.release());
+            qnSettings->setWebSocketPort(webChannel->serverPort());
 
             auto liteClientHandler = qnCommon->store(new QnLiteClientHandler());
             liteClientHandler->setUiController(context.uiController());
@@ -245,6 +247,8 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         qnSettings->setTestMode(true);
         qnSettings->setInitialTest(startupParameters.initialTest);
     }
+
+    qnSettings->setWebSocketPort(startupParameters.webSocketPort);
 }
 
 int main(int argc, char *argv[])

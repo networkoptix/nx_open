@@ -15,9 +15,11 @@ class WebChannelServer: public QWebChannel
     Q_OBJECT
 
 public:
-    WebChannelServer(QObject* parent = nullptr);
+    explicit WebChannelServer(const quint16 port = 0, QObject* parent = nullptr);
 
     bool isValid() const;
+
+    quint16 serverPort() const;
 
 private:
     QWebSocketServer* m_server = nullptr;

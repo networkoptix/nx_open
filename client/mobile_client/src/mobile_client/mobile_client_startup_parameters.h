@@ -15,6 +15,7 @@ struct QnMobileClientStartupParameters
     QUrl url;
     bool testMode = false;
     QString initialTest;
+    qint16 webSocketPort = 0;
 };
 
 Q_DECLARE_METATYPE(QnMobileClientStartupParameters)

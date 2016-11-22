@@ -61,13 +61,13 @@ private:
     QWebSocket* m_socket = nullptr;
 };
 
-WebChannelServer::WebChannelServer(QObject* parent):
+WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
     QWebChannel(parent),
     m_server(new QWebSocketServer(
         lit("%1 WebChannel Server").arg(QnAppInfo::productNameLong()),
         QWebSocketServer::NonSecureMode))
 {
-    if (!m_server->listen(QHostAddress::LocalHost))
+    if (!m_server->listen(QHostAddress::LocalHost, port))
     {
         NX_LOG(lit("WebChannelServer: Could not start server"), cl_logERROR);
 
@@ -89,6 +89,11 @@ WebChannelServer::WebChannelServer(QObject* parent):
 bool WebChannelServer::isValid() const
 {
     return m_server;
+}
+
+quint16 WebChannelServer::serverPort() const
+{
+    return m_server ? m_server->serverPort() : 0;
 }
 
 } // namespace webchannel

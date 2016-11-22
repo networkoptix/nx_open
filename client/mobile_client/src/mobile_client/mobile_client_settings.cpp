@@ -91,6 +91,7 @@ void QnMobileClientSettings::writeValueToSettings(
         case LiteMode:
         case TestMode:
         case InitialTest:
+        case WebSocketPort:
         case StartupParameters:
             break;
 

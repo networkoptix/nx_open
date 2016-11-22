@@ -41,6 +41,13 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
     testOption.setHidden(true);
     parser.addOption(testOption);
 
+    auto webSocketPortOption = QCommandLineOption(
+       lit("webSocketPort"),
+       lit("WEB socket port."),
+       lit("webSocketPort"));
+    webSocketPortOption.setHidden(true);
+    parser.addOption(webSocketPortOption);
+
     parser.parse(application.arguments());
 
     if (parser.isSet(basePathOption))
@@ -59,4 +66,7 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
         testMode = true;
         initialTest = parser.value(testOption);
     }
+
+    if (parser.isSet(webSocketPortOption))
+        webSocketPort = parser.value(webSocketPortOption).toUShort();
 }

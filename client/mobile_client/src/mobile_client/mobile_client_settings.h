@@ -25,6 +25,7 @@ public:
         BasePath,
         TestMode,
         InitialTest,
+        WebSocketPort,
 
         StartupParameters,
 
@@ -68,6 +69,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     basePath,                   setBasePath,                BasePath,                   lit("qrc:///"))
         QN_DECLARE_RW_PROPERTY(bool,                        testMode,                   setTestMode,                TestMode,                   false)
         QN_DECLARE_RW_PROPERTY(QString,                     initialTest,                setInitialTest,             InitialTest,                QString())
+        QN_DECLARE_RW_PROPERTY(qint16,                      webSocketPort,              setWebSocketPort,           WebSocketPort,              0)
 
         QN_DECLARE_RW_PROPERTY(
             QnMobileClientStartupParameters,
