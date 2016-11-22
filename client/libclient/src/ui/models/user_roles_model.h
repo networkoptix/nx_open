@@ -35,7 +35,7 @@ public:
 
     int rowForUser(const QnUserResourcePtr& user) const;
 
-    void setUserRoles(const ec2::ApiUserGroupDataList& roles);
+    void setUserRoles(const ec2::ApiUserRoleDataList& roles);
 
     /* If we want to override "Custom" role name and tooltip: */
     void setCustomRoleStrings(const QString& name, const QString& description);

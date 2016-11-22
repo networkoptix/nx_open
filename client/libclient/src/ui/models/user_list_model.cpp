@@ -8,7 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -50,11 +50,11 @@ public:
             });
 
         connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            [this](const ec2::ApiUserGroupData& group)
+            [this](const ec2::ApiUserRoleData& userRole)
             {
-                for (auto user : users)
+                for (auto user: users)
                 {
-                    if (user->userGroup() != group.id)
+                    if (user->userRoleId() != userRole.id)
                         continue;
                     handleUserChanged(user);
                 }

@@ -228,8 +228,8 @@ namespace detail
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
-        //getUserGroupList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
+        //getUserRoleList
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
 
         //getPredefinedRoles
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
@@ -304,7 +304,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
             NX_ASSERT(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
@@ -513,10 +513,10 @@ namespace detail
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode insertOrReplaceUserGroup(const ApiUserGroupData& data);
-        ErrorCode removeUserGroup( const QnUuid& guid );
+        ErrorCode insertOrReplaceUserRole(const ApiUserRoleData& data);
+        ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
-        ErrorCode cleanAccessRights(const QnUuid& userOrGroupId);
+        ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);
@@ -665,8 +665,8 @@ public:
         filterData(data->cameras);
         filterData(data->cameraUserAttributesList);
         filterData(data->users);
-        filterData(data->userGroups);
-        filterData(data->userGroups);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
         filterData(data->videowalls);
@@ -694,8 +694,8 @@ public:
         filterData(data->cameras);
         filterData(data->cameraUserAttributesList);
         filterData(data->users);
-        filterData(data->userGroups);
-        filterData(data->userGroups);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
         filterData(data->cameraHistory);

@@ -1,12 +1,12 @@
 #include "resource_access_subject.h"
 
 #include <core/resource/user_resource.h>
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 struct QnResourceAccessSubjectPrivate
 {
 public:
-    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserGroupData& role):
+    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserRoleData& role):
         user(user),
         role(role)
     {
@@ -33,24 +33,24 @@ public:
         if (user)
         {
             key = user->getId();
-            if (user->role() == Qn::UserRole::CustomUserGroup)
-                key = user->userGroup();
+            if (user->userRole() == Qn::UserRole::CustomUserRole)
+                key = user->userRoleId();
         }
         return key;
     }
 
     QnUserResourcePtr user;
-    ec2::ApiUserGroupData role;
+    ec2::ApiUserRoleData role;
 };
 
 
 
 QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
-    d_ptr(new QnResourceAccessSubjectPrivate(user, ec2::ApiUserGroupData()))
+    d_ptr(new QnResourceAccessSubjectPrivate(user, ec2::ApiUserRoleData()))
 {
 }
 
-QnResourceAccessSubject::QnResourceAccessSubject(const ec2::ApiUserGroupData& role):
+QnResourceAccessSubject::QnResourceAccessSubject(const ec2::ApiUserRoleData& role):
     d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), role))
 {
 }
@@ -61,7 +61,7 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& 
 }
 
 QnResourceAccessSubject::QnResourceAccessSubject():
-    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserGroupData()))
+    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserRoleData()))
 {
 }
 
@@ -74,7 +74,7 @@ const QnUserResourcePtr& QnResourceAccessSubject::user() const
     return d_ptr->user;
 }
 
-const ec2::ApiUserGroupData& QnResourceAccessSubject::role() const
+const ec2::ApiUserRoleData& QnResourceAccessSubject::role() const
 {
     return d_ptr->role;
 }

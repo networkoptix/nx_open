@@ -4,16 +4,16 @@
 
 namespace ec2 {
 
-struct ApiUserGroupData: ApiIdData
+struct ApiUserRoleData: ApiIdData
 {
-    ApiUserGroupData():
+    ApiUserRoleData():
         ApiIdData(),
         name(),
         permissions(Qn::NoGlobalPermissions)
     {
     }
 
-    ApiUserGroupData(const QnUuid& id, const QString& name, Qn::GlobalPermissions permissions):
+    ApiUserRoleData(const QnUuid& id, const QString& name, Qn::GlobalPermissions permissions):
         ApiIdData(id),
         name(name),
         permissions(permissions)
@@ -25,9 +25,9 @@ struct ApiUserGroupData: ApiIdData
 
     bool isNull() const;
 };
-#define ApiUserGroupData_Fields ApiIdData_Fields (name)(permissions)
+#define ApiUserRoleData_Fields ApiIdData_Fields (name)(permissions)
 
-/* Struct is not inherited from ApiUserGroupData as it has no 'id' field. */
+/* Struct is not inherited from ApiUserRoleData as it has no 'id' field. */
 struct ApiPredefinedRoleData: ApiData
 {
     ApiPredefinedRoleData():
@@ -50,6 +50,6 @@ struct ApiPredefinedRoleData: ApiData
 };
 #define ApiPredefinedRoleData_Fields (name)(permissions)(isOwner)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ApiUserGroupData)(ApiPredefinedRoleData), (eq));
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ApiUserRoleData)(ApiPredefinedRoleData), (eq));
 
 } //namespace ec2

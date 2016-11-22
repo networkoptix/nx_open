@@ -13,7 +13,7 @@ struct RoleDescription
     RoleDescription() {}
 
     explicit RoleDescription(const Qn::UserRole roleType);
-    explicit RoleDescription(const ec2::ApiUserGroupData& userRole);
+    explicit RoleDescription(const ec2::ApiUserRoleData& userRole);
 
     Qn::UserRole roleType;
     QString name;
@@ -30,7 +30,7 @@ public:
 
     int rowForUser(const QnUserResourcePtr& user) const;
 
-    void setUserRoles(ec2::ApiUserGroupDataList value);
+    void setUserRoles(ec2::ApiUserRoleDataList value);
 
     RoleDescription roleByRow(int row) const;
     int count() const;
@@ -40,8 +40,8 @@ public:
 private:
     void updateStandardRoles();
 
-    bool updateUserRole(const ec2::ApiUserGroupData& userRole);
-    bool removeUserRole(const ec2::ApiUserGroupData& userRole);
+    bool updateUserRole(const ec2::ApiUserRoleData& userRole);
+    bool removeUserRole(const ec2::ApiUserRoleData& userRole);
     bool removeUserRoleById(const QnUuid& roleId);
 
 private:
@@ -49,7 +49,7 @@ private:
     Q_DECLARE_PUBLIC(QnUserRolesModel)
 
     QList<Qn::UserRole> m_standardRoles;
-    ec2::ApiUserGroupDataList m_userRoles;
+    ec2::ApiUserRoleDataList m_userRoles;
     const bool m_customRoleEnabled;
 
     QString m_customRoleName;

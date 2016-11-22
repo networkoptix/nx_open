@@ -61,7 +61,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
     {
         UrlParam,
         EmailAddressParam,
-        UserGroupParam,
+        UserRoleParam,
         FpsParam,
         QualityParam,
         DurationParam,
@@ -97,8 +97,8 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
             case EmailAddressParam:
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
-            case UserGroupParam:
-                result.userGroup = static_cast<QnBusiness::UserGroup>(toInt(field));
+            case UserRoleParam:
+                result.userRole = static_cast<QnBusiness::UserRole>(toInt(field));
                 break;
             case FpsParam:
                 result.fps = toInt(field);

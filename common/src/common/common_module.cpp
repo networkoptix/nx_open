@@ -309,12 +309,12 @@ BeforeRestoreDbData QnCommonModule::beforeRestoreDbData() const
     return m_beforeRestoreDbData;
 }
 
-void QnCommonModule::setUseLowPriorityAdminPasswordHach(bool value)
+void QnCommonModule::setUseLowPriorityAdminPasswordHack(bool value)
 {
     m_lowPriorityAdminPassword = value;
 }
 
-bool QnCommonModule::useLowPriorityAdminPasswordHach() const
+bool QnCommonModule::useLowPriorityAdminPasswordHack() const
 {
     return m_lowPriorityAdminPassword;
 }
