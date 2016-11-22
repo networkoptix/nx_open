@@ -1696,7 +1696,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         const QString profileQueryStr = R"(
             INSERT OR REPLACE
             INTO vms_userprofile
-            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud, full_name)
+            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, user_role_guid, is_cloud, full_name)
             VALUES
             (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :userRoleId, :isCloud, :fullName)
         )";
@@ -1740,7 +1740,7 @@ ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
 {
     QSqlQuery query(m_sdb);
     const QString queryStr = R"(
-        INSERT OR REPLACE INTO vms_user_groups
+        INSERT OR REPLACE INTO vms_user_roles
         (id, name, permissions)
         VALUES
         (:id, :name, :permissions)
@@ -2267,10 +2267,10 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
 
 ErrorCode QnDbManager::removeUserRole(const QnUuid& userRoleId)
 {
-    /* Cleanup all users, belonging to this group. */
+    /* Cleanup all users having this role. */
     {
         QSqlQuery query(m_sdb);
-        const QString queryStr("UPDATE vms_userprofile SET group_guid = NULL WHERE group_guid = ?");
+        const QString queryStr("UPDATE vms_userprofile SET user_role_guid = NULL WHERE user_role_guid = ?");
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
@@ -2279,12 +2279,12 @@ ErrorCode QnDbManager::removeUserRole(const QnUuid& userRoleId)
             return ErrorCode::dbError;
     }
 
-    /* Cleanup group shared resources. */
+    /* Cleanup user role shared resources. */
     auto err = cleanAccessRights(userRoleId);
     if (err != ErrorCode::ok)
         return err;
 
-    return deleteTableRecord(userRoleId, "vms_user_groups", "id");
+    return deleteTableRecord(userRoleId, "vms_user_roles", "id");
 }
 
 ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
@@ -3643,7 +3643,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         u.is_superuser as isAdmin, u.email, \
         p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions, \
-        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as userRoleId, p.is_cloud as isCloud, \
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.user_role_guid as userRoleId, p.is_cloud as isCloud, \
         coalesce((SELECT value from vms_kvpair WHERE resource_guid = r.guid and name = '%1'), p.full_name) as fullName \
         FROM vms_resource r \
         JOIN auth_user u on u.id = r.id \
@@ -3675,7 +3675,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& resu
     query.setForwardOnly(true);
     const QString queryStr = QString(R"(
         SELECT id, name, permissions
-        FROM vms_user_groups
+        FROM vms_user_roles
         %1
         ORDER BY id
     )").arg(filterStr);

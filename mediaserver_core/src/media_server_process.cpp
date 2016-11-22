@@ -1401,7 +1401,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetUserRoles(roles);
+        messageProcessor->resetUserRoles(userRoles);
     }
 
     {
