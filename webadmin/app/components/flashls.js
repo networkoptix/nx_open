@@ -169,7 +169,7 @@ var flashlsAPI = new (function(){
                 console.log(this.flashObject);
             }
 
-            this.playerSetUseHardwareVideoDecoder(true);
+            //this.playerSetUseHardwareVideoDecoder(true);
             this.readyHandler(this);
         }
     };

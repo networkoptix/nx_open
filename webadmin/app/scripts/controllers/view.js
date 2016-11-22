@@ -101,7 +101,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
         function browserSupports(type, maybe, native){
-            return type === 'hls'; // ignore everything but hls
+            if(Config.allowDebugMode && (Config.debug.videoFormat == "flashls" || Config.debug.videoFormat == "hls" || Config.debug.videoFormat == "jshls")){
+                return type === 'hls'; // ignore everything but hls
+            }
 
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
@@ -151,8 +153,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             //1. Does browser and server support webm?
-            if(!formatSupported('webm',false) || formatSupported('hls',true) && browserSupports('hls', false, true)
-                || Config.allowDebugMode && Config.debug.videoFormat == "flashls"){
+            if(!formatSupported('webm',false) || formatSupported('hls',true) && browserSupports('hls', false, true)){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
