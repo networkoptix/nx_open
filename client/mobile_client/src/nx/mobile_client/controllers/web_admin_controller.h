@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <utils/common/credentials.h>
+
 class QnMobileClientUiController;
 
 namespace nx {
@@ -28,6 +30,7 @@ public slots:
 
 private:
     QnMobileClientUiController* m_uiController = nullptr;
+    QnCredentials m_credentials;
 };
 
 } // namespace controllers

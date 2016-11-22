@@ -65,6 +65,8 @@ public:
     Q_INVOKABLE QUrl getLastUsedUrl() const;
     Q_INVOKABLE QUrl getInitialUrl() const;
 
+    Q_INVOKABLE QUrl getWebSocketUrl() const;
+
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 
     Q_INVOKABLE QString lp(const QString& path) const;

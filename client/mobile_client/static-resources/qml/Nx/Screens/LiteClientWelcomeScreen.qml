@@ -13,4 +13,14 @@ PageBase
 
         anchors.fill: parent
     }
+
+    Component.onCompleted:
+    {
+        var baseUrl = Nx.url(getInitialUrl())
+
+        var url = baseUrl.scheme() + "://" + baseUrl.address()
+            + "?clientWebSocket=" + encodeURIComponent(getWebSocketUrl())
+
+        webView.url = url
+    }
 }
