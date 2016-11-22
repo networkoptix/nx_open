@@ -638,7 +638,6 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Connect to Server...")).
         shortcut(lit("Ctrl+Shift+C")).
-        icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 
     factory(QnActions::DisconnectAction).
