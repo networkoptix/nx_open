@@ -6,6 +6,7 @@ import Nx.Controls 1.0
 PageBase
 {
     id: liteClientWelcomeScreen
+    objectName: "liteClientWelcomeScreen"
 
     WebView
     {

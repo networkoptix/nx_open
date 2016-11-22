@@ -140,7 +140,10 @@ Page
         onInitialResourcesReceivedChanged:
         {
             if (connectionManager.initialResourcesReceived)
+            {
                 loadingDummy.opacity = 0
+                autoLoginEnabled = true
+            }
         }
     }
 

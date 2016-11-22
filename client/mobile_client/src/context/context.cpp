@@ -127,6 +127,20 @@ bool QnContext::autoLoginEnabled() const
     return qnSettings->isAutoLoginEnabled();
 }
 
+void QnContext::setAutoLoginEnabled(bool enabled)
+{
+    auto mode = AutoLoginMode::Auto;
+    if (liteMode())
+        mode = enabled ? AutoLoginMode::Enabled : AutoLoginMode::Disabled;
+
+    const auto intMode = (int) mode;
+    if (intMode == qnSettings->autoLoginMode())
+        return;
+
+    qnSettings->setAutoLoginMode(intMode);
+    emit autoLoginEnabledChanged();
+}
+
 bool QnContext::testMode() const
 {
     return qnSettings->testMode();
