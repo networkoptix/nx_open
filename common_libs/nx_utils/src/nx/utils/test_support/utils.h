@@ -8,16 +8,14 @@
 /**
  * Analogue of gtest's ASSERT_EQ but supports placing in non-void methods (throws on failure).
  */
-#define NX_GTEST_ASSERT_EQ(expected, actual) \
-    do \
+#define NX_GTEST_ASSERT_EQ(expected, actual) do \
     { \
         bool result = false; \
-        auto x = [&]() -> void \
+        [&]() -> void \
         { \
             ASSERT_EQ(expected, actual); \
             result = true; \
-        }; \
-        x(); \
+        }(); \
         if (!result) \
         { \
             throw std::runtime_error( \

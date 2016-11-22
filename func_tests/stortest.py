@@ -269,7 +269,7 @@ class BackupStorageTest(StorageBasedTest):
     _fill_storage_script = 'fill_stor.py'
 
     _suits = (
-        ('BackupStartTests', [
+        ('BackupTests', [
             'Initialization',
             'ScheduledBackupTest',
             'BackupByRequestTest',

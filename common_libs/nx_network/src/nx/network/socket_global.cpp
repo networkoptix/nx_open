@@ -8,17 +8,17 @@ const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 namespace nx {
 namespace network {
 
-bool SocketGlobals::Config::isAddressDisabled(const HostAddress& address) const
+bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
 {
     if (SocketGlobals::s_initState != InitState::done)
         return false;
 
     // Here 'static const' is an optimization as reload is called only on start.
-    static const auto disabledRegExps =
+    static const auto disabledHostPatterns =
         [this]()
         {
             std::list<QRegExp> regExps;
-            for (const auto& s: QString::fromUtf8(disableAddresses).split(QChar(',')))
+            for (const auto& s: QString::fromUtf8(disableHosts).split(QChar(',')))
             {
                 if (!s.isEmpty())
                     regExps.push_back(QRegExp(s, Qt::CaseInsensitive, QRegExp::Wildcard));
@@ -27,9 +27,9 @@ bool SocketGlobals::Config::isAddressDisabled(const HostAddress& address) const
             return regExps;
         }();
 
-    for (const auto& r: disabledRegExps)
+    for (const auto& p: disabledHostPatterns)
     {
-        if (r.exactMatch(address.toString()))
+        if (p.exactMatch(host.toString()))
             return true;
     }
 

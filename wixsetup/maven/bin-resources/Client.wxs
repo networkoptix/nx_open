@@ -319,7 +319,7 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>
             <ComponentRef Id="ClientVsRedistributable"/>
-            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>

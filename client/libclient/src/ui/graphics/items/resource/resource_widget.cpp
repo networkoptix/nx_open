@@ -160,18 +160,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     /* Status overlay. */
-    const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusController = new QnStatusOverlayController(m_resource, overlay, this);
+    m_overlay = new QnStatusOverlayWidget(this);
+    m_statusController = new QnStatusOverlayController(m_resource, m_overlay, this);
 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this, overlay, controller = m_statusController]()
+        [this, controller = m_statusController]()
         {
             const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
-            setOverlayWidgetVisible(overlay, !isEmptyOverlay, false);
+            setOverlayWidgetVisible(m_overlay, !isEmptyOverlay, true);
         });
 
-    addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
-    setOverlayWidgetVisible(overlay, false, false);
+    addOverlayWidget(m_overlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
+    setOverlayWidgetVisible(m_overlay, false, false);
 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());

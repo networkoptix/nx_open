@@ -110,7 +110,7 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
-    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
@@ -141,58 +141,48 @@ bool CloudStreamSocket::connect(
         [this, &promise](SystemError::ErrorCode code)
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
-            m_aioThreadBinder->post([this, code](){
-                if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
-                    promisePtr->set_value(std::make_pair(code, 0));
-            });
+            m_aioThreadBinder->post(
+                [this, code]()
+                {
+                    if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
+                        promisePtr->set_value(std::make_pair(code, 0));
+                });
         });
     
     auto result = promise.get_future().get().first;
-
     if (result != SystemError::noError)
     {
         SystemError::setLastErrorCode(result);
         return false;
     }
 
-    if (!setSendTimeout(sendTimeoutBak))
-        return false;
-
-    return true;
+    return setSendTimeout(sendTimeoutBak);
 }
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
-    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
-    if (m_socketDelegate)
+    if (!m_socketDelegate)
     {
-        {
-            QnMutexLocker lk(&m_mutex);
-            if (m_terminated)
-            {
-                SystemError::setLastErrorCode(SystemError::interrupted);
-                return 0;
-            }
-        }
-
-        return m_socketDelegate->recv(buffer, bufferLen, flags);
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
     }
 
-
-    SystemError::setLastErrorCode(SystemError::notConnected);
-    return -1;
+    return m_socketDelegate->recv(buffer, bufferLen, flags);
 }
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
-    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
-    if (m_socketDelegate)
-        return m_socketDelegate->send(buffer, bufferLen);
+    if (!m_socketDelegate)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
+    }
 
-    SystemError::setLastErrorCode(SystemError::notConnected);
-    return -1;
+    return m_socketDelegate->send(buffer, bufferLen);
 }
 
 SocketAddress CloudStreamSocket::getForeignAddress() const
@@ -200,6 +190,7 @@ SocketAddress CloudStreamSocket::getForeignAddress() const
     if (m_socketDelegate)
         return m_socketDelegate->getForeignAddress();
 
+    SystemError::setLastErrorCode(SystemError::notConnected);
     return SocketAddress();
 }
 
@@ -441,7 +432,7 @@ SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
         if (!streamSocket->setNonBlockingMode(false))
         {
             errorCode = SystemError::getLastOSErrorCode();
-            NX_CRITICAL(errorCode != SystemError::noError);
+            NX_ASSERT(errorCode != SystemError::noError);
         }
     }
 

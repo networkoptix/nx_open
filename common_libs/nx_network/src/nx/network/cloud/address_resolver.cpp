@@ -205,7 +205,7 @@ void AddressResolver::resolveAsync(
         return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
 
-    if (SocketGlobals::config().isAddressDisabled(hostName))
+    if (SocketGlobals::config().isHostDisabled(hostName))
         return handler(SystemError::noPermission, {});
 
     QnMutexLocker lk(&m_mutex);

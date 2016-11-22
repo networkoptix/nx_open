@@ -391,7 +391,7 @@ private:
     QStringList m_tags;
 
     bool m_initialized;
-    QnMutex m_initAsyncMutex;
+    static QnMutex m_initAsyncMutex;
 
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;

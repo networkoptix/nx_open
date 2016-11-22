@@ -49,16 +49,23 @@ int QnMultiserverBookmarksRestHandler::executeGet(
 
     // Check user permissions.
     {
-        QnMultiserverRequestData request(params);
         Qn::GlobalPermission requiredPermission = Qn::GlobalViewBookmarksPermission;
         if (isModifyingOperation(op))
         {
             if (QnPermissionsHelper::isSafeMode())
-                return QnPermissionsHelper::safeModeError(result, contentType, request.format, request.extraFormatting);
+            {
+                const QnMultiserverRequestData request(params);
+                return QnPermissionsHelper::safeModeError(
+                    result, contentType, request.format, request.extraFormatting);
+            }
             requiredPermission = Qn::GlobalManageBookmarksPermission;
         }
         if (!qnResourceAccessManager->hasGlobalPermission(processor->accessRights(), requiredPermission))
-            return QnPermissionsHelper::permissionsError(result, contentType, request.format, request.extraFormatting);
+        {
+            const QnMultiserverRequestData request(params);
+            return QnPermissionsHelper::permissionsError(
+                result, contentType, request.format, request.extraFormatting);
+        }
     }
 
     const auto ownerPort = processor->owner()->getPort();

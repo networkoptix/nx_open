@@ -134,7 +134,7 @@ private:
     void reportQueryCancellation(std::unique_ptr<AbstractExecutor>);
     void onConnectionClosed(BaseRequestExecutor* const executorThreadPtr);
     void dropConnectionAsync(
-        const QnMutexLockerBase& /*lk*/,
+        const QnMutexLockerBase&,
         BaseRequestExecutor* const executorThreadPtr);
 
     template<

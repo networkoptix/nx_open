@@ -66,7 +66,11 @@ void QnCrossdomainConnectionProcessor::run()
         {
             lines.removeAt(i);
             for (const auto& addr: mServer->getAllAvailableAddresses())
-                lines.insert(i, pattern.replace(kIfacePattern, addr.address.toString().toUtf8()));
+            {
+                QByteArray allowAccessFromRecord = pattern;
+                allowAccessFromRecord.replace(kIfacePattern, addr.address.toString().toUtf8());
+                lines.insert(i, allowAccessFromRecord);
+            }
         }
         else if (lines[i].contains(kCrossdomainPattern))
         {

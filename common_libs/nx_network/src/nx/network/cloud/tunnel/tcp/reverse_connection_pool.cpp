@@ -34,7 +34,7 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     m_publicIp = std::move(publicIp);
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
-        SocketGlobals::outgoingTunnelPool().selfPeerId(),
+        SocketGlobals::outgoingTunnelPool().ownPeerId(),
         serverAddress, m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")
