@@ -711,10 +711,13 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     /* We lay everything out manually. */
 
+    if (m_timeline)
+        m_timeline->stopAnimations();
     m_timeline->updateGeometry();
 
     if (m_title)
     {
+        m_title->stopAnimations();
         m_title->item->setGeometry(QRectF(
             0.0,
             m_title->item->pos().y(),
@@ -724,10 +727,17 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     if (m_notifications)
     {
+        m_notifications->stopAnimations();
         if (m_notifications->xAnimator->isRunning())
             m_notifications->xAnimator->stop();
         m_notifications->item->setX(rect.right() + (isNotificationsOpened() ? -m_notifications->item->size().width() : 1.0 /* Just in case. */));
     }
+
+    if (m_tree)
+        m_tree->stopAnimations();
+
+    if (m_calendar)
+        m_calendar->stopAnimations();
 
     updateTreeGeometry();
     updateNotificationsGeometry();

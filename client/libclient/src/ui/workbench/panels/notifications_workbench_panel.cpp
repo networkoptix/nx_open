@@ -219,6 +219,15 @@ QRectF NotificationsWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void NotificationsWorkbenchPanel::stopAnimations()
+{
+    if (!xAnimator->isRunning())
+        return;
+
+    xAnimator->stop();
+    item->setX(xAnimator->targetValue().toDouble());
+}
+
 void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
 {
     m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);

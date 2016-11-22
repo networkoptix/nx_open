@@ -39,6 +39,8 @@ public:
     /** This geometry the panel will have when all animations are finished. */
     virtual QRectF effectiveGeometry() const = 0;
 
+    virtual void stopAnimations() = 0;
+
     /** Master opacity. Descendants should multiply visibility-related opacity by
       * the master opacity to obtain final effective opacity for graphics items. */
     qreal masterOpacity() const;

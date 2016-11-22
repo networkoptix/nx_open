@@ -309,6 +309,15 @@ QRectF CalendarWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void CalendarWorkbenchPanel::stopAnimations()
+{
+    if (!m_yAnimator->isRunning())
+        return;
+
+    m_yAnimator->stop();
+    item->setY(m_yAnimator->targetValue().toDouble());
+}
+
 void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
 {
     if (m_dayTimeOpened == opened)

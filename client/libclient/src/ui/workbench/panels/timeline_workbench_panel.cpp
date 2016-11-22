@@ -484,6 +484,15 @@ QRectF TimelineWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void TimelineWorkbenchPanel::stopAnimations()
+{
+    if (!m_yAnimator->isRunning())
+        return;
+
+    m_yAnimator->stop();
+    item->setY(m_yAnimator->targetValue().toDouble());
+}
+
 bool TimelineWorkbenchPanel::isThumbnailsVisible() const
 {
     qreal height = item->geometry().height();
