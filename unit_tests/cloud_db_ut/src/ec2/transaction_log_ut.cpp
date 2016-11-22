@@ -1,14 +1,20 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/utils.h>
+#include <nx/utils/time.h>
+
 #include <utils/db/async_sql_query_executor.h>
 
 #include <db/db_instance_controller.h>
+#include <ec2/data_conversion.h>
 #include <ec2/outgoing_transaction_dispatcher.h>
 #include <ec2/transaction_log.h>
 #include <managers/persistent_layer/account_controller.h>
 #include <managers/persistent_layer/system_controller.h>
 #include <managers/persistent_layer/system_sharing_controller.h>
+#include <test_support/business_data_generator.h>
 #include <test_support/test_with_db_helper.h>
 
 #include "data/account_data.h"
@@ -18,32 +24,6 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 namespace test {
-
-class BusinessDataGenerator
-{
-public:
-    static api::AccountData generateRandomAccount()
-    {
-        return api::AccountData();
-    }
-
-    static data::SystemData generateRandomSystem(const api::AccountData& account)
-    {
-        //NX_ASSERT(!result->systemData.id.empty());
-        //result->systemData.name = newSystem.name;
-        //result->systemData.customization = newSystem.customization;
-        //result->systemData.opaque = newSystem.opaque;
-        //result->systemData.authKey = QnUuid::createUuid().toSimpleString().toStdString();
-        //result->systemData.ownerAccountEmail = account.email;
-        //result->systemData.status = api::SystemStatus::ssNotActivated;
-        //result->systemData.expirationTimeUtc =
-        //    nx::utils::timeSinceEpoch().count() +
-        //    std::chrono::duration_cast<std::chrono::seconds>(
-        //        m_settings.systemManager().notActivatedSystemLivePeriod).count();
-
-        return data::SystemData();
-    }
-};
 
 class BasePersistentDataTest:
     public TestWithDbHelper
@@ -64,7 +44,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        auto account = BusinessDataGenerator::generateRandomAccount();
+        auto account = cdb::test::BusinessDataGenerator::generateRandomAccount();
         const auto dbResult = executeUpdateQuerySync(
             std::bind(&persistent_layer::AccountController::insert, &m_accountDbController,
                 _1, account));
@@ -76,7 +56,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        auto system = BusinessDataGenerator::generateRandomSystem(account);
+        auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
         const auto dbResult = executeUpdateQuerySync(
             std::bind(&persistent_layer::SystemController::insert, &m_systemDbController,
                 _1, system, account.id));
@@ -84,7 +64,7 @@ protected:
         m_systems.push_back(std::move(system));
     }
 
-    void shareSystem(const api::SystemSharingEx& sharing)
+    void insertSystemSharing(const api::SystemSharingEx& sharing)
     {
         using namespace std::placeholders;
 
@@ -105,6 +85,21 @@ protected:
     }
 
 protected:
+    const std::vector<api::AccountData>& accounts() const
+    {
+        return m_accounts;
+    }
+
+    const std::vector<data::SystemData>& systems() const
+    {
+        return m_systems;
+    }
+
+    persistent_layer::SystemSharingController& systemSharingController()
+    {
+        return m_systemSharingController;
+    }
+
     template<typename QueryFunc, typename... OutputData>
     nx::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
     {
@@ -139,6 +134,31 @@ private:
     }
 };
 
+class TestOutgoingTransactionDispatcher:
+    public AbstractOutgoingTransactionDispatcher
+{
+public:
+    typedef nx::utils::MoveOnlyFunc<
+        void(const nx::String&, std::shared_ptr<const SerializableAbstractTransaction>)
+    > OnNewTransactionHandler;
+
+    virtual void dispatchTransaction(
+        const nx::String& systemId,
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override
+    {
+        if (m_onNewTransactionHandler)
+            m_onNewTransactionHandler(systemId, std::move(transactionSerializer));
+    }
+
+    void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler)
+    {
+        m_onNewTransactionHandler = std::move(onNewTransactionHandler);
+    }
+
+private:
+    OnNewTransactionHandler m_onNewTransactionHandler;
+};
+
 class TransactionLog:
     public BasePersistentDataTest,
     public ::testing::Test
@@ -146,6 +166,10 @@ class TransactionLog:
 public:
     TransactionLog()
     {
+        using namespace std::placeholders;
+
+        m_outgoingTransactionDispatcher.setOnNewTransaction(
+            std::bind(&TransactionLog::storeNewTransaction, this, _1, _2));
         initializeTransactionLog();
     }
 
@@ -160,37 +184,61 @@ public:
             insertRandomAccount();
         insertRandomSystem(getAccount(0));
 
-        // Adding users to the system.
-        for (int i = 1; i < accountCount; ++i)
-        {
-            api::SystemSharingEx sharing;
-            sharing.systemId = getSystem(0).id;
-            sharing.accountEmail = getAccount(i).email;
-            sharing.accessRole = api::SystemAccessRole::advancedViewer;
-            shareSystem(std::move(sharing));
-        }
-
         // Initializing system's transaction log.
         const nx::String systemId = getSystem(0).id.c_str();
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&ec2::TransactionLog::updateTimestampHiForSystem, m_transactionLog.get(),
-                _1, systemId, getSystem(0).systemSequence));
+            std::bind(&ec2::TransactionLog::updateTimestampHiForSystem,
+                m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
     }
 
     void havingAddedBunchOfTransactionsConcurrently()
     {
-        // TODO
+        using namespace std::placeholders;
+
+        constexpr int transactionToAddCount = 1000;
+
+        QnWaitCondition cond;
+        int transactionsToWait = 0;
+
+        QnMutexLocker lk(&m_mutex);
+
+        for (int i = 0; i < transactionToAddCount; ++i)
+        {
+            ++transactionsToWait;
+            m_transactionLog->startDbTransaction(
+                getSystem(0).id.c_str(),
+                std::bind(&TransactionLog::shareSystemToRandomUser, this, _1),
+                [this, &transactionsToWait, &cond](
+                    nx::db::QueryContext*, nx::db::DBResult dbResult)
+                {
+                    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+
+                    QnMutexLocker lk(&m_mutex);
+                    --transactionsToWait;
+                    cond.wakeAll();
+                });
+        }
+
+        while (transactionsToWait > 0)
+            cond.wait(lk.mutex());
     }
 
-    void expectTransactionsAreSentInAscendingSequenceOrder()
+    void expectingTransactionsWereSentInAscendingSequenceOrder()
     {
-        // TODO
+        int prevSequence = -1;
+        for (const auto& transaction: m_transactions)
+        {
+            ASSERT_GT(transaction->transactionHeader().persistentInfo.sequence, prevSequence);
+            prevSequence = transaction->transactionHeader().persistentInfo.sequence;
+        }
     }
 
 private:
-    OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
+    TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     std::unique_ptr<ec2::TransactionLog> m_transactionLog;
+    QnMutex m_mutex;
+    std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_transactions;
 
     void initializeTransactionLog()
     {
@@ -199,13 +247,48 @@ private:
             persistentDbManager()->queryExecutor().get(),
             &m_outgoingTransactionDispatcher);
     }
+
+    nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
+    {
+        api::SystemSharingEx sharing;
+        sharing.systemId = getSystem(0).id;
+        const auto& accountToShareWith = 
+            accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size()-1));
+        sharing.accountId = accountToShareWith.id;
+        sharing.accountEmail = accountToShareWith.email;
+        sharing.accessRole = api::SystemAccessRole::advancedViewer;
+        NX_GTEST_ASSERT_EQ(
+            nx::db::DBResult::ok,
+            systemSharingController().insertOrReplaceSharing(queryContext, sharing));
+
+        ::ec2::ApiUserData userData;
+        convert(sharing, &userData);
+        userData.isCloud = true;
+        userData.fullName = QString::fromStdString(accountToShareWith.fullName);
+        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::saveUser>(
+                queryContext,
+                sharing.systemId.c_str(),
+                std::move(userData));
+        NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+
+        return nx::db::DBResult::ok;
+    }
+
+    void storeNewTransaction(
+        const nx::String& /*systemId*/,
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_transactions.push_back(std::move(transactionSerializer));
+    }
 };
 
 TEST_F(TransactionLog, multiple_simultaneous_transactions)
 {
     givenRandomSystem();
     havingAddedBunchOfTransactionsConcurrently();
-    expectTransactionsAreSentInAscendingSequenceOrder();
+    expectingTransactionsWereSentInAscendingSequenceOrder();
 }
 
 } // namespace test

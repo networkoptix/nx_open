@@ -15,8 +15,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/sync_call.h>
 
-#include "managers/email_manager.h"
+#include "business_data_generator.h"
 #include "cloud_db_process.h"
+#include "managers/email_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -185,9 +186,7 @@ api::ResultCode CdbLauncher::addAccount(
 
 std::string CdbLauncher::generateRandomEmailAddress() const
 {
-    std::ostringstream ss;
-    ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
-    return ss.str();
+    return test::BusinessDataGenerator::generateRandomEmailAddress();
 }
 
 api::ResultCode CdbLauncher::activateAccount(

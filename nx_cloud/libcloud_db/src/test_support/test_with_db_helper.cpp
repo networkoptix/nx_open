@@ -17,6 +17,8 @@ TestWithDbHelper::TestWithDbHelper(QString tmpDir):
         "/cdb_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
+    QDir().mkpath(testDataDir());
+
     m_dbConnectionOptions = sDbConnectionOptions;
     m_dbConnectionOptions.maxConnectionCount = 3; // TODO: #ak Make tunable
 
