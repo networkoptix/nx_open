@@ -187,7 +187,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* After widget was removed we can possibly increase margins. */
     connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
-        &QnWorkbenchUi::updateViewportMargins, Qt::QueuedConnection);
+        &QnWorkbenchUi::updateViewportMarginsAnimated, Qt::QueuedConnection);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
     connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this,
@@ -431,7 +431,7 @@ void QnWorkbenchUi::setFlags(Flags flags)
     m_flags = flags;
 
     updateActivityInstrumentState();
-    updateViewportMargins();
+    updateViewportMargins(false);
 }
 
 bool QnWorkbenchUi::isTitleUsed() const
@@ -439,7 +439,7 @@ bool QnWorkbenchUi::isTitleUsed() const
     return m_title && m_title->isUsed();
 }
 
-void QnWorkbenchUi::updateViewportMargins()
+void QnWorkbenchUi::updateViewportMargins(bool animate)
 {
     using boost::algorithm::any_of;
 
@@ -476,7 +476,12 @@ void QnWorkbenchUi::updateViewportMargins()
     if (oldMargins == newMargins)
         return;
     display()->setViewportMargins(newMargins);
-    display()->fitInView(true);
+    display()->fitInView(animate);
+}
+
+void QnWorkbenchUi::updateViewportMarginsAnimated()
+{
+    updateViewportMargins(true);
 }
 
 void QnWorkbenchUi::updateActivityInstrumentState()
@@ -742,7 +747,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
-    updateViewportMargins();
+    updateViewportMargins(false);
 }
 
 void QnWorkbenchUi::createControlsWidget()
@@ -872,7 +877,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateViewportMargins);
+        &QnWorkbenchUi::updateViewportMarginsAnimated);
 
 }
 
@@ -924,12 +929,12 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_title, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        [this]
+        [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
             updateFpsGeometry();
-            updateViewportMargins();
+            updateViewportMargins(animated);
         });
 
     connect(m_title, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
@@ -1069,7 +1074,7 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateViewportMargins);
+        &QnWorkbenchUi::updateViewportMarginsAnimated);
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateFpsGeometry);
 }
@@ -1203,7 +1208,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateTreeGeometry();
             updateNotificationsGeometry();
             updateCalendarVisibility(animated);
-            updateViewportMargins();
+            updateViewportMargins(animated);
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
