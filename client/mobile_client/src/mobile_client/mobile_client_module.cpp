@@ -67,32 +67,31 @@ QnMobileClientModule::QnMobileClientModule(
     nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("mc", common->moduleGUID());
 
     // TODO: #mshevchenko Remove when client_core_module is created.
-    common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
+    common->store(new QnFfmpegInitializer());
 
-    common->store<QnTranslationManager>(translationManager);
-    common->store<QnClientCoreSettings>(new QnClientCoreSettings());
-    common->store<QnMobileClientSettings>(new QnMobileClientSettings);
+    common->store(translationManager);
+    common->store(new QnClientCoreSettings());
+    common->store(new QnMobileClientSettings);
     settings::migrateSettings();
-    common->store<QnSessionManager>(new QnSessionManager());
+    common->store(new QnSessionManager());
 
-    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
-    common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
-    common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
-    common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
-    common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
-    common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
+    common->store(new QnLongRunnablePool());
+    common->store(new QnMobileClientMessageProcessor());
+    common->store(new QnCameraHistoryPool());
+    common->store(new QnRuntimeInfoManager());
+    common->store(new QnMobileClientCameraFactory());
+    common->store(new QnClientRecentConnectionsManager());
 
-    common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
+    common->store(new QnResourcesChangesManager());
 
-    QnUserWatcher *userWatcher = new QnUserWatcher();
-    common->store<QnUserWatcher>(userWatcher);
+    auto userWatcher = common->store(new QnUserWatcher());
 
-    QnAvailableCamerasWatcher *availableCamerasWatcher = new QnAvailableCamerasWatcher();
-    common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
-    connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
+    auto availableCamerasWatcher = common->store(new QnAvailableCamerasWatcher());
+    connect(userWatcher, &QnUserWatcher::userChanged,
+        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
-    common->store<QnCloudConnectionProvider>(new QnCloudConnectionProvider());
-    common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
+    common->store(new QnCloudConnectionProvider());
+    common->store(new QnCloudStatusWatcher());
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
@@ -108,17 +107,16 @@ QnMobileClientModule::QnMobileClientModule(
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
-    auto moduleFinder = new QnModuleFinder(true);
-    common->store<QnModuleFinder>(moduleFinder);
+    auto moduleFinder = common->store(new QnModuleFinder(true));
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
     moduleFinder->start();
 
-    common->store<QnRouter>(new QnRouter(moduleFinder));
+    common->store(new QnRouter(moduleFinder));
 
-    common->store<QnSystemsFinder>(new QnSystemsFinder());
-    common->store<QnSystemsWeightsManager>(new QnSystemsWeightsManager());
+    common->store(new QnSystemsFinder());
+    common->store(new QnSystemsWeightsManager());
 
-    common->store<settings::SessionsMigrationHelper>(new settings::SessionsMigrationHelper());
+    common->store(new settings::SessionsMigrationHelper());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleFinder](Qt::ApplicationState state)

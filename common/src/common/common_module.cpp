@@ -96,10 +96,10 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     QnCommonMetaTypes::initialize();
 
-    store<QnLongRunableCleanup>(new QnLongRunableCleanup());
+    store(new QnLongRunableCleanup());
 
     /* Init statics. */
-    store<nx::utils::TimerManager>(new nx::utils::TimerManager());
+    store(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);

@@ -68,18 +68,20 @@ int runUi(QGuiApplication *application) {
 
     if (qnSettings->isLiteClientModeEnabled())
     {
-        auto webChannel = new webchannel::WebChannelServer();
-        qnCommon->store<webchannel::WebChannelServer>(webChannel);
+        auto prepearingWebChannel = std::make_unique<webchannel::WebChannelServer>();
 
-        auto liteClientHandler = new QnLiteClientHandler();
-        liteClientHandler->setUiController(context.uiController());
-        qnCommon->store<QnLiteClientHandler>(liteClientHandler);
+        if (prepearingWebChannel->isValid())
+        {
+            auto webChannel = qnCommon->store(prepearingWebChannel.release());
 
-        auto webAdminController = new controllers::WebAdminController();
-        webAdminController->setUiController(context.uiController());
-        qnCommon->store<controllers::WebAdminController>(webAdminController);
+            auto liteClientHandler = qnCommon->store(new QnLiteClientHandler());
+            liteClientHandler->setUiController(context.uiController());
 
-        webChannel->registerObject(lit("liteClientController"), webAdminController);
+            auto webAdminController = qnCommon->store(new controllers::WebAdminController());
+            webAdminController->setUiController(context.uiController());
+
+            webChannel->registerObject(lit("liteClientController"), webAdminController);
+        }
     }
 
     QStringList selectors;
