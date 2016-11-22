@@ -27,13 +27,25 @@ namespace cdb {
 
 namespace {
 
-class Account
-:
+class Account:
     public CdbFunctionalTest
 {
 };
 
 } // namespace
+
+// TODO: #ak following test should be broke into something like
+//
+//{
+//    havingIssuedAccountRegistrationRequest();
+//    expectingReceivalOfActiveAccountNotification();
+//    expectingAccountActivationCodeWorks();
+//}
+//
+//{
+//    havingIssuedAccountRegistrationRequest();
+//    expectingFailureToBindSystemToAccount();
+//}
 
 TEST_F(Account, activation)
 {

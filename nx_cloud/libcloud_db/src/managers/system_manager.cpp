@@ -1108,6 +1108,7 @@ nx::db::DBResult SystemManager::fillSystemSharedNotification(
             return dbResult;
     }
 
+    notification->customization = system.customization;
     notification->message.sharer_email = grantorEmail;
     notification->message.system_id = systemId;
     notification->message.system_name = system.name;
@@ -1344,6 +1345,7 @@ nx::db::DBResult SystemManager::prepareInviteNotification(
         queryContext, inviterEmail, systemId, inviteeAccount.email, notification);
     if (dbResult != db::DBResult::ok)
         return dbResult;
+
     notification->setActivationCode(std::move(accountConfirmationCode.code));
 
     return db::DBResult::ok;
