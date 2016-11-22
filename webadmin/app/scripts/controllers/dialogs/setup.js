@@ -37,25 +37,27 @@ angular.module('webadminApp')
 
         var cloudAuthorized = false;
 
-        $log.log("check getCredentials from client");
-        nativeClient.getCredentials().then(function(authObject){
-            $log.log("request get credentials from client");
-            var authObject = nativeClientObject.getCredentials();
-            if (typeof authObject === 'string' || authObject instanceof String){
-                $log.log("got string from client, try to decode JSON: " + authObject);
-                try {
-                    authObject = JSON.parse(authObject);
-                }catch(a){
-                    $log("could not decode JSON from string: " + authObject);
+        function getCredentialsFromClient() {
+            $log.log("check getCredentials from client");
+            return nativeClient.getCredentials().then(function (authObject) {
+                $log.log("request get credentials from client");
+                var authObject = nativeClientObject.getCredentials();
+                if (typeof authObject === 'string' || authObject instanceof String) {
+                    $log.log("got string from client, try to decode JSON: " + authObject);
+                    try {
+                        authObject = JSON.parse(authObject);
+                    } catch (a) {
+                        $log("could not decode JSON from string: " + authObject);
+                    }
                 }
-            }
-            $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
-            cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
-            if(cloudAuthorized){
-                $scope.settings.presetCloudEmail = authObject.cloudEmail;
-                $scope.settings.presetCloudPassword = authObject.cloudPassword;
-            }
-        });
+                $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
+                cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
+                if (cloudAuthorized) {
+                    $scope.settings.presetCloudEmail = authObject.cloudEmail;
+                    $scope.settings.presetCloudPassword = authObject.cloudPassword;
+                }
+            });
+        }
 
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
@@ -127,7 +129,11 @@ angular.module('webadminApp')
                 $log.log("failed to get systemCloudInfo");
                 return mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
+
                     $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
+                    $scope.IP = $scope.serverInfo.remoteAddresses[0];
+                    $scope.port = window.location.port;
+
                     checkInternet(false);
                     if($scope.serverInfo.flags.newSystem) {
                         $log.log("System is new - go to master");
@@ -761,11 +767,12 @@ angular.module('webadminApp')
                 });
             });
         }
-
+        //$scope.liteClient = true;// TODO: remove this hardcode
         nativeClient.init().then(function(result){
             $scope.thickClient = result.thick;
             $scope.liteClient = result.lite;
             $log.log("check client Thick:" + result.thick);
             $log.log("check client Lite:" + result.lite);
+            return getCredentialsFromClient();
         }).finally(initWizard);
     });

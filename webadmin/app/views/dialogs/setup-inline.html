@@ -17,11 +17,31 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('start')">
-    <div class="vertical-center">
+    <div ng-class="{'vertical-center':!liteClient,'master-description':liteClient}">
         <h2>Get Started with {{Config.productName}}</h2>
         <p>You need to configure your server before using it.<br>
         Don't worry. This won't take long.</p>
+        <div class="row" ng-if="liteClient">
+            <div class="col-xs-12">
+               <p>
+                   You also can set it up from another computer by connecting<br>
+                   to this device by one of the next ways:
+               </p>
+            </div>
+            <div class="col-xs-6">
+                <div class="text-center"><b>Using web browser</b></div>
+                <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            </div>
+            <div class="col-xs-6">
+                <div class="text-center"><b>Using {{Config.productName}} application</b></div>
+                <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+                <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+                <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+                <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            </div>
+        </div>
     </div>
+
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('systemName')">

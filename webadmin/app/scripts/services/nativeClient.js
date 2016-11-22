@@ -25,8 +25,8 @@ angular.module('webadminApp')
                 };
                 socket.onerror = function(error)
                 {
-                    $log.error("nativeClient: no client websocker");
-                    $log.error(error);
+                    $log.log("nativeClient: no client websocket");
+                    $log.log(error);
                     deferred.reject(error);
                 };
                 socket.onopen = function()
@@ -40,7 +40,7 @@ angular.module('webadminApp')
                     });
                 };
 
-                return deferred.promise();
+                return deferred.promise;
             },
             getCredentials:function(){
                 if(nativeClientObject && nativeClientObject.getCredentials){
