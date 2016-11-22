@@ -253,7 +253,11 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
         return false;
 
     setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
+
     m_updateProcess->pleaseStop();
+    m_updateProcess->deleteLater();
+    m_updateProcess = nullptr;
+
     return true;
 }
 
@@ -346,10 +350,6 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
             finishUpdate(result);
 
             const auto watcher = qnDesktopClientMessageProcessor->incompatibleServerWatcher();
-
-            m_updateProcess->deleteLater();
-            m_updateProcess = nullptr;
-
             for (const auto& id: incompatibleTargets)
                 watcher->keepServer(id, false);
 
