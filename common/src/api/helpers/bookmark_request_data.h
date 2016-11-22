@@ -21,7 +21,7 @@ struct QnGetBookmarksRequestData: public QnMultiserverRequestData
 
 struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData
 {
-    QnGetBookmarkTagsRequestData(int limit = unlimited());
+    explicit QnGetBookmarkTagsRequestData(int limit = unlimited());
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;

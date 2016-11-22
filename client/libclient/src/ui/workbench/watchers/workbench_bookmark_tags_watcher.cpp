@@ -34,9 +34,17 @@ void QnWorkbenchBookmarkTagsWatcher::refresh() {
 
     enum { TagsLimit = 20 };
 
-    server->apiConnection()->getBookmarkTagsAsync(QnGetBookmarkTagsRequestData(TagsLimit),
-                this, SLOT(at_connection_gotBookmarkTags(int,QnCameraBookmarkTagList,int)));
+    QnGetBookmarkTagsRequestData requestData(TagsLimit);
+    requestData.format = Qn::SerializationFormat::UbjsonFormat;
+
+    server->apiConnection()->getBookmarkTagsAsync(requestData,
+        this, SLOT(at_connection_gotBookmarkTags(int,QnCameraBookmarkTagList,int)));
 }
+
+struct S
+{
+    int requestData = {100};
+};
 
 void QnWorkbenchBookmarkTagsWatcher::at_connection_gotBookmarkTags(
         int status, const QnCameraBookmarkTagList &tags, int handle)

@@ -89,8 +89,8 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
         : period.endTimeMs();
     requestData.filter.orderBy = QnBookmarkSortOrder(Qn::BookmarkDuration, Qt::DescendingOrder);
     requestData.filter.limit = bookmarksLimitPerRequest;
+    requestData.format = Qn::SerializationFormat::UbjsonFormat;
 
-    //TODO: #GDM #Bookmarks #IMPLEMENT ME
     connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
 }
 
