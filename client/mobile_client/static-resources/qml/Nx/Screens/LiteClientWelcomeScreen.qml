@@ -1,0 +1,16 @@
+import QtQuick 2.6
+import QtWebView 1.0
+import Nx 1.0
+import Nx.Controls 1.0
+
+PageBase
+{
+    id: liteClientWelcomeScreen
+
+    WebView
+    {
+        id: webView
+
+        anchors.fill: parent
+    }
+}

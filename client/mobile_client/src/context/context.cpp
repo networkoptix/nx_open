@@ -121,6 +121,11 @@ bool QnContext::liteMode() const
     return qnSettings->isLiteClientModeEnabled();
 }
 
+bool QnContext::autoLoginEnabled() const
+{
+    return qnSettings->isAutoLoginEnabled();
+}
+
 bool QnContext::testMode() const
 {
     return qnSettings->testMode();

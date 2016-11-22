@@ -33,11 +33,16 @@
 #include <resource_allocator.h>
 #include <nx/utils/timer_manager.h>
 
+#include <nx/mobile_client/webchannel/web_channel_server.h>
+#include <nx/mobile_client/controllers/web_admin_controller.h>
+
 #include "config.h"
 using mobile_client::conf;
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <common/systemexcept.h>
+
+using namespace nx::mobile_client;
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -63,9 +68,18 @@ int runUi(QGuiApplication *application) {
 
     if (qnSettings->isLiteClientModeEnabled())
     {
+        auto webChannel = new webchannel::WebChannelServer();
+        qnCommon->store<webchannel::WebChannelServer>(webChannel);
+
         auto liteClientHandler = new QnLiteClientHandler();
         liteClientHandler->setUiController(context.uiController());
         qnCommon->store<QnLiteClientHandler>(liteClientHandler);
+
+        auto webAdminController = new controllers::WebAdminController();
+        webAdminController->setUiController(context.uiController());
+        qnCommon->store<controllers::WebAdminController>(webAdminController);
+
+        webChannel->registerObject(lit("liteClientController"), webAdminController);
     }
 
     QStringList selectors;
