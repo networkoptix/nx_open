@@ -20,6 +20,7 @@ PageBase
         var baseUrl = Nx.url(getInitialUrl())
 
         var url = baseUrl.scheme() + "://" + baseUrl.address()
+            + "/static/index.html"
             + "?clientWebSocket=" + encodeURIComponent(getWebSocketUrl())
 
         webView.url = url
