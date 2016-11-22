@@ -7,22 +7,19 @@ describe('Cloud disconnect', function () {
 
     beforeAll(function() {
         p.get();
-        p.helper.getTab("System").click();
     });
 
     beforeEach(function(){
         p.helper.getTab("System").click();
         // if button Disconnect from Cloud is not present (system is not in Cloud),
         // then connect to Cloud
-
-        p.helper.checkPresent(p.disconnectFromCloudButton).then(
-            p.disconnectFromCloudButton.click(),
-            function() {
-                console.log('Disconnect from Cloud Button not found, so logging into Cloud');
-                p.connectToCloud();
-                p.getSysTab(); // to end all pending requests
-                p.disconnectFromCloudButton.click();
-            });
+        p.helper.checkPresent(p.disconnectFromCloudButton).
+            then(function(){}, // do nothing if present
+                function() { // connect to cloud if button not present
+                    console.log('Disconnect from Cloud Button not found, so logging into Cloud');
+                    p.connectToCloud();
+                });
+        p.disconnectFromCloudButton.click();
     });
 
     afterEach(function(){
