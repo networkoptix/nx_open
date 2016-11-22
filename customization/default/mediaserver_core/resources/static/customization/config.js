@@ -32,6 +32,6 @@ Config.helpLinks.push({
     target: "new" // new|frame
 });
 
-// Config.allowDebugMode = false;
+Config.allowDebugMode = false;
 Config.productName = 'Nx Witness';
 Config.cloud.productName = 'Nx Cloud';

@@ -292,8 +292,8 @@ angular.module('webadminApp')
                                 scope.vgApi = api;
 
                                 if (scope.vgSrc) {
-                                    $timeout(function () { // Do not show preloader if debug mode
-                                        scope.loading = !(Config.allowDebugMode && Config.debug.video) && !!format;
+                                    $timeout(function () {
+                                        scope.loading = !!format;
                                     });
                                     scope.vgApi.load(getFormatSrc('hls'));
                                 }
