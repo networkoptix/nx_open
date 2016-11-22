@@ -32,6 +32,7 @@
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
