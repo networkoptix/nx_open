@@ -343,7 +343,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
     connect(m_updateProcess, &QnUpdateProcess::updateFinished, this,
         [this, incompatibleTargets, clearTargetsWhenFinished](const QnUpdateResult& result)
         {
-            emit updateFinished(result);
+            finishUpdate(result);
 
             const auto watcher = qnDesktopClientMessageProcessor->incompatibleServerWatcher();
 
