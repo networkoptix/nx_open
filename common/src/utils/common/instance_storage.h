@@ -41,22 +41,6 @@ public:
     }
 
 protected:
-    template<class T, class I>
-    I* store(I* instance)
-    {
-        static_assert(std::is_convertible<I*, T*>::value,
-            "Provided value must be convertible to the specified instance type T.");
-
-        NX_ASSERT(&T::staticMetaObject != &QObject::staticMetaObject,
-            Q_FUNC_INFO, "Do you forget to add Q_OBJECT macro?");
-        NX_ASSERT(!m_instanceByMetaObject.contains(&T::staticMetaObject));
-
-        m_instanceByMetaObject.insert(&T::staticMetaObject, instance);
-        m_instances.push_back(instance);
-
-        return instance;
-    }
-
     template<class T>
     T* store(T* instance)
     {
