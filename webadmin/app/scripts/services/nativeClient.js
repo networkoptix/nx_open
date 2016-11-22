@@ -4,43 +4,102 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('nativeClient', function () {
+    .factory('nativeClient', function ($q, $log) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
+        var socketClientController = null;
+        var wsUri =  "ws://localhost:50103";
 
         return {
             init:function(){
-                if(!nativeClientObject){
-                    return $q.reject();
+                if(nativeClientObject){
+                    return $q.resolve({thick:true});
                 }
-                return $q.resolve({thick:true});
+
+                var deferred = $q.defer();
+
+                var socket = new WebSocket(wsUri);
+                socket.onclose = function()
+                {
+                    socketClientController = null;
+                    $log.error("nativeClient: web channel closed");
+                };
+                socket.onerror = function(error)
+                {
+                    $log.error("nativeClient: no client websocker");
+                    $log.error(error);
+                    deferred.reject(error);
+                };
+                socket.onopen = function()
+                {
+                    window.channel = new QWebChannel(socket, function(channel) {
+                        channel.objects.liteClientController.liteClientMode(function(arg) {
+                            $log.log("nativeClient: Lite client mode enabled: " + arg)
+                            socketClientController = channel.objects.liteClientController;
+                            deferred.resolve({lite:true});
+                        })
+                    });
+                };
+
+                return deferred.promise();
             },
             getCredentials:function(){
-                if(!(nativeClientObject && nativeClientObject.getCredentials)){
-                    return $q.reject();
+                if(nativeClientObject && nativeClientObject.getCredentials){
+                    return $q.resolve(nativeClientObject.getCredentials());
                 }
-                return $q.resolve(nativeClientObject.getCredentials());
+
+                if(socketClientController && socketClientController.getCredentials){
+                    var deferred = $q.defer();
+                    socketClientController.getCredentials(function(result){
+                        deferred.resolve(result);
+                    });
+                    return deferred.promise;
+                }
+
+                return $q.reject();
             },
             openUrlInBrowser:function(url, windowFallback){
-                if(!(nativeClientObject && nativeClientObject.openUrlInBrowser)){
-                    if(windowFallback){
-                        window.open(url);
-                    }
-                    return $q.reject();
+                if(nativeClientObject && nativeClientObject.openUrlInBrowser){
+                    return $q.resolve(nativeClientObject.openUrlInBrowser(url));
                 }
-                return $q.resolve(nativeClientObject.openUrlInBrowser(url));
+
+                if(socketClientController && socketClientController.openUrlInBrowser){
+                    var deferred = $q.defer();
+                    socketClientController.openUrlInBrowser(url,function(result){
+                        deferred.resolve(result);
+                    });
+                    return deferred.promise;
+                }
+
+                if(windowFallback){
+                    window.open(url);
+                }
+                return $q.reject();
             },
             updateCredentials:function(login,password,isCloud){
-                if(!(nativeClientObject && nativeClientObject.updateCredentials)){
-                    return $q.reject();
+                if(nativeClientObject && nativeClientObject.updateCredentials){
+                    return $q.resolve(nativeClientObject.updateCredentials (login,password,isCloud));
                 }
-                return $q.resolve(nativeClientObject.updateCredentials (login,password,isCloud));
+
+                if(socketClientController && socketClientController.updateCredentials){
+                    var deferred = $q.defer();
+                    socketClientController.updateCredentials(login,password,isCloud,function(result){
+                        deferred.resolve(result);
+                    });
+                    return deferred.promise;
+                }
+
+                return $q.reject();
             },
             cancelDialog:function(){
-                if(!nativeClientObject){
-                    return $q.reject();
-                }
-                if(nativeClientObject.cancel){
+                if(nativeClientObject && nativeClientObject.cancel){
                     nativeClientObject.cancel();
+                }
+                if(socketClientController && socketClientController.cancel){
+                    var deferred = $q.defer();
+                    socketClientController.cancel(function(result){
+                        deferred.resolve(result);
+                    });
+                    return deferred.promise;
                 }
                 return this.closeDialog();
             },
@@ -52,17 +111,20 @@ angular.module('webadminApp')
                 window.close();
                 return $q.resolve();
             },
-            liteClientMode:function(){
-                if(!nativeClientObject){
-                    return $q.reject();
-                }
-
-            },
             startCamerasMode:function(){
-                if(!nativeClientObject){
-                    return $q.reject();
+                if(nativeClientObject && nativeClientObject.startCamerasMode){
+                    return $q.resolve(nativeClientObject.startCamerasMode());
                 }
 
+                if(socketClientController && socketClientController.startCamerasMode){
+                    var deferred = $q.defer();
+                    socketClientController.startCamerasMode(function(result){
+                        deferred.resolve(result);
+                    });
+                    return deferred.promise;
+                }
+
+                return $q.reject();
             }
         }
     });
