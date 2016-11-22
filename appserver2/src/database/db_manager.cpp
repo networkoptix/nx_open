@@ -3130,11 +3130,16 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDa
 
 void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
 {
-    for(const QFileInfo& fi: QDir(":/resources").entryInfoList(QDir::Files))
-        loadResourceTypeXML(fi.absoluteFilePath(), data);
-    QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
-    for(const QFileInfo& fi: dir2.entryInfoList(QDir::Files))
-        loadResourceTypeXML(fi.absoluteFilePath(), data);
+    const auto cameraTypesDir = lit("/resources/camera_types");
+    const auto nameFilters = QStringList{lit("*.xml")};
+
+    const auto qrcDir = QDir(lit(":") + cameraTypesDir);
+    for(const auto& fileInfo: qrcDir.entryInfoList(nameFilters, QDir::Files))
+        loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
+
+    const auto applicationDir = QDir(QCoreApplication::applicationDirPath() + cameraTypesDir);
+    for(const auto& fileInfo: applicationDir.entryInfoList(nameFilters, QDir::Files))
+        loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
