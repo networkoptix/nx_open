@@ -24,6 +24,7 @@ class QnContext: public QObject
     Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher CONSTANT)
     Q_PROPERTY(QnCloudUrlHelper* cloudUrlHelper MEMBER m_cloudUrlHelper CONSTANT)
     Q_PROPERTY(bool liteMode READ liteMode CONSTANT)
+    Q_PROPERTY(bool autoLoginEnabled READ autoLoginEnabled CONSTANT)
     Q_PROPERTY(bool testMode READ testMode CONSTANT)
     Q_PROPERTY(QString initialTest READ initialTest CONSTANT)
 
@@ -52,6 +53,7 @@ public:
     Q_INVOKABLE int getMaxTextureSize() const;
 
     Q_INVOKABLE bool liteMode() const;
+    Q_INVOKABLE bool autoLoginEnabled() const;
 
     Q_INVOKABLE bool testMode() const;
     Q_INVOKABLE QString initialTest() const;
@@ -62,6 +64,8 @@ public:
     Q_INVOKABLE QString getLastUsedSystemName() const;
     Q_INVOKABLE QUrl getLastUsedUrl() const;
     Q_INVOKABLE QUrl getInitialUrl() const;
+
+    Q_INVOKABLE QUrl getWebSocketUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 

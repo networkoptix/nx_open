@@ -499,8 +499,7 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
     switch (status)
     {
         case Qn::UnauthorizedConnectionResult:
-            /* Looks like server team has not fixed VMS-3794 */
-            NX_ASSERT(false);
+            /* Server database was cleaned up during restart, e.g. merge to other system. */
             m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
             break;
         case Qn::IncompatibleInternalConnectionResult:

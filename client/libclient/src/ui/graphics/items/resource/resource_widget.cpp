@@ -22,6 +22,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
@@ -179,6 +180,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_aspectRatio = defaultAspectRatio();
 
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this, [this, itemId = item->uuid()](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        {
+            if (id != itemId)
+                return;
+            at_itemDataChanged(role);
+        });
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
     /* Videowall license changes helper */

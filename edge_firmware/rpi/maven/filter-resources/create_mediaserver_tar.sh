@@ -143,7 +143,7 @@ done
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
-    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns"
+    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns DBus"
 fi
 for var in $QTLIBS
 do
@@ -208,6 +208,11 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   
   #additional platform specific files
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
+  cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
+  cp -Rf ${qt.dir}/translations $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -Rf ${qt.dir}/resources $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -f ${qt.dir}/resources/* $BUILD_DIR/$PREFIX_DIR/lite_client/bin/libexec
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
   cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx

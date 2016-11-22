@@ -185,7 +185,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     ui->setupUi(this);
 
     NX_ASSERT(parent);
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(parent ? parent : this);
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 

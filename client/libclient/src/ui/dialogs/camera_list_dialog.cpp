@@ -18,6 +18,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/widgets/common/item_view_auto_hider.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
@@ -60,6 +62,8 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     ui->camerasView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::CameraList_Help);
+
+    QnItemViewAutoHider::create(ui->camerasView, tr("No cameras"));
 }
 
 QnCameraListDialog::~QnCameraListDialog() { }

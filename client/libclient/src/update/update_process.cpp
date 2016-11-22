@@ -65,9 +65,19 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     moveToThread(this);
 }
 
-void QnUpdateProcess::pleaseStop() {
+void QnUpdateProcess::pleaseStop()
+{
+    if (!isRunning())
+        return;
+
+    QEventLoop waiter;
+    connect(this, &QThread::finished, &waiter, &QEventLoop::quit);
+
     base_type::pleaseStop();
     quit();
+
+    waiter.exec();
+
     setAllPeersStage(QnPeerUpdateStage::Init);
     setStage(QnFullUpdateStage::Init);
 }

@@ -131,7 +131,7 @@ Page
 
         onConnectionFailed:
         {
-            var systemName = title ? title : getLastUsedSystemId()
+            var systemName = title ? title : getLastUsedSystemName()
             Workflow.openSessionsScreenWithWarning(
                 connectionManager.connectionType == QnConnectionManager.LiteClientConnection
                     ? "" : systemName)

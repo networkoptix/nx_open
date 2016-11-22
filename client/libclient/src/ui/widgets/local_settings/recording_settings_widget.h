@@ -46,6 +46,8 @@ private:
     int screen() const;
     void setScreen(int screen);
 
+    bool isPrimaryScreenSelected() const;
+
 private:
     void updateRecordingWarning();
     void updateDisableAeroCheckbox();

@@ -32,12 +32,7 @@ private:
 
     void setCloudSystems(const QnCloudSystemList &systems);
 
-    void updateSystemInternal(const QString& cloudId,
-        const QnSystemDescription::PointerType& system);
-
-    void pingCloudSystem(const QString &cloudId);
-
-    void checkOutdatedServersInternal(const QnSystemDescription::PointerType &system);
+    void pingCloudSystem(const QString &cloudSystemId);
 
     void updateSystems();
 
@@ -52,6 +47,4 @@ private:
     mutable QnMutex m_mutex;
 
     SystemsHash m_systems;
-    SystemsHash m_factorySystems;       //< Stores cloud-factory systems with one factory server
-    RequestIdToSystemHash m_requestToSystem;
 };

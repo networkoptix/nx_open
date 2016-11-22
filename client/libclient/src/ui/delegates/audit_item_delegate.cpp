@@ -582,7 +582,7 @@ void QnAuditItemDelegate::paintUserActivity(const QStyle* style, QPainter* paint
 
     /* Obtain values: */
     qreal chartData = index.data(Qn::AuditLogChartDataRole).toReal();
-    QColor chartColor = index.data(Qt::BackgroundColorRole).value<QColor>();
+    QColor chartColor = index.data(Qt::ForegroundRole).value<QColor>();
 
     /* Draw chart bar: */
     QRect barRect = option.rect.adjusted(2, 1, -2, -1);

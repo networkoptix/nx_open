@@ -156,7 +156,8 @@ protected:
         const QRectF& titleGeometry,
         const QRectF& timelineGeometry,
         const QRectF& notificationsGeometry);
-    void updateViewportMargins();
+    void updateViewportMargins(bool animate = true);
+    void updateViewportMarginsAnimated();
 
     void updateTreeGeometry();
 

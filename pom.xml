@@ -857,6 +857,7 @@
                 </property>
             </activation>
             <properties>
+                <qt.version>5.6.2</qt.version>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>

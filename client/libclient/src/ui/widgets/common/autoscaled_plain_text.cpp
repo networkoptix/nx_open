@@ -1,5 +1,6 @@
 #include "autoscaled_plain_text.h"
 
+#include <ui/common/geometry.h>
 #include <utils/common/event_processors.h>
 
 
@@ -48,9 +49,7 @@ public:
         Q_Q(const QnAutoscaledPlainText);
         auto sizeToFit = q->contentsRect().size();
 
-        qreal factor = qMax(
-            static_cast<qreal>(sizeHint.width()) / sizeToFit.width(),
-            static_cast<qreal>(sizeHint.height()) / sizeToFit.height());
+        qreal factor = 1.0 / QnGeometry::scaleFactor(sizeHint, sizeToFit, Qt::KeepAspectRatio);
 
         m_effectiveFont = q->font();
 
