@@ -17,6 +17,7 @@
 #include "data/account_data.h"
 #include "managers_types.h"
 #include "notification.h"
+#include "persistent_layer/account_controller.h"
 
 namespace nx {
 namespace cdb {
@@ -143,6 +144,7 @@ private:
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     QnCounter m_startedAsyncCallsCounter;
     UpdateAccountSubroutine m_updateAccountSubroutine;
+    persistent_layer::AccountController m_accountDbController;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);

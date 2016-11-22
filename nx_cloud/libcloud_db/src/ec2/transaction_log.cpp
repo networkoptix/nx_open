@@ -22,7 +22,7 @@ QString toString(const ::ec2::QnAbstractTransaction& tran)
 TransactionLog::TransactionLog(
     const QnUuid& peerId,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
-    OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
+    AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
 :
     m_peerId(peerId),
     m_dbManager(dbManager),

@@ -33,7 +33,7 @@ class AsyncSqlQueryExecutor;
 namespace cdb {
 namespace ec2 {
 
-class OutgoingTransactionDispatcher;
+class AbstractOutgoingTransactionDispatcher;
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
@@ -59,7 +59,7 @@ public:
     TransactionLog(
         const QnUuid& peerId,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
-        OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
+        AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
     /** 
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
@@ -252,7 +252,7 @@ private:
 
     const QnUuid m_peerId;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
-    OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
+    AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
     std::map<
         std::pair<nx::db::QueryContext*, nx::String>,

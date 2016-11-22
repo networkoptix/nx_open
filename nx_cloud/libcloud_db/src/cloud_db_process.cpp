@@ -34,8 +34,7 @@
 #include <cloud_db_client/src/cdb_request_path.h>
 
 #include "access_control/authentication_manager.h"
-#include "db/structure_update_statements.h"
-#include "ec2/db/migration/add_history_to_transaction.h"
+#include "db/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
@@ -59,15 +58,11 @@ static int registerQtResources()
 namespace nx {
 namespace cdb {
 
-static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
-
 CloudDBProcess::CloudDBProcess(int argc, char **argv):
     m_argc(argc),
     m_argv(argv),
     m_terminated(false),
     m_settings(nullptr),
-    m_dbManager(nullptr),
-    m_timerManager(nullptr),
     m_emailManager(nullptr),
     m_streeManager(nullptr),
     m_httpMessageDispatcher(nullptr),
@@ -139,16 +134,15 @@ int CloudDBProcess::exec()
             return 1;
         }
 
-        nx::db::AsyncSqlQueryExecutor dbManager(settings.dbConnectionOptions());
-        m_dbManager = &dbManager;
-        if( !initializeDB(&dbManager) )
+        persistent_layer::DbInstanceController dbInstanceController(
+            settings.dbConnectionOptions());
+        if (!dbInstanceController.initialize())
         {
             NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
             return 2;
         }
 
         nx::utils::TimerManager timerManager;
-        m_timerManager = &timerManager;
         timerManager.start();
 
         std::unique_ptr<AbstractEmailManager> emailManager(
@@ -167,14 +161,14 @@ int CloudDBProcess::exec()
         //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
-            &dbManager);
+            dbInstanceController.queryExecutor().get());
         m_tempPasswordManager = &tempPasswordManager;
 
         AccountManager accountManager(
             settings,
             streeManager,
             &tempPasswordManager,
-            &dbManager,
+            dbInstanceController.queryExecutor().get(),
             emailManager.get());
         m_accountManager = &accountManager;
 
@@ -184,7 +178,7 @@ int CloudDBProcess::exec()
         ec2::SyncronizationEngine ec2SyncronizationEngine(
             kCdbGuid,
             settings.p2pDb(),
-            &dbManager);
+            dbInstanceController.queryExecutor().get());
 
         SystemHealthInfoProvider systemHealthInfoProvider(
             ec2SyncronizationEngine.connectionManager());
@@ -194,7 +188,7 @@ int CloudDBProcess::exec()
             &timerManager,
             &accountManager,
             systemHealthInfoProvider,
-            &dbManager,
+            dbInstanceController.queryExecutor().get(),
             emailManager.get(),
             &ec2SyncronizationEngine);
         m_systemManager = &systemManager;
@@ -445,122 +439,6 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::maintenance, DataActionType::fetch);
 }
 
-bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
-{
-    for (;;)
-    {
-        if (dbManager->init())
-            break;
-        NX_LOG(lit("Cannot start application due to DB connect error"), cl_logALWAYS);
-        std::this_thread::sleep_for(
-            std::chrono::seconds(DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC));
-    }
-
-    if (!updateDB(dbManager))
-    {
-        NX_LOG("Could not update DB to current vesion", cl_logALWAYS);
-        return false;
-    }
-
-    if (!configureDB(dbManager))
-    {
-        NX_LOG("Failed to tune DB", cl_logALWAYS);
-        return false;
-    }
-
-    return true;
-}
-
-bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
-{
-    if( dbManager->connectionOptions().driverType != nx::db::RdbmsDriverType::sqlite )
-        return true;
-
-    std::promise<nx::db::DBResult> cacheFilledPromise;
-    auto future = cacheFilledPromise.get_future();
-
-    //starting async operation
-    using namespace std::placeholders;
-    dbManager->executeUpdateWithoutTran(
-        [](nx::db::QueryContext* queryContext) ->nx::db::DBResult
-        {
-            QSqlQuery enableWalQuery(*queryContext->connection());
-            enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-            if (!enableWalQuery.exec())
-            {
-                NX_LOG(lit("sqlite configure. Failed to enable WAL mode. %1")
-                    .arg(enableWalQuery.lastError().text()),
-                    cl_logWARNING);
-                return nx::db::DBResult::ioError;
-            }
-
-            QSqlQuery enableFKQuery(*queryContext->connection());
-            enableFKQuery.prepare("PRAGMA foreign_keys = ON");
-            if (!enableFKQuery.exec())
-            {
-                NX_LOG(lit("sqlite configure. Failed to enable foreign keys. %1")
-                    .arg(enableFKQuery.lastError().text()),
-                    cl_logWARNING);
-                return nx::db::DBResult::ioError;
-            }
-
-            //QSqlQuery setLockingModeQuery(*connection);
-            //setLockingModeQuery.prepare("PRAGMA locking_mode = NORMAL");
-            //if (!setLockingModeQuery.exec())
-            //{
-            //    NX_LOG(lit("sqlite configure. Failed to set locking mode. %1")
-            //        .arg(setLockingModeQuery.lastError().text()), cl_logWARNING);
-            //    return nx::db::DBResult::ioError;
-            //}
-
-            return nx::db::DBResult::ok;
-        },
-        [&](nx::db::QueryContext* /*queryContext*/, nx::db::DBResult dbResult)
-        {
-            cacheFilledPromise.set_value(dbResult);
-        });
-
-    //waiting for completion
-    future.wait();
-    return future.get() == nx::db::DBResult::ok;
-}
-
-bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
-{
-    //updating DB structure to actual state
-    nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
-    dbStructureUpdater.addFullSchemaScript(13, db::kCreateDbVersion13);
-
-    dbStructureUpdater.addUpdateScript(db::kCreateAccountData);
-    dbStructureUpdater.addUpdateScript(db::kCreateSystemData);
-    dbStructureUpdater.addUpdateScript(db::kSystemToAccountMapping);
-    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToSystem);
-    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
-    dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
-    dbStructureUpdater.addUpdateScript(db::kAddIsEmailCodeToTemporaryAccountPassword);
-    dbStructureUpdater.addUpdateScript(db::kRenameSystemAccessRoles);
-    dbStructureUpdater.addUpdateScript(db::kChangeSystemIdTypeToString);
-    dbStructureUpdater.addUpdateScript(db::kAddDeletedSystemState);
-    dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
-    dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
-    dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
-    dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
-    dbStructureUpdater.addUpdateScript(db::kAddCustomAndDisabledAccessRoles);
-    dbStructureUpdater.addUpdateScript(db::kAddMoreFieldsToSystemSharing);
-    dbStructureUpdater.addUpdateScript(db::kAddVmsUserIdToSystemSharing);
-    dbStructureUpdater.addUpdateScript(db::kAddSystemTransactionLog);
-    dbStructureUpdater.addUpdateScript(db::kChangeTransactionLogTimestampTypeToBigInt);
-    dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
-    dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
-    dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
-    dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
-    dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
-    dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
-    dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
-    dbStructureUpdater.addUpdateScript(db::kAddVmsOpaqueData);
-    return dbStructureUpdater.updateStructSync();
-}
-
 template<typename ManagerType, typename InputData, typename... OutputData>
 void CloudDBProcess::registerHttpHandler(
     const char* handlerPath,
@@ -641,5 +519,5 @@ void CloudDBProcess::registerHttpHandler(
         });
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

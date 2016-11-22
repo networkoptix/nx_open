@@ -33,7 +33,8 @@
 #include "data_view.h"
 #include "ec2/transaction_log.h"
 #include "managers_types.h"
-
+#include "persistent_layer/system_sharing_controller.h"
+#include "persistent_layer/system_controller.h"
 
 namespace nx {
 namespace cdb {
@@ -42,7 +43,7 @@ namespace conf {
 
 class Settings;
 
-}   // namespace conf
+} // namespace conf
 
 class AbstractEmailManager;
 class AccountManager;
@@ -52,17 +53,16 @@ namespace ec2 {
 
 class SyncronizationEngine;
 
-}   // namespace ec2 
+} // namespace ec2 
 
 class InviteUserNotification;
 
-/*!
-    Provides methods for manipulating system data on persisent storage.
-    Calls \a DBManager instance to perform DB manipulation. SQL requests are written in this class
-    \note All data can be cached
-*/
-class SystemManager
-:
+/**
+ * Provides methods for manipulating system data on persisent storage.
+ * Calls DBManager instance to perform DB manipulation. SQL requests are written in this class
+ * @note All data can be cached
+ */
+class SystemManager:
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -72,10 +72,10 @@ public:
         doNotSendNotification,
     };
 
-    /*!
-        Fills internal cache
-        \throw std::runtime_error In case of failure to pre-fill data cache
-    */
+    /**
+     * Fills internal cache
+     * @throw std::runtime_error In case of failure to pre-fill data cache
+     */
     SystemManager(
         const conf::Settings& settings,
         nx::utils::TimerManager* const timerManager,
@@ -93,7 +93,7 @@ public:
         stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    //!Binds system to an account associated with \a authzInfo
+    /** Binds system to an account associated with authzInfo. */
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
         data::SystemRegistrationData registrationData,
@@ -102,13 +102,13 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
         std::function<void(api::ResultCode)> completionHandler);
-    //!Fetches systems satisfying specified \a filter
-    /*!
-        \param eventReceiver Events related to returned data are reported to this functor
-        \note It is garanteed that events are delivered after \a completionHandler has returned and only if request was a success
-        \note If \a filter is empty, all systems authorized for \a authInfo are returned
-        \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
-    */
+    /**
+     * Fetches systems satisfying specified filter.
+     * @param eventReceiver Events related to returned data are reported to this functor
+     * @note It is garanteed that events are delivered after completionHandler has returned and only if request was a success.
+     * @note If filter is empty, all systems authorized for authInfo are returned.
+     * @note if request can be completed immediately (e.g., data is present in internal cache) completionHandler will be invoked within this call.
+     */
     void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
@@ -117,7 +117,7 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler);
-    //!Provides list of cloud accounts who have access to this system
+    /** Provides list of cloud accounts who have access to this system. */
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
@@ -138,11 +138,11 @@ public:
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
 
-    /*!
-        \return \a api::SystemAccessRole::none is returned if\n
-        - \a accountEmail has no rights for \a systemId
-        - \a accountEmail or \a systemId is unknown
-    */
+    /**
+     * @return api::SystemAccessRole::none is returned if
+     * - accountEmail has no rights for systemId
+     * - accountEmail or systemId is unknown
+     */
     api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const;
@@ -150,7 +150,7 @@ public:
         const std::string& accountEmail,
         const std::string& systemId) const;
 
-    //!Create data view restricted by \a authzInfo and \a filter
+    /** Create data view restricted by authzInfo and filter. */
     DataView<data::SystemData> createView(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter);
@@ -235,7 +235,6 @@ private:
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
-    //!map<id, system>
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
@@ -243,6 +242,8 @@ private:
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
+    persistent_layer::SystemController m_systemDbController;
+    persistent_layer::SystemSharingController m_systemSharingController;
 
     nx::db::DBResult insertSystemToDB(
         nx::db::QueryContext* const queryContext,
@@ -461,7 +462,7 @@ private:
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
 
-    /** Processes saveUser transaction received from mediaserver */
+    /** Processes saveUser transaction received from mediaserver. */
     nx::db::DBResult processEc2SaveUser(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
@@ -513,5 +514,5 @@ private:
         float currentUsageFrequency);
 };
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

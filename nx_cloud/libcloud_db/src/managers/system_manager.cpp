@@ -728,15 +728,6 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
     if (dbResult != db::DBResult::ok)
         return dbResult;
 
-    QSqlQuery insertSystemQuery(*queryContext->connection());
-    insertSystemQuery.prepare(
-        R"sql(
-        INSERT INTO system(
-                id, name, customization, auth_key, owner_account_id,
-                status_code, expiration_utc_timestamp, opaque)
-        VALUES(:id, :name, :customization, :authKey, :ownerAccountID,
-               :status, :expirationTimeUtc, :opaque)
-        )sql");
     NX_ASSERT(!result->systemData.id.empty());
     result->systemData.name = newSystem.name;
     result->systemData.customization = newSystem.customization;
@@ -748,42 +739,14 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         nx::utils::timeSinceEpoch().count() +
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
-    QnSql::bind(result->systemData, &insertSystemQuery);
-    insertSystemQuery.bindValue(
-        ":ownerAccountID",
-        QnSql::serialized_field(account.id));
-    insertSystemQuery.bindValue(
-        ":expirationTimeUtc",
-        result->systemData.expirationTimeUtc);
-    if (!insertSystemQuery.exec())
-    {
-        NX_LOG(lm("Could not insert system %1 (%2) into DB. %3")
-            .arg(newSystem.name).arg(result->systemData.id)
-            .arg(insertSystemQuery.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
+    dbResult = m_systemDbController.insert(queryContext, result->systemData, account.id);
+    if (dbResult != db::DBResult::ok)
+        return dbResult;
 
-    // Selecting generated system sequence
-    QSqlQuery selectSystemSequence(*queryContext->connection());
-    selectSystemSequence.setForwardOnly(true);
-    selectSystemSequence.prepare(
-        R"sql(
-        SELECT seq FROM system WHERE id=?
-        )sql");
-    selectSystemSequence.bindValue(0, QnSql::serialized_field(result->systemData.id));
-    if (!selectSystemSequence.exec() ||
-        !selectSystemSequence.next())
-    {
-        NX_LOG(lm("Error selecting sequence of newly-created system %1 (%2). %3")
-            .arg(newSystem.name).arg(result->systemData.id)
-            .arg(insertSystemQuery.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
-    result->systemData.systemSequence = selectSystemSequence.value(0).toULongLong();
-
-    return db::DBResult::ok;
+    return m_systemDbController.selectSystemSequence(
+        queryContext,
+        result->systemData.id,
+        &result->systemData.systemSequence);
 }
 
 nx::db::DBResult SystemManager::insertOwnerSharingToDb(
@@ -1050,25 +1013,9 @@ nx::db::DBResult SystemManager::insertOrReplaceSharing(
     nx::db::QueryContext* const queryContext,
     api::SystemSharingEx sharing)
 {
-    QSqlQuery replaceSharingQuery(*queryContext->connection());
-    replaceSharingQuery.prepare(
-        R"sql(
-        REPLACE INTO system_to_account(
-            account_id, system_id, access_role_id, group_id, custom_permissions,
-            is_enabled, vms_user_id, last_login_time_utc, usage_frequency)
-        VALUES(:accountId, :systemId, :accessRole, :groupId, :customPermissions,
-                :isEnabled, :vmsUserId, :lastLoginTime, :usageFrequency)
-        )sql");
-    QnSql::bind(sharing, &replaceSharingQuery);
-    if (!replaceSharingQuery.exec())
-    {
-        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
-            .arg(sharing.systemId).arg(sharing.accountEmail)
-            .arg(QnLexical::serialized(sharing.accessRole))
-            .arg(replaceSharingQuery.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
+    auto dbResult = m_systemSharingController.insertOrReplaceSharing(queryContext, sharing);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, sharing = std::move(sharing)]() mutable
