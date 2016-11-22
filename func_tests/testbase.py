@@ -118,8 +118,7 @@ def RunTests(testclass, *args):
     :type testclass: FuncTestCase
     :type config: FtConfigParser
     """
-    #print "DEBUG: run test class %s" % testclass
-    print "RunTests: %s, %s" % (testclass, args)
+    #print "RunTests: %s, %s" % (testclass, args)
     config = _testMaster.getConfig()
     try:
         try:

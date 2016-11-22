@@ -60,7 +60,7 @@ private:
     TargetWithOptions cutTargetFromUrl(nx_http::Request* const request);
     TargetWithOptions cutTargetFromPath(nx_http::Request* const request);
 
-    void onConnected(SystemError::ErrorCode errorCode);
+    void onConnected(const SocketAddress& targetAddress, SystemError::ErrorCode errorCode);
     void onMessageFromTargetHost(nx_http::Message message);
 };
 

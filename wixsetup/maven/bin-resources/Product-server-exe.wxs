@@ -7,6 +7,7 @@
 
     <Bundle Name="$(var.productName) Server" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.serverBundleUpgradeCode)" DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
@@ -17,7 +18,6 @@
             />
         </BootstrapperApplicationRef>
 
-        <!-- For some reason vcredist 24215 installs 24210 -->
         <Chain>
             <PackageGroupRef Id="VC12RedistPackageGroup"/>
 <!--            <PackageGroupRef Id="VC14RedistPackageGroup"/> -->

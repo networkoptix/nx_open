@@ -1048,7 +1048,7 @@ class PerfTest:
 
     def _initPerfList(self,type):
         for s in testMaster.clusterTestServerList:
-            if type[0] :
+            if type[0]:
                 self._perfList.append((s,SingleResourcePerfTest(self._globalLock,UserPerfResourceGen(),s)))
 
             if type[1]:
@@ -1288,6 +1288,30 @@ def RunByAutotest():
     print "\nALL AUTOMATIC TEST ARE DONE\n"
     return True
 
+
+class StressTestTmp(object):
+    def __init__(self, config):
+        self.config = config
+        import stresst
+        self.module = stresst
+        self.runner = stresst.StressTestRunner
+
+    def run(self):
+        _h, _p = self.config.rtget("ServerList")[0].split(':')
+        class args:
+            host = _h
+            full = '20,40,60'
+            threads = 10
+            logexc = True # False
+            mix = None
+            drop = None
+            batch = None
+            reports = None
+            port = _p
+            proto = None
+            heavy = None
+        self.runner(self.module.preprocessArgs(args), handleSigInt=True).run()
+
 # These are the old legasy tests, just organized a bit
 SimpleTestKeys = {
     '--sys-id': SystemIdTest,
@@ -1295,6 +1319,7 @@ SimpleTestKeys = {
     '--rtsp-test': RtspTestSuit,
     '--rtsp-perf': RtspPerf,
     '--rtsp-stream': RtspStreamTest,
+    '--stress': StressTestTmp,
 }
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence

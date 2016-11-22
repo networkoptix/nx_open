@@ -533,9 +533,12 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
                 && !existRes->getHostAddress().isEmpty() 
                 && netRes->getHostAddress() == existRes->getHostAddress();
 
-            bool sameUrlHost = !netRes->getUrl().isEmpty() 
-                && !existRes->getUrl().isEmpty() 
-                && QUrl(netRes->getUrl()).host() == QUrl(existRes->getUrl()).host();
+            auto netUrlHost = QUrl(netRes->getUrl()).host();
+            auto existUrlHost = QUrl(existRes->getUrl()).host();
+
+            bool sameUrlHost = !netUrlHost.isEmpty() 
+                && !existUrlHost.isEmpty() 
+                && existUrlHost == netUrlHost;
 
             bool sameIp = sameHostAddress || sameUrlHost;
 

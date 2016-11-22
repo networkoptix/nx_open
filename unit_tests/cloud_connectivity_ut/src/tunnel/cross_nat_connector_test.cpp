@@ -43,11 +43,14 @@ hpm::MediatorFunctionalTest& TunnelConnector::mediator()
 TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     std::chrono::milliseconds connectTimeout,
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-    boost::optional<SocketAddress> mediatorAddressForConnector)
+    boost::optional<SocketAddress> mediatorAddressForConnector,
+    std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig)
 {
     ConnectResult connectResult;
     const auto system1 = mediator().addRandomSystem();
     const auto server1 = mediator().addRandomServer(system1);
+    if (serverConfig)
+        serverConfig(server1.get());
     doSimpleConnectTest(
         connectTimeout,
         actionOnConnectAckResponse,

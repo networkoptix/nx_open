@@ -285,17 +285,20 @@ void AccountManager::reactivateAccount(
     bool requestSourceSecured = false;
     authzInfo.get(attr::secureSource, &requestSourceSecured);
 
+    auto notification = std::make_unique<ActivateAccountNotification>();
+    notification->customization = existingAccount->customization;
+
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        [this](
+        [this, notification = std::move(notification)](
             nx::db::QueryContext* const queryContext,
             const std::string& accountEmail,
-            data::AccountConfirmationCode* const resultData)
+            data::AccountConfirmationCode* const resultData) mutable
         {
             return issueAccountActivationCode(
                 queryContext,
                 accountEmail, 
-                std::make_unique<ActivateAccountNotification>(),
+                std::move(notification),
                 resultData);
         },
         std::move(accountEmail.email),
@@ -645,10 +648,12 @@ nx::db::DBResult AccountManager::registerNewAccountInDb(
         return nx::db::DBResult::ioError;
     }
 
+    auto notification = std::make_unique<ActivateAccountNotification>();
+    notification->customization = accountData.customization;
     return issueAccountActivationCode(
         queryContext,
         accountData.email,
-        std::make_unique<ActivateAccountNotification>(),
+        std::move(notification),
         confirmationCode);
 }
 
@@ -959,7 +964,12 @@ nx::db::DBResult AccountManager::resetPassword(
     const std::string& accountEmail,
     data::AccountConfirmationCode* const confirmationCode)
 {
-    const auto dbResult = createPasswordResetCode(
+    data::AccountData account;
+    nx::db::DBResult dbResult = fetchAccountByEmail(queryContext, accountEmail, &account);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    dbResult = createPasswordResetCode(
         queryContext, accountEmail, confirmationCode);
     if (dbResult != nx::db::DBResult::ok)
     {
@@ -967,8 +977,9 @@ nx::db::DBResult AccountManager::resetPassword(
             .arg(accountEmail), cl_logDEBUG1);
         return dbResult;
     }
-
+    
     RestorePasswordNotification notification;
+    notification.customization = account.customization;
     notification.setAddressee(accountEmail);
     notification.setActivationCode(confirmationCode->code);
 

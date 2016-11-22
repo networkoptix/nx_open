@@ -596,7 +596,7 @@ void socketShutdown(
     bool useAsyncPriorSync,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    SocketAddress endpointToBindToTo = SocketAddress::anyPrivateAddress;
+    SocketAddress endpointToBindTo = SocketAddress::anyPrivateAddress;
 
     // Takes amazingly long with UdtSocket.
     const auto repeatCount = useAsyncPriorSync ? 5 : 14;
@@ -606,7 +606,7 @@ void socketShutdown(
         nx::utils::promise<SocketAddress> promise;
         nx::utils::thread serverThread(
             &syncSocketServerMainFunc<decltype(server)>,
-            endpointToBindToTo,
+            endpointToBindTo,
             useAsyncPriorSync ? kTestMessage : Buffer(),
             1,
             serverMaker(),
@@ -621,8 +621,8 @@ void socketShutdown(
             endpointToConnectTo = std::move(serverAddress);
 
         // TODO: #mux Figure out why it fails on UdtSocket when address changes
-        if (endpointToBindToTo == SocketAddress::anyPrivateAddress)
-            endpointToBindToTo = std::move(serverAddress);
+        if (endpointToBindTo == SocketAddress::anyPrivateAddress)
+            endpointToBindTo = std::move(serverAddress);
 
         auto client = clientMaker();
         ASSERT_TRUE(client->setRecvTimeout(2 * kTestTimeout.count()));

@@ -55,7 +55,7 @@ startquiet() {
     start
 }
 
-SECONDS_TO_WAIT_BEFORE_KILL_9=30
+SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
 stop() {
     echo -n "Stopping $BIN_NAME..... "

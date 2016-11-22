@@ -53,6 +53,7 @@ USR_DIR=$BUILD_OUTPUT_DIR/usr
 VOX_SOURCE_DIR=${ClientVoxSourceDir}
 
 STRIP=
+WITH_CLIENT=1
 
 for i in "$@"
 do
@@ -63,6 +64,8 @@ do
         TARGET_DIR="`echo $i | sed 's/--target-dir=\(.*\)/\1/'`"
     elif [ "$i" == "--no-strip" ] ; then
         STRIP=
+    elif [ "$i" == "--no-client" ] ; then
+        WITH_CLIENT=
     fi
 done
 
@@ -89,27 +92,30 @@ libnx_fusion \
 libnx_network \
 libnx_streaming \
 libnx_utils \
-libnx_vms_utils \
 libpostproc \
 libudt )
 
 #additional libs for nx1 client
 if [[ "${box}" == "bpi" ]]; then
-    LIBS_TO_COPY+=( \
-    ldpreloadhook \
-    libcedrus \
-    libclient_core \
-    libnx_audio \
-    libnx_media \
-    libopenal \
-    libproxydecoder \
-    libEGL \
-    libGLESv1_CM \
-    libGLESv2 \
-    libMali \
-    libpixman-1 \
-    libUMP \
-    libvdpau_sunxi )
+    LIBS_TO_COPY+=(
+        libGLESv2 \
+        libMali \
+        libUMP )
+    if [[ ! -z "$WITH_CLIENT" ]]; then
+        LIBS_TO_COPY+=( \
+            ldpreloadhook \
+            libcedrus \
+            libnx_vms_utils \
+            libclient_core \
+            libnx_audio \
+            libnx_media \
+            libopenal \
+            libproxydecoder \
+            libEGL \
+            libGLESv1_CM \
+            libpixman-1 \
+            libvdpau_sunxi )
+    fi
 fi
 
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
@@ -136,7 +142,7 @@ done
 
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns"
 fi
 for var in $QTLIBS
@@ -165,7 +171,7 @@ cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX
 cp -R ./etc $BUILD_DIR
 cp -R ./opt $BUILD_DIR
 
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   #copying ffmpeg 3.0.2 libs
   cp -av $LIBS_DIR/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
   #copying lite client bin
@@ -244,7 +250,11 @@ chmod -R 755 $BUILD_DIR/etc/init.d
 
 pushd $BUILD_DIR
     if [[ "${box}" == "bpi" ]]; then
-        tar czf $PACKAGE_NAME ./opt ./etc ./root ./usr
+        if [[ ! -z "$WITH_CLIENT" ]]; then
+            tar czf $PACKAGE_NAME ./opt ./etc ./root ./usr
+        else
+            tar czf $PACKAGE_NAME ./opt ./etc
+        fi
     else
         tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
     fi

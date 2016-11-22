@@ -38,6 +38,7 @@ class QnHtmlTextItem;
 class QnScrollableOverlayWidget;
 class QnButtonsOverlay;
 class GraphicsLabel;
+class QnStatusOverlayWidget;
 
 class QnResourceWidget:
     public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
@@ -383,7 +384,8 @@ private:
     void updateSelectedState();
 
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
-
+protected:
+    QnStatusOverlayWidget* m_overlay;
 private:
     friend class QnWorkbenchDisplay;
 

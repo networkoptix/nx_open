@@ -78,7 +78,7 @@ SystemSocketAddress::SystemSocketAddress():
 SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
     SystemSocketAddress()
 {
-    if (SocketGlobals::config().isAddressDisabled(endpoint.address))
+    if (SocketGlobals::config().isHostDisabled(endpoint.address))
     {
         SystemError::setLastErrorCode(SystemError::noPermission);
         return;
@@ -1581,7 +1581,7 @@ bool UDPSocket::setDestAddr( const SocketAddress& endpoint )
         const auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
             endpoint.address.toString(), m_ipVersion);
 
-        // TODO: Here we select first address with hope it is correct one. This will newer work
+        // TODO: Here we select first address with hope it is correct one. This will never work
         // for NAT64, so we have to fix it somehow.
         if (!ips.empty())
             m_destAddr = SystemSocketAddress(SocketAddress(ips.front(), endpoint.port), m_ipVersion);
@@ -1624,7 +1624,7 @@ void UDPSocket::sendToAsync(
             if (code != SystemError::noError)
                 return handler(code, SocketAddress(), 0);
 
-            // TODO: Here we select first address with hope it is correct one. This will newer work
+            // TODO: Here we select first address with hope it is correct one. This will never work
             // for NAT64, so we have to fix it somehow.
             sendToAsync(buffer, SocketAddress(ips.front(), port), std::move(handler));
         });

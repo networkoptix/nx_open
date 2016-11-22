@@ -41,6 +41,12 @@ namespace nx_hls
         QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
         virtual ~QnHttpLiveStreamingProcessor();
 
+        /** Processes request, generates and sends response asynchronously. */
+        void processRequest(const nx_http::Request& request);
+        void prepareResponse(
+            const nx_http::Request& request,
+            nx_http::Response* const response);
+
     protected:
         virtual void run() override;
 
@@ -66,8 +72,6 @@ namespace nx_hls
         size_t m_bytesSent;
         const size_t m_minPlaylistSizeToStartStreaming;
 
-        //!Processes \a request, generates and sends (asynchronously) response
-        void processRequest( const nx_http::Request& request );
         //!
         /*!
             In case of success, adds Content-Type, Content-Length headers to \a response

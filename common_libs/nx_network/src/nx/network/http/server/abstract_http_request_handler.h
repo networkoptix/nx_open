@@ -13,7 +13,6 @@ namespace nx_http {
 
 struct NX_NETWORK_API RequestResult
 {
-public:
     nx_http::StatusCode::Value statusCode;
     std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource;
     ConnectionEvents connectionEvents;
