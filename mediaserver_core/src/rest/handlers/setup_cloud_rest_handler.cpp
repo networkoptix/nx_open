@@ -137,7 +137,14 @@ int QnSetupCloudSystemRestHandler::execute(
     }
 
     QnSystemSettingsHandler settingsHandler;
-    settingsHandler.executeGet(QString(), data.systemSettings, result, owner);
+    if (!settingsHandler.updateSettings(
+        data.systemSettings,
+        result,
+        Qn::kSystemAccess,
+        owner->authSession()))
+    {
+        qWarning() << "failed to write system settings";
+    }
 
     return httpResult;
 }
