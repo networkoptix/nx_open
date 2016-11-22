@@ -41,11 +41,6 @@ void QnWorkbenchBookmarkTagsWatcher::refresh() {
         this, SLOT(at_connection_gotBookmarkTags(int,QnCameraBookmarkTagList,int)));
 }
 
-struct S
-{
-    int requestData = {100};
-};
-
 void QnWorkbenchBookmarkTagsWatcher::at_connection_gotBookmarkTags(
         int status, const QnCameraBookmarkTagList &tags, int handle)
 {
