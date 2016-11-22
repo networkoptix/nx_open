@@ -337,6 +337,106 @@
         </profile>
 
         <profile>
+            <id>bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}</directory>
+            </build>
+            <properties>
+                <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}</directory>
+            </build>
+            <properties>
+                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>isd</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}</directory>
+            </build>
+            <properties>
+                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>isd_s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}</directory>
+            </build>
+            <properties>
+                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}</directory>
+            </build>
+            <properties>
+                <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
             <id>linux-x86-on-x64</id>
             <activation>
                 <os>

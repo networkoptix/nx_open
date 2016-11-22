@@ -11,20 +11,20 @@ QnUserRolesManager::~QnUserRolesManager()
 {
 }
 
-ec2::ApiUserGroupDataList QnUserRolesManager::userRoles() const
+ec2::ApiUserRoleDataList QnUserRolesManager::userRoles() const
 {
     QnMutexLocker lk(&m_mutex);
-    ec2::ApiUserGroupDataList result;
+    ec2::ApiUserRoleDataList result;
     result.reserve(m_roles.size());
-    for (const auto& group : m_roles)
-        result.push_back(group);
+    for (const auto& role : m_roles)
+        result.push_back(role);
     return result;
 }
 
-void QnUserRolesManager::resetUserRoles(const ec2::ApiUserGroupDataList& userRoles)
+void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRoles)
 {
-    ec2::ApiUserGroupDataList removed;
-    ec2::ApiUserGroupDataList updated;
+    ec2::ApiUserRoleDataList removed;
+    ec2::ApiUserRoleDataList updated;
     {
         QnMutexLocker lk(&m_mutex);
 
@@ -59,13 +59,13 @@ bool QnUserRolesManager::hasRole(const QnUuid& id) const
     return m_roles.contains(id);
 }
 
-ec2::ApiUserGroupData QnUserRolesManager::userRole(const QnUuid& id) const
+ec2::ApiUserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
 {
     QnMutexLocker lk(&m_mutex);
     return m_roles.value(id);
 }
 
-void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserGroupData& role)
+void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserRoleData& role)
 {
     NX_ASSERT(!role.isNull());
     if (role.isNull())
@@ -84,7 +84,7 @@ void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserGroupData& role)
 void QnUserRolesManager::removeUserRole(const QnUuid& id)
 {
     NX_ASSERT(!id.isNull());
-    ec2::ApiUserGroupData role;
+    ec2::ApiUserRoleData role;
     {
         QnMutexLocker lk(&m_mutex);
         if (!m_roles.contains(id))
@@ -128,7 +128,7 @@ QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)
         case Qn::UserRole::LiveViewer:
             return tr("Live Viewer");
 
-        case Qn::UserRole::CustomUserGroup:
+        case Qn::UserRole::CustomUserRole:
             return tr("Custom Role");
 
         case Qn::UserRole::CustomPermissions:
@@ -157,7 +157,7 @@ QString QnUserRolesManager::userRoleDescription(Qn::UserRole userRole)
         case Qn::UserRole::LiveViewer:
             return tr("Can view live video from all cameras.");
 
-        case Qn::UserRole::CustomUserGroup:
+        case Qn::UserRole::CustomUserRole:
             return tr("Custom user role.");
 
         case Qn::UserRole::CustomPermissions:
@@ -187,7 +187,7 @@ Qn::GlobalPermissions QnUserRolesManager::userRolePermissions(Qn::UserRole userR
         case Qn::UserRole::CustomPermissions:
             return Qn::GlobalCustomUserPermission;
 
-        case Qn::UserRole::CustomUserGroup:
+        case Qn::UserRole::CustomUserRole:
             return Qn::NoGlobalPermissions;
     }
 
@@ -199,11 +199,11 @@ QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
     NX_ASSERT(user);
     if (!user)
         return QString();
-    Qn::UserRole roleType = user->role();
-    if (roleType == Qn::UserRole::CustomUserGroup)
-        return qnUserRolesManager->userRole(user->userGroup()).name;
+    Qn::UserRole userRole = user->userRole();
+    if (userRole == Qn::UserRole::CustomUserRole)
+        return qnUserRolesManager->userRole(user->userRoleId()).name;
 
-    return userRoleName(roleType);
+    return userRoleName(userRole);
 }
 
 ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()

@@ -6,20 +6,31 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
+#include <nx/utils/url_builder.h>
 
 #include "module_finder.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 
+using nx::utils::UrlBuilder;
+
 namespace {
     const int checkInterval = 3000;
 
-    QUrl makeUrl(const QString &host, int port) {
-        QUrl url;
-        url.setScheme(lit("http"));
-        url.setHost(host);
-        url.setPort(port);
-        return url;
+    QUrl makeUrl(const QString& host, int port)
+    {
+        return UrlBuilder()
+            .setScheme(lit("http"))
+            .setHost(host)
+            .setPort(port);
+    }
+
+    QUrl clearUrl(const QUrl& url)
+    {
+        return UrlBuilder()
+            .setScheme(lit("http"))
+            .setHost(url.host())
+            .setPort(url.port());
     }
 
     void addUrl(const QUrl &url, QHash<QUrl, int> &hash) {
@@ -35,7 +46,7 @@ namespace {
         if (--count == 0)
             hash.erase(it);
     }
-}
+} // namespace
 
 QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder, bool clientMode) :
     base_type(moduleFinder),
@@ -57,19 +68,51 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_elapsedTimer.start();
 }
 
-void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) 
+void QnDirectModuleFinderHelper::addForcedUrl(QObject* requester, const QUrl& url)
 {
-    url.setUserName(QString());
-    url.setPassword(QString());
-    url.setScheme(lit("http"));
+    NX_ASSERT(requester);
+    if (!requester)
+        return;
 
-    m_forcedUrls.insert(std::move(url));
-    updateModuleFinder();
+    auto& urls = m_forcedUrlsByRequester[requester];
+
+    if (urls.isEmpty())
+    {
+        connect(requester, &QObject::destroyed,
+            this, &QnDirectModuleFinderHelper::removeForcedUrls);
+    }
+
+    const auto cleanUrl = clearUrl(url);
+    if (urls.contains(cleanUrl))
+        return;
+
+    urls.insert(cleanUrl);
+    mergeForcedUrls();
 }
 
-void QnDirectModuleFinderHelper::setForcedUrls(QSet<QUrl> forcedUrls) {
-    m_forcedUrls.swap(forcedUrls);
-    updateModuleFinder();
+void QnDirectModuleFinderHelper::removeForcedUrl(QObject* requester, const QUrl& url)
+{
+    NX_ASSERT(requester);
+    if (!requester)
+        return;
+
+    auto it = m_forcedUrlsByRequester.find(requester);
+    if (it == m_forcedUrlsByRequester.end())
+        return;
+
+    if (!it->remove(clearUrl(url)))
+        return;
+
+    if (it->isEmpty())
+        removeForcedUrls(requester);
+
+    mergeForcedUrls();
+}
+
+void QnDirectModuleFinderHelper::setForcedUrls(QObject* requester, const QSet<QUrl>& forcedUrls)
+{
+    m_forcedUrlsByRequester[requester] = forcedUrls;
+    mergeForcedUrls();
 }
 
 void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
@@ -197,4 +240,20 @@ void QnDirectModuleFinderHelper::updateModuleFinder() {
     QnUrlSet ignored = QnUrlSet::fromList(m_ignoredUrls.keys());
     QnUrlSet alive = QnUrlSet::fromList(m_multicastedUrlLastPing.keys());
     m_moduleFinder->directModuleFinder()->setUrls((urls + m_forcedUrls) - ignored - alive);
+}
+
+void QnDirectModuleFinderHelper::mergeForcedUrls()
+{
+    m_forcedUrls.clear();
+    for (const auto& urls: m_forcedUrlsByRequester)
+        m_forcedUrls.unite(urls);
+
+    updateModuleFinder();
+}
+
+void QnDirectModuleFinderHelper::removeForcedUrls(QObject* requester)
+{
+    m_forcedUrlsByRequester.remove(requester);
+    disconnect(requester, &QObject::destroyed,
+        this, &QnDirectModuleFinderHelper::removeForcedUrls);
 }

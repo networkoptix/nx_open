@@ -1393,8 +1393,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //loading user roles
-        ec2::ApiUserGroupDataList roles;
-        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserGroupsSync(&roles)) != ec2::ErrorCode::ok)
+        ec2::ApiUserRoleDataList userRoles;
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2086,7 +2086,7 @@ void MediaServerProcess::run()
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
-    qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
+    qnCommon->setUseLowPriorityAdminPasswordHack(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
     BeforeRestoreDbData beforeRestoreDbData;
     beforeRestoreDbData.loadFromSettings(settings);

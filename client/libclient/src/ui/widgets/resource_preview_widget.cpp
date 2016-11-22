@@ -11,11 +11,14 @@
 
 #include <ui/common/geometry.h>
 #include <ui/style/helper.h>
+#include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
+
 
 namespace {
 
     const qreal kDefaultAspectRatio = 4.0 / 3.0;
+    const QMargins kMinPlaceholderMargins(4, 2, 4, 2);
 
 } // namespace
 
@@ -27,7 +30,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     m_resolutionHint(),
     m_aspectRatio(kDefaultAspectRatio),
     m_preview(new QLabel(this)),
-    m_placeholder(new QLabel(this)),
+    m_placeholder(new QnAutoscaledPlainText(this)),
     m_indicator(new QnBusyIndicatorWidget(this)),
     m_pages(new QStackedWidget(this)),
     m_status(QnCameraThumbnailManager::None)
@@ -44,43 +47,47 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     setProperty(style::Properties::kDontPolishFontProperty, true);
 
     m_placeholder->setAlignment(Qt::AlignCenter);
+    m_placeholder->setContentsMargins(kMinPlaceholderMargins);
+
     m_preview->setAlignment(Qt::AlignCenter);
 
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, [this](const QnUuid& resourceId, const QPixmap& thumbnail)
-    {
-        if (!m_target || m_target->getId() != resourceId)
-            return;
-
-        if (m_status != QnCameraThumbnailManager::Loaded)
-            return;
-
-        m_pages->setCurrentWidget(m_preview);
-        m_preview->setPixmap(thumbnail);
-        m_cachedSizeHint = QSize();
-        updateGeometry();
-    });
-
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::statusChanged, this, [this](const QnUuid& resourceId, QnCameraThumbnailManager::ThumbnailStatus status)
-    {
-        if (!m_target || m_target->getId() != resourceId)
-            return;
-
-        m_status = status;
-        switch (m_status)
+    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this,
+        [this](const QnUuid& resourceId, const QPixmap& thumbnail)
         {
-            case QnCameraThumbnailManager::Loaded:
-                /* This is handled in thumbnailReady handler */
-                break;
+            if (!m_target || m_target->getId() != resourceId)
+                return;
 
-            case QnCameraThumbnailManager::NoData:
-                m_pages->setCurrentWidget(m_placeholder);
-                break;
+            if (m_status != QnCameraThumbnailManager::Loaded)
+                return;
 
-            default:
-                m_pages->setCurrentWidget(m_indicator);
-                break;
-        }
-    });
+            m_pages->setCurrentWidget(m_preview);
+            m_preview->setPixmap(thumbnail);
+            m_cachedSizeHint = QSize();
+            updateGeometry();
+        });
+
+    connect(m_thumbnailManager, &QnCameraThumbnailManager::statusChanged, this,
+        [this](const QnUuid& resourceId, QnCameraThumbnailManager::ThumbnailStatus status)
+        {
+            if (!m_target || m_target->getId() != resourceId)
+                return;
+
+            m_status = status;
+            switch (m_status)
+            {
+                case QnCameraThumbnailManager::Loaded:
+                    /* This is handled in thumbnailReady handler */
+                    break;
+
+                case QnCameraThumbnailManager::NoData:
+                    m_pages->setCurrentWidget(m_placeholder);
+                    break;
+
+                default:
+                    m_pages->setCurrentWidget(m_indicator);
+                    break;
+            }
+        });
 }
 
 QnResourcePreviewWidget::~QnResourcePreviewWidget()

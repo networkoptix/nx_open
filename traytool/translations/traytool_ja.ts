@@ -50,14 +50,6 @@
         <translation>・%1・番のサービスがインストールされました</translation>
     </message>
     <message>
-        <source>Media server has been stopped</source>
-        <translation>メディアサーバーが停止しました</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>メディアサーバーが始動しました</translation>
-    </message>
-    <message>
         <source> (stopped)</source>
         <translation> (停止)</translation>
     </message>
@@ -86,32 +78,40 @@
         <translation>・(一時停止中)</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>メディアサーバーログ表示(&amp;M)</translation>
-    </message>
-    <message>
-        <source>Media Server Web Page</source>
-        <translation>メディアサーバーウェブページ</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>終了(&amp;Q)</translation>
-    </message>
-    <message>
-        <source>Start Media Server</source>
-        <translation>メディアサーバー始動</translation>
-    </message>
-    <message>
-        <source>Stop Media Server</source>
-        <translation>メディアサーバー停止</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>インストールされたサービスへのアクセスエラー:</translation>
     </message>
     <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>メディアサーバーは停止されます　宜しいですか？</translation>
+        <source>Server has been stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be stopped. Continue?</source>
+        <translation type="unfinished">メディアサーバーは停止されます　宜しいですか？</translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

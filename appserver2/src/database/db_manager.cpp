@@ -535,7 +535,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         {
             defaultAdminPassword = lit("admin");
             if (m_dbJustCreated)
-                qnCommon->setUseLowPriorityAdminPasswordHach(true);
+                qnCommon->setUseLowPriorityAdminPasswordHack(true);
         }
 
 
@@ -565,7 +565,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
             // admin user resource has been updated
             QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
             transactionLog->fillPersistentInfo(userTransaction);
-            if (qnCommon->useLowPriorityAdminPasswordHach())
+            if (qnCommon->useLowPriorityAdminPasswordHack())
                 userTransaction.persistentInfo.timestamp = Timestamp::fromInteger(1); // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
             fromResourceToApi(userResource, userTransaction.params);
             executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
@@ -1698,7 +1698,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
             INTO vms_userprofile
             (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud, full_name)
             VALUES
-            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :groupId, :isCloud, :fullName)
+            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :userRoleId, :isCloud, :fullName)
         )";
 
         QSqlQuery profileQuery(m_sdb);
@@ -1736,7 +1736,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceUserGroup(const ApiUserGroupData& data)
+ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
 {
     QSqlQuery query(m_sdb);
     const QString queryStr = R"(
@@ -2265,7 +2265,7 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
+ErrorCode QnDbManager::removeUserRole(const QnUuid& userRoleId)
 {
     /* Cleanup all users, belonging to this group. */
     {
@@ -2274,17 +2274,17 @@ ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        query.addBindValue(guid.toRfc4122());
+        query.addBindValue(userRoleId.toRfc4122());
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
 
     /* Cleanup group shared resources. */
-    auto err = cleanAccessRights(guid);
+    auto err = cleanAccessRights(userRoleId);
     if (err != ErrorCode::ok)
         return err;
 
-    return deleteTableRecord(guid, "vms_user_groups", "id");
+    return deleteTableRecord(userRoleId, "vms_user_groups", "id");
 }
 
 ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
@@ -2655,7 +2655,7 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
 
 ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
-    const QByteArray userOrGroupId = data.userId.toRfc4122();
+    const QByteArray userOrRoleId = data.userId.toRfc4122();
 
     /* Get list of resources, user already has access to. */
     QSet<qint32> accessibleResources;
@@ -2664,7 +2664,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         QString selectQueryString = R"(
             SELECT resource_ptr_id
             FROM vms_access_rights
-            WHERE guid = :userOrGroupId
+            WHERE guid = :userOrRoleId
         )";
 
         QSqlQuery selectQuery(m_sdb);
@@ -2672,7 +2672,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         if (!prepareSQLQuery(&selectQuery, selectQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        selectQuery.bindValue(":userOrGroupId", userOrGroupId);
+        selectQuery.bindValue(":userOrRoleId", userOrRoleId);
         if (!execSQLQuery(&selectQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
@@ -2701,14 +2701,14 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         QStringList values;
 
         for (const qint32& resource_ptr_id : resourcesToAdd)
-             values << QString("(:userOrGroupId, %1)").arg(resource_ptr_id);
+             values << QString("(:userOrRoleId, %1)").arg(resource_ptr_id);
          insertQueryString.append(values.join(L',')).append(L';');
 
         QSqlQuery insertQuery(m_sdb);
         insertQuery.setForwardOnly(true);
         if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
-        insertQuery.bindValue(":userOrGroupId", userOrGroupId);
+        insertQuery.bindValue(":userOrRoleId", userOrRoleId);
 
         if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
@@ -2726,7 +2726,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         QString removeQueryStr
         (R"(
             DELETE FROM vms_access_rights
-            WHERE guid = :userOrGroupId
+            WHERE guid = :userOrRoleId
             AND resource_ptr_id IN (%1);
         )");
         /* We cannot bind this value via QSql as it puts numbers to braces */
@@ -2735,7 +2735,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
+        removeQuery.bindValue(":userOrRoleId", userOrRoleId);
         if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
@@ -2769,19 +2769,19 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 }
 
 
-ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrGroupId)
+ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrRoleId)
 {
     QSqlQuery query(m_sdb);
     QString queryStr
     (R"(
         DELETE FROM vms_access_rights
-        WHERE guid = :userOrGroupId;
+        WHERE guid = :userOrRoleId;
      )");
 
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
-    query.bindValue(":userOrGroupId", userOrGroupId.toRfc4122());
+    query.bindValue(":userOrRoleId", userOrRoleId.toRfc4122());
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
@@ -2804,12 +2804,12 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     return insertOrReplaceUser(tran.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran)
 {
-    NX_ASSERT(tran.command == ApiCommand::saveUserGroup, Q_FUNC_INFO, "Unsupported transaction");
-    if (tran.command != ApiCommand::saveUserGroup)
+    NX_ASSERT(tran.command == ApiCommand::saveUserRole, Q_FUNC_INFO, "Unsupported transaction");
+    if (tran.command != ApiCommand::saveUserRole)
         return ec2::ErrorCode::serverError;
-    return insertOrReplaceUserGroup(tran.params);
+    return insertOrReplaceUserRole(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
@@ -3012,8 +3012,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeBusinessRule(tran.params.id);
     case ApiCommand::removeUser:
         return removeUser(tran.params.id);
-    case ApiCommand::removeUserGroup:
-        return removeUserGroup(tran.params.id);
+    case ApiCommand::removeUserRole:
+        return removeUserRole(tran.params.id);
     case ApiCommand::removeVideowall:
         return removeVideowall(tran.params.id);
     case ApiCommand::removeWebPage:
@@ -3643,7 +3643,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         u.is_superuser as isAdmin, u.email, \
         p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions, \
-        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud, \
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as userRoleId, p.is_cloud as isCloud, \
         coalesce((SELECT value from vms_kvpair WHERE resource_guid = r.guid and name = '%1'), p.full_name) as fullName \
         FROM vms_resource r \
         JOIN auth_user u on u.id = r.id \
@@ -3664,8 +3664,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList
     return ErrorCode::ok;
 }
 
-//getUserGroups
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& result)
+//getUserRoles
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& result)
 {
     QString filterStr;
     if (!id.isNull())
@@ -4066,7 +4066,7 @@ ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
     DB_LOAD(QnUuid(), data->cameras);
     DB_LOAD(QnUuid(), data->cameraUserAttributesList);
     DB_LOAD(QnUuid(), data->users);
-    DB_LOAD(QnUuid(), data->userGroups);
+    DB_LOAD(QnUuid(), data->userRoles);
     DB_LOAD(QnUuid(), data->layouts);
     DB_LOAD(QnUuid(), data->videowalls);
     DB_LOAD(QnUuid(), data->webPages);
@@ -4097,8 +4097,8 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (data->users.size() == 1)
         user = &data->users[0];
 
-    if (user) // Do not load userGroups if there is no current user.
-        DB_LOAD(user->groupId, data->userGroups);
+    if (user) // Do not load userRoles if there is no current user.
+        DB_LOAD(user->userRoleId, data->userRoles);
 
     DB_LOAD(QnUuid(), data->layouts);
     if (user) // Remove layouts belonging to other users.

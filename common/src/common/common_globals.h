@@ -840,7 +840,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     */
     enum class UserRole
     {
-        CustomUserGroup = -2,
+        CustomUserRole = -2,
         CustomPermissions = -1,
         Owner = 0,
         Administrator,

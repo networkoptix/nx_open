@@ -16,7 +16,7 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
     setRuntimeParams(runtimeParams);
 
     QnBusinessActionParameters actionParams;
-    actionParams.userGroup = QnBusiness::AdminOnly;
+    actionParams.userRole = QnBusiness::AdminOnly;
     setParams(actionParams);
 
 }

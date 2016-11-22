@@ -8,3 +8,5 @@ Config.helpLinks.push({
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
+Config.productName = 'VMS DTV';
+Config.cloud.productName = 'DTV Cloud';

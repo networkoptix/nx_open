@@ -542,7 +542,7 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
 {
     auto user = context()->user();
 
-    if (!user || user->role() != Qn::UserRole::Owner)
+    if (!user || user->userRole() != Qn::UserRole::Owner)
         return Scenario::Invalid;
 
     if (user->isLocal())
@@ -552,7 +552,7 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
         [](const QnUserResourcePtr& user)
         {
             return !user->isCloud()
-                && user->role() == Qn::UserRole::Owner;
+                && user->userRole() == Qn::UserRole::Owner;
         });
     NX_ASSERT(!localOwners.empty(), "At least 'admin' user must exist");
 

@@ -97,14 +97,16 @@ Handle ServerConnection::getStatisticsSettingsAsync(
     Result<QByteArray>::type callback,
     QThread *targetThread)
 {
-    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
+    QnEmptyRequestData emptyRequest;
+    emptyRequest.format = Qn::SerializationFormat::UbjsonFormat;
     static const auto path = lit("/ec2/statistics/settings");
 
     QnMediaServerResourcePtr server = getServerWithInternetAccess();
     if (!server)
         return Handle(); //< can't process request now. No internet access
 
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, kEmptyParams.toParams()));
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::GET, prepareUrl(path, emptyRequest.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();

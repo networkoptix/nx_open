@@ -305,7 +305,12 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
         return;
     }
 
-    const qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+    qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+
+    /* Calculating real border position. */
+    x += 0.5 + kResizerWidth;
+    if (widget->isScrollBarVisible())
+        x += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
     const qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
 

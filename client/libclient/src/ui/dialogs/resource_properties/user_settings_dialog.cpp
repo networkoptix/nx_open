@@ -46,7 +46,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_editGroupsButton(new QPushButton(tr("Edit Roles..."), this))
+    m_editRolesButton(new QPushButton(tr("Edit Roles..."), this))
 {
     ui->setupUi(this);
 
@@ -115,18 +115,18 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
         tryClose(true);
     });
 
-    ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
-    connect(m_editGroupsButton, &QPushButton::clicked, this,
+    ui->buttonBox->addButton(m_editRolesButton, QDialogButtonBox::HelpRole);
+    connect(m_editRolesButton, &QPushButton::clicked, this,
         [this]
         {
-            QnUuid groupId = isPageVisible(ProfilePage)
-                ? m_user->userGroup()
-                : m_settingsPage->selectedUserGroup();
+            QnUuid roleId = isPageVisible(ProfilePage)
+                ? m_user->userRoleId()
+                : m_settingsPage->selectedUserRoleId();
             menu()->trigger(QnActions::UserRolesAction,
-                QnActionParameters().withArgument(Qn::UuidRole, groupId));
+                QnActionParameters().withArgument(Qn::UuidRole, roleId));
         });
 
-    m_editGroupsButton->setVisible(false);
+    m_editRolesButton->setVisible(false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -209,8 +209,8 @@ void QnUserSettingsDialog::updatePermissions()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::UserRole roleType = m_user->role();
-        QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
+        Qn::UserRole role = m_user->userRole();
+        QString permissionsText = QnUserRolesManager::userRoleDescription(role);
         QnResourceAccessSubject subject(m_user);
 
         permissionsText += kHtmlTableTemplate.arg(
@@ -224,11 +224,11 @@ void QnUserSettingsDialog::updatePermissions()
         Qn::UserRole roleType = m_settingsPage->selectedRole();
         QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
 
-        if (roleType == Qn::UserRole::CustomUserGroup)
+        if (roleType == Qn::UserRole::CustomUserRole)
         {
             /* Handle custom user role: */
-            QnUuid groupId = m_settingsPage->selectedUserGroup();
-            QnResourceAccessSubject subject(qnUserRolesManager->userRole(groupId));
+            QnUuid roleId = m_settingsPage->selectedUserRoleId();
+            QnResourceAccessSubject subject(qnUserRolesManager->userRole(roleId));
 
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, true)) +
@@ -346,7 +346,7 @@ void QnUserSettingsDialog::applyChanges()
                 m_user->fillId();
         });
 
-    if (m_user->role() == Qn::UserRole::CustomPermissions)
+    if (m_user->userRole() == Qn::UserRole::CustomPermissions)
     {
         auto accessibleResources = m_model->accessibleResources();
 
@@ -402,7 +402,7 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
 
-    m_editGroupsButton->setVisible(settingsPageVisible);
+    m_editRolesButton->setVisible(settingsPageVisible);
 
     /* Buttons state takes into account pages visibility, so we must recalculate it. */
     updateButtonBox();

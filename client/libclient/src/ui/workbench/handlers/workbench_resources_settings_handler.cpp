@@ -36,7 +36,7 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     connect(action(QnActions::UserSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
     connect(action(QnActions::UserRolesAction), &QAction::triggered, this,
-        &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
+        &QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered);
     connect(action(QnActions::LayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
     connect(action(QnActions::CurrentLayoutSettingsAction), &QAction::triggered, this,
@@ -137,14 +137,14 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     //dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
 }
 
-void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
+void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnUuid groupId = parameters.argument(Qn::UuidRole).value<QnUuid>();
+    QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
     QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
-    if (!groupId.isNull())
-        dialog->selectGroup(groupId);
+    if (!userRoleId.isNull())
+        dialog->selectUserRole(userRoleId);
 
     dialog->exec();
 }

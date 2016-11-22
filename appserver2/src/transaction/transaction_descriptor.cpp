@@ -237,7 +237,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeStorage:
             return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
         case ApiCommand::removeUser:
-        case ApiCommand::removeUserGroup:
+        case ApiCommand::removeUserRole:
             return notificationParams.userNotificationManager->triggerNotification(tran);
         case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(tran);
@@ -845,21 +845,21 @@ struct AdminOnlyAccessOut
     }
 };
 
-struct RemoveUserGroupAccess
+struct RemoveUserRoleAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
     {
         if (!AdminOnlyAccess()(accessData, param))
         {
-            qWarning() << "Remove user group forbidden because user has no admin access";
+            qWarning() << "Removing user role is forbidden because the user has no admin access";
             return false;
         }
 
         for (const auto& user : qnResPool->getResources<QnUserResource>())
         {
-            if (user->userGroup() == param.id)
+            if (user->userRoleId() == param.id)
             {
-                qWarning() << "Remove user group forbidden because group is still using by user " << user->getName();
+                qWarning() << "Removing user role is forbidden because the role is still used by the user " << user->getName();
                 return false;
             }
         }

@@ -37,7 +37,7 @@ enum class SystemStatus
     // TODO: #ak remove "ss" prefix.
     ssInvalid = 0,
     /**
-     * System has been bound but not a single request from 
+     * System has been bound but not a single request from
      * that system has been received by cloud.
      */
     ssNotActivated,
@@ -112,6 +112,7 @@ enum class SystemAccessRole
     owner = 9,
 };
 
+// TODO: #mike: Ask #ebalashov about renaming groupId to userRoleId.
 class SystemSharing
 {
 public:
@@ -230,7 +231,7 @@ public:
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
     /**
-     * This number shows how often user, performing request, 
+     * This number shows how often user, performing request,
      * uses this system in comparision to other systems.
      */
     float usageFrequency;

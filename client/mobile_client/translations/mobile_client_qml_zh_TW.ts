@@ -2,253 +2,486 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_TW" sourcelanguage="en_US">
 <context>
-    <name>QnCameraFlow</name>
+    <name>CameraItem</name>
     <message>
-        <source>Hidden cameras</source>
-        <translation>隱藏攝影機</translation>
+        <source>Select camera</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>%n cameras are hidden</source>
-        <translation>
-            <numerusform>%n 支攝影機已隱藏</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraItem</name>
     <message>
-        <source>Authentication
-required</source>
-        <translation>需要驗證</translation>
+        <source>Press Ctrl + Arrow or use mouse wheel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication required</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation>離線</translation>
+        <translation type="unfinished">離線</translation>
     </message>
 </context>
 <context>
-    <name>QnCameraMenu</name>
+    <name>CloudPanel</name>
     <message>
-        <source>Quality</source>
-        <translation>畫質</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>自動</translation>
+        <source>Log in to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnDiscoveredSessionItem</name>
+    <name>CloudScreen</name>
     <message>
-        <source>incompatible server version</source>
-        <translation>不相容的伺服器版本</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>未知</translation>
+        <source>Cloud Account</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnHiddenCameraItem</name>
+    <name>CloudSummary</name>
     <message>
-        <source>Show</source>
-        <translation>顯示</translation>
+        <source>Log out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnHorizontalCalendarLayout</name>
+    <name>CloudSystemInformation</name>
     <message>
-        <source>Close</source>
-        <translation>關閉</translation>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnLiveVideoNavigation</name>
+    <name>CredentialsEditor</name>
     <message>
-        <source>LIVE</source>
-        <translation>即時影像</translation>
-    </message>
-</context>
-<context>
-    <name>QnLoginPage</name>
-    <message>
-        <source>New Connection</source>
-        <translation>新的連線</translation>
-    </message>
-    <message>
-        <source>Host</source>
-        <translation>主機</translation>
-    </message>
-    <message>
-        <source>Port (optional)</source>
-        <translation>埠號</translation>
-    </message>
-    <message>
-        <source>Login</source>
-        <translation>帳號</translation>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>密碼</translation>
+        <translation type="unfinished">密碼</translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation>儲存</translation>
+        <source>Learn more about %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>刪除</translation>
+        <source>Create account</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect</source>
-        <translation>連線</translation>
+        <source>Forgot your password?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto-discovered systems</source>
-        <translation>自動搜尋系統</translation>
+        <source>Invalid email or password</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incorrect login or password</source>
-        <translation>錯誤的帳號或密碼</translation>
+        <source>Cannot connect to %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server or network is not available</source>
-        <translation>伺服器或網路異常</translation>
-    </message>
-    <message>
-        <source>Incompatible server</source>
-        <translation>不相容的伺服器</translation>
-    </message>
-    <message>
-        <source>Incompatible server version %1</source>
-        <translation>不相容的伺服器版本 %1</translation>
+        <source>Email and password cannot be empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnOldClientOfferDialog</name>
+    <name>CustomConnectionScreen</name>
+    <message>
+        <source>Connect to System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">刪除</translation>
+    </message>
+</context>
+<context>
+    <name>DialogButtonBox</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">關閉</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DownloadOldClientDialog</name>
     <message>
         <source>To connect to old servers please download the legacy application from Google Play.</source>
         <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation>要連線至舊版伺服器請至Google Play下載舊版APP.</translation>
+        <translation type="unfinished">要連線至舊版伺服器請至Google Play下載舊版APP.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation>要連線至舊版伺服器請至App Store下載舊版APP.</translation>
+        <translation type="unfinished">要連線至舊版伺服器請至App Store下載舊版APP.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation>要連線至舊版伺服器請上網下載舊版APP.</translation>
+        <translation type="unfinished">要連線至舊版伺服器請上網下載舊版APP.</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation>下載</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="unfinished">下載</translation>
     </message>
 </context>
 <context>
-    <name>QnQualityDialog</name>
+    <name>HelpPopup</name>
     <message>
-        <source>Video quality</source>
-        <translation>影像品質</translation>
+        <source>Select another cell</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto</source>
-        <translation>自動</translation>
+        <source>Switch camera in the cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter or exit fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press any key to go to cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press F1 to show this message again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnResourcesPage</name>
+    <name>HorizontalCalendar</name>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">關閉</translation>
+    </message>
+</context>
+<context>
+    <name>HostSelectionDialog</name>
+    <message>
+        <source>Hosts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LaunchButton</name>
+    <message>
+        <source>Turn On</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LiteClientControlScreen</name>
+    <message>
+        <source>Cannot start client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please make sure that display is connected to Nx1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot stop client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nx1 is offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LiveVideoNavigation</name>
+    <message>
+        <source>LIVE</source>
+        <translation type="unfinished">即時影像</translation>
+    </message>
+</context>
+<context>
+    <name>LoginButton</name>
+    <message>
+        <source>Connect</source>
+        <translation type="unfinished">連線</translation>
+    </message>
+</context>
+<context>
+    <name>NoCameraItem</name>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NoDisplayDummy</name>
+    <message>
+        <source>No display connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OfflineDummy</name>
+    <message>
+        <source>You are not connected to any system</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QualityDialog</name>
+    <message>
+        <source>Video Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">未知</translation>
+    </message>
+    <message>
+        <source>Highest speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Best quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ResourcesScreen</name>
     <message>
         <source>Server offline</source>
-        <translation>伺服器離線</translation>
+        <translation type="unfinished">伺服器離線</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>讀取中...</translation>
+        <translation type="unfinished">讀取中...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation>連線中...</translation>
+        <translation type="unfinished">連線中...</translation>
+    </message>
+    <message>
+        <source>No cameras available on this layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show all cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnSearchItem</name>
+    <name>SearchToolBar</name>
     <message>
         <source>Search</source>
-        <translation>搜尋</translation>
+        <translation type="unfinished">搜尋</translation>
     </message>
 </context>
 <context>
-    <name>QnSettingsPage</name>
+    <name>ServerOfflineDummy</name>
+    <message>
+        <source>Nx1 is offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SessionCredentialsEditor</name>
+    <message>
+        <source>Host : Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">帳號</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">密碼</translation>
+    </message>
+</context>
+<context>
+    <name>SessionsScreen</name>
+    <message>
+        <source>Log in to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Another System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No systems found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the system &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check your network connection or contact a system administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsScreen</name>
     <message>
         <source>Settings</source>
-        <translation>設定</translation>
-    </message>
-    <message>
-        <source>Show offline cameras</source>
-        <translation>顯示離線的攝影機</translation>
+        <translation type="unfinished">設定</translation>
     </message>
 </context>
 <context>
-    <name>QnSideNavigation</name>
-    <message>
-        <source>Saved connections</source>
-        <translation>儲存連線資訊</translation>
-    </message>
+    <name>SideNavigation</name>
     <message>
         <source>New connection</source>
-        <translation>建立新的連線</translation>
+        <translation type="unfinished">建立新的連線</translation>
+    </message>
+    <message>
+        <source>Disconnect from system</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation>設定</translation>
+        <translation type="unfinished">設定</translation>
+    </message>
+    <message>
+        <source>Start test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop test</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnVerticalCalendarLayout</name>
+    <name>StartingDummy</name>
+    <message>
+        <source>Turning on</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StoppingDummy</name>
+    <message>
+        <source>Turning off</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SystemInformationBlock</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">未知</translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TestSelectionDialog</name>
+    <message>
+        <source>Select Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VerticalCalendar</name>
     <message>
         <source>Close</source>
-        <translation>關閉</translation>
+        <translation type="unfinished">關閉</translation>
     </message>
 </context>
 <context>
-    <name>QnVideoNavigation</name>
+    <name>VideoDummy</name>
+    <message>
+        <source>Server offline</source>
+        <translation type="unfinished">伺服器離線</translation>
+    </message>
+    <message>
+        <source>Authentication required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera offline</source>
+        <translation type="unfinished">攝影機離線</translation>
+    </message>
+    <message>
+        <source>Can&apos;t load video</source>
+        <translation type="unfinished">無法讀取影像</translation>
+    </message>
+</context>
+<context>
+    <name>VideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation>無歷史影像</translation>
+        <translation type="unfinished">無歷史影像</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation>即時影像</translation>
+        <translation type="unfinished">即時影像</translation>
     </message>
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation>d MMMM yyyy</translation>
+        <translation type="unfinished">d MMMM yyyy</translation>
     </message>
 </context>
 <context>
-    <name>QnVideoPage</name>
+    <name>VideoScreen</name>
     <message>
-        <source>Server offline</source>
-        <translation>伺服器離線</translation>
+        <source>Change Quality</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Authentication
-required</source>
-        <translation>需要驗證</translation>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>WelcomeScreen</name>
     <message>
-        <source>Camera offline</source>
-        <translation>攝影機離線</translation>
-    </message>
-    <message>
-        <source>Can&apos;t load video</source>
-        <translation>無法讀取影像</translation>
+        <source>Skip</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
