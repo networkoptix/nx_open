@@ -12,12 +12,16 @@ namespace cloud {
 namespace tcp {
 namespace test {
 
+namespace {
+
+constexpr auto defaultConnectTimeout = std::chrono::seconds(10);
+
+} // namespace
+
 class TcpTunnel:
     public ::testing::Test
 {
 public:
-    constexpr static auto defaultConnectTimeout = std::chrono::seconds(10);
-
     TcpTunnel()
     {
         init();
