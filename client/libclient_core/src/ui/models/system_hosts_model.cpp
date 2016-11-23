@@ -225,7 +225,6 @@ bool QnSystemHostsModel::updateServerHostInternal(const ServerIdHostList::iterat
     const auto modelIndex = index(row);
     emit dataChanged(modelIndex, modelIndex);
 
-
     if (row == 0)
         emit firstHostChanged();
 
