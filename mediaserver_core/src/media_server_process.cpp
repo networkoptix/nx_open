@@ -1908,16 +1908,13 @@ void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
 void MediaServerProcess::setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager)
 {
     loadBeforeRestoreDbData();
-    if (!qnGlobalSettings->systemName().isEmpty())
+    if (qnGlobalSettings->systemName().isEmpty())
     {
-        clearMigrationInfo();
-        return;
+        setUpSystemName();
+        setUpLocalSystemId(cloudConnectionManager);
     }
 
-    setUpSystemName();
-    setUpLocalSystemId(cloudConnectionManager);
     clearMigrationInfo();
-
     qnGlobalSettings->synchronizeNow();
 }
 
@@ -1965,7 +1962,7 @@ void MediaServerProcess::loadOrGenerateDefaultSystemName()
     m_systemName.loadFromConfig();
 
     if (m_systemName.value().isEmpty())
-        m_systemName.resetToDefault(); 
+        m_systemName.resetToDefault();
 }
 
 void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
