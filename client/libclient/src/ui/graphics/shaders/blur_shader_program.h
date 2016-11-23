@@ -6,7 +6,7 @@
 
 class QnBlurShaderProgram: public QnGLShaderProgram
 {
-    typedef QnGLShaderProgram base_type;
+    using base_type = QnGLShaderProgram;
 public:
     QnBlurShaderProgram(QObject *parent = NULL);
 

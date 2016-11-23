@@ -8,7 +8,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -149,7 +148,7 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         m_connections.erase(connectionContextIter);
     }
     
-    if (!context.socketAttributes.applyTo(tcpSocket.get()))
+    if (tcpSocket && !context.socketAttributes.applyTo(tcpSocket.get()))
     {
         sysErrorCode = SystemError::getLastOSErrorCode();
         stillValid = false;

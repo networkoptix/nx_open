@@ -6,7 +6,7 @@ __author__ = 'Danil Lavrentyuk'
 import sys, os, threading
 import argparse
 #import requests
-from requests.exceptions import SSLError, ConnectionError, RequestException
+#from requests.exceptions import SSLError, ConnectionError, RequestException
 import signal
 import time
 import random
@@ -14,6 +14,9 @@ import traceback as TB
 from collections import deque
 from subprocess import Popen, PIPE
 import urllib2
+
+if __name__ != '__main__':
+    from testbase import FuncTestCase
 
 #from requests.packages.urllib3.connectionpool import HTTPSConnectionPool, HTTPConnectionPool
 #HTTPSConnectionPool._validate_conn = HTTPConnectionPool._validate_conn
@@ -100,13 +103,13 @@ class RequestWorker(BaseWorker):
         if mix:
             self._url = None
             self._prep = [
-                urllib2.Request(mk_url(proto, HOST, uri))
+                urllib2.Request(mk_url(proto, master.host, uri))
                 #self._session.prepare_request(requests.Request('GET', url=mk_url(proto, HOST, uri), auth=AUTH))
                 for proto in ('http', 'https')
                 for uri in (URI, URI_HEAVY)
             ]
         else:
-            self._url = mk_url(PROTO, HOST, URI)
+            self._url = mk_url(master.proto, master.host, URI)
             #kwargs = dict(url=self._url, auth=AUTH)
             self._prep = [urllib2.Request(self._url)] # [self._session.prepare_request(requests.Request('GET', **kwargs))]
 
@@ -121,7 +124,8 @@ class RequestWorker(BaseWorker):
                 return None # means success!
             else:
                 return 'Code: %s' % res.getcode()
-        except RequestException, e:
+#        except RequestException, e:
+        except urllib2.URLError, e:
             self._output("%s: %s\n" % (type(e).__name__, e.message))
             return type(e).__name__
         except Exception, e:
@@ -135,7 +139,7 @@ class InteruptingWorker(BaseWorker):
 
     def __init__(self, master, num):
         super(InteruptingWorker, self).__init__(master, num)
-        self._urls = [mk_url("https", HOST, uri) for uri in (URI, URI_HEAVY)]
+        self._urls = [mk_url("https", master.host, uri) for uri in (URI, URI_HEAVY)]
 
     def _req(self):
         cmd = ['/usr/bin/env', 'curl',
@@ -174,8 +178,14 @@ class StressTestRunner(object):
     """
     _stop = False
     _threadNum = DEFAULT_THREADS
+    proto = PROTO
+    host = HOST
 
-    def __init__(self, args, handleSigInt=True):
+    def __init__(self, args, handleSigInt=True, rawArgs=False):
+        if rawArgs:
+            args = preprocessArgs(args)
+        #print "DEBUG: args = %s" % ("\n".join("%s = %s" % (a, getattr(args,a)) for a in dir(args) if not a.startswith('__')))
+        self.host = getattr(args, 'host', HOST)
         self._threads = []
         self._workers = []
         self._fails = _init_fails() # failures, groupped by error message
@@ -188,8 +198,10 @@ class StressTestRunner(object):
         self._nostat = False
         self._full = args.full
         self._logexc = args.logexc
+        self._assert = getattr(args, 'useAssert', False)
+        self.auth = args.auth if hasattr(args, 'auth') else AUTH
         if handleSigInt:
-            signal.signal(signal.SIGINT,self._onInterrupt)
+            signal.signal(signal.SIGINT, self._onInterrupt)
 
     def need_logexc(self):
         return self._logexc
@@ -290,7 +302,9 @@ class StressTestRunner(object):
         self._fails = _init_fails()
         self._tail.clear()
 
-    def _drop_stress(self):
+    def drop_stress(self, setBatch=None):
+        if setBatch is not None:
+            self._batch = setBatch
         self._drop = True
         self._nostat = True
         self._createWorkers()
@@ -306,7 +320,9 @@ class StressTestRunner(object):
         else:
             self.simple_test()
 
-    def simple_test(self):
+    def simple_test(self, setBatch=None):
+        if setBatch is not None:
+            self._batch = setBatch
         print "Testing with %s parallel workers. %s" % (
             self._threadNum,
             "Batch mode for %s seconds" % self._batch if self._batch is not None else
@@ -322,11 +338,14 @@ class StressTestRunner(object):
             self.print_tail()
         if not self._hang:
             self._check_server_hung()
-        if self._batch is not None:
-            print "FAIL:" if self._hang else "OK"
+        if self._assert:
+            assert not self._hang, "Server has hanged!"
+        else:
+            if self._batch is not None:
+                print "FAIL:" if self._hang else "OK"
         del self._workers[:]
 
-    def full_test(self):
+    def initSteps(self):
         if self._full == "":
             steps = (BATCH_PERIOD/3, 2*BATCH_PERIOD/3, BATCH_PERIOD)
         else:
@@ -335,17 +354,21 @@ class StressTestRunner(object):
                 steps.append(steps[0]*2)
             if len(steps) < 3:
                 steps.append(steps[0]*3)
-        self._batch = steps[0]
+        self.steps = steps
+
+    def wasHang(self):
+        return self._hang
+
+    def full_test(self):
+        self.initSteps()
         print "Test 1: Normal requests."
-        self.simple_test()
-        if not self._hang:
-            print "Test 2: Flood of interrupted requests, than try some nornal ones."
+        self.simple_test(self.steps[0])
+        if not self.wasHang():
+            print "Test 2: Flood of interrupted requests, than try some normal ones."
             self._reinit()
-            self._batch = steps[1]
-            self._drop_stress()
+            self.drop_stress(self.steps[1])
             self._reinit()
-            self._batch = steps[2]
-            self.simple_test()
+            self.simple_test(self.steps[2])
         print 'Test complete.'
 
 
@@ -371,13 +394,63 @@ def preprocessArgs(args):
         # else no changes to args.host required
     else:
         args.host = '%s:%s' % (host[0], args.port)
-    HOST = args.host
+    #HOST = args.host
+    #print "DEBUG: host = %s" % (HOST,)
+    time.sleep(5)
     if args.proto:
         PROTO = args.proto
     if args.heavy:
         print "Using heavy requests"
         URI = URI_HEAVY
     return args
+
+
+class HTTPStressTest(FuncTestCase):
+    helpStr = "HTTP(S) stress tests"
+    _test_name = "HTTP(S) stress tests"
+    _test_key = "stress"
+    _suits = (("HTTP stress", [
+        "NormalRequests",
+        "FloodRequests",
+    ]),)
+    _hanged = False
+
+    @classmethod
+    def isFailFast(cls, suit_name=""):
+        # it could depend on the specific suit
+        return True
+
+    @classmethod
+    def setUpClass(cls):
+        class args:
+            host = cls.hosts[0]
+            full = '20,40,60'
+            threads = 10
+            logexc = True # False
+            mix = None
+            drop = None
+            batch = None
+            reports = None
+            port = cls.ports[0]
+            proto = None
+            heavy = None
+            auth = (None, None) # need not it
+            useAssert = True
+        cls.runner = StressTestRunner(args, handleSigInt=False, rawArgs=True)
+        cls.runner.initSteps()
+
+    def NormalRequests(self):
+        self._prepare_test_phase()
+        self.runner.simple_test(self.runner.steps[0])
+
+    def FloodRequests(self):
+        "Tries flood of interrupted request, then check server with normal requests."
+        #if self._hanged:
+        #    self.skipTest("Normal requests test hanged")
+        self.runner._reinit()
+        self.runner.drop_stress(self.runner.steps[1])
+        self.runner._reinit()
+        self.runner.simple_test(self.runner.steps[2])
 
 
 def parse_args():

@@ -46,7 +46,7 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
 {
     post(
         [this, timeout = std::move(timeout), socketAttributes = std::move(socketAttributes),
-            handler = std::move(handler)]()
+            handler = std::move(handler)]() mutable
         {
             launchInactivityTimer();
             m_tunnelConnection->establishNewConnection(
@@ -64,7 +64,8 @@ void OutgoingTunnelConnectionWatcher::launchInactivityTimer()
         m_inactivityTimer->cancelSync();
         m_inactivityTimer->start(
             m_connectionParameters.tunnelInactivityTimeout,
-            std::bind(&OutgoingTunnelConnectionWatcher::onInactivityTimoutExpired, this));
+            std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this,
+                SystemError::timedOut));
     }
 }
 
@@ -75,20 +76,15 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
 
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
-        std::bind(&OutgoingTunnelConnectionWatcher::onTunnelClosed, this, _1));
+        std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
 }
 
-void OutgoingTunnelConnectionWatcher::onInactivityTimoutExpired()
-{
-    onTunnelClosed(SystemError::timedOut);
-    m_tunnelConnection.reset();
-}
-
-void OutgoingTunnelConnectionWatcher::onTunnelClosed(SystemError::ErrorCode reason)
+void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
 {
     NX_ASSERT(isInSelfAioThread());
 
     m_inactivityTimer.reset();
+    m_tunnelConnection.reset();
     if (m_onTunnelClosedHandler)
     {
         auto handler = std::move(m_onTunnelClosedHandler);
