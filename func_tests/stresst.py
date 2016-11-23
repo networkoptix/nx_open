@@ -6,7 +6,7 @@ __author__ = 'Danil Lavrentyuk'
 import sys, os, threading
 import argparse
 #import requests
-from requests.exceptions import SSLError, ConnectionError, RequestException
+#from requests.exceptions import SSLError, ConnectionError, RequestException
 import signal
 import time
 import random
@@ -124,7 +124,8 @@ class RequestWorker(BaseWorker):
                 return None # means success!
             else:
                 return 'Code: %s' % res.getcode()
-        except RequestException, e:
+#        except RequestException, e:
+        except urllib2.URLError, e:
             self._output("%s: %s\n" % (type(e).__name__, e.message))
             return type(e).__name__
         except Exception, e:
