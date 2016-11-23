@@ -71,6 +71,9 @@ SystemManager::SystemManager(
             m_settings.systemManager().dropExpiredSystemsPeriod,
             std::chrono::seconds::zero());
 
+    // TODO: #ak All caches must be updated on successful commit, not on "transaction sent" handler.
+    // Since it may lead to inconsistence between transactions and data cache (for a quite short period, though).
+
     // Registering transaction handler.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
         <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData, data::SystemSharing>(
