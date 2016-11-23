@@ -17,6 +17,7 @@
 #include <transaction/transaction.h>
 #include <transaction/transaction_descriptor.h>
 
+#include "dao/abstract_transaction_data_object.h"
 #include "serialization/transaction_serializer.h"
 #include "serialization/ubjson_serialized_transaction.h"
 #include "transaction_timestamp_calculator.h"
@@ -260,6 +261,7 @@ private:
     > m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
+    std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
 
     /** Fills transaction state cache. */
     nx::db::DBResult fillCache();

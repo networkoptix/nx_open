@@ -29,6 +29,8 @@ TransactionLog::TransactionLog(
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_transactionSequence(0)
 {
+    m_transactionDataObject = dao::AbstractTransactionDataObject::create();
+
     if (fillCache() != nx::db::DBResult::ok)
         throw std::runtime_error("Error loading transaction log from DB");
 }
@@ -57,8 +59,8 @@ void TransactionLog::startDbTransaction(
             nx::db::QueryContext* queryContext,
             nx::db::DBResult dbResult)
         {
-            onDbUpdateCompleted(queryContext, dbResult);
             onDbTransactionCompleted(queryContext, systemId, dbResult);
+            onDbUpdateCompleted(queryContext, dbResult);
         });
 }
 
@@ -359,53 +361,11 @@ nx::db::DBResult TransactionLog::saveToDb(
             .str(transaction).arg(transactionHash),
         cl_logDEBUG1);
 
-    QSqlQuery saveTranQuery(*queryContext->connection());
-    saveTranQuery.prepare(
-        R"sql(
-        REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence,
-                                     timestamp_hi, timestamp, tran_hash, tran_data)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        )sql");
-    saveTranQuery.addBindValue(QLatin1String(systemId));
-    saveTranQuery.addBindValue(transaction.peerID.toSimpleString());
-    saveTranQuery.addBindValue(transaction.persistentInfo.dbID.toSimpleString());
-    saveTranQuery.addBindValue(transaction.persistentInfo.sequence);
-    saveTranQuery.addBindValue(transaction.persistentInfo.timestamp.sequence);
-    saveTranQuery.addBindValue(transaction.persistentInfo.timestamp.ticks);
-    saveTranQuery.addBindValue(QLatin1String(transactionHash));
-    saveTranQuery.addBindValue(ubjsonData);
-    if (!saveTranQuery.exec())
-    {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
-                .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-                .str(transaction).arg(transactionHash).arg(saveTranQuery.lastError().text()),
-            cl_logWARNING);
-        return nx::db::DBResult::ioError;
-    }
-
-    if (transaction.peerID == m_peerId)
-    {
-        // Updating cloud_db sequence in DB
-        QSqlQuery updateCdbSequence(*queryContext->connection());
-        updateCdbSequence.prepare(
-            R"sql(
-            UPDATE cloud_db_transaction_sequence
-            SET max_sequence = :newSequence
-            WHERE max_sequence < :newSequence
-            )sql");
-        updateCdbSequence.bindValue(":newSequence", transaction.persistentInfo.sequence);
-        if (!updateCdbSequence.exec())
-        {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. "
-                    "Error updating cdb sequence. %5")
-                .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-                .str(transaction).arg(transactionHash).arg(saveTranQuery.lastError().text()),
-                cl_logWARNING);
-            return nx::db::DBResult::ioError;
-        }
-    }
+    auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
+        queryContext,
+        {systemId, transaction, transactionHash, ubjsonData});
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     // Modifying transaction log cache.
     QnMutexLocker lk(&m_mutex);
