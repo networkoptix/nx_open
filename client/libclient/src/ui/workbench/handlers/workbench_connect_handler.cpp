@@ -643,6 +643,9 @@ void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
 void QnWorkbenchConnectHandler::showPreloader()
 {
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+
+    resourceModeAction->setChecked(false); //< Shows welcome screen
     welcomeScreen->handleConnectingToSystem();
     welcomeScreen->setGlobalPreloaderVisible(true);
 }
