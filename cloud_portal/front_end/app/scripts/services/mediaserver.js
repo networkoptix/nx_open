@@ -50,7 +50,7 @@ angular.module('cloudApp')
                     return this._get('/ec2/getCurrentUser');
                 },
                 getAggregatedUsersData: function(){
-                    return this._get('/api/aggregator?exec_cmd=ec2%2FgetUsers&exec_cmd=ec2%2FgetPredefinedRoles&exec_cmd=ec2%2FgetUserGroups');
+                    return this._get('/api/aggregator?exec_cmd=ec2%2FgetUsers&exec_cmd=ec2%2FgetPredefinedRoles&exec_cmd=ec2%2FgetUserRoles');
                 },
                 saveUser: function(user){
                     return this._post('/ec2/saveUser', this.cleanUserObject(user));
@@ -59,7 +59,7 @@ angular.module('cloudApp')
                     return this._post('/ec2/removeUser', {id:userId});
                 },
                 cleanUserObject:function(user){ // Remove unnesesary fields from the object
-                    var supportedFields = ['email', 'userId', 'groupId', 'permissions', 'isCloud', 'isEnabled'];
+                    var supportedFields = ['email', 'userId', 'userRoleId', 'permissions', 'isCloud', 'isEnabled'];
                     var cleanedUser = {};
                     for(var i in supportedFields){
                         cleanedUser[supportedFields[i]] = user[supportedFields[i]];
@@ -76,7 +76,7 @@ angular.module('cloudApp')
                         'isCloud': true,
                         'isEnabled': true,
     
-                        'groupId': '{00000000-0000-0000-0000-000000000000}',
+                        'userRoleId': '{00000000-0000-0000-0000-000000000000}',
                         'permissions': '',
 
                         //TODO: Remove the trash below after #VMS-2968
