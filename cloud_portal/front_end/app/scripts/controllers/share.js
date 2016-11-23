@@ -58,7 +58,7 @@ angular.module('cloudApp')
             if($scope.user.role.description){
                 return $scope.user.role.description;
             }
-            if($scope.user.role.groupId){
+            if($scope.user.role.userRoleId){
                 return L.accessRoles.customRole.description;
             }
             if(L.accessRoles[$scope.user.role.name]){
