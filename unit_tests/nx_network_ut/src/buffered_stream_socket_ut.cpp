@@ -56,18 +56,19 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
     accepted->catchRecvEvent(acceptedResults.pusher());
     ASSERT_EQ(acceptedResults.pop(), SystemError::timedOut);
 
-    buffer.reserve(kTestMessage.size() * kClientCount);
+    const auto clientCount = testClientCount();
+    buffer.reserve(kTestMessage.size() * clientCount);
     accepted->catchRecvEvent(acceptedResults.pusher());
-    for (int i = 0; i < kClientCount; ++i)
+    for (size_t i = 0; i < clientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
     accepted->readAsyncAtLeast(
-        &buffer, kTestMessage.size() * kClientCount,
+        &buffer, kTestMessage.size() * clientCount,
         [&](SystemError::ErrorCode code, size_t size)
         {
             ASSERT_EQ(code, SystemError::noError);
-            ASSERT_EQ(size, kTestMessage.size() * kClientCount);
+            ASSERT_EQ(size, kTestMessage.size() * clientCount);
             ASSERT_EQ(buffer.size(), size);
             ASSERT_TRUE(buffer.startsWith(kTestMessage));
             ASSERT_TRUE(buffer.endsWith(kTestMessage));
@@ -75,9 +76,9 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
         });
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
 
-    buffer = Buffer(kTestMessage.size() * kClientCount, '\0');
+    buffer = Buffer(kTestMessage.size() * clientCount, '\0');
     accepted->catchRecvEvent(acceptedResults.pusher());
-    for (int i = 0; i < kClientCount; ++i)
+    for (size_t i = 0; i < clientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
