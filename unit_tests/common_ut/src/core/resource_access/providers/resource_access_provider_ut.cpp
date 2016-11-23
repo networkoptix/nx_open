@@ -53,8 +53,8 @@ TEST_F(QnResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserGroupData role;
-    QnResourceAccessSubject subject(role);
+    ec2::ApiUserRoleData userRole;
+    QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
