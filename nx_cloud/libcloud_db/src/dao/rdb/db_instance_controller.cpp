@@ -55,6 +55,7 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     m_dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
     m_dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     m_dbStructureUpdater.addUpdateScript(db::kAddVmsOpaqueData);
+    m_dbStructureUpdater.addUpdateScript(db::kDropGlobalTransactionSequenceTable);
 }
 
 bool DbInstanceController::initialize()
