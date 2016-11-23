@@ -320,6 +320,7 @@
             <ComponentRef Id="ClientSigar"/>
             <ComponentRef Id="ClientVsRedistributable"/>
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="ClientVcrt12ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>
