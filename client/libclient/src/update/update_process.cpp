@@ -435,7 +435,6 @@ void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompa
 
 void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
     if (errorCode != 0) {
-        qWarning() << "at_restUpdateTask_finished" << errorCode;
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::RestInstallationFailed);
         return;
@@ -604,7 +603,6 @@ void QnUpdateProcess::at_uploadTask_finished(int errorCode, const QSet<QnUuid> &
 
 void QnUpdateProcess::at_installTask_finished(int errorCode) {
     if (errorCode != 0) {
-        qWarning() << "at_installTask_finished" << errorCode;
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::InstallationFailed);
         return;
