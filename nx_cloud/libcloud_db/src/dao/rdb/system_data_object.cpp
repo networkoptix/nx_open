@@ -1,4 +1,4 @@
-#include "system_controller.h"
+#include "system_data_object.h"
 
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -8,9 +8,10 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
-nx::db::DBResult SystemController::insert(
+nx::db::DBResult SystemDataObject::insert(
     nx::db::QueryContext* const queryContext,
     const data::SystemData& system,
     const std::string& accountId)
@@ -39,7 +40,7 @@ nx::db::DBResult SystemController::insert(
     return nx::db::DBResult::ok;
 }
 
-nx::db::DBResult SystemController::selectSystemSequence(
+nx::db::DBResult SystemDataObject::selectSystemSequence(
     nx::db::QueryContext* const queryContext,
     const std::string& systemId,
     std::uint64_t* const sequence)
@@ -63,6 +64,7 @@ nx::db::DBResult SystemController::selectSystemSequence(
     return db::DBResult::ok;
 }
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

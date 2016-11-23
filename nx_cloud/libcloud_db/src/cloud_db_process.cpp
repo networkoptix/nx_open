@@ -34,7 +34,7 @@
 #include <cloud_db_client/src/cdb_request_path.h>
 
 #include "access_control/authentication_manager.h"
-#include "db/db_instance_controller.h"
+#include "dao/rdb/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
@@ -134,7 +134,7 @@ int CloudDBProcess::exec()
             return 1;
         }
 
-        persistent_layer::DbInstanceController dbInstanceController(
+        dao::rdb::DbInstanceController dbInstanceController(
             settings.dbConnectionOptions());
         if (!dbInstanceController.initialize())
         {

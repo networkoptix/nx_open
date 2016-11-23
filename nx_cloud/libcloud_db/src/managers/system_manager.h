@@ -27,14 +27,14 @@
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
+#include "dao/rdb/system_sharing_data_object.h"
+#include "dao/rdb/system_data_object.h"
 #include "data/account_data.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
 #include "data_view.h"
 #include "ec2/transaction_log.h"
 #include "managers_types.h"
-#include "persistent_layer/system_sharing_controller.h"
-#include "persistent_layer/system_controller.h"
 
 namespace nx {
 namespace cdb {
@@ -242,8 +242,8 @@ private:
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
-    persistent_layer::SystemController m_systemDbController;
-    persistent_layer::SystemSharingController m_systemSharingController;
+    dao::rdb::SystemDataObject m_systemDbController;
+    dao::rdb::SystemSharingDataObject m_systemSharingController;
 
     nx::db::DBResult insertSystemToDB(
         nx::db::QueryContext* const queryContext,

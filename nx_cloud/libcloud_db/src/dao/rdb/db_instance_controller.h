@@ -8,7 +8,8 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
 class DbInstanceController
 {
@@ -29,6 +30,7 @@ private:
     nx::db::DBResult configureSqliteInstance(nx::db::QueryContext* queryContext);
 };
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

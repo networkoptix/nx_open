@@ -7,9 +7,10 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
-class SystemSharingController
+class SystemSharingDataObject
 {
 public:
     nx::db::DBResult insertOrReplaceSharing(
@@ -17,6 +18,7 @@ public:
         const api::SystemSharingEx& sharing);
 };
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

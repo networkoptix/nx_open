@@ -1,4 +1,4 @@
-#include "system_sharing_controller.h"
+#include "system_sharing_data_object.h"
 
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -8,9 +8,10 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
-nx::db::DBResult SystemSharingController::insertOrReplaceSharing(
+nx::db::DBResult SystemSharingDataObject::insertOrReplaceSharing(
     nx::db::QueryContext* const queryContext,
     const api::SystemSharingEx& sharing)
 {
@@ -37,6 +38,7 @@ nx::db::DBResult SystemSharingController::insertOrReplaceSharing(
     return db::DBResult::ok;
 }
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

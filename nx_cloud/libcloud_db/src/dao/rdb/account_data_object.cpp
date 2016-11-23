@@ -1,4 +1,4 @@
-#include "account_controller.h"
+#include "account_data_object.h"
 
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -8,9 +8,10 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
-nx::db::DBResult AccountController::insert(
+nx::db::DBResult AccountDataObject::insert(
     nx::db::QueryContext* queryContext,
     const api::AccountData& account)
 {
@@ -33,6 +34,7 @@ nx::db::DBResult AccountController::insert(
     return nx::db::DBResult::ok;
 }
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

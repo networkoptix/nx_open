@@ -7,9 +7,10 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
-class AccountController
+class AccountDataObject
 {
 public:
     nx::db::DBResult insert(
@@ -17,6 +18,7 @@ public:
         const api::AccountData& account);
 };
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

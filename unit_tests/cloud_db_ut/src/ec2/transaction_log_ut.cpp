@@ -7,13 +7,13 @@
 
 #include <utils/db/async_sql_query_executor.h>
 
-#include <db/db_instance_controller.h>
+#include <dao/rdb/db_instance_controller.h>
+#include <dao/rdb/account_data_object.h>
+#include <dao/rdb/system_data_object.h>
+#include <dao/rdb/system_sharing_data_object.h>
 #include <ec2/data_conversion.h>
 #include <ec2/outgoing_transaction_dispatcher.h>
 #include <ec2/transaction_log.h>
-#include <managers/persistent_layer/account_controller.h>
-#include <managers/persistent_layer/system_controller.h>
-#include <managers/persistent_layer/system_sharing_controller.h>
 #include <test_support/business_data_generator.h>
 #include <test_support/test_with_db_helper.h>
 
@@ -35,7 +35,7 @@ public:
     }
 
 protected:
-    const std::unique_ptr<persistent_layer::DbInstanceController>& persistentDbManager() const
+    const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const
     {
         return m_persistentDbManager;
     }
@@ -46,7 +46,7 @@ protected:
 
         auto account = cdb::test::BusinessDataGenerator::generateRandomAccount();
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&persistent_layer::AccountController::insert, &m_accountDbController,
+            std::bind(&dao::rdb::AccountDataObject::insert, &m_accountDbController,
                 _1, account));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
         m_accounts.push_back(std::move(account));
@@ -58,7 +58,7 @@ protected:
 
         auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&persistent_layer::SystemController::insert, &m_systemDbController,
+            std::bind(&dao::rdb::SystemDataObject::insert, &m_systemDbController,
                 _1, system, account.id));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
         m_systems.push_back(std::move(system));
@@ -69,7 +69,7 @@ protected:
         using namespace std::placeholders;
 
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&persistent_layer::SystemSharingController::insertOrReplaceSharing,
+            std::bind(&dao::rdb::SystemSharingDataObject::insertOrReplaceSharing,
                 &m_systemSharingController, _1, sharing));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
     }
@@ -95,7 +95,7 @@ protected:
         return m_systems;
     }
 
-    persistent_layer::SystemSharingController& systemSharingController()
+    dao::rdb::SystemSharingDataObject& systemSharingController()
     {
         return m_systemSharingController;
     }
@@ -117,10 +117,10 @@ protected:
     }
 
 private:
-    std::unique_ptr<persistent_layer::DbInstanceController> m_persistentDbManager;
-    persistent_layer::AccountController m_accountDbController;
-    persistent_layer::SystemController m_systemDbController;
-    persistent_layer::SystemSharingController m_systemSharingController;
+    std::unique_ptr<dao::rdb::DbInstanceController> m_persistentDbManager;
+    dao::rdb::AccountDataObject m_accountDbController;
+    dao::rdb::SystemDataObject m_systemDbController;
+    dao::rdb::SystemSharingDataObject m_systemSharingController;
     std::vector<api::AccountData> m_accounts;
     std::vector<data::SystemData> m_systems;
 
@@ -129,7 +129,7 @@ private:
         dbConnectionOptions().maxConnectionCount = 10;
 
         m_persistentDbManager =
-            std::make_unique<persistent_layer::DbInstanceController>(dbConnectionOptions());
+            std::make_unique<dao::rdb::DbInstanceController>(dbConnectionOptions());
         ASSERT_TRUE(m_persistentDbManager->initialize());
     }
 };

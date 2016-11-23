@@ -7,9 +7,10 @@
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
-class SystemController
+class SystemDataObject
 {
 public:
     nx::db::DBResult insert(
@@ -23,6 +24,7 @@ public:
         std::uint64_t* const sequence);
 };
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx

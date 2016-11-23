@@ -8,11 +8,12 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "structure_update_statements.h"
-#include "../ec2/db/migration/add_history_to_transaction.h"
+#include "ec2/db/migration/add_history_to_transaction.h"
 
 namespace nx {
 namespace cdb {
-namespace persistent_layer {
+namespace dao {
+namespace rdb {
 
 namespace {
 
@@ -146,6 +147,7 @@ nx::db::DBResult DbInstanceController::configureSqliteInstance(
     return nx::db::DBResult::ok;
 }
 
-} // namespace persistent_layer
+} // namespace rdb
+} // namespace dao
 } // namespace cdb
 } // namespace nx
