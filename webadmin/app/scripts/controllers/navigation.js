@@ -8,7 +8,7 @@ angular.module('webadminApp')
         $scope.noPanel = true;
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
-            $scope.noPanel = $scope.settings.flags.noHDD;
+            $scope.noPanel = $scope.settings.flags.noHDD || $scope.settings.flags.cleanSystem;
             if(!$scope.noPanel) {
                 mediaserver.resolveNewSystemAndUser().then(function (user) {
                     if (user === null) {

@@ -172,7 +172,7 @@ angular.module('webadminApp')
                 if (data.data && data.data.reply) {
 
                     // Has any scripts
-                    $scope.controlDevice = !!data.data.reply;
+                    $scope.controlDevice = data.data.reply && data.data.reply.length>0;
 
                     $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                     $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;

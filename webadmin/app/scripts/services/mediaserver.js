@@ -29,28 +29,32 @@ angular.module('webadminApp')
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
                 }
 
-                data.flags = {};
-                data.flags.noHDD = data.ecDbReadOnly;
-
                 var ips = data.remoteAddresses;
-                data.flags.noNetwork = ips.length <= 1;
-                data.flags.wrongNetwork = true;
-                for(var ip in ips){
-                    if(ip == '127.0.0.1'){ // Localhost
+                var wrongNetwork = true;
+                for (var ip in ips) {
+                    if (ip == '127.0.0.1') { // Localhost
                         continue;
                     }
-                    if(ip.indexOf('169.254.') == 0){ // No DHCP address
+                    if (ip.indexOf('169.254.') == 0) { // No DHCP address
                         continue;
                     }
-                    data.flags.wrongNetwork = false;
+                    wrongNetwork = false;
+                    break;
                 }
 
-                data.flags.hasInternet = data.serverFlags.indexOf(Config.publicIpFlag) >= 0;
+                data.flags = {
+                    noHDD: data.ecDbReadOnly,
+                    noNetwork: ips.length <= 1,
+                    wrongNetwork: wrongNetwork,
+                    hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
+                    cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
+                    canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0
+                };
 
-                data.flags.newSystem = data.serverFlags.indexOf(Config.newServerFlag) >= 0
-                && ! (data.flags.noNetwork || data.flags.noHDD);
 
-                data.flags.canSetupNetwork = data.serverFlags.indexOf(Config.iflistFlag) >= 0;
+                //data.flags.wrongNetwork = true;// TODO: remove this hack
+
+                data.flags.newSystem = data.flags.cleanSystem && !data.flags.noHDD && !data.flags.noNetwork;
                 return r;
             });
         }

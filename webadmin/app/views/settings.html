@@ -5,15 +5,21 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
 
-            <alert type="danger" ng-if="settigns.flags.noHDD">
+            <alert type="danger" ng-if="settings.flags.noHDD">
                 This device is intended to work with hard disk drive installed.<br>
                 Please turn off the device and install a hard disk drive.
             </alert>
-            <alert type="danger" ng-if="settigns.flags.noNetwork">
+            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 This device needs network connection to work.<br>
                 Please connect it to your local network ot Internet
             </alert>
-            <tabset ng-hide="settings.flags.noHDD">
+            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+                This device has wrong network configuration.<br>
+                Please set up correct IP address.
+            </alert>
+
+
+            <tabset ng-hide="settings.flags.noHDD || settings.flags.cleanSystem">
                 <tab heading="Server" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
@@ -101,6 +107,7 @@
                         </div>
                     </div>
                 </tab>
+
                 <tab heading="Device" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
                         <h3>Device Network Settings</h3>
