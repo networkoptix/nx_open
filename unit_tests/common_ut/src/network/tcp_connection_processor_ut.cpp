@@ -11,6 +11,7 @@
 #include "nx/network/socket_common.h"
 #include "network/tcp_listener.h"
 #include "network/tcp_connection_priv.h"
+#include <thread>
 
 namespace {
     static const int kDataTransferTimeout = 1000;
