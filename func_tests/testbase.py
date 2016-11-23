@@ -188,6 +188,7 @@ class FuncTestCase(unittest.TestCase):
     _global_clear_script = 'ctl.sh'  # called only after all test suits of this class performed
     sl = []
     hosts = []
+    ports = []
     guids = []
     api = ServerApi
 
@@ -211,7 +212,9 @@ class FuncTestCase(unittest.TestCase):
         if len(cls.sl) > cls.num_serv:
             cls.sl[cls.num_serv:] = []
         cls.guids = ['' for _ in cls.sl]
-        cls.hosts = [addr.split(':')[0] for addr in cls.sl]
+        addrs = [addr.split(':') for addr in cls.sl]
+        cls.hosts = [addr[0] for addr in addrs]
+        cls.ports = [addr[1] for addr in addrs]
         #print "Server list: %s" % cls.sl
         cls._configured = True
 
@@ -338,7 +341,9 @@ class FuncTestCase(unittest.TestCase):
             print "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out)
         sys.stdout.write("Box %s is ready\n" % box)
 
-    def _prepare_test_phase(self, method):
+    def _prepare_test_phase(self, method=None):
+        if method is None:
+            method = self._stop_and_init
         self._worker.clearOks()
         for num, box in enumerate(self.hosts):
             self._worker.enqueue(method, (box, num))

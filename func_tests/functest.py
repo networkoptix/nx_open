@@ -33,6 +33,7 @@ from streaming_test import StreamingTest, HlsOnlyTest
 from natcon_test import NatConnectionTest
 from dbtest import DBTest
 from proxytest import ServerProxyTest
+from stresst import HTTPStressTest
 
 
 #class AuthH(urllib2.HTTPDigestAuthHandler):
@@ -1284,33 +1285,11 @@ def RunByAutotest():
             CallTest(StreamingTest)
         if not testMaster.args.skipdbup:
             CallTest(DBTest)
+        CallTest(HTTPStressTest)
     #FIXME: acureate test result processing required!!!
     print "\nALL AUTOMATIC TEST ARE DONE\n"
     return True
 
-
-class StressTestTmp(object):
-    def __init__(self, config):
-        self.config = config
-        import stresst
-        self.module = stresst
-        self.runner = stresst.StressTestRunner
-
-    def run(self):
-        _h, _p = self.config.rtget("ServerList")[0].split(':')
-        class args:
-            host = _h
-            full = '20,40,60'
-            threads = 10
-            logexc = True # False
-            mix = None
-            drop = None
-            batch = None
-            reports = None
-            port = _p
-            proto = None
-            heavy = None
-        self.runner(self.module.preprocessArgs(args), handleSigInt=True).run()
 
 # These are the old legasy tests, just organized a bit
 SimpleTestKeys = {
@@ -1319,7 +1298,6 @@ SimpleTestKeys = {
     '--rtsp-test': RtspTestSuit,
     '--rtsp-perf': RtspPerf,
     '--rtsp-stream': RtspStreamTest,
-    '--stress': StressTestTmp,
 }
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
@@ -1333,6 +1311,7 @@ BoxTestKeys = OrderedDict([
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
     ('--dbup', DBTest),
+    ('--htstress', HTTPStressTest),
     ('--natcon', NatConnectionTest),
     ('--boxtests', None),
 ])
@@ -1349,6 +1328,7 @@ def BoxTestsRun(name):
         if not CallTest(MultiserverArchiveTest): ok = False
         if not CallTest(StreamingTest): ok = False
         if not CallTest(DBTest): ok = False
+        if not CallTest(HTTPStressTest): ok = False
         return ok
     else:
         return CallTest(BoxTestKeys['--' + name])
