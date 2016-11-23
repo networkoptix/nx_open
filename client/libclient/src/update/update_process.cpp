@@ -356,11 +356,11 @@ void QnUpdateProcess::installClientUpdate()
         m_target.version, m_clientUpdateFile->fileName);
 
     auto futureWatcher = new QFutureWatcher<ResultType::Value>(this);
-    futureWatcher->setFuture(future);
     connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, this,
         &QnUpdateProcess::at_clientUpdateInstalled);
     connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, futureWatcher,
         &QObject::deleteLater);
+    futureWatcher->setFuture(future);
 }
 
 void QnUpdateProcess::setStage(QnFullUpdateStage stage) {

@@ -47,7 +47,7 @@
 
         <!-- Exit if upgrading and cloud hosts differ -->
         <bal:Condition Message="!(loc.Product_CloudHostMismatch)">
-            <![CDATA[ NOT (ServerInstalled = 5 AND IsConnectedToCloud = "yes" AND $(var.CloudHostIsDifferent)) ]]>
+            <![CDATA[ (NOT (ServerInstalled = 5 AND IsConnectedToCloud = "yes" AND $(var.CloudHostIsDifferent))) OR WixBundleAction = 3 ]]>
         </bal:Condition>
     </Fragment>
 

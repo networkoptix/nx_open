@@ -51,6 +51,8 @@ public:
     SocketAddress localAddress() const;
     void replaceOriginatingHostAddress(const QString& address);
 
+    static void setDefaultTunnelInactivityTimeout(std::chrono::seconds value);
+
 protected:
     virtual void messageReceived(
         SocketAddress sourceAddress,
@@ -58,6 +60,8 @@ protected:
     virtual void ioFailure(SystemError::ErrorCode errorCode) override;
 
 private:
+    static std::atomic<std::chrono::seconds> s_defaultTunnelInactivityTimeout;
+
     const AddressEntry m_targetPeerAddress;
     const nx::String m_connectSessionId;
     ConnectorFactory::CloudConnectors m_connectors;
@@ -83,6 +87,8 @@ private:
     void startNatTraversing(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::api::ConnectResponse response);
+    std::unique_ptr<AbstractOutgoingTunnelConnection> configureConnection(
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
     void onConnectorFinished(
         ConnectorFactory::CloudConnectors::iterator connectorIter,
         nx::hpm::api::NatTraversalResultCode resultCode,

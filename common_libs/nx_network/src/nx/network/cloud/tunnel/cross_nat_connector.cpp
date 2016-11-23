@@ -70,6 +70,8 @@ CrossNatConnector::CrossNatConnector(
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
     m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
+
+    m_connectionParameters.tunnelInactivityTimeout = s_defaultTunnelInactivityTimeout.load();
 }
 
 CrossNatConnector::~CrossNatConnector()
@@ -101,11 +103,11 @@ void CrossNatConnector::connect(
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
             if (auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(hostName))
             {
+                auto connection = std::make_unique<tcp::OutgoingReverseTunnelConnection>(
+                    getAioThread(), std::move(holder));
+
                 NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
-                return handler(
-                    SystemError::noError,
-                    std::make_unique<tcp::OutgoingReverseTunnelConnection>(
-                        getAioThread(), std::move(holder)));
+                return handler(SystemError::noError, configureConnection(std::move(connection)));
             }
 
             issueConnectRequestToMediator(timeout, std::move(handler));
@@ -122,6 +124,11 @@ void CrossNatConnector::replaceOriginatingHostAddress(const QString& address)
     m_originatingHostAddressReplacement = address;
 }
 
+void CrossNatConnector::setDefaultTunnelInactivityTimeout(std::chrono::seconds value)
+{
+    s_defaultTunnelInactivityTimeout = value;
+}
+
 void CrossNatConnector::messageReceived(
     SocketAddress /*sourceAddress*/,
     stun::Message /*msg*/)
@@ -135,6 +142,9 @@ void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
+
+std::atomic<std::chrono::seconds> CrossNatConnector::s_defaultTunnelInactivityTimeout(
+    hpm::api::kDefaultTunnelInactivityTimeout);
 
 void CrossNatConnector::issueConnectRequestToMediator(
     std::chrono::milliseconds timeout,
@@ -255,6 +265,18 @@ void CrossNatConnector::startNatTraversing(
     }
 }
 
+std::unique_ptr<AbstractOutgoingTunnelConnection> CrossNatConnector::configureConnection(
+    std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+{
+    std::unique_ptr<AbstractOutgoingTunnelConnection> watcher =
+        std::make_unique<OutgoingTunnelConnectionWatcher>(
+            std::move(m_connectionParameters),
+            std::move(connection));
+
+    watcher->bindToAioThread(getAioThread());
+    return watcher;
+}
+
 void CrossNatConnector::onConnectorFinished(
     ConnectorFactory::CloudConnectors::iterator connectorIter,
     api::NatTraversalResultCode resultCode,
@@ -270,12 +292,8 @@ void CrossNatConnector::onConnectorFinished(
     NX_CRITICAL((resultCode != api::NatTraversalResultCode::ok) || connection);
     m_connectors.clear();   // Cancelling other connectors.
     if (connection)
-    {
-        m_connection = std::make_unique<OutgoingTunnelConnectionWatcher>(
-            std::move(m_connectionParameters),
-            std::move(connection));
-        m_connection->bindToAioThread(getAioThread());
-    }
+        m_connection = configureConnection(std::move(connection));
+
     holePunchingDone(resultCode, sysErrorCode);
 }
 

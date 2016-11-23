@@ -31,7 +31,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1, boost::none, false);
+    const auto server1 = addRandomServer(system1, boost::none, hpm::ServerTweak::noBindEndpoint);
     ASSERT_NE(nullptr, server1);
 
     static const std::vector<std::list<SocketAddress>> kTestCases =
@@ -147,7 +147,7 @@ TEST_F(HolePunchingProcessor, server_failure)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1, boost::none, true);
+    const auto server1 = addRandomServer(system1, boost::none);
 
     typedef MediaServerEmulator::ActionToTake MsAction;
     static const std::map<MsAction, api::ResultCode> kTestCases =
