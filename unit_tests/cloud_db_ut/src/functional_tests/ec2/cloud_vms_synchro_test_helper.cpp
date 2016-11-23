@@ -321,7 +321,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     accountVmsData->isEnabled = true;
     accountVmsData->email = QString::fromStdString(accountEmail);
     accountVmsData->name = QString::fromStdString(accountEmail);
-    accountVmsData->groupId = QnUuid::createUuid();
+    accountVmsData->userRoleId = QnUuid::createUuid();
     accountVmsData->realm = QnAppInfo::realm();
     accountVmsData->hash = "password_is_in_cloud";
     accountVmsData->digest = "password_is_in_cloud";
@@ -361,7 +361,7 @@ void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
                 // TODO: Validating data
                 ASSERT_EQ(accountVmsData.isEnabled, user.isEnabled);
                 ASSERT_EQ(accountVmsData.id.toSimpleString().toStdString(), user.vmsUserId);
-                ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupId);
+                ASSERT_EQ(accountVmsData.userRoleId.toSimpleString().toStdString(), user.groupId);
                 //ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
                 //ASSERT_EQ(accountVmsData.fullName.toStdString(), user.accountFullName);
                 ASSERT_EQ(
