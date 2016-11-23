@@ -63,10 +63,16 @@ protected:
         m_tunnel->setControlConnectionClosedHandler(
             [this](SystemError::ErrorCode reason)
             {
+                m_tunnel.reset();
                 m_tunnelClosedPromise.set_value(reason);
             });
 
-        return InitializationGuard([this]() { m_tunnel->pleaseStopSync(); });
+        return InitializationGuard(
+            [this]()
+            {
+                if (m_tunnel)
+                    m_tunnel->pleaseStopSync();
+            });
     }
 
     void waitForTunnelToExpire(
