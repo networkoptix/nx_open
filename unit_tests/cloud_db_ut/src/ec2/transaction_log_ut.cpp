@@ -282,8 +282,6 @@ private:
 
     nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
     {
-        std::cout<<std::this_thread::get_id()<<std::endl;
-
         api::SystemSharingEx sharing;
         sharing.systemId = getSystem(0).id;
         const auto& accountToShareWith = 
