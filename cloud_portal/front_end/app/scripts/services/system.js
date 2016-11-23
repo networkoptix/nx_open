@@ -227,8 +227,8 @@ angular.module('cloudApp')
             });
         }
 
-        system.prototype.getUsers = function(system){
-            if(!this.usersPromise){
+        system.prototype.getUsers = function(reload){
+            if(!this.usersPromise || reload){
                 var self = this;
                 var promise = null;
                 if(self.isOnline){ // Two separate cases - either we get info from the system (presuming it has actual names)
