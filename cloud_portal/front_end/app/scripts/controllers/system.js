@@ -57,7 +57,7 @@ angular.module('cloudApp')
 
 
         function loadUsers(){
-            $scope.system.getUsers();
+            $scope.system.getUsers(true);
         }
         function cleanUrl(){
             $location.path('/systems/' + systemId, false);
