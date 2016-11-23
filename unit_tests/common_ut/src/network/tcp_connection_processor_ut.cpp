@@ -31,7 +31,7 @@ public:
     }
 
 protected:
-    void TestConnectionProcessor::run()
+    void run()
     {
         Q_D(QnTCPConnectionProcessor);
         ASSERT_TRUE(d->socket->setNonBlockingMode(true));
