@@ -2,6 +2,7 @@
 
 #include <nx/network/buffer.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <transaction/transaction.h>
 #include <utils/db/types.h>

@@ -159,8 +159,8 @@ api::ResultCode Ec2MserverCloudSynchronization::fillRegisteredSystemDataByCreden
 }
 
 api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
-    const std::string& id,
-    const std::string& authKey)
+    const std::string& /*id*/,
+    const std::string& /*authKey*/)
 {
     QnUuid adminUserId;
     if (!findAdminUserId(&adminUserId))
