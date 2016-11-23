@@ -33,6 +33,7 @@ from streaming_test import StreamingTest, HlsOnlyTest
 from natcon_test import NatConnectionTest
 from dbtest import DBTest
 from proxytest import ServerProxyTest
+from mergetest import MergeSystemTest
 from stresst import HTTPStressTest
 
 
@@ -1285,6 +1286,8 @@ def RunByAutotest():
             CallTest(StreamingTest)
         if not testMaster.args.skipdbup:
             CallTest(DBTest)
+        if not testMaster.args.skipmerge:
+          CallTest(MergeSystemTest)
         CallTest(HTTPStressTest)
     #FIXME: acureate test result processing required!!!
     print "\nALL AUTOMATIC TEST ARE DONE\n"
@@ -1313,6 +1316,7 @@ BoxTestKeys = OrderedDict([
     ('--dbup', DBTest),
     ('--htstress', HTTPStressTest),
     ('--natcon', NatConnectionTest),
+    ('--merge', MergeSystemTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
@@ -1328,6 +1332,7 @@ def BoxTestsRun(name):
         if not CallTest(MultiserverArchiveTest): ok = False
         if not CallTest(StreamingTest): ok = False
         if not CallTest(DBTest): ok = False
+        if not CallTest(MergeSystemTest): ok = False
         if not CallTest(HTTPStressTest): ok = False
         return ok
     else:
@@ -1456,6 +1461,7 @@ def parseArgs():
     parser.add_argument('--skipmsa', action="store_true", help="Skip multi-server archive tests")
     parser.add_argument('--skipstrm', action="store_true", help="Skip streaming tests")
     parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
+    parser.add_argument('--skipmerge', action="store_true", help="Skip merge system test")
 #    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
     parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
 
