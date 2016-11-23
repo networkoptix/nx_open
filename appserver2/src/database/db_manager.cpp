@@ -748,10 +748,7 @@ bool QnDbManager::queryObjects(ObjectListType& objects)
 }
 
 template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(
-    ApiCommand::Value command, 
-    std::function<bool (ObjectType& data)> updater,
-    std::function<bool (ObjectType& data)> saveToTransactionLogPredicate)
+bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
     if (!queryObjects<ObjectListType>(objects))
@@ -760,15 +757,19 @@ bool QnDbManager::fillTransactionLogInternal(
     for(const ObjectType& object: objects)
     {
         QnTransaction<ObjectType> transaction(command, object);
+        auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
+
+        if (transactionDescriptor)
+            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(object);
+        else
+            transaction.transactionType = ec2::TransactionType::Unknown;
+
         transactionLog->fillPersistentInfo(transaction);
         if (updater && updater(transaction.params))
         {
             if (executeTransactionInternal(transaction) != ErrorCode::ok)
                 return false;
         }
-
-        if (saveToTransactionLogPredicate && !saveToTransactionLogPredicate(transaction.params))
-            continue;
 
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
@@ -807,20 +808,8 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
-    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(
-            ApiCommand::setResourceStatus,
-            nullptr,
-            [] (const ApiResourceStatusData& statusData)
-            {
-                auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ApiResourceStatusData>(ApiCommand::setResourceStatus);
-                if (transactionDescriptor)
-                    return transactionDescriptor->getTransactionTypeFunc(statusData) != ec2::TransactionType::Local;
-
-                return false;
-            }))
-    {
+    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
         return false;
-    }
 
     return true;
 }
