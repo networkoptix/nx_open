@@ -10,7 +10,10 @@ angular.module('cloudApp', [
     'ngStorage',
     'base64',
     'ngToast'
-]).config(['ngToastProvider', function(ngToastProvider) {
+]).config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+}]).config(['ngToastProvider', function(ngToastProvider) {
     ngToastProvider.configure({
         timeout: Config.alertTimeout,
         animation: 'fade',

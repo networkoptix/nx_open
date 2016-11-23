@@ -58,6 +58,7 @@ angular.module('cloudApp')
                     url += linkSettings.action;
                 }
                 url += '?' + $.param(getParams);
+                console.log("generated link", url);
                 return url;
 
             },
@@ -78,6 +79,12 @@ angular.module('cloudApp')
                 this.getLink({
                     systemId: systemId
                 }).then(function(link){
+                    link = link.replace(/&/g,'&&'); // This is hack,
+                    // Google Chrome for mac has a bug - he looses one ampersand which brakes the link parameters
+                    // Here we duplicate ampersands to keep one of them
+                    // Dear successor, if you read this - plese, check if the bug was fixed in chrome and remove this
+                    // ugly thing!
+                    // see CLOUD-716 for more information
                     window.protocolCheck(link, function () {
                         result.reject(L.errorCodes.noClientDetected);
                     },function(){

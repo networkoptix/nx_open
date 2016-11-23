@@ -608,7 +608,7 @@ module.exports = function (grunt) {
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
             merge:{
-                command: 'hg pull -u; python ../../devtools/util/merge_dev.py -t prod_3.0.0; hg push;'
+                command: 'hg pull -u;  python ../../devtools/util/merge_dev.py -r prod_3.0.0; python ../../devtools/util/merge_dev.py -t prod_3.0.0; hg push;'
             },
             version: {
                 command: 'hg parent > dist/version.txt'
