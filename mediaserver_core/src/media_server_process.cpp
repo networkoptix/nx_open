@@ -69,7 +69,6 @@
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
-#include <media_server/serverutil.h>
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <media_server/file_connection_processor.h>
@@ -1906,44 +1905,67 @@ void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
     m_engineVersion = version;
 }
 
-void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
+void MediaServerProcess::setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager)
 {
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-
+    loadBeforeRestoreDbData();
     if (!qnGlobalSettings->systemName().isEmpty())
     {
-        systemName.clear();
-        systemName.saveToConfig(); //< remove from config file
-        return; //< systemName already in database
+        clearMigrationInfo();
+        return;
     }
 
-    if (systemName.value().isEmpty())
-        systemName.resetToDefault(); //< generate default value
+    setUpSystemName();
+    setUpLocalSystemId(cloudConnectionManager);
+    clearMigrationInfo();
 
-    // move data from config
-    qnGlobalSettings->setSystemName(systemName.value());
-
-    if (systemName.isDefault())
-    {
-        resetSystemState(cloudConnectionManager);
-    }
-    else
-    {
-        QString serverKey;
-        if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
-        {
-            for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
-                serverKey = qMax(serverKey, server->getAuthKey());
-        }
-        const auto generatedLocalSystemId = guidFromArbitraryData(systemName.value() + serverKey);
-
-        qnGlobalSettings->setLocalSystemId(generatedLocalSystemId);
-    }
-
-    systemName.clear();
-    systemName.saveToConfig(); //< remove from config file
     qnGlobalSettings->synchronizeNow();
+}
+
+void MediaServerProcess::loadBeforeRestoreDbData()
+{
+    if (!qnCommon->beforeRestoreDbData().localSystemId.isNull())
+        qnGlobalSettings->setLocalSystemId(QnUuid::fromStringSafe(qnCommon->beforeRestoreDbData().localSystemId));
+
+    if (!qnCommon->beforeRestoreDbData().localSystemName.isNull())
+        qnGlobalSettings->setSystemName(QString::fromLocal8Bit(qnCommon->beforeRestoreDbData().localSystemName));
+}
+
+void MediaServerProcess::setUpSystemName()
+{
+    loadOrGenerateDefaultSystemName();
+    qnGlobalSettings->setSystemName(m_systemName.value());
+}
+
+void MediaServerProcess::setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager)
+{
+    if (m_systemName.isDefault())
+        resetSystemState(cloudConnectionManager);
+    else
+        qnGlobalSettings->setLocalSystemId(generateSystemIdFromSystemName());
+}
+
+QnUuid MediaServerProcess::generateSystemIdFromSystemName()
+{
+    QString serverKey;
+    if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
+    {
+        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+            serverKey = qMax(serverKey, server->getAuthKey());
+    }
+    return guidFromArbitraryData(m_systemName.value() + serverKey);
+}
+
+void MediaServerProcess::clearMigrationInfo()
+{
+    nx::SystemName().saveToConfig(); //< remove from config file
+}
+
+void MediaServerProcess::loadOrGenerateDefaultSystemName()
+{
+    m_systemName.loadFromConfig();
+
+    if (m_systemName.value().isEmpty())
+        m_systemName.resetToDefault(); 
 }
 
 void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
@@ -2206,8 +2228,6 @@ void MediaServerProcess::run()
         abort();
         return;
     }
-
-    BeforeRestoreDbData::clearSettings(settings);
 
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
@@ -2511,13 +2531,9 @@ void MediaServerProcess::run()
 
     qnGlobalSettings->initialize();
 
-    if (!beforeRestoreDbData.localSystemId.isNull())
-        qnGlobalSettings->setLocalSystemId(QnUuid::fromStringSafe(beforeRestoreDbData.localSystemId));
+    setUpSystemIdentity(cloudConnectionManager);
 
-    if (!beforeRestoreDbData.localSystemName.isNull())
-        qnGlobalSettings->setSystemName(QString::fromLocal8Bit(beforeRestoreDbData.localSystemName));
-
-    migrateSystemNameFromConfig(cloudConnectionManager);
+    BeforeRestoreDbData::clearSettings(settings);
 
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
