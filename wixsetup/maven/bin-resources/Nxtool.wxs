@@ -154,7 +154,7 @@
             <ComponentGroupRef Id="QtQuickWindow2Files" />
             <ComponentGroupRef Id="QtQuick2Files" />
             <ComponentGroupRef Id="Platforms" />
-            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="NxtoolVcrt14ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>
