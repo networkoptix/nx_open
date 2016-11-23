@@ -513,13 +513,13 @@ class UnitTestRollback(object):
 
     def __init__(self, autorollback=False, nocreate=False):
         # nocreate is used only for `functest.py --recover` call only that doesn't run any tests
+        self._fpos = None
         self._auto = autorollback or _testMaster.args.autorollback
         if os.path.isfile(".rollback") and self._askRollback():
             self.doRecover(checkFile=False)
         if not nocreate:
             self._rollbackFile = open(".rollback","w+")
             self._savedIds.clear()
-        self._fpos = None
 
     def __enter__(self, testName=''):  # may be, pass the caller test name here?
         if self._fpos is not None:
@@ -531,7 +531,7 @@ class UnitTestRollback(object):
             self._savedIds.clear()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        #print "DEBUG: exiting rollback-with. UnitTestRollback._fpos == %s"  % (self._fpos, )
+        print "DEBUG: exiting rollback-with. UnitTestRollback._fpos == %s"  % (self._fpos, )
         if self._savedIds:
             self.doRollback()
         if self._rollbackFile.tell() != self._fpos:
@@ -565,7 +565,7 @@ class UnitTestRollback(object):
         self._write2Rollback(resourceId, serverAddress, methodName)
         self._rollbackFile.flush()
         self._savedIds[resourceId] = (serverAddress, methodName)
-        #print "DEBUG: added res %s at %s by %s" % (resourceId, serverAddress, methodName)
+        print "DEBUG: added res %s at %s by %s" % (resourceId, serverAddress, methodName)
 
     def takeOff(self, resourceId):
         "If the resource was removed by a test itself, no need to keep its id here"
