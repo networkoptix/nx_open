@@ -25,17 +25,29 @@ namespace cdb {
 namespace ec2 {
 namespace test {
 
+using DbInstanceController = cdb::dao::rdb::DbInstanceController;
+using AccountDataObject = cdb::dao::rdb::AccountDataObject;
+using SystemDataObject = cdb::dao::rdb::SystemDataObject;
+using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
+
 class BasePersistentDataTest:
     public TestWithDbHelper
 {
 public:
-    BasePersistentDataTest()
+    enum class DbInitializationType
     {
-        createDatabase();
+        immediate,
+        delayed
+    };
+
+    BasePersistentDataTest(DbInitializationType dbInitializationType)
+    {
+        if (dbInitializationType == DbInitializationType::immediate)
+            initializeDatabase();
     }
 
 protected:
-    const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const
+    const std::unique_ptr<DbInstanceController>& persistentDbManager() const
     {
         return m_persistentDbManager;
     }
@@ -46,7 +58,7 @@ protected:
 
         auto account = cdb::test::BusinessDataGenerator::generateRandomAccount();
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&dao::rdb::AccountDataObject::insert, &m_accountDbController,
+            std::bind(&AccountDataObject::insert, &m_accountDbController,
                 _1, account));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
         m_accounts.push_back(std::move(account));
@@ -58,7 +70,7 @@ protected:
 
         auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&dao::rdb::SystemDataObject::insert, &m_systemDbController,
+            std::bind(&SystemDataObject::insert, &m_systemDbController,
                 _1, system, account.id));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
         m_systems.push_back(std::move(system));
@@ -69,7 +81,7 @@ protected:
         using namespace std::placeholders;
 
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&dao::rdb::SystemSharingDataObject::insertOrReplaceSharing,
+            std::bind(&SystemSharingDataObject::insertOrReplaceSharing,
                 &m_systemSharingController, _1, sharing));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
     }
@@ -95,7 +107,7 @@ protected:
         return m_systems;
     }
 
-    dao::rdb::SystemSharingDataObject& systemSharingController()
+    SystemSharingDataObject& systemSharingController()
     {
         return m_systemSharingController;
     }
@@ -116,22 +128,20 @@ protected:
         return queryDonePromise.get_future().get();
     }
 
-private:
-    std::unique_ptr<dao::rdb::DbInstanceController> m_persistentDbManager;
-    dao::rdb::AccountDataObject m_accountDbController;
-    dao::rdb::SystemDataObject m_systemDbController;
-    dao::rdb::SystemSharingDataObject m_systemSharingController;
-    std::vector<api::AccountData> m_accounts;
-    std::vector<data::SystemData> m_systems;
-
-    void createDatabase()
+    void initializeDatabase()
     {
-        dbConnectionOptions().maxConnectionCount = 10;
-
         m_persistentDbManager =
-            std::make_unique<dao::rdb::DbInstanceController>(dbConnectionOptions());
+            std::make_unique<DbInstanceController>(dbConnectionOptions());
         ASSERT_TRUE(m_persistentDbManager->initialize());
     }
+
+private:
+    std::unique_ptr<DbInstanceController> m_persistentDbManager;
+    AccountDataObject m_accountDbController;
+    SystemDataObject m_systemDbController;
+    SystemSharingDataObject m_systemSharingController;
+    std::vector<api::AccountData> m_accounts;
+    std::vector<data::SystemData> m_systems;
 };
 
 class TestOutgoingTransactionDispatcher:
@@ -159,14 +169,32 @@ private:
     OnNewTransactionHandler m_onNewTransactionHandler;
 };
 
+class TransactionDataObject:
+    public ec2::dao::AbstractTransactionDataObject
+{
+public:
+    virtual nx::db::DBResult insertOrReplaceTransaction(
+        nx::db::QueryContext* /*queryContext*/,
+        const dao::TransactionData& /*transactionData*/) override
+    {
+        return nx::db::DBResult::ok;
+    }
+};
+
 class TransactionLog:
     public BasePersistentDataTest,
     public ::testing::Test
 {
 public:
-    TransactionLog()
+    TransactionLog():
+        BasePersistentDataTest(DbInitializationType::delayed)
     {
         using namespace std::placeholders;
+
+        dbConnectionOptions().maxConnectionCount = 100;
+        initializeDatabase();
+
+        ec2::dao::AbstractTransactionDataObject::setDataObjectType<TransactionDataObject>();
 
         m_outgoingTransactionDispatcher.setOnNewTransaction(
             std::bind(&TransactionLog::storeNewTransaction, this, _1, _2));
@@ -196,7 +224,7 @@ public:
     {
         using namespace std::placeholders;
 
-        constexpr int transactionToAddCount = 1000;
+        constexpr int transactionToAddCount = 100;
 
         QnWaitCondition cond;
         int transactionsToWait = 0;
@@ -212,7 +240,10 @@ public:
                 [this, &transactionsToWait, &cond](
                     nx::db::QueryContext*, nx::db::DBResult dbResult)
                 {
-                    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+                    if (dbResult != nx::db::DBResult::cancelled)
+                    {
+                        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+                    }
 
                     QnMutexLocker lk(&m_mutex);
                     --transactionsToWait;
@@ -238,6 +269,7 @@ private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     std::unique_ptr<ec2::TransactionLog> m_transactionLog;
     QnMutex m_mutex;
+    QnMutex m_queryMutex;
     std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_transactions;
 
     void initializeTransactionLog()
@@ -250,6 +282,8 @@ private:
 
     nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
     {
+        std::cout<<std::this_thread::get_id()<<std::endl;
+
         api::SystemSharingEx sharing;
         sharing.systemId = getSystem(0).id;
         const auto& accountToShareWith = 
@@ -257,9 +291,12 @@ private:
         sharing.accountId = accountToShareWith.id;
         sharing.accountEmail = accountToShareWith.email;
         sharing.accessRole = api::SystemAccessRole::advancedViewer;
-        NX_GTEST_ASSERT_EQ(
-            nx::db::DBResult::ok,
-            systemSharingController().insertOrReplaceSharing(queryContext, sharing));
+
+        // It does not matter for transaction log whether we save application data or not.
+        // TODO #ak But, it is still better to mockup data access object here.
+        //NX_GTEST_ASSERT_EQ(
+        //    nx::db::DBResult::ok,
+        //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
 
         ::ec2::ApiUserData userData;
         convert(sharing, &userData);
@@ -271,6 +308,9 @@ private:
                 sharing.systemId.c_str(),
                 std::move(userData));
         NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(nx::utils::random::number<int>(0, 1000)));
 
         return nx::db::DBResult::ok;
     }
