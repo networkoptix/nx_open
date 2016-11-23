@@ -46,7 +46,7 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
 {
     post(
         [this, timeout = std::move(timeout), socketAttributes = std::move(socketAttributes),
-            handler = std::move(handler)]()
+            handler = std::move(handler)]() mutable
         {
             launchInactivityTimer();
             m_tunnelConnection->establishNewConnection(

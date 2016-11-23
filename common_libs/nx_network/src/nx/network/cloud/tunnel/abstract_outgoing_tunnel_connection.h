@@ -29,7 +29,7 @@ public:
      * @param stillValid If false, connection cannot be used anymore 
      * (every subsequent AbstractOutgoingTunnelConnection::establishNewConnection call will fail)
      */
-    typedef std::function<void(
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
         bool stillValid)> OnNewConnectionHandler;
