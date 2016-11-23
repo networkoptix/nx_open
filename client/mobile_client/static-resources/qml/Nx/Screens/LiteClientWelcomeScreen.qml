@@ -6,6 +6,7 @@ import Nx.Controls 1.0
 PageBase
 {
     id: liteClientWelcomeScreen
+    objectName: "liteClientWelcomeScreen"
 
     WebView
     {
@@ -19,6 +20,7 @@ PageBase
         var baseUrl = Nx.url(getInitialUrl())
 
         var url = baseUrl.scheme() + "://" + baseUrl.address()
+            + "/static/index.html"
             + "?clientWebSocket=" + encodeURIComponent(getWebSocketUrl())
 
         webView.url = url
