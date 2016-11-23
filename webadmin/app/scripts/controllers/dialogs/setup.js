@@ -336,6 +336,7 @@ angular.module('webadminApp')
                 $log.error("Mediaserver error: \n" + error.statusText);
                 $scope.errorData = error.statusText;
             }
+            $log.error(JSON.stringify(error, null, 4));
         }
         /* Connect to cloud section */
 
