@@ -328,6 +328,17 @@
 </div>
 
 
+<div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
+    <p>
+        You need to configure network settings first
+    </p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
+    </p>
+</div>
+
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>Connect your server to the Internet</h2>

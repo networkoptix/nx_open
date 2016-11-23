@@ -51,10 +51,14 @@ angular.module('webadminApp')
                     canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0
                 };
 
+                // TODO: remove this hack
+                // data.flags.wrongNetwork = true;
+                // data.flags.canSetupNetwork = true;
 
-                //data.flags.wrongNetwork = true;// TODO: remove this hack
-
-                data.flags.newSystem = data.flags.cleanSystem && !data.flags.noHDD && !data.flags.noNetwork;
+                data.flags.newSystem = data.flags.cleanSystem &&
+                                        !data.flags.noHDD &&
+                                        !data.flags.noNetwork &&
+                                        !(data.flags.wrongNetwork && !data.flags.canSetupNetwork);
                 return r;
             });
         }

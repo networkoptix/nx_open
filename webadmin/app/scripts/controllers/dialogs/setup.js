@@ -135,7 +135,22 @@ angular.module('webadminApp')
                     $scope.port = window.location.port;
 
                     checkInternet(false);
+
                     if($scope.serverInfo.flags.newSystem) {
+
+                        if($scope.serverInfo.flags.canSetupNetwork) {
+                            mediaserver.networkSettings().then(function (r) {
+                                $scope.networkSettings = r.data.reply;
+                                if($scope.serverInfo.flags.wrongNetwork){
+                                    $log.log("Wrong network settings - go to setup step");
+                                    $scope.next('configureWrongNetwork');// go to start
+                                }
+                            });
+                        }
+                        if($scope.serverInfo.flags.wrongNetwork){
+                            $log.log("Wrong network settings - wait for network interfaces");
+                            return $q.reject();
+                        }
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                         return $q.reject();
@@ -577,6 +592,13 @@ angular.module('webadminApp')
                 advanced: {
                     back: 'systemName',
                     next: 'systemName'
+                },
+                configureWrongNetwork:{
+                    retry:function(){
+                        mediaserver.networkSettings($scope.networkSettings).then(function(){
+                            return mediaserver.execute('reboot');
+                        });
+                    }
                 },
                 noInternetOnServer: {
                     retry: function () {
