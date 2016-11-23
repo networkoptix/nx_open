@@ -57,7 +57,7 @@ struct ApiUserData: ApiResourceData
 {
     bool isAdmin;
     Qn::GlobalPermissions permissions;
-    QnUuid groupId;
+    QnUuid userRoleId;
     QString email;
     QnLatin1Array digest;
     QnLatin1Array hash;
@@ -79,8 +79,8 @@ struct ApiUserData: ApiResourceData
     (realm) \
     (isLdap) \
     (isEnabled) \
-    (groupId)  \
-    (isCloud)  \
+    (userRoleId) \
+    (isCloud) \
     (fullName)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

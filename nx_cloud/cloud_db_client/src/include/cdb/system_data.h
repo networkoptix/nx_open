@@ -112,14 +112,13 @@ enum class SystemAccessRole
     owner = 9,
 };
 
-// TODO: #mike: Ask #ebalashov about renaming groupId to userRoleId.
 class SystemSharing
 {
 public:
     std::string accountEmail;
     std::string systemId;
     SystemAccessRole accessRole;
-    std::string groupId;
+    std::string userRoleId;
     std::string customPermissions;
     bool isEnabled;
     //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
@@ -143,7 +142,7 @@ public:
         return accountEmail == rhs.accountEmail
             && systemId == rhs.systemId
             && accessRole == rhs.accessRole
-            && groupId == rhs.groupId
+            && userRoleId == rhs.userRoleId
             && customPermissions == rhs.customPermissions
             && isEnabled == rhs.isEnabled;
     }
