@@ -8,7 +8,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
