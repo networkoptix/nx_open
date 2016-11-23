@@ -329,9 +329,16 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
-    <p>
-        You need to configure network settings first
+    <p><b>You need to configure network settings first</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
     </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
+    <p><b>Configure network to set up Internet connection</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
@@ -348,6 +355,9 @@
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
         <button class="btn btn-default" ng-click="skip()">Setup local system</button>
+    </p>
+    <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
+        <a href="" ng-click="next('configureNetworkForInternet')">Configure network settings</a>
     </p>
 </div>
 

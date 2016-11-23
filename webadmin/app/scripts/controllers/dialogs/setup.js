@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient, $poll) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
         $scope.Config = Config;
 
@@ -565,6 +565,18 @@ angular.module('webadminApp')
             return form.$valid;
         }
 
+        function waitForReboot(){
+            $scope.next(0); // Go to loading
+            var poll = $poll(pingServer, 1000, 5000);
+
+            function pingServer(){
+                return mediaserver.getModuleInformation(true).then(function(){
+                    // success
+                    window.location.reload();
+                    $poll.cancel(poll);
+                });
+            }
+        }
 
         function required(val){
             return !!val && (!val.trim || val.trim() != '');
@@ -596,9 +608,17 @@ angular.module('webadminApp')
                 configureWrongNetwork:{
                     retry:function(){
                         mediaserver.networkSettings($scope.networkSettings).then(function(){
-                            return mediaserver.execute('reboot');
+                            return mediaserver.execute('reboot').then(waitForReboot);
                         });
                     }
+                },
+                configureNetworkForInternet:{
+                    retry:function(){
+                        mediaserver.networkSettings($scope.networkSettings).then(function(){
+                            return mediaserver.execute('reboot').then(waitForReboot);
+                        });
+                    },
+                    back: 'noInternetOnServer'
                 },
                 noInternetOnServer: {
                     retry: function () {
