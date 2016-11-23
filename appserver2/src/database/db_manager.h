@@ -73,6 +73,9 @@ namespace detail
         Q_OBJECT
 
         friend class ::ec2::QnDbManagerAccess;
+        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
+        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
+
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -577,7 +580,10 @@ namespace detail
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
         template <class ObjectType, class ObjectListType>
-        bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
+        bool fillTransactionLogInternal(
+            ApiCommand::Value command, 
+            std::function<bool (ObjectType& data)> updater = nullptr,
+            std::function<bool (ObjectType& data)> saveToTransactionLogPredicate = nullptr);
 
         template <class ObjectListType>
         bool queryObjects(ObjectListType& objects);

@@ -748,7 +748,10 @@ bool QnDbManager::queryObjects(ObjectListType& objects)
 }
 
 template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
+bool QnDbManager::fillTransactionLogInternal(
+    ApiCommand::Value command, 
+    std::function<bool (ObjectType& data)> updater,
+    std::function<bool (ObjectType& data)> saveToTransactionLogPredicate)
 {
     ObjectListType objects;
     if (!queryObjects<ObjectListType>(objects))
@@ -763,6 +766,9 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
             if (executeTransactionInternal(transaction) != ErrorCode::ok)
                 return false;
         }
+
+        if (saveToTransactionLogPredicate && !saveToTransactionLogPredicate(transaction.params))
+            continue;
 
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
@@ -801,8 +807,20 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
-    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
+    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(
+            ApiCommand::setResourceStatus,
+            nullptr,
+            [] (const ApiResourceStatusData& statusData)
+            {
+                auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ApiResourceStatusData>(ApiCommand::setResourceStatus);
+                if (transactionDescriptor)
+                    return transactionDescriptor->getTransactionTypeFunc(statusData) != ec2::TransactionType::Local;
+
+                return false;
+            }))
+    {
         return false;
+    }
 
     return true;
 }

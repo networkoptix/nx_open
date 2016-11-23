@@ -29,6 +29,7 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/webpage_manager.h"
+#include <database/db_manager.h>
 
 namespace ec2 {
 namespace access_helpers {
@@ -1014,13 +1015,24 @@ struct LocalTransactionType
     }
 };
 
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
+{
+    ApiMediaServerDataList serverDataList;
+    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, serverDataList);
+
+    if (errorCode != ErrorCode::ok)
+        return ec2::TransactionType::Unknown;
+
+    return serverDataList.empty() ? TransactionType::Regular : TransactionType::Local;
+}
+
 struct SetStatusTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
     {
         QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
         if (!resource)
-            return TransactionType::Unknown;
+            return getStatusTransactionTypeFromDb(params.id);
         if(resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
@@ -1051,13 +1063,24 @@ struct SetResourceParamTransactionType
     }
 };
 
+ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
+{
+    ApiUserDataList userDataList;
+    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, userDataList);
+
+    if (errorCode != ErrorCode::ok)
+        return ec2::TransactionType::Unknown;
+
+    return userDataList.empty() ? TransactionType::Regular : TransactionType::Local;
+}
+
 struct RemoveUserTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiIdData& params)
     {
         auto user = qnResPool->getResourceById<QnUserResource>(params.id);
         if (!user)
-            return TransactionType::Unknown;
+            return getRemoveUserTransactionTypeFromDb(params.id);
         return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
     }
 };
