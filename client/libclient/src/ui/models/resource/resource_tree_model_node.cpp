@@ -26,7 +26,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/resource_icon_cache.h>
-#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -72,9 +71,6 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     NX_ASSERT(model != NULL);
     m_editable.checked = false;
     m_icon = calculateIcon();
-
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        &QnResourceTreeModelNode::handlePermissionsChanged);
 }
 
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType):
@@ -83,15 +79,15 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     switch(nodeType)
     {
     case Qn::RootNode:
-        setName(lit("Root"));   /* This node is not visible directly. */
+        setNameInternal(lit("Root"));   /* This node is not visible directly. */
         break;
     case Qn::BastardNode:
-        setName(lit("Invalid Resources"));
+        setNameInternal(lit("Invalid Resources"));
         m_bastard = true; /* This node is always hidden. */
         m_state = Invalid;
         break;
     case Qn::LocalResourcesNode:
-        setName(tr("Local"));
+        setNameInternal(tr("Local"));
         break;
     case Qn::CurrentSystemNode:
         break;
@@ -104,26 +100,26 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_name = lit("-");
         break;
     case Qn::ServersNode:
-        setName(tr("Servers"));
+        setNameInternal(tr("Servers"));
         break;
     case Qn::OtherSystemsNode:
-        setName(tr("Other Systems"));
+        setNameInternal(tr("Other Systems"));
         break;
     case Qn::UsersNode:
-        setName(tr("Users"));
+        setNameInternal(tr("Users"));
         break;
     case Qn::MyCloudNode:
-        setName(QnAppInfo::cloudName());
+        setNameInternal(QnAppInfo::cloudName());
         m_state = Invalid;
         break;
     case Qn::WebPagesNode:
-        setName(tr("Web Pages"));
+        setNameInternal(tr("Web Pages"));
         break;
     case Qn::UserResourcesNode:
-        setName(tr("Cameras & Resources"));
+        setNameInternal(tr("Cameras & Resources"));
         break;
     case Qn::LayoutsNode:
-        setName(tr("Layouts"));
+        setNameInternal(tr("Layouts"));
         break;
     case Qn::RecorderNode:
         m_state = Invalid;
@@ -132,19 +128,19 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::AllCamerasAccessNode:
-        setName(tr("All Cameras & Resources"));
+        setNameInternal(tr("All Cameras & Resources"));
         m_state = Invalid;
         break;
     case Qn::AllLayoutsAccessNode:
-        setName(tr("All Shared Layouts"));
+        setNameInternal(tr("All Shared Layouts"));
         m_state = Invalid;
         break;
     case Qn::SharedResourcesNode:
-        setName(tr("Cameras & Resources"));
+        setNameInternal(tr("Cameras & Resources"));
         m_state = Invalid;
         break;
     case Qn::RoleUsersNode:
-        setName(tr("Users"));
+        setNameInternal(tr("Users"));
         m_state = Invalid;
         break;
     default:
@@ -167,20 +163,6 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         || nodeType == Qn::CloudSystemNode
     );
     setName(name);
-    if (m_displayName.isEmpty())
-    {
-        switch (nodeType)
-        {
-        case Qn::RecorderNode:
-            break;
-        case Qn::SystemNode:
-        case Qn::CloudSystemNode:
-            m_displayName = tr("<Unnamed system>");
-            break;
-        default:
-            break;
-        }
-    }
     m_state = Invalid;
 }
 
@@ -219,7 +201,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
         case Qn::RoleNode:
         {
             auto role = qnUserRolesManager->userRole(m_uuid);
-            setName(role.name);
+            setNameInternal(role.name);
             break;
         }
         default:
@@ -245,7 +227,10 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     );
 
     if (m_resource)
+    {
         m_resource->disconnect(this);
+        accessController()->disconnect(this);
+    }
 
     m_resource = resource;
 
@@ -263,6 +248,9 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
             connect(camera, &QnVirtualCameraResource::statusFlagsChanged, this,
                 &QnResourceTreeModelNode::update);
         }
+
+        connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+            &QnResourceTreeModelNode::handlePermissionsChanged);
     }
 
     update();
@@ -281,7 +269,7 @@ void QnResourceTreeModelNode::update()
         {
             if (!m_resource)
             {
-                setName(QString());
+                setNameInternal(QString());
                 m_flags = 0;
                 m_status = Qn::Online;
                 m_searchString = QString();
@@ -315,11 +303,11 @@ void QnResourceTreeModelNode::update()
                         m_status = Qn::Unauthorized;
                 }
 
-                setName(item.name);
+                setNameInternal(item.name);
             }
             else
             {
-                setName(QString());
+                setNameInternal(QString());
             }
             break;
         }
@@ -329,34 +317,34 @@ void QnResourceTreeModelNode::update()
             {
                 if (!videowall->matrices()->hasItem(m_uuid))
                     continue;
-                setName(videowall->matrices()->getItem(m_uuid).name);
+                setNameInternal(videowall->matrices()->getItem(m_uuid).name);
                 break;
             }
             break;
         }
         case Qn::CurrentSystemNode:
         {
-            setName(qnGlobalSettings->systemName());
+            setNameInternal(qnGlobalSettings->systemName());
             break;
         }
         case Qn::CurrentUserNode:
         {
             auto user = context()->user();
-            setName(user ? user->getName() : QString());
+            setNameInternal(user ? user->getName() : QString());
             break;
         }
         case Qn::RoleNode:
         {
             auto role = qnUserRolesManager->userRole(m_uuid);
-            setName(role.name);
+            setNameInternal(role.name);
             break;
         }
         case Qn::SharedLayoutsNode:
         {
             if (m_parent && m_parent->type() == Qn::RoleNode)
-                setName(tr("Shared Layouts"));
+                setNameInternal(tr("Shared Layouts"));
             else
-                setName(tr("Layouts"));
+                setNameInternal(tr("Layouts"));
             break;
         }
         default:
@@ -903,6 +891,33 @@ void QnResourceTreeModelNode::setModified(bool modified)
     changeInternal();
 }
 
+void QnResourceTreeModelNode::setName(const QString& name)
+{
+    if (m_name == name)
+        return;
+
+    setNameInternal(name);
+    if (m_displayName.isEmpty())
+    {
+        switch (m_type)
+        {
+            case Qn::SystemNode:
+            case Qn::CloudSystemNode:
+                m_displayName = tr("<Unnamed system>");
+                break;
+            default:
+                break;
+        }
+    }
+    changeInternal();
+}
+
+void QnResourceTreeModelNode::setIcon(const QIcon& icon)
+{
+    m_icon = icon;
+    changeInternal();
+}
+
 bool QnResourceTreeModelNode::isInitialized() const
 {
     return m_initialized;
@@ -934,10 +949,6 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
         case Qn::LocalResourcesNode:
             return qnResIconCache->icon(QnResourceIconCache::LocalResources);
-
-        case Qn::MyCloudNode:
-        case Qn::CloudSystemNode:
-            return qnSkin->icon("welcome_page/cloud_online.png");
 
         case Qn::CurrentSystemNode:
             return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
@@ -1091,7 +1102,7 @@ void QnResourceTreeModelNode::changeInternal()
     emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
 
-void QnResourceTreeModelNode::setName(const QString& name)
+void QnResourceTreeModelNode::setNameInternal(const QString& name)
 {
     m_displayName = m_name = name;
 }

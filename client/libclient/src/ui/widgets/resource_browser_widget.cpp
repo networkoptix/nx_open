@@ -842,6 +842,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
+            model->setFilterWildcard(L'*' + filter + L'*');
             if (filter.isEmpty())
             {
                 model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));

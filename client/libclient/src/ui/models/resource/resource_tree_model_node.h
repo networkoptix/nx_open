@@ -90,6 +90,11 @@ public:
     void setModified(bool modified) ;
 
 protected:
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+
+    void setName(const QString& name);
+    void setIcon(const QIcon& icon);
+
     bool isInitialized() const;
 
     QnResourceTreeModel* model() const;
@@ -101,12 +106,10 @@ protected:
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
-    void setName(const QString& name);
-
     void updateResourceStatus();
 private:
-    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 
+    void setNameInternal(const QString& name);
 
     bool isValid() const;
     State state() const;

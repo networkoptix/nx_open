@@ -5,15 +5,17 @@
 #include <finders/systems_finder.h>
 
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource/tree/resource_tree_model_cloud_system_node.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
-QnResourceTreeModeMyCloudNode::QnResourceTreeModeMyCloudNode(
-    QnResourceTreeModel* model)
-    :
+QnResourceTreeModeMyCloudNode::QnResourceTreeModeMyCloudNode(QnResourceTreeModel* model):
     base_type(model, Qn::MyCloudNode)
 {
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
         this, &QnResourceTreeModeMyCloudNode::handleSystemDiscovered);
+    connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
+        this, &QnResourceTreeModeMyCloudNode::handleSystemLost);
 
     rebuild();
 }
@@ -37,13 +39,36 @@ void QnResourceTreeModeMyCloudNode::deinitialize()
     base_type::deinitialize();
 }
 
+QIcon QnResourceTreeModeMyCloudNode::calculateIcon() const
+{
+    return qnSkin->icon("welcome_page/cloud_online.png");
+}
+
 void QnResourceTreeModeMyCloudNode::handleSystemDiscovered(const QnSystemDescriptionPtr& system)
 {
+    const QString id = system->id();
+
+    m_disconnectHelpers[id] << connect(system, &QnBaseSystemDescription::isCloudSystemChanged, this,
+        [this, id]
+        {
+            auto system = qnSystemsFinder->getSystem(id);
+            NX_ASSERT(system);
+
+            if (system->isCloudSystem())
+                ensureSystemNode(system);
+            else
+                removeNode(m_nodes.value(id));
+        });
+
     if (!system->isCloudSystem())
         return;
-
     auto node = ensureSystemNode(system);
-    //node->setName(system->name());
+}
+
+void QnResourceTreeModeMyCloudNode::handleSystemLost(const QString& id)
+{
+    m_disconnectHelpers.remove(id);
+    removeNode(m_nodes.value(id));
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModeMyCloudNode::ensureSystemNode(
@@ -52,10 +77,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModeMyCloudNode::ensureSystemNode(
     auto iter = m_nodes.find(system->id());
     if (iter == m_nodes.end())
     {
-        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(
-            model(),
-            Qn::CloudSystemNode,
-            system->name()));
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelCloudSystemNode(system, model()));
         node->initialize();
         node->setParent(toSharedPointer());
 
@@ -73,6 +95,9 @@ void QnResourceTreeModeMyCloudNode::rebuild()
 
 void QnResourceTreeModeMyCloudNode::removeNode(const QnResourceTreeModelNodePtr& node)
 {
+    if (!node)
+        return;
+
     /* Check if node was already removed. */
     auto key = m_nodes.key(node);
     if (key.isEmpty())
