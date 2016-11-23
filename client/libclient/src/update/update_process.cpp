@@ -356,11 +356,11 @@ void QnUpdateProcess::installClientUpdate()
         m_target.version, m_clientUpdateFile->fileName);
 
     auto futureWatcher = new QFutureWatcher<ResultType::Value>(this);
-    futureWatcher->setFuture(future);
     connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, this,
         &QnUpdateProcess::at_clientUpdateInstalled);
     connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, futureWatcher,
         &QObject::deleteLater);
+    futureWatcher->setFuture(future);
 }
 
 void QnUpdateProcess::setStage(QnFullUpdateStage stage) {
@@ -435,6 +435,7 @@ void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompa
 
 void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
     if (errorCode != 0) {
+        qWarning() << "at_restUpdateTask_finished" << errorCode;
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::RestInstallationFailed);
         return;
@@ -603,6 +604,7 @@ void QnUpdateProcess::at_uploadTask_finished(int errorCode, const QSet<QnUuid> &
 
 void QnUpdateProcess::at_installTask_finished(int errorCode) {
     if (errorCode != 0) {
+        qWarning() << "at_installTask_finished" << errorCode;
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::InstallationFailed);
         return;
