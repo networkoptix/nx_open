@@ -1,5 +1,7 @@
 #include "web_admin_controller.h"
 
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtGui/QDesktopServices>
 
 #include <mobile_client/mobile_client_settings.h>
@@ -28,8 +30,10 @@ void WebAdminController::openUrlInBrowser(const QString& urlString)
 
 QString WebAdminController::getCredentials() const
 {
-    return lit("{\"localLogin\": \"%1\", \"localPassword\": \"%2\"}")
-        .arg(m_credentials.user, m_credentials.password);
+    QJsonObject json;
+    json[lit("localLogin")] = m_credentials.user;
+    json[lit("localPassword")] = m_credentials.password;
+    return QString::fromUtf8(QJsonDocument(json).toJson(QJsonDocument::Compact));
 }
 
 void WebAdminController::updateCredentials(
