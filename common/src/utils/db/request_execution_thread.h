@@ -33,13 +33,6 @@ public:
     virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void start() override;
 
-    /**
-     * Establishes connection to DB.
-     * This method MUST be called after class instanciation
-     * @note Method is needed because we do not use exceptions
-     */
-    bool open();
-
 private:
     QSqlDatabase m_dbConnection;
     std::atomic<ConnectionState> m_state;
@@ -48,6 +41,12 @@ private:
     std::atomic<bool> m_terminated;
     int m_numberOfFailedRequestsInARow;
 
+    /**
+     * Establishes connection to DB.
+     * This method MUST be called after class instanciation
+     * @note Method is needed because we do not use exceptions
+     */
+    bool open();
     void queryExecutionThreadMain();
     bool tuneConnection();
     bool tuneMySqlConnection();
