@@ -50,7 +50,7 @@ public:
     virtual ~MediaServerEmulator();
 
     /** Attaches to a local port and */
-    bool start();
+    bool start(bool listenForConnectRequests = true);
     nx::String serverId() const;
     void setServerId(nx::String serverId);
     /** returns serverId.systemId */
@@ -78,6 +78,7 @@ public:
         boost::optional<nx::String> serverId);
 
     nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
 
 private:
     nx::network::aio::Timer m_timer;

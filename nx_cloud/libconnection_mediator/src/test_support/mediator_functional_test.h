@@ -27,6 +27,15 @@
 namespace nx {
 namespace hpm {
 
+namespace ServerTweak {
+enum Value
+{
+    defaultBehavior = 0,
+    noBindEndpoint = 1 << 0,
+    noListenToConnect = 1 << 1,
+};
+} // namespace ServerBehavior
+
 class MediatorFunctionalTest
 :
     public utils::test::ModuleLauncher<MediatorProcessPublic>
@@ -50,16 +59,16 @@ public:
 
     std::unique_ptr<MediaServerEmulator> addServer(
         const AbstractCloudDataProvider::System& system,
-        nx::String name, bool bindEndpoint = true);
+        nx::String name, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
     std::unique_ptr<MediaServerEmulator> addRandomServer(
         const AbstractCloudDataProvider::System& system,
         boost::optional<QnUuid> serverId = boost::none,
-        bool bindEndpoint = true);
+        ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count, bool bindEndpoint = true);
+        size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
     std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         getListeningPeers() const;

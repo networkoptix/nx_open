@@ -117,7 +117,7 @@ MediaServerEmulator::~MediaServerEmulator()
     m_httpServer.pleaseStop();
 }
 
-bool MediaServerEmulator::start()
+bool MediaServerEmulator::start(bool listenToConnectRequests)
 {
     if (!m_httpServer.bind(SocketAddress(HostAddress::localhost, 0)) ||
         !m_httpServer.listen())
@@ -125,11 +125,14 @@ bool MediaServerEmulator::start()
         return false;
     }
 
-    using namespace std::placeholders;
     m_serverClient = m_mediatorConnector->systemConnection();
     m_serverClient->bindToAioThread(m_timer.getAioThread());
-    m_serverClient->setOnConnectionRequestedHandler(
-        std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
+    if (listenToConnectRequests)
+    {
+        using namespace std::placeholders;
+        m_serverClient->setOnConnectionRequestedHandler(
+            std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
+    }
 
     auto client = m_mediatorConnector->systemConnection();
     client->bindToAioThread(m_timer.getAioThread());
@@ -223,6 +226,11 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
         [&promise](nx::hpm::api::ResultCode success) { promise.set_value(success); });
 
     return promise.get_future().get();
+}
+
+std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::mediatorConnection()
+{
+    return m_mediatorConnector->systemConnection();
 }
 
 void MediaServerEmulator::onConnectionRequested(

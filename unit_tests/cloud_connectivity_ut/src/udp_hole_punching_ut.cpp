@@ -65,14 +65,16 @@ private:
 
         //registering server in mediator
         m_system = mediator().addRandomSystem();
-        m_server = mediator().addRandomServer(m_system, boost::none, false);
-        ASSERT_NE(nullptr, m_server);
+        m_server = mediator().addRandomServer(
+            m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
+        ASSERT_NE(nullptr, m_server);
         SocketGlobals::mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 m_system.id,
                 m_server->serverId(),
                 m_system.authKey));
+
         SocketGlobals::mediatorConnector().mockupAddress(mediator().stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
