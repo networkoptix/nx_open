@@ -49,20 +49,16 @@ void QnResourceTreeModeMyCloudNode::handleSystemDiscovered(const QnSystemDescrip
     const QString id = system->id();
 
     m_disconnectHelpers[id] << connect(system, &QnBaseSystemDescription::isCloudSystemChanged, this,
-        [this, id]
+        [this, system, id]
         {
-            auto system = qnSystemsFinder->getSystem(id);
-            NX_ASSERT(system);
-
             if (system->isCloudSystem())
                 ensureSystemNode(system);
             else
                 removeNode(m_nodes.value(id));
         });
 
-    if (!system->isCloudSystem())
-        return;
-    auto node = ensureSystemNode(system);
+    if (system->isCloudSystem())
+        ensureSystemNode(system);
 }
 
 void QnResourceTreeModeMyCloudNode::handleSystemLost(const QString& id)

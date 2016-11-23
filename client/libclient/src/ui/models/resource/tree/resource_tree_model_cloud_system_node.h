@@ -17,6 +17,8 @@ public:
     virtual void initialize() override;
     virtual void deinitialize() override;
 
+    virtual QVariant data(int role, int column) const override;
+
 protected:
     virtual QIcon calculateIcon() const override;
 

@@ -81,7 +81,7 @@ public:
 
     Qt::ItemFlags flags(int column) const ;
 
-    QVariant data(int role, int column) const ;
+    virtual QVariant data(int role, int column) const;
 
     bool setData(const QVariant &value, int role, int column) ;
 

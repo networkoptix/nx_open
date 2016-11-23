@@ -204,6 +204,7 @@ namespace Qn
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
+        CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */

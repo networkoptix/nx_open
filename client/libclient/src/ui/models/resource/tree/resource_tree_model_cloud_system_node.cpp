@@ -42,6 +42,14 @@ void QnResourceTreeModelCloudSystemNode::deinitialize()
     base_type::deinitialize();
 }
 
+QVariant QnResourceTreeModelCloudSystemNode::data(int role, int column) const
+{
+    if (role == Qn::CloudSystemIdRole)
+        return m_system->id();
+
+    return base_type::data(role, column);
+}
+
 QIcon QnResourceTreeModelCloudSystemNode::calculateIcon() const
 {
     return m_system->isOnline()
