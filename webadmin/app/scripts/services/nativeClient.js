@@ -4,15 +4,32 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('nativeClient', function ($q, $log) {
+    .factory('nativeClient', function ($q, $log, $location) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
-        var wsUri =  "ws://localhost:50103";
+
+        function parseUrl(name){
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            if (results==null){
+                return null;
+            }
+            else{
+                return results[1] || 0;
+            }
+        }
+
+        var socketPort = $location.search().clientWebSocket || parseUrl('clientWebSocket');
+
+        var wsUri =  "ws://localhost:" + socketPort;
 
         return {
             init:function(){
                 if(nativeClientObject){
                     return $q.resolve({thick:true});
+                }
+
+                if(!socketPort){
+                    return $q.reject();
                 }
 
                 var deferred = $q.defer();
