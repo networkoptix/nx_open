@@ -92,7 +92,10 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           headers={'Content-Type': 'application/json'},
           data=json.dumps(settings))
         self.__checkResponseError(response, "api/setupLocalSystem")
+        # Check setupLocalSystem's settings
         if info.settings.get("systemSettings"):
+          response = self.client.httpRequest(
+            srv, "api/systemSettings")
           self.__checkSettings(response.data,
                                info.settings.get("systemSettings"))
         
@@ -212,9 +215,6 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
       headers={'Content-Type': 'application/json'},
       data=json.dumps(settings))
     self.__checkResponseError(response, "api/setupCloudSystem")
-    if srvInfo.settings.get("systemSettings"):
-      self.__checkSettings(response.data,
-                           srvInfo.settings.get("systemSettings"))
     srvInfo.user = CLOUD_USER_NAME
     srvInfo.password = CLOUD_USER_PWD
 
@@ -338,8 +338,17 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
     self.__waitCredentials(self.serverAddr1)
     self.__waitCredentials(self.serverAddr2)
 
-    # Disconnect Server2 from cloud
+    # Check setupCloud's settings on Server1
     self.client = Client(CLOUD_USER_NAME, CLOUD_USER_PWD)
+    srvInfo1 = self.servers[self.serverAddr1]
+    response = self.client.httpRequest(
+      self.serverAddr1, "api/systemSettings")
+    self.__checkSettings(
+      response.data,
+      srvInfo1.settings.get("systemSettings"))
+
+
+    # Disconnect Server2 from cloud
     newSrv2Pwd = 'new_password'
     response = self.client.httpRequest(
       self.serverAddr2,
