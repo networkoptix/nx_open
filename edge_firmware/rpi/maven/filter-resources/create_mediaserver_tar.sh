@@ -20,6 +20,7 @@ if [[ "${box}" == "bananapi" ]]; then
     TOOLCHAIN_ROOT=$environment/packages/bpi/gcc-${gcc.version}
 fi
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
+SYSROOT_PREFIX=$PACKAGES_ROOT/sysroot/usr/lib/arm-linux-gnueabihf
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -232,6 +233,25 @@ if [ -e "$BINS_DIR/plugins" ]; then
         $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins/${f}
       fi
     done
+fi
+
+#copying additional sysroot:
+if [[ "${box}" == "bpi" ]]; then
+    SYSROOT_LIBS_TO_COPY+=(
+        libopus \
+        libvpx \
+        libwebpdemux \
+        libwebp )
+    for var in "${SYSROOT_LIBS_TO_COPY[@]}"
+    do
+      echo "Adding lib" ${var}
+      cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
+      if [ ! -z "$STRIP" ]; then
+        $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$TARGET_LIB_DIR/${var} $DEBUG_DIR/$TARGET_LIB_DIR/${var}.debug
+        $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$TARGET_LIB_DIR/${var}.debug $BUILD_DIR/$TARGET_LIB_DIR/${var}
+        $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$TARGET_LIB_DIR/${var}
+      fi
+done
 fi
 
 #copying vox
