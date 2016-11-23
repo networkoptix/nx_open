@@ -54,7 +54,6 @@ ComboBox
             var lastIndex = thisComponent.currentIndex;
             thisComponent.currentIndex = -1;
             thisComponent.currentIndex = lastIndex;
-
         }
 
         onRowsRemoved:
@@ -316,7 +315,6 @@ ComboBox
         textInputItem.text = thisComponent.currentText;
         readOnlyTextItem.text = thisComponent.currentText;
     }
-
 }
 
 
