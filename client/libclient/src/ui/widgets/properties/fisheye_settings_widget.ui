@@ -42,17 +42,24 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QPushButton" name="autoCalibrationButton">
-       <property name="text">
-        <string>Auto Calibration</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
-    <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true"/>
+    <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true">
+     <widget class="QPushButton" name="autoCalibrationButton">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>240</y>
+        <width>85</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Auto Calibration</string>
+      </property>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QWidget" name="settingsWidget" native="true">
@@ -571,7 +578,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>fisheyeEnabledButton</tabstop>
-  <tabstop>autoCalibrationButton</tabstop>
   <tabstop>viewDownButton</tabstop>
   <tabstop>horizontalRadioButton</tabstop>
   <tabstop>viewUpButton</tabstop>

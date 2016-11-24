@@ -13,6 +13,8 @@
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <utils/common/event_processors.h>
+
 
 QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     base_type(parent),
@@ -32,8 +34,6 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png"), kPixmapSize));
     ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png"), kPixmapSize));
     ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png"), kPixmapSize));
-
-
 
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);
@@ -103,6 +103,24 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
         {
             ui->autoCalibrationButton->setEnabled(true);
         });
+
+    auto updateAutoCalibrationButtonGeometry = [this]
+        {
+            static const int kOffset = 8;
+
+            const auto size = ui->autoCalibrationButton->sizeHint();
+            auto parentSize = ui->calibrateWidget->geometry().size();
+            const int x = parentSize.width() - size.width() - kOffset;
+            const int y = parentSize.height() - size.height() - kOffset;
+            const QPoint pos(x, y);
+
+            ui->autoCalibrationButton->setGeometry(QRect(pos, size));
+        };
+
+    installEventHandler(ui->calibrateWidget, { QEvent::Resize, QEvent::Move }, this,
+        updateAutoCalibrationButtonGeometry);
+
+    updateAutoCalibrationButtonGeometry();
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget()
