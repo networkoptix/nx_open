@@ -7,7 +7,7 @@ namespace {
 
 QPen makeCosmeticPen(const QColor& color, int width)
 {
-    QPen result(color, width, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin);
+    QPen result(color, width);
     result.setCosmetic(true);
     return result;
 }
