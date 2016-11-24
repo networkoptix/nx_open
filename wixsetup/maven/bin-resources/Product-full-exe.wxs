@@ -19,11 +19,6 @@
         </BootstrapperApplicationRef>
 
         <Chain>
-<!--            <PackageGroupRef Id="VC12RedistPackageGroup"/>
-            <PackageGroupRef Id="VC14RedistPackageGroup"/> 
-
-            <RollbackBoundary /> -->
-
             <MsiPackage
                 Id="ClientPackage"
                 Name="$(var.ClientMsiName)"
