@@ -4,7 +4,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include BuildVars.wxi ?>
 
-    <Bundle Name="$(var.productName) Client" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.clientBundleUpgradeCode)" DisableModify="yes">
+    <Bundle Name="$(var.productName) Client" Manufacturer="$(var.companyName)" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.clientBundleUpgradeCode)" DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">

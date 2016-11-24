@@ -5,7 +5,7 @@
 
     <?include BuildVars.wxi ?>
 
-    <Bundle Name="$(var.productName) Server" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.serverBundleUpgradeCode)" DisableModify="yes">
+    <Bundle Name="$(var.productName) Server" Manufacturer="$(var.companyName)" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.serverBundleUpgradeCode)" DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
