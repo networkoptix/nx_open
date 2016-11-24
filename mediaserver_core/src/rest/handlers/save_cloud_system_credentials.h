@@ -3,23 +3,20 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef SAVE_CLOUD_SYSTEM_CREDENTIALS_H
-#define SAVE_CLOUD_SYSTEM_CREDENTIALS_H
+#pragma once
 
 #include "rest/server/json_rest_handler.h"
 
-
 struct CloudCredentialsData;
-class CloudConnectionManager;
+struct CloudManagerGroup;
 
-class QnSaveCloudSystemCredentialsHandler
-:
+class QnSaveCloudSystemCredentialsHandler:
     public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
-    QnSaveCloudSystemCredentialsHandler(const CloudConnectionManager& cloudConnectionManager);
+    QnSaveCloudSystemCredentialsHandler(CloudManagerGroup* cloudManagerGroup);
 
     virtual int executePost(
         const QString& path,
@@ -28,10 +25,24 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor*);
 
-    int execute(const CloudCredentialsData& data, QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
+    int execute(
+        const CloudCredentialsData& data,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
 
 private:
-    const CloudConnectionManager& m_cloudConnectionManager;
-};
+    CloudManagerGroup* m_cloudManagerGroup;
 
-#endif  //SAVE_CLOUD_SYSTEM_CREDENTIALS_H
+    bool authorize(
+        const QnRestConnectionProcessor* owner,
+        QnJsonRestResult* result,
+        nx_http::StatusCode::Value* const authorizationStatusCode);
+    bool validateInputData(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool checkInternetConnection(QnJsonRestResult* result);
+    bool saveCloudData(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool saveCloudCredentials(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool insertCloudOwner(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool fetchNecessaryDataFromCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool rollback();
+    void initializeCloudRelatedManagers();
+};

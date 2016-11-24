@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_MS_CDB_NONCE_FETCHER_H
-#define NX_MS_CDB_NONCE_FETCHER_H
+#pragma once
 
 #include <atomic>
 #include <chrono>
@@ -25,26 +24,24 @@
 
 #include "abstract_nonce_provider.h"
 
-
 class CloudConnectionManager;
 
-/*!
-    If server connected to cloud generates nonce suitable for authentication with cloud account credentials.
-    Otherwise, standard nonce generation/validation logic is used
-*/
-class CdbNonceFetcher
-:
+/**
+ * If server connected to cloud generates nonce suitable for authentication with cloud account credentials.
+ * Otherwise, standard nonce generation/validation logic is used.
+ */
+class CdbNonceFetcher:
     public AbstractNonceProvider,
     public QObject,
     public Qn::EnableSafeDirectConnection
 {
 public:
-    /*!
-        \param defaultGenerator Used if no connection to cloud
-    */
+    /**
+     * @param defaultGenerator Used if no connection to cloud.
+     */
     CdbNonceFetcher(
         CloudConnectionManager* const cloudConnectionManager,
-        std::shared_ptr<AbstractNonceProvider> defaultGenerator);
+        AbstractNonceProvider* defaultGenerator);
     ~CdbNonceFetcher();
 
     virtual QByteArray generateNonce() override;
@@ -61,16 +58,16 @@ private:
     struct NonceCtx
     {
         QByteArray nonce;
-        //!time we remove nonce from queue
+        /** Time we remove nonce from queue. */
         //TODO #ak #msvc2015 replace with std::chrono::time_point<std::chrono::steady_clock>
         qint64 validityTime;
-        //!time, we stop report this nonce to caller
+        /** Time, we stop report this nonce to caller. */
         qint64 expirationTime;
     };
 
     mutable QnMutex m_mutex;
     CloudConnectionManager* const m_cloudConnectionManager;
-    std::shared_ptr<AbstractNonceProvider> m_defaultGenerator;
+    AbstractNonceProvider* m_defaultGenerator;
     bool m_boundToCloud;
     //map<cdb_nonce, valid_time>
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
@@ -91,5 +88,3 @@ private:
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);
 };
-
-#endif  //NX_MS_CDB_NONCE_FETCHER_H

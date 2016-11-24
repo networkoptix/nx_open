@@ -78,6 +78,7 @@
 
 #include <motion/motion_helper.h>
 
+#include <network/auth/time_based_nonce_provider.h>
 #include <network/authenticate_helper.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
@@ -233,7 +234,7 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
-#include "cloud/cloud_connection_manager.h"
+#include "cloud/cloud_manager_group.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
@@ -1603,7 +1604,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudConnectionManager* const cloud)
+    CloudManagerGroup* cloudManagerGroup)
 {
     auto reg =
         [](const QString& path, QnRestRequestHandler* handler,
@@ -1656,10 +1657,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin);
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(), kAdmin);
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloud), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
     reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), kAdmin);
-    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(*cloud), kAdmin);
+    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudManagerGroup), kAdmin);
     reg("api/mergeSystems", new QnMergeSystemsRestHandler(), kAdmin);
     reg("api/backupDatabase", new QnBackupDbRestHandler());
     reg("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
@@ -1681,7 +1682,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(*cloud));
+    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 
     reg("favicon.ico", new QnFavIconRestHandler());
     reg("api/dev-mode-key", new QnCrashServerHandler());
@@ -1694,7 +1695,7 @@ void MediaServerProcess::registerRestHandlers(
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudConnectionManager* const cloudConnectionManager)
+    CloudManagerGroup* const cloudManagerGroup)
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
@@ -1704,7 +1705,7 @@ bool MediaServerProcess::initTcpListener(
         m_autoRequestForwarder.get(),
         std::placeholders::_1 ) );
 
-    registerRestHandlers(cloudConnectionManager);
+    registerRestHandlers(cloudManagerGroup);
 
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 #ifdef ENABLE_ACTI
@@ -1713,7 +1714,7 @@ bool MediaServerProcess::initTcpListener(
 #endif
 
     m_universalTcpListener = new QnUniversalTcpListener(
-        *cloudConnectionManager,
+        cloudManagerGroup->connectionManager,
         QHostAddress::Any,
         rtspPort,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
@@ -2029,23 +2030,24 @@ void MediaServerProcess::run()
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
-    CloudConnectionManager cloudConnectionManager;
-    auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
+    TimeBasedNonceProvider timeBasedNonceProvider;
+    CloudManagerGroup cloudManagerGroup(&timeBasedNonceProvider);
+    auto authHelper = std::make_unique<QnAuthHelper>(&timeBasedNonceProvider, &cloudManagerGroup);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
     QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), AuthMethod::noAuth );
 
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/ping"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/camera_event*"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/showLog*"), AuthMethod::urlQueryParam);   //allowed by default for now
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/moduleInformation"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/gettime"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/static/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
@@ -2289,7 +2291,7 @@ void MediaServerProcess::run()
         new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudConnectionManager))
+    if (!initTcpListener(&cloudManagerGroup))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2347,7 +2349,7 @@ void MediaServerProcess::run()
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
-        cloudConnectionManager.setProxyVia(
+        cloudManagerGroup.connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
@@ -2528,7 +2530,7 @@ void MediaServerProcess::run()
 
     qnGlobalSettings->initialize();
 
-    setUpSystemIdentity(cloudConnectionManager);
+    setUpSystemIdentity(cloudManagerGroup.connectionManager);
 
     BeforeRestoreDbData::clearSettings(settings);
 
@@ -2547,24 +2549,24 @@ void MediaServerProcess::run()
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
                     "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
 
-            resetSystemState(cloudConnectionManager);
+            resetSystemState(cloudManagerGroup.connectionManager);
         }
         if (isCloudInstanceChanged)
         {
             ec2::ErrorCode errCode;
             do
             {
-            const bool kCleanupDbObjects = false;
-            const bool kCleanupTransactionLog = true;
+                const bool kCleanupDbObjects = false;
+                const bool kCleanupTransactionLog = true;
 
-            errCode = QnAppServerConnectionFactory::getConnection2()
-                ->getMiscManager(Qn::kSystemAccess)
-                ->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
+                errCode = QnAppServerConnectionFactory::getConnection2()
+                    ->getMiscManager(Qn::kSystemAccess)
+                    ->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
 
                 if (errCode != ec2::ErrorCode::ok)
                 {
-                qWarning() << "Error while rebuild transaction log. Trying again...";
-                    msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+                    qWarning() << "Error while rebuild transaction log. Trying again...";
+                        msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
                 }
 
             } while (errCode != ec2::ErrorCode::ok && !m_needStop);
