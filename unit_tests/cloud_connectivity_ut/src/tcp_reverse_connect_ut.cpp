@@ -20,7 +20,6 @@ class TcpReverseConnectTest
 protected:
     void SetUp() override
     {
-        CrossNatConnector::setDefaultTunnelInactivityTimeout(kTunnelInactivityTimeout);
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
 
@@ -31,12 +30,6 @@ protected:
         ASSERT_NE(nullptr, m_server);
         SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
-    }
-
-    void TearDown() override
-    {
-        CrossNatConnector::setDefaultTunnelInactivityTimeout(
-            hpm::api::kDefaultTunnelInactivityTimeout);
     }
 
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(
@@ -116,10 +109,15 @@ TEST_F(TcpReverseConnectTest, SimpleMultiserver)
         m_system, boost::none, hpm::ServerTweak::noListenToConnect);
     std::unique_ptr<AbstractStreamServerSocket> serverSocket2 = cloudServerSocket(server2);
 
-    // Remove 1st server and perform test again.
-    NX_LOGX(lm(">>>>>>>>> KILL SERVER"), cl_logINFO);
+    // Suppose 1st server went offline.
     m_server.reset();
-    std::this_thread::sleep_for(kTunnelInactivityTimeout * 2);
+
+    // Cause old tunnel to expire to close by unsuccessful connect attempt.
+    CloudStreamSocket socket(AF_INET);
+    ASSERT_FALSE(socket.connect(m_system.id, 100));
+    ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+
+    // Ensure new tunnel to open and function normaly.
     simpleTest(std::move(serverSocket2), m_system.id);
 }
 
