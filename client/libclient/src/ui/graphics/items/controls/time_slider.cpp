@@ -2001,8 +2001,10 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
 
     if (m_thumbnailsUpdateTimer->isActive())
     {
-        updateThumbnailsStepSizeLater(); /* Re-start the timer. */
-        return;
+        if (instant || forced)
+            m_thumbnailsUpdateTimer->stop();
+        else
+            return;
     }
 
     /* Calculate new bounding size. */
@@ -2032,8 +2034,8 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
     qint64 timeStep = m_msecsPerPixel * size.width();
     bool timeStepChanged = qAbs(timeStep / m_msecsPerPixel - thumbnailsLoader()->timeStep() / m_msecsPerPixel) >= 1;
 
-    /* Nothing changed? Leave. */
-    if (!timeStepChanged && !boundingSizeChanged && !m_thumbnailData.isEmpty())
+    /* Nothing changed? Leave. */ //TODO #vkutin Check if removing "!m_thumbnailData.isEmpty()" is fine:
+    if (!timeStepChanged && !boundingSizeChanged && !forced) // && !m_thumbnailData.isEmpty())
         return;
 
     /* Ok, thumbnails have to be re-generated. So we first freeze our old thumbnails. */
@@ -2851,8 +2853,9 @@ void QnTimeSlider::sliderChange(SliderChange change)
             bool wasAtMinimum = windowStart == m_oldMinimum;
             bool wasAtMaximum = windowEnd == m_oldMaximum;
 
-            /* If a window is full range it should always be preserved: */
-            if (wasAtMinimum && wasAtMaximum)
+            //TODO: #vkutin Enable this when thumbnail updates fully support it
+            bool keepFullRange = false; // wasAtMinimum && wasAtMaximum;
+            if (keepFullRange)
             {
                 windowStart = minimum();
                 windowEnd = maximum();

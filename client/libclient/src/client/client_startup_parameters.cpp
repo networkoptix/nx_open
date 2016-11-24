@@ -5,6 +5,7 @@
 #include <utils/common/command_line_parser.h>
 
 #include <nx/vms/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -104,6 +105,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     {
         /* Restore protocol part that was cut out. */
         QString fixedUri = lit("%1://%2").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).arg(strCustomUri);
+        NX_LOG(lit("Run with custom URI %1").arg(fixedUri), cl_logDEBUG1);
         result.customUri = nx::vms::utils::SystemUri(fixedUri);
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
