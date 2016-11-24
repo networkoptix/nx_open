@@ -1,6 +1,7 @@
-
 #include <QFile>
 #include <QtCore/QProcess>
+
+#include <nx/fusion/model_functions.h>
 
 #include "settime_rest_handler.h"
 #include <api/app_server_connection.h>
@@ -10,6 +11,27 @@
 #include "core/resource/media_server_resource.h"
 
 #include <utils/common/app_info.h>
+
+struct SetTimeData
+{
+    SetTimeData() {}
+
+    SetTimeData(const QnRequestParams& params):
+        datetime(params.value("datetime")),
+        timezone(params.value("timezone"))
+    {
+    }
+
+    QString datetime;
+    QString timezone;
+};
+
+#define SetTimeData_Fields (datetime)(timezone)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+(SetTimeData),
+(json),
+_Fields)
 
 #ifdef Q_OS_LINUX
 #include <sys/time.h>
@@ -55,16 +77,36 @@ bool setDateTime(qint64 value)
 }
 #endif
 
-int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnSetTimeRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-    QString timezone = params.value("timezone");
-    QString dateTimeStr = params.value("datetime");
+    return execute(SetTimeData(params), owner, result);
+}
+
+int QnSetTimeRestHandler::executePost(
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
+{
+    SetTimeData data = QJson::deserialized<SetTimeData>(body);
+    return execute(data, owner, result);
+}
+
+int QnSetTimeRestHandler::execute(
+    const SetTimeData& data,
+    const QnRestConnectionProcessor* /*owner*/,
+    QnJsonRestResult& result)
+{
     qint64 dateTime = -1;
-    if (dateTimeStr.toLongLong() > 0)
-        dateTime = dateTimeStr.toLongLong();
+    if (data.datetime.toLongLong() > 0)
+        dateTime = data.datetime.toLongLong();
     else
-        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
+        dateTime = QDateTime::fromString(data.datetime, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
 
 
     if (dateTime < 1) {
@@ -83,8 +125,8 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
     }
 
 #ifdef Q_OS_LINUX
-    if (!timezone.isEmpty()) {
-        if (!setTimeZone(timezone)) {
+    if (!data.timezone.isEmpty()) {
+        if (!setTimeZone(data.timezone)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid timezone specified"));
             return CODE_OK;
         }
