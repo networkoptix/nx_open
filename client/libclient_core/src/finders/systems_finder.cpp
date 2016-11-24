@@ -6,6 +6,7 @@
 #include <finders/direct_systems_finder.h>
 #include <finders/cloud_systems_finder.h>
 #include <finders/recent_local_systems_finder.h>
+#include <client_core/client_core_settings.h>
 
 QnSystemsFinder::QnSystemsFinder(QObject *parent)
     : base_type(parent)
@@ -53,7 +54,7 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder,
     const auto discovered = connect(finder, &QnAbstractSystemsFinder::systemDiscovered, this,
         [this, priority](const QnSystemDescriptionPtr& system)
         {
-            onSystemDiscovered(system, priority);
+            onBaseSystemDiscovered(system, priority);
         });
 
     const auto lostConnection = connect(finder, &QnAbstractSystemsFinder::systemLost, this,
@@ -67,10 +68,10 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder,
 
     m_finders.insert(finder, connectionHolder);
     for (const auto& system: finder->systems())
-        onSystemDiscovered(system, priority);
+        onBaseSystemDiscovered(system, priority);
 }
 
-void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& system,
+void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system,
     int priority)
 {
     const auto it = m_systems.find(system->id());
@@ -83,7 +84,32 @@ void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& system,
 
     const AggregatorPtr target(new QnSystemDescriptionAggregator(priority, system));
     m_systems.insert(target->id(), target);
+    connect(target, &QnBaseSystemDescription::systemNameChanged, this,
+        [this, target]() { updateRecentConnections(target->localId(), target->name()); });
+
+    updateRecentConnections(target->localId(), target->name());
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
+}
+
+void QnSystemsFinder::updateRecentConnections(const QnUuid& localSystemId, const QString& name)
+{
+    // Updates name
+    auto connections = qnClientCoreSettings->recentLocalConnections();
+    bool changed = false;
+    for (auto& recent: connections)
+    {
+        if ((recent.localId != localSystemId) || (recent.systemName == name))
+            continue;
+
+        changed = true;
+        recent.systemName = name;
+    }
+
+    if (changed)
+    {
+        qnClientCoreSettings->setRecentLocalConnections(connections);
+        qnClientCoreSettings->save();
+    }
 }
 
 void QnSystemsFinder::onSystemLost(const QString& systemId,

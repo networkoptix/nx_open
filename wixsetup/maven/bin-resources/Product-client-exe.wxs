@@ -4,7 +4,13 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include BuildVars.wxi ?>
 
-    <Bundle Name="$(var.productName) Client" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.clientBundleUpgradeCode)" DisableModify="yes">
+    <Bundle
+            Name="$(var.productName) Client"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="Binary\eve\eve_logo.ico"
+            UpgradeCode="$(var.clientBundleUpgradeCode)"
+            DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
@@ -18,11 +24,6 @@
         </BootstrapperApplicationRef>
 
         <Chain>
-<!--            <PackageGroupRef Id="VC12RedistPackageGroup"/>
-            <PackageGroupRef Id="VC14RedistPackageGroup"/> 
-
-            <RollbackBoundary /> -->
-
             <PackageGroupRef Id="ClientPackageGroup"/>
         </Chain>
     </Bundle>

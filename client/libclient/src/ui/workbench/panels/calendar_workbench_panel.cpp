@@ -8,6 +8,7 @@
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -271,7 +272,7 @@ void CalendarWorkbenchPanel::setVisible(bool visible, bool animate)
 
 qreal CalendarWorkbenchPanel::opacity() const
 {
-    return opacityAnimator(item)->targetValue().toDouble();
+    return opacityAnimator(m_pinButton)->targetValue().toDouble();
 }
 
 void CalendarWorkbenchPanel::setOpacity(qreal opacity, bool animate)
@@ -281,14 +282,14 @@ void CalendarWorkbenchPanel::setOpacity(qreal opacity, bool animate)
     if (animate)
     {
         m_opacityAnimatorGroup->pause();
-        opacityAnimator(item)->setTargetValue(opacity);
+        opacityAnimator(item)->setTargetValue(opacity * masterOpacity());
         opacityAnimator(m_pinButton)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
     }
     else
     {
         m_opacityAnimatorGroup->stop();
-        item->setOpacity(opacity);
+        item->setOpacity(opacity * masterOpacity());
         m_pinButton->setOpacity(opacity);
     }
 }
@@ -308,6 +309,15 @@ QRectF CalendarWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void CalendarWorkbenchPanel::stopAnimations()
+{
+    if (!m_yAnimator->isRunning())
+        return;
+
+    m_yAnimator->stop();
+    item->setY(m_yAnimator->targetValue().toDouble());
+}
+
 void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
 {
     if (m_dayTimeOpened == opened)
@@ -318,12 +328,12 @@ void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
     qreal opacity = opened ? kOpaque : kHidden;
     if (animate)
     {
-        opacityAnimator(m_dayTimeItem)->animateTo(opacity);
+        opacityAnimator(m_dayTimeItem)->animateTo(opacity * masterOpacity());
         opacityAnimator(m_dayTimeMinimizeButton)->animateTo(opacity);
     }
     else
     {
-        m_dayTimeItem->setOpacity(opacity);
+        m_dayTimeItem->setOpacity(opacity * masterOpacity());
         m_dayTimeMinimizeButton->setOpacity(opacity);
     }
 

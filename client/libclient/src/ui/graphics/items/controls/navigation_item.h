@@ -55,6 +55,7 @@ private slots:
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
     QnImageButtonWidget* newActionButton(QnActions::IDType id);

@@ -461,7 +461,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
         QString cloudHost;
-        bool isClient;
+        bool isClient = false;
 
         if (!verifyUpdatePackage(fileName, &version, &sysInfo, &cloudHost, &isClient))
             continue;

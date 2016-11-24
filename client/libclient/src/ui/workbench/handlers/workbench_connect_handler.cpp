@@ -29,6 +29,9 @@
 
 #include <client_core/client_core_settings.h>
 #include <client/desktop_client_message_processor.h>
+
+#include <finders/systems_finder.h>
+
 #include <nx/network/socket_global.h>
 
 #include <helpers/system_weight_helper.h>
@@ -337,6 +340,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
     connect(action(QnActions::ConnectAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_connectAction_triggered);
+    connect(action(QnActions::ConnectToCloudSystemAction), &QAction::triggered, this,
+        &QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered);
     connect(action(QnActions::ReconnectAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
     connect(action(QnActions::DisconnectAction), &QAction::triggered, this,
@@ -499,8 +504,7 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
     switch (status)
     {
         case Qn::UnauthorizedConnectionResult:
-            /* Looks like server team has not fixed VMS-3794 */
-            NX_ASSERT(false);
+            /* Server database was cleaned up during restart, e.g. merge to other system. */
             m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
             break;
         case Qn::IncompatibleInternalConnectionResult:
@@ -644,6 +648,9 @@ void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
 void QnWorkbenchConnectHandler::showPreloader()
 {
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+
+    resourceModeAction->setChecked(false); //< Shows welcome screen
     welcomeScreen->handleConnectingToSystem();
     welcomeScreen->setGlobalPreloaderVisible(true);
 }
@@ -843,6 +850,36 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             testConnectionToServer(url, connectionSettings, true);
         }
     }
+}
+
+void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
+{
+    if (!qnCloudStatusWatcher->isCloudEnabled()
+        || qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+    {
+        return;
+    }
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
+
+    auto system = qnSystemsFinder->getSystem(id);
+    if (!system || !system->isOnline())
+        return;
+
+    const auto servers = system->servers();
+    auto onlineServer = std::find_if(servers.cbegin(), servers.cend(),
+        [system](const QnModuleInformation& server) { return system->isOnlineServer(server.id);});
+
+    if (onlineServer == servers.cend())
+        return;
+
+    QUrl url = system->getServerHost(onlineServer->id);
+    auto credentials = qnCloudStatusWatcher->credentials();
+    url.setUserName(credentials.user);
+    url.setPassword(credentials.password);
+
+    menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
 }
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered()

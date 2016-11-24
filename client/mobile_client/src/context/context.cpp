@@ -18,6 +18,7 @@
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/nx_globals_object.h>
+#include <nx/utils/url_builder.h>
 
 using namespace nx::vms::utils;
 
@@ -121,6 +122,25 @@ bool QnContext::liteMode() const
     return qnSettings->isLiteClientModeEnabled();
 }
 
+bool QnContext::autoLoginEnabled() const
+{
+    return qnSettings->isAutoLoginEnabled();
+}
+
+void QnContext::setAutoLoginEnabled(bool enabled)
+{
+    auto mode = AutoLoginMode::Auto;
+    if (liteMode())
+        mode = enabled ? AutoLoginMode::Enabled : AutoLoginMode::Disabled;
+
+    const auto intMode = (int) mode;
+    if (intMode == qnSettings->autoLoginMode())
+        return;
+
+    qnSettings->setAutoLoginMode(intMode);
+    emit autoLoginEnabledChanged();
+}
+
 bool QnContext::testMode() const
 {
     return qnSettings->testMode();
@@ -164,6 +184,18 @@ QUrl QnContext::getLastUsedUrl() const
 QUrl QnContext::getInitialUrl() const
 {
     return qnSettings->startupParameters().url;
+}
+
+QUrl QnContext::getWebSocketUrl() const
+{
+    const auto port = qnSettings->webSocketPort();
+    if (port == 0)
+        return QUrl();
+
+    return nx::utils::UrlBuilder()
+        .setScheme(lit("ws"))
+        .setHost(lit("localhost"))
+        .setPort(port);
 }
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)

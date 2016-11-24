@@ -250,6 +250,15 @@ QRectF ResourceTreeWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void ResourceTreeWorkbenchPanel::stopAnimations()
+{
+    if (!xAnimator->isRunning())
+        return;
+
+    xAnimator->stop();
+    item->setX(xAnimator->targetValue().toDouble());
+}
+
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 {
     if (m_updateResizerGeometryLater)

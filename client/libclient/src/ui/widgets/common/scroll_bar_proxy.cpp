@@ -3,19 +3,19 @@
 #include <QtCore/QEvent>
 #include <QtWidgets/QAbstractScrollArea>
 
-QnScrollBarProxy::QnScrollBarProxy(QWidget *parent)
-    : QScrollBar(parent)
-    , m_scrollBar(nullptr)
-    , m_visible(true)
+QnScrollBarProxy::QnScrollBarProxy(QWidget* parent):
+    QScrollBar(parent),
+    m_scrollBar(nullptr),
+    m_visible(true)
 {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setMinimumSize(1, 1);
 }
 
-QnScrollBarProxy::QnScrollBarProxy(QScrollBar *scrollBar, QWidget *parent)
-    : QScrollBar(parent)
-    , m_scrollBar(nullptr)
-    , m_visible(true)
+QnScrollBarProxy::QnScrollBarProxy(QScrollBar* scrollBar, QWidget* parent):
+    QScrollBar(parent),
+    m_scrollBar(nullptr),
+    m_visible(true)
 {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setScrollBar(scrollBar);
@@ -25,28 +25,26 @@ QnScrollBarProxy::~QnScrollBarProxy()
 {
 }
 
-void QnScrollBarProxy::setScrollBar(QScrollBar *scrollBar)
+void QnScrollBarProxy::setScrollBar(QScrollBar* scrollBar)
 {
     if (m_scrollBar == scrollBar)
         return;
 
     if (m_scrollBar)
-    {
-        disconnect(m_scrollBar, nullptr, this, nullptr);
-        disconnect(this, nullptr, m_scrollBar, nullptr);
-    }
+        m_scrollBar->disconnect(this);
 
     m_scrollBar = scrollBar;
 
     if (m_scrollBar)
     {
         m_scrollBar->setRange(minimum(), maximum());
+        m_scrollBar->setPageStep(pageStep());
+        m_scrollBar->setSingleStep(singleStep());
         m_scrollBar->setValue(value());
         m_scrollBar->setVisible(m_visible);
+
         setOrientation(m_scrollBar->orientation());
 
-        connect(this, &QnScrollBarProxy::rangeChanged, m_scrollBar, &QScrollBar::setRange);
-        connect(this, &QnScrollBarProxy::valueChanged, m_scrollBar, &QScrollBar::setValue);
         connect(m_scrollBar, &QnScrollBarProxy::valueChanged, this, &QScrollBar::setValue);
     }
 }
@@ -56,41 +54,45 @@ QSize QnScrollBarProxy::sizeHint() const
     return QSize(qMax(minimumWidth(), 1), qMax(minimumHeight(), 1));
 }
 
-bool QnScrollBarProxy::event(QEvent *event)
+bool QnScrollBarProxy::event(QEvent* event)
 {
     switch (event->type())
     {
-    case QEvent::Hide:
-        setScrollBarVisible(false);
-        break;
-    case QEvent::Show:
-        setScrollBarVisible(true);
-        break;
-    case QEvent::Paint:
-        break;
-    case QEvent::ParentAboutToChange:
-        if (parentWidget())
-            parentWidget()->removeEventFilter(this);
-        break;
-    case QEvent::ParentChange:
-        if (parentWidget())
-        {
+        case QEvent::Hide:
+            setScrollBarVisible(false);
+            break;
+
+        case QEvent::Show:
+            setScrollBarVisible(true);
+            break;
+
+        case QEvent::Paint:
+            break;
+
+        case QEvent::ParentAboutToChange:
+            if (parentWidget())
+                parentWidget()->removeEventFilter(this);
+            break;
+
+        case QEvent::ParentChange:
+            if (!parentWidget())
+                break;
             parentWidget()->installEventFilter(this);
             setScrollBarVisible(isVisible() && parentWidget()->isVisible());
-        }
-        break;
-    default:
-        break;
+            break;
+
+        default:
+            break;
     }
 
     return base_type::event(event);
 }
 
-void QnScrollBarProxy::makeProxy(QScrollBar *scrollBar, QAbstractScrollArea *scrollArea)
+void QnScrollBarProxy::makeProxy(QScrollBar* scrollBar, QAbstractScrollArea* scrollArea)
 {
     NX_ASSERT(scrollBar);
 
-    QnScrollBarProxy *proxy = new QnScrollBarProxy(scrollBar, scrollArea);
+    QnScrollBarProxy* proxy = new QnScrollBarProxy(scrollBar, scrollArea);
 
     if (scrollBar->orientation() == Qt::Vertical)
         scrollArea->setVerticalScrollBar(proxy);
@@ -98,8 +100,34 @@ void QnScrollBarProxy::makeProxy(QScrollBar *scrollBar, QAbstractScrollArea *scr
         scrollArea->setHorizontalScrollBar(proxy);
 }
 
-void QnScrollBarProxy::paintEvent(QPaintEvent *)
+void QnScrollBarProxy::paintEvent(QPaintEvent*)
 {
+}
+
+void QnScrollBarProxy::sliderChange(SliderChange change)
+{
+    base_type::sliderChange(change);
+    if (!m_scrollBar)
+        return;
+
+    switch (change)
+    {
+        case SliderStepsChange:
+            m_scrollBar->setPageStep(pageStep());
+            m_scrollBar->setSingleStep(singleStep());
+            break;
+
+        case SliderValueChange:
+            m_scrollBar->setValue(value());
+            break;
+
+        case SliderRangeChange:
+            m_scrollBar->setRange(minimum(), maximum());
+            break;
+
+        default:
+            break;
+    }
 }
 
 void QnScrollBarProxy::setScrollBarVisible(bool visible)

@@ -218,7 +218,10 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
     if (idx < 0)
         return; // item on another widget
 
-    NX_ASSERT(oldItem == m_items[idx]);
+    /* Item is already updated from another call. */
+    if (m_items[idx] == oldItem)
+        return;
+
     if (oldItem.screenSnaps.screens() != item.screenSnaps.screens())
     {
          // if there are more than one item on the widget, this one will be updated from outside

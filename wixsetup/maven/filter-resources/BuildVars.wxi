@@ -1,5 +1,6 @@
 <Include>
 
+    <?define companyName="${company.name}"?>
     <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
     <?define serverUpgradeCode = "${customization.upgradeCode}"?>

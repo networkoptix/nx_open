@@ -35,7 +35,7 @@ TEST_F(ListeningPeer, connection_override)
 
     const auto client = clientConnection();
     const auto system1 = addRandomSystem();
-    auto server1 = addRandomServer(system1, boost::none, true);
+    auto server1 = addRandomServer(system1, boost::none);
     ASSERT_NE(nullptr, server1);
     auto server2 = addServer(system1, server1->serverId());
     ASSERT_NE(nullptr, server2);
@@ -73,7 +73,7 @@ TEST_F(ListeningPeer, unknown_system_credentials)
 
     auto system2 = addRandomSystem();
     system2.authKey.clear();    //making credentials invalid
-    auto server2 = addRandomServer(system2, boost::none, false);
+    auto server2 = addRandomServer(system2, boost::none, hpm::ServerTweak::noBindEndpoint);
     ASSERT_NE(nullptr, server2);
     ASSERT_EQ(nx::hpm::api::ResultCode::notAuthorized, server2->bind());
     ASSERT_EQ(nx::hpm::api::ResultCode::notAuthorized, server2->listen());

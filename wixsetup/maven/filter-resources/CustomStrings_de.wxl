@@ -74,7 +74,8 @@
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>
     <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie ${nxtool.name} nachdem Setup beendet ist.</String>
-    <String Id="Product_ArchMismatch"                               Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">Dieses Paket ist ausschliesllich für 64-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Sie müssen mindestens eine Komponente auswählen</String>

@@ -65,9 +65,19 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     moveToThread(this);
 }
 
-void QnUpdateProcess::pleaseStop() {
+void QnUpdateProcess::pleaseStop()
+{
+    if (!isRunning())
+        return;
+
+    QEventLoop waiter;
+    connect(this, &QThread::finished, &waiter, &QEventLoop::quit);
+
     base_type::pleaseStop();
     quit();
+
+    waiter.exec();
+
     setAllPeersStage(QnPeerUpdateStage::Init);
     setStage(QnFullUpdateStage::Init);
 }
@@ -356,11 +366,11 @@ void QnUpdateProcess::installClientUpdate()
         m_target.version, m_clientUpdateFile->fileName);
 
     auto futureWatcher = new QFutureWatcher<ResultType::Value>(this);
-    futureWatcher->setFuture(future);
     connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, this,
         &QnUpdateProcess::at_clientUpdateInstalled);
     connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, futureWatcher,
         &QObject::deleteLater);
+    futureWatcher->setFuture(future);
 }
 
 void QnUpdateProcess::setStage(QnFullUpdateStage stage) {

@@ -168,6 +168,15 @@ bool TitleWorkbenchPanel::isHovered() const
     return m_opacityProcessor->isHovered();
 }
 
+void TitleWorkbenchPanel::stopAnimations()
+{
+    if (!m_yAnimator->isRunning())
+        return;
+
+    m_yAnimator->stop();
+    item->setY(m_yAnimator->targetValue().toDouble());
+}
+
 bool TitleWorkbenchPanel::isUsed() const
 {
     return m_used;

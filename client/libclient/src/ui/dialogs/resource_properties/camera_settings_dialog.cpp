@@ -26,7 +26,7 @@
 
 namespace {
 
-static const QSize kMinimumSize(900, 560);
+static const QSize kMinimumSize(900, -1); //< do not set minimum height
 static const QSize kOptimalSize(900, 880);
 
 /* Initial dialog height - 40px less than screen height. */

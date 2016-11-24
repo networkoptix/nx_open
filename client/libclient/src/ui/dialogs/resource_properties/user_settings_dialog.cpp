@@ -213,9 +213,12 @@ void QnUserSettingsDialog::updatePermissions()
         QString permissionsText = QnUserRolesManager::userRoleDescription(role);
         QnResourceAccessSubject subject(m_user);
 
-        permissionsText += kHtmlTableTemplate.arg(
-            kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, false)) +
-            kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, false)));
+        if (roleType == Qn::UserRole::CustomUserGroup || roleType == Qn::UserRole::CustomPermissions)
+        {
+            permissionsText += kHtmlTableTemplate.arg(
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, false)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, false)));
+        }
 
         m_profilePage->updatePermissionsLabel(permissionsText);
     }

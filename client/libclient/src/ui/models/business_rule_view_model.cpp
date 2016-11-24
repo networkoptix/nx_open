@@ -769,7 +769,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             auto resources = qnResPool->getResources(eventResources());
             if (!QnBusiness::isResourceRequired(m_eventType))
             {
-                return qnResIconCache->icon(QnResourceIconCache::Servers);
+                return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
             }
             else if (resources.size() == 1)
             {
@@ -828,7 +828,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             }
             else if (resources.isEmpty())
             {
-                return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+                return qnSkin->icon(lit("tree/buggy.png"));
             }
             else
             {

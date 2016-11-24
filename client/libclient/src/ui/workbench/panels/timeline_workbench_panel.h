@@ -53,6 +53,8 @@ public:
 
     virtual QRectF effectiveGeometry() const override;
 
+    virtual void stopAnimations() override;
+
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
