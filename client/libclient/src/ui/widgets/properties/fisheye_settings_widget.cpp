@@ -9,6 +9,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -104,23 +105,24 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
             ui->autoCalibrationButton->setEnabled(true);
         });
 
-    auto updateAutoCalibrationButtonGeometry = [this]
+    const QSize kSpacing = style::Metrics::kDefaultLayoutSpacing;
+    auto updateAutoCalibrationButtonGeometry = [this, kSpacing]
         {
-            static const int kOffset = 8;
-
             const auto size = ui->autoCalibrationButton->sizeHint();
             auto parentSize = ui->calibrateWidget->geometry().size();
-            const int x = parentSize.width() - size.width() - kOffset;
-            const int y = parentSize.height() - size.height() - kOffset;
-            const QPoint pos(x, y);
+            const int x = parentSize.width() - size.width() - kSpacing.width();
+            const int y = parentSize.height() - size.height() - kSpacing.height();
 
-            ui->autoCalibrationButton->setGeometry(QRect(pos, size));
+            ui->autoCalibrationButton->setGeometry(QRect(QPoint(x, y), size));
         };
 
-    installEventHandler(ui->calibrateWidget, { QEvent::Resize, QEvent::Move }, this,
+    installEventHandler(ui->calibrateWidget, QEvent::Resize, this,
         updateAutoCalibrationButtonGeometry);
 
     updateAutoCalibrationButtonGeometry();
+
+    ui->calibrateWidget->setMinimumHeight(ui->autoCalibrationButton->sizeHint().height()
+        + kSpacing.height() * 2);
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget()
