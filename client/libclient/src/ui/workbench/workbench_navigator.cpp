@@ -1350,7 +1350,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
     if (m_timeSlider->isSliderDown())
         return;
 
-    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
+    auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
 #ifdef Q_OS_MAC
@@ -1429,6 +1429,11 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
+
+            //TODO: #vkutin Change this later:
+            /* Temporary fix until we redesign "initializing recording" state: */
+            if (m_isRecording && m_syncedWidgets.contains(m_currentMediaWidget))
+                m_recordingStartUtcMs = startTimeMSec;
         }
     }
 
