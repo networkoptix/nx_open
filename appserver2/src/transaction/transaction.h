@@ -1236,7 +1236,7 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       LocalTransactionType()) /* regular transaction type */ \
+                       LocalTransactionType()) /* local transaction type */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        false, \
                        false, \
