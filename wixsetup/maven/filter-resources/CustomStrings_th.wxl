@@ -74,7 +74,8 @@
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">เริ่มดำเนินการ ${product.name} เมื่อออกจากการติดตั้ง</String>
     <String Id="Product_LaunchNxtool"                               Overridable="yes">เริ่มดำเนินการ ${nxtool.name} เมื่อออกจากการติดตั้ง</String>
-    <String Id="Product_ArchMismatch"                               Overridable="yes">แพคเกจนี้ถูกออกแบบมาสำหรับ ระบบปฏิบัติการ 32 บิต ออกจากการตั้งค่าในขณะนี้</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">แพคเกจนี้ถูกออกแบบมาสำหรับ ระบบปฏิบัติการ 32 บิต ออกจากการตั้งค่าในขณะนี้</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">แพคเกจนี้ถูกออกแบบมาสำหรับ ระบบปฏิบัติการ 64 บิต ออกจากการตั้งค่าในขณะนี้</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">ควรจะเลือกอย่างน้อยหนึ่งองค์ประกอบ</String>

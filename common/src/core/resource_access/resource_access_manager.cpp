@@ -127,8 +127,6 @@ bool QnResourceAccessManager::hasGlobalPermission(
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    NX_EXPECT(!isUpdating());
-
     if (!subject.isValid() || !resource)
         return Qn::NoPermissions;
 

@@ -27,12 +27,6 @@
 
         <?define CloudHostIsDifferent="(CLOUD_HOST <> "" AND CLOUD_HOST <> "$(var.cloudHost)")" ?>
 
-        <?if $(var.arch) = x86 ?>
-        <Condition Message="!(loc.Product_ArchMismatch)">
-            <![CDATA[ NOT VersionNT64 ]]>
-        </Condition>
-        <?endif?>
-
         <!-- Exit if upgrading and cloud hosts differ -->
         <Condition Message="!(loc.Product_CloudHostMismatch)">
             <![CDATA[ NOT ($(var.VmsUpgrading) AND IS_CONNECTED_TO_CLOUD = "yes" AND $(var.CloudHostIsDifferent)) ]]>
