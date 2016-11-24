@@ -29,7 +29,8 @@ IF_EXT = 'eth0'
 class TimeTestError(FuncTestError):
     pass
 
-time_servers = ('time.nist.gov', 'time.ien.it') # 'time-nw.nist.gov')
+#time_servers = ('time.nist.gov', 'time.ien.it') # 'time-nw.nist.gov')
+time_servers = ('instance1.rfc868server.com', )
 TIME_PORT = 37
 TIME_SERVER_TIMEOUT = 10
 SHIFT_1900_1970 = 2208988800
