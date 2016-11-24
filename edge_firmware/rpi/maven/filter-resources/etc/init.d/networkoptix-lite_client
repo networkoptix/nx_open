@@ -1,6 +1,6 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          ${deb.customization.company.name}-mediaserver
+# Provides:          ${deb.customization.company.name}-lite_client
 # Required-Start:    networking
 # Required-Stop:
 # Default-Start:     2 3 4 5
@@ -12,16 +12,14 @@
 
 RETVAL=0
 
-SERVICE_NAME=mediaserver
+SERVICE_NAME=lite_client
 CUSTOMIZATION=${deb.customization.company.name}
-PREFIX=/opt/$CUSTOMIZATION/mediaserver/
-BIN_NAME=mediaserver
+PREFIX=/opt/$CUSTOMIZATION/lite_client/
+BIN_NAME=mobile_client
 BIN_PATH=$PREFIX/bin/$BIN_NAME
-RUN_ARGS="-e --disable-crash-handler"
+PORT=$(cat /opt/networkoptix/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
 
 export LD_LIBRARY_PATH=$PREFIX/lib:/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
-export VMS_PLUGIN_DIR=$PREFIX/plugins
-export SASL_PATH=$/opt/$CUSTOMIZATION/lib/sasl2
 
 ulimit -n 8192
 ulimit -c unlimited
@@ -57,11 +55,8 @@ start() {
        return 0
     fi
 
-    process_core_dump
-    hdparm -I /dev/sd? | grep Model > /tmp/hddlist
-
     echo -n "Starting $BIN_NAME..... "
-    $BIN_PATH $RUN_ARGS 2>/dev/null 1>&2&
+    curl http://127.0.0.1:$PORT/api/startLiteClient
 
     if [ `/bin/pidof $BIN_NAME` ]
     then
@@ -92,23 +87,23 @@ stop() {
 }
 
 start_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep mediaserver| grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+    WATCHDOG_PID="`ps -eO command | grep lite_client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
     if [ "$WATCHDOG_PID" ]; then
-        echo "$CUSTOMIZATION-mediaserver watchdog is already running with pid $WATCHDOG_PID"
+        echo "$CUSTOMIZATION-lite_client watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
-    bash -c "/etc/init.d/$CUSTOMIZATION-mediaserver run_watchdog" 2>/dev/null 1>&2&
+    bash -c "/etc/init.d/$CUSTOMIZATION-lite_client run_watchdog" 2>/dev/null 1>&2&
     echo "$SERVICE_NAME watchdog has been started"
 }
 
 stop_watchdog() {
     WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
     if [ ! "$WATCHDOG_PID" ]; then
-        echo "$CUSTOMIZATION-mediaserver watchdog is not running"
+        echo "$CUSTOMIZATION-lite_client watchdog is not running"
         return 0
     fi
 
-    echo -n "Stopping $CUSTOMIZATION-mediaserver watchdog..... "
+    echo -n "Stopping $CUSTOMIZATION-lite_client watchdog..... "
     kill $WATCHDOG_PID
     sleep 1
     echo "OK"

@@ -156,8 +156,9 @@ QnCompositeTextOverlayColors::QnCompositeTextOverlayColors()
 {
 }
 
-QnRoutingManagementColors::QnRoutingManagementColors() {
-    readOnly = Qt::lightGray;
+QnRoutingManagementColors::QnRoutingManagementColors():
+    readOnly("#E1E7EA")
+{
 }
 
 QnAuditLogColors::QnAuditLogColors() {
