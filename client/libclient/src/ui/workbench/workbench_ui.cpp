@@ -205,8 +205,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     setTimelineVisible(false, false);
     setTreeVisible(true, false);
-    setTitleVisible(true, false);
-    setTitleUsed(false);
+    setTitleVisible(false, false);
     setNotificationsVisible(true, false);
     updateControlsVisibility(false);
 
