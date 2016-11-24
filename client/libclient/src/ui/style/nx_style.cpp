@@ -1946,7 +1946,7 @@ void QnNxStyle::drawControl(
                 if (selected)
                     painter->fillRect(menuItem->rect, backgroundColor);
 
-                int xPos = asDropdown
+                int xMargin = asDropdown
                     ? Metrics::kStandardPadding
                     : Metrics::kMenuItemTextLeftPadding;
 
@@ -1954,9 +1954,9 @@ void QnNxStyle::drawControl(
 
                 int textFlags = Qt::AlignVCenter | Qt::TextHideMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
 
-                QRect textRect(xPos,
+                QRect textRect(menuItem->rect.left() + xMargin,
                                y + Metrics::kMenuItemVPadding,
-                               menuItem->rect.width() - xPos - Metrics::kMenuItemHPadding,
+                               menuItem->rect.width() - xMargin - Metrics::kMenuItemHPadding,
                                menuItem->rect.height() - 2 * Metrics::kMenuItemVPadding);
 
                 if (!menuItem->text.isEmpty())
