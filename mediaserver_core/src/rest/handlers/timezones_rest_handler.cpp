@@ -1,0 +1,64 @@
+#include <QFile>
+#include <QtCore/QProcess>
+#include <QtCore/QTimeZone>
+
+#include <nx/fusion/model_functions.h>
+
+#include "timezones_rest_handler.h"
+
+namespace {
+
+struct TimeZoneInfo
+{
+    TimeZoneInfo():
+        id(),
+        offsetFromUTC(0),
+        displayName(),
+        hasDaylightTime(false),
+        isDaylightTime(false),
+        comment()
+    {
+    }
+
+    QString id;
+    int offsetFromUTC;
+    QString displayName;
+    bool hasDaylightTime;
+    bool isDaylightTime;
+    QString comment;
+};
+
+#define TimeZoneInfo_Fields (id)(offsetFromUTC)(displayName)(hasDaylightTime)(isDaylightTime)(comment)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+(TimeZoneInfo),
+(json),
+_Fields)
+
+} // namespace
+
+int QnGetTimeZonesRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    std::vector<TimeZoneInfo> outputData;
+
+    for (const auto& timeZoneId: QTimeZone::availableTimeZoneIds())
+    {
+        QTimeZone timeZone(timeZoneId);
+        TimeZoneInfo record;
+        record.id = timeZone.id();
+        record.displayName = timeZone.displayName(QDateTime::currentDateTime(), QTimeZone::DefaultName);
+        record.comment = timeZone.comment();
+        record.hasDaylightTime = timeZone.hasDaylightTime();
+        record.isDaylightTime = timeZone.isDaylightTime(QDateTime::currentDateTime());
+        record.offsetFromUTC = timeZone.offsetFromUtc(QDateTime::currentDateTime());
+        outputData.emplace_back(std::move(record));
+    }
+
+    result.setReply(outputData);
+
+    return nx_http::StatusCode::ok;
+}
