@@ -63,6 +63,16 @@ protected:
         startedPromise.get_future().wait();
     }
 
+    void TearDown() override
+    {
+        if (const auto connection = takeConnection())
+            connection->pleaseStopSync();
+
+        freeSocket->pleaseStopSync();
+        for (auto& socket : connectSockets)
+            socket->pleaseStopSync();
+    }
+
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
@@ -84,13 +94,13 @@ protected:
                 {
                     QnMutexLocker lock(&m_mutex);
                     acceptedSockets.push_back(std::move(socket));
+                    acceptResults.push(code);
+
+                    if (code == SystemError::noError && connection)
+                        return acceptForever();
                 }
 
-                acceptResults.push(code);
-                if (code == SystemError::noError)
-                    acceptForever();
-                else
-                    connection.reset();
+                takeConnection().reset();
             });
     }
 
@@ -116,18 +126,15 @@ protected:
         connectSockets.push_back(std::move(socket));
     }
 
-    void TearDown() override
+    std::unique_ptr<IncomingTunnelConnection> takeConnection()
     {
-        if (connection)
-            connection->pleaseStopSync();
-
-        if (freeSocket)
-            freeSocket->pleaseStopSync();
-
-        for (auto& socket : connectSockets)
-            socket->pleaseStopSync();
+        QnMutexLocker lock(&m_mutex);
+        auto localConection = std::move(connection);
+        connection = nullptr;
+        return localConection;
     }
 
+    QnMutex m_mutex;
     SocketAddress connectionAddress;
     std::unique_ptr<IncomingTunnelConnection> connection;
     utils::TestSyncQueue<SystemError::ErrorCode> acceptResults;
@@ -135,7 +142,6 @@ protected:
     std::unique_ptr<UdtStreamSocket> freeSocket;
     utils::TestSyncQueue<SystemError::ErrorCode> connectResults;
 
-    QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
 };
@@ -275,15 +281,9 @@ TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
             }));
     }
 
-    nx::utils::promise<void> promise;
-    connection->pleaseStop(
-        [this, &promise]()
-        {
-            connection.reset();
-            promise.set_value();
-        });
+    if (const auto connection = takeConnection())
+        connection->pleaseStopSync();
 
-    promise.get_future().wait();
     for (auto& thread : threads)
         thread.join();
 }
