@@ -662,7 +662,7 @@
 
     "QnServerAddressesModel": {
         "colors": {
-            "readOnly": "#c0c0c0"
+            "readOnly": "light10"
         }
     },
 
@@ -715,7 +715,7 @@
             }
         }
     },
-
+    
     "QnMediaResourceWidget": {
         "motionSensitivityColors": [
             "light16",

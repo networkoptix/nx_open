@@ -237,9 +237,9 @@ struct QnVideowallManageWidgetColors {
 };
 #define QnVideowallManageWidgetColors_Fields (desktop)(freeSpace)(item)(text)(error)
 
-struct QnRoutingManagementColors {
+struct QnRoutingManagementColors
+{
     QnRoutingManagementColors();
-
     QColor readOnly;
 };
 #define QnRoutingManagementColors_Fields (readOnly)
