@@ -29,7 +29,7 @@ IF_EXT = 'eth0'
 class TimeTestError(FuncTestError):
     pass
 
-time_servers = ('time.nist.gov', 'time-nw.nist.gov')
+time_servers = ('time.nist.gov', 'time.ien.it') # 'time-nw.nist.gov')
 TIME_PORT = 37
 TIME_SERVER_TIMEOUT = 10
 SHIFT_1900_1970 = 2208988800
@@ -48,10 +48,12 @@ def get_inet_time(host):
 
 def check_inet_time():
     "Make sure that at least one of time servers, used by mediaserver for time synchronization, is available and responding."
-    for host in time_servers:
-        d = get_inet_time(host)
-        if len(d) == 4:
-            return d # The first success means OK
+    for _ in xrange(3):  # try several times
+        for host in time_servers:
+            d = get_inet_time(host)
+            if len(d) == 4:
+                return d # The first success means OK
+        time.sleep(0.5)
     return False
 
 EMPTY_TIME = dict(
@@ -249,17 +251,16 @@ class TimeSyncTest(FuncTestCase):
         return self.num_serv - 1 if self._primary == 0 else self._primary - 1
 
     def _setPrimaryServer(self, boxnum):
-        print "New primary is %s (%s)" % (boxnum, self.hosts[boxnum])
+        print "Force box %s (%s) to be the primary server" % (boxnum, self.hosts[boxnum])
         self._server_request(boxnum, 'ec2/forcePrimaryTimeServer', data={'id': self.guids[boxnum]})
 
     ####################################################
 
     def InitialSynchronization(self):
-        """Stop both mediaservers, initialize boxes' system time and start the servers again.
+        """Stop both mediaservers, initialize boxes' system time and start the servers again. Check for sync.
         """
         self._prepare_test_phase(self._stop_and_init)
         #self.debug_systime()
-        #self._get_guids()
         print "Checking time..."
         self._check_time_sync()
         #self.debug_systime()
