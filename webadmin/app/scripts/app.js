@@ -76,6 +76,11 @@ angular.module('webadminApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
+        .when('/client/', {
+            templateUrl: 'views/client.html',
+            controller: 'ClientCtrl',
+            reloadOnSearch: false
+        })
         .when('/view/', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',

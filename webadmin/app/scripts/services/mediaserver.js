@@ -572,6 +572,13 @@ angular.module('webadminApp')
                     return wrapGet(proxy + '/web/api/iflist');
                 }
                 return wrapPost(proxy + '/web/api/ifconfig', settings);
+            },
+
+            timeSettings:function(time){
+                if(!time) {
+                    return wrapGet(proxy + '/web/api/gettime');
+                }
+                return wrapPost(proxy + '/web/api/settime', settings);
             }
         };
     });

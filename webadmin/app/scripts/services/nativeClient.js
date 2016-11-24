@@ -26,7 +26,11 @@ angular.module('webadminApp')
                     return $q.resolve({thick:true});
                 }
 
-                if(!socketPort){
+                if(socketClientController){
+                    return $q.resolve({lite:true});
+                }
+
+                if(!wsUri){
                     return $q.reject();
                 }
 
