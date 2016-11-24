@@ -18,11 +18,6 @@
         </BootstrapperApplicationRef>
 
         <Chain>
-            <PackageGroupRef Id="VC12RedistPackageGroup"/>
-<!--            <PackageGroupRef Id="VC14RedistPackageGroup"/> -->
-
-            <RollbackBoundary />
-
             <PackageGroupRef Id="ClientPackageGroup"/>
         </Chain>
     </Bundle>
