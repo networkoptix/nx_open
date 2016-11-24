@@ -3529,9 +3529,10 @@ void QnNxStyle::polish(QWidget *widget)
 
         /* Workaround to update scroll areas hover when they're scrolled: */
         auto updateScrollAreaHover =
-            [d, scrollBar]()
+            [d, guardedScrollBar = QPointer<QScrollBar>(scrollBar)]()
             {
-                d->updateScrollAreaHover(scrollBar);
+                if (guardedScrollBar)
+                    d->updateScrollAreaHover(guardedScrollBar);
             };
 
         connect(scrollBar, &QScrollBar::valueChanged,

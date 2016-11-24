@@ -149,7 +149,7 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         m_connections.erase(connectionContextIter);
     }
     
-    if (!context.socketAttributes.applyTo(tcpSocket.get()))
+    if (tcpSocket && !context.socketAttributes.applyTo(tcpSocket.get()))
     {
         sysErrorCode = SystemError::getLastOSErrorCode();
         stillValid = false;
