@@ -23,7 +23,6 @@
 #include "cloud/cloud_connection_manager.h"
 #include <api/global_settings.h>
 
-
 static const std::chrono::minutes UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD(1);
 
 CloudUserAuthenticator::CloudUserAuthenticator(
@@ -108,7 +107,8 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     });
 
 
-    // Server has provided to the client non-cloud nonce for cloud user due to no cloud connection so far
+    // Server has provided to the client non-cloud nonce 
+    // for cloud user due to no cloud connection so far.
     if (isCloudUser && !isCloudNonce && m_cloudConnectionManager->boundToCloud())
     {
         if (!cloudUsers.isEmpty())
@@ -404,7 +404,8 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     }
 }
 
-void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*boundToCloud*/)
+void CloudUserAuthenticator::cloudBindingStatusChanged(bool boundToCloud)
 {
-    clear();
+    if (!boundToCloud)
+        clear();
 }

@@ -12,18 +12,18 @@
 
 #include "cloud/cloud_connection_manager.h"
 
-
 namespace {
-    constexpr const int kNonceTrailingRandomByteCount = 4;
-    constexpr const char kMagicBytes[] = {'h', 'z'};
-    constexpr const int kNonceTrailerLength =
-        sizeof(kMagicBytes) + kNonceTrailingRandomByteCount;
-    constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::minutes(1);
-}
+
+constexpr const int kNonceTrailingRandomByteCount = 4;
+constexpr const char kMagicBytes[] = {'h', 'z'};
+constexpr const int kNonceTrailerLength = sizeof(kMagicBytes) + kNonceTrailingRandomByteCount;
+constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::minutes(1);
+
+} // namespace
 
 CdbNonceFetcher::CdbNonceFetcher(
     CloudConnectionManager* const cloudConnectionManager,
-    std::shared_ptr<AbstractNonceProvider> defaultGenerator)
+    AbstractNonceProvider* defaultGenerator)
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
@@ -252,14 +252,18 @@ void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
     }
 
     if (m_timerID)
+    {
         nx::utils::TimerManager::instance()->modifyTimerDelay(
             m_timerID.get(),
             std::chrono::milliseconds::zero());
+    }
     else
+    {
         m_timerID =
             nx::utils::TimerManager::TimerGuard(
                 nx::utils::TimerManager::instance(),
                 nx::utils::TimerManager::instance()->addTimer(
                     std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
                     std::chrono::milliseconds::zero()));
+    }
 }

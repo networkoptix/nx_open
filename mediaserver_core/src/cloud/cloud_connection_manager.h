@@ -18,8 +18,7 @@
 #include <utils/common/subscription.h>
 
 
-class CloudConnectionManager
-:
+class CloudConnectionManager:
     public QObject,
     public Qn::EnableSafeDirectConnection,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
