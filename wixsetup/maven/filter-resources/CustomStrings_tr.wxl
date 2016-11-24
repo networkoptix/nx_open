@@ -74,7 +74,8 @@
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">${display.product.name} i yükleme bitince çalıştır .</String>
     <String Id="Product_LaunchNxtool"                               Overridable="yes">${nxtool.name} i yükleme bitince çalıştır.</String>
-    <String Id="Product_ArchMismatch"                               Overridable="yes">bu yükleme dosyası 32 bit OS ler içindir.Yükleme yapılamıyor.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">bu yükleme dosyası 32 bit OS ler içindir.Yükleme yapılamıyor.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">bu yükleme dosyası 64 bit OS ler içindir.Yükleme yapılamıyor.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">En az bir bileşen seçmelisiniz</String>

@@ -14,7 +14,7 @@
           Key="Software" 
           Win64="yes"/>
 
-        <bal:Condition Message="!(loc.Product_ArchMismatch)">
+        <bal:Condition Message="!(loc.Product_ArchMismatch_$(var.arch))">
             <![CDATA[ ("$(var.arch)" = "x86" AND NOT VersionNT64) OR ("$(var.arch)" = "x64" AND VersionNT64) OR WixBundleAction = 3 ]]>
         </bal:Condition>
     </Fragment>
