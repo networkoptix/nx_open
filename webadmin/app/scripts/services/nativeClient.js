@@ -18,9 +18,7 @@ angular.module('webadminApp')
             }
         }
 
-        var socketPort = $location.search().clientWebSocket || parseUrl('clientWebSocket');
-
-        var wsUri =  "ws://localhost:" + socketPort;
+        var wsUri = $location.search().clientWebSocket || parseUrl('clientWebSocket');
 
         return {
             init:function(){
