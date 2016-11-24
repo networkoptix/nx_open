@@ -147,6 +147,36 @@ bool CdbNonceFetcher::parseCloudNonce(
     return true;
 }
 
+void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
+{
+    NX_LOGX(lm("Cloud binding status changed: %1").arg(boundToCloud), cl_logDEBUG1);
+
+    QnMutexLocker lk(&m_mutex);
+
+    m_boundToCloud = boundToCloud;
+    if (!boundToCloud)
+    {
+        m_cdbNonceQueue.clear();
+        return;
+    }
+
+    if (m_timerID)
+    {
+        nx::utils::TimerManager::instance()->modifyTimerDelay(
+            m_timerID.get(),
+            std::chrono::milliseconds::zero());
+    }
+    else
+    {
+        m_timerID =
+            nx::utils::TimerManager::TimerGuard(
+                nx::utils::TimerManager::instance(),
+                nx::utils::TimerManager::instance()->addTimer(
+                    std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
+                    std::chrono::milliseconds::zero()));
+    }
+}
+
 void CdbNonceFetcher::fetchCdbNonceAsync()
 {
     NX_LOGX(lm("Trying to fetch new cloud nonce"), cl_logDEBUG2);
@@ -235,35 +265,5 @@ void CdbNonceFetcher::removeInvalidNonce(
            cdbNonceQueue->front().validityTime < curClock)
     {
         cdbNonceQueue->pop_front();
-    }
-}
-
-void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
-{
-    NX_LOGX(lm("Cloud binding status changed: %1").arg(boundToCloud), cl_logDEBUG1);
-
-    QnMutexLocker lk(&m_mutex);
-
-    m_boundToCloud = boundToCloud;
-    if (!boundToCloud)
-    {
-        m_cdbNonceQueue.clear();
-        return;
-    }
-
-    if (m_timerID)
-    {
-        nx::utils::TimerManager::instance()->modifyTimerDelay(
-            m_timerID.get(),
-            std::chrono::milliseconds::zero());
-    }
-    else
-    {
-        m_timerID =
-            nx::utils::TimerManager::TimerGuard(
-                nx::utils::TimerManager::instance(),
-                nx::utils::TimerManager::instance()->addTimer(
-                    std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-                    std::chrono::milliseconds::zero()));
     }
 }

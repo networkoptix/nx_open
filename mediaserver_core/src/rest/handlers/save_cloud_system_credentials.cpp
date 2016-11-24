@@ -283,5 +283,5 @@ bool QnSaveCloudSystemCredentialsHandler::rollback()
 
 void QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers()
 {
-    //m_cloudManagerGroup->authenticationNonceFetcher
+    m_cloudManagerGroup->authenticationNonceFetcher.cloudBindingStatusChanged(true);
 }
