@@ -1,23 +1,23 @@
 #pragma once
 
 #include <map>
-#include <set>
 
 #include <QtWebSockets/QWebSocket>
 
-#include "flir_websocket_proxy.h"
+#include "flir_nexus_common.h"
+#include "flir_web_socket_proxy.h"
 #include "flir_nexus_response.h"
 #include "flir_nexus_parsing_utils.h"
 
+#include <nx/utils/timer_manager.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_data.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
-#include <nx/utils/timer_manager.h>
-#include <nx/network/http/asynchttpclient.h>
 
-namespace nx{
-namespace plugins{
-namespace flir{
+namespace nx {
+namespace plugins {
+namespace flir {
+namespace nexus {
 
 class WebSocketIoManager :
     public QObject,
@@ -26,7 +26,9 @@ class WebSocketIoManager :
     Q_OBJECT
 
 public:
-    WebSocketIoManager(QnVirtualCameraResource* resource);
+    WebSocketIoManager(
+        QnVirtualCameraResource* resource,
+        quint16 nexusPort = kDefaultNexusPort);
 
     virtual ~WebSocketIoManager();
 
@@ -71,8 +73,6 @@ private:
     enum class InitState
     {
         initial,
-        nexusServerStatusRequested,
-        nexusServerEnabled,
         controlSocketConnected,
         sessionIdObtained,
         remoteControlObtained,
@@ -83,18 +83,12 @@ private:
     void routeIOMonitoringInitializationUnsafe(InitState newState);
 
     void initIoPortStatesUnsafe();
-    bool initHttpClientUnsafe();
     void resetSocketProxiesUnsafe();
     void reinitMonitoringUnsafe();
 
-    QString getResourcesHostAddress() const;
-    QAuthenticator getResourceAuth() const;
-    QnResourceData getResourceData() const;
     int getPortNumberByPortId(const QString& portId) const;
     int getGpioModuleIdByPortId(const QString& portId) const;
 
-    void tryToGetNexusServerStatusUnsafe();
-    void tryToEnableNexusServerUnsafe();
     void requestSessionIdUnsafe();
     void requestRemoteControlUnsafe();
 
@@ -107,12 +101,10 @@ private:
 
     QString buildNotificationSubscriptionPath() const; 
     
-    void handleServerWhoAmIResponseUnsafe(const nexus::Response& response);
-    void handleRemoteControlRequestResponseUnsafe(const nexus::Response& response);
-    void handleRemoteControlReleaseResponseUnsafe(const nexus::Response& response);
-    void handleIoSensorOutputStateSetResponseUnsafe(const nexus::Response& response);
-    void handleServerStatusResponseUnsafe(nx_http::AsyncHttpClientPtr httpClient);
-    void handleServerEnableResponseUnsafe(nx_http::AsyncHttpClientPtr httpClient);
+    void handleServerWhoAmIResponseUnsafe(const nexus::CommandResponse& response);
+    void handleRemoteControlRequestResponseUnsafe(const nexus::CommandResponse& response);
+    void handleRemoteControlReleaseResponseUnsafe(const nexus::CommandResponse& response);
+    void handleIoSensorOutputStateSetResponseUnsafe(const nexus::CommandResponse& response);
 
     void sendKeepAliveUnsafe();
 
@@ -129,8 +121,6 @@ private:
     nexus::WebSocketProxy* m_controlProxy;
     nexus::WebSocketProxy* m_notificationProxy;
 
-    nx_http::AsyncHttpClientPtr m_asyncHttpClient;
-
     InputStateChangeCallback m_stateChangeCallback;
     NetworkIssueCallback m_networkIssueCallback;
 
@@ -138,15 +128,12 @@ private:
     QnIOPortDataList m_inputs;
     QnIOPortDataList m_outputs;
 
-    bool m_isNexusServerEnabled;
-    bool m_nexusServerHasJustBeenEnabled;
     quint16 m_nexusPort;
 
     mutable QnMutex m_mutex;
-    mutable QnMutex m_setOutputStateMutex;
-    mutable QnWaitCondition m_setOutputStateRequestCondition;
 };
 
-} //namespace flir
-} //namespace plugins
-} //namespace nx
+} // namespace nexus
+} // namespace flir
+} // namespace plugins
+} // namespace nx

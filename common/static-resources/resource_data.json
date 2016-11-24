@@ -237,7 +237,8 @@
             "keys":[
                 "FLIR Systems|FC-*", "FLIR|FC-*"
             ],
-            "forceSingleStream": true
+            "forceSingleStream": true,
+            "ignoreOnvif": true
         },
         {
             "keys": [

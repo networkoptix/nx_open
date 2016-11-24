@@ -1,4 +1,5 @@
 #include "flir_nexus_string_builder.h"
+#include "flir_nexus_parsing_utils.h"
 #include "flir_nexus_common.h"
 
 namespace nx {
@@ -50,8 +51,6 @@ QString SubscriptionStringBuilder::serializeSingleSubscription(
         .arg(subscription.minDeliveryInterval.count())
         .arg(subscription.maxDeliveryInterval.count())
         .arg(subscription.onChange);
-
-    qDebug() << "Flir, building subscription string" << subscriptionString;
 
     return subscriptionString;
 }

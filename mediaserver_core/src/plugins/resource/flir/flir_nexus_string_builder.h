@@ -10,19 +10,6 @@ namespace plugins{
 namespace flir{
 namespace nexus{
 
-struct Subscription final
-{
-    Subscription(const QString& subscriptionTypeString):
-        subscriptionType(subscriptionTypeString)
-    {};
-
-    QString subscriptionType;
-    int deviceId = kAnyDevice;
-    std::chrono::milliseconds minDeliveryInterval = std::chrono::milliseconds(1000);
-    std::chrono::milliseconds maxDeliveryInterval = std::chrono::milliseconds(1000);
-    bool onChange = false;
-};
-
 class SubscriptionStringBuilder final
 {
 public:

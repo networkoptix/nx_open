@@ -1,4 +1,4 @@
-#include "flir_websocket_proxy.h"
+#include "flir_web_socket_proxy.h"
 #include "flir_io_executor.h"
 
 namespace nx {
@@ -6,8 +6,7 @@ namespace plugins {
 namespace flir {
 namespace nexus {
 
-WebSocketProxy::WebSocketProxy(QObject* parent):
-    QObject(parent)
+WebSocketProxy::WebSocketProxy(QObject* parent): QObject(parent)
 {
     auto executorThread = IoExecutor::instance()->getThread();
     executorThread->start();

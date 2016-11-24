@@ -12,12 +12,12 @@ public:
     QnRtpStreamReader(const QnResourcePtr& res, const QString& request = QString());
     virtual ~QnRtpStreamReader();
 
+    void setRtpTransport(const RtpTransport::Value& transport);
     void setRequest(const QString& request);
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     virtual void pleaseStop() override;
-protected:
-    
 
+protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
@@ -27,7 +27,7 @@ protected:
 private:
     QnMulticodecRtpReader m_rtpReader;
     QString m_request;
-
+    RtpTransport::Value m_rtpTransport;
 
 };
 

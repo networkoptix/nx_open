@@ -7,5 +7,11 @@
             <param name = "supportedMotion" default_value="softwaregrid"/>
         </params>        
     </resource>
+    <resource name = "FLIR_FC" public="FLIR_COMMON">
+        <params>
+            <param name = "MaxFPS" default_value="30"/>
+            <param name = "supportedMotion" default_value="softwaregrid"/>
+        </params>
+    </resource>
     </oem>
 </resources>

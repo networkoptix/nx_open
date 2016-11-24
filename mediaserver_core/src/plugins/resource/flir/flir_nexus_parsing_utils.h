@@ -1,29 +1,25 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
+#include "flir_nexus_common.h"
+
 namespace nx {
-namespace plugins{
-namespace flir{
-namespace nexus{
+namespace plugins {
+namespace flir {
+namespace nexus {
 
-using NexusSettingGroup = std::map<QString, QString>;
+boost::optional<Notification> parseNotification(const QString& notificationString);
 
-struct NexusServerStatus
-{
-    std::map<QString, NexusSettingGroup> settings;
-    bool isNexusServerEnabled = true;
-};
+boost::optional<quint64> parseNotificationDateTime(const QString& dateTimeString);
 
-struct Notification
-{
-    QString alarmId;
-    int alarmState = 0;
-};
+boost::optional<Subscription> parseSubscription(const QString& subscriptionString);
 
-Notification parseNotification(const QString& notificationString, bool *outStatus);
+boost::optional<ServerStatus> parseNexusServerStatusResponse(const QString& response);
 
-quint64 parseNotificationDateTime(const QString& dateTimeString, bool* outStatus);
+boost::optional<PrivateDeviceInfo> parsePrivateDeviceInfo(const QString& deviceInfoString);
 
-NexusServerStatus parseNexusServerStatusResponse(const QString& response);
+boost::optional<DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QString& deviceDiscoveryInfoString);
 
 } // namespace nexus
 } // namespace flir

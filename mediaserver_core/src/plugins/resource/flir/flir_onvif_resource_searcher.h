@@ -2,10 +2,14 @@
 
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 
-class FlirOnvifResourceSearcher: public OnvifResourceSearcher
+namespace nx {
+namespace plugins {
+namespace flir {
+
+class OnvifResourceSearcher: public ::OnvifResourceSearcher
 {
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url, 
+        const QUrl& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
@@ -13,3 +17,7 @@ class FlirOnvifResourceSearcher: public OnvifResourceSearcher
 
     virtual bool isSequential() const override;
 };
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx

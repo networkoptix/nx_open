@@ -6,12 +6,14 @@
 
 #ifdef ENABLE_ONVIF
 
-QnFlirOnvifResource::QnFlirOnvifResource():
+using namespace nx::plugins;
+
+flir::OnvifResource::OnvifResource():
     m_ioManager(nullptr)
 {
 }
 
-QnFlirOnvifResource::~QnFlirOnvifResource()
+flir::OnvifResource::~OnvifResource()
 {
     stopInputPortMonitoringAsync();
 
@@ -24,7 +26,7 @@ QnFlirOnvifResource::~QnFlirOnvifResource()
     }
 }
 
-CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
+CameraDiagnostics::Result flir::OnvifResource::initInternal()
 {
     auto result = QnPlOnvifResource::initInternal();
 
@@ -33,8 +35,8 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
 
     if (!m_ioManager)
     {
-        m_ioManager = new nx::plugins::flir::WebSocketIoManager(dynamic_cast<QnVirtualCameraResource*>(this));
-        m_ioManager->moveToThread(nx::plugins::flir::IoExecutor::instance()->getThread());
+        m_ioManager = new flir::nexus::WebSocketIoManager(dynamic_cast<QnVirtualCameraResource*>(this));
+        m_ioManager->moveToThread(flir::IoExecutor::instance()->getThread());
     }
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
@@ -57,7 +59,7 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnFlirOnvifResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+bool flir::OnvifResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
     if (!m_ioManager)
         return false;
@@ -90,7 +92,7 @@ bool QnFlirOnvifResource::startInputPortMonitoringAsync(std::function<void(bool)
     return true;
 }
 
-void QnFlirOnvifResource::stopInputPortMonitoringAsync()
+void flir::OnvifResource::stopInputPortMonitoringAsync()
 {
     if (!m_ioManager)
         return;
@@ -101,7 +103,7 @@ void QnFlirOnvifResource::stopInputPortMonitoringAsync()
     m_ioManager->stopIOMonitoring();
 }
 
-QnIOPortDataList QnFlirOnvifResource::getInputPortList() const
+QnIOPortDataList flir::OnvifResource::getInputPortList() const
 {
     if (m_ioManager)
         return m_ioManager->getInputPortList();
@@ -109,7 +111,7 @@ QnIOPortDataList QnFlirOnvifResource::getInputPortList() const
     return QnIOPortDataList();
 }
 
-bool QnFlirOnvifResource::setRelayOutputState(
+bool flir::OnvifResource::setRelayOutputState(
     const QString& outputID,
     bool isActive,
     unsigned int autoResetTimeoutMS)
@@ -121,7 +123,7 @@ bool QnFlirOnvifResource::setRelayOutputState(
         autoResetTimeoutMS);
 }
 
-QnIOPortDataList QnFlirOnvifResource::getRelayOutputList() const
+QnIOPortDataList flir::OnvifResource::getRelayOutputList() const
 {
     if (!m_ioManager)
         return QnIOPortDataList();

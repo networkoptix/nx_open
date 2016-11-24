@@ -104,14 +104,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
     }
 
     m_multiCodec.setRole(getRole());
-
-
-    qDebug() << "SETTING STREAM URL!" << streamUrl;
-    QUrl modifiedStreamUrl(streamUrl);
-    //modifiedStreamUrl.setPort(555);
-    m_multiCodec.setRequest(modifiedStreamUrl.toString());
-
-
+    m_multiCodec.setRequest(streamUrl);
 
 	m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
 

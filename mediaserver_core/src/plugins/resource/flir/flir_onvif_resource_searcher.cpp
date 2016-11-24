@@ -4,7 +4,9 @@ namespace {
     const int kFlirDefaultOnvifPort = 8090;
 } // namespace
 
-QList<QnResourcePtr> FlirOnvifResourceSearcher::checkHostAddr(
+using namespace nx::plugins;
+
+QList<QnResourcePtr> flir::OnvifResourceSearcher::checkHostAddr(
     const QUrl& url,
     const QAuthenticator& auth,
     bool doMultichannelCheck)
@@ -13,15 +15,15 @@ QList<QnResourcePtr> FlirOnvifResourceSearcher::checkHostAddr(
     auto urlCopy = url;
     urlCopy.setPort(port);
 
-    return OnvifResourceSearcher::checkHostAddr(urlCopy, auth, doMultichannelCheck);
+    return ::OnvifResourceSearcher::checkHostAddr(urlCopy, auth, doMultichannelCheck);
 }
 
-QnResourceList FlirOnvifResourceSearcher::findResources()
+QnResourceList flir::OnvifResourceSearcher::findResources()
 {
     return QnResourceList();
 }
 
-bool FlirOnvifResourceSearcher::isSequential() const
+bool flir::OnvifResourceSearcher::isSequential() const
 {
     return true;
 }

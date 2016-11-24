@@ -1,6 +1,5 @@
 #pragma once
 
-#include <type_traits>
 #include <assert.h>
 
 #include <QtCore/QJsonDocument>
@@ -16,7 +15,7 @@ namespace plugins {
 namespace flir {
 namespace nexus {
 
-class Response
+class CommandResponse
 {
 public:
     enum class Type
@@ -28,8 +27,8 @@ public:
         ioSensorOutputStateSet
     };
 
-    Response();
-    Response(const QString &serialized);
+    CommandResponse();
+    CommandResponse(const QString &serialized);
 
     int returnCode() const;
     QString returnString() const;

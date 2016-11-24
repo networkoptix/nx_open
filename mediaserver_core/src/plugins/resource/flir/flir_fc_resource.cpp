@@ -1,0 +1,242 @@
+#include "flir_fc_resource.h"
+#include "flir_io_executor.h"
+
+#include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
+#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+
+using namespace nx::plugins::flir;
+
+namespace {
+    const QString kFlirFcDriverName = lit("FlirFC");
+    const std::chrono::milliseconds kServerStatusRequestTimeout = std::chrono::seconds(40);
+    const std::chrono::milliseconds kServerStatusResponseTimeout = std::chrono::seconds(40);
+}
+
+FcResource::FcResource():
+    m_ioManager(nullptr)
+{
+}
+
+FcResource::~FcResource()
+{
+    stopInputPortMonitoringAsync();
+
+    if (m_ioManager)
+    {
+        QMetaObject::invokeMethod(
+            m_ioManager,
+            "deleteLater",
+            Qt::QueuedConnection);
+    }
+}
+
+CameraDiagnostics::Result FcResource::initInternal()
+{
+    quint16 port = nexus::kDefaultNexusPort;
+    nx_http::HttpClient httpClient;
+    auto auth = getAuth();
+
+    httpClient.setSendTimeoutMs(kServerStatusRequestTimeout.count());
+    httpClient.setMessageBodyReadTimeoutMs(kServerStatusResponseTimeout.count());
+    httpClient.setResponseReadTimeoutMs(kServerStatusResponseTimeout.count());
+    httpClient.setUserName(auth.user());
+    httpClient.setUserPassword(auth.password());
+
+    auto serverStatus = getNexusServerStatus(httpClient);
+
+    // It's ok if this request fails. Everything can happen - it's Flir camera.
+    // We just hope that everything is fine and use default settings.
+    if (serverStatus)
+    {
+        if (!serverStatus->isNexusServerEnabled)
+        { 
+            bool serverEnabled = tryToEnableNexusServer(httpClient);
+            if (!serverEnabled)
+            {
+                return CameraDiagnostics::RequestFailedResult(
+                    lit("Enable Nexus server"),
+                    lit("Failed to enable Nexus server"));
+            }
+        }
+
+        const auto& kSettings = serverStatus->settings;
+        if (kSettings.find(nexus::kNexusInterfaceGroupName) != kSettings.cend())
+        {
+            const auto& group = kSettings.at(nexus::kNexusInterfaceGroupName);
+            if (group.find(nexus::kNexusPortParamName) != group.cend())
+            {
+                bool status = false;
+                const auto kNexusPort = group
+                    .at(nexus::kNexusPortParamName)
+                    .toInt(&status);
+
+                if (status)
+                    port = kNexusPort;
+            }
+        }
+    }
+
+    if (!m_ioManager)
+    {
+        m_ioManager = new nexus::WebSocketIoManager(
+            dynamic_cast<QnVirtualCameraResource*>(this),
+            port);
+
+        m_ioManager->moveToThread(IoExecutor::instance()->getThread());
+    }
+
+    Qn::CameraCapabilities caps = Qn::NoCapabilities;
+    QnIOPortDataList allPorts = getInputPortList();
+    QnIOPortDataList outputPorts = getRelayOutputList();
+
+    if (!allPorts.empty())
+        caps |= Qn::RelayInputCapability;
+
+    if (!outputPorts.empty())
+        caps |= Qn::RelayOutputCapability;
+
+    allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
+
+    setIOPorts(allPorts);
+    setCameraCapabilities(caps);
+
+    saveParams();
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+{
+    if (!m_ioManager)
+        return false;
+
+    if (m_ioManager->isMonitoringInProgress())
+        return false;
+
+    m_ioManager->setInputPortStateChangeCallback(
+        [this](QString portId, nx_io_managment::IOPortState portState)
+        {
+            emit cameraInput(
+                toSharedPointer(this),
+                portId,
+                nx_io_managment::isActiveIOPortState(portState),
+                qnSyncTime->currentUSecsSinceEpoch());
+        });
+
+    m_ioManager->setNetworkIssueCallback(
+        [this](QString reason, bool /*isFatal*/)
+        {
+            NX_LOG(
+                lm("Flir Onvif resource, %1 (%2), netowk issue detected. Reason: %3")
+                .arg(getModel())
+                .arg(getUrl())
+                .arg(reason),
+                cl_logWARNING);
+        });
+
+    m_ioManager->startIOMonitoring();
+    return true;
+}
+
+void FcResource::stopInputPortMonitoringAsync()
+{
+    if (!m_ioManager)
+        return;
+
+    if (!m_ioManager->isMonitoringInProgress())
+        return;
+
+    m_ioManager->stopIOMonitoring();
+}
+
+QnIOPortDataList FcResource::getRelayOutputList() const
+{
+    if (m_ioManager)
+        return m_ioManager->getOutputPortList();    
+
+    return QnIOPortDataList();
+}
+
+QnIOPortDataList FcResource::getInputPortList() const
+{
+    if (m_ioManager)
+        return m_ioManager->getInputPortList();
+
+    return QnIOPortDataList();
+}
+
+QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
+{
+    auto reader = new QnRtpStreamReader(toSharedPointer(this), "ch0");
+    reader->setRtpTransport(RtpTransport::udp);
+
+    return reader;
+}
+
+QString FcResource::getDriverName() const
+{
+    return kFlirFcDriverName;
+}
+
+void FcResource::setIframeDistance(int, int)
+{
+    // Do nothing.
+}
+
+bool FcResource::hasDualStreaming() const
+{
+    return false;
+}
+
+bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const QUrl& url)
+{
+    auto success = httpClient.doGet(url);
+    if (!success)
+        return false;
+
+    auto response = httpClient.response();
+
+    if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+        return false;
+
+    return true;
+}
+
+boost::optional<nexus::ServerStatus> FcResource::getNexusServerStatus(nx_http::HttpClient& httpClient)
+{
+    QUrl url = getUrl();
+    url.setPath(nexus::kConfigurationFile);
+
+    if (!doGetRequestAndCheckResponse(httpClient, url))
+        return boost::none;
+
+    nx_http::BufferType messageBody;
+    while (!httpClient.eof())
+        messageBody.append(httpClient.fetchMessageBodyBuffer());
+
+    return nexus::parseNexusServerStatusResponse(QString::fromUtf8(messageBody));
+}
+
+bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
+{
+    QUrl url = getUrl();
+    url.setPath(nexus::kStartNexusServerCommand);
+
+    if (!doGetRequestAndCheckResponse(httpClient, url))
+        return false;
+
+    nx_http::BufferType messageBody;
+    while (!httpClient.eof())
+        messageBody.append(httpClient.fetchMessageBodyBuffer());
+    
+    bool status = false;
+    auto isEnabled = messageBody.trimmed().toInt(&status);
+
+    if (!status || !isEnabled == 1)
+        return false;
+
+    return true;
+}
+
+

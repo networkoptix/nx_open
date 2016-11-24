@@ -2,53 +2,51 @@
 
 using namespace nx::plugins::flir::nexus;
 
-Response::Response():
+CommandResponse::CommandResponse():
     m_responseType(Type::invalid)
 {};
 
-Response::Response(const QString &serialized)
+CommandResponse::CommandResponse(const QString &serialized)
 {
     deserialize(serialized);
 };
 
-int Response::returnCode() const
+int CommandResponse::returnCode() const
 {
     return m_returnCode;
 };
 
-QString Response::returnString() const
+QString CommandResponse::returnString() const
 {
     return m_returnString;
 };
 
-Response::Type Response::responseType() const
+CommandResponse::Type CommandResponse::responseType() const
 {
     return m_responseType;
 };
 
-bool Response::isValid() const
+bool CommandResponse::isValid() const
 {
     return m_responseType != Type::invalid;
 };
 
-Response::Type Response::fromStringToResponseType(const QString& typeStr) const
+CommandResponse::Type CommandResponse::fromStringToResponseType(const QString& typeStr) const
 {
     if (typeStr == kServerWhoAmICommand)
-        return Response::Type::serverWhoAmI;
+        return CommandResponse::Type::serverWhoAmI;
     else if (typeStr == kRequestControlCommand)
-        return Response::Type::serverRemoteControlRequest;
+        return CommandResponse::Type::serverRemoteControlRequest;
     else if (typeStr == kReleaseControlCommand)
-        return Response::Type::serverRemoteControlRelease;
+        return CommandResponse::Type::serverRemoteControlRelease;
     else if (typeStr == kSetOutputPortStateCommand)
-        return Response::Type::ioSensorOutputStateSet;
+        return CommandResponse::Type::ioSensorOutputStateSet;
 
-    return Response::Type::invalid;
+    return CommandResponse::Type::invalid;
 }
 
-void Response::deserialize(const QString& serialized)
+void CommandResponse::deserialize(const QString& serialized)
 {
-    qDebug() << "=====> Deserializing flir message" << serialized;
-
     const QString kReturnCodeKey = lit("Return Code");
     const QString kReturnStringKey = lit("Return String");
 
@@ -58,22 +56,17 @@ void Response::deserialize(const QString& serialized)
     auto keys = jsonObject.keys();
     if (keys.size() != 1)
     {
-        qDebug () << "=======> Keys size" << keys.size();
         m_responseType = Type::invalid;
         return;
     }
 
     const auto kResponseTypeStr = keys.at(0);
-    qDebug () << "========> First key" << kResponseTypeStr;
     m_responseType = fromStringToResponseType(kResponseTypeStr);
     if (m_responseType == Type::invalid)
         return;
 
-    qDebug() << "=====> ReponseType" << (int)m_responseType;
-
     if (!jsonObject[kResponseTypeStr].isObject())
     {
-        qDebug() << "===========> Not object";
         m_responseType = Type::invalid;
         return;
     }
