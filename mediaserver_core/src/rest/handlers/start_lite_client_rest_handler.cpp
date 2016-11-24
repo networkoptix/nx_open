@@ -40,12 +40,18 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const int port = connectionProcessor->owner()->getPort();
 
-    auto user = qnResPool->getResourceById<QnUserResource>(connectionProcessor->accessRights().userId);
-    if (!user)
+    QString effectiveUserName;
+    if (!connectionProcessor->accessRights().isNull())
     {
-        NX_ASSERT(false);
-        result.setError(QnRestResult::CantProcessRequest);
-        return nx_http::StatusCode::ok;
+        auto user = qnResPool->getResourceById<QnUserResource>(
+            connectionProcessor->accessRights().userId);
+        if (!user)
+        {
+            NX_ASSERT(false);
+            result.setError(QnRestResult::CantProcessRequest);
+            return nx_http::StatusCode::ok;
+        }
+        effectiveUserName = user->getName();
     }
 
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
@@ -58,7 +64,6 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const QString userName = server->getId().toString();
     const QString password = server->getAuthKey();
-    const QString effectiveUserName = user->getName();
 
     const QUrl url(lit("liteclient://%1:%2@127.0.0.1:%3?effectiveUserName=%4")
        .arg(userName).arg(password).arg(port).arg(effectiveUserName));
