@@ -444,7 +444,7 @@ private:
     SelectionState m_selectionState;
 
     QnViewportScaleWatcher m_scaleWatcher;
-    QnFramePainter m_framePainter;
+    QnCosmeticFramePainter m_framePainter;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

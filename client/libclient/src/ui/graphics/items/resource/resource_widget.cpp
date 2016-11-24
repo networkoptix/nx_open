@@ -973,14 +973,14 @@ void QnResourceWidget::updateSelectedState()
 
 void QnResourceWidget::updateFrameWidth()
 {
-    m_framePainter.setFrameWidth(calculateFrameWidth() * m_scaleWatcher.scale());
+    m_framePainter.setFrameWidth(calculateFrameWidth());
     updateFrameGeometry();
 }
 
 void QnResourceWidget::updateFrameGeometry()
 {
     static const qreal kPadding = 1.5;
-    const auto frameWidth = m_framePainter.frameWidth();
+    const auto frameWidth = m_framePainter.frameWidth() * m_scaleWatcher.scale();
     const auto offsetValue = frameWidth + kPadding * m_scaleWatcher.scale();
     const auto offset = QPointF(offsetValue, offsetValue);
     const auto targetRect = QRectF(-offset, size() + QSizeF(offsetValue, offsetValue) * 2);
