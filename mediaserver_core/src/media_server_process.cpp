@@ -1656,7 +1656,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/iflist", new QnIfListRestHandler());
     reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
-    reg("api/settime", new QnSetTimeRestHandler(), kAdmin);
+    reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
+    reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(), kAdmin);
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);

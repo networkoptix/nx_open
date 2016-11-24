@@ -16,39 +16,40 @@ struct SetTimeData
 {
     SetTimeData() {}
 
+    /**
+     * Used for the deprecated GET method (the new one is POST).
+     */
     SetTimeData(const QnRequestParams& params):
-        datetime(params.value("datetime")),
-        timezone(params.value("timezone"))
+        dateTime(params.value("datetime")),
+        timeZoneId(params.value("timezone"))
     {
     }
 
-    QString datetime;
-    QString timezone;
+    QString dateTime;
+    QString timeZoneId;
 };
 
-#define SetTimeData_Fields (datetime)(timezone)
+#define SetTimeData_Fields (dateTime)(timeZoneId)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-(SetTimeData),
-(json),
-_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SetTimeData), (json), _Fields)
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX)
+
 #include <sys/time.h>
 
-bool setTimeZone(const QString& timezone)
+bool setTimeZone(const QString& timeZoneId)
 {
-    QString timezoneFile = QString(lit("/usr/share/zoneinfo/%1")).arg(timezone);
-    if (!QFile::exists(timezoneFile))
+    QString timeZoneFile = QString(lit("/usr/share/zoneinfo/%1")).arg(timeZoneId);
+    if (!QFile::exists(timeZoneFile))
         return false;
     if (unlink("/etc/localtime") != 0)
         return false;
-    if (symlink(timezoneFile.toLatin1().data(), "/etc/localtime") != 0)
+    if (symlink(timeZoneFile.toLatin1().data(), "/etc/localtime") != 0)
         return false;
     QFile tzFile(lit("/etc/timezone"));
     if (!tzFile.open(QFile::WriteOnly | QFile::Truncate))
         return false;
-    return tzFile.write(timezone.toLatin1()) != 0;
+    return tzFile.write(timeZoneId.toLatin1()) != 0;
 }
 
 
@@ -75,8 +76,12 @@ bool setDateTime(qint64 value)
     return true;
 
 }
-#endif
 
+#endif // defined(Q_OS_LINUX)
+
+/**
+ * GET is the deprecated API method.
+ */
 int QnSetTimeRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams& params,
@@ -103,41 +108,57 @@ int QnSetTimeRestHandler::execute(
     QnJsonRestResult& result)
 {
     qint64 dateTime = -1;
-    if (data.datetime.toLongLong() > 0)
-        dateTime = data.datetime.toLongLong();
+    if (data.dateTime.toLongLong() > 0)
+    {
+        dateTime = data.dateTime.toLongLong();
+    }
     else
-        dateTime = QDateTime::fromString(data.datetime, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
+    {
+        dateTime = QDateTime::fromString(
+            data.dateTime, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
+    }
 
-
-    if (dateTime < 1) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid datetime format specified"));
+    if (dateTime < 1)
+    {
+        result.setError(
+            QnJsonRestResult::CantProcessRequest, lit("Invalid date-time format specified"));
         return CODE_OK;
     }
 
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (!mServer) {
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(
+        qnCommon->moduleGUID());
+    if (!mServer)
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
-    if (!(mServer->getServerFlags() & Qn::SF_timeCtrl)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support time control"));
+    if (!(mServer->getServerFlags() & Qn::SF_timeCtrl))
+    {
+        result.setError(
+            QnJsonRestResult::CantProcessRequest, lit("This server does not support time control"));
         return CODE_OK;
     }
 
-#ifdef Q_OS_LINUX
-    if (!data.timezone.isEmpty()) {
-        if (!setTimeZone(data.timezone)) {
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid timezone specified"));
+    #if defined(Q_OS_LINUX)
+
+        if (!data.timeZoneId.isEmpty())
+        {
+            if (!setTimeZone(data.timeZoneId))
+            {
+                result.setError(
+                    QnJsonRestResult::CantProcessRequest, lit("Invalid time zone specified"));
+                return CODE_OK;
+            }
+        }
+
+        if (!setDateTime(dateTime))
+        {
+            result.setError(
+                QnJsonRestResult::CantProcessRequest, lit("Can't set new date-time value"));
             return CODE_OK;
         }
-    }
 
-    if (!setDateTime(dateTime)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't set new datetime value"));
-        return CODE_OK;
-    }
-
-#endif
+    #endif // defined(Q_OS_LINUX)
 
     //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     //ec2Connection->getTimeManager()->forceTimeResync();

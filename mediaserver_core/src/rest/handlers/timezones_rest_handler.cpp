@@ -12,7 +12,7 @@ struct TimeZoneInfo
 {
     TimeZoneInfo():
         id(),
-        offsetFromUTC(0),
+        offsetFromUtc(0),
         displayName(),
         hasDaylightTime(false),
         isDaylightTime(false),
@@ -21,14 +21,14 @@ struct TimeZoneInfo
     }
 
     QString id;
-    int offsetFromUTC;
+    int offsetFromUtc;
     QString displayName;
     bool hasDaylightTime;
     bool isDaylightTime;
     QString comment;
 };
 
-#define TimeZoneInfo_Fields (id)(offsetFromUTC)(displayName)(hasDaylightTime)(isDaylightTime)(comment)
+#define TimeZoneInfo_Fields (id)(offsetFromUtc)(displayName)(hasDaylightTime)(isDaylightTime)(comment)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 (TimeZoneInfo),
@@ -54,7 +54,7 @@ int QnGetTimeZonesRestHandler::executeGet(
         record.comment = timeZone.comment();
         record.hasDaylightTime = timeZone.hasDaylightTime();
         record.isDaylightTime = timeZone.isDaylightTime(QDateTime::currentDateTime());
-        record.offsetFromUTC = timeZone.offsetFromUtc(QDateTime::currentDateTime());
+        record.offsetFromUtc = timeZone.offsetFromUtc(QDateTime::currentDateTime());
         outputData.emplace_back(std::move(record));
     }
 
