@@ -338,7 +338,8 @@
                 "Axis|P7214*",
                 "Axis|M70114*",
                 "Axis|P7016*",
-                "UNIVIEW|DVS4116"
+                "UNIVIEW|DVS4116",
+                "Axis|P7216*"
             ],
             "analogEncoder": true
         },
@@ -409,6 +410,14 @@
             ],
             "isRTSPSupported": false
     	},
+        {
+            "keys": ["ArecontVision|20185DN"],
+            "forceRtspSupport": true
+        },
+        {
+            "keys": ["ArecontVision|*"],
+            "forceRtcpReports": true
+        },
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
@@ -624,7 +633,64 @@
             }
         },
         {
-            "keys":["Honeywell|H4D3PRV3", "Honeywell|H4D3PRV2"],
+            "keys":[
+                "Honeywell|H4D3PRV3", 
+                "Honeywell|H4D3PRV2", 
+                "Honeywell|HBD2PR1",
+                "Honeywell|H2D2PR1",
+                "Honeywell|HED1PR3",
+                "Honeywell|HED3PR3",
+                "Honeywell|HBD1PR1",
+                "Honeywell|HBD3PR1",
+                "Honeywell|HBD3PR2",
+                "Honeywell|HCL2G",
+                "Honeywell|HCW2G",
+                "Honeywell|HCW4G",
+                "Honeywell|H3W2GR1",
+                "Honeywell|H3W4GR1",
+                "Honeywell|H3W2GR2",
+                "Honeywell|H4L2GR1",
+                "Honeywell|H4W2GR1",
+                "Honeywell|H4W4GR1",
+                "Honeywell|H4W2GR2",
+                "Honeywell|HBL2GR1",
+                "Honeywell|HBW2GR1",
+                "Honeywell|HBW4GR1",
+                "Honeywell|HBW2GR3",
+                "Honeywell|HCD1F",
+                "Honeywell|HCD2F",
+                "Honeywell|HCW1F",
+                "Honeywell|H3D1F1",
+                "Honeywell|H3D1F2",
+                "Honeywell|H3D1F3",
+                "Honeywell|H3D2F1",
+                "Honeywell|H3D2F2",
+                "Honeywell|H3W1F1",
+                "Honeywell|H4D1F1",
+                "Honeywell|H4D1F2",
+                "Honeywell|H4D1F3",
+                "Honeywell|H4D2F1",
+                "Honeywell|H4D2F2",
+                "Honeywell|H4W1F1",
+                "Honeywell|H4D1FR1",
+                "Honeywell|HBD2FR1",
+                "Honeywell|HBD2FR2",
+                "Honeywell|H2S1P6",
+                "Honeywell|H2S2P6",
+                "Honeywell|HCW2S2",
+                "Honeywell|HCD3S2",
+                "Honeywell|HCD5S2",
+                "Honeywell|H3D2S2",
+                "Honeywell|H3D3S2",
+                "Honeywell|H3D5S2",
+                "Honeywell|H3D2SR2",
+                "Honeywell|H3D3SR2",
+                "Honeywell|H3D5SR2",
+                "Honeywell|H4D2S2",
+                "Honeywell|H4D3S2",
+                "Honeywell|H4D5S2",
+                "Honeywell|HDZ302LIW"
+            ],
             "preferredAuthScheme": "Automatic"
         },
         {
@@ -1555,6 +1621,11 @@
                 "user": "root",
                 "password": "pass"
             }
+        },
+        {
+            "keys": ["DW|DWC-MV950TIR"],
+            "forceOnvifAdvancedParameters": true
+
         }
     ]
 }

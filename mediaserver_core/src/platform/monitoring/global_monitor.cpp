@@ -13,6 +13,7 @@
 #include <sys/resource.h>
 #endif
 
+#include <iostream>
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -154,7 +155,7 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
     d->restartTimersLocked();
 }
 
-static const int STATISTICS_LOGGING_PERIOD_MS = 100 * 60 * 1000;
+static const int STATISTICS_LOGGING_PERIOD_MS = 30 * 60 * 1000;
 
 qreal QnGlobalMonitor::totalCpuUsage() {
     Q_D(QnGlobalMonitor);
@@ -185,6 +186,12 @@ qreal QnGlobalMonitor::totalRamUsage() {
     {
         NX_LOG(lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2), cl_logWARNING);
         d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
+
+#ifdef __linux__
+        std::cerr << std::endl << "-----------------------------> malloc_stats info start " << std::endl;
+        malloc_stats();
+        std::cerr << "-----------------------------> malloc_stats info end" << std::endl << std::endl;
+#endif
     }
 
     return d->totalRamUsage;

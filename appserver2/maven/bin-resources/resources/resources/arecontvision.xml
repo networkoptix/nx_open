@@ -97,7 +97,11 @@
         </resource>
         <resource name = "2556" public = "2555"/>
         <resource name = "5555" public = "5115"/>
-        <resource name = "20275" public = "20185"/>
+        <resource name = "20275" public = "20185">
+            <params>
+                <param name = "VideoLayout" default_value="width=4;height=1;sensors=3,2,1,0"/>
+            </params>
+        </resource>
         <resource name = "12275" public = "12186"/>
         <resource name = "12276" public = "12176"> 
             <params>
@@ -119,5 +123,8 @@
             </params>
         </resource>
         <resource name = "2196" public = "2195"/>
+        <resource name = "20565" public = "20175"/>
+        <resource name = "12565" public = "12176"/>
+        <resource name = "12566" public = "12176"/>
     </oem>
 </resources>

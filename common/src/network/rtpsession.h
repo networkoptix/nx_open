@@ -99,10 +99,9 @@ private:
 class RTPIODevice
 {
 public:
-    explicit RTPIODevice(RTPSession* owner, bool useTCP);
+    explicit RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
     virtual ~RTPIODevice();
     virtual qint64 read(char * data, qint64 maxSize );
-    
     const RtspStatistic& getStatistic() { return m_statistic;}
     void setStatistic(const RtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
@@ -112,6 +111,9 @@ public:
     quint32 getSSRC() const { return ssrc; }
     
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
+    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
+    void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
+    void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
     quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
     quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
@@ -122,8 +124,14 @@ private:
     RtspStatistic m_statistic;
     AbstractDatagramSocket* m_mediaSocket;
     AbstractDatagramSocket* m_rtcpSocket;
+    quint16 m_mediaPort;
+    quint16 m_remoteEndpointRtcpPort;
+    HostAddress m_hostAddress;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
+    QElapsedTimer m_reportTimer;
+    bool m_reportTimerStarted;
+    bool m_forceRtcpReports;
 };
 
 class RTPSession: public QObject
@@ -156,8 +164,11 @@ public:
 
             ioDevice = new RTPIODevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
+            ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
             interleaved = QPair<int,int>(-1,-1);
         }
+
+        void setRemoteEndpointRtcpPort(quint16 rtcpPort) {ioDevice->setRemoteEndpointRtcpPort(rtcpPort);};
 
         void setSSRC(quint32 value);
         quint32 getSSRC() const;
@@ -241,6 +252,8 @@ public:
     */
     void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
+
+    QUrl getUrl() const;
 
     void setProxyAddr(const QString& addr, int port);
 
