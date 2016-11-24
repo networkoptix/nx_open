@@ -156,9 +156,6 @@
         "palette": {
             "default": {
                 "link":             "blue10"
-            },
-            "inactive": {
-                "link":             "blue12"
             }
         }
     },
