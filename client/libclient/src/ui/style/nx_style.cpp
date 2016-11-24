@@ -1926,7 +1926,7 @@ void QnNxStyle::drawControl(
                     int padding = asDropdown ? Metrics::kStandardPadding: Metrics::kMenuItemHPadding;
                     painter->drawLine(padding, y,
                                       menuItem->rect.right() - padding, y);
-                    break;
+                    return;
                 }
 
                 bool enabled = menuItem->state.testFlag(State_Enabled);
@@ -1952,9 +1952,7 @@ void QnNxStyle::drawControl(
 
                 int y = menuItem->rect.y();
 
-                int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
-                if (!styleHint(SH_UnderlineShortcut, menuItem, widget, nullptr))
-                    textFlags |= Qt::TextHideMnemonic;
+                int textFlags = Qt::AlignVCenter | Qt::TextHideMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
 
                 QRect textRect(xPos,
                                y + Metrics::kMenuItemVPadding,
