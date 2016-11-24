@@ -261,6 +261,7 @@ cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
+    mv -f $BUILD_DIR/etc/init.d/networkoptix-lite_client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite_client
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
     rm -Rf $BUILD_DIR/opt/networkoptix/
 fi
