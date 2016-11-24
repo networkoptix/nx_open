@@ -38,7 +38,7 @@ struct QnCameraConflictList;
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
-QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType ActionType UserRole, )
+QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType ActionType UserGroup, )
 
     enum EventReason
     {
@@ -207,12 +207,12 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
-    enum UserRole
+    enum UserGroup
     {
         EveryOne  = 0,
         AdminOnly = 1,
     };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UserRole)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UserGroup)
 
 } // namespace QnBusiness
 
@@ -220,6 +220,6 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
     (QnBusiness::EventReason)\
     (QnBusiness::EventType)\
     (QnBusiness::ActionType)\
-    (QnBusiness::UserRole)\
+    (QnBusiness::UserGroup)\
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES(QnBusiness::EventState), (metatype)(lexical))

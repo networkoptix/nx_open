@@ -229,7 +229,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                         case QnBusiness::SendMailAction:
                             return m_actionParams.emailAddress;
                         case QnBusiness::ShowPopupAction:
-                            return (int) m_actionParams.userRole;
+                            return (int) m_actionParams.userGroup;
                         default:
                             break;
                     }
@@ -312,7 +312,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
                     // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
                     // This code will fail silently if someone changes the header. Please write it properly.
-                    params.userRole = (QnBusiness::UserRole) value.toInt();
+                    params.userGroup = (QnBusiness::UserGroup) value.toInt();
                     setActionParams(params);
                     break;
                 }
@@ -798,7 +798,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
 
                 case QnBusiness::ShowPopupAction:
                 {
-                    if (m_actionParams.userRole == QnBusiness::AdminOnly)
+                    if (m_actionParams.userGroup == QnBusiness::AdminOnly)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     return qnResIconCache->icon(QnResourceIconCache::Users);
                 }
@@ -1026,7 +1026,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
         }
         case QnBusiness::ShowPopupAction:
         {
-            if (m_actionParams.userRole == QnBusiness::AdminOnly)
+            if (m_actionParams.userGroup == QnBusiness::AdminOnly)
                 return tr("Administrators Only");
             else
                 return tr("All Users");

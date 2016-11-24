@@ -319,7 +319,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                 }
             }
             else if (actionType == QnBusiness::ShowPopupAction) {
-                if (action.actionParams.userRole == QnBusiness::AdminOnly)
+                if (action.actionParams.userGroup == QnBusiness::AdminOnly)
                     return qnResIconCache->icon(QnResourceIconCache::User);
                 else
                     return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -344,7 +344,7 @@ QString QnEventLogModel::getResourceNameString(const QnUuid &id)
     return QnResourceDisplayInfo(getResourceById(id)).toString(qnSettings->extraInfoInTree());
 }
 
-QString QnEventLogModel::getUserRoleString(QnBusiness::UserRole value) {
+QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
     switch (value) {
     case QnBusiness::EveryOne:
         return tr("All Users");
@@ -380,7 +380,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         if (actionType == QnBusiness::SendMailAction)
             return action.actionParams.emailAddress;
         else if (actionType == QnBusiness::ShowPopupAction)
-            return getUserRoleString(action.actionParams.userRole);
+            return getUserGroupString(action.actionParams.userGroup);
         else if (actionType == QnBusiness::ShowOnAlarmLayoutAction) {
             // For ShowOnAlarmLayoutAction action type additionalResources contains users list
             const auto &users = action.actionParams.additionalResources;
