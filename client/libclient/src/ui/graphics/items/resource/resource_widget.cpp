@@ -979,9 +979,7 @@ void QnResourceWidget::updateFrameWidth()
 
 void QnResourceWidget::updateFrameGeometry()
 {
-    static const qreal kPadding = 1.5;
-    const auto frameWidth = m_framePainter.frameWidth() * m_scaleWatcher.scale();
-    const auto offsetValue = frameWidth + kPadding * m_scaleWatcher.scale();
+    const auto offsetValue = (0.9 + m_framePainter.frameWidth()) * m_scaleWatcher.scale();
     const auto offset = QPointF(offsetValue, offsetValue);
     const auto targetRect = QRectF(-offset, size() + QSizeF(offsetValue, offsetValue) * 2);
     m_framePainter.setBoundingRect(targetRect);

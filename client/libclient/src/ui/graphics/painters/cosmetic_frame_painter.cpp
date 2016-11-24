@@ -1,5 +1,5 @@
 
-#include "frame_painter.h"
+#include "cosmetic_frame_painter.h"
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -7,7 +7,7 @@ namespace {
 
 QPen makeCosmeticPen(const QColor& color, int width)
 {
-    QPen result(color, width);
+    QPen result(color, width, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin);
     result.setCosmetic(true);
     return result;
 }
@@ -57,10 +57,9 @@ void QnCosmeticFramePainter::paint(QPainter& painter)
     const QnScopedPainterPenRollback penRollback(&painter, makeCosmeticPen(m_color, m_frameWidth));
     const QnScopedPainterBrushRollback brushRollback(&painter, QBrush(Qt::transparent));
 
-    const auto roundedTransform = QTransform(1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-        qRound(painter.transform().m31()), qRound(painter.transform().m32()), 1.0);
-    const QPointF roundedPosition(qRound(m_rect.x()), qRound(m_rect.y()));
-    const auto targetRect = QRectF(roundedPosition, m_rect.size());
-
-    painter.drawRect(targetRect);
+    // Make sure all corners were drawn correctly
+    painter.drawLine(m_rect.topLeft(), m_rect.topRight());
+    painter.drawLine(m_rect.bottomLeft(), m_rect.bottomRight());
+    painter.drawLine(m_rect.topLeft(), m_rect.bottomLeft());
+    painter.drawLine(m_rect.topRight(), m_rect.bottomRight());
 }

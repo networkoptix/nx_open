@@ -23,7 +23,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/graphics/painters/frame_painter.h>
+#include <ui/graphics/painters/cosmetic_frame_painter.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
