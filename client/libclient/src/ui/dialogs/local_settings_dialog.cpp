@@ -82,8 +82,7 @@ bool QnLocalSettingsDialog::canApplyChanges() const
 void QnLocalSettingsDialog::applyChanges()
 {
     base_type::applyChanges();
-    if (qnSettings->isWritable())
-        qnSettings->save();
+    qnSettings->save();
 }
 
 void QnLocalSettingsDialog::updateButtonBox()

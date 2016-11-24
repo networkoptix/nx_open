@@ -52,6 +52,7 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
                 directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
                 qnSettings->setKnownServerUrls(m_urls);
+                qnSettings->save();
             }
     );
 }

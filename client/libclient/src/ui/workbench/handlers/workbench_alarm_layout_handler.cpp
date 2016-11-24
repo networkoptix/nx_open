@@ -284,7 +284,7 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
 
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
-    auto clientInstanceManager = qnCommon->instance<QnClientInstanceManager>();
+    auto clientInstanceManager = qnClientInstanceManager;
     NX_ASSERT(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
     if (!clientInstanceManager)
         return true;

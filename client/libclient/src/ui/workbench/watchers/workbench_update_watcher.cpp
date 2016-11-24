@@ -123,6 +123,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         qnSettings->setUpdateDeliveryDate(releaseDate.addSecs(timeToDeliverMs).toMSecsSinceEpoch());
     }
     qnSettings->setLatestUpdateInfo(info);
+    qnSettings->save();
 
     /* Update is postponed */
     if (qnSettings->updateDeliveryDate() > QDateTime::currentMSecsSinceEpoch())
@@ -188,7 +189,12 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
     if (result == QDialogButtonBox::Yes)
+    {
         action(QnActions::SystemUpdateAction)->trigger();
+    }
     else
+    {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
+        qnSettings->save();
+    }
 }
