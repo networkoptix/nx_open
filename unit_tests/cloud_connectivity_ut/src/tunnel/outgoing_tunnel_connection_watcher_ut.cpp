@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
+#include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
@@ -70,8 +71,9 @@ protected:
         return InitializationGuard(
             [this]()
             {
-                if (m_tunnel)
-                    m_tunnel->pleaseStopSync();
+                auto tunnel = std::move(m_tunnel);
+                if (tunnel)
+                    tunnel->pleaseStopSync();
             });
     }
 
@@ -85,7 +87,7 @@ protected:
     }
 
     nx::hpm::api::ConnectionParameters m_connectionParameters;
-    std::unique_ptr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
+    nx::utils::AtomicUniquePtr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
 };
 
