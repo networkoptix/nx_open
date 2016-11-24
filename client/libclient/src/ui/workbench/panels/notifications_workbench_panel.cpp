@@ -72,7 +72,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     action(QnActions::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setTransform(QTransform::fromScale(-1, 1));
     m_showButton->setFocusProxy(item);
-    m_showButton->setZValue(ControlItemZOrder);
+    m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     setHelpTopic(m_showButton, Qn::MainWindow_Pin_Help);
     item->setBlinker(m_showButton);
     connect(action(QnActions::ToggleNotificationsAction), &QAction::toggled, this,
