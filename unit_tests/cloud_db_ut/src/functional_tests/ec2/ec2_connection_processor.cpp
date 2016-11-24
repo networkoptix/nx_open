@@ -127,7 +127,7 @@ void Ec2ConnectionProcessor::run()
             t.restart();
             parseRequest();
 
-            auto handler = m_owner->findHandler(d->protocol, d->request);
+            /*auto handler =*/ m_owner->findHandler(d->protocol, d->request);
             bool noAuth = true;
             //if (handler && !authenticate(&d->accessRights, &noAuth))
             //    return;

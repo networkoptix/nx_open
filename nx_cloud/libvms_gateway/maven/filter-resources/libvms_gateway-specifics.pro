@@ -5,3 +5,7 @@ win* {
 }
 
 SOURCES += ${project.build.directory}/libvms_gateway_app_info_impl.cpp
+
+linux {
+    QMAKE_CXXFLAGS += -Werror
+}
