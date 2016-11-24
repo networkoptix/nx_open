@@ -17,8 +17,16 @@ class TestTunnelConnection:
     public AbstractOutgoingTunnelConnection
 {
 public:
+    virtual ~TestTunnelConnection() override
+    {
+        stopWhileInAioThread();
+    }
+
     virtual void stopWhileInAioThread() override
     {
+        auto onClosedHandler = std::move(m_onClosedHandler);
+        if (onClosedHandler)
+            onClosedHandler(SystemError::interrupted);
     }
 
     virtual void establishNewConnection(
@@ -29,9 +37,13 @@ public:
     }
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
+        m_onClosedHandler = std::move(handler);
     }
+
+private:
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
 };
 
 constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
