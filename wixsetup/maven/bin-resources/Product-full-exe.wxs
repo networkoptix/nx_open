@@ -4,7 +4,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include BuildVars.wxi ?>
 
-    <Bundle Name="$(var.productName) Bundle" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.fullBundleUpgradeCode)" DisableModify="yes">
+    <Bundle Name="$(var.productName) Bundle" Manufacturer="$(var.companyName)" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.fullBundleUpgradeCode)" DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
