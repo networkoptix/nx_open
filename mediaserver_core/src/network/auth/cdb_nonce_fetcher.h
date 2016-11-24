@@ -54,6 +54,9 @@ public:
         nx_http::BufferType* const cloudNonce,
         nx_http::BufferType* const nonceTrailer);
 
+public slots:
+    void cloudBindingStatusChanged(bool boundToCloud);
+
 private:
     struct NonceCtx
     {
@@ -84,7 +87,4 @@ private:
     static void removeInvalidNonce(
         std::deque<NonceCtx>* const cdbNonceQueue,
         qint64 curClock);
-
-private slots:
-    void cloudBindingStatusChanged(bool boundToCloud);
 };
