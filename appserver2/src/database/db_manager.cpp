@@ -696,6 +696,8 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
 
 bool QnDbManager::resyncTransactionLog()
 {
+    using std::nullptr_t;
+
     if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
         return false;
     if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
