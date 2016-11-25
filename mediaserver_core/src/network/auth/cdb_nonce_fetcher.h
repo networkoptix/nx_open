@@ -17,9 +17,9 @@
 #include <QtCore/QObject>
 
 #include <cdb/connection.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/common/safe_direct_connection.h>
 
 #include "abstract_nonce_provider.h"
@@ -48,14 +48,12 @@ public:
     virtual bool isNonceValid(const QByteArray& nonce) const override;
 
     bool isValidCloudNonce(const QByteArray& nonce) const;
+    nx::cdb::api::ResultCode initializeConnectionToCloudSync();
 
     static bool parseCloudNonce(
         const nx_http::BufferType& nonce,
         nx_http::BufferType* const cloudNonce,
         nx_http::BufferType* const nonceTrailer);
-
-public slots:
-    void cloudBindingStatusChanged(bool boundToCloud);
 
 private:
     struct NonceCtx
@@ -83,8 +81,11 @@ private:
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
+    void saveCloudNonce(nx::cdb::api::NonceData nonce);
+    void removeExpiredNonce(const QnMutexLockerBase&, qint64 curClock);
 
-    static void removeInvalidNonce(
-        std::deque<NonceCtx>* const cdbNonceQueue,
-        qint64 curClock);
+    void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
+
+private slots:
+    void cloudBindingStatusChanged(bool boundToCloud);
 };

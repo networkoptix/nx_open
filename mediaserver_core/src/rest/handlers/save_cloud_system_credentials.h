@@ -39,10 +39,14 @@ private:
         nx_http::StatusCode::Value* const authorizationStatusCode);
     bool validateInputData(const CloudCredentialsData& data, QnJsonRestResult* result);
     bool checkInternetConnection(QnJsonRestResult* result);
+
     bool saveCloudData(const CloudCredentialsData& data, QnJsonRestResult* result);
     bool saveCloudCredentials(const CloudCredentialsData& data, QnJsonRestResult* result);
     bool insertCloudOwner(const CloudCredentialsData& data, QnJsonRestResult* result);
+
     bool fetchNecessaryDataFromCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool saveLocalSystemIdToCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool initializeCloudRelatedManagers(QnJsonRestResult* result);
+
     bool rollback();
-    void initializeCloudRelatedManagers();
 };
