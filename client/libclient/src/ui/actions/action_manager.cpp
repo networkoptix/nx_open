@@ -517,9 +517,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ConnectAction).
         flags(Qn::NoTarget);
 
+    factory(QnActions::ConnectToCloudSystemAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::ReconnectAction).
-        flags(Qn::NoTarget).
-        text(tr("Reconnect to Server"));
+        flags(Qn::NoTarget);
 
     factory(QnActions::FreespaceAction).
         flags(Qn::GlobalHotkey).
@@ -638,7 +640,6 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Connect to Server...")).
         shortcut(lit("Ctrl+Shift+C")).
-        icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 
     factory(QnActions::DisconnectAction).

@@ -89,12 +89,12 @@ CREATE TABLE account_password(                                                  
     is_email_code               INTEGER,                                        \
     FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE            \
 );                                                                              \
-";                                                                              
+";
 
 
 
-//!Account table                                                                
-static const char kCreateAccountData[] =                                        
+//!Account table
+static const char kCreateAccountData[] =
 "                                                                   \
 CREATE TABLE account_status (                                       \
     code                INTEGER PRIMARY KEY,                        \
@@ -149,7 +149,7 @@ CREATE TABLE system (                                                           
 );                                                                                  \
 ";
 
-static const char kSystemToAccountMapping[] = 
+static const char kSystemToAccountMapping[] =
 "                                                                                   \
 CREATE TABLE access_role (                                                          \
     id                  INTEGER PRIMARY KEY,                                        \
@@ -229,7 +229,7 @@ UPDATE access_role SET description='localAdmin' WHERE id=4;                 \
 UPDATE access_role SET description='cloudAdmin' WHERE id=5;                 \
 ";
 
-static const char kChangeSystemIdTypeToString[] = 
+static const char kChangeSystemIdTypeToString[] =
 "                                                                           \
 ALTER TABLE system_to_account RENAME TO system_to_account_old;              \
 ALTER TABLE system RENAME TO system_old;                                    \
@@ -613,13 +613,13 @@ ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
 )sql";
 
 /**
- * #CLOUD-588. If user has ignored invitation email 
+ * #CLOUD-588. If user has ignored invitation email
  * he can still register cloud account in a regular way.
  */
 static const char kAddInviteHasBeenSentAccountStatus[] =
 R"sql(
 
-INSERT INTO account_status(code, description) 
+INSERT INTO account_status(code, description)
     VALUES(4, 'invite message has been sent');
 
 )sql";
@@ -648,6 +648,36 @@ static const char kDropGlobalTransactionSequenceTable[] =
 R"sql(
 
 DROP TABLE cloud_db_transaction_sequence;
+
+)sql";
+
+/**
+ * #VMS-4425. Rename user group - > user role.
+ */
+static const char kRenameGroupToRole[] =
+R"sql(
+
+ALTER TABLE system_to_account RENAME TO system_to_account_old;
+
+CREATE TABLE system_to_account(
+    account_id                  VARCHAR(64) NOT NULL,
+    system_id                   VARCHAR(64) NOT NULL,
+    access_role_id              INTEGER NOT NULL,
+    user_role_id                VARCHAR(64) NULL,
+    custom_permissions          VARCHAR(1024) NULL,
+    is_enabled                  INTEGER NULL,
+    vms_user_id                 VARCHAR(64) NULL,
+    last_login_time_utc         BIGINT,
+    usage_frequency             FLOAT,
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE,
+    FOREIGN KEY(access_role_id) REFERENCES access_role(id)
+);
+
+INSERT INTO system_to_account
+    SELECT * FROM system_to_account_old;
+
+DROP TABLE system_to_account_old;
 
 )sql";
 

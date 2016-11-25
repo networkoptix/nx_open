@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
+#include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
@@ -17,8 +18,16 @@ class TestTunnelConnection:
     public AbstractOutgoingTunnelConnection
 {
 public:
+    virtual ~TestTunnelConnection() override
+    {
+        stopWhileInAioThread();
+    }
+
     virtual void stopWhileInAioThread() override
     {
+        auto onClosedHandler = std::move(m_onClosedHandler);
+        if (onClosedHandler)
+            onClosedHandler(SystemError::interrupted);
     }
 
     virtual void establishNewConnection(
@@ -29,9 +38,13 @@ public:
     }
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
+        m_onClosedHandler = std::move(handler);
     }
+
+private:
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
 };
 
 constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
@@ -70,8 +83,9 @@ protected:
         return InitializationGuard(
             [this]()
             {
-                if (m_tunnel)
-                    m_tunnel->pleaseStopSync();
+                decltype(m_tunnel) tunnel(m_tunnel.release());
+                if (tunnel)
+                    tunnel->pleaseStopSync();
             });
     }
 
@@ -85,7 +99,7 @@ protected:
     }
 
     nx::hpm::api::ConnectionParameters m_connectionParameters;
-    std::unique_ptr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
+    nx::utils::AtomicUniquePtr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
 };
 

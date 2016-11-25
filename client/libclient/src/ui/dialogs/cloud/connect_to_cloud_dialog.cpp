@@ -295,6 +295,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
         messageBox.setInformativeText(message);
 
     messageBox.exec();
+    lockUi(false);
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(

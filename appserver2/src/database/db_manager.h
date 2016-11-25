@@ -579,11 +579,8 @@ namespace detail
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
-        template <class ObjectType, class ObjectListType>
-        bool fillTransactionLogInternal(
-            ApiCommand::Value command, 
-            std::function<bool (ObjectType& data)> updater = nullptr,
-            std::function<bool (ObjectType& data)> saveToTransactionLogPredicate = nullptr);
+        template <class FilterType, class ObjectType, class ObjectListType>
+        bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
 
         template <class ObjectListType>
         bool queryObjects(ObjectListType& objects);

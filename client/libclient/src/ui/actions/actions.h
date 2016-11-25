@@ -29,6 +29,11 @@ enum IDType
     ConnectAction,
 
     /**
+    * Connects to cloud system.
+    */
+    ConnectToCloudSystemAction,
+
+    /**
      * Disconnects from server.
      */
     DisconnectAction,

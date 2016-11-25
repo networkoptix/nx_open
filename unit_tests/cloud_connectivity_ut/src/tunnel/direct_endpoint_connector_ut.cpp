@@ -88,10 +88,16 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
         { QnUuid::createUuid().toByteArray(), false },
         { boost::none, false } };
 
-    for (const auto& systemIdTestContext : testSystemIdArray)
+    for (size_t i = 0; i < sizeof(testSystemIdArray) / sizeof(*testSystemIdArray); ++i)
     {
-        for (const auto& peerIdTestContext: testPeerIdArray)
+        const auto& systemIdTestContext = testSystemIdArray[i];
+
+        for (size_t j = 0; j < sizeof(testPeerIdArray) / sizeof(*testPeerIdArray); ++j)
         {
+            const auto& peerIdTestContext = testPeerIdArray[j];
+
+            std::cout<<"test debug: "<<i<<", "<<j<<std::endl;
+
             ConnectResult connectResult;
             auto server1 = mediator().addRandomServer(system1, peerId);
 

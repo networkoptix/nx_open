@@ -20,7 +20,8 @@ namespace style
         static const int kMinimumButtonWidth;
         static const int kButtonHeight;
         static const int kHeaderSize;
-        static const int kViewRowHeight;
+        static const int kListRowHeight;                /** QListView minimal row height */
+        static const int kViewRowHeight;                /** Other item views minimal row height */
         static const int kSortIndicatorSize;
         static const int kRounding;
         static const QSize kButtonSwitchSize;
@@ -77,9 +78,6 @@ namespace style
     };
 
     Q_DECLARE_FLAGS(SliderFeatures, SliderFeature)
-
-    qreal dpr(qreal value);
-    int dp(qreal value);
 
     bool isDark(const QColor &color);
 

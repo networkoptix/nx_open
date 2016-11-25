@@ -9,6 +9,13 @@ enum class LiteModeType
     LiteModeEnabled
 };
 
+enum class AutoLoginMode
+{
+    Auto = -1,
+    Enabled,
+    Disabled
+};
+
 class QnMobileClientMetaTypes {
 public:
     static void initialize();

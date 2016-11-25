@@ -270,10 +270,10 @@
     "QListView": {
         "palette": {
             "default": {
-                "base":             "dark4"
+                "base":             "dark6"
             },
             "disabled": {
-                "base":             "dark4.setAlpha(77)"
+                "base":             "dark6.setAlpha(77)"
             }
         }
     },
@@ -378,7 +378,7 @@
 
     "QnTimelinePlaceholder": {
         "palette": { "default": {
-            "windowText": "dark11"
+            "windowText": "dark16"
         }}
     },
 
@@ -400,6 +400,8 @@
 
             "pastMotion": "red_d1",
             "futureMotion": "red_d1",
+
+            "noThumbnailsLabel": "dark16",
 
             "separator": "dark6",
 
@@ -660,7 +662,7 @@
 
     "QnServerAddressesModel": {
         "colors": {
-            "readOnly": "#c0c0c0"
+            "readOnly": "light10"
         }
     },
 
@@ -708,11 +710,12 @@
     "QnNotificationWidget" : {
         "palette": {
             "default": {
-                "dark": "dark6"
+                "dark": "dark6",
+                "windowText": "light10"
             }
         }
     },
-
+    
     "QnMediaResourceWidget": {
         "motionSensitivityColors": [
             "light16",
@@ -744,10 +747,7 @@
 
     "QnFisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
-    },
-    
-    "QnNotificationWidget": {
-        "palette": { "default": { "windowText": "light10" } }
     }
+
 }
 

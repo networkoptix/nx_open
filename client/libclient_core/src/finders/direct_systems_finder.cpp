@@ -77,34 +77,34 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
 
 void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
+    const auto systemId = helpers::getTargetSystemId(moduleInformation);
+
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
     {
-        // checks if it is new system
-        const bool wasNewSystem = systemIt.value()->isNewSystem();
-        const bool isNewSystem = helpers::isNewSystem(moduleInformation);
-
         /**
-         * We can check for system state change only here because in this
-         * finder system exists only if at least one server is attached
-         */
-        if (wasNewSystem == isNewSystem)
+        * We can check for system state/id change only here because in this
+        * finder system exists only if at least one server is attached
+        */
+        const auto current = systemIt.value();
+
+        // Checks if "new system" state hasn't been changed yet
+        const bool sameNewSystemState =
+            (current->isNewSystem() == helpers::isNewSystem(moduleInformation));
+
+        // Checks if server has same system id (in case of merge/restore operations)
+        const bool belongsToSameSystem = (current->id() == systemId);
+
+        if (sameNewSystemState && belongsToSameSystem)
         {
-            // "New system" state is not changed, just update system
+            // Just update system
             updateServer(systemIt, moduleInformation);
             return;
         }
-        else
-        {
-            /**
-             * "New system" state is changed - remove old system in
-             * order to create a new one with updated state. Id of system will be changed.
-             */
-            removeSystem(systemIt);
-        }
+
+        removeServer(moduleInformation);
     }
 
-    const auto systemId = helpers::getTargetSystemId(moduleInformation);
     auto itSystem = m_systems.find(systemId);
     const auto createNewSystem = (itSystem == m_systems.end());
     if (createNewSystem)

@@ -414,7 +414,7 @@ protected:
         // Init singletons.
         m_common = new QnCommonModule();
         m_common->setModuleGUID(QnUuid::createUuid());
-        m_common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
+        m_common->store(new QnFfmpegInitializer());
 
         VideoDecoderRegistry::instance()->reinitialize(); //< Just in case.
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>();

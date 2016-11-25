@@ -220,7 +220,7 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
     QnResourcePtr admin = qnResPool->getResourceById(QnUserResource::kAdminGuid);
     NX_ASSERT(admin);
     QnBusinessEventRuleList result;
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userRole\" : 0 }",   0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(3,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::NetworkIssueEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(4,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::CameraIpConflictEvent));

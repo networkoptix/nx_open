@@ -116,11 +116,17 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->updateButton->setEnabled(false);
 
-    connect(ui->cancelButton, &QPushButton::clicked, this, [this]()
-    {
-        if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-            m_updateTool->cancelUpdate();
-    });
+    connect(ui->cancelButton, &QPushButton::clicked, this,
+        [this]()
+        {
+
+            if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            {
+                ui->cancelButton->setEnabled(false);
+                m_updateTool->cancelUpdate();
+                ui->cancelButton->setEnabled(true);
+            }
+        });
 
     connect(ui->updateButton, &QPushButton::clicked, this, [this]()
     {

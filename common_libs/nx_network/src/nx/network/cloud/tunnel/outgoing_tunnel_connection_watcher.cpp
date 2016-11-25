@@ -84,13 +84,17 @@ void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
     NX_ASSERT(isInSelfAioThread());
 
     m_inactivityTimer.reset();
-    m_tunnelConnection.reset();
-    if (m_onTunnelClosedHandler)
-    {
-        auto handler = std::move(m_onTunnelClosedHandler);
-        m_onTunnelClosedHandler = nullptr;
-        handler(reason);
-    }
+
+    decltype(m_tunnelConnection) tunnelConnection;
+    tunnelConnection.swap(m_tunnelConnection);
+    
+    decltype(m_onTunnelClosedHandler) onTunnelClosedHandler;
+    onTunnelClosedHandler.swap(m_onTunnelClosedHandler);
+
+    tunnelConnection.reset();
+
+    if (onTunnelClosedHandler)
+        onTunnelClosedHandler(reason);
 }
 
 } // namespace cloud

@@ -32,12 +32,18 @@
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/std/cpp14.h>
+
+#include <nx/mobile_client/webchannel/web_channel_server.h>
+#include <nx/mobile_client/controllers/web_admin_controller.h>
 
 #include "config.h"
 using mobile_client::conf;
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <common/systemexcept.h>
+
+using namespace nx::mobile_client;
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -63,9 +69,22 @@ int runUi(QGuiApplication *application) {
 
     if (qnSettings->isLiteClientModeEnabled())
     {
-        auto liteClientHandler = new QnLiteClientHandler();
-        liteClientHandler->setUiController(context.uiController());
-        qnCommon->store<QnLiteClientHandler>(liteClientHandler);
+        auto preparingWebChannel = std::make_unique<webchannel::WebChannelServer>(
+            qnSettings->webSocketPort());
+
+        if (preparingWebChannel->isValid())
+        {
+            auto webChannel = qnCommon->store(preparingWebChannel.release());
+            qnSettings->setWebSocketPort(webChannel->serverPort());
+
+            auto liteClientHandler = qnCommon->store(new QnLiteClientHandler());
+            liteClientHandler->setUiController(context.uiController());
+
+            auto webAdminController = qnCommon->store(new controllers::WebAdminController());
+            webAdminController->setUiController(context.uiController());
+
+            webChannel->registerObject(lit("liteClientController"), webAdminController);
+        }
     }
 
     QStringList selectors;
@@ -229,6 +248,8 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         qnSettings->setTestMode(true);
         qnSettings->setInitialTest(startupParameters.initialTest);
     }
+
+    qnSettings->setWebSocketPort(startupParameters.webSocketPort);
 }
 
 int main(int argc, char *argv[])

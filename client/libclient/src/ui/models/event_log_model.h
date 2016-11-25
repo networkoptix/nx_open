@@ -70,7 +70,7 @@ private:
     static QnResourcePtr getResourceById(const QnUuid& id);
     static QString getUserNameById(const QnUuid &id);
     static QString getResourceNameString(const QnUuid &id);
-    static QString getUserRoleString(QnBusiness::UserRole value);
+    static QString getUserGroupString(QnBusiness::UserGroup value);
 
     void at_resource_removed(const QnResourcePtr &resource);
     static bool hasVideoLink(const QnBusinessActionData &action);

@@ -9,6 +9,7 @@ import traceback
 import Queue
 import threading
 import difflib
+from pycommons.Logger import log, LOGLEVEL
 
 __all__ = ['JsonDiff', 'FtConfigParser', 'compareJson', 'showHelp', 'getHelpDesc',
            'TestDigestAuthHandler', 'ManagerAddPassword',
@@ -392,8 +393,8 @@ def checkResultsEqual(responseList, methodName):
     The function compares that all responces are ok and their json contents are equal.
     Returns a tupple of a boolean success indicator and a string fail reason.
     """
-    print "------------------------------------------"
-    print "Check sync status on method %s" % (methodName)
+    log(LOGLEVEL.INFO, "------------------------------------------")
+    log(LOGLEVEL.INFO, "Check sync status on method %s" % (methodName))
     result = None
     resultAddr = None
     resultJsonObject = None
@@ -418,12 +419,12 @@ def checkResultsEqual(responseList, methodName):
                 contentJsonObject = TestJsonLoads(content, address, methodName)
                 compareResult = compareJson(contentJsonObject, resultJsonObject)
                 if compareResult.hasDiff():
-                    print "Method %s returns different results on server %s and %s" % (methodName, address, resultAddr)
-                    print compareResult.errorInfo()
+                    log(LOGLEVEL.ERROR, "Method %s returns different results on server %s and %s" % (methodName, address, resultAddr))
+                    log(LOGLEVEL.ERROR, compareResult.errorInfo())
                     raise ServerCompareFailure("Servers %s and %s aren't synced on %s" % (address, resultAddr, methodName))
         response.close()
-    print "Method %s is synced in cluster" % (methodName)
-    print "------------------------------------------"
+    log(LOGLEVEL.INFO, "Method %s is synced in cluster" % (methodName))
+    log(LOGLEVEL.INFO, "------------------------------------------")
 
 
 # ---------------------------------------------------------------------
@@ -587,7 +588,7 @@ def SafeJsonLoads(text, serverAddr, methodName):
     try:
         return json.loads(text)
     except ValueError, e:
-        print "Error parsing server %s, method %s response: %s" % (serverAddr, methodName, e)
+        log(LOGLEVEL.ERROR, "Error parsing server %s, method %s response: %s" % (serverAddr, methodName, e))
         return None
 
 def TestJsonLoads(text, serverAddr, methodName):
@@ -605,7 +606,7 @@ def HttpRequest(serverAddr, methodName, params=None, headers=None, timeout=None,
     if params:
         url += '?'+ urlencode(params)
     if logURL:
-        print "Requesting: " + url
+        log(LOGLEVEL.DEBUG + 9, "Requesting: " + url)
     req = urllib2.Request(url)
     if headers:
         for k, v in headers.iteritems():
@@ -625,10 +626,10 @@ def HttpRequest(serverAddr, methodName, params=None, headers=None, timeout=None,
                 err = "Error: server %s, method %s %s" % (serverAddr, methodName, err)
             if isinstance(printHttpError, Exception):
                 raise printHttpError(err)
-            print err
+            log(LOGLEVEL.ERROR, err)
         return None
     data = response.read()
-    print "DEBUG0: %s returned data: %s" % (url, repr(data))
+    log(LOGLEVEL.DEBUG + 9, "DEBUG0: %s returned data: %s" % (url, repr(data)))
     if len(data):
         return SafeJsonLoads(data, serverAddr, methodName)
     return True
@@ -679,14 +680,14 @@ class ClusterWorker(object):
                 func(*args)
             except LegacyTestFailure as err:
                 msg = "%s failed: %s"  % (func.__name__, err.message)
-                print "ERROR: ClusterWorker call " + msg
+                log(LOGLEVEL.ERROR, "ERROR: ClusterWorker call " + msg)
                 self._oks.append(False)
                 self._fails.append(msg)
             except Exception as err:
                 etype, value, tb = sys.exc_info()
-                print "ERROR: ClusterWorker call to %s failed with %s: %s\nTraceback:\n%s" % (
+                log(LOGLEVEL.ERROR, "ERROR: ClusterWorker call to %s failed with %s: %s\nTraceback:\n%s" % (
                     func.__name__, type(err).__name__, getattr(err, 'message', str(err)),
-                    ''.join(traceback.format_tb(tb)))
+                    ''.join(traceback.format_tb(tb))))
                 self._oks.append(False)
             else:
                 self._oks.append(True)
@@ -720,7 +721,7 @@ class ClusterWorker(object):
         if len(alive) < len(self._threadList):
             self._threadList[:] = alive
         if not (alive) and self._queue.qsize() > 0:
-            print "WARNING: no alive threads but queue isn't empty! Starting threads again!"
+            log(LOGLEVEL.WARNING, "WARNING: no alive threads but queue isn't empty! Starting threads again!")
             self._threadList.clear()
             self.startThreads()
         # Second we call queue join to join the queue
@@ -830,7 +831,7 @@ def sendRequest(lock, url, data, notify=False):
     try:
         with lock:
             if notify:
-                print "Requesting " + url
+                log(LOGLEVEL.DEBUG + 9, "Requesting " + url)
             response = urllib2.urlopen(req)
     except Exception as err:
         raise TestRequestError(url, err.message or str(err), data)

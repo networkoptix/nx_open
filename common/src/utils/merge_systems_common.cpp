@@ -39,7 +39,8 @@ public:
             case notFound:
                 return tr("The system was not found.");
             case incompatibleVersion:
-                return tr("The discovered system %1 has an incompatible version %2.")
+                return tr("The discovered system %1 has an incompatible version %2.",
+                    "%1 is name of the system, %2 is version information")
                     .arg(moduleInformation.systemName).arg(moduleInformation.version.toString());
             case unauthorized:
                 return tr("The password or user name is invalid.");
@@ -47,7 +48,8 @@ public:
                 return tr("This user does not have permissions for the requested operation.");
             case notLocalOwner:
                 return tr("Can't connect to the other system "
-                    "because current system is already connected to %1.")
+                    "because current system is already connected to %1.",
+                    "%1 is name of cloud (like 'Nx Cloud')")
                         .arg(QnAppInfo::cloudName());
             case backupFailed:
                 return tr("Cannot create database backup.");
@@ -60,19 +62,24 @@ public:
                     + tr("If you understand this and would like to proceed please click "
                         "Merge to continue.");
             case safeMode:
-                return tr("The discovered system %1 is in safe mode.")
+                return tr("The discovered system %1 is in safe mode.",
+                    "%1 is name of the system")
                     .arg(moduleInformation.systemName);
             case configurationFailed:
-                return tr("Could not configure the remote system %1.")
+                return tr("Could not configure the remote system %1.",
+                    "%1 is name of the system")
                     .arg(moduleInformation.systemName);
             case dependentSystemBoundToCloud:
-                return tr("System being merged cannot be connected to %1.")
+                return tr("In this version you can only merge systems which are not connected to %1.",
+                    "%1 is name of cloud (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case bothSystemBoundToCloud:
-                return tr("Both systems are connected to %1. Merge is not allowed.")
+                return tr("Both systems are connected to %1. Merge is not allowed.",
+                    "%1 is name of cloud (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case differentCloudHost:
-                return tr("These systems are built with different %1 URL. Merge is not allowed.")
+                return tr("These systems are built with different %1 URL. Merge is not allowed.",
+                    "%1 is name of cloud (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");

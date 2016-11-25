@@ -457,49 +457,49 @@ bool QnDbManager::init(const QUrl& dbUrl)
         else
         {
             if (m_needResyncLicenses) {
-                if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+                if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
                     return false;
             }
             if (m_needResyncFiles) {
-                if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
                     return false;
             }
             if (m_needResyncCameraUserAttributes) {
-                if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
                     return false;
             }
             if (m_needResyncServerUserAttributes) {
-                if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+                if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
                     return false;
             }
             if (m_needResyncMediaServers) {
-                if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
+                if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
                     return false;
             }
             if (m_needResyncLayout) {
-                if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
+                if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
                     return false;
             }
             if (m_needResyncbRules) {
-                if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
+                if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
                     return false;
             }
             if (m_needResyncUsers) {
-                if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+                if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
                     return false;
             }
             if (m_needResyncStorages) {
-                if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+                if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
                     return false;
             }
             if (m_needResyncClientInfoData) {
-                if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+                if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
                     return false;
             }
             if (m_needResyncVideoWall)
             {
-//                 if (!fillTransactionLogInternal<ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
-//                     return false;
+                 if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+                     return false;
             }
 
         }
@@ -663,112 +663,30 @@ bool QnDbManager::syncLicensesBetweenDB()
     return true;
 }
 
-template <>
-bool QnDbManager::queryObjects<ApiMediaServerUserAttributesDataList>(ApiMediaServerUserAttributesDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
 
-template <>
-bool QnDbManager::queryObjects<ApiCameraAttributesDataList>(ApiCameraAttributesDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiClientInfoDataList>(ApiClientInfoDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiStorageDataList>(ApiStorageDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiResourceParamWithRefDataList>(ApiResourceParamWithRefDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiLayoutDataList>(ApiLayoutDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiUserDataList>(ApiUserDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiBusinessRuleDataList>(ApiBusinessRuleDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiMediaServerDataList>(ApiMediaServerDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiCameraDataList>(ApiCameraDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiResourceStatusDataList>(ApiResourceStatusDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <class ObjectListType>
-bool QnDbManager::queryObjects(ObjectListType& objects)
-{
-    ErrorCode errCode = doQueryNoLock(nullptr, objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(
-    ApiCommand::Value command, 
-    std::function<bool (ObjectType& data)> updater,
-    std::function<bool (ObjectType& data)> saveToTransactionLogPredicate)
+template <class FilterType, class ObjectType, class ObjectListType>
+bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
-    if (!queryObjects<ObjectListType>(objects))
+    if (doQueryNoLock(FilterType(), objects) != ErrorCode::ok)
         return false;
 
     for(const ObjectType& object: objects)
     {
         QnTransaction<ObjectType> transaction(command, object);
+        auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
+
+        if (transactionDescriptor)
+            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(object);
+        else
+            transaction.transactionType = ec2::TransactionType::Unknown;
+
         transactionLog->fillPersistentInfo(transaction);
         if (updater && updater(transaction.params))
         {
             if (executeTransactionInternal(transaction) != ErrorCode::ok)
                 return false;
         }
-
-        if (saveToTransactionLogPredicate && !saveToTransactionLogPredicate(transaction.params))
-            continue;
 
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
@@ -778,49 +696,51 @@ bool QnDbManager::fillTransactionLogInternal(
 
 bool QnDbManager::resyncTransactionLog()
 {
-    if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+    using std::nullptr_t;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
         return false;
-    if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
+    if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
         return false;
-    if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+    if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
         return false;
-    if (!fillTransactionLogInternal<ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
+    if (!fillTransactionLogInternal<QnUuid, ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
         return false;
-    if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+    if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
         return false;
-    if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
+    if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
         return false;
-    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
+    if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
         return false;
-    if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
+    if (!fillTransactionLogInternal<QnUuid, ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
 
-    if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+    if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
         return false;
 
-    if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+    if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
         return false;
 
-    if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+    if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
         return false;
 
-    if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+    if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
-    if (!fillTransactionLogInternal<ApiResourceStatusData, ApiResourceStatusDataList>(
-            ApiCommand::setResourceStatus,
-            nullptr,
-            [] (const ApiResourceStatusData& statusData)
-            {
-                auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ApiResourceStatusData>(ApiCommand::setResourceStatus);
-                if (transactionDescriptor)
-                    return transactionDescriptor->getTransactionTypeFunc(statusData) != ec2::TransactionType::Local;
-
-                return false;
-            }))
-    {
+    if (!fillTransactionLogInternal<QnUuid, ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
         return false;
-    }
+
+    if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+        return false;
+
+    if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiUserRoleData, ApiUserRoleDataList>(ApiCommand::saveUserRole))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
+        return false;
 
     return true;
 }
@@ -3145,11 +3065,16 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDa
 
 void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
 {
-    for(const QFileInfo& fi: QDir(":/resources").entryInfoList(QDir::Files))
-        loadResourceTypeXML(fi.absoluteFilePath(), data);
-    QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
-    for(const QFileInfo& fi: dir2.entryInfoList(QDir::Files))
-        loadResourceTypeXML(fi.absoluteFilePath(), data);
+    const auto cameraTypesDir = lit("/resources/camera_types");
+    const auto nameFilters = QStringList{lit("*.xml")};
+
+    const auto qrcDir = QDir(lit(":") + cameraTypesDir);
+    for(const auto& fileInfo: qrcDir.entryInfoList(nameFilters, QDir::Files))
+        loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
+
+    const auto applicationDir = QDir(QCoreApplication::applicationDirPath() + cameraTypesDir);
+    for(const auto& fileInfo: applicationDir.entryInfoList(nameFilters, QDir::Files))
+        loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)

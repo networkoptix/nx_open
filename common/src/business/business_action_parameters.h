@@ -21,7 +21,7 @@ struct QnBusinessActionParameters
     QString emailAddress;
 
     // Popups and System Health
-    QnBusiness::UserRole userRole;
+    QnBusiness::UserGroup userGroup;
 
     // Recording
     int fps;
@@ -69,7 +69,7 @@ struct QnBusinessActionParameters
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userRole)(fps)(streamQuality)(recordingDuration)(recordAfter)\
+#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
     (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */

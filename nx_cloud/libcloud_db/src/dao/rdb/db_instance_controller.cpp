@@ -56,6 +56,7 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     m_dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     m_dbStructureUpdater.addUpdateScript(db::kAddVmsOpaqueData);
     m_dbStructureUpdater.addUpdateScript(db::kDropGlobalTransactionSequenceTable);
+    m_dbStructureUpdater.addUpdateScript(db::kRenameGroupToRole);
 }
 
 bool DbInstanceController::initialize()

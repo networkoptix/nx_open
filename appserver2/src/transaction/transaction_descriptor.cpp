@@ -1020,10 +1020,10 @@ ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
     ApiMediaServerDataList serverDataList;
     ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, serverDataList);
 
-    if (errorCode != ErrorCode::ok)
+    if (errorCode != ErrorCode::ok || serverDataList.empty())
         return ec2::TransactionType::Unknown;
 
-    return serverDataList.empty() ? TransactionType::Regular : TransactionType::Local;
+    return TransactionType::Local;
 }
 
 struct SetStatusTransactionType
@@ -1068,10 +1068,10 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
     ApiUserDataList userDataList;
     ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, userDataList);
 
-    if (errorCode != ErrorCode::ok)
+    if (errorCode != ErrorCode::ok || userDataList.empty())
         return ec2::TransactionType::Unknown;
 
-    return userDataList.empty() ? TransactionType::Regular : TransactionType::Local;
+    return userDataList[0].isCloud ? TransactionType::Cloud : TransactionType::Regular;
 }
 
 struct RemoveUserTransactionType

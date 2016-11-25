@@ -42,12 +42,13 @@ MediatorFunctionalTest::MediatorFunctionalTest()
 
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
+    QDir().mkpath(m_tmpDir);
 
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-stun/addrToListenList"); addArg("127.0.0.1:0");
     addArg("-http/addrToListenList"); addArg("127.0.0.1:0");
-    addArg("-log/logLevel"); addArg("none");
+    addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
 
     registerCloudDataProvider(&m_cloudDataProvider);
@@ -131,20 +132,21 @@ AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     const AbstractCloudDataProvider::System& system,
-    nx::String name, bool bindEndpoint)
+    nx::String name, ServerTweak::Value tweak)
 {
     auto server = std::make_unique<MediaServerEmulator>(
         stunEndpoint(),
         system,
         std::move(name));
 
-    if (!server->start())
+    if (!server->start(!(tweak & ServerTweak::noListenToConnect)))
     {
         NX_LOGX(lm("Failed to start server: %1").arg(server->fullName()), cl_logERROR);
         return nullptr;
     }
 
-    if (bindEndpoint && server->bind() != nx::hpm::api::ResultCode::ok)
+    if (!(tweak & ServerTweak::noBindEndpoint)
+        && server->bind() != nx::hpm::api::ResultCode::ok)
     {
         NX_LOGX(lm("Failed to bind server: %1, endpoint=%2")
             .arg(server->fullName()).str(server->endpoint()), cl_logERROR);
@@ -157,25 +159,26 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
     const AbstractCloudDataProvider::System& system,
     boost::optional<QnUuid> serverId,
-    bool bindEndpoint)
+    ServerTweak::Value tweak)
 {
     if (!serverId)
         serverId = QnUuid::createUuid();
+
     return addServer(
         system,
         serverId.get().toSimpleString().toUtf8(),
-        bindEndpoint);
+        tweak);
 }
 
 std::vector<std::unique_ptr<MediaServerEmulator>>
     MediatorFunctionalTest::addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count, bool bindEndpoint)
+        size_t count, ServerTweak::Value tweak)
 {
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
     for (size_t i = 0; i < count; ++i)
     {
-        auto server = addRandomServer(system, boost::none, bindEndpoint);
+        auto server = addRandomServer(system, boost::none, tweak);
         if (!server)
             return {};
 

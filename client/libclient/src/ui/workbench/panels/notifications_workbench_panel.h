@@ -44,6 +44,8 @@ public:
 
     virtual QRectF effectiveGeometry() const override;
 
+    virtual void stopAnimations() override;
+
 private:
     void setShowButtonUsed(bool used);
     void updateControlsGeometry();

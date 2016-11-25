@@ -11,6 +11,7 @@ import urllib, urllib2
 import pprint
 import uuid
 import json
+from pycommons.Logger import log, LOGLEVEL
 
 #from functest_util import SafeJsonLoads
 #from generator import BasicGenerator
@@ -31,7 +32,7 @@ class SystemIdTest(object):
 
     def _doGet(self, addr, methodName):
         url = "http://%s/ec2/%s" % (addr,methodName)
-        print "Connection to " + url
+        log(LOGLEVEL.DEBUG + 9, "Connection to " + url)
         try:
             response = urllib2.urlopen(url)
             assert response.getcode() == 200, "Failed request to %s: HTTP Error %s" % (
@@ -43,7 +44,7 @@ class SystemIdTest(object):
 
     def _changeSystemId(self, addr, _id):
         url = "http://%s/api/configure?%s" % (addr,urllib.urlencode({"localSystemId": _id}))
-        print "Request:", url
+        log(LOGLEVEL.DEBUG + 9, "Request:%s" % url)
         try:
             response = urllib2.urlopen(url)
             assert response.getcode() == 200, "Failed to set localSysteId: HTTP Error %s" % response.getcode()
@@ -129,19 +130,19 @@ class SystemIdTest(object):
             self._doSingleTest(s)
 
     def _doRollback(self):
-        print "Rolling back system ids"
+        log(LOGLEVEL.INFO, "Rolling back system ids")
         for s in self._serverList:
             self._changeSystemId(s, self._oldSystemId)
         self._ensureServerSystemId(end=True)
         self._idsChanged = False
 
     def run(self):
-        print "========================================="
-        print "LocalSystemId Test Start"
+        log(LOGLEVEL.INFO, "=========================================")
+        log(LOGLEVEL.INFO,"LocalSystemId Test Start")
         self._ensureServerSystemId()
         ok = False
 
-        print "-----------------------------------------"
+        log(LOGLEVEL.INFO, "-----------------------------------------")
         try:
             self._doTest()
             self._doRollback()
@@ -149,11 +150,11 @@ class SystemIdTest(object):
         except AssertionError:
             raise
         except Exception:
-            print "FAIL: exception occured: %s" % traceback.format_exc()
+            log(LOGLEVEL.ERROR, "FAIL: exception occured: %s" % traceback.format_exc())
             ret = False
         finally:
             if ok:
-                print "LocalSystemId test finished"
+                log(LOGLEVEL.INFO, "LocalSystemId test finished")
             if self._idsChanged:
                 self._doRollback()
-            print "========================================="
+            log(LOGLEVEL.INFO, "=========================================")

@@ -24,6 +24,24 @@ QnBaseSystemDescription::ServersList subtractLists(
     return result;
 };
 
+bool isSameSystem(
+    const QnBaseSystemDescription& first,
+    const QnBaseSystemDescription& second)
+{
+    typedef QSet<QnUuid> ServerIdsSet;
+    static const auto extractServerIds =
+        [](const QnBaseSystemDescription::ServersList& servers) -> ServerIdsSet
+        {
+            ServerIdsSet result;
+            for (const auto& server: servers)
+                result.insert(server.id);
+            return result;
+        };
+
+    // Systems are the same if they have same set of servers
+    return extractServerIds(first.servers()) == extractServerIds(second.servers());
+}
+
 }   // namespace
 
 QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(int priority,
@@ -127,20 +145,10 @@ void QnSystemDescriptionAggregator::onSystemNameChanged(const QnSystemDescriptio
     if (m_systems.empty() || !system)
         return;
 
-    /*
-     * We have 3 types of systems here:
-     * 1. Cloud systems (online/offline, it does not matter) - change of system name
-     *    is not processing now. (TODO: #add processing of cloud system name change)
-     * 2. Local offline recent systems - they can't change their names
-     * 3. Locally discovered systems - we process name change for systems with version
-     *    less than 2.3. (TODO: #ynikitenkov add processing of local online systems name change)
-     * Thus, it is enough to just test if system with changed name and head system is both cloud
-     * or both non cloud - it means that it is same system.
-     */
+    if (invalidSystem())
+        return;
 
-    const auto headSystem = m_systems.begin().value();
-    const auto sameAsHeadSystem = (headSystem->isCloudSystem() != system->isCloudSystem());
-    if (sameAsHeadSystem)
+    if (isSameSystem(*system, *m_systems.first()))
         emit systemNameChanged();
 }
 

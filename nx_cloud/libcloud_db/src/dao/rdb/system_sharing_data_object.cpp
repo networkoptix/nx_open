@@ -19,9 +19,9 @@ nx::db::DBResult SystemSharingDataObject::insertOrReplaceSharing(
     replaceSharingQuery.prepare(
         R"sql(
         REPLACE INTO system_to_account(
-            account_id, system_id, access_role_id, group_id, custom_permissions,
+            account_id, system_id, access_role_id, user_role_id, custom_permissions,
             is_enabled, vms_user_id, last_login_time_utc, usage_frequency)
-        VALUES(:accountId, :systemId, :accessRole, :groupId, :customPermissions,
+        VALUES(:accountId, :systemId, :accessRole, :userRoleId, :customPermissions,
                 :isEnabled, :vmsUserId, :lastLoginTime, :usageFrequency)
         )sql");
     QnSql::bind(sharing, &replaceSharingQuery);

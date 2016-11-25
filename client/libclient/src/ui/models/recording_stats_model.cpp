@@ -193,8 +193,9 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
             break;
     }
 
+    result = qBound(0.0, result, 1.0);
     NX_ASSERT(qBetween(0.0, result, 1.00001));
-    return qBound(0.0, result, 1.0);
+    return result;
 }
 
 QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const

@@ -55,6 +55,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
 
         QnModuleInformation fakeServerInfo;
         fakeServerInfo.id = QnUuid::createUuid();   // It SHOULD be new unique id
+        fakeServerInfo.systemName = connection.systemName;
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         system->setServerHost(fakeServerInfo.id, connection.url);
         newSystems.insert(system->id(), system);
@@ -154,13 +155,13 @@ void QnRecentLocalSystemsFinder::setFinalSystems(const SystemsHash& newFinalSyst
     const auto added = newSystemsKeys - currentKeys;
     const auto removed = currentKeys - newSystemsKeys;
 
+    for (const auto& systemId: removed)
+        removeFinalSystem(systemId);
+
     for (const auto& systemId: added)
     {
         const auto system = newFinalSystems.value(systemId);
         m_finalSystems.insert(systemId, system);
         emit systemDiscovered(system);
     }
-
-    for (const auto& systemId: removed)
-        removeFinalSystem(systemId);
 }

@@ -24,6 +24,8 @@ class QnContext: public QObject
     Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher CONSTANT)
     Q_PROPERTY(QnCloudUrlHelper* cloudUrlHelper MEMBER m_cloudUrlHelper CONSTANT)
     Q_PROPERTY(bool liteMode READ liteMode CONSTANT)
+    Q_PROPERTY(bool autoLoginEnabled READ autoLoginEnabled WRITE setAutoLoginEnabled
+        NOTIFY autoLoginEnabledChanged)
     Q_PROPERTY(bool testMode READ testMode CONSTANT)
     Q_PROPERTY(QString initialTest READ initialTest CONSTANT)
 
@@ -53,6 +55,9 @@ public:
 
     Q_INVOKABLE bool liteMode() const;
 
+    Q_INVOKABLE bool autoLoginEnabled() const;
+    Q_INVOKABLE void setAutoLoginEnabled(bool enabled);
+
     Q_INVOKABLE bool testMode() const;
     Q_INVOKABLE QString initialTest() const;
 
@@ -63,10 +68,15 @@ public:
     Q_INVOKABLE QUrl getLastUsedUrl() const;
     Q_INVOKABLE QUrl getInitialUrl() const;
 
+    Q_INVOKABLE QUrl getWebSocketUrl() const;
+
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 
     Q_INVOKABLE QString lp(const QString& path) const;
     void setLocalPrefix(const QString& prefix);
+
+signals:
+    bool autoLoginEnabledChanged();
 
 private:
     NxGlobalsObject* m_nxGlobals;

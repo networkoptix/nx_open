@@ -12,6 +12,8 @@ namespace network {
 namespace cloud {
 namespace test {
 
+const std::chrono::seconds kTunnelInactivityTimeout(1);
+
 class TcpReverseConnectTest
     : public ::testing::Test
 {
@@ -22,20 +24,18 @@ protected:
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
 
         m_system = m_mediator.addRandomSystem();
-        m_server = m_mediator.addRandomServer(m_system, boost::none, false);
+        m_server = m_mediator.addRandomServer(
+            m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
-        SocketGlobals::mediatorConnector().setSystemCredentials(
-            nx::hpm::api::SystemCredentials(m_system.id, m_server->serverId(), m_system.authKey));
-
+        ASSERT_NE(nullptr, m_server);
         SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
 
-    std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket()
+    std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(
+        const std::unique_ptr<nx::hpm::MediaServerEmulator>& server)
     {
-        auto serverSocket = std::make_unique<CloudServerSocket>(
-            SocketGlobals::mediatorConnector().systemConnection());
-
+        auto serverSocket = std::make_unique<CloudServerSocket>(server->mediatorConnection());
         serverSocket->setSupportedConnectionMethods(hpm::api::ConnectionMethod::reverseConnect);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
         return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));
@@ -49,6 +49,17 @@ protected:
         ASSERT_TRUE(pool.start(HostAddress::localhost, 0, true));
     }
 
+    void simpleTest(std::unique_ptr<AbstractStreamServerSocket> serverSocket, String hostName)
+    {
+        // Wait some time to let reverse connections to be estabilished.
+        std::this_thread::sleep_for(kTunnelInactivityTimeout);
+
+        network::test::socketSimpleSync(
+            [&](){ return std::move(serverSocket); },
+            [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
+            SocketAddress(hostName));
+    }
+
     hpm::MediatorFunctionalTest m_mediator;
     nx::hpm::AbstractCloudDataProvider::System m_system;
     std::unique_ptr<nx::hpm::MediaServerEmulator> m_server;
@@ -56,66 +67,65 @@ protected:
 
 TEST_F(TcpReverseConnectTest, SimpleSyncClientServer)
 {
-    // Client binds 1st, meditor resieves indication on listen:
+    // Client binds 1st, meditor resieves indication on listen.
     enableReveseConnectionsOnClient();
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
-
-    // Wait some time to let reverse connections to be estabilished:
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    network::test::socketSimpleSync(
-        [&](){ return std::move(serverSocket); },
-        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(m_server->fullName()));
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
+    simpleTest(std::move(serverSocket), m_server->fullName());
 }
 
 TEST_F(TcpReverseConnectTest, SimpleSyncServerClient)
 {
-    // Meditor starts to listen 1st, client initiates indication by it's bind:
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
+    // Meditor starts to listen 1st, client initiates indication by it's bind.
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
     enableReveseConnectionsOnClient();
-
-    // Wait some time to let reverse connections to be estabilished:
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    network::test::socketSimpleSync(
-        [&](){ return std::move(serverSocket); },
-        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(m_server->fullName()));
+    simpleTest(std::move(serverSocket), m_server->fullName());
 }
 
 TEST_F(TcpReverseConnectTest, SimpleSyncClientSystem)
 {
-    // Client binds 1st, meditor resieves indication on listen:
+    // Client binds 1st, meditor resieves indication on listen.
     enableReveseConnectionsOnClient();
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
-
-    // Wait some time to let reverse connections to be estabilished:
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    network::test::socketSimpleSync(
-        [&](){ return std::move(serverSocket); },
-        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(m_system.id));
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
+    simpleTest(std::move(serverSocket), m_system.id);
 }
 
 TEST_F(TcpReverseConnectTest, SimpleAsyncClientSystem)
 {
-    // Client binds 1st, meditor resieves indication on listen:
+    // Client binds 1st, meditor resieves indication on listen.
     enableReveseConnectionsOnClient();
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
+    simpleTest(std::move(serverSocket), m_system.id);
+}
 
-    // Wait some time to let reverse connections to be estabilished:
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    network::test::socketSimpleAsync(
-        [&](){ return std::move(serverSocket); },
-        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-        SocketAddress(m_system.id));
+TEST_F(TcpReverseConnectTest, SimpleMultiserver)
+{
+    // Test with 1 server.
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
+    enableReveseConnectionsOnClient();
+    simpleTest(std::move(serverSocket), m_system.id);
+
+    // Add 2nd server.
+    const auto server2 = m_mediator.addRandomServer(
+        m_system, boost::none, hpm::ServerTweak::noListenToConnect);
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket2 = cloudServerSocket(server2);
+
+    // Suppose 1st server went offline.
+    m_server.reset();
+
+    // Cause old tunnel to expire to close by unsuccessful connect attempt.
+    CloudStreamSocket socket(AF_INET);
+    ASSERT_FALSE(socket.connect(m_system.id, 100));
+    ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+
+    // Ensure new tunnel to open and function normaly.
+    simpleTest(std::move(serverSocket2), m_system.id);
 }
 
 TEST_F(TcpReverseConnectTest, Load)
 {
-    // Wait for some NXRC connections to be estabilished
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
     enableReveseConnectionsOnClient();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
     const std::chrono::seconds testDuration(7 * utils::TestOptions::timeoutMultiplier());
     const int maxSimultaneousConnections = 25;

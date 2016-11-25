@@ -3,6 +3,7 @@
 # Client emulator
 
 import urllib2, FuncTest, json, base64
+from Logger import LOGLEVEL
 
 DEFAULT_TIMEOUT =  10.0
 DEFAULT_USER = 'admin'
@@ -75,20 +76,20 @@ class Client:
     if params:
       url+= '?' + params
     if data:
-      FuncTest.tlog(15, "Client#%d POST request '%s':\n'%s'" % (self.index, url, data))
+      FuncTest.tlog(LOGLEVEL.DEBUG + 9, "Client#%d POST request '%s':\n'%s'" % (self.index, url, data))
     else:
-      FuncTest.tlog(15, "Client#%d GET request '%s'" % (self.index, url))
+      FuncTest.tlog(LOGLEVEL.DEBUG + 9, "Client#%d GET request '%s'" % (self.index, url))
     try:
       request = urllib2.Request(url, data=data, headers=headers)
       response = Client.ServerResponseData(
         url, self._processRequest(request, user, password))
-      FuncTest.tlog(15, "Client#%d HTTP response:\n'%s'" % (self.index, response.data))
+      FuncTest.tlog(LOGLEVEL.DEBUG + 9, "Client#%d HTTP response:\n'%s'" % (self.index, response.data))
       return response
     except urllib2.HTTPError, x:
-      FuncTest.tlog(3, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
+      FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
       return Client.ServerResponse(x.code, x.reason)
     except urllib2.URLError, x:
-      FuncTest.tlog(3, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
+      FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
       return Client.ServerResponse(None, x.reason)
 
 class DigestAuthClient(Client):

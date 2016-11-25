@@ -9,6 +9,7 @@ from pycommons.ComparisonMixin import ComparisonMixin
 from pycommons.MockClient import DigestAuthClient as Client
 from pycommons.Utils import bool2str, str2bool
 from pycommons.FuncTest import execVBoxCmd, MEDIA_SERVER_DIR, tlog
+from pycommons.Logger import LOGLEVEL
 from functest_util import generateKey
 
 TEST_SYSTEM_NAME_1="MergeTestSystem1"
@@ -74,7 +75,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           self.Server(self.sysName2, {}, self.user, self.password)}
 
   def __prepareInitialState(self, init = True):
-    tlog(5, "Prepare initial state...")
+    tlog(LOGLEVEL.INFO, "Prepare initial state...")
     try:
       self._prepare_test_phase(self._stop_and_init)
     except Exception:
@@ -99,7 +100,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           self.__checkSettings(response.data,
                                info.settings.get("systemSettings"))
         
-    tlog(5, "Prepare initial state done")
+    tlog(LOGLEVEL.INFO, "Prepare initial state done")
 
   # Check API call error
   def __checkResponseError(self, response, method):
@@ -111,7 +112,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
   # Change boolean global settings
   def __changeBoolSettings(self, srv, name):
-    tlog(5, "Change system setting '%s' on '%s'..." % (name, srv))
+    tlog(LOGLEVEL.INFO, "Change system setting '%s' on '%s'..." % (name, srv))
     response = self.client.httpRequest(
       srv, "api/systemSettings")
     val = str2bool(response.data['reply']['settings'][name])
@@ -123,7 +124,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
       srv, "api/systemSettings")
     self.assertEqual(response.data['reply']['settings'][name], bool2str(not val),
                      "%s changes")
-    tlog(5, "Change system setting '%s' on '%s (%s->%s) done" % (name, srv,
+    tlog(LOGLEVEL.INFO, "Change system setting '%s' on '%s (%s->%s) done" % (name, srv,
                                                                  bool2str(val),
                                                                  bool2str(not val)))
     return val
@@ -131,7 +132,6 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
   def __checkSettings(self, data, settings):
     got_settings = data['reply']['settings']
-    print settings
     for name, val in settings.items():
       if type(val) is bool:
         val = bool2str(val)
@@ -141,7 +141,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
   # Merge srv2 to srv1
   def __mergeSystems(self, takeRemoteSettings = False):
-    tlog(5, "Systems merging start...")
+    tlog(LOGLEVEL.INFO, "Systems merging start...")
     srvInfo1 = self.servers[self.serverAddr1]
     srvInfo2 = self.servers[self.serverAddr2]
     srvClient1 = Client(srvInfo1.user, srvInfo1.password)
@@ -159,10 +159,10 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
        takeRemoteSettings=bool2str(takeRemoteSettings))
     self.__checkResponseError(response, "api/mergeSystems")
     srvInfo2.change_credentials(srvInfo1)
-    tlog(5, "System merging done")
+    tlog(LOGLEVEL.INFO, "System merging done")
 
   def __waitMergeDone(self):
-    tlog(5, "Systems merging (wait cycle) start...")
+    tlog(LOGLEVEL.INFO, "Systems merging (wait cycle) start...")
     start = time.time()
     srvInfo1 = self.servers[self.serverAddr1]
     srvInfo2 = self.servers[self.serverAddr2]
@@ -176,11 +176,11 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
         self.assertEqual(response1.status, 200)
         self.assertEqual(response2.status, 200)
         self.compare(response1.data, response2.data, 'after merge')
-        tlog(5, "Systems merging (wait cycle) done")
+        tlog(LOGLEVEL.INFO, "Systems merging (wait cycle) done")
         return response1.data, response2.data
       if response1.status == response2.status == 200 and \
          self.isEqual(response1.data, response2.data):
-        tlog(5, "Systems merging (wait cycle) done")
+        tlog(LOGLEVEL.INFO, "Systems merging (wait cycle) done")
         return response1.data, response2.data
 
   def __getServerGuid(self, srv):
@@ -190,7 +190,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
     for srvData in response.data:
       if srv in srvData['networkAddresses']:
         guid = srvData['id']
-        tlog(5, "Get server '%s' guid '%s' done" % (srv, guid))
+        tlog(LOGLEVEL.INFO, "Get server '%s' guid '%s' done" % (srv, guid))
         return guid
     self.fail("Can't find '%s' in ec2/getMediaServers" % srv)
 
@@ -220,7 +220,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
   # wait cloud credentials
   def __waitCredentials(self, srv):
-    tlog(5, "Cloud credentials (wait cycle) start...")
+    tlog(LOGLEVEL.INFO, "Cloud credentials (wait cycle) start...")
     srvInfo = self.servers[srv]
     client = Client(srvInfo.user, srvInfo.password)
     start = time.time()
@@ -233,7 +233,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
         time.sleep(5.0)
       else:
         break
-    tlog(5, "Cloud credentials (wait cycle) done")
+    tlog(LOGLEVEL.INFO, "Cloud credentials (wait cycle) done")
  
       
   # Test cases

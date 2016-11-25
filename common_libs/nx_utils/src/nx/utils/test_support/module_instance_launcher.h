@@ -65,7 +65,8 @@ public:
 
     virtual bool waitUntilStarted()
     {
-        static const std::chrono::seconds initializedMaxWaitTime(15);
+        // NOTE: Valgrind does not stand small timeouts.
+        static const std::chrono::minutes initializedMaxWaitTime(1);
 
         auto moduleStartedFuture = m_moduleStartedPromise->get_future();
         if (moduleStartedFuture.wait_for(initializedMaxWaitTime) !=

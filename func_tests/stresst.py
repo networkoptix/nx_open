@@ -13,6 +13,7 @@ import random
 import traceback as TB
 from collections import deque
 from subprocess import Popen, PIPE
+from pycommons.Logger import log, LOGLEVEL
 import urllib2
 
 if __name__ != '__main__':
@@ -214,7 +215,7 @@ class StressTestRunner(object):
 
     def _onInterrupt(self, _signum, _stack):
         self._stop = True
-        print "Finishing work..."
+        log(LOGLEVEL.INFO, "Finishing work...")
 
     def stopping(self):
         return self._stop
@@ -247,15 +248,15 @@ class StressTestRunner(object):
     def print_totals(self):
         passed, fails = self._collect_stat()
         if self._nostat:
-            print "[%s] %d\n" % (int(round(passed)), sum(fails.itervalues())),
+            log(LOGLEVEL.INFO, "[%s] %d\n" % (int(round(passed)), sum(fails.itervalues())))
         else:
-            print "[%s] %s\n" % (int(round(passed)), self._stat_str(passed, fails)),
+            log(LOGLEVEL.INFO, "[%s] %s\n" % (int(round(passed)), self._stat_str(passed, fails)))
 
     def print_tail(self):
         tail_start, fails_a = self._tail[0]
         tail_end, fails = self._tail[-1]
         dict_sub(fails, fails_a)
-        print "Last %.1f seconds: %s" % (tail_end - tail_start, self._stat_str(tail_end - tail_start, fails))
+        log(LOGLEVEL.INFO, "Last %.1f seconds: %s" % (tail_end - tail_start, self._stat_str(tail_end - tail_start, fails)))
 
     def _check_server_hung(self):
         passed, fails = self._tail[-1]
@@ -267,7 +268,7 @@ class StressTestRunner(object):
         if not found:
             return False
         if fails[None] == 0 or fails[None] == self._tail[i][1][None]: # i.e. there was no more successes after i's
-            print "FAIL: No successes for the last %.1f seconds!" % (passed - self._tail[i][0],)
+            log(LOGLEVEL.ERROR,  "FAIL: No successes for the last %.1f seconds!" % (passed - self._tail[i][0],))
             self._hang = True
             return True
         return False
@@ -323,16 +324,16 @@ class StressTestRunner(object):
     def simple_test(self, setBatch=None):
         if setBatch is not None:
             self._batch = setBatch
-        print "Testing with %s parallel workers. %s" % (
+        log(LOGLEVEL.INFO, "Testing with %s parallel workers. %s" % (
             self._threadNum,
             "Batch mode for %s seconds" % self._batch if self._batch is not None else
             ("Mix-mode" if self._mix else ("Protocol: %s" % PROTO))
-        )
+        ))
         self._createWorkers()
         self._startThreads()
         self._watchThreads(self._start + self._batch if self._batch is not None else None)
         self._joinThreads()
-        print "===========================\nFinal result:"
+        log(LOGLEVEL.INFO, "===========================\nFinal result:")
         self.print_totals()
         if not self._nostat:
             self.print_tail()
@@ -342,7 +343,7 @@ class StressTestRunner(object):
             assert not self._hang, "Server has hanged!"
         else:
             if self._batch is not None:
-                print "FAIL:" if self._hang else "OK"
+                log(LOGLEVEL.ERROR, "FAIL:" if self._hang else "OK")
         del self._workers[:]
 
     def initSteps(self):
@@ -361,15 +362,15 @@ class StressTestRunner(object):
 
     def full_test(self):
         self.initSteps()
-        print "Test 1: Normal requests."
+        log(LOGLEVEL.INFO, "Test 1: Normal requests.")
         self.simple_test(self.steps[0])
         if not self.wasHang():
-            print "Test 2: Flood of interrupted requests, than try some normal ones."
+            log(LOGLEVEL.INFO, "Test 2: Flood of interrupted requests, than try some normal ones.")
             self._reinit()
             self.drop_stress(self.steps[1])
             self._reinit()
             self.simple_test(self.steps[2])
-        print 'Test complete.'
+        log(LOGLEVEL.INFO, 'Test complete.')
 
 
 def preprocessArgs(args):
@@ -379,17 +380,17 @@ def preprocessArgs(args):
         if args.reports > 0:
             REPORT_PERIOD = args.reports
         else:
-            print "ERROR: Wrong report period value: %s" % args.reports
+            log(LOGLEVEL.ERROR, "ERROR: Wrong report period value: %s" % args.reports)
             sys.exit(1)
     if args.batch is not None or args.full is not None:
         args.mix = True
     if args.mix and (args.heavy or args.proto):
-        print "ERROR: --proto and --heavy options meaningless in the mix, batch and full modes."
+        log(LOGLEVEL.ERROR, "ERROR: --proto and --heavy options meaningless in the mix, batch and full modes.")
         sys.exit(1)
     host = args.host.split(':', 1)
     if len(host) > 1:
         if host[1] != str(args.port):
-            print "ERROR: Hostname contains a port number %s and it's not equal to the option --port value %s" % (host[1], args.port)
+            log(LOGLEVEL.ERROR, "ERROR: Hostname contains a port number %s and it's not equal to the option --port value %s" % (host[1], args.port))
             sys.exit(1)
         # else no changes to args.host required
     else:
@@ -400,7 +401,7 @@ def preprocessArgs(args):
     if args.proto:
         PROTO = args.proto
     if args.heavy:
-        print "Using heavy requests"
+        log(LOGLEVEL.INFO, "Using heavy requests")
         URI = URI_HEAVY
     return args
 

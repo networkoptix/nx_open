@@ -98,7 +98,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    if (businessAction->getParams().userRole == QnBusiness::AdminOnly
+    if (businessAction->getParams().userGroup == QnBusiness::AdminOnly
         && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
