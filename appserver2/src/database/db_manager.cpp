@@ -70,6 +70,8 @@ namespace detail
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
+using std::nullptr_t;
+
 static bool removeDirRecursive(const QString & dirName)
 {
     bool result = true;
@@ -667,8 +669,6 @@ bool QnDbManager::syncLicensesBetweenDB()
 template <class FilterType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
-    using std::nullptr_t;
-
     ObjectListType objects;
     if (doQueryNoLock(FilterType(), objects) != ErrorCode::ok)
         return false;
@@ -698,8 +698,6 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
 
 bool QnDbManager::resyncTransactionLog()
 {
-    using std::nullptr_t;
-
     if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
         return false;
     if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
