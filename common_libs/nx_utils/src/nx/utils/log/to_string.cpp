@@ -10,6 +10,11 @@ QString toString(const QByteArray& t)
     return QString::fromUtf8(t);
 }
 
+QString toString(const std::string& t)
+{
+    return QString::fromStdString(t);
+}
+
 QString toString(const std::chrono::hours& t)
 {
     return QString(QLatin1String("%1h")).arg(t.count());
