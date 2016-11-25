@@ -119,7 +119,7 @@ private:
         NX_LOGX(lm("Started on %1").arg(serverAddress.toString()), cl_logINFO);
         m_startedPromise.set_value(std::move(serverAddress));
 
-        const auto startTime = std::chrono::system_clock::now();
+        const auto startTime = std::chrono::steady_clock::now();
         const auto maxTimeout = kTestTimeout * testClientCount();
         while (!m_needToStop)
         {
@@ -129,7 +129,7 @@ private:
                 if (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
                     m_errorHandling == ErrorHandling::ignore)
                 {
-                    const auto runTime = std::chrono::system_clock::now() - startTime;
+                    const auto runTime = std::chrono::steady_clock::now() - startTime;
                     NX_ASSERT( runTime < maxTimeout, "Are we frozen?");
                     continue;
                 }
@@ -776,26 +776,55 @@ void socketConnectToBadAddress(
 enum class StopType { cancelIo, pleaseStop };
 
 template<typename ClientSocketMaker>
-void socketConnectCancel(
+void socketConnectCancelSync(
     const ClientSocketMaker& clientMaker, StopType stopType)
 {
-    auto client = clientMaker();
-    ASSERT_TRUE(client->setNonBlockingMode(true));
-    client->connectAsync(
-        SocketAddress("ya.ru:80"),
-        [](SystemError::ErrorCode) { NX_CRITICAL(false); });
-
-    switch (stopType)
+    const auto clientCount = testClientCount();
+    for (size_t i = 0; i < clientCount; ++i)
     {
-        case StopType::cancelIo:
-            client->cancelIOSync(aio::EventType::etWrite);
-            break;
-        case StopType::pleaseStop:
-            client->pleaseStopSync();
-            break;
-        default:
-            NX_CRITICAL(false);
-    };
+        auto client = clientMaker();
+        ASSERT_TRUE(client->setNonBlockingMode(true));
+        client->connectAsync(SocketAddress("ya.ru:80"), [](SystemError::ErrorCode) { /*pass*/ });
+        switch (stopType)
+        {
+            case StopType::cancelIo:
+                client->cancelIOSync(aio::EventType::etWrite);
+                break;
+            case StopType::pleaseStop:
+                client->pleaseStopSync();
+                break;
+            default:
+                NX_CRITICAL(false);
+        };
+    }
+}
+
+template<typename ClientSocketMaker>
+void socketConnectCancelAsync(
+    const ClientSocketMaker& clientMaker, StopType stopType)
+{
+    std::vector<std::unique_ptr<AbstractStreamSocket>> clients;
+    nx::utils::BarrierWaiter barrier;
+    const auto clientCount = testClientCount();
+    for (size_t i = 0; i < clientCount; ++i)
+    {
+        auto client = clientMaker();
+        ASSERT_TRUE(client->setNonBlockingMode(true));
+        client->connectAsync(SocketAddress("ya.ru:80"), [](SystemError::ErrorCode) { /*pass*/ });
+        switch (stopType)
+        {
+            case StopType::cancelIo:
+                client->cancelIOAsync(aio::EventType::etWrite, barrier.fork());
+                break;
+            case StopType::pleaseStop:
+                client->pleaseStop(barrier.fork());
+                break;
+            default:
+                NX_CRITICAL(false);
+        };
+
+        clients.push_back(std::move(client));
+    }
 }
 
 template<typename ServerSocketMaker>
@@ -809,10 +838,10 @@ void socketAcceptTimeoutSync(
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(server->listen(5));
 
-    const auto start = std::chrono::system_clock::now();
+    const auto start = std::chrono::steady_clock::now();
     EXPECT_EQ(server->accept(), nullptr);
     EXPECT_EQ(SystemError::getLastOSErrorCode(), SystemError::timedOut);
-    EXPECT_LT(std::chrono::system_clock::now() - start, timeout * 2);
+    EXPECT_LT(std::chrono::steady_clock::now() - start, timeout * 2);
 }
 
 template<typename ServerSocketMaker>
@@ -829,7 +858,7 @@ void socketAcceptTimeoutAsync(
     ASSERT_TRUE(server->listen(5));
 
     nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
-    const auto start = std::chrono::system_clock::now();
+    const auto start = std::chrono::steady_clock::now();
     server->acceptAsync([&](SystemError::ErrorCode /*code*/,
                             AbstractStreamSocket* /*socket*/)
     {
@@ -840,7 +869,7 @@ void socketAcceptTimeoutAsync(
     });
 
     EXPECT_EQ(serverResults.pop(), SystemError::timedOut);
-    EXPECT_TRUE(std::chrono::system_clock::now() - start < timeout * 2);
+    EXPECT_TRUE(std::chrono::steady_clock::now() - start < timeout * 2);
     if (server)
         server->pleaseStopSync();
 }
@@ -858,10 +887,10 @@ void socketAcceptCancelSync(
     const auto serverCount = testClientCount();
     for (size_t i = 0; i < serverCount; ++i)
     {
-        server->acceptAsync(
-            [&](SystemError::ErrorCode, AbstractStreamSocket*) { NX_CRITICAL(false); });
+        server->acceptAsync([&](SystemError::ErrorCode, AbstractStreamSocket*) { /*pass*/ });
+        if (i)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100 * i));
 
-        if (i) std::this_thread::sleep_for(std::chrono::milliseconds(100 * i));
         switch (stopType)
         {
             case StopType::cancelIo:
@@ -930,10 +959,14 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketConnectToBadAddress(mkClient, false); } \
     Type(Name, ConnectToBadAddressIoDelete) \
         { nx::network::test::socketConnectToBadAddress(mkClient, true); } \
-    Type(Name, ConnectCancelIo) \
-        { nx::network::test::socketConnectCancel(mkClient, StopType::cancelIo); } \
-    Type(Name, ConnectPleaseStop) \
-        { nx::network::test::socketConnectCancel(mkClient, StopType::pleaseStop); } \
+    Type(Name, ConnectCancelIoSync) \
+        { nx::network::test::socketConnectCancelSync(mkClient, StopType::cancelIo); } \
+    Type(Name, ConnectPleaseStopSync) \
+        { nx::network::test::socketConnectCancelSync(mkClient, StopType::pleaseStop); } \
+    Type(Name, ConnectCancelIoAsync) \
+        { nx::network::test::socketConnectCancelAsync(mkClient, StopType::cancelIo); } \
+    Type(Name, ConnectPleaseStopAsync) \
+        { nx::network::test::socketConnectCancelAsync(mkClient, StopType::pleaseStop); } \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleAcceptMixed) \
