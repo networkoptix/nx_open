@@ -34,6 +34,7 @@ class QnLdapManager;
 namespace ec2 {
     class CrashReporter;
 }
+struct CloudManagerGroup;
 
 void restartServer(int restartTimeout);
 
@@ -87,8 +88,8 @@ private:
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudConnectionManager* const cloudConnectionManager);
-    bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
+    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
+    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();

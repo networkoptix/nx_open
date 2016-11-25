@@ -33,6 +33,8 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
 
+#include "cloud/cloud_manager_group.h"
+
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
@@ -59,18 +61,13 @@ static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
 
 const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 * 1000;
 
-QnAuthHelper::QnAuthHelper(CloudConnectionManager* const cloudConnectionManager)
+QnAuthHelper::QnAuthHelper(
+    TimeBasedNonceProvider* timeBasedNonceProvider,
+    CloudManagerGroup* cloudManagerGroup)
     :
-    m_timeBasedNonceProvider(std::make_shared<TimeBasedNonceProvider>()),
-    m_nonceProvider(
-        new CdbNonceFetcher(
-            cloudConnectionManager,
-            m_timeBasedNonceProvider)),
-    m_userDataProvider(
-        new CloudUserAuthenticator(
-            cloudConnectionManager,
-            std::make_unique<GenericUserDataProvider>(),
-            static_cast<const CdbNonceFetcher&>(*m_nonceProvider.get())))
+    m_timeBasedNonceProvider(timeBasedNonceProvider),
+    m_nonceProvider(&cloudManagerGroup->authenticationNonceFetcher),
+    m_userDataProvider(&cloudManagerGroup->userAuthenticator)
 {
 #ifndef USE_USER_RESOURCE_PROVIDER
     connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
