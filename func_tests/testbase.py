@@ -7,7 +7,6 @@ import json
 import pprint
 import unittest
 from collections import OrderedDict
-from StringIO import StringIO
 from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
 from pycommons.Logger import log, LOGLEVEL
@@ -57,18 +56,9 @@ def _addResult(textList, resData, resType, name):
     textList.append(
     ("\t%s: %d\n" % (resType.capitalize(), len(resData))) +
     ''.join(
-#        "%s.%s (%s)\n" % (type(res[0]).__name__, res[0]._testMethodName, res[0]._testMethodDoc)
-        #"\t\t%s.%s\n" % (type(res[0]).__name__, res[0]._testMethodName)
         "\t\t%s\n" % (res[0],)
         for res in resData
     ))
-            #trace = res[1].split('\n')
-            #if len(trace) > 1:
-            #    print res[1].split('\n')[-2]
-            #else:
-            #    print "((%s))" % res[1]
-            #if len(res) > 2:
-            #    print "Other data: %s" % (res,)
 
 
 def _testResNum(result):

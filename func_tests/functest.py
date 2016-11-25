@@ -1505,6 +1505,7 @@ def main(args, other):
     if args.help_arg is not None:
         showHelp(args.help_arg)
         return True
+    initLog(args.loglevel, args.log, rewrite=True)
     if args.recover:
         UnitTestRollback(autorollback=True, nocreate=True)
         return True
@@ -1512,7 +1513,6 @@ def main(args, other):
         ListAutoTests()
         return True
     testMaster.applyArgs(args)
-    initLog(args.loglevel, args.log, rewrite=True)
     try:
         if other:
             return DoTests(other)
