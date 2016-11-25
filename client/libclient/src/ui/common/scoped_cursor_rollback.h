@@ -7,7 +7,7 @@ class QWidget;
 class QnScopedCursorRollback final
 {
 public:
-    QnScopedCursorRollback(QWidget* widget);
+    explicit QnScopedCursorRollback(QWidget* widget);
     QnScopedCursorRollback(QWidget* widget, const QCursor& cursor);
 
     ~QnScopedCursorRollback();
