@@ -12,6 +12,7 @@
 #include <ui/models/storage_model_info.h>
 
 struct QnStorageStatusReply;
+class QnBusyIndicatorButton;
 
 namespace Ui {
     class StorageUrlDialog;
@@ -23,7 +24,7 @@ class QnStorageUrlDialog: public QnSessionAwareButtonBoxDialog {
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnStorageUrlDialog(const QnMediaServerResourcePtr& server, QWidget* parent = nullptr, Qt::WindowFlags windowFlags = 0);
     virtual ~QnStorageUrlDialog();
 
     QSet<QString> protocols() const;
@@ -41,27 +42,28 @@ public:
 
 protected:
     virtual void accept() override;
+
 private:
-    struct ProtocolDescription {
+    struct ProtocolDescription
+    {
         QString protocol;
         QString name;
         QString urlTemplate;
         QString urlPattern;
     };
 
-    static ProtocolDescription protocolDescription(const QString &protocol);
+    static ProtocolDescription protocolDescription(const QString& protocol);
 
     QString makeUrl(const QString& path, const QString& login, const QString& password);
-    bool storageAlreadyUsed(const QString &path) const;
+    bool storageAlreadyUsed(const QString& path) const;
 
 private slots:
     void updateComboBox();
 
     void at_protocolComboBox_currentIndexChanged();
     QString normalizePath(QString path);
+
 private:
-
-
     QScopedPointer<Ui::StorageUrlDialog> ui;
     QnMediaServerResourcePtr m_server;
     QSet<QString> m_protocols;
@@ -70,6 +72,7 @@ private:
     QString m_lastProtocol;
     QnStorageModelInfo m_storage;
     QnStorageModelInfoList m_currentServerStorages;
+    QnBusyIndicatorButton* m_okButton;
 };
 
 #endif // QN_STORAGE_URL_DIALOG_H
