@@ -77,8 +77,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
             return nx_http::StatusCode::internalServerError;
     }
 
-    initializeCloudRelatedManagers();
-
     result.setError(QnJsonRestResult::NoError);
     return nx_http::StatusCode::ok;
 }
@@ -237,6 +235,35 @@ bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
+    return saveLocalSystemIdToCloud(data, result) &&
+        initializeCloudRelatedManagers(result);
+}
+
+bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
+    QnJsonRestResult* result)
+{
+    using namespace nx::cdb;
+
+    api::ResultCode resultCode = 
+        m_cloudManagerGroup->authenticationNonceFetcher.initializeConnectionToCloudSync();
+    if (resultCode != api::ResultCode::ok)
+    {
+        NX_LOGX(lm("Failed to getch cloud nonce: %1")
+            .arg(api::toString(resultCode)), cl_logWARNING);
+        result->setError(
+            QnJsonRestResult::CantProcessRequest,
+            tr("Could not connect to cloud: %1")
+                .arg(QString::fromStdString(api::toString(resultCode))));
+        return false;
+    }
+
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::saveLocalSystemIdToCloud(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
     using namespace nx::cdb;
 
     ec2::ApiCloudSystemData opaque;
@@ -262,8 +289,8 @@ bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
             .arg(api::toString(cdbResultCode)), cl_logWARNING);
         result->setError(
             QnJsonRestResult::CantProcessRequest,
-            tr("Could not connect to cloud: %1").
-            arg(QString::fromStdString(api::toString(cdbResultCode))));
+            tr("Could not connect to cloud: %1")
+                .arg(QString::fromStdString(api::toString(cdbResultCode))));
         return false;
     }
 
@@ -279,9 +306,4 @@ bool QnSaveCloudSystemCredentialsHandler::rollback()
         return false;
     }
     return true;
-}
-
-void QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers()
-{
-    m_cloudManagerGroup->authenticationNonceFetcher.cloudBindingStatusChanged(true);
 }
