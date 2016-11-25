@@ -20,9 +20,6 @@ public:
     void setNotificationFormat(const QString& notificationFormat);
 
 private:
-    QString serializeSingleSubscription(const Subscription& subscription) const;
-
-private:
     int m_sessionId;
     QString m_notificationFormat;
 };

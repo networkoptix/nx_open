@@ -1,21 +1,11 @@
 #pragma once
 
-namespace nx{
-namespace plugins{
-namespace flir{
-namespace nexus{
+namespace nx {
+namespace plugins {
+namespace flir {
+namespace nexus {
 
-const quint16 kDefaultNexusPort = 8080;
-
-//This group of settings is from a private API. We shouldn't rely on it.
-const QString kConfigurationFile("/api/server/status/full");
-const QString kStartNexusServerCommand("/api/server/start");
-const QString kStopNexusServerCommand("/api/server/stop");
-const QString kServerSuccessfullyStarted("1");
-const QString kServerSuccessfullyStopped("0");
-const QString kNumberOfInputsParamName("Number of IOs");
-const QString kNexusInterfaceGroupName("INTERFACE Configuration - Device 0");
-const QString kNexusPortParamName("Port");
+const quint16 kDefaultNexusPort = 8090;
 
 const QString kAlarmPrefix = lit("$ALARM");
 const QString kThgSpotPrefix = lit("$THGSPOT");
@@ -61,14 +51,6 @@ const QString kDiscoveryPrefix = lit("$NEXUS");
 const QString kOldDiscoveryPrefix = lit("$LUVEO");
 const int kDiscoveryMessageFieldsNumber = 13;
 
-using NexusSettingGroup = std::map<QString, QString>;
-
-struct ServerStatus final
-{
-    std::map<QString, NexusSettingGroup> settings;
-    bool isNexusServerEnabled = true;
-};
-
 struct Notification final
 {
     QString alarmId;
@@ -83,18 +65,21 @@ struct Subscription final
     {
     };
 
+    QString toString() const
+    {
+        return lit("\"%1,%2,%3,%4,%5\"")
+            .arg(subscriptionType)
+            .arg(deviceId)
+            .arg(minDeliveryInterval.count())
+            .arg(maxDeliveryInterval.count())
+            .arg(onChange);
+    };
+
     QString subscriptionType;
     int deviceId = kAnyDevice;
     std::chrono::milliseconds minDeliveryInterval = std::chrono::milliseconds(1000);
     std::chrono::milliseconds maxDeliveryInterval = std::chrono::milliseconds(1000);
     bool onChange = false;
-};
-
-struct PrivateDeviceInfo final
-{
-    QString model;
-    QString serialNumber;
-    QUrl url;
 };
 
 enum class SensorType
@@ -140,7 +125,7 @@ struct DeviceDiscoveryInfo final
     HostType hostType;
 };
 
-} //namespace nexus
-} //namespace flir
-} //namespace plugins
-} //namespace nx
+} // namespace nexus
+} // namespace flir
+} // namespace plugins
+} // namespace nx

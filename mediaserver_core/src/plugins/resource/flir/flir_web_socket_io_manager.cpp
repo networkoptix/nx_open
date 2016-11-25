@@ -7,7 +7,7 @@
 #include "flir_web_socket_io_manager.h"
 #include "flir_io_executor.h"
 #include "flir_nexus_common.h"
-#include "flir_nexus_parsing_utils.h"
+#include "flir_parsing_utils.h"
 #include "flir_nexus_string_builder.h"
 
 #include <core/resource/camera_resource.h>

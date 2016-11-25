@@ -6,11 +6,12 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
-IoExecutor::IoExecutor():
+IoExecutor::IoExecutor(QObject* parent):
+    QObject(parent),
     m_thread(new QThread())
 {
     qRegisterMetaType<QWebSocket*>("QWebSocket*");
-    m_thread->setObjectName(lit("FlirIoExecutor thread"));
+    m_thread->setObjectName(lit("nx::plugins::flir::IoExecutor"));
 }
 
 IoExecutor::~IoExecutor()

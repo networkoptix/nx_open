@@ -17,11 +17,11 @@ class IoExecutor:
 {
     Q_OBJECT
 public:
-    IoExecutor();
+    IoExecutor(QObject* parent = 0);
     virtual ~IoExecutor();
     QThread* getThread() const;
 private:
-    std::unique_ptr<QThread> m_thread;
+    const std::unique_ptr<QThread> m_thread;
 };
 
 } // namespace flir

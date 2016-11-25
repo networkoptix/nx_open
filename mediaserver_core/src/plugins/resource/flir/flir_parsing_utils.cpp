@@ -1,10 +1,11 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-#include "flir_nexus_parsing_utils.h"
-#include "flir_nexus_common.h"
+#include "flir_parsing_utils.h"
 
-using namespace nx::plugins::flir::nexus;
+#include <nx/utils/log/assert.h>
+
+using namespace nx::plugins::flir;
 
 namespace {
 
@@ -14,12 +15,13 @@ const QString kSerialNumberKey = lit("serialNumber");
 
 bool isThgObjectNotificationType(const QString& notificationTypeString)
 {
-    return notificationTypeString == kThgSpotPrefix || notificationTypeString == kThgAreaPrefix;
+    return notificationTypeString == nexus::kThgSpotPrefix 
+        || notificationTypeString == nexus::kThgAreaPrefix;
 };
 
-boost::optional<Notification> parseAlarmNotification(const QStringList& notificationParts)
+boost::optional<nexus::Notification> parseAlarmNotification(const QStringList& notificationParts)
 {
-    Notification alarmEvent;
+    nexus::Notification alarmEvent;
     bool status = false;
     const auto kDeviceTypeFieldPosition = 5;
     const auto kAlarmSourceIndexFieldPosition = 6;
@@ -38,10 +40,10 @@ boost::optional<Notification> parseAlarmNotification(const QStringList& notifica
         return boost::none;
 
     QString prefix;
-    if (kDeviceType == kIODeviceType)
-        prefix = kDigitalInputPrefix;
-    else if (kDeviceType == kThgObjectDeviceType)
-        prefix = kAlarmPrefix;
+    if (kDeviceType == nexus::kIODeviceType)
+        prefix = nexus::kDigitalInputPrefix;
+    else if (kDeviceType == nexus::kThgObjectDeviceType)
+        prefix = nexus::kAlarmPrefix;
 
 
     alarmEvent.alarmId = lit("%1:%2")
@@ -56,9 +58,9 @@ boost::optional<Notification> parseAlarmNotification(const QStringList& notifica
     return alarmEvent;
 };
 
-boost::optional<Notification> parseThgObjectNotification(const QStringList& notificationParts)
+boost::optional<nexus::Notification> parseThgObjectNotification(const QStringList& notificationParts)
 {
-    Notification alarmEvent;
+    nexus::Notification alarmEvent;
     bool status = false;
     const auto kObjectTypeFieldPosition = 0;
     const auto kObjectIndexFieldPosition = 7;
@@ -74,8 +76,8 @@ boost::optional<Notification> parseThgObjectNotification(const QStringList& noti
         isThgObjectNotificationType(kObjectType),
         lm("Flir notification parser: wrong notification type %1. %2 or %3 are expected.")
             .arg(kObjectType)
-            .arg(kThgAreaPrefix)
-            .arg(kThgSpotPrefix));
+            .arg(nexus::kThgAreaPrefix)
+            .arg(nexus::kThgSpotPrefix));
 
     if (!isThgObjectNotificationType(kObjectType))
         return boost::none;
@@ -94,29 +96,29 @@ boost::optional<Notification> parseThgObjectNotification(const QStringList& noti
 
 bool isValidTransmissionType(int rawValue)
 {
-    return rawValue == static_cast<int>(TransmissionType::unicast) 
-        || rawValue == static_cast<int>(TransmissionType::multicast);
+    return rawValue == static_cast<int>(nexus::TransmissionType::unicast) 
+        || rawValue == static_cast<int>(nexus::TransmissionType::multicast);
 };
 
 bool isValidHostType(int rawValue)
 {
-    return rawValue == static_cast<int>(HostType::windows)
-        || rawValue == static_cast<int>(HostType::miniServer)
-        || rawValue == static_cast<int>(HostType::compactServer)
-        || rawValue == static_cast<int>(HostType::sentirServer)
-        || rawValue == static_cast<int>(HostType::cieloBoard);
+    return rawValue == static_cast<int>(nexus::HostType::windows)
+        || rawValue == static_cast<int>(nexus::HostType::miniServer)
+        || rawValue == static_cast<int>(nexus::HostType::compactServer)
+        || rawValue == static_cast<int>(nexus::HostType::sentirServer)
+        || rawValue == static_cast<int>(nexus::HostType::cieloBoard);
 };
 
 bool isValidSensortype(int rawValue)
 {
-    return rawValue == static_cast<int>(SensorType::shortRange)
-        || rawValue == static_cast<int>(SensorType::midRange)
-        || rawValue == static_cast<int>(SensorType::longRange)
-        || rawValue == static_cast<int>(SensorType::wideEye)
-        || rawValue == static_cast<int>(SensorType::radar)
-        || rawValue == static_cast<int>(SensorType::uav)
-        || rawValue == static_cast<int>(SensorType::cctv)
-        || rawValue == static_cast<int>(SensorType::foveus);
+    return rawValue == static_cast<int>(nexus::SensorType::shortRange)
+        || rawValue == static_cast<int>(nexus::SensorType::midRange)
+        || rawValue == static_cast<int>(nexus::SensorType::longRange)
+        || rawValue == static_cast<int>(nexus::SensorType::wideEye)
+        || rawValue == static_cast<int>(nexus::SensorType::radar)
+        || rawValue == static_cast<int>(nexus::SensorType::uav)
+        || rawValue == static_cast<int>(nexus::SensorType::cctv)
+        || rawValue == static_cast<int>(nexus::SensorType::foveus);
 };
 
 } // namespace
@@ -124,17 +126,16 @@ bool isValidSensortype(int rawValue)
 namespace nx {
 namespace plugins {
 namespace flir {
-namespace nexus {
 
-boost::optional<Notification> parseNotification(
+boost::optional<nexus::Notification> parseNotification(
     const QString& notificationString)
 {
-    boost::optional<Notification> notification;
+    boost::optional<nexus::Notification> notification;
 
     const auto kParts = notificationString.split(L',');
     const auto kNotificationType = kParts[0];
 
-    if (kNotificationType == kAlarmPrefix)
+    if (kNotificationType == nexus::kAlarmPrefix)
         notification = parseAlarmNotification(kParts);
     else if (isThgObjectNotificationType(kNotificationType))
         notification = parseThgObjectNotification(kParts);
@@ -146,7 +147,7 @@ boost::optional<Notification> parseNotification(
 
 boost::optional<quint64> parseNotificationDateTime(const QString& dateTimeString)
 {
-    auto dateTime = QDateTime::fromString(dateTimeString, kDateTimeFormat);
+    auto dateTime = QDateTime::fromString(dateTimeString, nexus::kDateTimeFormat);
 
     if (!dateTime.isValid())
         return boost::none;
@@ -154,10 +155,10 @@ boost::optional<quint64> parseNotificationDateTime(const QString& dateTimeString
     return dateTime.toMSecsSinceEpoch();
 }
 
-boost::optional<Subscription> parseSubscription(const QString& subscriptionString)
+boost::optional<nexus::Subscription> parseSubscription(const QString& subscriptionString)
 {
 
-    Subscription subscription;
+    nexus::Subscription subscription;
     const int kSubscriptionPartsNumber = 5;
     bool status = false;
     auto subscriptionParts = subscriptionString.split(L',');
@@ -195,9 +196,9 @@ boost::optional<Subscription> parseSubscription(const QString& subscriptionStrin
     return subscription;
 }
 
-boost::optional<ServerStatus> parseNexusServerStatusResponse(const QString& response)
+boost::optional<fc_private::ServerStatus> parseNexusServerStatusResponse(const QString& response)
 {
-    ServerStatus serverStatus;
+    fc_private::ServerStatus serverStatus;
     QString currentGroupName;
 
     bool status = false;
@@ -238,9 +239,9 @@ boost::optional<ServerStatus> parseNexusServerStatusResponse(const QString& resp
     return serverStatus;
 }
 
-boost::optional<PrivateDeviceInfo> parsePrivateDeviceInfo(const QString& deviceInfoString)
+boost::optional<fc_private::DeviceInfo> parsePrivateDeviceInfo(const QString& deviceInfoString)
 {
-    PrivateDeviceInfo info;
+    fc_private::DeviceInfo info;
 
     auto jsonDocument = QJsonDocument::fromJson(deviceInfoString.toUtf8());
     if (!jsonDocument.isObject())
@@ -266,16 +267,16 @@ boost::optional<PrivateDeviceInfo> parsePrivateDeviceInfo(const QString& deviceI
     return info;
 }
 
-boost::optional<DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QString& deviceDiscoveryInfoString)
+boost::optional<nexus::DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QString& deviceDiscoveryInfoString)
 {
-    DeviceDiscoveryInfo info;
+    nexus::DeviceDiscoveryInfo info;
     bool status = false;
     auto parts = deviceDiscoveryInfoString.split(L',');
 
-    if (parts.size() != kDiscoveryMessageFieldsNumber)
+    if (parts.size() != nexus::kDiscoveryMessageFieldsNumber)
         return boost::none;
 
-    if (parts[0] != kDiscoveryPrefix && parts[0] != kOldDiscoveryPrefix)
+    if (parts[0] != nexus::kDiscoveryPrefix && parts[0] != nexus::kOldDiscoveryPrefix)
         return boost::none;
 
     info.serverName = parts[1];
@@ -289,7 +290,7 @@ boost::optional<DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QString& dev
     if (!status || !isValidTransmissionType(transmissionType))
         return boost::none;
 
-    info.transmissionType = static_cast<TransmissionType>(transmissionType);
+    info.transmissionType = static_cast<nexus::TransmissionType>(transmissionType);
     info.multicastAddress = parts[6];
     info.multicastPort = parts[7].toUInt(&status);
     if (!status)
@@ -304,7 +305,7 @@ boost::optional<DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QString& dev
     if (!status || !isValidSensortype(sensorType))
         return boost::none;
 
-    info.sensorType = static_cast<SensorType>(sensorType);
+    info.sensorType = static_cast<nexus::SensorType>(sensorType);
     info.nmeaInterval = parts[10].toUInt(&status);
     if (!status)
         return boost::none;
@@ -321,7 +322,6 @@ boost::optional<DeviceDiscoveryInfo> parseDeviceDiscoveryInfo(const QString& dev
     return info;
 }
 
-} // namespace nexus
 } // namespace flir
 } // namespace plugins
 } // namespace nx

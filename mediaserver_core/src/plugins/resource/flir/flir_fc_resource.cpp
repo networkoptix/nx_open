@@ -8,10 +8,12 @@
 using namespace nx::plugins::flir;
 
 namespace {
-    const QString kFlirFcDriverName = lit("FlirFC");
-    const std::chrono::milliseconds kServerStatusRequestTimeout = std::chrono::seconds(40);
-    const std::chrono::milliseconds kServerStatusResponseTimeout = std::chrono::seconds(40);
-}
+
+const QString kFlirFcDriverName = lit("FlirFC");
+const std::chrono::milliseconds kServerStatusRequestTimeout = std::chrono::seconds(40);
+const std::chrono::milliseconds kServerStatusResponseTimeout = std::chrono::seconds(40);
+
+} // namespace
 
 FcResource::FcResource():
     m_ioManager(nullptr)
@@ -61,14 +63,14 @@ CameraDiagnostics::Result FcResource::initInternal()
         }
 
         const auto& kSettings = serverStatus->settings;
-        if (kSettings.find(nexus::kNexusInterfaceGroupName) != kSettings.cend())
+        if (kSettings.find(fc_private::kNexusInterfaceGroupName) != kSettings.cend())
         {
-            const auto& group = kSettings.at(nexus::kNexusInterfaceGroupName);
-            if (group.find(nexus::kNexusPortParamName) != group.cend())
+            const auto& group = kSettings.at(fc_private::kNexusInterfaceGroupName);
+            if (group.find(fc_private::kNexusPortParamName) != group.cend())
             {
                 bool status = false;
                 const auto kNexusPort = group
-                    .at(nexus::kNexusPortParamName)
+                    .at(fc_private::kNexusPortParamName)
                     .toInt(&status);
 
                 if (status)
@@ -79,10 +81,7 @@ CameraDiagnostics::Result FcResource::initInternal()
 
     if (!m_ioManager)
     {
-        m_ioManager = new nexus::WebSocketIoManager(
-            dynamic_cast<QnVirtualCameraResource*>(this),
-            port);
-
+        m_ioManager = new nexus::WebSocketIoManager(this, port);
         m_ioManager->moveToThread(IoExecutor::instance()->getThread());
     }
 
@@ -203,10 +202,10 @@ bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, c
     return true;
 }
 
-boost::optional<nexus::ServerStatus> FcResource::getNexusServerStatus(nx_http::HttpClient& httpClient)
+boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx_http::HttpClient& httpClient)
 {
     QUrl url = getUrl();
-    url.setPath(nexus::kConfigurationFile);
+    url.setPath(fc_private::kConfigurationFile);
 
     if (!doGetRequestAndCheckResponse(httpClient, url))
         return boost::none;
@@ -215,13 +214,13 @@ boost::optional<nexus::ServerStatus> FcResource::getNexusServerStatus(nx_http::H
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
-    return nexus::parseNexusServerStatusResponse(QString::fromUtf8(messageBody));
+    return parseNexusServerStatusResponse(QString::fromUtf8(messageBody));
 }
 
 bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
 {
     QUrl url = getUrl();
-    url.setPath(nexus::kStartNexusServerCommand);
+    url.setPath(fc_private::kStartNexusServerCommand);
 
     if (!doGetRequestAndCheckResponse(httpClient, url))
         return false;

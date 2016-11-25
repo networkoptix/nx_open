@@ -1,5 +1,5 @@
 #include "flir_nexus_string_builder.h"
-#include "flir_nexus_parsing_utils.h"
+#include "flir_parsing_utils.h"
 #include "flir_nexus_common.h"
 
 namespace nx {
@@ -26,7 +26,7 @@ QString SubscriptionStringBuilder::buildSubscriptionString(
     {
         query.addQueryItem(
             lit("subscription%1").arg(i + 1),
-            serializeSingleSubscription(subscriptions[i]));
+            subscriptions[i].toString());
     }
 
     return kSubscriptionPrefix + lit("?") + query.toString(QUrl::FullyEncoded);
@@ -40,19 +40,6 @@ void SubscriptionStringBuilder::setSessionId(int sessionId)
 void SubscriptionStringBuilder::setNotificationFormat(const QString& notificationFormat)
 {
     m_notificationFormat = notificationFormat;
-}
-
-QString SubscriptionStringBuilder::serializeSingleSubscription(
-    const Subscription& subscription) const
-{
-    auto subscriptionString = lit("\"%1,%2,%3,%4,%5\"")
-        .arg(subscription.subscriptionType)
-        .arg(subscription.deviceId)
-        .arg(subscription.minDeliveryInterval.count())
-        .arg(subscription.maxDeliveryInterval.count())
-        .arg(subscription.onChange);
-
-    return subscriptionString;
 }
 
 } // namespace nexus

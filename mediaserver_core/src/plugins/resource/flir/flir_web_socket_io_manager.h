@@ -7,7 +7,7 @@
 #include "flir_nexus_common.h"
 #include "flir_web_socket_proxy.h"
 #include "flir_nexus_response.h"
-#include "flir_nexus_parsing_utils.h"
+#include "flir_parsing_utils.h"
 
 #include <nx/utils/timer_manager.h>
 #include <core/resource/resource_fwd.h>

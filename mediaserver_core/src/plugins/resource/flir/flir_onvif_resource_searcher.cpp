@@ -1,7 +1,9 @@
 #include "flir_onvif_resource_searcher.h" 
 
 namespace {
-    const int kFlirDefaultOnvifPort = 8090;
+
+const int kFlirDefaultOnvifPort = 8090;
+
 } // namespace
 
 using namespace nx::plugins;

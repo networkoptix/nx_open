@@ -2,6 +2,7 @@
 
 #include <boost/optional.hpp>
 
+#include "flir_fc_private.h"
 #include "flir_web_socket_io_manager.h"
 
 #include <core/resource/camera_resource.h>
@@ -33,7 +34,7 @@ public:
 
 private:
     bool doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const QUrl& url);
-    boost::optional<nexus::ServerStatus> getNexusServerStatus(nx_http::HttpClient& httpClient);
+    boost::optional<fc_private::ServerStatus> getNexusServerStatus(nx_http::HttpClient& httpClient);
     bool tryToEnableNexusServer(nx_http::HttpClient& httpClient);
 
 private:

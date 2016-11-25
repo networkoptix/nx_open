@@ -1,6 +1,6 @@
 #include "flir_fc_resource.h"
 #include "flir_fc_resource_searcher.h"
-#include "flir_nexus_parsing_utils.h"
+#include "flir_parsing_utils.h"
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/httpclient.h>
@@ -76,7 +76,7 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
     auto deviceInfoString = QString::fromUtf8(messageBody);
-    auto deviceInfo = nexus::parsePrivateDeviceInfo(deviceInfoString);
+    auto deviceInfo = parsePrivateDeviceInfo(deviceInfoString);
 
     if (!deviceInfo)
         return QList<QnResourcePtr>();
@@ -146,7 +146,7 @@ QString FcResourceSearcher::manufacture() const
 }
 
 QnResourcePtr FcResourceSearcher::makeResource(
-    const nexus::PrivateDeviceInfo& info,
+    const fc_private::DeviceInfo& info,
     const QAuthenticator& auth)
 {
     if (!isDeviceSupported(info))
@@ -240,7 +240,7 @@ void FcResourceSearcher::receiveFromCallback(
         initListenerUnsafe();
     
     auto discoveryMessage = QString::fromUtf8(m_receiveBuffer.left(bytesRead));
-    auto discoveryInfo = nexus::parseDeviceDiscoveryInfo(discoveryMessage);
+    auto discoveryInfo = parseDeviceDiscoveryInfo(discoveryMessage);
 
     m_receiveBuffer.clear();
 
@@ -280,7 +280,7 @@ void FcResourceSearcher::receiveFromCallback(
                 }
 
                 auto deviceInfoString = QString::fromUtf8(httpClient->fetchMessageBodyBuffer());
-                auto deviceInfo = nexus::parsePrivateDeviceInfo(deviceInfoString);
+                auto deviceInfo = parsePrivateDeviceInfo(deviceInfoString);
 
                 if (!deviceInfo || !isDeviceSupported(deviceInfo.get()))
                 {
@@ -327,7 +327,7 @@ bool FcResourceSearcher::hasValidCacheUnsafe(const SocketAddress& address) const
     return true;
 }
 
-bool FcResourceSearcher::isDeviceSupported(const nexus::PrivateDeviceInfo& deviceInfo) const
+bool FcResourceSearcher::isDeviceSupported(const fc_private::DeviceInfo& deviceInfo) const
 {
     return deviceInfo.model.startsWith(kFLirFcModelPrefix);
 }

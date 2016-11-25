@@ -5,6 +5,8 @@
 #include <unordered_map>
 
 #include "flir_nexus_common.h"
+#include "flir_fc_private.h"
+
 #include <nx/network/system_socket.h>
 #include <core/resource_management/resource_searcher.h>
 
@@ -23,11 +25,11 @@ namespace flir {
 
 class FcResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
-    using DeviceInfo = nx::plugins::flir::nexus::PrivateDeviceInfo;
+    using DeviceInfo = nx::plugins::flir::fc_private::DeviceInfo;
 
     struct TimestampedDeviceInfo
     {
-        nx::plugins::flir::nexus::PrivateDeviceInfo deviceInfo;
+        DeviceInfo deviceInfo;
         quint64 timestamp;
     };
 
