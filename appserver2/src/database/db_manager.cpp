@@ -4102,6 +4102,9 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (data->users.size() == 1)
         user = &data->users[0];
 
+    // Admin user is required for global properties.
+    DB_LOAD(QnUserResource::kAdminGuid, data->users);
+
     if (user) // Do not load userGroups if there is no current user.
         DB_LOAD(user->groupId, data->userGroups);
 
