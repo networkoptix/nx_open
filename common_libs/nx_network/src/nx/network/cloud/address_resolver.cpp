@@ -322,7 +322,7 @@ void AddressResolver::HostAddressInfo::setDnsEntries(
     std::vector<AddressEntry> entries)
 {
     m_dnsState = State::resolved;
-    m_dnsResolveTime = std::chrono::system_clock::now();
+    m_dnsResolveTime = std::chrono::steady_clock::now();
     m_dnsEntries = std::move(entries);
 }
 
@@ -330,14 +330,14 @@ void AddressResolver::HostAddressInfo::setMediatorEntries(
         std::vector<AddressEntry> entries)
 {
     m_mediatorState = State::resolved;
-    m_mediatorResolveTime = std::chrono::system_clock::now();
+    m_mediatorResolveTime = std::chrono::steady_clock::now();
     m_mediatorEntries = std::move(entries);
 }
 
 void AddressResolver::HostAddressInfo::checkExpirations()
 {
     if (m_dnsState == State::resolved &&
-        m_dnsResolveTime + kDnsCacheTimeout < std::chrono::system_clock::now())
+        m_dnsResolveTime + kDnsCacheTimeout < std::chrono::steady_clock::now())
     {
         m_dnsState = State::unresolved;
         m_dnsEntries.clear();
@@ -347,7 +347,7 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         return; // just a short cut
 
     if (m_mediatorState == State::resolved &&
-        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::system_clock::now())
+        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::steady_clock::now())
     {
         m_mediatorState = State::unresolved;
         m_mediatorEntries.clear();
