@@ -670,7 +670,7 @@ template <class FilterType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
-    FilterType filter;
+    const FilterType filter = FilterType();
     if (doQueryNoLock(filter, objects) != ErrorCode::ok)
         return false;
 
