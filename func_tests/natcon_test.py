@@ -14,6 +14,7 @@ from functest_util import checkResultsEqual, generateKey #, HttpRequest
 from testbase import *
 from stortest import StorageBasedTest, TEST_CAMERA_ATTR, TEST_CAMERA_DATA, STORAGE_INIT_TIMEOUT
 from rtsptests import SingleServerRtspPerf, RtspStreamTest, SingleServerHlsTest, HlsStreamingTest #, Camera
+from pycommons.Logger import log
 
 NUM_NAT_SERV = 2  # 2 mediaservers are used: 1st before NAT, 2rd - behind NAT
                   # there is no mediaserver on the box with NAT
@@ -118,7 +119,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
 
     def VMPreparation(self):
         "Join servers into one system"
-        print "Server list: %s" % self.sl
+        log(5, "Server list: %s" % self.sl)
         self._prepare_test_phase(self._stop_and_init)
         getKey, postKey = self._prepareKeys(HOST_BEHIND_NAT)
         func = ("api/mergeSystems?url=http://%s&"
@@ -143,7 +144,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
         for method in self._sync_test_requests:
             responseList = []
             for server in self.sl:
-                print "Request http://%s/ec2/%s" % (server, method)
+                log(15, "Request http://%s/ec2/%s" % (server, method))
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
             # checking the last response validation
             checkResultsEqual(responseList, method)

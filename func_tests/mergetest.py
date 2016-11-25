@@ -131,7 +131,6 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
   def __checkSettings(self, data, settings):
     got_settings = data['reply']['settings']
-    print settings
     for name, val in settings.items():
       if type(val) is bool:
         val = bool2str(val)

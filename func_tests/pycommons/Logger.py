@@ -53,6 +53,9 @@ class Logger:
     self.__mutex__.release()
     self.logLogLevel()
 
+  def isSystem(self):
+    return False
+
   def log( self, level, msg ):
     self.__mutex__.acquire()
     try:
@@ -78,16 +81,21 @@ class Logger:
 
 class FileLogger(Logger):
   
-  def __init__( self, logLevel, fileName = None, alwaysSync = False ):
+  def __init__( self, logLevel, fileName = None, alwaysSync = False, rewrite = False ):
     Logger.__init__(self, logLevel)
     self.__fileName__ = fileName
+    self.__isSystem__ = True
     if fileName is None or fileName == '-':
       self.__file__ = sys.stdout
     elif fileName == 'stderr':
       self.__file__ = sys.stderr
     else:
-      self.__file__ = file(fileName, 'a+')
+      self.__isSystem__ = False
+      self.__file__ = file(fileName, rewrite and 'w' or 'a+')
     self.alwaysSync = alwaysSync
+
+  def isSystem(self):
+    return self.__file__ in [sys.stdout, sys.stderr]
 
   def _log( self, level, msg ):
     print >> self.__file__, '%s  %s' % (makePrefix(level, True), msg)
@@ -106,6 +114,9 @@ class SysLogger(Logger):
   def __init__( self, app, logLevel ):
     Logger.__init__(self, logLevel)
     syslog.openlog(app, syslog.LOG_PID, syslog.LOG_USER)
+
+  def isSystem(self):
+    return True
 
   def _getPriority( self, level ):
     if level <=  2: return syslog.LOG_ERR
@@ -150,7 +161,7 @@ class NullLogger(Logger):
 logger = FileLogger(defLogLevel)
 
 
-def _initLog( logLevel = None, fileName = None, alwaysSync = 0, app = 'python' ):
+def _initLog( logLevel = None, fileName = None, alwaysSync = 0, app = 'python', rewrite = False ):
   #use logger.set please
   global logger
   if logLevel is None: logLevel = defLogLevel
@@ -161,10 +172,10 @@ def _initLog( logLevel = None, fileName = None, alwaysSync = 0, app = 'python' )
   elif sys.platform == 'win32':
     logger = AutoTruncateLogger(logLevel, fileName, alwaysSync, maxLFileSize, minLFileSize)
   else:
-    logger = FileLogger(logLevel, fileName, alwaysSync)
+    logger = FileLogger(logLevel, fileName, alwaysSync, rewrite)
   logger.logLogLevel()
 
-def initLog( logLevel = None, fileName = None, app = 'python' ):
+def initLog( logLevel = None, fileName = None, app = 'python', rewrite = False ):
   alwaysSync = 0
   for v in sys.argv:
     l = string.split(v, '=')
@@ -174,7 +185,7 @@ def initLog( logLevel = None, fileName = None, app = 'python' ):
       fileName = l[1]
     if len(l) == 2 and l[0] == '--logsync':
       alwaysSync = int(l[1])
-  _initLog(logLevel, fileName, alwaysSync, app)
+  _initLog(logLevel, fileName, alwaysSync, app, rewrite)
 
 
 def logLevel():
@@ -194,7 +205,7 @@ def logReopen():
     logger.reopen()
 
 
-def logException( level ):
+def logException():
   for line in traceback.format_exc().splitlines():
     log(1, '  %s' % line)
   # unit test support

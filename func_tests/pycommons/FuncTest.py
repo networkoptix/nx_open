@@ -10,6 +10,10 @@ class XTimedOut(Exception): pass
 VSSH_CMD = "./vssh-ip.sh"
 MEDIA_SERVER_DIR='/opt/networkoptix/mediaserver'
 
+# test logging
+def tlog( level, msg ):
+  log(level, 'TEST: %s' % msg)
+
 def execVBoxCmd(host, *command):
   cmd = ' '.join(command)
   try:
@@ -22,8 +26,3 @@ def execVBoxCmd(host, *command):
     tlog(10, "%s command '%s' failed, code=%d:\n%s" % \
          (host, cmd, x.returncode, x.output))
     raise
-
-
-# test logging
-def tlog( level, msg ):
-  print '%s %s' % (makePrefix(level, True), msg)

@@ -10,6 +10,7 @@ from collections import OrderedDict
 from StringIO import StringIO
 from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
+from pycommons.Logger import log
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
     checkResultsEqual, TestDigestAuthHandler, ManagerAddPassword, \
@@ -43,11 +44,11 @@ class TestLoader(unittest.TestLoader):
     def load(self, testclass, testset, config, *args):
         names = getattr(testclass, testset, None)
         if names is not None:
-            print "[Preparing %s tests]" % testset
+            log(5, "[Preparing %s tests]" % testset)
             testclass.testset = testset
             return self.suiteClass(map(testclass, names))
         else:
-            print "ERROR: No test set '%s' found!" % testset
+            log(3, "ERROR: No test set '%s' found!" % testset)
 
 
 def _addResult(textList, resData, resType, name):
@@ -93,7 +94,7 @@ def _testResNum(result):
 
 def _singleSuiteRun(testclass, suite_name, config, args):
     result = unittest.TextTestRunner(
-            stream=_testMaster.log or sys.stdout,
+            stream=UTStreamSplitter(),
             verbosity=2,
             failfast=testclass.isFailFast(suite_name)
         ).run(
@@ -125,8 +126,8 @@ def RunTests(testclass, *args):
             testclass.globalInit(config)
         except Exception as err:
             #traceback.print_exc()
-            print "FAIL: %s initialization failed: %s!" % (testclass.__name__,
-                "".join(traceback.format_exception(*sys.exc_info())))
+            log(3, "FAIL: %s initialization failed: %s!" % (testclass.__name__,
+                "".join(traceback.format_exception(*sys.exc_info()))))
             return
         return all([
                     _singleSuiteRun(testclass, suite_name, config, args)
@@ -194,8 +195,6 @@ class FuncTestCase(unittest.TestCase):
 
     @classmethod
     def globalInit(cls, config):
-        print "========================================="
-        print
         if config is None:
             raise FuncTestError("%s can't be configured, config is None!" % cls.__name__)
         cls.config = config
@@ -229,11 +228,10 @@ class FuncTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print "========================================="
         if cls.testset:
-            print "%s Test Start: %s" % (cls._test_name, cls.testset)
+            log(5, "%s Test Start: %s" % (cls._test_name, cls.testset))
         else:
-            print "%s Test Start" % cls._test_name
+            log(5, "%s Test Start" % cls._test_name)
         # cls.config should be assigned in TestLoader.load()
 
     @classmethod
@@ -245,8 +243,7 @@ class FuncTestCase(unittest.TestCase):
         #    print "Restoring mediaserver on %s" % host
         #    cls.class_call_box(host, '/vagrant/safestart.sh', 'networkoptix-mediaserver')
         cls._stopped.clear()
-        print "%s Test End" % cls._test_name
-        print "========================================="
+        log(5, "%s Test End" % cls._test_name)
 
     @classmethod
     def isFailFast(cls, suit_name=""):
@@ -292,7 +289,7 @@ class FuncTestCase(unittest.TestCase):
         try:
             return boxssh(box, command)
         except CalledProcessError, e:
-            print ("ERROR: Box %s: remote command `%s` failed at %s with code. Output:\n%s" %
+            log(3, "ERROR: Box %s: remote command `%s` failed at %s with code. Output:\n%s" %
                       (box, ' '.join(command), e.returncode, e.output))
             return ''
 
@@ -303,10 +300,10 @@ class FuncTestCase(unittest.TestCase):
                 try:
                     if cls._need_clear_box(num):
                         args = args_method(num)
-                        print "Remotely calling at box %s: %s %s" % (num, script, ' '.join(args))
+                        log(5, "Remotely calling at box %s: %s %s" % (num, script, ' '.join(args)))
                         cls.class_call_box(cls.hosts[num], '/vagrant/' + script, *args)
                 except Exception as err:
-                    print "ERROR: _clear_box with %s for box %s: %s" % (script, num, err)
+                    log(3, "ERROR: _clear_box with %s for box %s: %s" % (script, num, err))
 
     @classmethod
     def _need_clear_box(cls, num):
@@ -331,15 +328,15 @@ class FuncTestCase(unittest.TestCase):
     #def _call_init_script(self, box, num):
 
     def _stop_and_init(self, box, num):
-        sys.stdout.write("Stopping box %s\n" % box)
+        log(5, "Stopping box %s\n" % box)
         self._mediaserver_ctl(box, 'safe-stop')
         time.sleep(0)
         if self._init_script:
             #self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
             cmd = ('/vagrant/' + self._init_script,  self._test_key, 'init') + self._init_script_args(num)
             out = self._call_box(box, *cmd)
-            print "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out)
-        sys.stdout.write("Box %s is ready\n" % box)
+            log(15, "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out))
+        log(5, "Box %s is ready\n" % box)
 
     def _prepare_test_phase(self, method=None):
         if method is None:
@@ -354,7 +351,7 @@ class FuncTestCase(unittest.TestCase):
         self._wait_servers_up()
         if self._serv_version is None:
             self._getVersion()
-        print "Servers are ready. Server vervion = %s" % self._serv_version
+        log(5, "Servers are ready. Server vervion = %s" % self._serv_version)
 
     def _getVersion(self):
         """ Returns mediaserver version as reported in api/moduleInformation.
@@ -424,10 +421,10 @@ class FuncTestCase(unittest.TestCase):
         req = self._prepare_request(host, func, data, headers)
         url = req.get_full_url()
         if not nolog:
-            print "DEBUG: requesting: %s" % url
+            log(15, "DEBUG: requesting: %s" % url)
             if data is not None and (not nodump):
                 # on restoreDatabase data is a large binary block, not interesting for debug
-                print "DEBUG: with data %s" % (pprint.pformat(data),)
+                log(15, "DEBUG: with data %s" % (pprint.pformat(data),))
         try:
             response = urllib2.urlopen(req, **({} if timeout is None else {'timeout': timeout}))
         except httplib.HTTPException as err:
@@ -453,11 +450,11 @@ class FuncTestCase(unittest.TestCase):
             response = urllib2.urlopen(req, **({} if timeout is None else {'timeout': timeout}))
         except Exception, e:
             if with_debug:
-                print "Host %s, call %s, exception: %s" % (host, func, e)
+                log(3, "Host %s, call %s, exception: %s" % (host, func, e))
             return None
         if response.getcode() != 200:
             if with_debug:
-                print "Host %s, call %s, HTTP code: %s" % (host, func, response.getcode())
+                log(3, "Host %s, call %s, HTTP code: %s" % (host, func, response.getcode()))
             return None
         # but it could fail here since with code == 200 the response must be parsable or empty
         answer = self._json_loads(response.read(), req.get_full_url())
@@ -492,8 +489,8 @@ class FuncTestCase(unittest.TestCase):
 
 
     def setUp(self):
-        "Just prints \n after unittest module prints a test name"
-        print
+        log(5, "Just prints \n after unittest module prints a test name")
+        pass
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)
     ####################################################
 
@@ -547,8 +544,8 @@ class UnitTestRollback(object):
         selection = ''
         if not self._auto:
             try :
-                print "+++++++++++++++++++++++++++++++++++++++++++WARNING!!!++++++++++++++++++++++++++++++++"
-                print "The .rollback file has been detected, if continues to run test the previous rollback information will be lost!\n"
+                log(4, "+++++++++++++++++++++++++++++++++++++++++++WARNING!!!++++++++++++++++++++++++++++++++")
+                log(4, "The .rollback file has been detected, if continues to run test the previous rollback information will be lost!\n")
                 selection = raw_input("Press <r> to RUN RECOVER at first, press <Enter> to SKIP RECOVER and run the test")
             except Exception:
                 pass
@@ -565,7 +562,7 @@ class UnitTestRollback(object):
         self._write2Rollback(resourceId, serverAddress, methodName)
         self._rollbackFile.flush()
         self._savedIds[resourceId] = (serverAddress, methodName)
-        print "DEBUG: added res %s at %s by %s" % (resourceId, serverAddress, methodName)
+        log(15, "DEBUG: added res %s at %s by %s" % (resourceId, serverAddress, methodName))
 
     def takeOff(self, resourceId):
         "If the resource was removed by a test itself, no need to keep its id here"
@@ -600,14 +597,14 @@ class UnitTestRollback(object):
         recovered = set()
         for resId, info in self._savedIds.iteritems():
             if resId in recovered:
-                print "\nWARNING: Duplicated resource %s in rollback list!" % resId
+                log(4, "\nWARNING: Duplicated resource %s in rollback list!" % resId)
             else:
                 if not self._doSingleRollback(resId, info[0], info[1]):
                     failed[resId] = info
                 else:
                     recovered.add(resId)
-                    print '+',
-        print  # newline after print '+',
+        #            print '+',
+        #print  # newline after print '+',
         if self._fpos is None:
             self.removeRollbackDB()
         else:
@@ -643,7 +640,7 @@ class UnitTestRollback(object):
                 else:
                     self._savedIds[resourceId] = (serverAddress, methodName)
         self.doRollback()
-        print "Recover done..."
+        log(5, "Recover done...")
 
     def removeRollbackDB(self):
         if self._rollbackFile is not None:
@@ -652,37 +649,6 @@ class UnitTestRollback(object):
         if os.path.isfile(".rollback"):
             os.remove(".rollback")
         self._savedIds.clear()
-
-
-class LogCatcher(StringIO):
-
-    def __init__(self, fname=""):
-        StringIO.__init__(self)
-        self.outFile = open(fname, "wt") if fname != "" else None
-        self.saved = sys.stdout  # so it can re-substitute
-        sys.stdout = self
-
-    def write(self, s):
-        if self.outFile is None:
-            StringIO.write(self, s)
-        else:
-            self.outFile.write(s)
-
-    def flush(self):
-        if self.outFile is None:
-            StringIO.flush(self)
-        else:
-            self.outFile.flush()
-
-    def close(self):
-        if self.outFile is not None:
-            self.outFile.close()
-        StringIO.close(self)
-
-    def unbind(self):
-        if not self.closed:
-            self.close()
-        sys.stdout = self.saved
 
 
 class FuncTestMaster(object):
@@ -753,22 +719,11 @@ class FuncTestMaster(object):
         if args.config:
             self.configFname = args.config
             print "Use config", self.configFname
-        if args.log is not None:
-            self.log = LogCatcher(args.log)
         self.args = args
         return
 
     def logResult(self, text, testOk):
-        (sys.stdout if self.log is None else self.log.saved).write(text)
-        if not testOk and  self.log is not None:
-            if self.log.outFile is None:
-                self.log.saved.write(
-                    "\nFailed test accumulated log:\n============================\n")
-                self.log.saved.write(self.log.getvalue())
-                self.log.truncate()
-            else:
-                self.log.flush()
-
+        sys.stdout.write(text)
 
     def setUpPassword(self):
         config = self.getConfig()
@@ -785,17 +740,15 @@ class FuncTestMaster(object):
 #        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
 
     def _callAllGetters(self):
-        print "======================================"
-        print "Test all ec2 get request status"
+        log(5, "Test all ec2 get request status")
         for s in self.clusterTestServerList:
             for reqName in self._ec2GetRequests:
-                print "Connection to http://%s/ec2/%s" % (s,reqName)
+                log(15, "Connection to http://%s/ec2/%s" % (s,reqName))
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
                 assert response.getcode() == 200, \
                     "%s failed with statusCode %d" % (reqName,response.getcode(),)
                 response.close()
-        print "All ec2 get requests work well"
-        print "======================================"
+        log(5, "All ec2 get requests work well")
 
     def getRandomServer(self):
         return random.choice(self.clusterTestServerList)
@@ -872,43 +825,43 @@ class FuncTestMaster(object):
 
     def testConnection(self, frame=True):
         if frame:
-            print "=================================================="
-            print "Test connection with each server in the server list "
+            log(5, "==================================================")
+            log(5, "Test connection with each server in the server list ")
         timeout = 5
         failed = False
         for s in self.clusterTestServerList:
-            print "Try to connect to server: %s" % (s),
+            log(5, "Try to connect to server: %s" % (s))
             request = urllib2.Request("http://%s/ec2/testConnection" % (s))
             try:
                 response = urllib2.urlopen(request, timeout=timeout)
             except urllib2.URLError , e:
-                print "\nFAIL: error connecting to %s with a %s seconds timeout:" % (s,timeout),
+                log(3, "\nFAIL: error connecting to %s with a %s seconds timeout:" % (s,timeout))
                 if isinstance(e, urllib2.HTTPError):
-                    print "HTTP error: (%s) %s" % (e.code, e.reason)
+                    log(3, "HTTP error: (%s) %s" % (e.code, e.reason))
                 else:
-                    print str(e.reason)
+                    log(3, str(e.reason))
                 failed = True
                 continue
 
             if response.getcode() != 200:
-                print "\nFAIL: Server %s responds with code %s" % (s, response.getcode())
+                log(3, "\nFAIL: Server %s responds with code %s" % (s, response.getcode()))
                 continue
             json_obj = SafeJsonLoads(response.read(), s, 'testConnection')
             if json_obj is None:
-                print "\nFAIL: Wrong response data from server %s" % (s,)
+                log(3, "\nFAIL: Wrong response data from server %s" % (s,))
                 continue
             self.clusterTestServerObjs[s] = json_obj
             self.clusterTestServerUUIDList.append([self._patchUUID(json_obj["ecsGuid"]), ''])
             response.close()
-            print "- OK"
+            log(5, "- OK")
 
         if not failed:
             self.config.rtset('ServerObjs', self.clusterTestServerObjs)
             self.config.rtset('ServerUUIDList', self.clusterTestServerUUIDList)
             failed = self._checkVersions()
         if frame:
-            print "Connection Test %s" % ("FAILED" if failed else "passed.")
-            print "=================================================="
+            log(5, "Connection Test %s" % ("FAILED" if failed else "passed."))
+            log(5,  "==================================================")
         return not failed
 
     def _checkVersions(self):
@@ -920,8 +873,8 @@ class FuncTestMaster(object):
                 first = addr
             else:
                 if serv['version'] != version:
-                    print "ERROR: Different server versions: %s at %s and %s at %s!" % (
-                        version, first, serv['version'], addr)
+                    log(3, "ERROR: Different server versions: %s at %s and %s at %s!" % (
+                        version, first, serv['version'], addr))
                     return False
         self.api.fix(Version(version) < Version("3.0.0"))
         for i, name in enumerate(self._ec2GetRequests):
@@ -987,7 +940,7 @@ class FuncTestMaster(object):
                 method = method[:method.index('?')]
             for server in self.clusterTestServerList:
                 url = "http://%s/ec2/%s?format=json" % (server, method)
-                print "Requesting " + url
+                log(15, "Requesting " + url)
                 try:
                     responseList.append((urllib2.urlopen(url),server))
                 except urllib2.URLError as err:
@@ -1005,7 +958,7 @@ class FuncTestMaster(object):
 
     def _loadTransactionLog(self, address):
         url = "http://%s/ec2/%s" % (address, "getTransactionLog")
-        print "Requesting " + url
+        log(15, "Requesting " + url)
         # check if we have that transactionLog
         try:
             return  urllib2.urlopen(url).read()
@@ -1025,11 +978,11 @@ class FuncTestMaster(object):
         for s in self.clusterTestServerList[1:]:
             tranLog = self._loadTransactionLog(s)
             if firstLog != tranLog:
-                print "Servers %s and %s return differen transaction logs:" % (serverAddr, s)
+                log(3, "Servers %s and %s return differen transaction logs:" % (serverAddr, s))
                 self._seeDiff(firstLog, tranLog, 0)
                 if len(firstLog) != len(tranLog):
-                    print "Also the lengths of transaction logs are different: %s and %s" % (
-                        len(firstLog), len(tranLog))
+                    log(3, "Also the lengths of transaction logs are different: %s and %s" % (
+                        len(firstLog), len(tranLog)))
                 #self._saveTransactionLogs(((serverAddr, firstLog), (s, tranLog)))
                 raise ServerCompareFailure(
                     "Different transaction logs on %s and %s" % (serverAddr, s))
@@ -1064,7 +1017,7 @@ class FuncTestMaster(object):
             except ServerCompareFailure as err:
                 count -= 1
                 if count > 0:
-                    print "DEBUG: initial_tests: %s (%s attempts left)" % (err, count)
+                    log(15, "DEBUG: initial_tests: %s (%s attempts left)" % (err, count))
                 else:
                     raise
 #            except Exception as err:
@@ -1088,6 +1041,18 @@ def getTestMaster():  # type: FuncTestMaster
     return _testMaster
 
 
+class UTStreamSplitter:
+
+    def write(self, s):
+        logStr = s.strip()
+        from pycommons.Logger import logger
+        if logStr and not logger.isSystem():
+            log(1, logStr)
+        sys.stdout.write(s)
+
+    def flush(self):
+        sys.stdout.flush()
+
 # TODO: remove it!
 class LegacyTestWrapperOld(FuncTestCase):
     """
@@ -1100,18 +1065,18 @@ class LegacyTestWrapperOld(FuncTestCase):
         self.globalInit(config)
 
     def __enter__(self):
-        print "Entering TestBoxHandler"
+        log(3, "Entering TestBoxHandler")
         self._servers_th_ctl('safe-start')
         self._wait_servers_up()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        print "Exitting TestBoxHandler"
+        log(3, "Exitting TestBoxHandler")
         try:
             self._servers_th_ctl('safe-stop')
             self.globalFinalise()
         except Exception as err:
-            print "Error finalizing tests: $s" % (err,)
+            log(5, "Error finalizing tests: $s" % (err,))
 
     def __del__(self):
         if self._worker:
