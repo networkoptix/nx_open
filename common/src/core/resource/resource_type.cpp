@@ -4,7 +4,6 @@
 
 #include <nx/utils/log/log.h>
 
-const QString QnResourceTypePool::kDesktopCameraTypeName(lit("SERVER_DESKTOP_CAMERA"));
 const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
 const QString QnResourceTypePool::kServerTypeId(lit("Server"));
 const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
@@ -20,6 +19,7 @@ const QnUuid QnResourceTypePool::kStorageTypeUuid(
     qnResTypePool->getFixedResourceTypeId(kStorageTypeId));
 const QnUuid QnResourceTypePool::kLayoutTypeUuid(
     qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
+const QnUuid QnResourceTypePool::kDesktopCameraTypeUuid("{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}");
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -257,20 +257,4 @@ QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() c
     QnMutexLocker lock( &m_mutex );
 
     return QnResourceTypeMap(m_resourceTypeMap);
-}
-
-QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
-    QnMutexLocker lock( &m_mutex );
-    if (!m_desktopCamResourceType)
-    {
-        for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
-        {
-            if (itr.value()->getName() == kDesktopCameraTypeName)
-            {
-                m_desktopCamResourceType = itr.value();
-                break;
-            }
-        }
-    }
-    return m_desktopCamResourceType;
 }
