@@ -210,12 +210,8 @@ void QnWorkbenchContext::setClosingDown(bool value)
 
 bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& uri)
 {
-    NX_LOG(lit("Connecting to server by custom URI %1").arg(uri.toString()), cl_logDEBUG1);
     if (!uri.isValid())
-    {
-        NX_LOG(lit("Custom URI is invalid: %1").arg(uri.toString()), cl_logWARNING);
         return false;
-    }
 
     using namespace nx::vms::utils;
 
