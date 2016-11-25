@@ -666,12 +666,11 @@ bool QnDbManager::syncLicensesBetweenDB()
 }
 
 
-template <class FilterType, class ObjectType, class ObjectListType>
+template <typename FilterDataType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
-    const FilterType filter = FilterType();
-    if (doQueryNoLock(filter, objects) != ErrorCode::ok)
+    if (doQueryNoLock(FilterDataType(), objects) != ErrorCode::ok)
         return false;
 
     for(const ObjectType& object: objects)
