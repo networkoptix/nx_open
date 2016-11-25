@@ -98,6 +98,9 @@
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
 
+#include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
+
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -625,6 +628,24 @@ void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const W
     QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, nullptr, selectedItems.materialized()));
     if(menu->isEmpty())
         return;
+
+    /*
+    // Tried to implement VMS-2713 - Right click doesn't popup menu each time
+    // Really we have a bunch of problems with selected items and right clicks on different action providers
+    installEventHandler(menu.data(), QEvent::MouseButtonPress, this,
+        [this](QObject* object, QEvent* event)
+        {
+            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::RightButton)
+            {
+                executeDelayedParented(
+                    [this, pos = mouseEvent->globalPos()]
+                    {
+                        showContextMenuAt(pos);
+                    }, 100, this);
+            }
+        });
+    */
 
     QnHiDpiWorkarounds::showMenu(menu.data(), pos);
 }
