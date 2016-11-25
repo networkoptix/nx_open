@@ -173,15 +173,15 @@ void QnStorageUrlDialog::accept()
     m_server->apiConnection()->getStorageStatusAsync(url,  &result, SLOT(processReply(int, const QVariant &, int)));
 
     enum {
-        finished,
-        cancelled
+        kFinished,
+        kCancelled
     };
 
     QEventLoop loop;
     connect(&result, &QnConnectionRequestResult::replyProcessed, &loop,
-        [&loop]() { loop.exit(finished); });
+        [&loop]() { loop.exit(kFinished); });
     connect(this, &QDialog::rejected, &loop,
-        [&loop]() { loop.exit(cancelled); });
+        [&loop]() { loop.exit(kCancelled); });
 
     // Scoped event loop:
     {
@@ -193,7 +193,7 @@ void QnStorageUrlDialog::accept()
         QnScopedTypedPropertyRollback<bool, QnBusyIndicatorButton> buttonIndicatorRollback(m_okButton,
             &QnBusyIndicatorButton::showIndicator, &QnBusyIndicatorButton::isIndicatorVisible, true);
 
-        if (loop.exec() == cancelled)
+        if (loop.exec() == kCancelled)
             return;
     }
 
