@@ -62,7 +62,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
     helpStr = "Connection behind NAT test"
     _test_name = "NAT Connection"
     _test_key = "natcon"
-    _suits = (
+    _suites = (
         ('NatConnectionTests', [
             'VMPreparation',
             'TestDataSynchronization',

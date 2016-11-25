@@ -167,7 +167,7 @@ class FuncTestCase(unittest.TestCase):
     _configured = False
     _stopped = set()
     _worker = None
-    _suits = ()
+    _suites = ()
     _init_suites_done = False
     _serv_version = None  # here I suppose that all servers being created from the same image have the same version
     before_2_5 = False # TODO remove it!
@@ -244,13 +244,13 @@ class FuncTestCase(unittest.TestCase):
     # These 3 methods used in a caller (see the RunTests and functest.CallTest funcions)
     @classmethod
     def _check_suites(cls):
-        if not cls._suits:
+        if not cls._suites:
             raise RuntimeError("%s's test suites list is empty!" % cls.__name__)
 
     @classmethod
     def iter_suites(cls):
         cls._check_suites()
-        return (s[0] for s in cls._suits)
+        return (s[0] for s in cls._suites)
 
     @classmethod
     def init_suites(cls):
@@ -258,7 +258,7 @@ class FuncTestCase(unittest.TestCase):
         if cls._init_suites_done:
             return
         cls._check_suites()
-        for name, tests in cls._suits:
+        for name, tests in cls._suites:
             if hasattr(cls, name):
                 raise AssertionError("Test suite naming error: class %s already has attrinute %s" % (cls.__name__, name))
             setattr(cls, name, tests)
@@ -486,7 +486,7 @@ class FuncTestCase(unittest.TestCase):
 
     @classmethod
     def filterSuites(cls, *names):
-        return tuple(sw for sw in cls._suits if sw[0] in names)
+        return tuple(sw for sw in cls._suites if sw[0] in names)
 
 
 # Rollback support
@@ -1048,7 +1048,7 @@ class LegacyTestWrapperOld(FuncTestCase):
     """
     Provides an object to use virtual box control methods
     """
-    _suits = "dummy"
+    _suites = "dummy"
     _test_key = "legacy"
 
     def __init__(self, config):

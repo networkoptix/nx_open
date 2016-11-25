@@ -1195,7 +1195,7 @@ class MainFunctests(FuncTestCase):
     helpStr = "The main minimal functional tests set"
     _test_name = "Main functests"
     _test_key = "legacy"
-    _suits = (("Main", [
+    _suites = (("Main", [
         "ConnectionTest",
         "InitialClusterTest",
         "BasicClusterTest",

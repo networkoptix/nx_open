@@ -36,8 +36,8 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
   _test_name = 'Merge system'
   _test_key = 'merge'
 
-  # Test suits
-  _suits = (
+  # Test suites
+  _suites = (
         ('MergeSystemSuits', [
             'testMergeTakeLocalSettings',
             'testMergeTakeRemoteSettings',
