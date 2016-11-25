@@ -21,6 +21,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <nx/utils/log/log.h>
 
 using namespace nx::plugins;
 
@@ -120,9 +121,15 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
-
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
+    {
+        NX_LOG(
+            lm("OnvifResourceInformationFetcher, device %1 %2 is ignored by the Onvif driver")
+                .arg(manufacturer)
+                .arg(name),
+            cl_logDEBUG2);
         return true;
+    }
 
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {

@@ -238,7 +238,14 @@
                 "FLIR Systems|FC-*", "FLIR|FC-*"
             ],
             "forceSingleStream": true,
-            "ignoreOnvif": true
+            "ignoreONVIF": true
+        },
+        {
+            "__comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
+            "keys":[
+                "FC-Series-R|*", "FC-Series-S|*"
+            ],
+            "ignoreONVIF": true
         },
         {
             "keys": [
