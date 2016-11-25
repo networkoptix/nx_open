@@ -4,15 +4,9 @@
 
 QnScopedCursorRollback::QnScopedCursorRollback(QWidget* widget):
     m_widget(widget),
-    m_hadCursor(false)
+    m_hadCursor(widget ? widget->testAttribute(Qt::WA_SetCursor) : false),
+    m_oldCursor(m_hadCursor ? widget->cursor() : QCursor())
 {
-    if (!widget)
-        return;
-
-    m_hadCursor = widget->testAttribute(Qt::WA_SetCursor);
-
-    if (m_hadCursor)
-        m_oldCursor = widget->cursor();
 }
 
 QnScopedCursorRollback::QnScopedCursorRollback(QWidget* widget, const QCursor& cursor):

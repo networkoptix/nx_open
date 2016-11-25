@@ -4,7 +4,7 @@
 #include <QtGui/QCursor>
 
 class QWidget;
-class QnScopedCursorRollback
+class QnScopedCursorRollback final
 {
 public:
     QnScopedCursorRollback(QWidget* widget);
@@ -13,7 +13,7 @@ public:
     ~QnScopedCursorRollback();
 
 private:
-    QPointer<QWidget> m_widget;
-    bool m_hadCursor;
-    QCursor m_oldCursor;
+    const QPointer<QWidget> m_widget;
+    const bool m_hadCursor;
+    const QCursor m_oldCursor;
 };
