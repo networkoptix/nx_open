@@ -12,7 +12,7 @@ import threading
 from functest_util import *
 from generator import *
 from testbase import FuncTestMaster, getTestMaster
-from pycommons.Logger import log
+from pycommons.Logger import log, LOGLEVEL
 
 testMaster = getTestMaster()  # it's a singleton
 
@@ -58,7 +58,7 @@ class _pvt(object):
             try:
                 sendRequest(self._Lock, url, d, notify=True)
             except TestRequestError as err:
-                log(3, "ERROR in test %s: %s" % (self.__class__.__name__, err.message))
+                log(LOGLEVEL.ERROR, "ERROR in test %s: %s" % (self.__class__.__name__, err.message))
                 self._dump_post_data(d)
                 #self._dumpFailedRequest(d, methodName)
                 self.fail("%s failed with %s" % (methodName, err.errMessage))
@@ -99,8 +99,8 @@ class _pvt(object):
             pass
 
         def test(self):
-            log(5, "\n===================================")
-            log(5, "Test %s start\n" % (self._getMethodName(),))
+            log(LOGLEVEL.INFO, "\n===================================")
+            log(LOGLEVEL.INFO, "Test %s start\n" % (self._getMethodName(),))
 
             postDataList = self._generateModifySeq()
 
@@ -122,14 +122,14 @@ class _pvt(object):
                     testMaster.checkMethodStatusConsistent(self._getObserverNames())
                 except ServerCompareFailure as err:
                     if flag:
-                        log(15, "DEBUG: %s. Try again." % str(err))
+                        log(LOGLEVEL.DEBUG + 9, "DEBUG: %s. Try again." % str(err))
                         raise
                     time.sleep(1.5)
                 else:
                     break
 
-            log(5, "Test %s done" % (self._getMethodName()))
-            log(5, "===================================\n")
+            log(LOGLEVEL.INFO, "Test %s done" % (self._getMethodName()))
+            log(LOGLEVEL.INFO, "===================================\n")
 
 
 class CameraTest(_pvt.LegacyFuncTestBase):
@@ -314,9 +314,9 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
     def setUp(self):
         dataGen = ConflictionDataGenerator()
 
-        log(5, "Start confliction data preparation, this will generate Cameras/Users/MediaServers")
+        log(LOGLEVEL.INFO, "Start confliction data preparation, this will generate Cameras/Users/MediaServers")
         dataGen.prepare(testMaster.testCaseSize)
-        log(5,"Confilication data generation done")
+        log(LOGLEVEL.INFO,"Confilication data generation done")
 
         self._testCase = testMaster.testCaseSize
         self._conflictList = [ ("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
@@ -341,8 +341,8 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
     def test(self):
         workerQueue = ClusterWorker(testMaster.threadNumber, self._testCase * 2)
 
-        log(5, "===================================")
-        log(5,"Test: ResourceConfliction start\n")
+        log(LOGLEVEL.INFO, "===================================")
+        log(LOGLEVEL.INFO,"Test: ResourceConfliction start\n")
 
         for _ in xrange(self._testCase):
             conf = self._generateResourceConfliction()
@@ -357,7 +357,7 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
 
         self._checkStatus()
 
-        log(5,"Test: ResourceConfliction done")
-        log(5,"===================================\n")
+        log(LOGLEVEL.INFO,"Test: ResourceConfliction done")
+        log(LOGLEVEL.INFO,"===================================\n")
 
 

@@ -9,13 +9,34 @@ from threading import Lock, currentThread
 if sys.platform != 'win32':
   import syslog
   
-
 logEncoding = 'koi8-r'
 defLogLevel = 5
 normalLevel = 20  # level num for massive messages must be greater than this
 maxLFileSize = 100 * 1024  # max and min log file size for windows for AutoTruncateLogger
 minLFileSize =  10 * 1024
 
+class LOGLEVEL:
+
+  MAINTENANCE = 0
+  ERROR0 = 1
+  ERROR1 = 2
+  ERROR = ERROR3 = 3
+  WARNING = 4
+  INFO = 5
+  DEBUG = 6
+
+  @classmethod
+  def str(cls, level):
+    if level == cls.MAINTENANCE:
+      return "MAINT"
+    elif level >= cls.ERROR0 and level <= cls.ERROR3:
+      return "ERROR%d" % (level - cls.ERROR0)
+    elif level == cls.WARNING:
+      return "WARN"
+    elif level == cls.INFO:
+      return "INFO"
+    else:
+      return "DEBUG%d" % (level - cls.DEBUG)
 
 def makePrefix( level, useTime ):
   if useTime:
@@ -25,10 +46,9 @@ def makePrefix( level, useTime ):
   else:
     timeStr = ''
   threadName = currentThread().getName()
-  return '%s[%s] %02d' % (timeStr, threadName, level)
+  return '%s[%s] [%s]' % (timeStr, threadName, LOGLEVEL.str(level))
   #return '%s[%s|%d-%d] %02d' % (timeStr, threadName, os.getpid(), thread.get_ident(), level)
   #return '%s[%d][%s] %02d' % (timeStr, os.getpid(), threadName, level)
-
 
 class Logger:
 
@@ -38,7 +58,7 @@ class Logger:
     self.__encoder__ = codecs.getencoder(logEncoding)
   
   def logLogLevel( self ):
-    self.log(0, 'Log level set to %d' % self.logLevel())
+    self.log(LOGLEVEL.MAINTENANCE, 'Log level set to %d' % self.logLevel())
 
   def logLevel( self ):
     self.__mutex__.acquire()
@@ -103,10 +123,10 @@ class FileLogger(Logger):
 
   def _reopen( self ):
     if self.__fileName__ is None or self.__fileName__ == '-': return
-    self._log(0, 'Reopening...')
+    self._log(LOGLEVEL.MAINTENANCE, 'Reopening...')
     self.__file__.close()
     self.__file__ = file(self.__fileName__, 'a+')
-    self._log(0, 'Reopened. Log level = %d' % self.__logLevel__)
+    self._log(LOGLEVEL.MAINTENANCE, 'Reopened. Log level = %d' % self.__logLevel__)
     
 
 class SysLogger(Logger):
@@ -177,14 +197,6 @@ def _initLog( logLevel = None, fileName = None, alwaysSync = 0, app = 'python', 
 
 def initLog( logLevel = None, fileName = None, app = 'python', rewrite = False ):
   alwaysSync = 0
-  for v in sys.argv:
-    l = string.split(v, '=')
-    if len(l) == 2 and l[0] == '--loglevel':
-      logLevel = int(l[1])
-    if len(l) == 2 and l[0] == '--log':
-      fileName = l[1]
-    if len(l) == 2 and l[0] == '--logsync':
-      alwaysSync = int(l[1])
   _initLog(logLevel, fileName, alwaysSync, app, rewrite)
 
 
@@ -207,7 +219,7 @@ def logReopen():
 
 def logException():
   for line in traceback.format_exc().splitlines():
-    log(1, '  %s' % line)
+    log(LOGLEVEL.ERROR0, '  %s' % line)
   # unit test support
   # log Exception executed on failed thread - THIS trace we want to see on unittest output
   setThreadTrace()

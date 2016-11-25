@@ -3,7 +3,7 @@
 # base classes for functional tests
 
 import subprocess
-from Logger import log, makePrefix
+from Logger import log, makePrefix, LOGLEVEL
 
 class XTimedOut(Exception): pass
 
@@ -17,12 +17,12 @@ def tlog( level, msg ):
 def execVBoxCmd(host, *command):
   cmd = ' '.join(command)
   try:
-    tlog(10, "DEBUG: %s" % str([VSSH_CMD, host, 'sudo'] + list(command))) 
+    tlog(LOGLEVEL.DEBUG + 4, "DEBUG: %s" % str([VSSH_CMD, host, 'sudo'] + list(command))) 
     output = subprocess.check_output(
       [VSSH_CMD, host, 'sudo'] + list(command),
       shell=False, stderr=subprocess.STDOUT)
-    tlog(10, "%s command '%s':\n%s" % (host, cmd, output))
+    tlog(LOGLEVEL.DEBUG + 4, "%s command '%s':\n%s" % (host, cmd, output))
   except subprocess.CalledProcessError, x:
-    tlog(10, "%s command '%s' failed, code=%d:\n%s" % \
+    tlog(LOGLEVEL.DEBUG + 4, "%s command '%s' failed, code=%d:\n%s" % \
          (host, cmd, x.returncode, x.output))
     raise

@@ -10,7 +10,7 @@ import os, time
 from functest_util import compareJson, textdiff
 from testbase import FuncTestCase
 from stortest import StorageBasedTest
-from pycommons.Logger import log
+from pycommons.Logger import log, LOGLEVEL
 
 NUM_SERV=2
 SERVERS_MERGE_WAIT=20
@@ -23,7 +23,7 @@ DUMP_AFTER="" # "data-after"
 EXPECTED_REALM="networkoptix"
 
 def _sleep(n):
-    log(5, "Sleep %s..." % n)
+    log(LOGLEVEL.INFO, "Sleep %s..." % n)
     time.sleep(n)
 
 
@@ -42,7 +42,7 @@ def _saveDump(name, data, mode = "t"):
             with open(name, "w"+mode) as f:
                 print >>f, data
         except Exception as err:
-            log(4, "WARNING: failed to store FullInfo dump into file %s: %r" % (name, err))
+            log(LOGLEVEL.WARNING, "WARNING: failed to store FullInfo dump into file %s: %r" % (name, err))
 
 
 class DBTest(StorageBasedTest):
@@ -81,11 +81,11 @@ class DBTest(StorageBasedTest):
         return super(StorageBasedTest, cls)._need_clear_box(num)
 
     def _init_script_args(self, boxnum):
-        log(15, "DEBUG: box %s, set id %s" % (boxnum, self._ids[boxnum]))
+        log(LOGLEVEL.DEBUG + 9, "DEBUG: box %s, set id %s" % (boxnum, self._ids[boxnum]))
         return (self._dbfiles[boxnum], self._ids[boxnum])
 
     def _ensureRealm(self):
-        log(5, "Ensure the old realm used...")
+        log(LOGLEVEL.INFO, "Ensure the old realm used...")
         realmNotReady = set(xrange(self.num_serv))
         until = time.time() + REALM_FIX_TIMEOUT
         func = "api/moduleInformation" if self.before_3_0 else "api/getNonce?userName=admin"
@@ -110,10 +110,10 @@ class DBTest(StorageBasedTest):
     def DBUpgradeTest(self):
         """ Start both servers and check that their data are synchronized. """
         self._prepare_test_phase(self._stop_and_init)
-        log(5, "Wait %s seconds for server to upgrade DB and merge data..." % SERVERS_MERGE_WAIT)
+        log(LOGLEVEL.INFO, "Wait %s seconds for server to upgrade DB and merge data..." % SERVERS_MERGE_WAIT)
         time.sleep(SERVERS_MERGE_WAIT)
         self._ensureRealm()
-        log(5, "Now check the data")
+        log(LOGLEVEL.INFO, "Now check the data")
         func = 'ec2/getFullInfo?extraFormatting'
         answers = [self._server_request(n, func, unparsed=True) for n in xrange(self.num_serv)]
         diff = compareJson(answers[0][0], answers[1][0])
@@ -175,7 +175,7 @@ class DBTest(StorageBasedTest):
             fulldataAfter = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
             diff = compareJson(fulldataBefore[0], fulldataAfter[0])
             if diff.hasDiff() and time.time() < stop:
-                log(5, "Try %d failed" % cnt)
+                log(LOGLEVEL.INFO, "Try %d failed" % cnt)
                 cnt += 1
                 time.sleep(1.5)
                 continue
@@ -183,8 +183,8 @@ class DBTest(StorageBasedTest):
         #self._get_db_copy('after')
         _saveDump(DUMP_AFTER, fulldataAfter[1])
         if diff.hasDiff():
-            log(15, "DEBUG: compareJson has found differences: %s" % (diff.errorInfo(),))
+            log(LOGLEVEL.DEBUG + 9, "DEBUG: compareJson has found differences: %s" % (diff.errorInfo(),))
             diffresult = textdiff(fulldataBefore[1], fulldataAfter[1], "Before", "After")
             self.fail("Servers responses on %s are different:\n%s" % (getInfoFunc, diffresult))
         else:
-            log(5, "Success after %.1f seconds" % (time.time() - start,))
+            log(LOGLEVEL.INFO, "Success after %.1f seconds" % (time.time() - start,))

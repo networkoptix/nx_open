@@ -10,7 +10,7 @@ from rtsptests import RtspStreamTest, HlsStreamingTest
 from stortest import StorageBasedTest, checkInit  #, TEST_CAMERA_DATA
 from functest_util import quote_guid
 from testbase import NUM_SERV
-from pycommons.Logger import log
+from pycommons.Logger import log, LOGLEVEL
 
 _NUM_STREAM_SERV = 1
 _WORK_HOST = 0
@@ -52,12 +52,12 @@ class StreamingTest(StorageBasedTest):
         time.sleep(1)
         self.config.rtset("ServerUUIDList", self.guids[:]) # [quote_guid(guid) for guid in self.guids]
         answer = self._server_request(_WORK_HOST, 'ec2/getCamerasEx')
-        log(5, "_other_inits: before _fill_storage getCamerasEx(%s) response: '%s'" % (_WORK_HOST, answer))
+        log(LOGLEVEL.INFO, "_other_inits: before _fill_storage getCamerasEx(%s) response: '%s'" % (_WORK_HOST, answer))
         #raw_input("Before filling storage.... Press ENTER")
         self._fill_storage('streaming', _WORK_HOST, "streaming")
-        log(15, "DEBUG0: _fill_storage finished at %s" % int(time.time()))
+        log(LOGLEVEL.DEBUG + 9, "DEBUG0: _fill_storage finished at %s" % int(time.time()))
         answer = self._server_request(_WORK_HOST, 'ec2/getCamerasEx')
-        log(5, "_other_inits: after _fill_storage getCamerasEx(%s) response: '%s'" % (_WORK_HOST, answer))
+        log(LOGLEVEL.INFO, "_other_inits: after _fill_storage getCamerasEx(%s) response: '%s'" % (_WORK_HOST, answer))
 
     @checkInit
     def MultiProtoStreamingTest(self):

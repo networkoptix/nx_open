@@ -10,7 +10,7 @@ from collections import OrderedDict
 from StringIO import StringIO
 from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
-from pycommons.Logger import log
+from pycommons.Logger import log, LOGLEVEL
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
     checkResultsEqual, TestDigestAuthHandler, ManagerAddPassword, \
@@ -44,11 +44,11 @@ class TestLoader(unittest.TestLoader):
     def load(self, testclass, testset, config, *args):
         names = getattr(testclass, testset, None)
         if names is not None:
-            log(5, "[Preparing %s tests]" % testset)
+            log(LOGLEVEL.INFO, "[Preparing %s tests]" % testset)
             testclass.testset = testset
             return self.suiteClass(map(testclass, names))
         else:
-            log(3, "ERROR: No test set '%s' found!" % testset)
+            log(LOGLEVEL.ERROR, "ERROR: No test set '%s' found!" % testset)
 
 
 def _addResult(textList, resData, resType, name):
@@ -126,7 +126,7 @@ def RunTests(testclass, *args):
             testclass.globalInit(config)
         except Exception as err:
             #traceback.print_exc()
-            log(3, "FAIL: %s initialization failed: %s!" % (testclass.__name__,
+            log(LOGLEVEL.ERROR, "FAIL: %s initialization failed: %s!" % (testclass.__name__,
                 "".join(traceback.format_exception(*sys.exc_info()))))
             return
         return all([
@@ -229,9 +229,9 @@ class FuncTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         if cls.testset:
-            log(5, "%s Test Start: %s" % (cls._test_name, cls.testset))
+            log(LOGLEVEL.INFO, "%s Test Start: %s" % (cls._test_name, cls.testset))
         else:
-            log(5, "%s Test Start" % cls._test_name)
+            log(LOGLEVEL.INFO, "%s Test Start" % cls._test_name)
         # cls.config should be assigned in TestLoader.load()
 
     @classmethod
@@ -243,7 +243,7 @@ class FuncTestCase(unittest.TestCase):
         #    print "Restoring mediaserver on %s" % host
         #    cls.class_call_box(host, '/vagrant/safestart.sh', 'networkoptix-mediaserver')
         cls._stopped.clear()
-        log(5, "%s Test End" % cls._test_name)
+        log(LOGLEVEL.INFO, "%s Test End" % cls._test_name)
 
     @classmethod
     def isFailFast(cls, suit_name=""):
@@ -289,7 +289,7 @@ class FuncTestCase(unittest.TestCase):
         try:
             return boxssh(box, command)
         except CalledProcessError, e:
-            log(3, "ERROR: Box %s: remote command `%s` failed at %s with code. Output:\n%s" %
+            log(LOGLEVEL.ERROR, "ERROR: Box %s: remote command `%s` failed at %s with code. Output:\n%s" %
                       (box, ' '.join(command), e.returncode, e.output))
             return ''
 
@@ -300,10 +300,10 @@ class FuncTestCase(unittest.TestCase):
                 try:
                     if cls._need_clear_box(num):
                         args = args_method(num)
-                        log(5, "Remotely calling at box %s: %s %s" % (num, script, ' '.join(args)))
+                        log(LOGLEVEL.INFO, "Remotely calling at box %s: %s %s" % (num, script, ' '.join(args)))
                         cls.class_call_box(cls.hosts[num], '/vagrant/' + script, *args)
                 except Exception as err:
-                    log(3, "ERROR: _clear_box with %s for box %s: %s" % (script, num, err))
+                    log(LOGLEVEL.ERROR, "ERROR: _clear_box with %s for box %s: %s" % (script, num, err))
 
     @classmethod
     def _need_clear_box(cls, num):
@@ -328,15 +328,15 @@ class FuncTestCase(unittest.TestCase):
     #def _call_init_script(self, box, num):
 
     def _stop_and_init(self, box, num):
-        log(5, "Stopping box %s\n" % box)
+        log(LOGLEVEL.INFO, "Stopping box %s\n" % box)
         self._mediaserver_ctl(box, 'safe-stop')
         time.sleep(0)
         if self._init_script:
             #self._call_box(box, '/vagrant/' + self._init_script,  self._test_key, 'init', *self._init_script_args(num))
             cmd = ('/vagrant/' + self._init_script,  self._test_key, 'init') + self._init_script_args(num)
             out = self._call_box(box, *cmd)
-            log(15, "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out))
-        log(5, "Box %s is ready\n" % box)
+            log(LOGLEVEL.DEBUG + 9, "DEBUG: _stop_and_init[%s]: called %s\nwith output output: %s" % (box, cmd, out))
+        log(LOGLEVEL.INFO, "Box %s is ready\n" % box)
 
     def _prepare_test_phase(self, method=None):
         if method is None:
@@ -351,7 +351,7 @@ class FuncTestCase(unittest.TestCase):
         self._wait_servers_up()
         if self._serv_version is None:
             self._getVersion()
-        log(5, "Servers are ready. Server vervion = %s" % self._serv_version)
+        log(LOGLEVEL.INFO, "Servers are ready. Server vervion = %s" % self._serv_version)
 
     def _getVersion(self):
         """ Returns mediaserver version as reported in api/moduleInformation.
@@ -421,10 +421,10 @@ class FuncTestCase(unittest.TestCase):
         req = self._prepare_request(host, func, data, headers)
         url = req.get_full_url()
         if not nolog:
-            log(15, "DEBUG: requesting: %s" % url)
+            log(LOGLEVEL.DEBUG + 9, "DEBUG: requesting: %s" % url)
             if data is not None and (not nodump):
                 # on restoreDatabase data is a large binary block, not interesting for debug
-                log(15, "DEBUG: with data %s" % (pprint.pformat(data),))
+                log(LOGLEVEL.DEBUG + 9, "DEBUG: with data %s" % (pprint.pformat(data),))
         try:
             response = urllib2.urlopen(req, **({} if timeout is None else {'timeout': timeout}))
         except httplib.HTTPException as err:
@@ -450,11 +450,11 @@ class FuncTestCase(unittest.TestCase):
             response = urllib2.urlopen(req, **({} if timeout is None else {'timeout': timeout}))
         except Exception, e:
             if with_debug:
-                log(3, "Host %s, call %s, exception: %s" % (host, func, e))
+                log(LOGLEVEL.ERROR, "Host %s, call %s, exception: %s" % (host, func, e))
             return None
         if response.getcode() != 200:
             if with_debug:
-                log(3, "Host %s, call %s, HTTP code: %s" % (host, func, response.getcode()))
+                log(LOGLEVEL.ERROR, "Host %s, call %s, HTTP code: %s" % (host, func, response.getcode()))
             return None
         # but it could fail here since with code == 200 the response must be parsable or empty
         answer = self._json_loads(response.read(), req.get_full_url())
@@ -489,7 +489,7 @@ class FuncTestCase(unittest.TestCase):
 
 
     def setUp(self):
-        log(5, "Just prints \n after unittest module prints a test name")
+        log(LOGLEVEL.INFO, "Just prints \n after unittest module prints a test name")
         pass
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)
     ####################################################
@@ -544,8 +544,8 @@ class UnitTestRollback(object):
         selection = ''
         if not self._auto:
             try :
-                log(4, "+++++++++++++++++++++++++++++++++++++++++++WARNING!!!++++++++++++++++++++++++++++++++")
-                log(4, "The .rollback file has been detected, if continues to run test the previous rollback information will be lost!\n")
+                log(LOGLEVEL.WARNING, "+++++++++++++++++++++++++++++++++++++++++++WARNING!!!++++++++++++++++++++++++++++++++")
+                log(LOGLEVEL.WARNING, "The .rollback file has been detected, if continues to run test the previous rollback information will be lost!\n")
                 selection = raw_input("Press <r> to RUN RECOVER at first, press <Enter> to SKIP RECOVER and run the test")
             except Exception:
                 pass
@@ -562,7 +562,7 @@ class UnitTestRollback(object):
         self._write2Rollback(resourceId, serverAddress, methodName)
         self._rollbackFile.flush()
         self._savedIds[resourceId] = (serverAddress, methodName)
-        log(15, "DEBUG: added res %s at %s by %s" % (resourceId, serverAddress, methodName))
+        log(LOGLEVEL.DEBUG + 9, "DEBUG: added res %s at %s by %s" % (resourceId, serverAddress, methodName))
 
     def takeOff(self, resourceId):
         "If the resource was removed by a test itself, no need to keep its id here"
@@ -597,7 +597,7 @@ class UnitTestRollback(object):
         recovered = set()
         for resId, info in self._savedIds.iteritems():
             if resId in recovered:
-                log(4, "\nWARNING: Duplicated resource %s in rollback list!" % resId)
+                log(LOGLEVEL.WARNING, "\nWARNING: Duplicated resource %s in rollback list!" % resId)
             else:
                 if not self._doSingleRollback(resId, info[0], info[1]):
                     failed[resId] = info
@@ -640,7 +640,7 @@ class UnitTestRollback(object):
                 else:
                     self._savedIds[resourceId] = (serverAddress, methodName)
         self.doRollback()
-        log(5, "Recover done...")
+        log(LOGLEVEL.INFO, "Recover done...")
 
     def removeRollbackDB(self):
         if self._rollbackFile is not None:
@@ -740,15 +740,15 @@ class FuncTestMaster(object):
 #        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
 
     def _callAllGetters(self):
-        log(5, "Test all ec2 get request status")
+        log(LOGLEVEL.INFO, "Test all ec2 get request status")
         for s in self.clusterTestServerList:
             for reqName in self._ec2GetRequests:
-                log(15, "Connection to http://%s/ec2/%s" % (s,reqName))
+                log(LOGLEVEL.DEBUG + 9, "Connection to http://%s/ec2/%s" % (s,reqName))
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
                 assert response.getcode() == 200, \
                     "%s failed with statusCode %d" % (reqName,response.getcode(),)
                 response.close()
-        log(5, "All ec2 get requests work well")
+        log(LOGLEVEL.INFO, "All ec2 get requests work well")
 
     def getRandomServer(self):
         return random.choice(self.clusterTestServerList)
@@ -825,43 +825,43 @@ class FuncTestMaster(object):
 
     def testConnection(self, frame=True):
         if frame:
-            log(5, "==================================================")
-            log(5, "Test connection with each server in the server list ")
+            log(LOGLEVEL.INFO, "==================================================")
+            log(LOGLEVEL.INFO, "Test connection with each server in the server list ")
         timeout = 5
         failed = False
         for s in self.clusterTestServerList:
-            log(5, "Try to connect to server: %s" % (s))
+            log(LOGLEVEL.INFO, "Try to connect to server: %s" % (s))
             request = urllib2.Request("http://%s/ec2/testConnection" % (s))
             try:
                 response = urllib2.urlopen(request, timeout=timeout)
             except urllib2.URLError , e:
-                log(3, "\nFAIL: error connecting to %s with a %s seconds timeout:" % (s,timeout))
+                log(LOGLEVEL.ERROR, "\nFAIL: error connecting to %s with a %s seconds timeout:" % (s,timeout))
                 if isinstance(e, urllib2.HTTPError):
-                    log(3, "HTTP error: (%s) %s" % (e.code, e.reason))
+                    log(LOGLEVEL.ERROR, "HTTP error: (%s) %s" % (e.code, e.reason))
                 else:
-                    log(3, str(e.reason))
+                    log(LOGLEVEL.ERROR, str(e.reason))
                 failed = True
                 continue
 
             if response.getcode() != 200:
-                log(3, "\nFAIL: Server %s responds with code %s" % (s, response.getcode()))
+                log(LOGLEVEL.ERROR, "\nFAIL: Server %s responds with code %s" % (s, response.getcode()))
                 continue
             json_obj = SafeJsonLoads(response.read(), s, 'testConnection')
             if json_obj is None:
-                log(3, "\nFAIL: Wrong response data from server %s" % (s,))
+                log(LOGLEVEL.ERROR, "\nFAIL: Wrong response data from server %s" % (s,))
                 continue
             self.clusterTestServerObjs[s] = json_obj
             self.clusterTestServerUUIDList.append([self._patchUUID(json_obj["ecsGuid"]), ''])
             response.close()
-            log(5, "- OK")
+            log(LOGLEVEL.INFO, "- OK")
 
         if not failed:
             self.config.rtset('ServerObjs', self.clusterTestServerObjs)
             self.config.rtset('ServerUUIDList', self.clusterTestServerUUIDList)
             failed = self._checkVersions()
         if frame:
-            log(5, "Connection Test %s" % ("FAILED" if failed else "passed."))
-            log(5,  "==================================================")
+            log(LOGLEVEL.INFO, "Connection Test %s" % ("FAILED" if failed else "passed."))
+            log(LOGLEVEL.INFO,  "==================================================")
         return not failed
 
     def _checkVersions(self):
@@ -873,7 +873,7 @@ class FuncTestMaster(object):
                 first = addr
             else:
                 if serv['version'] != version:
-                    log(3, "ERROR: Different server versions: %s at %s and %s at %s!" % (
+                    log(LOGLEVEL.ERROR, "ERROR: Different server versions: %s at %s and %s at %s!" % (
                         version, first, serv['version'], addr))
                     return False
         self.api.fix(Version(version) < Version("3.0.0"))
@@ -940,7 +940,7 @@ class FuncTestMaster(object):
                 method = method[:method.index('?')]
             for server in self.clusterTestServerList:
                 url = "http://%s/ec2/%s?format=json" % (server, method)
-                log(15, "Requesting " + url)
+                log(LOGLEVEL.DEBUG + 9, "Requesting " + url)
                 try:
                     responseList.append((urllib2.urlopen(url),server))
                 except urllib2.URLError as err:
@@ -958,7 +958,7 @@ class FuncTestMaster(object):
 
     def _loadTransactionLog(self, address):
         url = "http://%s/ec2/%s" % (address, "getTransactionLog")
-        log(15, "Requesting " + url)
+        log(LOGLEVEL.DEBUG + 9, "Requesting " + url)
         # check if we have that transactionLog
         try:
             return  urllib2.urlopen(url).read()
@@ -978,10 +978,10 @@ class FuncTestMaster(object):
         for s in self.clusterTestServerList[1:]:
             tranLog = self._loadTransactionLog(s)
             if firstLog != tranLog:
-                log(3, "Servers %s and %s return differen transaction logs:" % (serverAddr, s))
+                log(LOGLEVEL.ERROR, "Servers %s and %s return differen transaction logs:" % (serverAddr, s))
                 self._seeDiff(firstLog, tranLog, 0)
                 if len(firstLog) != len(tranLog):
-                    log(3, "Also the lengths of transaction logs are different: %s and %s" % (
+                    log(LOGLEVEL.ERROR, "Also the lengths of transaction logs are different: %s and %s" % (
                         len(firstLog), len(tranLog)))
                 #self._saveTransactionLogs(((serverAddr, firstLog), (s, tranLog)))
                 raise ServerCompareFailure(
@@ -1017,7 +1017,7 @@ class FuncTestMaster(object):
             except ServerCompareFailure as err:
                 count -= 1
                 if count > 0:
-                    log(15, "DEBUG: initial_tests: %s (%s attempts left)" % (err, count))
+                    log(LOGLEVEL.DEBUG + 9, "DEBUG: initial_tests: %s (%s attempts left)" % (err, count))
                 else:
                     raise
 #            except Exception as err:
@@ -1047,7 +1047,7 @@ class UTStreamSplitter:
         logStr = s.strip()
         from pycommons.Logger import logger
         if logStr and not logger.isSystem():
-            log(1, logStr)
+            log(LOGLEVEL.MAINTENANCE, logStr)
         sys.stdout.write(s)
 
     def flush(self):
@@ -1065,18 +1065,18 @@ class LegacyTestWrapperOld(FuncTestCase):
         self.globalInit(config)
 
     def __enter__(self):
-        log(3, "Entering TestBoxHandler")
+        log(LOGLEVEL.ERROR, "Entering TestBoxHandler")
         self._servers_th_ctl('safe-start')
         self._wait_servers_up()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        log(3, "Exitting TestBoxHandler")
+        log(LOGLEVEL.ERROR, "Exitting TestBoxHandler")
         try:
             self._servers_th_ctl('safe-stop')
             self.globalFinalise()
         except Exception as err:
-            log(5, "Error finalizing tests: $s" % (err,))
+            log(LOGLEVEL.INFO, "Error finalizing tests: $s" % (err,))
 
     def __del__(self):
         if self._worker:
