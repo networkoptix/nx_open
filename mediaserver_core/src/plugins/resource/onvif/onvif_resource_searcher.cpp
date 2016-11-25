@@ -17,6 +17,8 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 
+namespace {
+
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
     bool rez = false;
@@ -36,19 +38,20 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 
     netRes->unlockConsumers();
     return rez;
-}
+};
 
 /*
 *   Port list used for manual camera add
 */
-static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
-{
+const std::vector<quint16> ONVIF_SERVICE_DEFAULT_PORTS = {
     80,
-    8090, //FLIR default port
+    8081, //FLIR default port
     8032, // DW default port
     50080, // NEW DW cam default port
     9988 // Dahui default port
 };
+
+} // namespace
 
 OnvifResourceSearcher::OnvifResourceSearcher()
 {
@@ -77,7 +80,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const
 
     if (url.port() == -1)
     {
-        for (uint i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i)
+        for (uint i = 0; i < ONVIF_SERVICE_DEFAULT_PORTS.size(); ++i)
         {
             QUrl newUrl(url);
             newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);

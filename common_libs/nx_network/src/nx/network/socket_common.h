@@ -127,4 +127,17 @@ inline uint qHash(const SocketAddress &address) {
     return qHash(address.address.toString(), address.port);
 }
 
+namespace std {
+
+template <> struct hash<SocketAddress>
+{
+    size_t operator()(const SocketAddress& socketAddress) const
+    {
+        const auto stdString = socketAddress.toString().toStdString();
+        return hash<std::string>{}(stdString);
+    }
+};
+
+}
+
 Q_DECLARE_METATYPE(SocketAddress)

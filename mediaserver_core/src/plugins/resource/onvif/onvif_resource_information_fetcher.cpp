@@ -393,25 +393,27 @@ QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& respo
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
 {
     QnPlOnvifResourcePtr resource;
-    if (manufacture.toLower().contains(QLatin1String("digital watchdog")) ||
-            manufacture.toLower().contains(QLatin1String("digitalwatchdog")))
+    auto canonicalManufacture = manufacture.toLower();
+
+    if (canonicalManufacture.contains(QLatin1String("digital watchdog")) ||
+            canonicalManufacture.contains(QLatin1String("digitalwatchdog")))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
-    else if (manufacture.toLower() == QLatin1String("panoramic"))
+    else if (canonicalManufacture == QLatin1String("panoramic"))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
-    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
+    else if (canonicalManufacture == QLatin1String("ipnc"))   // new dw panoramic cameras
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
-    else if (manufacture.toLower().contains(QLatin1String("sony")))
+    else if (canonicalManufacture.contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
-    else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
+    else if (canonicalManufacture.contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
-    else if (manufacture.toLower().contains(QLatin1String("vista")))
+    else if (canonicalManufacture.contains(QLatin1String("vista")))
         resource = QnPlOnvifResourcePtr(new QnVistaResource());
-    else if (manufacture.toLower().contains(QLatin1String("avigilon")))
+    else if (canonicalManufacture.contains(QLatin1String("avigilon")))
         resource = QnPlOnvifResourcePtr(new QnAvigilonResource());
-    else if (manufacture.toLower().contains(QLatin1String("pelcooptera")))
+    else if (canonicalManufacture.contains(QLatin1String("pelcooptera")))
         resource = QnPlOnvifResourcePtr(new QnOpteraResource());
 #ifdef ENABLE_AXIS
-    else if (manufacture.toLower().contains(QLatin1String("axis")))
+    else if (canonicalManufacture.contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
 #endif
     else if (manufacture.toLower().contains(QLatin1String("flir")))

@@ -54,7 +54,7 @@ public:
 
     virtual void setNetworkIssueCallback(NetworkIssueCallback callback) override;
 
-    virtual void terminate();
+    virtual void terminate() override;
 
 private slots:
     void at_controlWebSocketConnected();

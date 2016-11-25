@@ -10,15 +10,6 @@
 #include <nx/network/system_socket.h>
 #include <core/resource_management/resource_searcher.h>
 
-class SocketAddressHasher
-{
-public:
-    std::size_t operator()(const SocketAddress& socketAdrress) const
-    {
-        return qHash(socketAdrress.toString());
-    };
-};
-
 namespace nx {
 namespace plugins {
 namespace flir {
@@ -78,8 +69,8 @@ private:
     std::unique_ptr<nx::network::UDPSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
 
-    std::unordered_map<SocketAddress, nx_http::AsyncHttpClientPtr, SocketAddressHasher> m_httpClients;
-    std::unordered_map<SocketAddress, TimestampedDeviceInfo, SocketAddressHasher> m_deviceInfoCache;
+    std::unordered_map<SocketAddress, nx_http::AsyncHttpClientPtr> m_httpClients;
+    std::unordered_map<SocketAddress, TimestampedDeviceInfo> m_deviceInfoCache;
     std::set<SocketAddress> m_requestsInProgress;
     bool m_terminated;
 

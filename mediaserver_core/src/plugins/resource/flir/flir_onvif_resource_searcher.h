@@ -10,6 +10,8 @@ namespace flir {
 
 class OnvifResourceSearcher: public ::OnvifResourceSearcher
 {
+
+public:
     virtual QList<QnResourcePtr> checkHostAddr(
         const QUrl& url,
         const QAuthenticator& auth,

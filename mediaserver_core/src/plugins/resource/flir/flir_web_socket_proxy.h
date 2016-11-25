@@ -31,4 +31,3 @@ private:
 } // namespace flir
 } // namespace plugins
 } // namespace nx
-
