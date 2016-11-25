@@ -54,7 +54,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
                 return qnCommon->moduleGUID().toRfc4122(); // block
             QnResourcePtr mServer = qnResPool->getResourceById(camRes->getParentId());
             if (mServer && mServer->getStatus() == Qn::Online)
-                return qnCommon->moduleGUID().toRfc4122(); // block
+                return mServer->getId().toRfc4122(); // block
         }
     }
     else if (name.startsWith(CAM_HISTORY_PREFIX))

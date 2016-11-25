@@ -35,7 +35,7 @@ Ec2MserverCloudSynchronization::~Ec2MserverCloudSynchronization()
     m_cdb.stop();
 }
 
-utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>* 
+utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>*
     Ec2MserverCloudSynchronization::appserver2()
 {
     return &m_appserver2;
@@ -159,8 +159,8 @@ api::ResultCode Ec2MserverCloudSynchronization::fillRegisteredSystemDataByCreden
 }
 
 api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
-    const std::string& id,
-    const std::string& authKey)
+    const std::string& /*id*/,
+    const std::string& /*authKey*/)
 {
     QnUuid adminUserId;
     if (!findAdminUserId(&adminUserId))
@@ -274,7 +274,7 @@ void Ec2MserverCloudSynchronization::testSynchronizingUserFromCloudToMediaServer
     sharingData.systemId = registeredSystemData().id;
     sharingData.accountEmail = account2.email;
     sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
-    sharingData.groupId = "test_group";
+    sharingData.userRoleId = "test_user_role";
     sharingData.accountFullName = account2.fullName;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -321,7 +321,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     accountVmsData->isEnabled = true;
     accountVmsData->email = QString::fromStdString(accountEmail);
     accountVmsData->name = QString::fromStdString(accountEmail);
-    accountVmsData->groupId = QnUuid::createUuid();
+    accountVmsData->userRoleId = QnUuid::createUuid();
     accountVmsData->realm = QnAppInfo::realm();
     accountVmsData->hash = "password_is_in_cloud";
     accountVmsData->digest = "password_is_in_cloud";
@@ -361,7 +361,8 @@ void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
                 // TODO: Validating data
                 ASSERT_EQ(accountVmsData.isEnabled, user.isEnabled);
                 ASSERT_EQ(accountVmsData.id.toSimpleString().toStdString(), user.vmsUserId);
-                ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupId);
+                ASSERT_EQ(
+                    accountVmsData.userRoleId.toSimpleString().toStdString(), user.userRoleId);
                 //ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
                 //ASSERT_EQ(accountVmsData.fullName.toStdString(), user.accountFullName);
                 ASSERT_EQ(
@@ -641,7 +642,7 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncUsers(
         std::chrono::steady_clock::now() - t0 < kMaxTimeToWaitForChangesToBePropagatedToCloud;
         )
     {
-        const bool isLastRun = 
+        const bool isLastRun =
             (std::chrono::steady_clock::now() + std::chrono::seconds(1)) >=
             (t0 + kMaxTimeToWaitForChangesToBePropagatedToCloud);
 

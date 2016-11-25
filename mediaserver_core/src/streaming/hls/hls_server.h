@@ -84,6 +84,7 @@ namespace nx_hls
         bool prepareDataToSend();
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
+            const QString& requestFileExtension,
             const QnSecurityCamResourcePtr& camResource,
             const Qn::UserAccessData& accessRights,
             const QnVideoCameraPtr& videoCamera,
@@ -96,14 +97,14 @@ namespace nx_hls
             const QnSecurityCamResourcePtr& camResource,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            QByteArray* serializedPlaylist );
         //!Generates playlist with chunks inside
         nx_http::StatusCode::Value getChunkedPlaylist(
             HLSSession* const session,
             const nx_http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            QByteArray* serializedPlaylist );
         nx_http::StatusCode::Value getResourceChunk(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,

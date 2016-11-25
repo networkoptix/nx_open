@@ -43,7 +43,7 @@ private:
     QnResourceTreeModelNodePtr ensureSubjectNode(const QnResourceAccessSubject& subject);
 
     /** Get or create user role node. */
-    QnResourceTreeModelNodePtr ensureRoleNode(const ec2::ApiUserGroupData& role);
+    QnResourceTreeModelNodePtr ensureRoleNode(const ec2::ApiUserRoleData& role);
 
     /** Get or create user node. */
     QnResourceTreeModelNodePtr ensureUserNode(const QnUserResourcePtr& user);

@@ -11,7 +11,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node.h>
@@ -57,13 +57,13 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         });
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        [this](const ec2::ApiUserGroupData& role)
+        [this](const ec2::ApiUserRoleData& role)
         {
             ensureRoleNode(role)->update();
         });
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
-        [this](const ec2::ApiUserGroupData& role)
+        [this](const ec2::ApiUserRoleData& role)
         {
             if (m_roles.contains(role.id))
                 removeNode(m_roles.take(role.id));
@@ -153,8 +153,8 @@ bool QnResourceTreeModelUserNodes::placeholderAllowedForSubject(
     if (m_model->scope() != QnResourceTreeModel::FullScope)
         return false;
 
-    /* Do not show user placeholders under groups. */
-    if (subject.user() && subject.user()->role() == Qn::UserRole::CustomUserGroup)
+    /* Do not show user placeholders under roles. */
+    if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
         return false;
 
     bool isRole = !subject.user();
@@ -220,8 +220,8 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
                 return false;
         }
 
-        /* Shared layouts are displayed under group node. */
-        if (subject.user() && subject.user()->role() == Qn::UserRole::CustomUserGroup)
+        /* Shared layouts are displayed under role node. */
+        if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
             return false;
 
         return qnResourceAccessProvider->hasAccess(subject, layout);
@@ -246,8 +246,8 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
         Qn::GlobalAccessAllMediaPermission))
             return false;
 
-    /* Shared resources are displayed under group node. */
-    if (subject.user() && subject.user()->role() == Qn::UserRole::CustomUserGroup)
+    /* Shared resources are displayed under role node. */
+    if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
         return false;
 
     return qnResourceAccessProvider->hasAccess(subject, media);
@@ -265,7 +265,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
-    const ec2::ApiUserGroupData& role)
+    const ec2::ApiUserRoleData& role)
 {
     auto pos = m_roles.find(role.id);
     if (pos == m_roles.end())
@@ -296,9 +296,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
             Qn::ResourceNode));
         node->initialize();
         auto parent = m_rootNode;
-        if (user->role() == Qn::UserRole::CustomUserGroup)
+        if (user->userRole() == Qn::UserRole::CustomUserRole)
         {
-            auto role = qnUserRolesManager->userRole(user->userGroup());
+            auto role = qnUserRolesManager->userRole(user->userRoleId());
             if (!role.isNull())
                 parent = ensureRoleNode(role);
         }
@@ -548,7 +548,7 @@ void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& reso
         connect(user, &QnUserResource::enabledChanged, this,
             &QnResourceTreeModelUserNodes::rebuildSubjectTree);
 
-        connect(user, &QnUserResource::userGroupChanged, this,
+        connect(user, &QnUserResource::userRoleChanged, this,
             [this](const QnUserResourcePtr& user)
         {
             removeUserNode(user);

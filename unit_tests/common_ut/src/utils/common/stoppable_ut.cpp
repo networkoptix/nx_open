@@ -82,15 +82,3 @@ TEST( QnStoppableAsync, MultiManual )
     s3.pleaseStopSync();
     EXPECT_EQ( runningCount(), 0 );
 }
-
-TEST( QnStoppableAsync, MultiAuto )
-{
-    auto s1 = std::make_unique< StoppableTestClass >();
-    auto s2 = std::make_unique< StoppableTestClass >();
-
-    nx::utils::promise< bool > p;
-    QnStoppableAsync::pleaseStop( [ & ](){ p.set_value( true ); },
-                                  std::move( s1 ), std::move( s2 ) );
-
-    ASSERT_TRUE( p.get_future().get() );
-}

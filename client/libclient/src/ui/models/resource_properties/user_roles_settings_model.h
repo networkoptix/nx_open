@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -12,12 +12,12 @@ class QnUserRolesSettingsModel : public QAbstractListModel, public QnAbstractPer
 
     using base_type = QAbstractListModel;
 public:
-    struct RoleReplacement
+    struct UserRoleReplacement
     {
-        QnUuid role;
+        QnUuid userRoleId;
         Qn::GlobalPermissions permissions;
-        RoleReplacement();
-        RoleReplacement(const QnUuid& role, Qn::GlobalPermissions permissions);
+        UserRoleReplacement();
+        UserRoleReplacement(const QnUuid& userRoleId, Qn::GlobalPermissions permissions);
         bool isEmpty() const;
     };
 
@@ -25,31 +25,34 @@ public:
     QnUserRolesSettingsModel(QObject* parent = nullptr);
     virtual ~QnUserRolesSettingsModel();
 
-    ec2::ApiUserGroupDataList roles() const;
-    void setRoles(const ec2::ApiUserGroupDataList& value);
+    ec2::ApiUserRoleDataList userRoles() const;
+    void setUserRoles(const ec2::ApiUserRoleDataList& value);
 
     /** Add new role. Returns index of added role in the model. */
-    int addRole(const ec2::ApiUserGroupData& role);
+    int addUserRole(const ec2::ApiUserRoleData& userRole);
 
-    void removeRole(const QnUuid& id, const RoleReplacement& replacement);
+    void removeUserRole(const QnUuid& userRoleId, const UserRoleReplacement& replacement);
 
-    /* Final replacement for a deleted role. */
-    RoleReplacement replacement(const QnUuid& source) const;
+    /** Final replacement for a deleted role. */
+    UserRoleReplacement replacement(const QnUuid& sourceUserRoleId) const;
 
-    /* Direct replacement for a deleted role. May reference a role that is also deleted.
-    * Might be needed if we decide to offer custom permissions replacements. */
-    RoleReplacement directReplacement(const QnUuid& source) const;
+    /**
+     * Direct replacement for a deleted role. May reference a role that is also deleted.
+     * Might be needed if we decide to offer custom permissions replacements.
+     */
+    UserRoleReplacement directReplacement(const QnUuid& sourceUserRoleId) const;
 
     /** Select role as current. */
-    void selectRole(const QnUuid& value);
-    QnUuid selectedRole() const;
+    void selectUserRoleId(const QnUuid& value);
 
-    /* Following  methods are working with the currently selected role. */
+    QnUuid selectedUserRoleId() const;
 
-    QString roleName() const;
-    void setRoleName(const QString& value);
+    // The following methods work with the currently selected role.
 
-    bool isRoleValid(const ec2::ApiUserGroupData& role) const;
+    QString userRoleName() const;
+    void setUserRoleName(const QString& value);
+
+    bool isUserRoleValid(const ec2::ApiUserRoleData& userRole) const;
     bool isValid() const;
 
     virtual Qn::GlobalPermissions rawPermissions() const override;
@@ -61,10 +64,10 @@ public:
     virtual QnResourceAccessSubject subject() const override;
 
     /** Get accessible resources for the given role - just for convenience. */
-    QSet<QnUuid> accessibleResources(const ec2::ApiUserGroupData& role) const;
+    QSet<QnUuid> accessibleResources(const ec2::ApiUserRoleData& userRole) const;
 
     /** Get list of users for given role. */
-    QnUserResourceList users(const QnUuid& roleId, bool withCandidates) const;
+    QnUserResourceList users(const QnUuid& userRoleId, bool withCandidates) const;
 
     /** Get list of users for selected role. */
     QnUserResourceList users(bool withCandidates) const;
@@ -74,13 +77,13 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const override;
 
 private:
-    ec2::ApiUserGroupDataList::iterator currentRole();
-    ec2::ApiUserGroupDataList::const_iterator currentRole() const;
+    ec2::ApiUserRoleDataList::iterator currentRole();
+    ec2::ApiUserRoleDataList::const_iterator currentRole() const;
 
 private:
-    QnUuid m_currentRoleId;
-    ec2::ApiUserGroupDataList m_roles;
+    QnUuid m_currentUserRoleId;
+    ec2::ApiUserRoleDataList m_userRoles;
     QHash<QnUuid, QSet<QnUuid>> m_accessibleResources;
-    QHash<QnUuid, RoleReplacement> m_replacements;
+    QHash<QnUuid, UserRoleReplacement> m_replacements;
     QSet<QString> m_predefinedNames;
 };

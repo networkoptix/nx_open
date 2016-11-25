@@ -4,25 +4,31 @@
 
 #include <QtCore/QSettings>
 
-#include <qtsinglecoreapplication.h>
-#include <qtservice.h>
-
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/std/future.h>
 
 #include <utils/common/stoppable.h>
 
-namespace nx_http { class HttpStreamSocketServer; }
-namespace nx_http { class MessageDispatcher; }
-namespace nx { namespace hpm { class PeerRegistrator; } }
-namespace nx { namespace hpm { namespace conf { class Settings; } } }
+namespace nx_http {
+
+class HttpStreamSocketServer;
+class MessageDispatcher;
+
+} // namespace nx_http
 
 namespace nx {
 namespace hpm {
 
-class MediatorProcess
-:
-    public QtService<QCoreApplication>,
+class PeerRegistrator;
+
+namespace conf {
+
+class Settings;
+
+} // namespace conf
+
+class MediatorProcess:
     public QnStoppable
 {
 public:
@@ -36,10 +42,7 @@ public:
     const std::vector<SocketAddress>& httpEndpoints() const;
     const std::vector<SocketAddress>& stunEndpoints() const;
 
-protected:
-    virtual int executeApplication() override;
-    virtual void start() override;
-    virtual void stop() override;
+    int exec();
 
 private:
     std::unique_ptr<QSettings> m_settings;
@@ -48,6 +51,7 @@ private:
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
     std::vector<SocketAddress> m_stunEndpoints;
+    nx::utils::promise<void> m_processTerminationEvent;
 
     QString getDataDirectory();
     int printHelp();

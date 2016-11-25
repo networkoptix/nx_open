@@ -280,11 +280,8 @@ void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler
     post(
         [this, handler = std::move(handler)]() mutable
         {
-            for (auto& socketContext: m_serverSockets)
-                socketContext.stopAccepting();
-
+            cancelIoFromAioThread();
             NX_LOGX(lm("Async IO is canceled asynchronously"), cl_logDEBUG1);
-            m_acceptHandler = nullptr;
             handler();
         });
 }
@@ -293,15 +290,11 @@ void MultipleServerSocket::cancelIOSync()
 {
     DEBUG_LOG(lm("Canceling async IO synchronously..."));
     nx::utils::promise<void> ioCancelledPromise;
-    //TODO #ak deal with copy-paste
     dispatch(
         [this, &ioCancelledPromise]() mutable
         {
-            for (auto& socketContext: m_serverSockets)
-                socketContext.stopAccepting();
-
+            cancelIoFromAioThread();
             NX_LOGX(lm("Async IO is canceled synchronously"), cl_logDEBUG1);
-            m_acceptHandler = nullptr;
             ioCancelledPromise.set_value();
         });
 
@@ -419,6 +412,14 @@ void MultipleServerSocket::accepted(
         socketContext.stopAccepting();
 
     handler(code, socket.release());
+}
+
+void MultipleServerSocket::cancelIoFromAioThread()
+{
+    m_acceptHandler = nullptr;
+    m_timerSocket.cancelSync();
+    for (auto& socketContext: m_serverSockets)
+        socketContext.stopAccepting();
 }
 
 } // namespace network

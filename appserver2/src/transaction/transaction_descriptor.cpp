@@ -29,6 +29,7 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/webpage_manager.h"
+#include <database/db_manager.h>
 
 namespace ec2 {
 namespace access_helpers {
@@ -237,7 +238,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeStorage:
             return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
         case ApiCommand::removeUser:
-        case ApiCommand::removeUserGroup:
+        case ApiCommand::removeUserRole:
             return notificationParams.userNotificationManager->triggerNotification(tran);
         case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(tran);
@@ -845,21 +846,21 @@ struct AdminOnlyAccessOut
     }
 };
 
-struct RemoveUserGroupAccess
+struct RemoveUserRoleAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
     {
         if (!AdminOnlyAccess()(accessData, param))
         {
-            qWarning() << "Remove user group forbidden because user has no admin access";
+            qWarning() << "Removing user role is forbidden because the user has no admin access";
             return false;
         }
 
         for (const auto& user : qnResPool->getResources<QnUserResource>())
         {
-            if (user->userGroup() == param.id)
+            if (user->userRoleId() == param.id)
             {
-                qWarning() << "Remove user group forbidden because group is still using by user " << user->getName();
+                qWarning() << "Removing user role is forbidden because the role is still used by the user " << user->getName();
                 return false;
             }
         }
@@ -1014,13 +1015,24 @@ struct LocalTransactionType
     }
 };
 
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
+{
+    ApiMediaServerDataList serverDataList;
+    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, serverDataList);
+
+    if (errorCode != ErrorCode::ok || serverDataList.empty())
+        return ec2::TransactionType::Unknown;
+
+    return TransactionType::Local;
+}
+
 struct SetStatusTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
     {
         QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
         if (!resource)
-            return TransactionType::Unknown;
+            return getStatusTransactionTypeFromDb(params.id);
         if(resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
@@ -1051,13 +1063,24 @@ struct SetResourceParamTransactionType
     }
 };
 
+ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
+{
+    ApiUserDataList userDataList;
+    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, userDataList);
+
+    if (errorCode != ErrorCode::ok || userDataList.empty())
+        return ec2::TransactionType::Unknown;
+
+    return userDataList[0].isCloud ? TransactionType::Cloud : TransactionType::Regular;
+}
+
 struct RemoveUserTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiIdData& params)
     {
         auto user = qnResPool->getResourceById<QnUserResource>(params.id);
         if (!user)
-            return TransactionType::Unknown;
+            return getRemoveUserTransactionTypeFromDb(params.id);
         return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
     }
 };

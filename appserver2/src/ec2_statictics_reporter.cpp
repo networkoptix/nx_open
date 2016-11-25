@@ -16,7 +16,6 @@
 #include "ec2_connection.h"
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
-static const bool DEFAULT_SERVER_AUTH = true;
 
 static const uint MIN_DELAY_RATIO = 30;
 static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
