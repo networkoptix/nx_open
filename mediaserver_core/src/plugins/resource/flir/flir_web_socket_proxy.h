@@ -19,7 +19,7 @@ public:
     void open(const QUrl& url);
     void sendTextMessage(const QString& message);
 
-    private slots:
+private slots:
     void openInternal(const QUrl& url);
     void sendTextMessageInternal(const QString& message);
 

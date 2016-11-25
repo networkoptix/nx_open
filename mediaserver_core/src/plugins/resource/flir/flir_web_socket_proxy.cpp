@@ -53,4 +53,3 @@ void WebSocketProxy::sendTextMessageInternal(const QString& message)
 } // namespace flir
 } // namespace plugins
 } // namespace nx
-

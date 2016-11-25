@@ -1,5 +1,7 @@
 #include "flir_onvif_resource_searcher.h" 
 
+#if defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
+
 namespace {
 
 const int kFlirDefaultOnvifPort = 8090;
@@ -29,4 +31,6 @@ bool flir::OnvifResourceSearcher::isSequential() const
 {
     return true;
 }
+
+#endif // defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
 

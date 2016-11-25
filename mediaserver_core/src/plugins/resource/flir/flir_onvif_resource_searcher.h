@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
+
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 
 namespace nx {
@@ -21,3 +23,5 @@ class OnvifResourceSearcher: public ::OnvifResourceSearcher
 } // namespace flir
 } // namespace plugins
 } // namespace nx
+
+#endif // defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)

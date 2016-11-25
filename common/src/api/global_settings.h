@@ -209,6 +209,9 @@ public:
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
+    bool sequentialFlirOnvifSearcherEnabled() const;
+    void setSequentialFlirOnvifSearcherEnabled(bool newVal);
+
     std::chrono::seconds proxyConnectTimeout() const;
 
     /*!
@@ -313,6 +316,7 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;

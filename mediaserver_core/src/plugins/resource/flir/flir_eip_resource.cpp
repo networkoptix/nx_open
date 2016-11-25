@@ -1,3 +1,5 @@
+#ifdef ENABLE_FLIR
+
 #include "flir_eip_resource.h"
 #include "common/common_module.h"
 #include <utils/common/synctime.h>
@@ -842,3 +844,5 @@ quint8 QnFlirEIPResource::getOutputPortCIPAttributeById(const QString &portId) c
 {
     return static_cast<quint8>(portId.toUInt());
 }
+
+#endif

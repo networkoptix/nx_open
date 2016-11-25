@@ -1,5 +1,6 @@
-#ifndef FLIR_EIP_RESOURCE_H
-#define FLIR_EIP_RESOURCE_H
+#pragma once
+
+#ifdef ENABLE_FLIR
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -134,4 +135,4 @@ private slots:
     void routeAlarmMonitoringFlow();
 };
 
-#endif // FLIR_EIP_RESOURCE_H
+#endif // ENABLE_FLIR

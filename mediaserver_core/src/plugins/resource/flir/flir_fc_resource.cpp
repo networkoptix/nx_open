@@ -1,3 +1,5 @@
+#ifdef ENABLE_FLIR
+
 #include "flir_fc_resource.h"
 #include "flir_io_executor.h"
 
@@ -238,4 +240,4 @@ bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
     return true;
 }
 
-
+#endif // ENABLE_FLIR

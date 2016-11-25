@@ -1,5 +1,4 @@
-#ifndef FLIR_EIP_DATA_H
-#define FLIR_EIP_DATA_H
+#pragma once
 
 #include <QString>
 #include <QtGlobal>
@@ -63,5 +62,3 @@ namespace FlirDataType
     const QString Double("double");
     const QString Bool("bool");
 }
-
-#endif // FLIR_EIP_DATA_H

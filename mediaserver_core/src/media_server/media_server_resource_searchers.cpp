@@ -1,5 +1,7 @@
 #include "media_server_resource_searchers.h"
 
+#include <api/global_settings.h>
+
 #include <core/resource_management/resource_discovery_manager.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
@@ -40,7 +42,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
 
-#if 0
+
 #ifndef EDGE_SERVER
     #ifdef ENABLE_ARECONT
         m_searchers << new QnPlArecontResourceSearcher();
@@ -66,29 +68,30 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
     #ifdef ENABLE_ISD
         m_searchers << new QnPlISDResourceSearcher();
     #endif
-
     #ifdef ENABLE_ADVANTECH
         m_searchers << new QnAdamResourceSearcher();
     #endif
-
-        m_searchers << new OnvifResourceSearcher();
-
+    #ifdef ENABLE_FLIR
+        m_searchers << new flir::FcResourceSearcher();
+        m_searchers << new QnFlirResourceSearcher();
+        #ifdef ENABLE_ONVIF
+        if (QnGlobalSettings::instance()->sequentialFlirOnvifSearcherEnabled())
+            m_searchers << new flir::OnvifResourceSearcher();
+        #endif
+    #endif
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         m_searchers << new QnPlVmax480ResourceSearcher();
     #endif
 
         m_searchers << new QnArchiveCamResourceSearcher();
 
-        //Onvif searcher should be the last:
+    //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF
-        m_searchers << new QnFlirResourceSearcher();
         m_searchers << new QnFlexWatchResourceSearcher();
         m_searchers << new OnvifResourceSearcher();
     #endif //ENABLE_ONVIF
 #endif
-#endif
-    m_searchers << new flir::FcResourceSearcher();
-   /* m_searchers << new OnvifResourceSearcher();*/
+   
     for (auto searcher : m_searchers)
         QnResourceDiscoveryManager::instance()->addDeviceServer(searcher);
 }

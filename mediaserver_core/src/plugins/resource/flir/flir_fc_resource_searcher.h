@@ -66,6 +66,10 @@ private:
 
     bool hasValidCacheUnsafe(const SocketAddress& address) const;
     bool isDeviceSupported(const DeviceInfo& deviceInfo) const;
+    void handleDeviceInfoResponseUnsafe(
+        const SocketAddress& senderAddress,
+        nx_http::AsyncHttpClientPtr httpClient);
+
     void cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint);
 
 private:

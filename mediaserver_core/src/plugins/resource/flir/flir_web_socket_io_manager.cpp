@@ -147,10 +147,7 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
     auto commandResponse = CommandResponse(QString::fromUtf8(messageBody));
-    if (!commandResponse.isValid())
-        return false;
-
-    if (commandResponse.returnCode() != kNoError)
+    if (!commandResponse.isValid() || commandResponse.returnCode() != kNoError)
         return false;
 
     return true;
@@ -413,7 +410,7 @@ void WebSocketIoManager::connectWebsocketUnsafe(
                 .arg(m_nexusPort)
                 .arg(path);
 
-            auto message = lm("Connecting socket to url").arg(kUrl);
+            auto message = lm("Connecting socket to url %1").arg(kUrl);
             qDebug() << message;
             NX_LOGX(message, cl_logDEBUG2);
 

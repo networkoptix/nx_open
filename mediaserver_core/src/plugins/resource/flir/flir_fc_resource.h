@@ -1,5 +1,7 @@
 #pragma once 
 
+#ifdef ENABLE_FLIR
+
 #include <boost/optional.hpp>
 
 #include "flir_fc_private.h"
@@ -44,3 +46,5 @@ private:
 } // namespace flir
 } // namespace plugins
 } // namespace nx
+
+#endif // ENABLE_FLIR

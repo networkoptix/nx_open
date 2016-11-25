@@ -8,20 +8,23 @@
 #include <utils/common/synctime.h>
 
 namespace {
-    const QString kFlirFcManufacture = lit("FLIR");
-    const QString kFlirFcResourceTypeName = lit("FLIR_FC");
-    const QString kFLirFcModelPrefix = lit("FC-");
-    const QString kDeviceInfoUrlPath = lit("/page/factory/production/info");
 
-    const int kReceiveBufferSize = 50 * 1024;
-    const int kDefaultBroadcastPort = 1005;
+const QString kFlirFcManufacture = lit("FLIR_FC");
+const QString kFlirVendor = lit("FLIR");
+const QString kFlirFcResourceTypeName = lit("FLIR_FC");
+const QString kFLirFcModelPrefix = lit("FC-");
+const QString kDeviceInfoUrlPath = lit("/page/factory/production/info");
 
-    const std::chrono::milliseconds kDeviceInfoRequestTimeout = std::chrono::seconds(40);
-    const std::chrono::milliseconds kDeviceInfoResponseTimeout = std::chrono::seconds(40);
-    const std::chrono::milliseconds kCacheExpirationTime = std::chrono::minutes(5);
+const int kReceiveBufferSize = 50 * 1024;
+const int kDefaultBroadcastPort = 1005;
 
-    const QString kFlirDefaultUsername = lit("admin");
-    const QString kFlirDefaultPassword = lit("admin");
+const std::chrono::milliseconds kDeviceInfoRequestTimeout = std::chrono::seconds(40);
+const std::chrono::milliseconds kDeviceInfoResponseTimeout = std::chrono::seconds(40);
+const std::chrono::milliseconds kCacheExpirationTime = std::chrono::minutes(5);
+
+const QString kFlirDefaultUsername = lit("admin");
+const QString kFlirDefaultPassword = lit("admin");
+
 } // namespace
 
 using namespace nx::plugins::flir;
@@ -156,7 +159,7 @@ QnResourcePtr FcResourceSearcher::makeResource(
 
     resource->setName(info.model);
     resource->setModel(info.model);
-    resource->setVendor(manufacture());
+    resource->setVendor(kFlirVendor);
     resource->setTypeId(m_flirFcTypeId);
     resource->setUrl(info.url.toString());
     resource->setPhysicalId(info.serialNumber);
@@ -250,9 +253,7 @@ void FcResourceSearcher::receiveFromCallback(
         return;
     }
    
-    QUrl url;
-    url.setScheme(lit("http"));
-    url.setHost(senderAddress.address.toString());
+    auto url = senderAddress.toUrl(lit("http"));
     url.setPort(nx_http::DEFAULT_HTTP_PORT);
     url.setPath(kDeviceInfoUrlPath);
 
@@ -262,44 +263,7 @@ void FcResourceSearcher::receiveFromCallback(
             [this, senderAddress](nx_http::AsyncHttpClientPtr httpClient)
             {
                 QnMutexLocker lock(&m_mutex);
-
-                if (m_terminated)
-                    return;
-
-                if (httpClient->state() != nx_http::AsyncHttpClient::State::sDone)
-                {
-                    cleanUpEndpointInfoUnsafe(senderAddress);
-                    return;
-                }
-
-                auto response = httpClient->response();
-                if (response->statusLine.statusCode != nx_http::StatusCode::ok)
-                {
-                    cleanUpEndpointInfoUnsafe(senderAddress);
-                    return;
-                }
-
-                auto deviceInfoString = QString::fromUtf8(httpClient->fetchMessageBodyBuffer());
-                auto deviceInfo = parsePrivateDeviceInfo(deviceInfoString);
-
-                if (!deviceInfo || !isDeviceSupported(deviceInfo.get()))
-                {
-                    cleanUpEndpointInfoUnsafe(senderAddress);
-                    return;
-                }
-
-                QUrl url;
-                url.setScheme("http");
-                url.setHost(senderAddress.address.toString());
-                url.setPort(nx_http::DEFAULT_HTTP_PORT);
-                deviceInfo->url = url;
-
-                TimestampedDeviceInfo tsDeviceInfo;
-                tsDeviceInfo.deviceInfo = deviceInfo.get();
-                tsDeviceInfo.timestamp = qnSyncTime->currentMSecsSinceEpoch();
-
-                m_deviceInfoCache[senderAddress] = tsDeviceInfo;
-                m_requestsInProgress.erase(senderAddress);
+                handleDeviceInfoResponseUnsafe(senderAddress, httpClient);
             };
 
         if (m_httpClients.find(senderAddress) == m_httpClients.end())
@@ -338,3 +302,43 @@ void FcResourceSearcher::cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint
     m_requestsInProgress.erase(endpoint);
 }
 
+void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
+    const SocketAddress& senderAddress,
+    nx_http::AsyncHttpClientPtr httpClient)
+{
+    if (m_terminated)
+        return;
+
+    if (httpClient->state() != nx_http::AsyncHttpClient::State::sDone)
+    {
+        cleanUpEndpointInfoUnsafe(senderAddress);
+        return;
+    }
+
+    auto response = httpClient->response();
+    if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+    {
+        cleanUpEndpointInfoUnsafe(senderAddress);
+        return;
+    }
+
+    auto deviceInfoString = QString::fromUtf8(httpClient->fetchMessageBodyBuffer());
+    auto deviceInfo = parsePrivateDeviceInfo(deviceInfoString);
+
+    if (!deviceInfo || !isDeviceSupported(deviceInfo.get()))
+    {
+        cleanUpEndpointInfoUnsafe(senderAddress);
+        return;
+    }
+
+    auto url = senderAddress.toUrl(lit("http"));
+    url.setPort(nx_http::DEFAULT_HTTP_PORT);
+    deviceInfo->url = url;
+
+    TimestampedDeviceInfo tsDeviceInfo;
+    tsDeviceInfo.deviceInfo = deviceInfo.get();
+    tsDeviceInfo.timestamp = qnSyncTime->currentMSecsSinceEpoch();
+
+    m_deviceInfoCache[senderAddress] = tsDeviceInfo;
+    m_requestsInProgress.erase(senderAddress);
+}
