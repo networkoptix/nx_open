@@ -49,3 +49,43 @@ TEST_F(QnLayoutItemAggregatorTest, checkRemoveLayout)
     aggregator->removeWatchedLayout(layout);
     ASSERT_FALSE(aggregator->watchedLayouts().contains(layout));
 }
+
+TEST_F(QnLayoutItemAggregatorTest, checkLayoutItem)
+{
+    auto targetId = QnUuid::createUuid();
+
+    auto layout = createLayout();
+
+    QnLayoutItemData item;
+    item.uuid = QnUuid::createUuid();
+    item.resource.id = targetId;
+    layout->addItem(item);
+
+    aggregator->addWatchedLayout(layout);
+
+    ASSERT_TRUE(aggregator->hasItem(targetId));
+}
+
+TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemAbsent)
+{
+    auto targetId = QnUuid::createUuid();
+    ASSERT_FALSE(aggregator->hasItem(targetId));
+}
+
+TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemRemoved)
+{
+    auto targetId = QnUuid::createUuid();
+
+    auto layout = createLayout();
+
+    QnLayoutItemData item;
+    item.uuid = QnUuid::createUuid();
+    item.resource.id = targetId;
+    layout->addItem(item);
+
+    aggregator->addWatchedLayout(layout);
+
+    layout->removeItem(item.uuid);
+
+    ASSERT_FALSE(aggregator->hasItem(targetId));
+}
