@@ -1,13 +1,9 @@
-/**********************************************************
-* 21 jan 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "ec2_connection.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QUrlQuery>
 
+#include <nx/utils/std/cpp14.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
 
