@@ -17,7 +17,17 @@ void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 {
     m_watchedLayouts.insert(layout);
     for (auto item: layout->getItems())
-        m_items.insert(item.resource.id);
+    {
+        if (!item.resource.id.isNull())
+            m_items.insert(item.resource.id);
+    }
+
+    connect(layout, &QnLayoutResource::itemAdded, this,
+        [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        {
+            if (!item.resource.id.isNull())
+                m_items.insert(item.resource.id);
+        });
 
     connect(layout, &QnLayoutResource::itemRemoved, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)

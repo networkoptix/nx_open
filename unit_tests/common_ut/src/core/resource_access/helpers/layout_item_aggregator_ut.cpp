@@ -27,6 +27,15 @@ protected:
         return layout;
     }
 
+    QnUuid addItem(const QnLayoutResourcePtr& layout, const QnUuid& resourceId = QnUuid::createUuid())
+    {
+        QnLayoutItemData item;
+        item.uuid = QnUuid::createUuid();
+        item.resource.id = resourceId;
+        layout->addItem(item);
+        return resourceId;
+    }
+
     QScopedPointer<QnLayoutItemAggregator> aggregator;
 };
 
@@ -52,14 +61,8 @@ TEST_F(QnLayoutItemAggregatorTest, checkRemoveLayout)
 
 TEST_F(QnLayoutItemAggregatorTest, checkLayoutItem)
 {
-    auto targetId = QnUuid::createUuid();
-
     auto layout = createLayout();
-
-    QnLayoutItemData item;
-    item.uuid = QnUuid::createUuid();
-    item.resource.id = targetId;
-    layout->addItem(item);
+    auto targetId = addItem(layout);
 
     aggregator->addWatchedLayout(layout);
 
@@ -88,4 +91,24 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemRemoved)
     layout->removeItem(item.uuid);
 
     ASSERT_FALSE(aggregator->hasItem(targetId));
+}
+
+TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemAdded)
+{
+    auto layout = createLayout();
+    aggregator->addWatchedLayout(layout);
+
+    auto targetId = addItem(layout);
+
+    ASSERT_TRUE(aggregator->hasItem(targetId));
+}
+
+
+TEST_F(QnLayoutItemAggregatorTest, checkNullIdIgnored)
+{
+    auto layout = createLayout();
+    addItem(layout, QnUuid());
+    aggregator->addWatchedLayout(layout);
+
+    ASSERT_FALSE(aggregator->hasItem(QnUuid()));
 }
