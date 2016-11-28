@@ -63,9 +63,7 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItem)
 {
     auto layout = createLayout();
     auto targetId = addItem(layout);
-
     aggregator->addWatchedLayout(layout);
-
     ASSERT_TRUE(aggregator->hasItem(targetId));
 }
 
@@ -78,7 +76,6 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemAbsent)
 TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemRemoved)
 {
     auto targetId = QnUuid::createUuid();
-
     auto layout = createLayout();
 
     QnLayoutItemData item;
@@ -87,9 +84,7 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemRemoved)
     layout->addItem(item);
 
     aggregator->addWatchedLayout(layout);
-
     layout->removeItem(item.uuid);
-
     ASSERT_FALSE(aggregator->hasItem(targetId));
 }
 
@@ -97,19 +92,15 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemAdded)
 {
     auto layout = createLayout();
     aggregator->addWatchedLayout(layout);
-
     auto targetId = addItem(layout);
-
     ASSERT_TRUE(aggregator->hasItem(targetId));
 }
-
 
 TEST_F(QnLayoutItemAggregatorTest, checkNullIdIgnored)
 {
     auto layout = createLayout();
     addItem(layout, QnUuid());
     aggregator->addWatchedLayout(layout);
-
     ASSERT_FALSE(aggregator->hasItem(QnUuid()));
 }
 
@@ -119,7 +110,6 @@ TEST_F(QnLayoutItemAggregatorTest, checkItemIfLayoutRemoved)
     auto targetId = addItem(layout);
     aggregator->addWatchedLayout(layout);
     aggregator->removeWatchedLayout(layout);
-
     ASSERT_FALSE(aggregator->hasItem(targetId));
 }
 
@@ -129,6 +119,16 @@ TEST_F(QnLayoutItemAggregatorTest, stopListeningLayout)
     aggregator->addWatchedLayout(layout);
     aggregator->removeWatchedLayout(layout);
     auto targetId = addItem(layout);
-
     ASSERT_FALSE(aggregator->hasItem(targetId));
+}
+
+TEST_F(QnLayoutItemAggregatorTest, addSeveralLayoutItems)
+{
+    auto layout = createLayout();
+    aggregator->addWatchedLayout(layout);
+    auto targetId = addItem(layout);
+    addItem(layout, targetId); /*< The same resource second time. */
+    auto firstItemId = layout->getItems().begin().key();
+    layout->removeItem(firstItemId);
+    ASSERT_TRUE(aggregator->hasItem(targetId));
 }
