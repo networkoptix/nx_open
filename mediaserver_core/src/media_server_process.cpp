@@ -488,7 +488,12 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
             return QnStorageResourcePtr(); // if storage size isn't known or small do not add it by default
         }
     }
-
+    else
+    {
+        NX_ASSERT(false);
+        NX_LOG(lit("%1 Failed to create to storage %2").arg(Q_FUNC_INFO).arg(path), cl_logWARNING);
+        return QnStorageResourcePtr();
+    }
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
