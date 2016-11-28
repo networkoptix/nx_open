@@ -107,8 +107,8 @@ protected:
     void changeInternal();
 
     void updateResourceStatus();
-private:
 
+private:
     void setNameInternal(const QString& name);
 
     bool isValid() const;
@@ -120,6 +120,8 @@ private:
 
     bool isBastard() const;
     void setBastard(bool bastard);
+
+    int helpTopicId() const;
 
 private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
