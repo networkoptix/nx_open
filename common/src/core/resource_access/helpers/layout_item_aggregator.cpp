@@ -17,11 +17,17 @@ void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 {
     auto addItem = [this](const QnLayoutItemData& item)
         {
-            if (!item.resource.id.isNull())
-                m_items.insert(item.resource.id);
+            const auto resourceId = item.resource.id;
+            if (resourceId.isNull())
+                return;
+
+            if (m_items.insert(resourceId))
+                emit itemAdded(resourceId);
         };
 
-    m_watchedLayouts.insert(layout);
+    if (!m_watchedLayouts.insert(layout))
+        return;
+
     for (auto item: layout->getItems())
         addItem(item);
 
@@ -34,21 +40,35 @@ void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
     connect(layout, &QnLayoutResource::itemRemoved, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
-            m_items.remove(item.resource.id);
+            const auto resourceId = item.resource.id;
+            if (resourceId.isNull())
+                return;
+
+            m_items.remove(resourceId);
+            emit itemRemoved(resourceId);
         });
 }
 
 void QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layout)
 {
+    if (!m_watchedLayouts.remove(layout))
+        return;
+
     layout->disconnect(this);
-    m_watchedLayouts.remove(layout);
     for (auto item : layout->getItems())
-        m_items.remove(item.resource.id);
+    {
+        const auto resourceId = item.resource.id;
+        if (resourceId.isNull())
+            return;
+
+        m_items.remove(resourceId);
+        emit itemRemoved(resourceId);
+    }
 }
 
 QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
 {
-    return m_watchedLayouts;
+    return m_watchedLayouts.keys().toSet();
 }
 
 bool QnLayoutItemAggregator::hasItem(const QnUuid& id) const

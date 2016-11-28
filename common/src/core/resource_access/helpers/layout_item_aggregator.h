@@ -31,7 +31,11 @@ public:
 
     bool hasItem(const QnUuid& id) const;
 
+signals:
+    void itemAdded(const QnUuid& resourceId);
+    void itemRemoved(const QnUuid& resourceId);
+
 private:
-    QnLayoutResourceSet m_watchedLayouts;
+    QnCounterHash<QnLayoutResourcePtr> m_watchedLayouts;
     QnCounterHash<QnUuid> m_items;
 };
