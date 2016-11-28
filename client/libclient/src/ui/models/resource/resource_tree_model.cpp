@@ -117,8 +117,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     if (scope != CamerasScope)
     {
         auto userNodes = new QnResourceTreeModelUserNodes(this);
-        userNodes->setModel(this);
-        userNodes->setRootNode(m_rootNodes[Qn::UsersNode]);
+        userNodes->initialize(this, m_rootNodes[Qn::UsersNode]);
     }
 
     /* Connect to context. */

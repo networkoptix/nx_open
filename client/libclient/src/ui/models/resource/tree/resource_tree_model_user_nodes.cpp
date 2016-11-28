@@ -18,7 +18,9 @@
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
@@ -94,6 +96,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::rootNode() const
 void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr& node)
 {
     m_rootNode = node;
+}
+
+void QnResourceTreeModelUserNodes::initialize(QnResourceTreeModel* model,
+    const QnResourceTreeModelNodePtr& rootNode)
+{
+    setModel(model);
+    setRootNode(rootNode);
+    handleUserChanged(context()->accessController()->user());
 }
 
 void QnResourceTreeModelUserNodes::rebuild()
