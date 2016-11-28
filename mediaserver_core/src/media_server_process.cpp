@@ -466,6 +466,30 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
 
+    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto it = std::find_if(partitions.begin(), partitions.end(),
+        [&](const QnPlatformMonitor::PartitionSpace& part)
+    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+
+    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    storage->setStorageType(QnLexical::serialized(storageType));
+
+    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+    {
+        const qint64 totalSpace = fileStorage->getTotalSpaceWithoutInit();
+        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < fileStorage->calcInitialSpaceLimit())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
+                .arg(Q_FUNC_INFO)
+                .arg(path)
+                .arg(totalSpace)
+                .arg(storage->getSpaceLimit()), cl_logDEBUG1);
+            return QnStorageResourcePtr(); // if storage size isn't known or small do not add it by default
+        }
+    }
+
+
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
     NX_LOG(lit("%1 Storage %2 is operational: %3")
@@ -478,15 +502,6 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     if (resType)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
-
-    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
-    const auto it = std::find_if(partitions.begin(), partitions.end(),
-                                 [&](const QnPlatformMonitor::PartitionSpace& part)
-        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
-
-    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -611,17 +626,8 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
         }
         // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
-        const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
-        {
-            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
-                    .arg(Q_FUNC_INFO)
-                    .arg(folderPath)
-                    .arg(totalSpace)
-                    .arg(storage->getSpaceLimit()), cl_logDEBUG1);
-            continue; // if storage size isn't known do not add it by default
-        }
-
+        if (!storage)
+            continue;
 
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
@@ -1994,7 +2000,6 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 
 void MediaServerProcess::run()
 {
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
 
     if (!m_engineVersion.isNull())
