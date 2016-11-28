@@ -124,7 +124,7 @@ private:
     int helpTopicId() const;
 
     bool changeCheckStateRecursivelyUp(Qt::CheckState newState);
-    void childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState);
+    void childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState, bool forceUpdate = false);
     void propagateCheckStateRecursivelyDown();
 
 private:

@@ -925,39 +925,45 @@ bool QnResourceTreeModelNode::changeCheckStateRecursivelyUp(Qt::CheckState newSt
     return true;
 }
 
-void QnResourceTreeModelNode::childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState)
+void QnResourceTreeModelNode::childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState, bool forceUpdate)
 {
-    switch (oldState)
+    if (oldState == newState && !forceUpdate)
+        return;
+
+    if (oldState != newState)
     {
-        case Qt::Unchecked:
-            --m_uncheckedChildren;
-            NX_ASSERT(m_uncheckedChildren >= 0);
-            break;
+        switch (oldState)
+        {
+            case Qt::Unchecked:
+                --m_uncheckedChildren;
+                NX_ASSERT(m_uncheckedChildren >= 0);
+                break;
 
-        case Qt::Checked:
-            --m_checkedChildren;
-            NX_ASSERT(m_checkedChildren >= 0);
-            break;
+            case Qt::Checked:
+                --m_checkedChildren;
+                NX_ASSERT(m_checkedChildren >= 0);
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
+
+        switch (newState)
+        {
+            case Qt::Unchecked:
+                ++m_uncheckedChildren;
+                break;
+
+            case Qt::Checked:
+                ++m_checkedChildren;
+                break;
+
+            default:
+                break;
+        }
+
+        NX_ASSERT(m_checkedChildren + m_uncheckedChildren <= m_children.size());
     }
-
-    switch (newState)
-    {
-        case Qt::Unchecked:
-            ++m_uncheckedChildren;
-            break;
-
-        case Qt::Checked:
-            ++m_checkedChildren;
-            break;
-
-        default:
-            break;
-    }
-
-    NX_ASSERT(m_checkedChildren + m_uncheckedChildren <= m_children.size());
 
     if (m_uncheckedChildren == m_children.size())
         changeCheckStateRecursivelyUp(Qt::Unchecked);
@@ -1195,7 +1201,7 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
     }
 
     /* To subtract from checked/unchecked children counter & update parents recursively: */
-    childCheckStateChanged(child->m_checkState, Qt::PartiallyChecked);
+    childCheckStateChanged(child->m_checkState, Qt::PartiallyChecked, true);
 
     if (nodeRequiresChildren(m_type) && m_children.size() == 0)
         setBastard(true);
@@ -1220,7 +1226,7 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
     }
 
     /* To add to checked/unchecked children counter & update parents recursively: */
-    childCheckStateChanged(Qt::PartiallyChecked, child->m_checkState);
+    childCheckStateChanged(Qt::PartiallyChecked, child->m_checkState, true);
 
     /* Check if we must display parent node. */
     if (nodeRequiresChildren(m_type) && isBastard())
