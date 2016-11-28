@@ -66,7 +66,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     m_parent(NULL),
     m_status(Qn::Online),
     m_modified(false),
-    m_checkState(Qt::Unchecked)
+    m_checkState(Qt::Unchecked),
+    m_uncheckedChildren(0),
+    m_checkedChildren(0)
 {
     NX_ASSERT(model != NULL);
     m_editable.checked = false;
@@ -377,6 +379,8 @@ void QnResourceTreeModelNode::initialize()
 void QnResourceTreeModelNode::deinitialize()
 {
     NX_ASSERT(m_initialized);
+    m_state = Invalid;
+
     for (auto child: children())
         child->deinitialize();
 
@@ -840,12 +844,14 @@ int QnResourceTreeModelNode::helpTopicId() const
     return -1;
 }
 
-bool QnResourceTreeModelNode::setData(const QVariant &value, int role, int column)
+bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int column)
 {
     if (column == Qn::CheckColumn && role == Qt::CheckStateRole)
     {
-        m_checkState = static_cast<Qt::CheckState>(value.toInt());
-        changeInternal();
+        if (!changeCheckStateRecursivelyUp(static_cast<Qt::CheckState>(value.toInt())))
+            return false;
+
+        propagateCheckStateRecursivelyDown();
         return true;
     }
 
@@ -896,6 +902,101 @@ bool QnResourceTreeModelNode::setData(const QVariant &value, int role, int colum
     else
         menu()->trigger(QnActions::RenameResourceAction, parameters);
     return true;
+}
+
+bool QnResourceTreeModelNode::changeCheckStateRecursivelyUp(Qt::CheckState newState)
+{
+    if (m_checkState == newState)
+        return false;
+
+    auto oldState = m_checkState;
+
+    m_checkState = newState;
+
+    if (m_parent)
+        m_parent->childCheckStateChanged(oldState, newState);
+
+    changeInternal();
+    return true;
+}
+
+void QnResourceTreeModelNode::childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState)
+{
+    switch (oldState)
+    {
+        case Qt::Unchecked:
+            --m_uncheckedChildren;
+            NX_ASSERT(m_uncheckedChildren >= 0);
+            break;
+
+        case Qt::Checked:
+            --m_checkedChildren;
+            NX_ASSERT(m_checkedChildren >= 0);
+            break;
+
+        default:
+            break;
+    }
+
+    switch (newState)
+    {
+        case Qt::Unchecked:
+            ++m_uncheckedChildren;
+            break;
+
+        case Qt::Checked:
+            ++m_checkedChildren;
+            break;
+
+        default:
+            break;
+    }
+
+    NX_ASSERT(m_checkedChildren + m_uncheckedChildren <= m_children.size());
+
+    if (m_uncheckedChildren == m_children.size())
+        changeCheckStateRecursivelyUp(Qt::Unchecked);
+    else if (m_checkedChildren == m_children.size())
+        changeCheckStateRecursivelyUp(Qt::Checked);
+    else
+        changeCheckStateRecursivelyUp(Qt::PartiallyChecked);
+}
+
+void QnResourceTreeModelNode::propagateCheckStateRecursivelyDown()
+{
+    if (m_checkState == Qt::PartiallyChecked)
+    {
+        NX_ASSERT(false); //< should not happen
+        return;
+    }
+
+    /* Update counters at each child state change to keep them consistent
+     * with current state every time when dataChanged signal is emitted: */
+    auto& increasing = m_checkState == Qt::Checked
+        ? m_checkedChildren
+        : m_uncheckedChildren;
+
+    auto& decreasing = m_checkState == Qt::Checked
+        ? m_uncheckedChildren
+        : m_checkedChildren;
+
+    for (const auto& child: m_children)
+    {
+        if (child->m_checkState == m_checkState)
+            continue;
+
+        if (child->m_checkState != Qt::PartiallyChecked)
+        {
+            ++increasing;
+            --decreasing;
+        }
+
+        child->m_checkState = m_checkState;
+        child->propagateCheckStateRecursivelyDown();
+        child->changeInternal();
+    }
+
+    NX_ASSERT(decreasing == 0 && increasing == m_children.size());
 }
 
 bool QnResourceTreeModelNode::isModified() const
@@ -1088,6 +1189,9 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
         m_children.removeOne(child);
     }
 
+    /* To subtract from checked/unchecked children counter & update parents recursively: */
+    childCheckStateChanged(child->m_checkState, Qt::PartiallyChecked);
+
     if (nodeRequiresChildren(m_type) && m_children.size() == 0)
         setBastard(true);
 }
@@ -1109,6 +1213,9 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
     {
         m_children.push_back(child);
     }
+
+    /* To add to checked/unchecked children counter & update parents recursively: */
+    childCheckStateChanged(Qt::PartiallyChecked, child->m_checkState);
 
     /* Check if we must display parent node. */
     if (nodeRequiresChildren(m_type) && isBastard())
