@@ -2,6 +2,7 @@
 
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/helpers/layout_item_aggregator.h>
 
 #include <core/resource_management/resource_pool.h>
 
@@ -9,11 +10,26 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
+namespace {
+
+QnLayoutResourceList getLayoutsForVideoWall(const QnVideoWallResourcePtr& videoWall)
+{
+    return qnResPool->getResourcesByParentId(videoWall->getId()).filtered<QnLayoutResource>();
+}
+
+}
+
 QnVideoWallItemAccessProvider::QnVideoWallItemAccessProvider(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_itemAggregator(new QnLayoutItemAggregator())
 {
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnVideoWallItemAccessProvider::updateAccessBySubject);
+
+    connect(m_itemAggregator, &QnLayoutItemAggregator::itemAdded, this,
+        &QnVideoWallItemAccessProvider::handleItemAdded);
+    connect(m_itemAggregator, &QnLayoutItemAggregator::itemRemoved, this,
+        &QnVideoWallItemAccessProvider::handleItemRemoved);
 }
 
 QnVideoWallItemAccessProvider::~QnVideoWallItemAccessProvider()
@@ -34,24 +50,14 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
     if (resource->hasFlags(Qn::layout))
     {
         auto layout = resource.dynamicCast<QnLayoutResource>();
-        NX_ASSERT(layout);
-        return layout && m_accessibleLayouts.contains(layout); /*< This method is called under mutex. */
+        NX_EXPECT(layout);
+        return layout && m_itemAggregator->hasLayout(layout); /*< This method is called under mutex. */
     }
 
     if (!QnResourceAccessFilter::isShareableMedia(resource))
         return false;
 
-    auto resourceId = resource->getId();
-    for (const auto& layout : m_accessibleLayouts)
-    {
-        for (const auto& item : layout->getItems())
-        {
-            if (item.resource.id == resourceId)
-                return true;
-        }
-    }
-
-    return false;
+    return m_itemAggregator->hasItem(resource->getId());
 }
 
 void QnVideoWallItemAccessProvider::fillProviders(
@@ -61,9 +67,6 @@ void QnVideoWallItemAccessProvider::fillProviders(
 {
     if (!qnGlobalPermissionsManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return;
-
-    /* Access to layout may be granted only by parent videowall resource. */
-    auto layouts = accessibleLayouts();
 
     if (resource->hasFlags(Qn::layout))
     {
@@ -76,9 +79,14 @@ void QnVideoWallItemAccessProvider::fillProviders(
     if (!QnResourceAccessFilter::isShareableMedia(resource))
         return;
 
+    /* Access to layout may be granted only by parent videowall resource. */
     auto resourceId = resource->getId();
-    for (const auto& layout : layouts)
+
+    for (auto iter = m_itemAggregator->layoutBegin();
+        iter != m_itemAggregator->layoutEnd();
+        ++iter)
     {
+        const auto layout = *iter;
         for (const auto& item : layout->getItems())
         {
             if (item.resource.id == resourceId)
@@ -96,6 +104,9 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
 {
     base_type::handleResourceAdded(resource);
 
+    if (isUpdating())
+        return;
+
     if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
     {
         handleVideoWallAdded(videoWall);
@@ -110,137 +121,78 @@ void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& r
 {
     base_type::handleResourceRemoved(resource);
 
+    /* Layouts and videowall can be removed independently. */
+
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        if (isUpdating())
+        if (!m_itemAggregator->hasLayout(layout))
             return;
 
-        {
-            QnMutexLocker lk(&m_mutex);
-            m_accessibleLayouts.remove(layout);
-        }
-
-        for (const auto& resource : layout->layoutResources())
-            updateAccessToResource(resource);
+        m_itemAggregator->removeWatchedLayout(layout);
+        updateAccessToResource(layout);
     }
     else if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
     {
-        if (isUpdating())
-            return;
-
-        QnUuid videoWallId = videoWall->getId();
-        QSet<QnLayoutResourcePtr> removedLayouts;
+        for (auto layout: getLayoutsForVideoWall(videoWall))
         {
-            QnMutexLocker lk(&m_mutex);
-            for (auto layout : m_accessibleLayouts)
-            {
-                if (layout->getParentId() == videoWallId)
-                    removedLayouts.insert(layout);
-            }
-            m_accessibleLayouts -= removedLayouts;
-        }
+            if (!m_itemAggregator->hasLayout(layout))
+                continue;
 
-        for (auto layout: removedLayouts)
-            updateByLayout(layout);
+            m_itemAggregator->removeWatchedLayout(layout);
+            updateAccessToResource(layout);
+        }
     }
 }
 
 void QnVideoWallItemAccessProvider::afterUpdate()
 {
-    updateAccessibleLayouts();
+    for (auto layout: qnResPool->getResources<QnLayoutResource>())
+        handleLayoutAdded(layout);
+
     base_type::afterUpdate();
 }
 
 void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResourcePtr& videoWall)
 {
-    if (!isUpdating())
+    /* Layouts and videowalls can be added independently. */
+    for (auto layout : getLayoutsForVideoWall(videoWall))
     {
-        const auto childLayouts = qnResPool->getResourcesWithParentId(videoWall->getId())
-            .filtered<QnLayoutResource>();
+        if (m_itemAggregator->hasLayout(layout))
+            continue;
 
-        {
-            QnMutexLocker lk(&m_mutex);
-            for (const auto& child: childLayouts)
-                m_accessibleLayouts.insert(child);
-        }
-
-        for (const auto& child: childLayouts)
-            updateByLayout(child);
+        m_itemAggregator->addWatchedLayout(layout);
+        updateAccessToResource(layout);
     }
 }
 
 void QnVideoWallItemAccessProvider::handleLayoutAdded(const QnLayoutResourcePtr& layout)
 {
-    auto handleItemChanged =
-        [this](const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
-        {
-            if (isUpdating())
-                return;
-
-            /* Check only layouts that belong to videowall. */
-            if (!accessibleLayouts().contains(layout))
-                return;
-
-            /* Only remote resources with correct id can be accessed. */
-            if (item.resource.id.isNull())
-                return;
-
-            if (auto resource = qnResPool->getResourceById(item.resource.id))
-                updateAccessToResource(resource);
-        };
-
-    /* Connect to all layouts. Possibly videowall will be added to the pool later. */
-    connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
-    connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
-
-    if (!isUpdating())
+    /* Layouts and videowalls can be added independently. */
+    auto parent = layout->getParentResource();
+    if (parent && parent->hasFlags(Qn::videowall))
     {
-        auto parent = layout->getParentResource();
-        if (parent && parent->hasFlags(Qn::videowall))
-        {
-            {
-                QnMutexLocker lk(&m_mutex);
-                m_accessibleLayouts.insert(layout);
-            }
-            for (const auto& resource: layout->layoutResources())
-                updateAccessToResource(resource);
-        }
+        if (m_itemAggregator->hasLayout(layout))
+            return;
+
+        m_itemAggregator->addWatchedLayout(layout);
+        updateAccessToResource(layout);
     }
 }
 
-void QnVideoWallItemAccessProvider::updateByLayout(const QnLayoutResourcePtr& layout)
+void QnVideoWallItemAccessProvider::handleItemAdded(const QnUuid& resourceId)
 {
     if (isUpdating())
         return;
 
-    NX_ASSERT(layout);
-    if (!layout)
-        return;
-
-    updateAccessToResource(layout);
-    for (const auto& resource: layout->layoutResources())
+    if (auto resource = qnResPool->getResourceById(resourceId))
         updateAccessToResource(resource);
 }
 
-void QnVideoWallItemAccessProvider::updateAccessibleLayouts()
+void QnVideoWallItemAccessProvider::handleItemRemoved(const QnUuid& resourceId)
 {
     if (isUpdating())
         return;
 
-    QSet<QnLayoutResourcePtr> result;
-    for (const auto& layout : qnResPool->getResources<QnLayoutResource>())
-    {
-        auto parent = layout->getParentResource();
-        if (parent && parent->hasFlags(Qn::videowall))
-            result << layout;
-    }
-
-    QnMutexLocker lk(&m_mutex);
-    m_accessibleLayouts = result;
-}
-
-QSet<QnLayoutResourcePtr> QnVideoWallItemAccessProvider::accessibleLayouts() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_accessibleLayouts;
+    if (auto resource = qnResPool->getResourceById(resourceId))
+        updateAccessToResource(resource);
 }
