@@ -330,7 +330,7 @@ public:
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
                     filter.scanPeriod.durationMs = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);
                     m_owner->partialMediaScan(itr.key(), scanData.storage, filter);
-                    if (needToStop())
+                    if (needToStop() || QnResource::isStopping())
                         return;
                     ++currentStorageStep;
                 }
