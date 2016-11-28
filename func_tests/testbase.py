@@ -479,7 +479,6 @@ class FuncTestCase(unittest.TestCase):
 
 
     def setUp(self):
-        log(LOGLEVEL.INFO, "Just prints \n after unittest module prints a test name")
         pass
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)
     ####################################################
