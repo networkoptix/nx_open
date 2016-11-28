@@ -164,7 +164,7 @@ public:
     virtual ~UdtStreamServerSocket();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);

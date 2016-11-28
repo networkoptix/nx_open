@@ -52,7 +52,7 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    void pleaseStopSync(bool assertIfCalledUnderLock) override;
+    void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
