@@ -125,21 +125,15 @@ void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& r
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        if (!m_itemAggregator->hasLayout(layout))
-            return;
-
-        m_itemAggregator->removeWatchedLayout(layout);
-        updateAccessToResource(layout);
+        if (m_itemAggregator->removeWatchedLayout(layout))
+            updateAccessToResource(layout);
     }
     else if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
     {
         for (auto layout: getLayoutsForVideoWall(videoWall))
         {
-            if (!m_itemAggregator->hasLayout(layout))
-                continue;
-
-            m_itemAggregator->removeWatchedLayout(layout);
-            updateAccessToResource(layout);
+            if (m_itemAggregator->removeWatchedLayout(layout))
+                updateAccessToResource(layout);
         }
     }
 }
@@ -157,11 +151,8 @@ void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResour
     /* Layouts and videowalls can be added independently. */
     for (auto layout : getLayoutsForVideoWall(videoWall))
     {
-        if (m_itemAggregator->hasLayout(layout))
-            continue;
-
-        m_itemAggregator->addWatchedLayout(layout);
-        updateAccessToResource(layout);
+        if (m_itemAggregator->addWatchedLayout(layout))
+            updateAccessToResource(layout);
     }
 }
 
@@ -171,11 +162,8 @@ void QnVideoWallItemAccessProvider::handleLayoutAdded(const QnLayoutResourcePtr&
     auto parent = layout->getParentResource();
     if (parent && parent->hasFlags(Qn::videowall))
     {
-        if (m_itemAggregator->hasLayout(layout))
-            return;
-
-        m_itemAggregator->addWatchedLayout(layout);
-        updateAccessToResource(layout);
+        if (m_itemAggregator->addWatchedLayout(layout))
+            updateAccessToResource(layout);
     }
 }
 
