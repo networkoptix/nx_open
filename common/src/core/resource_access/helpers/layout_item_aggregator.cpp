@@ -15,37 +15,22 @@ QnLayoutItemAggregator::~QnLayoutItemAggregator()
 
 void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 {
-    auto addItem = [this](const QnLayoutItemData& item)
-        {
-            const auto resourceId = item.resource.id;
-            if (resourceId.isNull())
-                return;
-
-            if (m_items.insert(resourceId))
-                emit itemAdded(resourceId);
-        };
-
     if (!m_watchedLayouts.insert(layout))
         return;
 
     for (auto item: layout->getItems())
-        addItem(item);
+        handleItemAdded(item);
 
     connect(layout, &QnLayoutResource::itemAdded, this,
-        [this, addItem](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
-            addItem(item);
+            handleItemAdded(item);
         });
 
     connect(layout, &QnLayoutResource::itemRemoved, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
-            const auto resourceId = item.resource.id;
-            if (resourceId.isNull())
-                return;
-
-            m_items.remove(resourceId);
-            emit itemRemoved(resourceId);
+            handleItemRemoved(item);
         });
 }
 
@@ -56,14 +41,7 @@ void QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layo
 
     layout->disconnect(this);
     for (auto item : layout->getItems())
-    {
-        const auto resourceId = item.resource.id;
-        if (resourceId.isNull())
-            return;
-
-        m_items.remove(resourceId);
-        emit itemRemoved(resourceId);
-    }
+        handleItemRemoved(item);
 }
 
 QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
@@ -74,4 +52,24 @@ QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
 bool QnLayoutItemAggregator::hasItem(const QnUuid& id) const
 {
     return m_items.contains(id);
+}
+
+void QnLayoutItemAggregator::handleItemAdded(const QnLayoutItemData& item)
+{
+    const auto resourceId = item.resource.id;
+    if (resourceId.isNull())
+        return;
+
+    if (m_items.insert(resourceId))
+        emit itemAdded(resourceId);
+}
+
+void QnLayoutItemAggregator::handleItemRemoved(const QnLayoutItemData& item)
+{
+    const auto resourceId = item.resource.id;
+    if (resourceId.isNull())
+        return;
+
+    if (m_items.remove(resourceId))
+        emit itemRemoved(resourceId);
 }

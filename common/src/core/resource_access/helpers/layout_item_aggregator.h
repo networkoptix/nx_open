@@ -36,6 +36,10 @@ signals:
     void itemRemoved(const QnUuid& resourceId);
 
 private:
+    void handleItemAdded(const QnLayoutItemData& item);
+    void handleItemRemoved(const QnLayoutItemData& item);
+
+private:
     QnCounterHash<QnLayoutResourcePtr> m_watchedLayouts;
     QnCounterHash<QnUuid> m_items;
 };

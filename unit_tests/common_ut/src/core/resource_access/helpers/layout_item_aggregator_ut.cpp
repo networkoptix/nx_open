@@ -252,3 +252,14 @@ TEST_F(QnLayoutItemAggregatorTest, ignoreNullIdOnLayoutRemoved)
     setAwaiting(true);
     aggregator->removeWatchedLayout(layout);
 }
+
+TEST_F(QnLayoutItemAggregatorTest, awaitItemRemovedOnce)
+{
+    auto layout = createLayout();
+    auto targetId = addItem(layout);
+    addItem(layout, targetId); /*< Second time */
+    aggregator->addWatchedLayout(layout);
+    setAwaiting(true);
+    auto firstItemId = layout->getItems().begin().key();
+    layout->removeItem(firstItemId);
+}
