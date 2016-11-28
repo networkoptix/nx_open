@@ -262,7 +262,6 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     drawVideoData(sourceRect, dstPaintRect);
     m_blurBufferA->release();
 
-    const float blurStrength = sin(m_blurFactor * M_PI / 2.0);
     const int kIterations = 8;
 
     QOpenGLFramebufferObject* fboA = m_blurBufferA.get();
@@ -270,7 +269,7 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     for (int i = 0; i < kIterations; ++i)
     {
         // blur A->B, B->A several times
-        const float blurStep = (kIterations - i - 1) * blurStrength;
+        const float blurStep = (kIterations - i - 1) * m_blurFactor;
         const float ar = blurSize.width() / (float)blurSize.height();
         const QVector2D textureOffset(
             //sourceRect.width() / (float)blurSize.width() * blurStep,
