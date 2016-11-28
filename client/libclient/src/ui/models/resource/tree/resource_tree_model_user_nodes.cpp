@@ -18,7 +18,6 @@
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 
@@ -103,7 +102,7 @@ void QnResourceTreeModelUserNodes::initialize(QnResourceTreeModel* model,
 {
     setModel(model);
     setRootNode(rootNode);
-    handleUserChanged(context()->accessController()->user());
+    handleUserChanged(context()->user());
 }
 
 void QnResourceTreeModelUserNodes::rebuild()
