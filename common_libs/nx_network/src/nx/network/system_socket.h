@@ -290,6 +290,7 @@ public:
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(

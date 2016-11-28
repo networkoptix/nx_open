@@ -163,7 +163,8 @@ public:
     UdtStreamServerSocket(int ipVersion);
     virtual ~UdtStreamServerSocket();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock) override;
 
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);

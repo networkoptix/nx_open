@@ -52,6 +52,7 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void pleaseStopSync(bool assertIfCalledUnderLock) override;
 
     //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -113,6 +114,9 @@ protected:
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default
+
+private:
+    void stopWhileInAioThread();
 };
 
 } // namespace cloud

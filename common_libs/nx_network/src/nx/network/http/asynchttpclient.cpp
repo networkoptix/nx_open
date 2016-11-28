@@ -10,14 +10,16 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
-#include <nx/utils/thread/mutex.h>
 
 #include <http/custom_headers.h>
-#include <utils/crypt/linux_passwd_crypt.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
+
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/systemerror.h>
+#include <utils/common/util.h>
 
 #include "auth_tools.h"
 
@@ -116,9 +118,14 @@ namespace nx_http
     void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
     {
         if (m_aioThreadBinder.isInSelfAioThread())
+        {
             stopWhileInAioThread();
+        }
         else
+        {
+            NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
             QnStoppableAsync::pleaseStopSync(checkForLocks);
+        }
     }
 
     void AsyncHttpClient::stopWhileInAioThread()

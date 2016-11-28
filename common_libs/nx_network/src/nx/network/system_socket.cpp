@@ -1375,6 +1375,12 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
         });
 }
 
+void TCPServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+    d->asyncServerSocketHelper.cancelIOSync();
+}
+
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
