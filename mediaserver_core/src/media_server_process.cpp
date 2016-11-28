@@ -242,6 +242,7 @@
 #include <media_server/master_server_status_watcher.h>
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
+#include "misc/migrate_oldwin_dir.h"
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2000,7 +2001,9 @@ void MediaServerProcess::run()
         qnCommon->setEngineVersion(m_engineVersion);
 
     QnCallCountStart(std::chrono::milliseconds(5000));
-
+#ifdef Q_OS_WIN32
+    misc::migrateFilesFromWindowsOldDir();
+#endif
     ffmpegInit();
 
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
