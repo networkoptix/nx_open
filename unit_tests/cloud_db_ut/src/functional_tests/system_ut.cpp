@@ -62,7 +62,7 @@ TEST_F(System, unbind)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 2);
+            ASSERT_EQ(systems.size(), 2U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
@@ -121,7 +121,7 @@ TEST_F(System, unbind)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 1U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         }
@@ -155,7 +155,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
         ASSERT_EQ(
             api::ResultCode::ok,
             testSetup->getSystem(account1.email, account1Password, system1.id, &systems));
-        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(1U, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
     }
@@ -240,7 +240,7 @@ TEST_F(System, activation)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 0);   //only activated systems are provided
+            ASSERT_EQ(systems.size(), 0U);   //only activated systems are provided
             //ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             //ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
             //ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
@@ -270,7 +270,7 @@ TEST_F(System, activation)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 1U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
             ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
@@ -282,7 +282,7 @@ TEST_F(System, activation)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 1U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
             ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
@@ -646,7 +646,7 @@ TEST_F(System, sorting_order_multiple_systems)
             api::ResultCode::ok,
             getSystems(account.email, account.password, &systems));
 
-        ASSERT_EQ(3, systems.size());
+        ASSERT_EQ(3U, systems.size());
         std::sort(
             systems.begin(), systems.end(),
             [](const api::SystemDataEx& one, const api::SystemDataEx& two)
@@ -842,7 +842,7 @@ TEST_F(System, update)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystems(account1.email, account1.password, &systems));
-        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(1U, systems.size());
         ASSERT_EQ(system1, systems[0]);
         ASSERT_EQ(system1.opaque, systems[0].opaque);
     }

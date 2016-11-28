@@ -248,7 +248,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 0);
+        ASSERT_EQ(systems.size(), 0U);
     }
 
     {
@@ -267,7 +267,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
+        ASSERT_EQ(systems.size(), 1U);
         ASSERT_TRUE(system1 == systems[0]);
     }
 
