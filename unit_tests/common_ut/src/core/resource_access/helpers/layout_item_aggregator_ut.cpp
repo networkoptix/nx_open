@@ -86,14 +86,15 @@ private:
 
 TEST_F(QnLayoutItemAggregatorTest, checkInit)
 {
-    ASSERT_TRUE(aggregator->watchedLayouts().isEmpty());
+    const auto layoutsNumber = std::distance(aggregator->layoutBegin(), aggregator->layoutEnd());
+    ASSERT_TRUE(layoutsNumber == 0);
 }
 
 TEST_F(QnLayoutItemAggregatorTest, checkAddLayout)
 {
     auto layout = createLayout();
     aggregator->addWatchedLayout(layout);
-    ASSERT_TRUE(aggregator->watchedLayouts().contains(layout));
+    ASSERT_TRUE(aggregator->hasLayout(layout));
 }
 
 TEST_F(QnLayoutItemAggregatorTest, checkRemoveLayout)
@@ -101,7 +102,7 @@ TEST_F(QnLayoutItemAggregatorTest, checkRemoveLayout)
     auto layout = createLayout();
     aggregator->addWatchedLayout(layout);
     aggregator->removeWatchedLayout(layout);
-    ASSERT_FALSE(aggregator->watchedLayouts().contains(layout));
+    ASSERT_FALSE(aggregator->hasLayout(layout));
 }
 
 TEST_F(QnLayoutItemAggregatorTest, checkLayoutItem)
@@ -262,4 +263,14 @@ TEST_F(QnLayoutItemAggregatorTest, awaitItemRemovedOnce)
     setAwaiting(true);
     auto firstItemId = layout->getItems().begin().key();
     layout->removeItem(firstItemId);
+}
+
+TEST_F(QnLayoutItemAggregatorTest, iterateOverLayouts)
+{
+    static const int N = 15;
+    for (int i = 0; i < N; ++i)
+        aggregator->addWatchedLayout(createLayout());
+
+    const auto layoutsNumber = std::distance(aggregator->layoutBegin(), aggregator->layoutEnd());
+    ASSERT_EQ(N, layoutsNumber);
 }

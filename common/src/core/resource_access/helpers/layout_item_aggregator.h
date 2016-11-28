@@ -21,14 +21,18 @@ class QnLayoutItemAggregator: public Connective<QObject>
 
     using base_type = Connective<QObject>;
 public:
+
     QnLayoutItemAggregator(QObject* parent = nullptr);
     virtual ~QnLayoutItemAggregator();
 
     void addWatchedLayout(const QnLayoutResourcePtr& layout);
     void removeWatchedLayout(const QnLayoutResourcePtr& layout);
 
-    QnLayoutResourceSet watchedLayouts() const;
+    using key_iterator = QnCounterHash<QnLayoutResourcePtr>::key_iterator;
+    key_iterator layoutBegin() const;
+    key_iterator layoutEnd() const;
 
+    bool hasLayout(const QnLayoutResourcePtr& layout) const;
     bool hasItem(const QnUuid& id) const;
 
 signals:

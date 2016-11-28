@@ -44,9 +44,19 @@ void QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layo
         handleItemRemoved(item);
 }
 
-QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
+QnLayoutItemAggregator::key_iterator QnLayoutItemAggregator::layoutBegin() const
 {
-    return m_watchedLayouts.keys().toSet();
+    return m_watchedLayouts.keyBegin();
+}
+
+QnLayoutItemAggregator::key_iterator QnLayoutItemAggregator::layoutEnd() const
+{
+    return m_watchedLayouts.keyEnd();
+}
+
+bool QnLayoutItemAggregator::hasLayout(const QnLayoutResourcePtr& layout) const
+{
+    return m_watchedLayouts.contains(layout);
 }
 
 bool QnLayoutItemAggregator::hasItem(const QnUuid& id) const

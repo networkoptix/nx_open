@@ -9,6 +9,18 @@ class QnCounterHash
 public:
     QnCounterHash() {}
 
+    using key_iterator = typename QHash<T, int>::key_iterator;
+
+    key_iterator keyBegin() const
+    {
+        return m_hash.keyBegin();
+    }
+
+    key_iterator keyEnd() const
+    {
+        return m_hash.keyEnd();
+    }
+
     /** Returns true if key was absent in hash, false otherwise. */
     bool insert(const T& key)
     {
