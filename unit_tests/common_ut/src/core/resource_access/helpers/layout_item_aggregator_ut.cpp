@@ -179,6 +179,15 @@ TEST_F(QnLayoutItemAggregatorTest, addSeveralLayoutItems)
     ASSERT_TRUE(aggregator->hasItem(targetId));
 }
 
+TEST_F(QnLayoutItemAggregatorTest, watchLayoutSeveralTimesResult)
+{
+    auto layout = createLayout();
+    ASSERT_TRUE(aggregator->addWatchedLayout(layout));
+    ASSERT_FALSE(aggregator->addWatchedLayout(layout));
+    ASSERT_TRUE(aggregator->removeWatchedLayout(layout));
+    ASSERT_FALSE(aggregator->removeWatchedLayout(layout));
+}
+
 TEST_F(QnLayoutItemAggregatorTest, watchLayoutSeveralTimes)
 {
     auto layout = createLayout();
@@ -186,7 +195,7 @@ TEST_F(QnLayoutItemAggregatorTest, watchLayoutSeveralTimes)
     aggregator->addWatchedLayout(layout);
     aggregator->removeWatchedLayout(layout);
     auto targetId = addItem(layout);
-    ASSERT_TRUE(aggregator->hasItem(targetId));
+    ASSERT_FALSE(aggregator->hasItem(targetId));
 }
 
 TEST_F(QnLayoutItemAggregatorTest, awaitItemAdded)

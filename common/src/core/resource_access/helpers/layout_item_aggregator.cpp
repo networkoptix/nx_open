@@ -13,10 +13,12 @@ QnLayoutItemAggregator::~QnLayoutItemAggregator()
 
 }
 
-void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
+bool QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 {
-    if (!m_watchedLayouts.insert(layout))
-        return;
+    if (m_watchedLayouts.contains(layout))
+        return false;
+
+    m_watchedLayouts.insert(layout);
 
     for (auto item: layout->getItems())
         handleItemAdded(item);
@@ -32,26 +34,32 @@ void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
         {
             handleItemRemoved(item);
         });
+
+    return true;
 }
 
-void QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layout)
+bool QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layout)
 {
-    if (!m_watchedLayouts.remove(layout))
-        return;
+    if (!m_watchedLayouts.contains(layout))
+        return false;
+
+    m_watchedLayouts.remove(layout);
 
     layout->disconnect(this);
     for (auto item : layout->getItems())
         handleItemRemoved(item);
+
+    return true;
 }
 
 QnLayoutItemAggregator::key_iterator QnLayoutItemAggregator::layoutBegin() const
 {
-    return m_watchedLayouts.keyBegin();
+    return m_watchedLayouts.cbegin();
 }
 
 QnLayoutItemAggregator::key_iterator QnLayoutItemAggregator::layoutEnd() const
 {
-    return m_watchedLayouts.keyEnd();
+    return m_watchedLayouts.cend();
 }
 
 bool QnLayoutItemAggregator::hasLayout(const QnLayoutResourcePtr& layout) const

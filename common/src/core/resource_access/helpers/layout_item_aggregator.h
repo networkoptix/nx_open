@@ -25,10 +25,13 @@ public:
     QnLayoutItemAggregator(QObject* parent = nullptr);
     virtual ~QnLayoutItemAggregator();
 
-    void addWatchedLayout(const QnLayoutResourcePtr& layout);
-    void removeWatchedLayout(const QnLayoutResourcePtr& layout);
+    /** Start watching layout. Return false if layout was already watched.  */
+    bool addWatchedLayout(const QnLayoutResourcePtr& layout);
 
-    using key_iterator = QnCounterHash<QnLayoutResourcePtr>::key_iterator;
+    /** Stops watching layout. Returns false if layout was not watched. */
+    bool removeWatchedLayout(const QnLayoutResourcePtr& layout);
+
+    using key_iterator = QSet<QnLayoutResourcePtr>::const_iterator;
     key_iterator layoutBegin() const;
     key_iterator layoutEnd() const;
 
@@ -44,6 +47,6 @@ private:
     void handleItemRemoved(const QnLayoutItemData& item);
 
 private:
-    QnCounterHash<QnLayoutResourcePtr> m_watchedLayouts;
+    QSet<QnLayoutResourcePtr> m_watchedLayouts;
     QnCounterHash<QnUuid> m_items;
 };
