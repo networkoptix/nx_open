@@ -339,7 +339,8 @@
                 "Axis|M70114*",
                 "Axis|P7016*",
                 "UNIVIEW|DVS4116",
-                "Axis|P7216*"
+                "Axis|P7216*",
+                "Axis|AXISP7216*"
             ],
             "analogEncoder": true
         },
