@@ -8,9 +8,9 @@
 #include <recording/time_period_list.h>
 #include <nx/utils/test_support/test_options.h>
 #include <network/tcp_connection_processor.h>
-#include "nx/network/socket_common.h"
-#include "network/tcp_listener.h"
-#include "network/tcp_connection_priv.h"
+#include <nx/network/socket_common.h>
+#include <network/tcp_listener.h>
+#include <network/tcp_connection_priv.h>
 #include <thread>
 
 namespace {
@@ -83,9 +83,9 @@ TEST( TcpConnectionProcessor, sendAsyncData )
     int gotBytes = 0;
     while (gotBytes < kTotalTestBytes)
     {
-        int readed = clientSocket->recv(buffer, sizeof(buffer));
-        ASSERT_TRUE(readed > 0);
-        gotBytes += readed;
+        int bytesRead = clientSocket->recv(buffer, sizeof(buffer));
+        ASSERT_TRUE(bytesRead > 0);
+        gotBytes += bytesRead;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
