@@ -15,18 +15,20 @@ QnLayoutItemAggregator::~QnLayoutItemAggregator()
 
 void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 {
-    m_watchedLayouts.insert(layout);
-    for (auto item: layout->getItems())
-    {
-        if (!item.resource.id.isNull())
-            m_items.insert(item.resource.id);
-    }
-
-    connect(layout, &QnLayoutResource::itemAdded, this,
-        [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+    auto addItem = [this](const QnLayoutItemData& item)
         {
             if (!item.resource.id.isNull())
                 m_items.insert(item.resource.id);
+        };
+
+    m_watchedLayouts.insert(layout);
+    for (auto item: layout->getItems())
+        addItem(item);
+
+    connect(layout, &QnLayoutResource::itemAdded, this,
+        [this, addItem](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        {
+            addItem(item);
         });
 
     connect(layout, &QnLayoutResource::itemRemoved, this,
@@ -38,7 +40,10 @@ void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 
 void QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layout)
 {
+    layout->disconnect(this);
     m_watchedLayouts.remove(layout);
+    for (auto item : layout->getItems())
+        m_items.remove(item.resource.id);
 }
 
 QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const

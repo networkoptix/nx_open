@@ -112,3 +112,23 @@ TEST_F(QnLayoutItemAggregatorTest, checkNullIdIgnored)
 
     ASSERT_FALSE(aggregator->hasItem(QnUuid()));
 }
+
+TEST_F(QnLayoutItemAggregatorTest, checkItemIfLayoutRemoved)
+{
+    auto layout = createLayout();
+    auto targetId = addItem(layout);
+    aggregator->addWatchedLayout(layout);
+    aggregator->removeWatchedLayout(layout);
+
+    ASSERT_FALSE(aggregator->hasItem(targetId));
+}
+
+TEST_F(QnLayoutItemAggregatorTest, stopListeningLayout)
+{
+    auto layout = createLayout();
+    aggregator->addWatchedLayout(layout);
+    aggregator->removeWatchedLayout(layout);
+    auto targetId = addItem(layout);
+
+    ASSERT_FALSE(aggregator->hasItem(targetId));
+}

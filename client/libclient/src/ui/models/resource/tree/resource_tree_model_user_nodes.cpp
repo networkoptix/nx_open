@@ -68,6 +68,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
             if (m_roles.contains(role.id))
                 removeNode(m_roles.take(role.id));
         });
+
 }
 
 QnResourceTreeModelUserNodes::~QnResourceTreeModelUserNodes()
