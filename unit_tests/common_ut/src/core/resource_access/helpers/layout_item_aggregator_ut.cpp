@@ -20,7 +20,7 @@ protected:
         aggregator.reset();
     }
 
-    QnLayoutResourcePtr createLayout(const QnUuid& id)
+    QnLayoutResourcePtr createLayout(const QnUuid& id = QnUuid::createUuid())
     {
         QnLayoutResourcePtr layout(new QnLayoutResource());
         layout->setId(id);
@@ -33,4 +33,19 @@ protected:
 TEST_F(QnLayoutItemAggregatorTest, checkInit)
 {
     ASSERT_TRUE(aggregator->watchedLayouts().isEmpty());
+}
+
+TEST_F(QnLayoutItemAggregatorTest, checkAddLayout)
+{
+    auto layout = createLayout();
+    aggregator->addWatchedLayout(layout);
+    ASSERT_TRUE(aggregator->watchedLayouts().contains(layout));
+}
+
+TEST_F(QnLayoutItemAggregatorTest, checkRemoveLayout)
+{
+    auto layout = createLayout();
+    aggregator->addWatchedLayout(layout);
+    aggregator->removeWatchedLayout(layout);
+    ASSERT_FALSE(aggregator->watchedLayouts().contains(layout));
 }

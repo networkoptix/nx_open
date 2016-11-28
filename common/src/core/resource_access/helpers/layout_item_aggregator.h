@@ -19,5 +19,11 @@ public:
     QnLayoutItemAggregator(QObject* parent = nullptr);
     virtual ~QnLayoutItemAggregator();
 
-    QSet<QnLayoutResourcePtr> watchedLayouts() const;
+    void addWatchedLayout(const QnLayoutResourcePtr& layout);
+    void removeWatchedLayout(const QnLayoutResourcePtr& layout);
+
+    QnLayoutResourceSet watchedLayouts() const;
+
+private:
+    QnLayoutResourceSet m_watchedLayouts;
 };

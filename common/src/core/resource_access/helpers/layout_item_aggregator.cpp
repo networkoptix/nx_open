@@ -11,7 +11,17 @@ QnLayoutItemAggregator::~QnLayoutItemAggregator()
 
 }
 
+void QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
+{
+    m_watchedLayouts.insert(layout);
+}
+
+void QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layout)
+{
+    m_watchedLayouts.remove(layout);
+}
+
 QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
 {
-    return QSet<QnLayoutResourcePtr>();
+    return m_watchedLayouts;
 }
