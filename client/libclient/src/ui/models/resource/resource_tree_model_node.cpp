@@ -848,7 +848,12 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
 {
     if (column == Qn::CheckColumn && role == Qt::CheckStateRole)
     {
-        if (!changeCheckStateRecursivelyUp(static_cast<Qt::CheckState>(value.toInt())))
+        auto checkState = static_cast<Qt::CheckState>(value.toInt());
+
+        if (checkState == Qt::PartiallyChecked)
+            return false; //< setting PartiallyChecked from outside is prohibited
+
+        if (!changeCheckStateRecursivelyUp(checkState))
             return false;
 
         propagateCheckStateRecursivelyDown();
