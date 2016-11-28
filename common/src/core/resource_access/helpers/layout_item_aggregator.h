@@ -3,14 +3,17 @@
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/connective.h>
+#include <utils/common/counter_hash.h>
 
 #include <nx/utils/uuid.h>
+
 
 /**
  * This class watches set of given layouts, combining all items on them.
  * It will notify if any item will be added to this layout set for the first time and if any item
  * will be removed from the last layout it belongs to.
  * NOTE: class does not depend on resource pool, so even deleted layouts must be removed manually.
+ * WARNING: this class is not thread-safe.
  */
 class QnLayoutItemAggregator: public Connective<QObject>
 {
@@ -30,5 +33,5 @@ public:
 
 private:
     QnLayoutResourceSet m_watchedLayouts;
-    QSet<QnUuid> m_items;
+    QnCounterHash<QnUuid> m_items;
 };
