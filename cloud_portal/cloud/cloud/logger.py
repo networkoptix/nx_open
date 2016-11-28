@@ -1,5 +1,5 @@
 from django.utils.log import AdminEmailHandler
-import md5
+import md5, traceback
 
 
 class LimitAdminEmailHandler(AdminEmailHandler):
@@ -9,10 +9,9 @@ class LimitAdminEmailHandler(AdminEmailHandler):
     COUNTER_CACHE_KEY = "email_admins_counter_"
 
     def increment_counter(self, record):
-        key_postfix = record.get_message()[:self.KEY_LENGTH]
-        key_postfix = md5(key_postfix).hexdigest()
-        from django.core.cache import get_cache
-        cache = get_cache("default")
+        key_postfix = record.message[:self.KEY_LENGTH]
+        key_postfix = md5.md5(key_postfix).hexdigest()
+        from django.core.cache import cache
         try:
             cache.incr(self.COUNTER_CACHE_KEY + key_postfix)
         except ValueError:
@@ -23,7 +22,7 @@ class LimitAdminEmailHandler(AdminEmailHandler):
         try:
             counter = self.increment_counter(record)
         except Exception:
-            pass
+            print (traceback.format_exc())
         else:
             if counter > self.MAX_EMAILS_IN_PERIOD:
                 return
