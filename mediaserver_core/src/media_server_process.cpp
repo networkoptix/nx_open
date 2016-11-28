@@ -2007,7 +2007,7 @@ void MediaServerProcess::run()
 
     QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
-    misc::migrateFilesFromWindowsOldDir();
+    misc::migrateFilesFromWindowsOldDir(QDir::toNativeSeparators(getDataDirectory()));
 #endif
     ffmpegInit();
 

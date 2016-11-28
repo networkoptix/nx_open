@@ -1,8 +1,6 @@
 #ifdef Q_OS_WIN32
 
 #include "migrate_oldwin_dir.h"
-#include "media_server/serverutil.h"
-
 
 namespace misc {
 
@@ -36,10 +34,8 @@ bool moveDir(const QDir& srcDir, const QDir& dstDir)
     return true;
 }
 
-void migrateFilesFromWindowsOldDir()
+void migrateFilesFromWindowsOldDir(const QString& currentDataDir)
 {
-    QString currentDataDir = QDir::toNativeSeparators(getDataDirectory());
-
     WCHAR lpBuffer[MAX_PATH];
     if (GetWindowsDirectory(lpBuffer, sizeof(lpBuffer)) == 0)
         return; //< nothing to migrate
