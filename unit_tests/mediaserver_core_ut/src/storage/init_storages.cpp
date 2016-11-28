@@ -53,7 +53,9 @@ TEST(InitStoragesTest, main)
     QString dbDir = MSSettings::roSettings()->value("eventsDBFilePath", closeDirPath(getDataDirectory())).toString();
     MSSettings::roSettings()->setValue(lit("systemName"), QnUuid::createUuid().toString()); // random value
     MSSettings::roSettings()->setValue(lit("port"), 0);
-    MSSettings::roSettings()->setValue(nx_ms_conf::MIN_STORAGE_SPACE, std::numeric_limits<int64_t>::max());
+    MSSettings::roSettings()->setValue(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        (qint64) std::numeric_limits<int64_t>::max());
 
     MediaServerProcess mserverProcessor(argc, argv);
     InitStoragesTestWorker worker(mserverProcessor);
