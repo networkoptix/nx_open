@@ -1780,6 +1780,8 @@ void MediaServerProcess::savePersistentDataBeforeDbRestore()
 
     data.localSystemId = qnGlobalSettings->localSystemId().toByteArray();
     data.localSystemName = qnGlobalSettings->systemName().toLocal8Bit();
+    if (m_mediaServer)
+        data.serverName = m_mediaServer->getName().toLocal8Bit();
 
     data.saveToSettings(MSSettings::roSettings());
 }
@@ -2341,7 +2343,11 @@ void MediaServerProcess::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
-            server->setName(getDefaultServerName());
+
+            if (!beforeRestoreDbData.serverName.isEmpty())
+                server->setName(QString::fromLocal8Bit(beforeRestoreDbData.serverName));
+            else
+                server->setName(getDefaultServerName());
 
             if (!noSetupWizardFlag && beforeRestoreDbData.localSystemId.isNull())
                 isNewServerInstance = true;
