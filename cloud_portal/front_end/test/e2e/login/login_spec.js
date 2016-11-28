@@ -4,46 +4,28 @@ describe('Login dialog', function () {
 
     var p = new LoginPage();
 
-    beforeAll(function() {
-        // Otherwise "window.angular is undefined" appears. See http://git.io/v4gXM for details
+    beforeEach(function() {
         p.get();
+
         // Log out if logged in
-        p.helper.checkPresent(p.loginButton).then( function () {
-            p.loginButton.click();
-        }, function() {
+        p.helper.checkPresent(p.loginButton).then( null, function() {
             p.helper.logout();
         });
-    });
-
-    beforeEach(function() {
-        // Log out, if logged in by occasion
-        p.loginSuccessElement.isPresent().then( function(isPresent) {
-            if (isPresent) {
-                p.loginSuccessElement.isDisplayed().then( function(isDisplayed) {
-                    if (isDisplayed) {
-                        p.helper.logout();
-                    }
-                });
-            }
-        })
+        p.loginButton.click();
     });
 
     it("can be opened in anonymous state", function () {
-        //browser.sleep(1000);
-        p.get();
         expect((p.dialogLoginButton).isDisplayed()).toBe(true);
     });
 
     it("can be closed after clicking on background", function () {
-        p.get();
-        expect((p.dialogLoginButton).isDisplayed()).toBe(true);
+        expect(p.dialogLoginButton.isDisplayed()).toBe(true);
 
         p.loginDialogBackground.click(); // click on login dialog overlay to close it
         expect((p.loginDialog).isPresent()).toBe(false);
     });
 
     it("allows to log in with existing credentials and to log out", function () {
-        p.get();
         p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
@@ -61,8 +43,6 @@ describe('Login dialog', function () {
     });
 
     it("; after login, display user's email and menu in top right corner", function () {
-        p.get();
-
         var email = p.helper.userEmail;
 
         p.emailInput.sendKeys(email);
@@ -74,7 +54,7 @@ describe('Login dialog', function () {
         p.userAccountDropdownToggle.click();
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
         expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
+        expect(p.userAccountDropdownMenu.getText()).toContain('Log out');
         p.userAccountDropdownToggle.click();
 
         p.helper.logout();
@@ -83,7 +63,6 @@ describe('Login dialog', function () {
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
 
-        p.get();
         p.emailInput.sendKeys(p.helper.userEmailWrong);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
@@ -93,8 +72,6 @@ describe('Login dialog', function () {
     }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
 
     it("rejects log in with wrong email", function () {
-        p.get();
-
         p.emailInput.sendKeys(p.helper.userEmailWrong);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
@@ -105,8 +82,6 @@ describe('Login dialog', function () {
     });
 
     it("allows log in with existing email in uppercase", function () {
-        p.get();
-
         p.emailInput.sendKeys(p.helper.userEmail.toUpperCase());
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
@@ -114,8 +89,6 @@ describe('Login dialog', function () {
     });
 
     it("rejects log in with wrong password", function () {
-        p.get();
-
         p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPasswordWrong);
         p.dialogLoginButton.click();
@@ -126,8 +99,6 @@ describe('Login dialog', function () {
     });
 
     it("rejects log in without password", function () {
-        p.get();
-
         p.emailInput.sendKeys(p.helper.userEmail);
         p.dialogLoginButton.click();
 
@@ -139,8 +110,6 @@ describe('Login dialog', function () {
     });
 
     it("rejects log in without email but with password", function () {
-        p.get();
-
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
 
@@ -153,8 +122,6 @@ describe('Login dialog', function () {
     });
 
     it("rejects log in without both email and password", function () {
-        p.get();
-
         p.dialogLoginButton.click();
 
         p.checkPasswordMissing();
@@ -167,8 +134,6 @@ describe('Login dialog', function () {
     });
 
     it("rejects log in with email in non-email format but with password", function () {
-        p.get();
-
         p.emailInput.sendKeys('vert546 464w6345');
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
@@ -182,8 +147,6 @@ describe('Login dialog', function () {
     });
 
     it("shows red outline if field is wrong/empty after blur", function () {
-        p.get();
-
         p.emailInput.sendKeys('vert546 464w6345');
         p.rememberCheckbox.click(); // blur email field
         p.checkEmailInvalid();
@@ -201,8 +164,6 @@ describe('Login dialog', function () {
     });
 
     it("allows log in with \'Remember Me checkmark\' switched off", function () {
-        p.get();
-
         p.emailInput.sendKeys(p.helper.userEmail2);
         p.passwordInput.sendKeys(p.helper.userPassword);
 
@@ -216,8 +177,6 @@ describe('Login dialog', function () {
     });
 
     it("contains \'I forgot password\' link that leads to Restore Password page with pre-filled email from login form", function () {
-        p.get();
-
         var currentEmail = p.helper.userEmail;
         p.emailInput.sendKeys(currentEmail);
         p.passwordInput.sendKeys(p.helper.userPasswordWrong);
@@ -226,21 +185,19 @@ describe('Login dialog', function () {
 
         p.iForgotPasswordLink.click();
 
-        expect(p.htmlBody.getText()).toContain('Restore password');
+        expect(p.htmlBody.getText()).toContain('Reset Password');
         expect(browser.getCurrentUrl()).toContain('restore_password');
 
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
     it("passes email from email input to Restore password page, even without clicking \'Log in\' button", function () {
-        p.get();
-
         var currentEmail = p.helper.userEmail2; // keep it different from previous case "should test I forgot password link" !!!
         p.emailInput.sendKeys(currentEmail);
 
         p.iForgotPasswordLink.click();
 
-        expect(p.htmlBody.getText()).toContain('Restore password');
+        expect(p.htmlBody.getText()).toContain('Reset Password');
         expect(browser.getCurrentUrl()).toContain('restore_password');
 
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
@@ -250,7 +207,7 @@ describe('Login dialog', function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);
-        p.get();
+        p.loginButton.click();
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
@@ -262,7 +219,7 @@ describe('Login dialog', function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);
-        p.get();
+        p.loginButton.click();
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
@@ -276,7 +233,6 @@ describe('Login dialog', function () {
     });
 
     it("displays password masked", function () {
-        p.get();
         p.passwordInput.sendKeys(p.helper.userPassword);
         expect(p.passwordInput.getText()).not.toContain(p.helper.userPassword);
         //browser.takeScreenshot().then(function (png) {
@@ -288,12 +244,12 @@ describe('Login dialog', function () {
         p.helper.login();
         p.helper.logout();
         browser.navigate().back();
-        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        // browser.pause();
+        expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
         expect(p.loginDialog.isDisplayed()).toBe(true);
     });
 
     it("handles more than 256 symbols email and password", function() {
-        p.get();
         p.emailInput.clear().sendKeys(p.helper.inputLong300);
         p.passwordInput.clear().sendKeys(p.helper.inputLong300);
         p.dialogLoginButton.click();
@@ -311,7 +267,6 @@ describe('Login dialog', function () {
     });
 
     it("allows copy-paste in input fields", function() {
-        p.get();
         p.emailInput.sendKeys('copiedValue');
 
         // Copy + paste
@@ -342,13 +297,11 @@ describe('Login dialog', function () {
     });
 
     it("should respond to Esc key and close dialog", function () {
-        p.get();
         p.emailInput.sendKeys(protractor.Key.ESCAPE);
         expect(p.loginDialog.isPresent()).toBe(false);
     });
 
     it("should respond to Enter key and log in", function () {
-        p.get();
         p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword)
             .sendKeys(protractor.Key.ENTER);
@@ -357,14 +310,13 @@ describe('Login dialog', function () {
     });
 
     it("should respond to Tab key", function () {
-        p.get();
         // Navigate to next field using TAB key
         p.emailInput.sendKeys(protractor.Key.TAB);
         p.helper.checkElementFocusedBy(p.passwordInput, 'id');
     });
 
-    it("should respond to Space key and toggle checkbox", function () {
-        p.get();
+    // Disabled because current chromedriver does not support it
+    xit("should respond to Space key and toggle checkbox", function () {
         p.passwordInput.sendKeys(protractor.Key.TAB);
         p.rememberCheckbox.sendKeys(protractor.Key.SPACE);
         expect(p.rememberCheckbox.isSelected()).toBe(false); // verify that it is switched off
@@ -400,7 +352,7 @@ describe('Login dialog', function () {
             });
             browser.switchTo().window(newWindow).then(function () {
                 browser.refresh();
-                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+                expect(p.helper.loginSuccessElement.isPresent()).toBe(false); // user is logged out
                 browser.close();
             });
             browser.switchTo().window(oldWindow);

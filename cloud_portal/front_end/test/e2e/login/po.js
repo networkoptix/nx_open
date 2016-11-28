@@ -54,7 +54,7 @@ LoginPage = function () {
     this.changePassLink = this.userAccountDropdownMenu.element(by.linkText('Change Password'));
 
     this.rememberCheckbox = element(by.model('auth.remember'));
-    this.iForgotPasswordLink = element(by.linkText('I forgot my password'));
+    this.iForgotPasswordLink = element(by.linkText('Forgot password?'));
 
     this.htmlBody = element(by.css('body'));
 

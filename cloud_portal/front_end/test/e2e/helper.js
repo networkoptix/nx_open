@@ -60,7 +60,9 @@ var Helper = function () {
             emailInput: element(by.model('account.email')),
             passwordGroup: element(by.css('password-input')),
             passwordInput: element(by.css('password-input')).element(by.css('input[type=password]')),
-            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account'))
+            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account')),
+            alreadyLoggedIn: element(by.cssContainingText('.modal-dialog', 'You are already logged in to portal.')),
+            logOut: element(by.buttonText('Log out'))
         },
         account: {
             firstNameInput: element(by.model('account.first_name')),
@@ -77,7 +79,7 @@ var Helper = function () {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('a[uib-dropdown-toggle]')),
             dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
-            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Logout'))
+            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Log out'))
         },
         restorePassEmail: {
             emailInput: element(by.model('data.email')),
@@ -86,7 +88,7 @@ var Helper = function () {
         },
         restorePassPassword: {
             passwordInput: element(by.model('data.newPassword')).element(by.css('input[type=password]')),
-            submitButton: element(by.buttonText('Save Password'))
+            submitButton: element(by.buttonText('Save password'))
         }
     };
 
@@ -157,7 +159,7 @@ var Helper = function () {
     };
 
     this.login = function(email, password) {
-        var loginButton = self.forms.login.openLink;
+        var loginButton = h.forms.login.openLink;
 
         h.get(h.urls.homepage);
         browser.sleep(500);
@@ -208,6 +210,11 @@ var Helper = function () {
         var userEmail = email || this.getRandomEmail();
         var userPassword = password || this.userPassword;
 
+        // Log out if logged in
+        h.checkPresent(h.forms.register.alreadyLoggedIn).then( function () {
+            h.forms.register.logOut.click()
+        }, function () {});
+
         h.forms.register.firstNameInput.sendKeys(userFistName);
         h.forms.register.lastNameInput.sendKeys(userLastName);
         h.forms.register.emailInput.sendKeys(userEmail);
@@ -219,11 +226,11 @@ var Helper = function () {
     this.register = function(firstName, lastName, email, password) {
         var deferred = protractor.promise.defer();
 
-        this.get(this.urls.register);
-        expect(h.forms.register.firstNameInput.isPresent()).toBe(true);
-        this.fillRegisterForm(firstName, lastName, email, password);
+        h.get(h.urls.register);
+
+        h.fillRegisterForm(firstName, lastName, email, password);
         expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
-        expect(h.alert.successMessageElem.getText()).toContain(this.alert.alertMessages.registerSuccess);
+        expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.registerSuccess);
         deferred.fulfill();
 
         return deferred.promise;
