@@ -897,6 +897,23 @@ void QnNxStyle::drawPrimitive(
             return;
         }
 
+        case PE_IndicatorBranch:
+        {
+            if (!option->state.testFlag(State_Children))
+                return;
+
+            /* Do not draw branch marks in dropdowns: */
+            if (isWidgetOwnedBy<QComboBox>(widget))
+                return;
+
+            auto icon = option->state.testFlag(State_Open)
+                ? qnSkin->icon("tree/branch_closed.png")
+                : qnSkin->icon("tree/branch_open.png");
+
+            icon.paint(painter, option->rect);
+            return;
+        }
+
         case PE_IndicatorViewItemCheck:
         {
             QStyleOptionViewItem adjustedOption;
