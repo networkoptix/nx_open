@@ -246,11 +246,6 @@ if [[ "${box}" == "bpi" ]]; then
     do
       echo "Adding lib" ${var}
       cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
-      if [ ! -z "$STRIP" ]; then
-        $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$TARGET_LIB_DIR/${var} $DEBUG_DIR/$TARGET_LIB_DIR/${var}.debug
-        $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$TARGET_LIB_DIR/${var}.debug $BUILD_DIR/$TARGET_LIB_DIR/${var}
-        $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$TARGET_LIB_DIR/${var}
-      fi
 done
 fi
 
