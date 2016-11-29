@@ -14,7 +14,7 @@ angular.module('webadminApp')
                 return null;
             }
             else{
-                return results[1] || 0;
+                return decodeURIComponent(results[1]) || 0;
             }
         }
 
