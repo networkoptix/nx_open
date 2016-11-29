@@ -205,6 +205,19 @@ void AddressResolver::resolveAsync(
         return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
 
+    // Checking if hostName is fixed address.
+    const auto hostStr = hostName.toString().toStdString();
+    const auto ipv4Address = inet_addr(hostStr.c_str());
+    if (ipv4Address != INADDR_NONE)
+    {
+        // Resolved.
+        struct in_addr resolvedAddress;
+        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
+        resolvedAddress.s_addr = ipv4Address;
+        AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
+        return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+    }
+
     if (SocketGlobals::config().isHostDisabled(hostName))
         return handler(SystemError::noPermission, {});
 

@@ -4043,7 +4043,7 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     // Admin user is required for global properties.
     DB_LOAD(QnUserResource::kAdminGuid, data->users);
 
-    if (user) // Do not load userRoles if there is no current user.
+    if (user) // Do not load user roles if there is no current user.
         DB_LOAD(user->userRoleId, data->userRoles);
 
     DB_LOAD(QnUuid(), data->layouts);
