@@ -169,7 +169,7 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
         connect(user, &QnUserResource::userRoleChanged, this,
             &QnBaseResourceAccessProvider::updateAccessBySubject);
 
-        updateAccessBySubject(user);
+        handleSubjectAdded(user);
     }
 }
 
@@ -205,10 +205,8 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     const ec2::ApiUserRoleData& userRole)
 {
-    if (isUpdating())
-        return;
-
-    updateAccessBySubject(userRole);
+    /* We have no certain way to check if user role was already added. */
+    handleSubjectAdded(userRole);
 }
 
 void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
@@ -219,6 +217,11 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData&
     handleSubjectRemoved(userRole);
     for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateAccessBySubject(subject);
+}
+
+void QnBaseResourceAccessProvider::handleSubjectAdded(const QnResourceAccessSubject& subject)
+{
+    updateAccessBySubject(subject);
 }
 
 void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)

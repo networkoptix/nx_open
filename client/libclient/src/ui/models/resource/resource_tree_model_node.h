@@ -107,8 +107,8 @@ protected:
     void changeInternal();
 
     void updateResourceStatus();
-private:
 
+private:
     void setNameInternal(const QString& name);
 
     bool isValid() const;
@@ -120,6 +120,12 @@ private:
 
     bool isBastard() const;
     void setBastard(bool bastard);
+
+    int helpTopicId() const;
+
+    bool changeCheckStateRecursivelyUp(Qt::CheckState newState);
+    void childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState, bool forceUpdate = false);
+    void propagateCheckStateRecursivelyDown();
 
 private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
@@ -178,6 +184,10 @@ private:
 
     /** Whether this resource is checked. */
     Qt::CheckState m_checkState;
+
+    /** Number of unchecked and checked children. */
+    int m_uncheckedChildren;
+    int m_checkedChildren;
 
     //TODO: #GDM #Common implement cache invalidating in case of permissions change
     /** Whether this resource can be renamed, cached value. */

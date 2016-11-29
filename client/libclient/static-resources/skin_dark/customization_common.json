@@ -156,9 +156,6 @@
         "palette": {
             "default": {
                 "link":             "blue10"
-            },
-            "inactive": {
-                "link":             "blue12"
             }
         }
     },
@@ -747,6 +744,10 @@
 
     "QnFisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
+    },
+    
+    "QnCloudStatusPanel": {
+        "palette": { "default": { "window": "dark8" } }
     }
 
 }

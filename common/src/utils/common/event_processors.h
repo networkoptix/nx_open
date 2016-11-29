@@ -357,6 +357,9 @@ bool installEventFilter(const Watched& watched, QObject* filter)
 *   receiver - raw or smart pointer to QObject descendant to handle signals
 *   handler - member function or functor that will be called to handle signals
 *   connectionType - Qt signal/slot connection type
+*      Qt::UniqueConnection is currently not supported
+*      Qt::QueuedConnection should be used with care: unguarded pointer to watched object
+*          is passed to the handler function, so user must provide own guard measures
 */
 template<
     class Watched = std::initializer_list<QObject*>,

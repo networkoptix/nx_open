@@ -7,6 +7,8 @@ var Config = {
     defaultPassword: 'admin',
     newServerFlag: 'SF_NewSystem',
     publicIpFlag: 'SF_HasPublicIP',
+    iflistFlag: 'SF_IfListCtrl',
+    timeCtrlFlag: 'SF_timeCtrl',
 
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
@@ -23,6 +25,8 @@ var Config = {
         portalRegisterUrl: '/register',
         portalSystemUrl: '/systems/{systemId}'
     },
+
+    dateSettingsFormat:'dd MMMM yyyy',
 
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {

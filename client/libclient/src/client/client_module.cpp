@@ -27,6 +27,7 @@
 #include <client/system_weights_manager.h>
 #include <client/forgotten_systems_manager.h>
 #include <client/startup_tile_manager.h>
+#include <client/client_settings_watcher.h>
 #include <client_core/client_core_settings.h>
 
 #include <cloud/cloud_connection.h>
@@ -267,6 +268,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     auto clientInstanceManager =
         qnCommon->store(new QnClientInstanceManager()); //< Depends on QnClientSettings
+
+    /* Depends on QnClientSettings and QnClientInstanceManager, never used by anyone else. */
+    auto clientSettingsWatcher = new QnClientSettingsWatcher(clientInstanceManager);
+
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
         .designateOwnPeerId("dc", common->moduleGUID());

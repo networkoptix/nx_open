@@ -195,7 +195,7 @@ QnItemViewAutoHider* QnItemViewAutoHider::create(QAbstractItemView* view, const 
     auto autoHider = new QnItemViewAutoHider(parent);
 
     if (parent && parent->layout())
-        parent->layout()->replaceWidget(view, autoHider, Qt::FindDirectChildrenOnly);
+        parent->layout()->replaceWidget(view, autoHider);
 
     autoHider->setEmptyViewMessage(message);
     autoHider->setView(view);

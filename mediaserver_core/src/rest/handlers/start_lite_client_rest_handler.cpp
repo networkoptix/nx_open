@@ -40,20 +40,6 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const int port = connectionProcessor->owner()->getPort();
 
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (!server)
-    {
-        NX_ASSERT(false);
-        result.setError(QnRestResult::CantProcessRequest);
-        return nx_http::StatusCode::ok;
-    }
-
-    const QString userName = server->getId().toString();
-    const QString password = server->getAuthKey();
-
-    QString urlStr = lit("liteclient://%1:%2@127.0.0.1:%3").arg(userName).arg(password).arg(port);
-    // If 'effectiveUserName' is disabled liteClient has full access rights
-#ifdef USE_EFFECTIVE_USER_NAME
     QString effectiveUserName;
     if (!connectionProcessor->accessRights().isNull())
     {
@@ -65,12 +51,28 @@ int QnStartLiteClientRestHandler::executeGet(
             result.setError(QnRestResult::CantProcessRequest);
             return nx_http::StatusCode::ok;
         }
+#if 0 // Currently it is decided not to pass effectiveUserName in the URL, so, keep it empty.
         effectiveUserName = user->getName();
+#endif // 0
     }
 
-    urlStr += lit("?effectiveUserName=%1").arg(effectiveUserName);
-#endif
-    const QUrl url(urlStr);
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (!server)
+    {
+        NX_ASSERT(false);
+        result.setError(QnRestResult::CantProcessRequest);
+        return nx_http::StatusCode::ok;
+    }
+
+    const QString userName = server->getId().toString();
+    const QString password = server->getAuthKey();
+
+    const QString urlParams = effectiveUserName.isEmpty()
+        ? ""
+        : lit("?effectiveUserName=%1").arg(effectiveUserName);
+
+    const QUrl url(lit("liteclient://%1:%2@127.0.0.1:%3%4")
+        .arg(userName).arg(password).arg(port).arg(urlParams));
 
     const QnUuid videowallInstanceGuid = server->getId();
 

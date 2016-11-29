@@ -3,7 +3,8 @@
 var L = {
     dialogs:{
         okButton: 'Ok',
-        loginTitle: 'Login to Nx Cloud'
+        loginTitle: 'Login to Nx Cloud',
+        openLink: 'Visit this link'
     },
     passwordRequirements:
     {

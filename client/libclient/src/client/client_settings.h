@@ -170,6 +170,9 @@ public:
     bool isWritable() const;
     QSettings* rawSettings();
 
+signals:
+    void saved();
+
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
 

@@ -272,6 +272,7 @@ void QnWorkbenchUi::storeSettings()
     thumbnails.span = m_timeline->lastThumbnailsHeight;
 
     qnSettings->setPaneSettings(settings);
+    qnSettings->save();
 }
 
 void QnWorkbenchUi::updateCursor()

@@ -46,6 +46,7 @@ public:
                 {
                     switch (static_cast<QFocusEvent*>(event)->reason())
                     {
+                        case Qt::ActiveWindowFocusReason:
                         case Qt::MenuBarFocusReason:
                         case Qt::PopupFocusReason:
                         case Qt::OtherFocusReason:
