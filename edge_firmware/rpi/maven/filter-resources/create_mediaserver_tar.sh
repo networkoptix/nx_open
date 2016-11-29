@@ -217,7 +217,7 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   cp -f ${qt.dir}/resources/* $BUILD_DIR/$PREFIX_DIR/lite_client/bin/libexec
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
-  cp opt/$CUSTOMIZAION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
+  cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
   if [[ "${box}" == "bpi" ]]; then chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts; fi
 fi
 
