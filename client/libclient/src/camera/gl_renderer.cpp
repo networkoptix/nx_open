@@ -248,11 +248,10 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     glGetIntegerv(GL_VIEWPORT, prevViewPort);
 
     auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
-    QMatrix matrix = renderer->getModelViewMatrix().toAffine();
-    QTransform transform(matrix);
+    auto prevMatrix = renderer->getModelViewMatrix();
+    renderer->setModelViewMatrix(QMatrix4x4());
 
-    QRectF screenRect(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
-    QRectF dstPaintRect = transform.inverted().mapRect(screenRect);
+    QRectF dstPaintRect(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
 
     // first step: blur to FBO_A
     QSize blurSize = m_blurBufferA->size();
@@ -270,18 +269,17 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     {
         // blur A->B, B->A several times
         const float blurStep = (kIterations - i - 1) * m_blurFactor;
-        const float ar = blurSize.width() / (float)blurSize.height();
         const QVector2D textureOffset(
-            //sourceRect.width() / (float)blurSize.width() * blurStep,
-            //sourceRect.height() / (float)blurSize.height() * blurStep);
             1.0 / kMaxBlurSize * blurStep,
-            1.0 / kMaxBlurSize / ar * blurStep);
+            1.0 / kMaxBlurSize * blurStep);
 
         fboB->bind();
         doBlurStep(sourceRect, dstPaintRect, fboA->texture(), textureOffset, i % 2 == 0);
         fboB->release();
         std::swap(fboA, fboB);
     }
+
+    renderer->setModelViewMatrix(prevMatrix);
     glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
 }
 
