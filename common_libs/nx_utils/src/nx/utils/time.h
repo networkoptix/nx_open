@@ -31,6 +31,12 @@ enum class ClockType
 class ScopedTimeShift
 {
 public:
+    ScopedTimeShift(ClockType clockType):
+        m_clockType(clockType),
+        m_currentAbsoluteShift(std::chrono::milliseconds::zero())
+    {
+    }
+
     ScopedTimeShift(ClockType clockType, std::chrono::milliseconds value):
         m_clockType(clockType),
         m_currentAbsoluteShift(value)

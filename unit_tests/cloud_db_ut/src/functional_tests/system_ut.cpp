@@ -537,7 +537,7 @@ void bringToTop(
 
 TEST_F(System, sorting_order_weight_expiration)
 {
-    nx::utils::test::ScopedTimeShift timeShift;
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
 
     ASSERT_TRUE(startAndWaitUntilStarted());
     const auto account = addActivatedAccount2();
@@ -623,7 +623,7 @@ TEST_F(System, sorting_order_multiple_systems)
     systemIdsInSortOrder.push_back(system2.id);
     systemIdsInSortOrder.push_back(system1.id);
 
-    nx::utils::test::ScopedTimeShift timeShift;
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
 
     for (int i = 0; i < 3; ++i)
     {
@@ -735,7 +735,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
         {
             ASSERT_TRUE(restart());
         }
-        nx::utils::test::ScopedTimeShift timeShift;
+        nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
         if (bringNewSystemDown)
         {
             timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
