@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <atomic>
 
+#include <nx/utils/log/log.h>
 #include <utils/common/guard.h>
 
 namespace nx {
@@ -47,6 +48,9 @@ DnsResolver::~DnsResolver()
 
 void DnsResolver::pleaseStop()
 {
+    NX_LOGX(lm("DnsResolver::pleaseStop"), cl_logDEBUG2);
+    NX_CRITICAL(false);
+    
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
     m_cond.wakeAll();
@@ -117,7 +121,9 @@ std::deque<HostAddress> DnsResolver::resolveSync(const QString& hostName, int ip
         hints.ai_family = ipVersion;
 
     addrinfo* addressInfo = nullptr;
+    NX_LOGX(lm("Resolving %1 on DNS").str(hostName), cl_logDEBUG2);
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
+    NX_LOGX(lm("Resolve of %1 on DNS completed with result %2").str(hostName).arg(status), cl_logDEBUG2);
 
     if (status == EAI_BADFLAGS)
     {
@@ -142,6 +148,8 @@ std::deque<HostAddress> DnsResolver::resolveSync(const QString& hostName, int ip
             default: resultCode = SystemError::dnsServerFailure; break;
         };
         
+        NX_LOGX(lm("Resolve of %1 on DNS failed with result %2")
+            .str(hostName).str(SystemError::toString(resultCode)), cl_logDEBUG2);
         return std::deque<HostAddress>();
     }
 
@@ -208,6 +216,8 @@ std::deque<HostAddress> DnsResolver::getEtcHost(const QString& name, int ipVersi
 
 void DnsResolver::run()
 {
+    NX_LOGX(lm("DnsResolver::run. Entered"), cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     while(!m_terminated)
     {
@@ -240,6 +250,8 @@ void DnsResolver::run()
         m_runningTaskRequestId = nullptr;
         m_cond.wakeAll();
     }
+
+    NX_LOGX(lm("DnsResolver::run. Exiting. %1").arg(m_terminated), cl_logDEBUG2);
 }
 
 } // namespace network

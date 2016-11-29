@@ -436,6 +436,9 @@ namespace nx_http
 
     void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     {
+        NX_LOGX(lm("Opened connection to url %1. Result code %2")
+            .str(m_url).str(errorCode), cl_logDEBUG2);
+
         std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
         if (m_terminated)
@@ -455,6 +458,8 @@ namespace nx_http
             m_state = sSendingRequest;
             emit tcpConnectionEstablished(sharedThis);
             using namespace std::placeholders;
+            NX_LOGX(lm("Sending request to url %1").str(m_url), cl_logDEBUG2);
+
             m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
             return;
         }
@@ -632,6 +637,7 @@ namespace nx_http
 
                     serializeRequest();
                     m_state = sSendingRequest;
+                    NX_LOGX(lm("Sending request to url %1").str(m_url), cl_logDEBUG2);
                     m_socket->sendAsync(
                         m_requestBuffer,
                         std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
@@ -654,6 +660,9 @@ namespace nx_http
         m_state = sInit;
 
         m_socket = SocketFactory::createStreamSocket(/*m_url.scheme() == lit("https")*/);
+
+        NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_url).arg(m_socket->handle()), cl_logDEBUG2);
+
         m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
         if (!m_socket->setNonBlockingMode(true) ||
