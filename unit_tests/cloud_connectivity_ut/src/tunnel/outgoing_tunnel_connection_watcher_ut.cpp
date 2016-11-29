@@ -83,7 +83,7 @@ protected:
         return InitializationGuard(
             [this]()
             {
-                auto tunnel = std::move(m_tunnel);
+                decltype(m_tunnel) tunnel(m_tunnel.release());
                 if (tunnel)
                     tunnel->pleaseStopSync();
             });

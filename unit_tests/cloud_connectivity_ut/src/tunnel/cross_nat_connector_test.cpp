@@ -146,6 +146,7 @@ void TunnelConnector::doSimpleConnectTest(
     CrossNatConnector connector(
         SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorAddressForConnector);
+    auto connectorGuard = makeScopedGuard([&connector]() { connector.pleaseStopSync(); });
 
     auto t1 = std::chrono::steady_clock::now();
     connector.connect(
@@ -160,23 +161,19 @@ void TunnelConnector::doSimpleConnectTest(
             connectedPromise.set_value(std::move(result));
         });
     auto connectedFuture = connectedPromise.get_future();
-    ASSERT_EQ(
-        std::future_status::ready,
-        connectedFuture.wait_for(
-            connectTimeout == std::chrono::milliseconds::zero()
-            ? kDefaultTestTimeout
-            : connectTimeout * 2));
+    const auto actualConnectTimeout =
+        connectTimeout == std::chrono::milliseconds::zero()
+        ? kDefaultTestTimeout
+        : (connectTimeout * 2);
+    ASSERT_EQ(std::future_status::ready, connectedFuture.wait_for(actualConnectTimeout));
     *connectResult = connectedFuture.get();
     connectResult->executionTime =
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - t1);
-
-    connector.pleaseStopSync();
 }
 
 
-class CrossNatConnector
-    :
+class CrossNatConnector:
     public TunnelConnector
 {
 };

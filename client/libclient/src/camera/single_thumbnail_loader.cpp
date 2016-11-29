@@ -29,6 +29,7 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     m_request.rotation = rotation;
     m_request.size = size;
     m_request.imageFormat = format;
+    m_request.format = Qn::SerializationFormat::UbjsonFormat;
 
     if (!camera || !camera->hasVideo(nullptr))
     {

@@ -617,7 +617,7 @@ APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_righ
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(505, getUserGroups, ApiUserGroupDataList, \
+APPLY(505, getUserRoles, ApiUserRoleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -628,7 +628,7 @@ APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(506, saveUserGroup, ApiUserGroupData, \
+APPLY(506, saveUserRole, ApiUserRoleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -639,12 +639,12 @@ APPLY(506, saveUserGroup, ApiUserGroupData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(507, removeUserGroup, ApiIdData, \
+APPLY(507, removeUserRole, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       RemoveUserGroupAccess(), /* save permission checker */ \
+                       RemoveUserRoleAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1236,7 +1236,7 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+                       LocalTransactionType()) /* local transaction type */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        false, \
                        false, \

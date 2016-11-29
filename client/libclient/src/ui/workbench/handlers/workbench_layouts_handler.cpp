@@ -591,11 +591,11 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
         };
     QnResourceList toShare = change.added.filtered(inaccessible); //TODO: #GDM code duplication
 
-    switch (user->role())
+    switch (user->userRole())
     {
         case Qn::UserRole::CustomPermissions:
             return QnLayoutsHandlerMessages::changeUserLocalLayout(mainWindow(), change.removed);
-        case Qn::UserRole::CustomUserGroup:
+        case Qn::UserRole::CustomUserRole:
             return QnLayoutsHandlerMessages::addToRoleLocalLayout(mainWindow(), toShare)
                 && QnLayoutsHandlerMessages::removeFromRoleLocalLayout(mainWindow(), change.removed);
         default:

@@ -47,7 +47,7 @@
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
-        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
+        <!-- <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/> -->
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 

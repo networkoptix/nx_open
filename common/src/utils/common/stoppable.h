@@ -41,46 +41,6 @@ public:
         Default implementation calls \a QnStoppableAsync::pleaseStop and waits for completion
     */
     virtual void pleaseStopSync(bool checkForLocks = true);
-
-    typedef std::unique_ptr< QnStoppableAsync > UniquePtr;
-
-    /**
-        Calls \fn pleaseStop for each of \param stoppables and remove them after
-        the last terminate is complete.
-    */
-    // TODO: #mux refactor with variadic template
-    static void pleaseStop(nx::utils::MoveOnlyFunc< void() > completionHandler,
-                            UniquePtr stoppable1 )
-    {
-        std::vector< UniquePtr > stoppables;
-        stoppables.push_back( std::move( stoppable1 ) );
-        pleaseStopImpl( std::move( stoppables ), std::move( completionHandler) );
-    }
-    static void pleaseStop(nx::utils::MoveOnlyFunc< void() > completionHandler,
-                            UniquePtr stoppable1, UniquePtr stoppable2 )
-    {
-        std::vector< UniquePtr > stoppables;
-        stoppables.push_back( std::move( stoppable1 ) );
-        stoppables.push_back( std::move( stoppable2 ) );
-        pleaseStopImpl( std::move( stoppables ), std::move( completionHandler) );
-    }
-
-private:
-    static void pleaseStopImpl(
-        std::vector< UniquePtr > stoppables,
-        nx::utils::MoveOnlyFunc< void() > completionHandler );
-
-    /*
-    template< typename ... Args >
-    static void pleaseStopImpl( std::vector< UniquePtr > stoppables,
-                                std::function< void() > completionHandler,
-                                UniquePtr stoppable1, Args ... args )
-    {
-        stoppables.push_back( std::move( stoppable1 ) );
-        pleaseStopImpl( std::move( stoppables ), std::move( completionHandler),
-                        std::move( args ) );
-    }
-    */
 };
 
 #endif  //QNSTOPPABLE_H

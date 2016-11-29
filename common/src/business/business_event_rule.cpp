@@ -161,12 +161,12 @@ bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
 }
 
 QnBusinessEventRule::QnBusinessEventRule(
-    int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, 
+    int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
     QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes)
 {
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;
-    
+
     m_id = intToGuid(internalId, "vms_businessrule");
     m_aggregationPeriod = aggregationPeriod;
     m_system = isSystem;
@@ -211,7 +211,7 @@ void QnBusinessEventRule::removeResource(const QnUuid& resId)
         if (m_eventResources[i] == resId)
             m_eventResources.removeAt(i);
     }
-    
+
 }
 
 
@@ -233,7 +233,7 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(11, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerFailureEvent, admin));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(12, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerConflictEvent, admin));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(20, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerStartEvent, admin));
-    
+
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(22, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::LicenseIssueEvent, admin));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(23, 30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::LicenseIssueEvent));
 

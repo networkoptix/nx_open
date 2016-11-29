@@ -11,6 +11,7 @@ import socket
 import struct
 import pprint
 import sys
+from pycommons.Logger import log, LOGLEVEL
 
 from testbase import *
 
@@ -29,7 +30,8 @@ IF_EXT = 'eth0'
 class TimeTestError(FuncTestError):
     pass
 
-time_servers = ('time.nist.gov', 'time-nw.nist.gov')
+#time_servers = ('time.nist.gov', 'time.ien.it') # 'time-nw.nist.gov')
+time_servers = ('instance1.rfc868server.com', )
 TIME_PORT = 37
 TIME_SERVER_TIMEOUT = 10
 SHIFT_1900_1970 = 2208988800
@@ -48,10 +50,12 @@ def get_inet_time(host):
 
 def check_inet_time():
     "Make sure that at least one of time servers, used by mediaserver for time synchronization, is available and responding."
-    for host in time_servers:
-        d = get_inet_time(host)
-        if len(d) == 4:
-            return d # The first success means OK
+    for _ in xrange(3):  # try several times
+        for host in time_servers:
+            d = get_inet_time(host)
+            if len(d) == 4:
+                return d # The first success means OK
+        time.sleep(0.5)
     return False
 
 EMPTY_TIME = dict(
@@ -114,7 +118,7 @@ class TimeSyncTest(FuncTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        print "Restoring external interfaces"
+        log(LOGLEVEL.INFO, "Restoring external interfaces")
         #FIXME: use threads and subprocess.check_output, tbe able to log stderr messages
         with open(os.devnull, 'w') as FNULL:
             proc = [
@@ -125,7 +129,7 @@ class TimeSyncTest(FuncTestCase):
             ]
             for b, p in proc:
                 if p.wait() != 0:
-                    print "ERROR: Failed to start external interface for box %s" % (b,)
+                    log(LOGLEVEL.ERROR, "ERROR: Failed to start external interface for box %s" % (b,))
         super(TimeSyncTest, cls).tearDownClass()
 
     def setUp(self):
@@ -153,7 +157,7 @@ class TimeSyncTest(FuncTestCase):
         return (str(int(time.time())),)
 
     def _show_systime(self, box):
-        print "OS time for %s: %s " % (box, self.get_box_time(box))
+        log(LOGLEVEL.DEBUG + 4, "OS time for %s: %s " % (box, self.get_box_time(box)))
 
     def debug_systime(self):
         for box in self.hosts:
@@ -194,36 +198,36 @@ class TimeSyncTest(FuncTestCase):
                     if not self.before_2_5:
                         self.assertTrue(self.times[self._primary]['isPrimaryTimeServer'],
                             "Time was syncronized by server %s system time, but it's isPrimaryTimeServer flag is False" % self._primary)
-                    print "Synchronized by box %s" % self._primary
+                    log(LOGLEVEL.INFO, "Synchronized by box %s" % self._primary)
                     return
                 else:
                     reason = "None of servers report time close enough to it's system time. Min delta = %.3f" % min_td
             time.sleep(0.2)
         #self.debug_systime()
-        print "0: ", self.times[0]
-        print "1: ", self.times[1]
+        log(LOGLEVEL.ERROR, "0: ", self.times[0])
+        log(LOGLEVEL.ERROR, "1: ", self.times[1])
         self.fail(reason)
         #TODO: Add more details about servers' and their systems' time!
 
     def _check_systime_sync(self, boxnum, must_synchronize=True):
         tt = time.time() + (1 if must_synchronize else SYSTEM_TIME_NOTSYNC_SURE)
         timediff = 0
-        print "DEBUG: now %s, checking for sync until %s" % (int(time.time()), int(tt))
+        log(LOGLEVEL.DEBUG + 9, "DEBUG: now %s, checking for sync until %s" % (int(time.time()), int(tt)))
         while time.time() < tt:
             timedata = self._request_gettime(boxnum)
-            print "DEBUG: server time: %s, system time: %s" % (timedata['time'], timedata['boxtime'])
+            log(LOGLEVEL.DEBUG + 9, "DEBUG: server time: %s, system time: %s" % (timedata['time'], timedata['boxtime']))
             timediff = abs(timedata['time'] - timedata['boxtime'])
             if timediff > GRACE:
                 if must_synchronize:
-                    print "DEBUG (_check_systime_sync): %s server time: %s, system time: %s. Diff = %.2f - too high" % (
-                        boxnum, timedata['time'], timedata['boxtime'], timediff)
+                    log(LOGLEVEL.DEBUG + 9, "DEBUG (_check_systime_sync): %s server time: %s, system time: %s. Diff = %.2f - too high" % (
+                        boxnum, timedata['time'], timedata['boxtime'], timediff))
                 time.sleep(1)
             else:
                 break
         if must_synchronize:
             self.assertLess(timediff, GRACE, "Primary server time hasn't synchronized with it's system time change. Time difference = %s" % timediff)
         else:
-            print "Time diff = %.1f, grace = %s" % (timediff, GRACE)
+            log(LOGLEVEL.ERROR, "Time diff = %.1f, grace = %s" % (timediff, GRACE))
             self.assertGreater(timediff, GRACE, "Secondary server time has synchronized with it's system time change")
 
     def get_box_time(self, box):
@@ -249,18 +253,17 @@ class TimeSyncTest(FuncTestCase):
         return self.num_serv - 1 if self._primary == 0 else self._primary - 1
 
     def _setPrimaryServer(self, boxnum):
-        print "New primary is %s (%s)" % (boxnum, self.hosts[boxnum])
+        log(LOGLEVEL.INFO, "Force box %s (%s) to be the primary server" % (boxnum, self.hosts[boxnum]))
         self._server_request(boxnum, 'ec2/forcePrimaryTimeServer', data={'id': self.guids[boxnum]})
 
     ####################################################
 
     def InitialSynchronization(self):
-        """Stop both mediaservers, initialize boxes' system time and start the servers again.
+        """Stop both mediaservers, initialize boxes' system time and start the servers again. Check for sync.
         """
         self._prepare_test_phase(self._stop_and_init)
         #self.debug_systime()
-        #self._get_guids()
-        print "Checking time..."
+        log(LOGLEVEL.INFO, "Checking time...")
         self._check_time_sync()
         #self.debug_systime()
         #TODO add here flags check, what server has became the primary one
@@ -284,7 +287,7 @@ class TimeSyncTest(FuncTestCase):
         #self.debug_systime()
         primary = self._primary # they'll be compared later
         box = self.hosts[primary]
-        print "Use primary box %s (%s)" % (primary, box)
+        log(LOGLEVEL.INFO, "Use primary box %s (%s)" % (primary, box))
         self.shift_box_time(box, 12345)
         #self.debug_systime()
         time.sleep(SYSTEM_TIME_SYNC_SLEEP)
@@ -299,7 +302,7 @@ class TimeSyncTest(FuncTestCase):
         primary = self._primary # they'll be compared later
         sec = self._get_secondary()
         box = self.hosts[sec]
-        print "Use secondary box %s (%s)" % (sec, box)
+        log(LOGLEVEL.INFO, "Use secondary box %s (%s)" % (sec, box))
         self.shift_box_time(box, -12345)
         #self.debug_systime()
         time.sleep(SYSTEM_TIME_SYNC_SLEEP)
@@ -324,9 +327,9 @@ class TimeSyncTest(FuncTestCase):
         """Check if restarting the secondary (while the primary is off) doesn't change it's time
         """
         delta_before = self._serv_local_delta(self._secondary)
-        print "Delta before = %.2f" % delta_before
+        log(LOGLEVEL.INFO, "Delta before = %.2f" % delta_before)
         self._mediaserver_ctl(self.hosts[self._secondary], 'restart')
-        print "Waiting for secondary restarted"
+        log(LOGLEVEL.INFO, "Waiting for secondary restarted")
         #try:
         self._wait_servers_up(set((self._secondary,)))
         #except Exception, e:
@@ -335,7 +338,7 @@ class TimeSyncTest(FuncTestCase):
         #    raise
         #print "Check...."
         delta_after = self._serv_local_delta(self._secondary)
-        print "Delta after = %.2f" % delta_after
+        log(LOGLEVEL.INFO, "Delta after = %.2f" % delta_after)
         time.sleep(0.1)
         if not self.before_2_5:
             self.assertFalse(self.times[self._secondary]['isPrimaryTimeServer'],
@@ -398,7 +401,7 @@ class TimeSyncTest(FuncTestCase):
         self._setPrimaryServer(self._primary)
         self._check_time_sync(False)
         type(self)._secondary = self._get_secondary()
-        print "DEBUG: primary is %s, secondary is %s" % (self._primary, self._secondary)
+        log(LOGLEVEL.DEBUG + 9, "DEBUG: primary is %s, secondary is %s" % (self._primary, self._secondary))
         #raw_input("[Press ENTER to turn Inet up on secondary...]")
         #print self._call_box(self.hosts[self._secondary], '/vagrant/ctl.sh', 'timesync', 'iup')
         self._call_box(self.hosts[self._secondary], '/sbin/ifup', IF_EXT)
@@ -407,8 +410,8 @@ class TimeSyncTest(FuncTestCase):
         self.assertTrue(itime_str, "Internet time request failed!")
         itime = struct.unpack('!I', itime_str)[0] - SHIFT_1900_1970
         idelta = itime - time.time() # get the difference between local ant inet time to use it later
-        print "DEBUG: time from internet: %s (%s); delta: %s" % (
-            itime, time.asctime(time.localtime(itime)), idelta)
+        log(LOGLEVEL.DEBUG + 9, "DEBUG: time from internet: %s (%s); delta: %s" % (
+            itime, time.asctime(time.localtime(itime)), idelta))
         #raw_input("[Press ENTER to continue...]")
 
         fail = False
@@ -416,11 +419,11 @@ class TimeSyncTest(FuncTestCase):
         for boxnum in xrange(self.num_serv):
             btime = self._request_gettime(boxnum)
             itime = time.time() + idelta
-            print "Server %s time %s; inet time %s" % (boxnum, btime['time'], itime)
+            log(LOGLEVEL.INFO, "Server %s time %s; inet time %s" % (boxnum, btime['time'], itime))
             if abs(itime - btime['time']) > INET_GRACE:
                 fail = True
                 failed.append([boxnum])
-                print ("Server at box %s hasn't sinchronized with Internet time in %s seconds. "
+                log(LOGLEVEL.ERROR, "Server at box %s hasn't sinchronized with Internet time in %s seconds. "
                     "Time delta %s, max delta allowed: %s, " %
                     (boxnum, INET_SYNC_TIMEOUT, abs(itime - btime['time']), INET_GRACE))
 
@@ -446,7 +449,7 @@ class TimeSyncTest(FuncTestCase):
         """Check if the servers keep time, synchronized with the Internet, after the Internet connection goes down.
         """
         delta_before = self._serv_local_delta(self._primary)
-        print "Turn off the internet connection at the box %s" % self._secondary
+        log(LOGLEVEL.INFO, "Turn off the internet connection at the box %s" % self._secondary)
         self._call_box(self.hosts[self._secondary], '/sbin/ifdown', IF_EXT)
         time.sleep(SYSTEM_TIME_SYNC_SLEEP)
         delta_after = self._serv_local_delta(self._primary)

@@ -385,7 +385,7 @@ private:
 
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 protected:
-    QnStatusOverlayWidget* m_overlay;
+    QnStatusOverlayWidget* m_statusOverlay;
 private:
     friend class QnWorkbenchDisplay;
 

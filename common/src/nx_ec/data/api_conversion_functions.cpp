@@ -749,7 +749,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
 	dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setHash(src.hash);
-    dst->setUserGroup(src.groupId);
+    dst->setUserRoleId(src.userRoleId);
     dst->setFullName(src.fullName);
 
     dst->setRawPermissions(src.permissions);
@@ -772,7 +772,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
     dst.cryptSha512Hash = src->getCryptSha512Hash();
     dst.realm = src->getRealm();
     dst.isCloud = userType == QnUserType::Cloud;
-    dst.groupId = src->userGroup();
+    dst.userRoleId = src->userRoleId();
     dst.fullName = src->fullName();
 }
 

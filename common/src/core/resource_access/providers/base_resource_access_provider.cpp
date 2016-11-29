@@ -166,7 +166,7 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
             &QnBaseResourceAccessProvider::updateAccessBySubject);
 
         /* Changing of role means change of all user access rights. */
-        connect(user, &QnUserResource::userGroupChanged, this,
+        connect(user, &QnUserResource::userRoleChanged, this,
             &QnBaseResourceAccessProvider::updateAccessBySubject);
 
         handleSubjectAdded(user);
@@ -203,13 +203,13 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 }
 
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
-    const ec2::ApiUserGroupData& userRole)
+    const ec2::ApiUserRoleData& userRole)
 {
     /* We have no certain way to check if user role was already added. */
     handleSubjectAdded(userRole);
 }
 
-void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
+void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     if (isUpdating())
         return;

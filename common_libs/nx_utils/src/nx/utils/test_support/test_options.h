@@ -21,7 +21,7 @@ public:
     static LoadMode getLoadMode();
 
     template<typename Count>
-    static void applyLoadMode(Count& count);
+    static Count applyLoadMode(Count count);
 
     static void applyArguments(const ArgumentParser& args);
 
@@ -32,14 +32,16 @@ private:
 };
 
 template<typename Count>
-void TestOptions::applyLoadMode(Count& count)
+Count TestOptions::applyLoadMode(Count count)
 {
     switch (s_loadMode.load())
     {
-        case LoadMode::light: count = 1; break;
-        case LoadMode::normal: break;
-        case LoadMode::stress: count *= 100; break;
+        case LoadMode::light: return 1;
+        case LoadMode::normal: return count;
+        case LoadMode::stress: return count * 100;
     }
+
+    return count;
 }
 
 } // namespace utils

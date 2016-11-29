@@ -24,7 +24,7 @@ signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
 protected:
-    virtual bool processDiscoveredResources(QnResourceList& resources) override;
+    virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType) override;
 private:
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 

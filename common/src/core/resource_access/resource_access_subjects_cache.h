@@ -28,16 +28,16 @@ private:
     void handleUserRemoved(const QnUserResourcePtr& user);
     void updateUserRole(const QnUserResourcePtr& user);
 
-    void handleRoleAdded(const ec2::ApiUserGroupData& userRole);
-    void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
+    void handleRoleAdded(const ec2::ApiUserRoleData& userRole);
+    void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
 
     void removeUserFromRole(const QnUserResourcePtr& user, const QnUuid& roleId);
 private:
     mutable QnMutex m_mutex;
 
     QList<QnResourceAccessSubject> m_subjects;
-    QHash<QnUuid, QnUuid> m_roleByUser;
-    QHash<QnUuid, QList<QnResourceAccessSubject>> m_usersByRole;
+    QHash<QnUuid, QnUuid> m_roleIdByUserId;
+    QHash<QnUuid, QList<QnResourceAccessSubject>> m_usersByRoleId;
 };
 
 #define qnResourceAccessSubjectsCache QnResourceAccessSubjectsCache::instance()

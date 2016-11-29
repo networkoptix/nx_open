@@ -92,8 +92,8 @@ public:
     * At this case admin user will rewritted. To keep other admin user field unchanged (email settings)
     * we have to insert new transaction with low priority
     */
-    void setUseLowPriorityAdminPasswordHach(bool value);
-    bool useLowPriorityAdminPasswordHach() const;
+    void setUseLowPriorityAdminPasswordHack(bool value);
+    bool useLowPriorityAdminPasswordHack() const;
 
     void setBeforeRestoreData(const BeforeRestoreDbData& data);
     BeforeRestoreDbData beforeRestoreDbData() const;

@@ -972,7 +972,7 @@ content type "application/json". Example of such object:
 <pre><code>
 {
     "user": "some_user",
-    "password: "some_password",
+    "password": "some_password",
     "cameras":
     [
         {
@@ -1324,7 +1324,7 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>gettime</name>
-                    <description>Returns server UTC time (in milliseconds), time zone and authentication realm (realm is added for convenience)</description>
+                    <description>Return server time (in milliseconds since epoch), time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1908,16 +1908,106 @@ the respective JSON fields can be empty.</description>
                     <params>
                       <param>
                         <name>timezone</name>
-                        <description>Time zone name, as a file path located in Linux "/usr/share/zoneinfo".</description>
+                        <description>Time zone identifier, can be obtained via /api/getTimeZones.</description>
                         <optional>true</optional>
                       </param>
                       <param>
                         <name>datetime</name>
-                        <description>Time in milliseconds since UNIX epoch, or formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                        <description>Time in milliseconds since UNIX epoch, or a UTC time formatted like "yyyy-MM-ddThh:mm:ss".</description>
                         <optional>false</optional>
                       </param>
                     </params>
                 </function>
+              <function>
+                <name>setTime</name>
+                <description>
+                  Set current time on the server machine.
+                  Can be called only if server flags include "SF_timeCtrl"
+                  (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+<p>
+                  Parameters should be passed as a JSON object in POST message body with
+                  content type "application/json". Example of such object:
+<pre><code>
+{
+    "dateTime": "2015-02-28T16:37:00",
+    "timeZoneId": "Europe/Moscow"
+}
+</code></pre>
+</p>
+              </description>
+                <permissions>Administrator.</permissions>
+                <method>POST</method>
+                <params>
+                  <param>
+                    <name>timeZoneId</name>
+                    <description>Time zone identifier, can be obtained via /api/getTimeZones.</description>
+                    <optional>true</optional>
+                  </param>
+                  <param>
+                    <name>dateTime</name>
+                    <description>Time in milliseconds since UNIX epoch, or a UTC time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+              </function>
+              <function>
+                <name>getTimeZones</name>
+                <description>
+                  Return the complete list of time zones supported by the server machine.
+                </description>
+                <method>GET</method>
+                <params />
+                <result>
+                  <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:</caption>
+                  <params>
+                    <param>
+                      <name>comment</name>
+                      <description>Time zone description in English.</description>
+                    </param>
+                    <param>
+                      <name>displayName</name>
+                      <description>Time zone verbose name in English.</description>
+                    </param>
+                    <param>
+                      <name>hasDaylightTime</name>
+                      <description>Whether the time zone has the DST feature.</description>
+                      <values>
+                        <value>
+                          <name>false</name>
+                          <description />
+                        </value>
+                        <value>
+                          <name>true</name>
+                          <description />
+                        </value>
+                      </values>
+                    </param>
+                    <param>
+                      <name>id</name>
+                      <description>Time zone identifier, to be used for e.g. /api/setTime.</description>
+                    </param>
+                    <param>
+                      <name>isDaylightTime</name>
+                      <description>Whether the time zone is on DST right now. To be reported properly,
+                          the server machine should have the correct current time set.</description>
+                      <values>
+                        <value>
+                          <name>false</name>
+                          <description />
+                        </value>
+                        <value>
+                          <name>true</name>
+                          <description />
+                        </value>
+                      </values>
+                    </param>
+                    <param>
+                      <name>offsetFromUtc</name>
+                      <description>Time zone offset from UTC (in seconds).</description>
+                    </param>
+                  </params>
+                </result>
+              </function>
             </functions>
         </group>
         <group>

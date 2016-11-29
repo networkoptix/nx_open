@@ -1051,7 +1051,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     {
         /* Technically it works right, but layout becomes shared and appears in "Shared layouts"
          * node, not under user, where it was dragged. Disabling to not confuse user. */
-        if (targetUser->role() == Qn::UserRole::CustomUserGroup)
+        if (targetUser->userRole() == Qn::UserRole::CustomUserRole)
             return;
 
         for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())

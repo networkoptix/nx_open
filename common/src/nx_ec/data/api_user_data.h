@@ -49,8 +49,7 @@ struct ApiUserData: ApiResourceData
     /** Global user permissions. */
     Qn::GlobalPermissions permissions;
 
-    /** Id of the access rights group. */
-    QnUuid groupId;
+    QnUuid userRoleId;
 
     QString email;
     QnLatin1Array digest;
@@ -76,7 +75,7 @@ struct ApiUserData: ApiResourceData
     (realm) \
     (isLdap) \
     (isEnabled) \
-    (groupId)  \
+    (userRoleId)  \
     (isCloud)  \
     (fullName)
 
