@@ -1,10 +1,8 @@
-cache()
-
-NAME=minilauncher
-TEMPLATE = app
-TARGET = minilauncher
-GUID = {d4a489d6-017e-432f-afd8-cfa7645e5256}
-VERSION = 3.0.0
+NAME=${project.artifactId}
+TEMPLATE = ${template}
+TARGET = ${targetName}
+GUID = ${guid}
+VERSION = ${release.version}
 
 CONFIG -= flat qt
 CONFIG += c++14 console
