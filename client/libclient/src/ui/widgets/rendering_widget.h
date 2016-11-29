@@ -10,7 +10,7 @@ class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
 /**
- * Widget for displaying video from the given resource without constructing 
+ * Widget for displaying video from the given resource without constructing
  * the heavy graphics scene machinery.
  */
 class QnRenderingWidget: public QnGLWidget {
@@ -23,6 +23,12 @@ public:
     void setResource(const QnMediaResourcePtr &resource);
 
     void stopPlayback();
+
+    void setEffectiveWidth(int value);
+    int effectiveWidth() const;
+
+    virtual QSize sizeHint() const override;
+    virtual QSize minimumSizeHint() const override;
 
 protected:
     void updateChannelScreenSize();
@@ -40,6 +46,7 @@ private:
     QnResourceDisplay *m_display;
     QnResourceWidgetRenderer *m_renderer;
     QSize m_channelScreenSize;
+    int m_effectiveWidth = 0;
 };
 
 
