@@ -8,7 +8,8 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage',
-    'typeahead-focus'
+    'typeahead-focus',
+    'ui.timepicker'
 ]).config(function ($routeProvider) {
 
     var universalResolves = {

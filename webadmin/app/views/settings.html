@@ -114,6 +114,50 @@
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
                         <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
+                    <div ng-if="settings.flags.canSetupTime">
+                        <h3>Date and Time</h3>
+                        <form name="timeSettings">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="timeZone">Time zone</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><select class="form-control"
+                                                    ng-options="zone.id as zone.id +': ' + zone.comment for zone in timeZones"
+                                                    id="timeZone"
+                                                    name="timeZone"
+                                                    ng-model="dateTimeSettings.timeZone"
+                                                    required></select></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="date" name="date"
+                                                       class="form-control"
+                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       ng-model="dateTimeSettings.dateTime"
+                                                       required
+                                                       is-open="dateTimeSettings.openDate"
+                                                       close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default"
+                                                            ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <button class="btn btn-default" ng-click="saveDateTime()">Save Date and Time</button>
+                    </div>
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
                         <h3>Restore Server Settings</h3>
                         <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Full Restore</button>
@@ -126,7 +170,6 @@
                         <p>Use mobile application or a keyboard and a mouse to control your nx1</p>
                     </div>
                 </tab>
-
             </tabset>
         </div>
     </div>

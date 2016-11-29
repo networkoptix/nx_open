@@ -48,13 +48,9 @@ angular.module('webadminApp')
                     wrongNetwork: wrongNetwork,
                     hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
                     cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
-                    canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0
+                    canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0,
+                    canSetupTime: data.serverFlags.indexOf(Config.timeCtrlFlag) >= 0
                 };
-
-                // TODO: remove this hack
-                // data.flags.wrongNetwork = true;
-                // data.flags.canSetupNetwork = true;
-
                 data.flags.newSystem = data.flags.cleanSystem &&
                                         !data.flags.noHDD &&
                                         !data.flags.noNetwork &&
@@ -454,6 +450,9 @@ angular.module('webadminApp')
             getTime:function(){
                 return wrapGet(proxy + '/web/api/gettime');
             },
+            getTimeZones:function(){
+                return wrapGet(proxy + '/web/api/getTimeZones');
+            },
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/web/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
@@ -574,11 +573,14 @@ angular.module('webadminApp')
                 return wrapPost(proxy + '/web/api/ifconfig', settings);
             },
 
-            timeSettings:function(time){
-                if(!time) {
+            timeSettings:function(dateTime, timeZone){
+                if(!dateTime || !timeZone) {
                     return wrapGet(proxy + '/web/api/gettime');
                 }
-                return wrapPost(proxy + '/web/api/settime', settings);
+                return wrapPost(proxy + '/web/api/setTime', {
+                    timeZoneId: timeZone,
+                    dateTime: dateTime
+                });
             }
         };
     });

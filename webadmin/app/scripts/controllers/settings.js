@@ -346,4 +346,44 @@ angular.module('webadminApp')
             }, errorHandler);
         };
 
+        mediaserver.getTimeZones().then(function(reply){
+
+            var zones = reply.data.reply;
+            zones = _.sortBy(zones,function(zone){
+                return zone.comment;
+            });
+            /*$scope.alltimeZones = _.indexBy(zones,function(zone){
+                return zone.id;
+            });
+            zones = _.uniq(zones, false, function(zone){
+                return zone.comment;
+            });*/
+            $scope.timeZones = zones;
+
+            return mediaserver.timeSettings().then(function(reply){
+                var time = reply.data.reply;
+                $scope.dateTimeSettings = {
+                    timeZone: time.timezoneId,
+                    dateTime: new Date(time.utcTime * 1),
+                    openDate: true
+                };
+                /*
+                var currentZone = $scope.alltimeZones[time.timezoneId];
+                if($scope.timeZones.indexOf(currentZone)<=0){
+                    $scope.timeZones.push(currentZone);
+                }
+                */
+            });
+        });
+
+        $scope.openDatePicker = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dateTimeSettings.openDate = true;
+        };
+
+        $scope.saveDateTime = function(){
+            mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
+                then(resultHandler,errorHandler);
+        };
     });
