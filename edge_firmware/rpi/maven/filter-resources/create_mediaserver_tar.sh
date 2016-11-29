@@ -116,6 +116,7 @@ if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so )
 fi
 
+if [ -d 'opt/networkoptix' ]; then mv -f opt/networkoptix opt/$CUSTOMIZATION; fi
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
 echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
@@ -159,7 +160,7 @@ fi
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/etc/
-cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
+cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
 
 #start script and platform specific scripts
 cp -R ./etc $BUILD_DIR
@@ -205,8 +206,8 @@ if [[ "${box}" == "bpi" ]]; then
   cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
-  cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
-  chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts
+  cp opt/$CUSTOMIZAION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
+  if [[ "${box}" == "bpi" ]]; then chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts; fi
 fi
 
 #copying plugins
@@ -231,8 +232,6 @@ cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
-    cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
-    rm -Rf $BUILD_DIR/opt/networkoptix/
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
@@ -272,4 +271,5 @@ zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
+rm -Rf $BUILD_DIR
 rm -Rf $TEMP_DIR
