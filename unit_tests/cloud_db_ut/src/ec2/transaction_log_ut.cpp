@@ -322,7 +322,7 @@ private:
     }
 };
 
-TEST_F(TransactionLog, multiple_simultaneous_transactions)
+TEST_F(TransactionLog, DISABLED_multiple_simultaneous_transactions)
 {
     givenRandomSystem();
     havingAddedBunchOfTransactionsConcurrently();

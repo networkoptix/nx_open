@@ -20,7 +20,7 @@
 #include "dao/abstract_transaction_data_object.h"
 #include "serialization/transaction_serializer.h"
 #include "serialization/ubjson_serialized_transaction.h"
-#include "transaction_timestamp_calculator.h"
+#include "transaction_log_cache.h"
 #include "transaction_transport_header.h"
 
 namespace nx {
@@ -136,6 +136,10 @@ public:
         const nx::String& systemId,
         TransactionDataType transactionData)
     {
+        QnMutexLocker lock(&m_mutex);
+        DbTransactionContext& dbTranContext = getTransactionContext(lock, queryContext, systemId);
+        lock.unlock();
+
         const int tranSequence = generateNewTransactionSequence(queryContext, systemId);
 
         // Generating transaction.
@@ -147,7 +151,7 @@ public:
         transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);
         transaction.persistentInfo.sequence = tranSequence;
         transaction.persistentInfo.timestamp =
-            generateNewTransactionTimestamp(queryContext, systemId);
+            generateNewTransactionTimestamp(dbTranContext, systemId);
         transaction.params = std::move(transactionData);
 
         const auto transactionHash = calculateTransactionHash(transaction);
@@ -179,8 +183,6 @@ public:
 
         // Saving transactions, generated under current DB transaction,
         //  so that we can send "new transaction" notifications after commit.
-        QnMutexLocker lk(&m_mutex);
-        DbTransactionContext& dbTranContext = getTransactionContext(lk, queryContext, systemId);
         dbTranContext.transactions.push_back(std::move(transactionSerializer));
 
         return nx::db::DBResult::ok;
@@ -208,39 +210,18 @@ public:
     void clearTransactionLogCacheForSystem(const nx::String& systemId);
 
 private:
-    struct UpdateHistoryData
-    {
-        ::ec2::QnTranStateKey updatedBy;
-        ::ec2::Timestamp timestamp;
-    };
-
-    struct VmsTransactionLogData
-    {
-        nx::String systemId;
-        /** map<transaction hash, peer which updated transaction> */
-        std::map<nx::Buffer, UpdateHistoryData> transactionHashToUpdateAuthor;
-        /** map<peer, transport sequence> */
-        std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
-        ::ec2::QnTranState transactionState;
-        std::uint64_t timestampSequence;
-        std::unique_ptr<TransactionTimestampCalculator> timestampCalculator;
-
-        VmsTransactionLogData():
-            timestampSequence(0)
-        {
-            timestampCalculator =
-                std::make_unique<TransactionTimestampCalculator>();
-        }
-    };
-
     struct DbTransactionContext
     {
     public:
         nx::String systemId;
         /** List of transactions, added within this DB transaction. */
         std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions;
-        /** Changes done to vms transaction log under Db transaction. */
-        VmsTransactionLogData transactionLogUpdate;
+        VmsTransactionLogCache::TranId cacheTranId;
+
+        DbTransactionContext():
+            cacheTranId(VmsTransactionLogCache::InvalidTranId)
+        {
+        }
     };
 
     struct TransactionReadResult
@@ -259,7 +240,7 @@ private:
         std::pair<nx::db::QueryContext*, nx::String>,
         DbTransactionContext
     > m_dbTransactionContexts;
-    std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
+    std::map<nx::String, VmsTransactionLogCache> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
 
@@ -301,7 +282,7 @@ private:
         nx::db::QueryContext* connection,
         const nx::String& systemId);
     ::ec2::Timestamp generateNewTransactionTimestamp(
-        nx::db::QueryContext* connection,
+        const DbTransactionContext& tranContext,
         const nx::String& systemId);
     void onDbTransactionCompleted(
         nx::db::QueryContext* dbConnection,

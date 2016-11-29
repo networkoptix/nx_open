@@ -2301,5 +2301,5 @@ float SystemManager::calculateSystemUsageFrequency(
         0);
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
