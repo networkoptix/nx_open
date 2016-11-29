@@ -13,7 +13,10 @@ void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
         static_cast<void>(checkForLocks); // unused
     #endif
 
-    NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
+    if (nx::network::SocketGlobals::isInitialized())
+    {
+        NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
+    }
 
     nx::utils::promise<void> promise;
     auto fut = promise.get_future();
