@@ -30,6 +30,7 @@ struct BeforeRestoreDbData
     QByteArray realm;
     QByteArray localSystemId;
     QByteArray localSystemName;
+    QByteArray serverName;
 };
 
 

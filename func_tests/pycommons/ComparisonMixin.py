@@ -30,7 +30,7 @@ class ComparisonMixin:
 
   def compareVal( self, expect, got, desc ):
     if got != expect:
-      self.fail('%s mismatch: expected %s, but got %s' % \
+      self.fail('%s mismatch: expected %s, but got %s' %
                 (desc, self.__v2str(expect), self.__v2str(got)))
     
   def compareRec( self, expect, got, desc = 'item' ):

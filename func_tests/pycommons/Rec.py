@@ -22,10 +22,10 @@ class Rec:
     setattr(self, name, val)
 
   def asString( self ):
-    s = ''
-    for key, val in self.get().items():
-      if s: s += ', '
-      s += '%s=%s' % (str(key), str(val))
+    s = ', '.join(
+      '%s=%s' % (str(key), str(val))
+      for key, val in self.get().iteritems()
+    )
     return '<%s>' % s
 
   def __repr__( self ):

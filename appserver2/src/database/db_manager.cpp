@@ -70,6 +70,8 @@ namespace detail
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
+using std::nullptr_t;
+
 static bool removeDirRecursive(const QString & dirName)
 {
     bool result = true;
@@ -664,11 +666,11 @@ bool QnDbManager::syncLicensesBetweenDB()
 }
 
 
-template <class FilterType, class ObjectType, class ObjectListType>
+template <typename FilterDataType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
-    if (doQueryNoLock(FilterType(), objects) != ErrorCode::ok)
+    if (doQueryNoLock(FilterDataType(), objects) != ErrorCode::ok)
         return false;
 
     for(const ObjectType& object: objects)
@@ -696,8 +698,6 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
 
 bool QnDbManager::resyncTransactionLog()
 {
-    using std::nullptr_t;
-
     if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
         return false;
     if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
@@ -1182,13 +1182,13 @@ bool QnDbManager::encryptKvPairs()
 
     if(!query.prepare(queryStr))
     {
-        NX_LOG(lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING);
+        NX_LOG(lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
         return false;
     }
 
     if (!query.exec())
     {
-        NX_LOG(lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING);
+        NX_LOG(lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
         return false;
     }
 
@@ -1218,7 +1218,7 @@ bool QnDbManager::encryptKvPairs()
 
             if (!insQuery.exec())
             {
-                NX_LOG(lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logWARNING);
+                NX_LOG(lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logERROR);
                 return false;
             }
         }
@@ -1563,7 +1563,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
 
     if( !query.prepare( queryStr ) )
     {
-        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -1573,7 +1573,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
         query.bindValue(QLatin1String(":parentGuid"), resParentID.toRfc4122());
     if (!query.exec())
     {
-        NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -1770,7 +1770,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
     QnSql::bind(data, &insQuery);
     if( !insQuery.exec() )
     {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -1782,7 +1782,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
     renameQuery.addBindValue(QnSql::serialized_field(data.cameraId));
     if( !renameQuery.exec() )
     {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 #endif
@@ -2123,7 +2123,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
 
     if( !insQuery.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -2137,7 +2137,7 @@ ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
     query.bindValue(":guid", guid.toRfc4122());
     if( !query.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -3282,7 +3282,7 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
     "));
 
     if (!queryScheduleTask.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -3327,7 +3327,7 @@ ErrorCode QnDbManager::doQueryNoLock(
           .arg(filterStr));
 
     if (!queryCameras.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -3390,7 +3390,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
       .arg(filterStr));
 
     if (!queryCameras.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(queryCameras, &cameraExList);
@@ -3546,7 +3546,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
     ").arg(filterStr));
     if( !query.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(query, &serverAttrsList);
@@ -3939,13 +3939,13 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 
     if( !m_sdb.open() )
     {
-        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
     if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
-        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -3974,13 +3974,13 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabas
 
     if( !m_sdb.open() )
     {
-        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
     if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
-        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -4040,7 +4040,10 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (data->users.size() == 1)
         user = &data->users[0];
 
-    if (user) // Do not load userRoles if there is no current user.
+    // Admin user is required for global properties.
+    DB_LOAD(QnUserResource::kAdminGuid, data->users);
+
+    if (user) // Do not load user roles if there is no current user.
         DB_LOAD(user->userRoleId, data->userRoles);
 
     DB_LOAD(QnUuid(), data->layouts);

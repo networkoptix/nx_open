@@ -223,13 +223,13 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
     memset(MAC_str, 0, sizeof(MAC_str));
     mac_eth0( MAC_str, nullptr );
 
-    // Historycally hardware id is mac + '\0'
+    // Historically hardware id is mac + '\0'
     QByteArray hardwareId = QByteArray(MAC_str, sizeof(MAC_str));
 
     // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
-    QStringList hardwareIdList = QStringList() << QString::fromUtf8(hardwareId, sizeof(MAC_str));
+    QStringList hardwareIdList = QStringList() << QString::fromUtf8(MAC_str, sizeof(MAC_str));
 
     HardwareIdListForVersion macHardwareIds;
     macHardwareIds << MacAndItsHardwareIds(kEmptyMac, hardwareIdList);

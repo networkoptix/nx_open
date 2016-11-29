@@ -488,14 +488,19 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
 //    qDebug() << "folder being scanned: " << folder;
+    NX_LOG(lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder), cl_logDEBUG2);
     QnAbstractStorageResource::FileInfoList files;
+
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
         while (!getMyStorageMan()->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
 
         if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
-            return; // cancceled
+        {
+            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
+            return; // canceled
+        }
 
         if (fi.isDir()) {
             QnTimePeriod folderPeriod = timePeriodFromDir(storage, fi.absoluteFilePath());
@@ -518,7 +523,10 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     for(const auto& fi: files)
     {
         if (QnResource::isStopping())
+        {
+            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
             break;
+        }
 
         QnConcurrent::run( &tp, [&]()
         {
