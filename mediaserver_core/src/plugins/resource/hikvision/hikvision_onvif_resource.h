@@ -13,6 +13,8 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 private:
     CameraDiagnostics::Result initialize2WayAudio();
+private:
+    QnAudioTransmitterPtr m_audioTransmitter;
 };
 
 typedef QnSharedResourcePointer<QnHikvisionOnvifResource> QnHikvisionOnvifResourcePtr;

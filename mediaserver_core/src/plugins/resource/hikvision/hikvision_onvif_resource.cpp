@@ -16,7 +16,7 @@ namespace {
         return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
     }
 
-    QnAudioFormat toAudioFormat(const QString& codecName)
+    QnAudioFormat toAudioFormat(const QString& codecName, int bitrateKbps)
     {
         QnAudioFormat result;
         if (codecName == lit("G.711alaw"))
@@ -39,7 +39,8 @@ namespace {
             result.setSampleRate(16000);
             result.setCodec("AAC");
         }
-
+        if (bitrateKbps > 0)
+            result.setSampleRate(bitrateKbps); //< override default value
         return result;
     }
 
@@ -100,6 +101,7 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
 
     QString outputId;
     QStringList supportedCodecs;
+    int bitrateKbps = 0;
 
     QDomNode node = docElem.firstChild();
     while (!node.isNull())
@@ -111,15 +113,14 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
             while (!params.isNull())
             {
                 element = params.toElement();
-                QString gg1 = element.nodeName();
-                QString gg2 = element.localName();
-
                 if (element.isNull())
                     continue;
                 if (element.nodeName() == "id")
                     outputId = element.text();
                 else if (element.nodeName() == "audioCompressionType")
                     supportedCodecs = element.text().split(",");
+                else if (element.nodeName() == "audioBitRate")
+                    bitrateKbps = element.text().toInt();
 
                 params = params.nextSibling();
             }
@@ -129,10 +130,10 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
 
     for (const auto& codec: supportedCodecs)
     {
-        QnAudioFormat outputFormat = toAudioFormat(codec);
-        //if (m_audioTransmitter->isCompatible(outputFormat))
+        QnAudioFormat outputFormat = toAudioFormat(codec, bitrateKbps);
+        if (m_audioTransmitter->isCompatible(outputFormat))
         {
-            //m_audioTransmitter->setOutputFormat(outputFormat);
+            m_audioTransmitter->setOutputFormat(outputFormat);
             setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
         }
     }
