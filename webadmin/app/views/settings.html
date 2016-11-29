@@ -99,11 +99,18 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">This system is not linked to {{Config.cloud.productName}} <a ng-href="{{Config.cloud.portalUrl}}" ng-click="openLink()" target="_blank">Learn more</a></alert>
+                            <alert type="warning">This system is not linked to {{Config.cloud.productName}}
+                                <a ng-href="{{Config.cloud.portalUrl}}"
+                                   ng-click="openLink($event)" target="_blank">Learn more</a></alert>
                             <alert type="error" ng-if="!hasInternetOnServer">Connect your server to internet to setup {{Config.cloud.productName}}</alert>
                             <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">You need internet connetion on your computer to connect your system to {{Config.cloud.productName}}</alert>
-                            <p ng-if="canConnectToCloud"  ><button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
-                                <a class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create {{Config.cloud.productName}} Account</a></p>
+                            <p ng-if="canConnectToCloud"  ><button
+                                    class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
+                                <a class="btn btn-default"
+                                   ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
+                                   ng-click="openLink($event)"
+                                   target="_blank">Create {{Config.cloud.productName}} Account</a></p>
                         </div>
                     </div>
                 </tab>

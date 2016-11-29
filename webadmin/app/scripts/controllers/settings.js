@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope,$rootScope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
+    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver,
+                                          cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
 
         function updateActive(){
@@ -385,5 +386,12 @@ angular.module('webadminApp')
         $scope.saveDateTime = function(){
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
+        };
+
+        $scope.openLink = function($event){
+            var url = $event.target.baseURI;
+            nativeClient.openUrlInBrowser(url,true);
+            $event.stopPropagation();
+            $event.preventDefault();
         };
     });

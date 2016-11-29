@@ -4,7 +4,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('nativeClient', function ($q, $log, $location) {
+    .factory('nativeClient', function ($q, $log, $location, dialogs) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
 
@@ -87,6 +87,11 @@ angular.module('webadminApp')
                         deferred.resolve(result);
                     });
                     return deferred.promise;
+                }
+
+                if(socketClientController){
+                    dialogs.alert(url, L.dialogs.openLink);
+                    return $q.resolve();
                 }
 
                 if(windowFallback){
