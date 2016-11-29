@@ -6,6 +6,7 @@ angular.module('webadminApp')
 
         function updateActive(){
             $scope.active={
+                device: $location.path() === '/settings/device',
                 system: $location.path() === '/settings/system',
                 server: $location.path() === '/settings/server'
             };
@@ -18,22 +19,17 @@ angular.module('webadminApp')
         });
 
         mediaserver.getModuleInformation().then(function (r) {
-            Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
+            var data = r.data.reply;
 
-            if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
+            if(data.flags.newSystem){
                 return;
             }
 
+            $scope.settings = data;
+            // $scope.noNetwork =
 
-            $scope.settings = {
-                systemName: r.data.reply.systemName,
-                port: r.data.reply.port,
-                id: r.data.reply.id,
-                ecDbReadOnly:r.data.reply.ecDbReadOnly
-            };
-
-            $scope.oldSystemName = r.data.reply.systemName;
-            $scope.oldPort = r.data.reply.port;
+            $scope.oldSystemName = data.systemName;
+            $scope.oldPort = data.port;
             checkUserRights();
         });
 
@@ -44,14 +40,19 @@ angular.module('webadminApp')
                     return false;
                 }
 
+                $scope.$watch("active.device",function(){
+                    if( $scope.active.device){
+                        $location.path('/settings/device',false);
+                    }
+                });
                 $scope.$watch("active.system",function(){
                     if( $scope.active.system){
-                        $location.path('/settings/system');
+                        $location.path('/settings/system',false);
                     }
                 });
                 $scope.$watch("active.server",function(){
                     if( $scope.active.server){
-                        $location.path('/settings/server');
+                        $location.path('/settings/server',false);
                     }
                 });
 
@@ -166,10 +167,13 @@ angular.module('webadminApp')
         $scope.canHardwareRestart = false;
         $scope.canRestoreSettings = false;
         $scope.canRestoreSettingsNotNetwork = false;
-
         function requestScripts() {
             return mediaserver.getScripts().then(function (data) {
                 if (data.data && data.data.reply) {
+
+                    // Has any scripts
+                    $scope.controlDevice = data.data.reply && data.data.reply.length>0;
+
                     $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                     $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                     $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
@@ -195,9 +199,9 @@ angular.module('webadminApp')
             mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
         };
 
-        $scope.hardwareRestart = function(){
-            dialogs.confirm(L.settings.confirmHardwareRestart).then(function(){
-                mediaserver.execute('reboot').then(resultHandler, errorHandler);
+        $scope.hardwareRestart = function(settingsSaved){
+            dialogs.confirm(settingsSaved?L.settings.restartNeeded:L.settings.confirmHardwareRestart).then(function(){
+                mediaserver.execute('reboot').then(restartServer, errorHandler);
             });
         };
 
@@ -333,7 +337,13 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(true); //Open Connect Dialog
         };
-
-
+        mediaserver.networkSettings().then(function(r){
+            $scope.networkSettings = r.data.reply;
+        });
+        $scope.saveNetworkSettings = function(){
+            mediaserver.networkSettings($scope.networkSettings).then(function(){
+                $scope.hardwareRestart(true);
+            }, errorHandler);
+        };
 
     });
