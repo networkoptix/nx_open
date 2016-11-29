@@ -1,19 +1,19 @@
 #ifdef ENABLE_ONVIF
 
 #include "hikvision_onvif_resource.h"
-#include <nx/network/http/httpclient.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <QtXml/QDomElement>
+#include "hikvision_audio_transmitter.h"
 
 namespace {
 
     const int kRequestTimeoutMs = 4 * 1000;
 
-    bool isResponseOK(const nx_http::HttpClient& client)
+    bool isResponseOK(const nx_http::HttpClient* client)
     {
-        if (!client.response())
+        if (!client->response())
             return false;
-        return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+        return client->response()->statusLine.statusCode == nx_http::StatusCode::ok;
     }
 
     QnAudioFormat toAudioFormat(const QString& codecName, int bitrateKbps)
@@ -46,9 +46,15 @@ namespace {
 
 } // namespace
 
-QnHikvisionOnvifResource::QnHikvisionOnvifResource(): QnPlOnvifResource()
+QnHikvisionOnvifResource::QnHikvisionOnvifResource():
+    QnPlOnvifResource(),
+    m_audioTransmitter(new QnHikvisionAudioTransmitter(this))
 {
+}
 
+QnHikvisionOnvifResource::~QnHikvisionOnvifResource()
+{
+    m_audioTransmitter.reset();
 }
 
 CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
@@ -64,24 +70,29 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
+std::unique_ptr<nx_http::HttpClient> QnHikvisionOnvifResource::getHttpClient()
+
+{
+    std::unique_ptr<nx_http::HttpClient> httpClient(new nx_http::HttpClient);
+    httpClient->setResponseReadTimeoutMs(kRequestTimeoutMs);
+    httpClient->setSendTimeoutMs(kRequestTimeoutMs);
+    httpClient->setMessageBodyReadTimeoutMs(kRequestTimeoutMs);
+    httpClient->setUserName(getAuth().user());
+    httpClient->setUserPassword(getAuth().password());
+
+    return std::move(httpClient);
+}
+
 CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
 {
-    nx_http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(kRequestTimeoutMs);
-    httpClient.setSendTimeoutMs(kRequestTimeoutMs);
-    httpClient.setMessageBodyReadTimeoutMs(kRequestTimeoutMs);
-
-    httpClient.setUserName(getAuth().user());
-    httpClient.setUserPassword(getAuth().password());
-
-
+    auto httpClient = getHttpClient();
 
     QUrl requestUrl(getUrl());
     requestUrl.setPath("/ISAPI/System/TwoWayAudio/channels");
     requestUrl.setHost(getHostAddress());
     requestUrl.setPort(QUrl(getUrl()).port(80));
 
-    if (!httpClient.doGet(requestUrl) || !isResponseOK(httpClient))
+    if (!httpClient->doGet(requestUrl) || !isResponseOK(httpClient.get()))
     {
         return CameraDiagnostics::CameraResponseParseErrorResult(
             requestUrl.toString(QUrl::RemovePassword),
@@ -89,12 +100,11 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
     }
 
     QByteArray data;
-    while (!httpClient.eof())
-        data.append(httpClient.fetchMessageBodyBuffer());
+    while (!httpClient->eof())
+        data.append(httpClient->fetchMessageBodyBuffer());
     if (data.isEmpty())
         return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
 
-    qWarning() << data;
     QDomDocument doc;
     doc.setContent(data);
     QDomElement docElem = doc.documentElement();
@@ -128,17 +138,29 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
         node = node.nextSibling();
     }
 
+    if (outputId.isEmpty())
+        return CameraDiagnostics::NoErrorResult(); //< no audio outputs
+
     for (const auto& codec: supportedCodecs)
     {
         QnAudioFormat outputFormat = toAudioFormat(codec, bitrateKbps);
         if (m_audioTransmitter->isCompatible(outputFormat))
         {
             m_audioTransmitter->setOutputFormat(outputFormat);
+            m_audioTransmitter->setOutputId(outputId);
             setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
         }
     }
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+QnAudioTransmitterPtr QnHikvisionOnvifResource::getAudioTransmitter()
+{
+    if (!isInitialized() || !m_audioTransmitter->isInitialized())
+        return nullptr;
+
+    return m_audioTransmitter;
 }
 
 #endif  //ENABLE_ONVIF
