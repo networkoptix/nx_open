@@ -41,7 +41,6 @@ angular.module('webadminApp')
             $log.log("check getCredentials from client");
             return nativeClient.getCredentials().then(function (authObject) {
                 $log.log("request get credentials from client");
-                var authObject = nativeClientObject.getCredentials();
                 if (typeof authObject === 'string' || authObject instanceof String) {
                     $log.log("got string from client, try to decode JSON: " + authObject);
                     try {
