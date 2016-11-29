@@ -404,14 +404,42 @@ QnNxStyle::QnNxStyle() :
     /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates: */
     installEventHandler(qApp, QEvent::WindowDeactivate, this,
         [this](QObject* watched, QEvent*)
-    {
-        auto view = qobject_cast<QGraphicsView*>(watched);
-        if (!view || !view->scene())
-            return;
+        {
+            auto view = qobject_cast<QGraphicsView*>(watched);
+            if (!view || !view->scene())
+                return;
 
-        if (auto grabber = view->scene()->mouseGrabberItem())
-            grabber->ungrabMouse();
-    });
+            if (auto grabber = view->scene()->mouseGrabberItem())
+                grabber->ungrabMouse();
+        });
+
+    /* Windows-style handling of mouse clicks outside of popup menu: */
+    installEventHandler(qApp, QEvent::MouseButtonPress, this,
+        [this](QObject* watched, QEvent* event)
+        {
+            if (!event->spontaneous())
+                return;
+
+            auto activeMenu = qobject_cast<QMenu*>(qApp->activePopupWidget());
+            if (activeMenu != watched)
+                return;
+
+            auto mouseEvent = static_cast<QMouseEvent*>(event);
+            auto globalPos = mouseEvent->globalPos();
+
+            if (activeMenu->geometry().contains(globalPos))
+                return;
+
+            auto window = QGuiApplication::topLevelAt(globalPos);
+            if (!window)
+                return;
+
+            auto localPos = window->mapFromGlobal(globalPos);
+
+            qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
+                localPos, globalPos, mouseEvent->button(),
+                mouseEvent->buttons(), mouseEvent->modifiers()));
+        });
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
