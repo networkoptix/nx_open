@@ -30,7 +30,7 @@ describe('On account page,', function () {
         p.userAccountDropdownToggle.click();
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
         expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
+        expect(p.userAccountDropdownMenu.getText()).toContain('Log out');
     });
 
     it("it is possible to log out", function () {
@@ -158,13 +158,13 @@ describe('On account page,', function () {
         var saveButton2 = browser2.element(by.css('[form=accountForm]')).element(by.buttonText('Save'));
         var loginEmailInput2 = browser2.element(by.css('.modal-dialog')).element(by.model('auth.email'));
         var loginPasswordInput2 = browser2.element(by.css('.modal-dialog')).element(by.model('auth.password'));
-        var loginSubmitButton2 = browser2.element(by.css('.modal-dialog')).element(by.buttonText('Login'));
+        var loginSubmitButton2 = browser2.element(by.css('.modal-dialog')).element(by.buttonText('Log in'));
 
         // Log in in browser2
         browser2.get(p.helper.urls.homepage);
         browser2.waitForAngular();
         browser2.sleep(500);
-        browser2.element(by.linkText('Login')).click();
+        browser2.element(by.linkText('Log in')).click();
         loginEmailInput2.sendKeys(p.helper.userEmail);
         loginPasswordInput2.sendKeys(p.helper.userPassword);
         loginSubmitButton2.click();

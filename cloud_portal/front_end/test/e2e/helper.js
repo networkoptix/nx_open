@@ -60,9 +60,7 @@ var Helper = function () {
             emailInput: element(by.model('account.email')),
             passwordGroup: element(by.css('password-input')),
             passwordInput: element(by.css('password-input')).element(by.css('input[type=password]')),
-            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account')),
-            alreadyLoggedIn: element(by.cssContainingText('.modal-dialog', 'You are already logged in to portal.')),
-            logOut: element(by.buttonText('Log out'))
+            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account'))
         },
         account: {
             firstNameInput: element(by.model('account.first_name')),
@@ -79,7 +77,9 @@ var Helper = function () {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('a[uib-dropdown-toggle]')),
             dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
-            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Log out'))
+            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Log out')),
+            alreadyLoggedIn: element(by.cssContainingText('.modal-dialog', 'You are already logged in to portal.')),
+            logOut: element(by.buttonText('Log out'))
         },
         restorePassEmail: {
             emailInput: element(by.model('data.email')),
@@ -193,7 +193,7 @@ var Helper = function () {
             if(h.isSubstr(text, 'noptixqa')) {
                 h.forms.logout.dropdownToggle.click();
                 h.forms.logout.logoutLink.click();
-                browser.sleep(500); // such a shame, but I can't solve it right now
+                browser.sleep(500);
 
                 // Check that element that is visible only for authorized user is NOT displayed on page
                 expect(h.loginSuccessElement.isPresent()).toBe(false);
@@ -211,8 +211,8 @@ var Helper = function () {
         var userPassword = password || this.userPassword;
 
         // Log out if logged in
-        h.checkPresent(h.forms.register.alreadyLoggedIn).then( function () {
-            h.forms.register.logOut.click()
+        h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
+            h.forms.logout.logOut.click()
         }, function () {});
 
         h.forms.register.firstNameInput.sendKeys(userFistName);
@@ -355,6 +355,12 @@ var Helper = function () {
 
     this.forms.restorePassPassword.setNewPassword = function(newPassword) {
         var here = h.forms.restorePassPassword;
+
+        // Log out if logged in
+        h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
+            h.forms.logout.logOut.click()
+        }, function () {});
+
         expect(here.passwordInput.isPresent()).toBe(true);
         here.passwordInput.sendKeys(newPassword);
         here.submitButton.click();
