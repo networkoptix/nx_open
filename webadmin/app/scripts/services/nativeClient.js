@@ -4,7 +4,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('nativeClient', function ($q, $log, $location) {
+    .factory('nativeClient', function ($q, $log, $location, dialogs) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
 
@@ -14,13 +14,11 @@ angular.module('webadminApp')
                 return null;
             }
             else{
-                return results[1] || 0;
+                return decodeURIComponent(results[1]) || 0;
             }
         }
 
-        var socketPort = $location.search().clientWebSocket || parseUrl('clientWebSocket');
-
-        var wsUri =  "ws://localhost:" + socketPort;
+        var wsUri = $location.search().clientWebSocket || parseUrl('clientWebSocket');
 
         return {
             init:function(){
@@ -28,7 +26,11 @@ angular.module('webadminApp')
                     return $q.resolve({thick:true});
                 }
 
-                if(!socketPort){
+                if(socketClientController){
+                    return $q.resolve({lite:true});
+                }
+
+                if(!wsUri){
                     return $q.reject();
                 }
 
@@ -87,6 +89,11 @@ angular.module('webadminApp')
                     return deferred.promise;
                 }
 
+                if(socketClientController){
+                    dialogs.alert(url, L.dialogs.openLink);
+                    return $q.resolve();
+                }
+
                 if(windowFallback){
                     window.open(url);
                 }
@@ -121,12 +128,22 @@ angular.module('webadminApp')
                 return this.closeDialog();
             },
             closeDialog:function(){
-                if(!nativeClientObject){
-                    return $q.reject();
+                if(nativeClientObject){ // Thick client - close current window
+                    $log.log("close window");
+                    window.close();
+                    return $q.resolve();
                 }
-                $log.log("close dialog");
-                window.close();
-                return $q.resolve();
+
+                if(socketClientController){ // Lite client - go to invitation page and reload
+                    $log.log("navigate to client tab");
+                    $location.path("/client");
+                    setTimeout(function(){
+                        window.location.reload();
+                    });
+                    return $q.resolve();
+                }
+
+                return $q.reject(); // No client - reject
             },
             startCamerasMode:function(){
                 if(nativeClientObject && nativeClientObject.startCamerasMode){

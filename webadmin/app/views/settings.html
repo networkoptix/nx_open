@@ -99,11 +99,18 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">This system is not linked to {{Config.cloud.productName}} <a ng-href="{{Config.cloud.portalUrl}}" ng-click="openLink()" target="_blank">Learn more</a></alert>
+                            <alert type="warning">This system is not linked to {{Config.cloud.productName}}
+                                <a ng-href="{{Config.cloud.portalUrl}}"
+                                   ng-click="openLink($event)" target="_blank">Learn more</a></alert>
                             <alert type="error" ng-if="!hasInternetOnServer">Connect your server to internet to setup {{Config.cloud.productName}}</alert>
                             <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">You need internet connetion on your computer to connect your system to {{Config.cloud.productName}}</alert>
-                            <p ng-if="canConnectToCloud"  ><button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
-                                <a class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create {{Config.cloud.productName}} Account</a></p>
+                            <p ng-if="canConnectToCloud"  ><button
+                                    class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
+                                <a class="btn btn-default"
+                                   ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
+                                   ng-click="openLink($event)"
+                                   target="_blank">Create {{Config.cloud.productName}} Account</a></p>
                         </div>
                     </div>
                 </tab>
@@ -113,6 +120,50 @@
                         <h3>Device Network Settings</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
                         <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                    </div>
+                    <div ng-if="settings.flags.canSetupTime">
+                        <h3>Date and Time</h3>
+                        <form name="timeSettings">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="timeZone">Time zone</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><select class="form-control"
+                                                    ng-options="zone.id as zone.id +': ' + zone.comment for zone in timeZones"
+                                                    id="timeZone"
+                                                    name="timeZone"
+                                                    ng-model="dateTimeSettings.timeZone"
+                                                    required></select></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="date" name="date"
+                                                       class="form-control"
+                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       ng-model="dateTimeSettings.dateTime"
+                                                       required
+                                                       is-open="dateTimeSettings.openDate"
+                                                       close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default"
+                                                            ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <button class="btn btn-default" ng-click="saveDateTime()">Save Date and Time</button>
                     </div>
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
                         <h3>Restore Server Settings</h3>
@@ -126,7 +177,6 @@
                         <p>Use mobile application or a keyboard and a mouse to control your nx1</p>
                     </div>
                 </tab>
-
             </tabset>
         </div>
     </div>

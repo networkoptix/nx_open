@@ -8,7 +8,8 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage',
-    'typeahead-focus'
+    'typeahead-focus',
+    'ui.timepicker'
 ]).config(function ($routeProvider) {
 
     var universalResolves = {
@@ -76,7 +77,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
-        .when('/view/', {
+        .when('/client', {
+            templateUrl: 'views/client.html',
+            controller: 'ClientCtrl',
+            reloadOnSearch: false
+        })
+        .when('/view', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
