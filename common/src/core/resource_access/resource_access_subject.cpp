@@ -7,9 +7,9 @@ struct QnResourceAccessSubjectPrivate
 {
 public:
     QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserRoleData& role):
-        m_id(user ? user->getId() : role.id),
         user(user),
-        role(role)
+        role(role),
+        m_id(user ? user->getId() : role.id)
     {
     }
 
