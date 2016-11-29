@@ -2,8 +2,7 @@
 
 var L = {
     productName: 'PRODUCT_NAME',
-    //clientProtocol: 'CLIENT_PROTOCOL:',
-    clientProtocol: 'nx-vms:',
+    clientProtocol: 'CLIENT_PROTOCOL:',
 
     clientDomain: '{{portalDomain}}',
 

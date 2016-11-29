@@ -17,7 +17,7 @@ cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
 
-mail_from: 'service@networkoptix.com'
+mail_from: 'DW Cloud <service@networkoptix.com>'
 
 mail_prefix: '[DW_PORTAL]'
 
