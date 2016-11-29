@@ -9,7 +9,7 @@ import unittest
 from collections import OrderedDict
 from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
-from pycommons.Logger import log, LOGLEVEL
+from pycommons.Logger import log, logger, LOGLEVEL
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
     checkResultsEqual, TestDigestAuthHandler, ManagerAddPassword, \
@@ -364,13 +364,15 @@ class FuncTestCase(unittest.TestCase):
 
     def _mediaserver_ctl(self, box, cmd):
         "Perform a service control command for a mediaserver on one of boxes"
+        log(LOGLEVEL.DEBUG + 9, "_mediaserver_ctl[%s]: performing %s" % (box, cmd))
         if cmd == 'safe-stop':
             rcmd = '/vagrant/safestop.sh'
         elif cmd == 'safe-start':
             rcmd = '/vagrant/safestart.sh'
         else:
             rcmd = cmd
-        self._call_box(box, rcmd, 'networkoptix-mediaserver')
+        out = self._call_box(box, rcmd, 'networkoptix-mediaserver')
+        log(LOGLEVEL.DEBUG + 9, "_mediaserver_ctl[%s] output: %s" % (box, out.rstrip()))
         if cmd in ('stop', 'safe-stop'):
             self._stopped.add(box)
         elif cmd in ('start', 'safe-stop', 'restart'): # for 'restart' - just in case it was off unexpectedly
@@ -468,7 +470,7 @@ class FuncTestCase(unittest.TestCase):
             if tocheck:
                 time.sleep(0.5)
         if tocheck:
-            self.fail("Servers' startup timed out: %s" % (', '.join(self.sl[b] for b in tocheck)))
+            self.fail("Servers startup timed out: %s" % (', '.join(self.sl[b] for b in tocheck)))
             #TODO: Report the last error on each unready server!
 
     def _change_system_name(self, host, newName):
@@ -479,7 +481,10 @@ class FuncTestCase(unittest.TestCase):
 
 
     def setUp(self):
-        pass
+        if logger.isSystem():
+            print "logger is system",
+            print  # this is because the unittest module desn't add \n after printing new test name,
+            #  so the first log message would be printed in the same line
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)
     ####################################################
 

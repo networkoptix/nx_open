@@ -18,25 +18,28 @@ minLFileSize =  10 * 1024
 class LOGLEVEL:
 
   MAINTENANCE = 0
-  ERROR0 = 1
-  ERROR1 = 2
-  ERROR = ERROR3 = 3
+  FATAL = 1
+  SEVERE = 2
+  ERROR = 3
   WARNING = 4
   INFO = 5
   DEBUG = 6
 
+  _printNames = {
+    0: 'MAINT',
+    1: 'FATAL',
+    2: 'SEVER',
+    3: 'ERROR',
+    4: 'WARN',
+    5: 'INFO',
+    6: 'DEBUG'
+  }
+
   @classmethod
   def str(cls, level):
-    if level == cls.MAINTENANCE:
-      return "MAINT"
-    elif level >= cls.ERROR0 and level <= cls.ERROR3:
-      return "ERROR%d" % (level - cls.ERROR0)
-    elif level == cls.WARNING:
-      return "WARN"
-    elif level == cls.INFO:
-      return "INFO"
-    else:
+    if level > cls.DEBUG:
       return "DEBUG%d" % (level - cls.DEBUG)
+    return cls._printNames[level if level >= 0 else 0]
 
 def makePrefix( level, useTime ):
   if useTime:
@@ -219,7 +222,7 @@ def logReopen():
 
 def logException():
   for line in traceback.format_exc().splitlines():
-    log(LOGLEVEL.ERROR0, '  %s' % line)
+    log(LOGLEVEL.FATAL, '  %s' % line)
   # unit test support
   # log Exception executed on failed thread - THIS trace we want to see on unittest output
   setThreadTrace()

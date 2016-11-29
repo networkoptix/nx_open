@@ -69,9 +69,9 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
     self.sysName1 = uuid.uuid4().hex
     self.sysName2 = uuid.uuid4().hex
     self.servers = {
-      self.serverAddr1: \
+      self.serverAddr1:
         self.Server(self.sysName1, SYSTEM_SETTINGS_1, self.user, self.password),
-      self.serverAddr2: \
+      self.serverAddr2:
           self.Server(self.sysName2, {}, self.user, self.password)}
 
   def __prepareInitialState(self, init = True):
