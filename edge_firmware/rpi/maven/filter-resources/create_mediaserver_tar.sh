@@ -123,7 +123,7 @@ if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so )
 fi
 
-if [ -d 'opt/networkoptix' ]; then mv -f opt/networkoptix opt/$CUSTOMIZATION; fi
+if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then mv -f opt/networkoptix opt/$CUSTOMIZATION; fi
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
 echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
