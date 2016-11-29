@@ -123,12 +123,22 @@ angular.module('webadminApp')
                 return this.closeDialog();
             },
             closeDialog:function(){
-                if(!nativeClientObject){
-                    return $q.reject();
+                if(nativeClientObject){ // Thick client - close current window
+                    $log.log("close window");
+                    window.close();
+                    return $q.resolve();
                 }
-                $log.log("close dialog");
-                window.close();
-                return $q.resolve();
+
+                if(socketClientController){ // Lite client - go to invitation page and reload
+                    $log.log("navigate to client tab");
+                    $location.path("/client");
+                    setTimeout(function(){
+                        window.location.reload();
+                    });
+                    return $q.resolve();
+                }
+
+                return $q.reject(); // No client - reject
             },
             startCamerasMode:function(){
                 if(nativeClientObject && nativeClientObject.startCamerasMode){
