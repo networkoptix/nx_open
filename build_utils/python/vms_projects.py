@@ -44,10 +44,12 @@ def getTranslatableProjects():
 class CustomizableProject():
     name = ""
     sources = None
+    static_icons_root = None
 
-    def __init__(self, name, sources):
+    def __init__(self, name, sources, static_icons_root = None):
         self.name = name
         self.sources = sources
+        self.static_icons_root = static_icons_root
                
     def __repr__(self):
         return "<CustomizableProject name:%s sources:%s>" % (
@@ -60,8 +62,14 @@ class CustomizableProject():
 customizableProjects = [   
     CustomizableProject("common", ["common/src"]),
     CustomizableProject("icons", None),
-    CustomizableProject("client", ["client/libclient/src", "client/libclient/static-resources/src"]),
-    CustomizableProject("mobile_client", ["client/mobile_client/src", "client/mobile_client/static-resources/qml"])
+    CustomizableProject(
+        "client", 
+        ["client/libclient/src", "client/libclient/static-resources/src"], 
+        "client/libclient/static-resources/skin"),
+    CustomizableProject(
+        "mobile_client", 
+        ["client/mobile_client/src", "client/mobile_client/static-resources/qml"], 
+        "client/mobile_client/static-resources/images")
 ]
 
 def getCustomizableProjects():
