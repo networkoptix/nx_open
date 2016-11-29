@@ -7,6 +7,7 @@ struct QnResourceAccessSubjectPrivate
 {
 public:
     QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserRoleData& role):
+        m_id(user ? user->getId() : role.id),
         user(user),
         role(role)
     {
@@ -14,33 +15,35 @@ public:
 
     bool isValid() const
     {
-        return user || !role.isNull();
+        return !m_id.isNull();
     }
 
     QnUuid id() const
     {
-        return user
-            ? user->getId()
-            : role.id;
+        return m_id;
     }
 
     QnUuid effectiveId() const
     {
-        if (!isValid())
-            return QnUuid();
+        QnUuid key = m_id;
+        if (user && user->userRole() == Qn::UserRole::CustomUserRole)
+            key = user->userRoleId();
 
-        QnUuid key = role.id;
-        if (user)
-        {
-            key = user->getId();
-            if (user->userRole() == Qn::UserRole::CustomUserRole)
-                key = user->userRoleId();
-        }
         return key;
+    }
+
+    void operator=(const QnResourceAccessSubjectPrivate& other)
+    {
+        user = other.user;
+        role = other.role;
+        m_id = other.m_id;
     }
 
     QnUserResourcePtr user;
     ec2::ApiUserRoleData role;
+
+private:
+    QnUuid m_id;
 };
 
 
@@ -109,15 +112,14 @@ QString QnResourceAccessSubject::name() const
     return d_ptr->user ? d_ptr->user->getName() : d_ptr->role.name;
 }
 
+void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
+{
+    *d_ptr = *(other.d_ptr);
+}
+
 bool QnResourceAccessSubject::operator!=(const QnResourceAccessSubject& other) const
 {
     return !(*this == other);
-}
-
-void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
-{
-    d_ptr->user = other.d_ptr->user;
-    d_ptr->role = other.d_ptr->role;
 }
 
 bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) const
