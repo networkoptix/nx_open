@@ -16,6 +16,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/time.h>
 
 #include <utils/common/guard.h>
 
@@ -37,7 +38,7 @@ DnsResolver::ResolveTask::ResolveTask(
     sequence(sequence),
     ipVersion(ipVersion)
 {
-    creationTime = std::chrono::steady_clock::now();
+    creationTime = nx::utils::monotonicTime();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -211,7 +212,7 @@ void DnsResolver::run()
 
 bool DnsResolver::isExpired(const ResolveTask& task) const
 {
-    return std::chrono::steady_clock::now() >= task.creationTime + m_resolveTimeout;
+    return nx::utils::monotonicTime() >= task.creationTime + m_resolveTimeout;
 }
 
 } // namespace network

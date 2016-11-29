@@ -4,6 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace network {
@@ -37,22 +38,21 @@ static std::unique_ptr<CustomResolver<Func>> makeCustomResolver(Func func)
     return std::make_unique<CustomResolver<Func>>(std::move(func));
 }
 
-class FtDnsResolver:
+class DnsResolver:
     public ::testing::Test
 {
 public:
-    FtDnsResolver():
+    DnsResolver():
         m_prevResolveRequestId(0)
     {
         using namespace std::placeholders;
 
-        m_dnsResolver.setResolveTimeout(std::chrono::seconds(1));
         m_dnsResolver.registerResolver(
-            makeCustomResolver(std::bind(&FtDnsResolver::testResolve, this, _1, _2)),
+            makeCustomResolver(std::bind(&DnsResolver::testResolve, this, _1, _2)),
             m_dnsResolver.maxRegisteredResolverPriority() + 1);
     }
 
-    ~FtDnsResolver()
+    ~DnsResolver()
     {
     }
 
@@ -80,11 +80,19 @@ private:
     QnMutex m_mutex;
     std::map<QString, SystemError::ErrorCode> m_hostNameToResolveResult;
     QnWaitCondition m_cond;
+    std::list<nx::utils::test::ScopedTimeShift> m_shiftedTime;
 
     std::deque<HostAddress> testResolve(const QString& hostName, int /*ipVersion*/)
     {
+        using namespace nx::utils::test;
+
         if (hostName == hardToResolveHost)
-            std::this_thread::sleep_for(m_dnsResolver.resolveTimeout() + std::chrono::seconds(1));
+        {
+            // Shifting time instead of sleep.
+            m_shiftedTime.push_back(ScopedTimeShift(
+                ClockType::steady,
+                m_dnsResolver.resolveTimeout() + std::chrono::seconds(1)));
+        }
         return std::deque<HostAddress>( {HostAddress::localhost} );
     }
 
@@ -94,7 +102,7 @@ private:
 
         m_dnsResolver.resolveAsync(
             hostName,
-            std::bind(&FtDnsResolver::onHostResolved, this, hostName, _1, _2),
+            std::bind(&DnsResolver::onHostResolved, this, hostName, _1, _2),
             AF_INET,
             reinterpret_cast<network::DnsResolver::RequestId>(++m_prevResolveRequestId));
     }
@@ -116,7 +124,7 @@ private:
     }
 };
 
-TEST_F(FtDnsResolver, resolve_fails_with_timeout)
+TEST_F(DnsResolver, resolve_fails_with_timeout)
 {
     addTaskThatTakesMoreThanResolveTimeout();
     addRegularTask();
