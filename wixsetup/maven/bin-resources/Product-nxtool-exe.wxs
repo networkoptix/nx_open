@@ -19,6 +19,7 @@
                 LogoFile="nxtool-logo-64x64.png"
                 SuppressRepair="yes"
                 SuppressOptionsUI="yes"
+                ShowFilesInUse="yes"
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"
             />
         </BootstrapperApplicationRef>

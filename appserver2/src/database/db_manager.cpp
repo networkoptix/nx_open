@@ -4040,7 +4040,10 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (data->users.size() == 1)
         user = &data->users[0];
 
-    if (user) // Do not load userRoles if there is no current user.
+    // Admin user is required for global properties.
+    DB_LOAD(QnUserResource::kAdminGuid, data->users);
+
+    if (user) // Do not load user roles if there is no current user.
         DB_LOAD(user->userRoleId, data->userRoles);
 
     DB_LOAD(QnUuid(), data->layouts);

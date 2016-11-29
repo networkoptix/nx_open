@@ -19,6 +19,7 @@
                 LogoFile="logo-64x64.png"
                 SuppressRepair="yes"
                 SuppressOptionsUI="yes"
+                ShowFilesInUse="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />
         </BootstrapperApplicationRef>

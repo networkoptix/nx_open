@@ -229,7 +229,7 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
     // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
-    QStringList hardwareIdList = QStringList() << QString::fromUtf8(hardwareId, sizeof(MAC_str));
+    QStringList hardwareIdList = QStringList() << QString::fromUtf8(MAC_str, sizeof(MAC_str));
 
     HardwareIdListForVersion macHardwareIds;
     macHardwareIds << MacAndItsHardwareIds(kEmptyMac, hardwareIdList);

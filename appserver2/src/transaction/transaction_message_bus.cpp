@@ -1109,21 +1109,14 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         tranCameras.command = ApiCommand::getCamerasEx;
         tranCameras.peerID = qnCommon->moduleGUID();
 
-        // filter out desktop cameras
-        auto desktopCameraResourceType = qnResTypePool->desktopCameraResourceType();
-        QnUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QnUuid();
-        if (desktopCameraTypeId.isNull())
-        {
-            tranCameras.params = cameras;
-        }
-        else
-        {
-            tranCameras.params.reserve(cameras.size());  //usually, there are only a few desktop cameras relatively to total cameras count
-            std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params), [&desktopCameraTypeId](const ec2::ApiCameraData &camera)
+        // Filter out desktop cameras.
+        // Usually, there are only a few desktop cameras relatively to total cameras count.
+        tranCameras.params.reserve(cameras.size());
+        std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params),
+            [](const ec2::ApiCameraData& camera)
             {
-                return camera.typeId != desktopCameraTypeId;
+                return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
             });
-        }
 
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
