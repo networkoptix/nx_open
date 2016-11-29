@@ -21,8 +21,7 @@
 QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
     QObject(parent)
 {
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-
+    instance<QnLongRunnablePool>();
 
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
