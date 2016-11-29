@@ -62,6 +62,7 @@ public:
     static void init(); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
     static void verifyInitialization();
+    static bool isInitialized();
 
     static void applyArguments(const utils::ArgumentParser& arguments);
 

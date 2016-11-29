@@ -109,6 +109,11 @@ void SocketGlobals::verifyInitialization()
         "SocketGlobals::InitGuard must be initialized before using Sockets");
 }
 
+bool SocketGlobals::isInitialized()
+{
+    return s_instance != nullptr;
+}
+
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
 {
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
