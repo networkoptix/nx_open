@@ -22,8 +22,17 @@
                         <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                     </ServiceInstall>
 
-                    <ServiceControl Id="Start${customization}ServerService" Name="${customization}MediaServer" Start="install" Wait="no" />
-                    <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
+                    <ServiceControl
+                        Id="Start${customization}ServerService"
+                        Name="${customization}MediaServer"
+                        Start="install"
+                        Wait="no" />
+                    <ServiceControl
+                        Id="Stop${customization}ServerService"
+                        Name="${customization}MediaServer"
+                        Stop="both"
+                        Wait="yes"
+                        Remove="uninstall" />
                 </Component>
 
                 <Component Id="ServerVersion">
