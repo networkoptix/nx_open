@@ -52,9 +52,11 @@ var Helper = function () {
             dialog: element(by.css('.modal-dialog')),
             emailInput: element(by.css('.modal-dialog')).element(by.model('auth.email')),
             passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
-            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Log in'))
+            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Log in')),
+            messageLoginLink: element(by.css('h1')).element(by.linkText('Log in'))
         },
         register: {
+            triggerRegisterButton: element(by.linkText('Create Account')),
             firstNameInput: element(by.model('account.firstName')),
             lastNameInput: element(by.model('account.lastName')),
             emailInput: element(by.model('account.email')),
@@ -151,6 +153,7 @@ var Helper = function () {
     this.userPasswordWrong = 'qweqwe123';
 
     this.loginSuccessElement = element(by.cssContainingText('h1','Systems')); // some element on page, that is only visible when user is authenticated
+    this.loginNoSysSuccessElement = element(by.cssContainingText('span','You have no systems connected to Nx Cloud')); // some element on page, that is only visible when user is authenticated
     //this.loggedOutElement = element(by.css('.container.ng-scope')).all(by.css('.auth-hidden')).first(); // some element on page visible to not auth user
     this.htmlBody = element(by.css('body'));
 
@@ -169,9 +172,13 @@ var Helper = function () {
         this.loginFromCurrPage(email, password);
 
         // Check that element that is visible only for authorized user is displayed on page
-        return h.loginSuccessElement.isDisplayed().then( function (isDisplayed) {
-            if (!isDisplayed) {
-                return protractor.promise.rejected('Login failed');
+        return h.loginSuccessElement.isPresent().then( function (isPresent) {
+            if (!isPresent) {
+                h.loginNoSysSuccessElement.isPresent().then( function (isPresent) {
+                    if (!isPresent) {
+                        return protractor.promise.rejected('Login failed');
+                    }
+                });
             }
         });
     };

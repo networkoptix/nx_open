@@ -17,7 +17,7 @@ describe('Registration suite', function () {
         p.openRegisterButton.click();
     
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
     });
 
     it("should open register page from register success page by clicking Register button on top right corner", function () {
@@ -26,7 +26,7 @@ describe('Registration suite', function () {
         p.openRegisterButton.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
     });
 
     it("should open register page in anonymous state by clicking Register button on homepage", function () {
@@ -35,12 +35,12 @@ describe('Registration suite', function () {
         p.openRegisterButtonAdv.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
     });
 
     it("should open register page in anonymous state", function () {
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
     });
 
     it("should register user with correct credentials", function () {
@@ -210,14 +210,18 @@ describe('Registration suite', function () {
         p.checkEmailExists();
     });
 
-    it("should log user out, if he was logged in and goes to registration link", function () {
+    it("should suggest user to log out, if he was logged in and goes to registration link", function () {
         p.helper.login();
         p.helper.get(p.url);
+
+        expect(p.helper.forms.logout.alreadyLoggedIn.isDisplayed()).toBe(true);
+        p.helper.forms.logout.logOut.click(); // log out
+
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
         // Check that register form is opened
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
     });
 
     it("should display promo-block, if user goes to registration from native app", function () {

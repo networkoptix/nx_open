@@ -2,6 +2,8 @@
 
 var RegisterPage = function () {
 
+    var p = this;
+
     var PasswordFieldSuite = require('../password_check.js');
     this.passwordField = new PasswordFieldSuite();
 
@@ -13,8 +15,8 @@ var RegisterPage = function () {
 
     this.url = '/register';
 
-    this.openRegisterButton = element(by.linkText('Register'));
-    this.openRegisterButtonAdv = element(by.linkText('Register now')); // Register button on home page
+    this.openRegisterButton = p.helper.forms.register.triggerRegisterButton;
+    this.openRegisterButtonAdv = element(by.linkText('Create account now')); // Register button on home page
 
     this.firstNameInput = element(by.model('account.firstName'));
     this.lastNameInput = element(by.model('account.lastName'));
@@ -22,14 +24,16 @@ var RegisterPage = function () {
     this.passwordGroup = element(by.css('password-input'));
     this.passwordInput = this.passwordGroup.element(by.css('input[type=password]'));
 
-    this.submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
+    this.submitButton = p.helper.forms.register.submitButton;
 
     this.openInClientButton = element(by.cssContainingText('button', 'Open '));
-    this.messageLoginLink = element(by.css('h1')).element(by.linkText('Login'));
+    this.messageLoginLink = p.helper.forms.login.messageLoginLink;
 
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));
     };
+
+    this.preRegisterMessage = "By clicking 'Create Account', you agree to our Terms and Conditions";
 
     this.invalidClassRequired = 'ng-invalid-required';
     this.invalidClass = 'ng-invalid';
@@ -58,7 +62,7 @@ var RegisterPage = function () {
 
     this.checkEmailExists = function () {
         this.checkInputInvalid(this.emailInput, this.invalidClassExists);
-        expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('Email is already registered in portal');
+        expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('This email address has been already registered in');
     };
 
     this.passCheck = {
