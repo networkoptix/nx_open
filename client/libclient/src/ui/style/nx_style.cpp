@@ -402,7 +402,7 @@ QnNxStyle::QnNxStyle() :
 {
     //TODO: Think through how to make it better
     /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates: */
-    installEventHandler(qApp, QEvent::WindowDeactivate, this,
+    installEventHandler(qApp, { QEvent::WindowDeactivate, QEvent::FocusOut }, this,
         [this](QObject* watched, QEvent*)
         {
             auto view = qobject_cast<QGraphicsView*>(watched);
