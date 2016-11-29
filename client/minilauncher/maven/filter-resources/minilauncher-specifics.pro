@@ -30,7 +30,7 @@ QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290 /wd4661 /wd4100 /we4717
 # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
 QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
 QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
-QMAKE_LFLAGS += /MACHINE:x64 /LARGEADDRESSAWARE
+QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
 
 QMAKE_CXXFLAGS_DEBUG += /MTd
 QMAKE_CXXFLAGS_RELEASE += /MT
