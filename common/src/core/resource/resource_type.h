@@ -66,7 +66,6 @@ class QN_EXPORT QnResourceTypePool
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
-    static const QString kDesktopCameraTypeName;
     static const QString kLayoutTypeId;
     static const QString kServerTypeId;
     static const QString kVideoWallTypeId;
@@ -78,6 +77,7 @@ public:
     static const QnUuid kServerTypeUuid;
     static const QnUuid kStorageTypeUuid;
     static const QnUuid kLayoutTypeUuid;
+    static const QnUuid kDesktopCameraTypeUuid;
 
     static QnResourceTypePool *instance();
 
@@ -99,7 +99,6 @@ public:
 
     bool isEmpty() const;
 
-    QnResourceTypePtr desktopCameraResourceType() const;
 private:
     mutable QnMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;

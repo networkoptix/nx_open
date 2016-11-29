@@ -770,8 +770,7 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("File(s)...")).
             shortcut(lit("Ctrl+O")).
-            autoRepeat(false).
-            icon(qnSkin->icon("folder.png"));
+            autoRepeat(false);
 
         factory(QnActions::OpenFolderAction).
             flags(Qn::Main | Qn::Scene).
