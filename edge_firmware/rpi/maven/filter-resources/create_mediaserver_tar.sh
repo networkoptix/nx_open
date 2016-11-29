@@ -206,7 +206,7 @@ if [[ "${box}" == "bpi" ]]; then
   cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
-  cp opt/$CUSTOMIZAION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
+  cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
   if [[ "${box}" == "bpi" ]]; then chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts; fi
 fi
 
