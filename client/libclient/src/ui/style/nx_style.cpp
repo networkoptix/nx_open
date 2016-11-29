@@ -412,7 +412,7 @@ QnNxStyle::QnNxStyle() :
             if (auto grabber = view->scene()->mouseGrabberItem())
                 grabber->ungrabMouse();
         });
-
+#if 0
     /* Windows-style handling of mouse clicks outside of popup menu: */
     installEventHandler(qApp, QEvent::MouseButtonPress, this,
         [this](QObject* watched, QEvent* event)
@@ -440,6 +440,7 @@ QnNxStyle::QnNxStyle() :
                 localPos, globalPos, mouseEvent->button(),
                 mouseEvent->buttons(), mouseEvent->modifiers()));
         });
+#endif
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
