@@ -8,7 +8,7 @@ VERSION = 3.0.0
 
 CONFIG -= flat qt
 CONFIG += c++14 console
-RESOURCES += C:\\develop\\2nx_vms\\client\\minilauncher\\x64/build/minilauncher.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
@@ -17,13 +17,13 @@ else {
   CONFIGURATION=release
 }
 
-OUTPUT_PATH = $$clean_path("C:\\develop\\2nx_vms\\client\\minilauncher/../../build_environment/target")
+OUTPUT_PATH = $$clean_path("${libdir}")
 DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
 
-OBJECTS_DIR = C:\\develop\\2nx_vms\\client\\minilauncher\\x64/build/$$CONFIGURATION/
+OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 CONFIG += x64
-RC_FILE = C:\\develop\\2nx_vms\\client\\minilauncher\\x64/hdwitness.rc
-ICON = C:\\develop\\2nx_vms\\client\\minilauncher/../../customization/default/icons/favicon.ico
+RC_FILE = ${project.build.directory}/hdwitness.rc
+ICON = ${customization.dir}/icons/favicon.ico
 LIBS += shlwapi.lib
 # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
 QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290 /wd4661 /wd4100 /we4717
