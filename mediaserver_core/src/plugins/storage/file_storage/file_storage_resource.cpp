@@ -683,9 +683,8 @@ void QnFileStorageResource::setUrl(const QString& url)
 QnFileStorageResource::QnFileStorageResource():
     m_valid(false),
     m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted),
-    m_isSystem(false),
-    m_spaceLimitUnset(true)
+    m_cachedTotalSpace(QnStorageResource::kUnknownSize),
+    m_isSystem(false)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -861,11 +860,8 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     qint64 oldCachedTotalSpace = m_cachedTotalSpace;
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
 
-    if (m_spaceLimitUnset && oldCachedTotalSpace != m_cachedTotalSpace)
-    {
+    if (oldCachedTotalSpace != m_cachedTotalSpace)
         setSpaceLimit(calcInitialSpaceLimit());
-        m_spaceLimitUnset = false;
-    }
 
     return Qn::StorageInit_Ok;
 }
