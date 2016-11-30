@@ -8,8 +8,10 @@
 	<string>${mac.protocol_handler_bundle.identifier}${buildNumber}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleDisplayName</key>
+	<string>${product.name} Links Handler</string>
 	<key>CFBundleName</key>
-	<string>${product.name} Protocol Handler</string>
+	<string>${product.name} Links Handler</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -20,10 +22,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>Nx Witness Link</string>
+			<string>${product.name} Link</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>dw-vms</string>
+				<string>${uri.protocol}</string>
 			</array>
 		</dict>
 	</array>
