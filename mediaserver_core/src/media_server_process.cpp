@@ -599,6 +599,13 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         }
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
+
+        NX_LOG(lit("%1 Candidate %2, isFileStorage = %3, totalSpace = %4, spaceLimit = %5")
+               .arg(Q_FUNC_INFO)
+               .arg(storage->getUrl())
+               .arg((bool)fileStorage)
+               .arg(totalSpace)
+               .arg(storage->getSpaceLimit()), cl_logDEBUG2);
     }
     return result;
 }
@@ -736,10 +743,25 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             if (m_needStop)
                 return;
         }
+
         for(const auto& storage: storages)
+        {
+            NX_LOG(lit("%1 Existing storage: %2, spaceLimit = %3")
+                   .arg(Q_FUNC_INFO)
+                   .arg(storage.url)
+                   .arg(storage.spaceLimit), cl_logDEBUG2);
             messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+        }
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+
+        NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
+        for (const auto& storage: storagesToRemove)
+            NX_LOG(lit("%1 Storage to remove: %2, id: %3")
+                   .arg(Q_FUNC_INFO)
+                   .arg(storage->getUrl())
+                   .arg(storage->getId().toString()), cl_logDEBUG2);
+
         if (!storagesToRemove.isEmpty())
         {
             ec2::ApiIdDataList idList;

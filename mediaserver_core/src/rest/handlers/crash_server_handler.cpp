@@ -5,7 +5,7 @@
 
 #include "crash_server_handler.h"
 
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/http/httptypes.h>
 

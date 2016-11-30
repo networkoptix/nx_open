@@ -107,6 +107,7 @@ private:
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
     bool m_isSystem;
+    bool m_spaceLimitUnset;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

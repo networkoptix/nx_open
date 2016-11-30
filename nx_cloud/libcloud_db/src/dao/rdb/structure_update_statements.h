@@ -681,6 +681,27 @@ DROP TABLE system_to_account_old;
 
 )sql";
 
+/**
+ * #CLOUD-732. Set isEnabled = true for users created before introduction of isEnabled.
+ */
+static const char kSetIsEnabledToTrueWhereUndefined[] =
+R"sql(
+
+UPDATE system_to_account SET is_enabled = 1 WHERE is_enabled IS NULL;
+
+)sql";
+
+/**
+ * TODO in #CLOUD-737
+ */
+//static const char kRestoreSystemToAccountReferenceUniqueness[] =
+//R"sql(
+//
+//CREATE UNIQUE INDEX system_to_account_primary
+//ON system_to_account (account_id, system_id);
+//
+//)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

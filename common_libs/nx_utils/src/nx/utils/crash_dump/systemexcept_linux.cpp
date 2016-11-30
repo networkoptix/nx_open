@@ -21,7 +21,8 @@
 #include <pthread.h>
 
 #include <QDebug>
-#include "utils/common/app_info.h"
+
+#include <nx/utils/nx_utils_app_info.h>
 
 static const int BUFFER_SIZE = 2048;
 static const int STACK_SHIFT = 2; // signalHandler and printThreadData
@@ -33,7 +34,7 @@ static const struct timespec WAIT_FOR_MUTEX     = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_THREADS   = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_MAIN      = { 1 /* sec */, 500000 /* nsec */ };
 
-static const std::string fullVersionId = QnAppInfo::applicationFullVersion().toStdString();
+static const std::string fullVersionId = NxUtilsAppInfo::applicationFullVersion().toStdString();
 
 /** Thread Keeper without heap usage */
 class ThreadKeeper
