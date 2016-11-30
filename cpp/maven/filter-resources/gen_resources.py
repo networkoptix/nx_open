@@ -2,6 +2,7 @@ import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
 from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 from os import listdir
+from sets import Set
 
 template_file='template.pro'
 skip_template_file = 'template.skip'
@@ -41,7 +42,7 @@ def fileIsAllowed(file, exclusions):
             return False
     return True
 
-def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
+def genqrc(qrcname, qrcprefix, pathes, exclusions):
     os.path = posixpath
 
     qrcfile = open(qrcname, 'w')
@@ -50,14 +51,18 @@ def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
     print >> qrcfile, '<RCC version="1.0">'
     print >> qrcfile, '<qresource prefix="%s">' % (qrcprefix)
 
+    aliases = Set()
+
     for path in pathes:
         for root, dirs, files in os.walk(path):
             parent = root[len(path) + 1:]
             for f in files:
                 if fileIsAllowed(f, exclusions):
-                    print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
+                    alias = os.path.join(parent, f)
+                    if not alias in aliases:
+                        aliases.add(alias)
+                        print >> qrcfile, '<file alias="%s">%s</file>' % (alias, os.path.join(root, f))
 
-    print >> qrcfile, additions
     print >> qrcfile, '</qresource>'
     print >> qrcfile, '</RCC>'
 
@@ -160,7 +165,15 @@ if __name__ == '__main__':
     exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
     if "${noQmlInQrc}" == "true":
         exceptions += qml_files
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons/all'], exceptions)
+
+    genqrc(
+        'build/${project.artifactId}.qrc',
+        '/',
+        ['${customization.dir}/icons/all',
+            '${project.build.directory}/resources',
+            '${project.basedir}/static-resources'],
+        exceptions)
+
     if os.path.exists('${project.build.directory}/additional-resources'):
         genqrc('build/${project.artifactId}_additional.qrc', '/', ['${project.build.directory}/additional-resources'], exceptions)
         pro_file = open('${project.artifactId}-specifics.pro', 'a')
