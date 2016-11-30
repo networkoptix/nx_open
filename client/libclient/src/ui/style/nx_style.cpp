@@ -453,7 +453,7 @@ QnNxStyle::QnNxStyle() :
 
                 qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
                     localPos, globalPos, mouseEvent->button(),
-                    mouseEvent->buttons(), mouseEvent->modifiers()));
+                    mouseEvent->buttons(), mouseEvent->modifiers()), Qt::HighEventPriority);
             });
     }
 }
