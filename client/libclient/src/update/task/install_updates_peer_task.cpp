@@ -18,7 +18,7 @@
 #include <network/router.h>
 
 namespace {
-    const int checkTimeout = 15 * 60 * 1000;
+    const int checkTimeout = 20 * 60 * 1000;
     const int startPingTimeout = 1 * 60 * 1000;
     const int pingInterval = 10 * 1000;
     const int shortTimeout = 60 * 1000;
