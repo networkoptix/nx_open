@@ -759,7 +759,8 @@
     },
     
     "QnCloudStatusPanel": {
-        "palette": { "default": { "window": "dark8" } },
+        "palette": { "default": { "window": "dark8" } }
+    },
         
     "QnAuditLogModel": {
         "colors": {
