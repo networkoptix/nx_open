@@ -26,6 +26,7 @@
 #include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
+#include <vms_gateway_embeddable.h>
 
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
@@ -92,6 +93,9 @@ QnMobileClientModule::QnMobileClientModule(
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
+
+    common->store<nx::cloud::gateway::VmsGatewayEmbeddable>(
+        new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
