@@ -84,18 +84,18 @@ QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) c
         index = 6;
         break;
     case QnNxStyle::Colors::kContrast:
+    case QnNxStyle::Colors::kBrand:
         index = 7;
         break;
     case QnNxStyle::Colors::kRed:
     case QnNxStyle::Colors::kBlue:
-    case QnNxStyle::Colors::kBrand:
         index = 4;
         break;
     case QnNxStyle::Colors::kGreen:
         index = 3;
         break;
     case QnNxStyle::Colors::kYellow:
-        index = 0;
+        index = 2;
         break;
     }
 
