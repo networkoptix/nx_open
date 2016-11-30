@@ -160,9 +160,6 @@
         "palette": {
             "default": {
                 "link":             "brand_core"
-            },
-            "inactive": {
-                "link":             "brand_d2"
             }
         }
     },
@@ -185,13 +182,21 @@
                 "window":           "dark13",
                 "windowText":       "light4",
                 "buttonText":       "light12",
-                "highlight":        "brand_core",
+                "highlight":        "brand_d1",
                 "highlightedText":  "brand_contrast",
                 "midlight":         "dark11"
             },
             "disabled": {
                 "windowText":       "light4.setAlpha(77)",
                 "buttonText":       "light12.setAlpha(77)"
+            }
+        }
+    },
+
+    "QComboBox": {
+        "palette": {
+            "default": {
+                "highlight":        "brand_d2"
             }
         }
     },
@@ -217,21 +222,21 @@
             "default": {
                 "base":             "transparent",
                 "midlight":         "dark10.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10",
                 "highlightedText":  "light4"
             },
             "disabled": {
                 "base":             "transparent",
                 "midlight":         "dark10.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10.setAlpha(77)",
                 "highlightedText":  "light4.setAlpha(77)"
             },
             "inactive": {
                 "base":             "transparent",
                 "midlight":         "dark10.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10",
                 "highlightedText":  "light4"
             }
@@ -286,7 +291,7 @@
         "palette": {
             "default": {
                 "midlight":         "dark8.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)"
+                "highlight":        "brand_core.setAlpha(77)"
             },
             "inactive": {
                 "midlight":         "dark8.setAlpha(102)",
@@ -308,7 +313,7 @@
 
     "QnRecordingStatsItemDelegate": {
         "colors": {
-            "chartBackground": "brand_d4",
+            "chartBackground": "brand_d3",
             "chartForeground": "light10",
             "foreignForeground": "dark17",
             "totalForeground": "light4"
@@ -731,7 +736,7 @@
             "#c22626"
         ]
     },
-
+    
     "QnTimeServerSelectionModel": {
         "colors": [
             "light12",
@@ -748,6 +753,24 @@
 
     "QnFisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
+    },
+    
+    "QnAuditLogModel": {
+        "colors": {
+            "httpLink": "brand_d2",
+            "loginAction": "#65991c",
+            "unsucessLoginAction": "#cf2727",
+            "updUsers": "#994998",
+            "watchingLive": "#029eb0",
+            "watchingArchive": "#029eb0",
+            "exportVideo": "#5d82bf",
+            "updCamera": "#f38282",
+            "systemActions": "#b13016",
+            "updServer": "#dcb428",
+            "eventRules": "#9c6b50",
+            "emailSettings": "#cbcbcb",
+            "chartColor": "brand_d3"
+        }
     }
 }
 
