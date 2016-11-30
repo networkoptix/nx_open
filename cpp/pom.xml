@@ -104,6 +104,20 @@
                 <version>1.1.1</version>
                 <executions>
                     <execution>
+                        <id>additional-build-steps</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>build-prepare.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>gen-qrc</id>
                         <phase>process-sources</phase>
                         <goals>
@@ -121,20 +135,6 @@
                                 <ANDROID_NDK_TOOLCHAIN_VERSION>${android.toolchain.version}</ANDROID_NDK_TOOLCHAIN_VERSION>
                                 <ANDROID_NDK_PLATFORM>${android.platform}</ANDROID_NDK_PLATFORM>
                             </environmentVariables>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>additional-build-steps</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${init.python.dir}/${python.executable}</executable>
-                            <arguments>
-                                <argument>build-prepare.py</argument>
-                            </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -215,15 +215,19 @@
                                     <replacements>
                                         <replacement>
                                             <token>
-                                                <![CDATA[release</ProgramDataBaseFileName>]]></token>
+                                                <![CDATA[release</ProgramDataBaseFileName>]]>
+                                            </token>
                                             <value>
-                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
+                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]>
+                                            </value>
                                         </replacement>
                                         <replacement>
                                             <token>
-                                                <![CDATA[debug</ProgramDataBaseFileName>]]></token>
+                                                <![CDATA[debug</ProgramDataBaseFileName>]]>
+                                            </token>
                                             <value>
-                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
+                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]>
+                                            </value>
                                         </replacement>
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
@@ -240,18 +244,24 @@
                                         <!-- Adding target machine for x86 -->
                                         <replacement>
                                             <xpath>//Project/ItemDefinitionGroup</xpath>
-                                            <token><![CDATA[</Lib>]]></token>
-                                            <value><![CDATA[
+                                            <token>
+                                                <![CDATA[</Lib>]]>
+                                            </token>
+                                            <value>
+                                                <![CDATA[
       <TargetMachine>Machine${machine.type}</TargetMachine>
-    </Lib>]]></value>
+    </Lib>]]>
+                                            </value>
                                         </replacement>
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
                                             <token>
-                                                <![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
+                                                <![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]>
+                                            </token>
                                             <value>
-                                                <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
+                                                <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]>
+                                            </value>
                                         </replacement>
 
                                     </replacements>
