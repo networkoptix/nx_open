@@ -66,13 +66,16 @@ bool SelfUpdater::registerUriHandler()
 
     #if defined(Q_OS_LINUX)
         binaryPath = qApp->applicationDirPath() + lit("/client");
+    #elif defined(Q_OS_MACX)
+        binaryPath = lit("%1/%2").arg(qApp->applicationDirPath(),
+            QnClientAppInfo::protocolHandlerBundleName());
     #endif
 
     return nx::vms::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
         QnAppInfo::productNameLong(),
-        QnClientAppInfo::macOsBundleName(),
+        QnClientAppInfo::protocolHandlerBundleId(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
