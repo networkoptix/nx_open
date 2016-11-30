@@ -453,7 +453,8 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList),
+                        transactionsPostProcessList,
+                        tran.transactionType),
                     lit("Remove resource status failed"));
 
                 break;
