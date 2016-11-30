@@ -622,6 +622,7 @@ void QnLoginDialog::at_saveButton_clicked()
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
+    qnSettings->save();
 
     resetSavedSessionsModel();
 
@@ -672,6 +673,7 @@ void QnLoginDialog::at_deleteButton_clicked()
 
     connections.removeOne(connection.name);
     qnSettings->setCustomConnections(connections);
+    qnSettings->save();
     resetConnectionsModel();
 }
 

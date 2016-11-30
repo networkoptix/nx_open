@@ -41,8 +41,7 @@ public:
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
-    bool drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
-    bool drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    bool skipItemViewPrimitive(PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const;
 
 private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
@@ -56,8 +55,6 @@ private:
     QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
     QnCustomizer *m_customizer;
-    QIcon m_branchClosed;
-    QIcon m_branchOpen;
 };
 
 

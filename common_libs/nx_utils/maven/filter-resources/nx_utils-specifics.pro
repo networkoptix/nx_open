@@ -9,4 +9,4 @@ win* {
     PRECOMPILED_SOURCE = StdAfx.cpp
 }    
 
-SOURCES += ${project.build.directory}/nx_utils_app_info_impl.cpp
+SOURCES += ${project.build.directory}/app_info_impl.cpp

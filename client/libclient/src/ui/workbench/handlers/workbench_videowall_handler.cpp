@@ -322,6 +322,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     {
         pcUuid = QnUuid::createUuid();
         qnSettings->setPcUuid(pcUuid);
+        qnSettings->save();
     }
     m_controlMode.pcUuid = pcUuid.toString();
 

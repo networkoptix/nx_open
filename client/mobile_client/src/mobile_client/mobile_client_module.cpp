@@ -66,6 +66,9 @@ QnMobileClientModule::QnMobileClientModule(
     common->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::outgoingTunnelPool().designateOwnPeerId("mc", common->moduleGUID());
 
+    // TODO: #mu ON/OFF switch in settings?
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
+
     // TODO: #mshevchenko Remove when client_core_module is created.
     common->store(new QnFfmpegInitializer());
 

@@ -14,14 +14,18 @@
 class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
 {
     using base_type = Connective<QObject>;
+
 public:
     QnResourceTreeModelUserNodes(QObject* parent = nullptr);
     virtual ~QnResourceTreeModelUserNodes();
 
     QnResourceTreeModel* model() const;
-    void setModel(QnResourceTreeModel* value);
-
     QnResourceTreeModelNodePtr rootNode() const;
+
+    void initialize(QnResourceTreeModel* model, const QnResourceTreeModelNodePtr& rootNode);
+
+protected:
+    void setModel(QnResourceTreeModel* value);
     void setRootNode(const QnResourceTreeModelNodePtr& node);
 
 private:

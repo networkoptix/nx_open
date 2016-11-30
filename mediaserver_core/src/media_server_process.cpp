@@ -185,7 +185,7 @@
 #include <network/router.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/nx_utils_app_info.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/sleep.h>
@@ -2429,7 +2429,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
 
         server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-        server->setProperty(Qn::FULL_VERSION, NxUtilsAppInfo::applicationFullVersion());
+        server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
         server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
         server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
@@ -3215,7 +3215,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.parse(argc, argv, stderr);
     if( showVersion )
     {
-        std::cout << NxUtilsAppInfo::applicationFullVersion().toStdString() << std::endl;
+        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
         return 0;
     }
     if( showHelp )

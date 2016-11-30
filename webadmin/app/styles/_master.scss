@@ -61,6 +61,9 @@
     &.wide {
       width: 320px;
     }
+    &.widest {
+      width: 400px;
+    }
   }
 
   .form-group {
@@ -159,7 +162,7 @@
       background-repeat: no-repeat;
       background-size: 66px 14px;
 
-      margin-bottom: 20px;
+      margin-top: 56px;
       width: 66px;
       height: 14px;
     }

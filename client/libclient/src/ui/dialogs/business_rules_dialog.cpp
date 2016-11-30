@@ -270,7 +270,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     * Create auto-hider which will hide empty table and show a message instead. Table will be
     * reparented. Snapped scrollbar is already created and will stay in the correct parent.
     */
-    //QnItemViewAutoHider::create(ui->tableView, tr("No Event Rules"));
+    QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
