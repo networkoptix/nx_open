@@ -28,8 +28,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtSingleApplication>
 
-#include <common/systemexcept.h>
-
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -40,6 +38,7 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/audio/audiodevice.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>

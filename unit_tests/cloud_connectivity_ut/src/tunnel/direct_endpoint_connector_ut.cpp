@@ -56,6 +56,8 @@ TEST_F(TcpTunnelConnector, failModuleInformation)
 
 TEST_F(TcpTunnelConnector, cancellation)
 {
+    NX_CRITICAL(false);
+
     cancellationTest();
 }
 

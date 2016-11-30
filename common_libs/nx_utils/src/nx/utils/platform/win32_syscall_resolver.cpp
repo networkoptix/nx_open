@@ -7,19 +7,48 @@
 
 #include "win32_syscall_resolver.h"
 
+#include <Windows.h>
+
 #include <memory>
 #include <mutex>
 
+namespace {
 
-Win32FuncResolver::Win32FuncResolver()
+class LibFunctions
+{
+public:
+    HMODULE hLib;
+    std::map<std::string, void*> funcByName;
+
+    LibFunctions():
+        hLib(NULL)
+    {
+    }
+};
+
+} // namespace
+
+struct Win32FuncResolverImpl
+{
+    std::mutex mutex;
+    //!map<libname, function addresses>
+    std::map<std::wstring, LibFunctions> loadedLibraries;
+};
+
+
+Win32FuncResolver::Win32FuncResolver():
+    m_impl(new Win32FuncResolverImpl())
 {
 }
 
 Win32FuncResolver::~Win32FuncResolver()
 {
-    for( auto lib: m_loadedLibraries )
+    for( auto lib: m_impl->loadedLibraries )
         FreeLibrary( lib.second.hLib );
-    m_loadedLibraries.clear();
+    m_impl->loadedLibraries.clear();
+
+    delete m_impl;
+    m_impl = nullptr;
 }
 
 static std::unique_ptr<Win32FuncResolver> Win32FuncResolver_instance;
@@ -35,9 +64,9 @@ Win32FuncResolver* Win32FuncResolver::instance()
 
 void* Win32FuncResolver::resolveFunction( const std::wstring& libName, const std::string& funcName )
 {
-    std::unique_lock<std::mutex> lk( m_mutex );
+    std::unique_lock<std::mutex> lk( m_impl->mutex );
 
-    auto libInsRes = m_loadedLibraries.insert( std::make_pair( libName, LibFunctions() ) );
+    auto libInsRes = m_impl->loadedLibraries.insert( std::make_pair( libName, LibFunctions() ) );
     LibFunctions& libCtx = libInsRes.first->second;
     if( libInsRes.second )  //added new value
         libCtx.hLib = LoadLibrary( libName.c_str() );
