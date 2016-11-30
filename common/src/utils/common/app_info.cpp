@@ -1,5 +1,7 @@
 #include "app_info.h"
 
+#include <nx/utils/nx_utils_app_info.h>
+
 QnAppInfo::QnAppInfo(QObject* parent):
     QObject(parent)
 {
@@ -37,12 +39,5 @@ bool QnAppInfo::isMobile()
 
 QString QnAppInfo::applicationFullVersion()
 {
-    static const QString kBeta = beta() ? lit("-beta") : QString();
-    static const QString kFullVersion = lit("%1-%2-%3%4")
-        .arg(applicationVersion())
-        .arg(applicationRevision())
-        .arg(customizationName().replace(L' ', L'_'))
-        .arg(kBeta);
-
-    return kFullVersion;
+    return NxUtilsAppInfo::applicationFullVersion();
 }
