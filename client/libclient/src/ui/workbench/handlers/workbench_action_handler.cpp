@@ -1142,6 +1142,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::DeleteResources;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;

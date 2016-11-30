@@ -71,6 +71,7 @@ public:
     QString fetchPublicIpUrl;
     QString publicIpAddress;
     TcpReverseOptions tcpReverse;
+    bool sslAllowed;
 
     CloudConnect();
 };

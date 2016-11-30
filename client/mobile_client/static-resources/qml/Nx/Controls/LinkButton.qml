@@ -6,7 +6,7 @@ Button
 {
     id: control
 
-    property color color: ColorTheme.blue_d2
+    property color color: ColorTheme.brand_d2
 
     implicitHeight: 32
     implicitWidth: label ? label.implicitWidth : 0

@@ -9,7 +9,7 @@
 
 #include <utils/common/connective.h>
 #include <ui/utils/viewport_scale_watcher.h>
-#include <ui/graphics/painters/frame_painter.h>
+#include <ui/graphics/painters/cosmetic_frame_painter.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -444,7 +444,7 @@ private:
     SelectionState m_selectionState;
 
     QnViewportScaleWatcher m_scaleWatcher;
-    QnFramePainter m_framePainter;
+    QnCosmeticFramePainter m_framePainter;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

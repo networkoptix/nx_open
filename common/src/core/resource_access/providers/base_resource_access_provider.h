@@ -52,7 +52,8 @@ protected:
     void handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
     void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
 
-    void handleSubjectRemoved(const QnResourceAccessSubject& subject);
+    virtual void handleSubjectAdded(const QnResourceAccessSubject& subject);
+    virtual void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
     QSet<QnUuid> accessible(const QnResourceAccessSubject& subject) const;
 

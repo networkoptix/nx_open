@@ -136,6 +136,7 @@ void removeCustomConnection(const QnLocalConnectionData& data)
 
     customConnections.erase(itSameSystem);
     qnSettings->setCustomConnections(customConnections);
+    qnSettings->save();
 }
 
 void storeCustomConnection(const QnLocalConnectionData& data)
@@ -195,6 +196,7 @@ void storeCustomConnection(const QnLocalConnectionData& data)
     }
 
     qnSettings->setCustomConnections(customConnections);
+    qnSettings->save();
 }
 
 void storeLocalSystemConnection(

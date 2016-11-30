@@ -43,6 +43,8 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
             return nx::utils::naturalStringLess(l->getName(), r->getName());
         });
 
+    auto currentLayout = context()->workbench()->currentLayout()->resource();
+
     QList<QAction *> result;
     for (const auto &layout : layouts)
     {
@@ -59,6 +61,8 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
         QAction *action = new QAction(parent);
         action->setText(layout->getName());
         action->setData(QVariant::fromValue<QnLayoutResourcePtr>(layout));
+        action->setCheckable(true);
+        action->setChecked(layout == currentLayout);
         connect(action, &QAction::triggered, this,
             [this, layout]()
             {
