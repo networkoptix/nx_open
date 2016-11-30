@@ -59,7 +59,7 @@ angular.module('cloudApp')
                     return this._post('/ec2/removeUser', {id:userId});
                 },
                 cleanUserObject:function(user){ // Remove unnesesary fields from the object
-                    var supportedFields = ['email', 'userId', 'groupId', 'permissions', 'isCloud', 'isEnabled'];
+                    var supportedFields = ['email', 'name', 'fullName', 'userId', 'groupId', 'permissions', 'isCloud', 'isEnabled'];
                     var cleanedUser = {};
                     for(var i in supportedFields){
                         cleanedUser[supportedFields[i]] = user[supportedFields[i]];
