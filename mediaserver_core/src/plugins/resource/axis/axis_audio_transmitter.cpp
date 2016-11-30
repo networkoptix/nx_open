@@ -31,10 +31,11 @@ QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res):
     m_noAuth(false),
     m_state(TransmitterState::WaitingForConnection)
 {
-    connect(m_resource, &QnResource::parentIdChanged, this, [this]()
-    {
-        pleaseStop();
-    }, Qt::DirectConnection);
+    connect(m_resource, &QnResource::parentIdChanged, this, 
+        [this]()
+        {
+            pleaseStop();
+        }, Qt::DirectConnection);
 }
 
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
@@ -135,10 +136,10 @@ std::unique_ptr<AbstractStreamSocket> QnAxisAudioTransmitter::takeSocket(const n
     nx::utils::promise<void> socketTakenPromise;
     httpClient->dispatch(
         [this, &sock, &socketTakenPromise, &httpClient]()
-    {
-        sock = std::move(httpClient->takeSocket());
-        socketTakenPromise.set_value();
-    });
+        {
+            sock = std::move(httpClient->takeSocket());
+            socketTakenPromise.set_value();
+        });
     socketTakenPromise.get_future().wait();
 
     if (!sock || !sock->setNonBlockingMode(false))

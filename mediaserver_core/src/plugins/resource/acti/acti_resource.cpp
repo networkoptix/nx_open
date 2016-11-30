@@ -2,6 +2,7 @@
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 #include "acti_ptz_controller.h"
+#include "acti_audio_transmitter.h"
 
 #include <functional>
 #include <memory>
@@ -19,19 +20,29 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
 
-
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_SYSTEM(lit("system"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_DEFAULT(lit("encoder"));
 const QString QnActiResource::DEFAULT_ADVANCED_PARAMETERS_TEMPLATE(lit("nx-cube.xml"));
 const QString QnActiResource::ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME(lit("advancedParametersTemplate"));
-static const int TCP_TIMEOUT = 3000;
-static const int DEFAULT_RTSP_PORT = 7070;
 
-static int actiEventPort = 0;
+namespace {
 
-static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
+const int TCP_TIMEOUT = 3000;
+const int DEFAULT_RTSP_PORT = 7070;
+int actiEventPort = 0;
+int DEFAULT_AVAIL_BITRATE_KBPS[] = {
+    28, 56, 128, 256,
+    384, 500, 750, 1000,
+    1200, 1500, 2000, 2500,
+    3000, 3500, 4000, 4500,
+    5000, 5500, 6000};
+
+const QString kTwoAudioParamName = lit("factory default type");
+const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
+
+} // namespace
 
 QnActiResource::QnActiResource() :
     m_desiredTransport(RtpTransport::_auto),
@@ -39,7 +50,8 @@ QnActiResource::QnActiResource() :
     m_hasAudio(false),
     m_outputCount(0),
     m_inputCount(0),
-    m_inputMonitored(false)
+    m_inputMonitored(false),
+    m_audioTransmitter(new ActiAudioTransmitter(this))
 {
     setVendor(lit("ACTI"));
 
@@ -517,6 +529,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         m_availableBitrates = parseVideoBitrateCap(bitrateCap.toLatin1());
 
     initializeIO(report);
+    initialize2WayAudio(report);
 
     std::unique_ptr<QnAbstractPtzController> ptzController(
         createPtzControllerInternal());
@@ -1364,6 +1377,23 @@ QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCamer
     }
 
     return result;
+}
+
+QnAudioTransmitterPtr QnActiResource::getAudioTransmitter()
+{
+    if (!isInitialized() && !m_audioTransmitter->isInitialized())
+        return nullptr;
+
+    return m_audioTransmitter;
+}
+
+void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
+{
+    if (!systemInfo.contains(kTwoAudioParamName))
+        return;
+
+    if (systemInfo[kTwoAudioParamName] == kTwoWayAudioDeviceType)
+        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
 }
 
 #endif // #ifdef ENABLE_ACTI

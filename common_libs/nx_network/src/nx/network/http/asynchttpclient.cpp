@@ -75,7 +75,8 @@ namespace nx_http
         m_lastSysErrorCode(SystemError::noError),
         m_requestSequence(0),
         m_forcedEof(false),
-        m_precalculatedAuthorizationDisabled(false)
+        m_precalculatedAuthorizationDisabled(false),
+        m_allowPrecalculatedBasicAuth(false)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -417,6 +418,12 @@ namespace nx_http
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
     {
         m_precalculatedAuthorizationDisabled = val;
+    }
+
+
+    void AsyncHttpClient::setAllowPrecalculatedBasicAuth(bool val)
+    {
+        m_allowPrecalculatedBasicAuth = val;
     }
 
     void AsyncHttpClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
@@ -1044,8 +1051,21 @@ namespace nx_http
                 &m_request,
                 &m_authCacheItem))
         {
-            //not using Basic authentication by default, since it is not secure
-            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            if (m_allowPrecalculatedBasicAuth)
+            {
+                header::BasicAuthorization basicAuthorization(m_userName.toLatin1(), m_userPassword.toLatin1());
+                nx_http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    nx_http::HttpHeader(
+                        header::Authorization::NAME,
+                        basicAuthorization.serialized()));
+            }
+            else
+            {
+                //not using Basic authentication by default, since it is not secure
+                nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            }
+            
         }
     }
 
@@ -1285,7 +1305,6 @@ namespace nx_http
         m_forcedEof = true;
         m_httpStreamReader.forceEndOfMsgBody();
     }
-
 
     /**********************************************************
     * utils

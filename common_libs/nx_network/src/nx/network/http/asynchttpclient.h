@@ -217,6 +217,9 @@ namespace nx_http
         //!If set to \a true client will not try to add Authorization header to the first request. \a false by default
         void setDisablePrecalculatedAuthorization(bool val);
 
+        //!If set to \a true client will try to add basic auth header to the first request. \a false by default
+        void setAllowPrecalculatedBasicAuth(bool val);
+
         //!Set socket connect/send timeout
         void setSendTimeoutMs(unsigned int sendTimeoutMs);
         /*!
@@ -323,6 +326,7 @@ namespace nx_http
         //TODO #ak remove this member
         nx::network::aio::Timer m_aioThreadBinder;
         bool m_precalculatedAuthorizationDisabled;
+        bool m_allowPrecalculatedBasicAuth;
 
         AsyncHttpClient();
 
