@@ -4,11 +4,11 @@
 #include <memory>
 #include <boost/type_traits/is_same.hpp>
 
-#include <platform/win32_syscall_resolver.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/platform/win32_syscall_resolver.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <common/common_globals.h>
