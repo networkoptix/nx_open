@@ -9,6 +9,7 @@ import unittest
 from collections import OrderedDict
 from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
+import pycommons.Logger
 from pycommons.Logger import log, logger, LOGLEVEL
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
@@ -481,8 +482,7 @@ class FuncTestCase(unittest.TestCase):
 
 
     def setUp(self):
-        if logger.isSystem():
-            print "logger is system",
+        if pycommons.Logger.logger.isSystem():
             print  # this is because the unittest module desn't add \n after printing new test name,
             #  so the first log message would be printed in the same line
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)

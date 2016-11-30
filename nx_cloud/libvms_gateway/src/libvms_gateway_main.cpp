@@ -12,7 +12,7 @@
     #include <signal.h>
 #endif
 
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 static nx::cloud::gateway::VmsGatewayProcessPublic* serviceInstance = NULL;
 
