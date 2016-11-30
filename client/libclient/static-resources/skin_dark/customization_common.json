@@ -86,9 +86,8 @@
         "timeline_main":    "#3a911e",
         "timeline_bg":      "#223925",
 
-        "opaqueSelection":  "blue10",
-        "ptz":              "blue10",
-        "selection":        "opaqueSelection.setAlpha(110)"
+        "ptz":              "brand_core",
+        "selection":        "brand_core.setAlpha(110)"
     },
 
     "QnGlobals": {
@@ -98,7 +97,7 @@
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
         "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
-        "businessRuleInvalidHighlightColor": "opaqueSelection",
+        "businessRuleInvalidHighlightColor": "brand_core",
         "errorTextColor": "red_l2",
         "warningTextColor": "yellow_core",
         "successTextColor": "green_l2",
@@ -127,8 +126,8 @@
                 "shadow":           "dark5",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast",
-                "link":             "blue12",
-                "linkVisited":      "blue11",
+                "link":             "brand_d2",
+                "linkVisited":      "brand_d1",
                 "alternateBase":    "dark7",
                 "toolTipBase":      "light4",
                 "toolTipText":      "dark4"
@@ -148,8 +147,8 @@
                 "shadow":           "dark5.setAlpha(77)",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast.setAlpha(77)",
-                "link":             "blue12.setAlpha(77)",
-                "linkVisited":      "blue11.setAlpha(77)",
+                "link":             "brand_d2.setAlpha(77)",
+                "linkVisited":      "brand_d1.setAlpha(77)",
                 "alternateBase":    "dark7.setAlpha(77)",
                 "toolTipBase":      "light4",
                 "toolTipText":      "dark4"
@@ -160,10 +159,10 @@
     "QWidget": {
         "palette": {
             "default": {
-                "link":             "blue10"
+                "link":             "brand_core"
             },
             "inactive": {
-                "link":             "blue12"
+                "link":             "brand_d2"
             }
         }
     },
@@ -418,10 +417,10 @@
 
             "pastBookmark": "blue12.setAlpha(204)",
             "futureBookmark": "blue12.setAlpha(204)",
-            "pastBookmarkHover": "brand_core.setAlpha(230)",
-            "futureBookmarkHover": "brand_core.setAlpha(230)",
-            "pastBookmarkBound": "brand_core",
-            "futureBookmarkBound": "brand_core",
+            "pastBookmarkHover": "blue10.setAlpha(230)",
+            "futureBookmarkHover": "blue10.setAlpha(230)",
+            "pastBookmarkBound": "blue10",
+            "futureBookmarkBound": "blue10",
 
             "tickmarkLines": [ "light10", "dark17", "dark13", "dark9" ],
             "tickmarkText" : [ "light8", "light16", "dark15" ]
@@ -486,8 +485,8 @@
 
     "QnServerResourceWidget": {
         "colors": {
-            "frame": "opaqueSelection",
-            "grid": "opaqueSelection.setAlpha(100)",
+            "frame": "brand_core",
+            "grid": "brand_core.setAlpha(100)",
             "cpu": "#428ced",
             "ram": "#db3ba9",
             "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
