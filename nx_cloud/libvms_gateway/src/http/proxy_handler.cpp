@@ -43,6 +43,8 @@ void ProxyHandler::processRequest(
         requestOptions.isSsl = m_runTimeOptions.isSslEnforsed(requestOptions.target);
 
     // TODO: #ak avoid request loop by using Via header.
+    if (requestOptions.isSsl && !m_settings.cloudConnect().sslAllowed)
+        requestOptions.isSsl = false;
 
     m_targetPeerSocket = SocketFactory::createStreamSocket(requestOptions.isSsl);
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
