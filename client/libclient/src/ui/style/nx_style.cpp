@@ -39,13 +39,18 @@
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-
-#define CUSTOMIZE_POPUP_SHADOWS
-
 using namespace style;
 
 namespace
 {
+    constexpr bool kCustomizePopupShadows = true;
+
+#if defined(Q_OS_WIN) || defined(Q_OS_OSX)
+    constexpr bool kForceMenuMouseReplay = true;
+#else
+    constexpr bool kForceMenuMouseReplay = false;
+#endif
+
     const char* kDelegateClassBackupId = "delegateClass";
     const char* kViewportMarginsBackupId = "viewportMargins";
     const char* kContentsMarginsBackupId = "contentsMargins";
@@ -410,38 +415,47 @@ QnNxStyle::QnNxStyle() :
             if (!view || !view->scene())
                 return;
 
-            if (auto grabber = view->scene()->mouseGrabberItem())
+            while (auto grabber = view->scene()->mouseGrabberItem())
                 grabber->ungrabMouse();
         });
-#if 0
-    /* Windows-style handling of mouse clicks outside of popup menu: */
-    installEventHandler(qApp, QEvent::MouseButtonPress, this,
-        [this](QObject* watched, QEvent* event)
-        {
-            if (!event->spontaneous())
-                return;
 
-            auto activeMenu = qobject_cast<QMenu*>(qApp->activePopupWidget());
-            if (activeMenu != watched)
-                return;
+    /* Windows-style handling of mouse clicks outside of popup menu. */
+    //QTBUG: Qt is supposed to handle this, but currently it seems broken.
+    if (kForceMenuMouseReplay)
+    {
+        installEventHandler(qApp, QEvent::MouseButtonPress, this,
+            [this](QObject* watched, QEvent* event)
+            {
+                if (!event->spontaneous())
+                    return;
 
-            auto mouseEvent = static_cast<QMouseEvent*>(event);
-            auto globalPos = mouseEvent->globalPos();
+                auto activeMenu = qobject_cast<QMenu*>(qApp->activePopupWidget());
+                if (activeMenu != watched)
+                    return;
 
-            if (activeMenu->geometry().contains(globalPos))
-                return;
+                auto mouseEvent = static_cast<QMouseEvent*>(event);
+                auto globalPos = mouseEvent->globalPos();
 
-            auto window = QGuiApplication::topLevelAt(globalPos);
-            if (!window)
-                return;
+                if (activeMenu->geometry().contains(globalPos))
+                    return;
 
-            auto localPos = window->mapFromGlobal(globalPos);
+                /* If menu was invoked by a click on some area we most probably want to
+                 * prevent re-invoking menu if it was closed by click in the same area: */
+                QRect noReplayRect = activeMenu->property(Properties::kMenuNoMouseReplayRect).value<QRect>();
+                if (noReplayRect.isValid() && noReplayRect.contains(globalPos))
+                    return;
 
-            qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
-                localPos, globalPos, mouseEvent->button(),
-                mouseEvent->buttons(), mouseEvent->modifiers()));
-        });
-#endif
+                auto window = QGuiApplication::topLevelAt(globalPos);
+                if (!window)
+                    return;
+
+                auto localPos = window->mapFromGlobal(globalPos);
+
+                qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
+                    localPos, globalPos, mouseEvent->button(),
+                    mouseEvent->buttons(), mouseEvent->modifiers()));
+            });
+    }
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
@@ -3657,8 +3671,7 @@ void QnNxStyle::polish(QWidget *widget)
     if (auto label = qobject_cast<QLabel*>(widget))
         QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
 
-#ifdef CUSTOMIZE_POPUP_SHADOWS
-    if (popupToCustomizeShadow)
+    if (kCustomizePopupShadows && popupToCustomizeShadow)
     {
         /* Create customized shadow: */
         if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
@@ -3671,7 +3684,6 @@ void QnNxStyle::polish(QWidget *widget)
             shadow->setSpread(0);
         }
     }
-#endif
 
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
@@ -3724,10 +3736,8 @@ void QnNxStyle::unpolish(QWidget* widget)
         }
     }
 
-#ifdef CUSTOMIZE_POPUP_SHADOWS
-    if (popupWithCustomizedShadow)
+    if (kCustomizePopupShadows && popupWithCustomizedShadow)
         QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
-#endif
 
     if (auto label = qobject_cast<QLabel*>(widget))
         QnObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);

@@ -8,6 +8,7 @@
 #include <ui/actions/actions.h>
 #include <ui/common/geometry.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/style/helper.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/common/tool_button.h>
@@ -16,6 +17,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workaround/hidpi_workarounds.h>
+
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -32,7 +35,25 @@ QFrame* newVLine()
     line->setFixedWidth(1);
     return line;
 }
+
+void executeButtonMenu(QnToolButton* invoker, QMenu* menu, const QPoint& offset = QPoint(0, 0))
+{
+    if (!menu || !invoker)
+        return;
+
+    QRect invokerGeometry(QnHiDpiWorkarounds::safeMapToGlobal(invoker, QPoint()),
+        invoker->size());
+
+    menu->setProperty(style::Properties::kMenuNoMouseReplayRect, invokerGeometry);
+
+    QnHiDpiWorkarounds::showMenu(menu,
+        QnHiDpiWorkarounds::safeMapToGlobal(invoker,
+            invoker->rect().bottomLeft() + offset));
+
+    invoker->setDown(false);
 }
+
+} // namespace
 
 class QnMainWindowTitleBarWidgetPrivate: public QObject
 {
@@ -91,23 +112,14 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->mainMenuButton = newActionButton(
         QnActions::MainMenuAction,
         Qn::MainWindow_TitleBar_MainMenu_Help);
-    d->mainMenuButton->setPopupMode(QToolButton::InstantPopup);
     connect(d->mainMenuButton, &QnToolButton::justPressed, this,
         [this]()
         {
-            QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::MainScope, nullptr));
-            if (!menu)
-                return;
-
-            static const QPoint kVerticalOffset(0, 2);
-
             Q_D(const QnMainWindowTitleBarWidget);
-            QnHiDpiWorkarounds::showMenu(menu.data(),
-                QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
-                    d->mainMenuButton->rect().bottomLeft() + kVerticalOffset));
-
-            d->mainMenuButton->setDown(false);
-    });
+            static const QPoint kVerticalOffset(0, 2);
+            QScopedPointer<QMenu> mainMenu(menu()->newMenu(Qn::MainScope, nullptr));
+            executeButtonMenu(d->mainMenuButton, mainMenu.data(), kVerticalOffset);
+        });
 
     d->tabBar = new QnLayoutTabBar(this);
     d->tabBar->setFocusPolicy(Qt::NoFocus);
@@ -143,22 +155,15 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->currentLayoutsButton = newActionButton(
         QnActions::OpenCurrentUserLayoutMenu,
         kTabBarButtonSize);
-    d->currentLayoutsButton->setPopupMode(QToolButton::InstantPopup);
     connect(d->currentLayoutsButton, &QnToolButton::justPressed, this,
         [this]()
         {
-            QScopedPointer<QMenu> menu(this->menu()->newMenu(
+            QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
                 QnActions::OpenCurrentUserLayoutMenu,
                 Qn::TitleBarScope));
-            if (!menu)
-                return;
 
             Q_D(const QnMainWindowTitleBarWidget);
-            QnHiDpiWorkarounds::showMenu(menu.data(),
-                QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
-                    d->currentLayoutsButton->rect().bottomLeft()));
-
-            d->currentLayoutsButton->setDown(false);
+            executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
         });
 
     layout->addWidget(d->newTabButton);
