@@ -876,6 +876,7 @@
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>client/libclient_core</module>
+                <module>nx_cloud/libvms_gateway</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>media_db_util</module>
@@ -1035,6 +1036,7 @@
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>client/libclient_core</module>
+                <module>nx_cloud/libvms_gateway</module>
                 <module>client/mobile_client</module>
             </modules>
         </profile>
