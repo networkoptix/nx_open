@@ -1,7 +1,11 @@
 #pragma once
 
-struct NX_UTILS_API NxUtilsAppInfo
+namespace nx {
+namespace utils {
+
+class NX_UTILS_API AppInfo
 {
+public:
     /** History name, used as a key in windows registry, appdata folder, etc. */
     static QString applicationName();
 
@@ -18,3 +22,6 @@ struct NX_UTILS_API NxUtilsAppInfo
 
     static QString customizationName();
 };
+
+} // namespace nx
+} // namespace utils

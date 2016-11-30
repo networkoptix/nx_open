@@ -1,6 +1,6 @@
 #include "app_info.h"
 
-#include <nx/utils/nx_utils_app_info.h>
+#include <nx/utils/app_info.h>
 
 QnAppInfo::QnAppInfo(QObject* parent):
     QObject(parent)
@@ -35,9 +35,4 @@ bool QnAppInfo::isIos()
 bool QnAppInfo::isMobile()
 {
     return isAndroid() || isIos();
-}
-
-QString QnAppInfo::applicationFullVersion()
-{
-    return NxUtilsAppInfo::applicationFullVersion();
 }
