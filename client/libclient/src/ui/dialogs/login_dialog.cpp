@@ -57,7 +57,7 @@
 namespace {
 static const QnUuid kCustomConnectionLocalId;
 
-constexpr auto kMinIntroWidth = 550;
+constexpr int kMinIntroWidth = 550;
 
 static std::array<const char*, 5> kIntroNames {
     "intro.mkv",
