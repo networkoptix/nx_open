@@ -5,11 +5,12 @@ GUID = ${guid}
 VERSION = ${release.version}
 
 CONFIG -= flat qt
-CONFIG += c++14 console
+CONFIG += c++14
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
+  CONFIG += console
 }
 else {
   CONFIGURATION=release
@@ -26,7 +27,7 @@ LIBS += shlwapi.lib
 QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /wd4290 /wd4661 /wd4100 /we4717
 # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
 QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
-QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
+QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF /ENTRY:"mainCRTStartup"
 QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
 
 QMAKE_CXXFLAGS_DEBUG += /MTd
