@@ -15,7 +15,9 @@ namespace api {
 
 qint32 getResourceInternalId(const QSqlDatabase& database, const QnUuid& guid)
 {
-    const QString queryStr = "SELECT id from vms_resource where guid = ?";
+    const QString queryStr = R"sql(
+        SELECT id from vms_resource where guid = ?
+    )sql";
 
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -42,23 +44,26 @@ bool insertOrReplaceResource(
     QSqlQuery query(database);
     if (*internalId)
     {
-        const QString queryStr = R"(
+        const QString queryStr = R"sql(
             UPDATE vms_resource
             SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url
             WHERE id = :internalId
-        )";
+        )sql";
+
         if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return false;
+
         query.bindValue(":internalId", *internalId);
     }
     else
     {
-        const QString queryStr = R"(
+        const QString queryStr = R"sql(
             INSERT INTO vms_resource
             (guid, xtype_guid, parent_guid, name, url)
             VALUES
             (:id, :typeId, :parentId, :name, :url)
-        )";
+        )sql";
+
         if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return false;
     }
