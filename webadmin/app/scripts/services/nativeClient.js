@@ -61,7 +61,7 @@ angular.module('webadminApp')
 
                 return deferred.promise;
             },
-            getCredentials:function(){
+            getCredentialsRaw:function(){
                 if(nativeClientObject && nativeClientObject.getCredentials){
                     return $q.resolve(nativeClientObject.getCredentials());
                 }
@@ -75,6 +75,21 @@ angular.module('webadminApp')
                 }
 
                 return $q.reject();
+            },
+
+            getCredentials:function(){
+                return this.getCredentialsRaw().then(function(authObject){
+                    if (typeof authObject === 'string' || authObject instanceof String) {
+                        $log.log("got string from client, try to decode JSON: " + authObject);
+                        try {
+                            authObject = JSON.parse(authObject);
+                        } catch (a) {
+                            $log("could not decode JSON from string: " + authObject);
+                        }
+                    }
+                    $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
+                    return authObject;
+                });
             },
             openUrlInBrowser:function(url, windowFallback){
                 if(nativeClientObject && nativeClientObject.openUrlInBrowser){
@@ -131,15 +146,6 @@ angular.module('webadminApp')
                 if(nativeClientObject){ // Thick client - close current window
                     $log.log("close window");
                     window.close();
-                    return $q.resolve();
-                }
-
-                if(socketClientController){ // Lite client - go to invitation page and reload
-                    $log.log("navigate to client tab");
-                    $location.path("/client");
-                    setTimeout(function(){
-                        window.location.reload();
-                    });
                     return $q.resolve();
                 }
 

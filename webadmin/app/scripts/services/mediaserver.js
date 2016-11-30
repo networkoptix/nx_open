@@ -3,10 +3,12 @@
 angular.module('webadminApp')
     .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log) {
 
+        var mediaserver = {};
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
         var proxy = '';
+        // Support proxy mode
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');
             for (var i=0;i<params.length;i++) {
@@ -82,8 +84,22 @@ angular.module('webadminApp')
                 return; // inline mode - do not do anything
             }
             if(error.status === 403 || error.status === 401) {
-                callLogin();
-                return;
+                // Try to get credentials from native client
+                return nativeClient.init().then(function(){
+                    return nativeClient.getCredentials().then(function(credentials) {
+                        var login = credentials.localLogin;
+                        var password = credentials.localPassword;
+                        if(!(login && password)) {
+                            return $q.reject();
+                        }
+                        return mediaserver.login(login, password).then(function(){
+                            setTimeout(function(){
+                                window.location.reload();
+                            },20);
+                            return true;
+                        });
+                    });
+                }, callLogin);
             }
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
@@ -132,6 +148,7 @@ angular.module('webadminApp')
         }
 
 
+        // Special hack to make our json recognizable by fusion on mediaserver
         function stringifyValues(object){
             if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
                 return object;
@@ -144,7 +161,7 @@ angular.module('webadminApp')
         }
 
 
-        return {
+        mediaserver = {
             checkCurrentPassword:function(password){
                 var login = $localStorage.login;
                 var realm = $localStorage.realm;
@@ -254,9 +271,7 @@ angular.module('webadminApp')
             },
             getUser:function(reload){
                 if(this.hasProxy()){ // Proxy means read-only
-                    var deferred = $q.defer();
-                    deferred.resolve(false);
-                    return deferred.promise;
+                    return $q.resolve(false);
                 }
 
                 return this.getCurrentUser(reload).then(function(result){
@@ -594,4 +609,6 @@ angular.module('webadminApp')
                 });
             }
         };
+
+        return mediaserver;
     });
