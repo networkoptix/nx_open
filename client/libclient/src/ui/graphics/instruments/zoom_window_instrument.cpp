@@ -23,7 +23,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/graphics/painters/frame_painter.h>
+#include <ui/graphics/painters/cosmetic_frame_painter.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
@@ -217,7 +217,7 @@ private:
     bool m_interactive;
     QPointer<ZoomOverlayWidget> m_overlay;
     QPointer<QnMediaResourceWidget> m_zoomWidget;
-    QnFramePainter m_framePainter;
+    QnCosmeticFramePainter m_framePainter;
 };
 
 
@@ -403,29 +403,6 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     connect(display(), &QnWorkbenchDisplay::zoomLinkAdded,              this, &ZoomWindowInstrument::at_display_zoomLinkAdded);
     connect(display(), &QnWorkbenchDisplay::zoomLinkAboutToBeRemoved,   this, &ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved);
     connect(display(), &QnWorkbenchDisplay::widgetChanged,              this, &ZoomWindowInstrument::at_display_widgetChanged);
-
-    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
-        [this](qreal value)
-        {
-            const auto penWidth = kZoomLineWidth * value;
-            const auto pen = QPen(m_zoomWindowColor, penWidth, Qt::SolidLine,
-                Qt::SquareCap, Qt::MiterJoin);
-            if (selectionItem())
-                selectionItem()->setPen(pen);
-
-            for (const auto widget : m_dataByWidget)
-            {
-                if (widget.windowWidget)
-                    widget.windowWidget->setFrameWidth(penWidth);
-            }
-        });
-
-    connect(this, &Instrument::sceneChanged, this,
-        [this]()
-        {
-            if (scene() && !m_scaleWatcher.initialized())
-                m_scaleWatcher.initialize(scene());
-        });
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
@@ -554,7 +531,7 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaRe
         windowWidget = new ZoomWindowWidget();
     }
     windowWidget->setZoomWidget(widget);
-    windowWidget->setFrameWidth(kZoomLineWidth * m_scaleWatcher.scale());
+    windowWidget->setFrameWidth(kZoomLineWidth);
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
     connect(windowWidget, &ZoomWindowWidget::geometryChanged,   this, &ZoomWindowInstrument::at_windowWidget_geometryChanged);

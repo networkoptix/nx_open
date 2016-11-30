@@ -14,10 +14,10 @@ public:
     QnResourceRuntimeDataManager(QObject* parent = nullptr);
 
     QVariant resourceData(const QnResourcePtr& resource, Qn::ItemDataRole role) const;
-    void setResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role, QVariant data);
+    void setResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role, const QVariant& data);
 
     QVariant layoutItemData(const QnUuid& id, Qn::ItemDataRole role) const;
-    void setLayoutItemData(const QnUuid& id, Qn::ItemDataRole role, QVariant data);
+    void setLayoutItemData(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 
     template<class T>
     void setLayoutItemData(const QnUuid& id, Qn::ItemDataRole role, const T &value)
@@ -25,8 +25,11 @@ public:
         setLayoutItemData(id, role, QVariant::fromValue<T>(value));
     }
 
+signals:
+    void layoutItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+
 private:
-    void setDataInternal(const QnUuid& id, Qn::ItemDataRole role, QVariant data);
+    void setDataInternal(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 
 private:
     using DataHash = QHash<Qn::ItemDataRole, QVariant>;

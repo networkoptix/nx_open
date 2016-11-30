@@ -18,6 +18,7 @@
 
 
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/graphics/shaders/blur_shader_program.h>
 
 class CLVideoDecoderOutput;
 class ScreenshotInterface;
@@ -48,6 +49,7 @@ public:
 
     QnYv12ToRgbaShaderProgram *yv12ToRgba;
     QnNv12ToRgbShaderProgram *nv12ToRgb;
+    QnBlurShaderProgram* m_blurShader;
 };
 
 
@@ -63,6 +65,11 @@ public:
         Called with corresponding QGLContext is surely alive
     */
     void beforeDestroy();
+
+    /**
+     * Set blur in range [0..1]
+     */
+    void setBlurFactor(qreal value);
 
     Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
 
@@ -162,6 +169,16 @@ private:
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
+    Qn::RenderStatus drawVideoData(const QRectF &sourceRect, const QRectF &targetRect);
+
+    Qn::RenderStatus prepareBlurBuffers();
+    void renderBlurFBO(const QRectF &sourceRect);
+    void doBlurStep(
+        const QRectF& sourceRect,
+        const QRectF& dstRect,
+        GLuint texture,
+        const QVector2D& textureOffset,
+        bool isHorizontalPass);
 
 private:
     bool m_initialized;
@@ -171,6 +188,11 @@ private:
     QSharedPointer<QOpenGLVertexArrayObject> m_vertices;
     QOpenGLBuffer m_positionBuffer;
     QOpenGLBuffer m_textureBuffer;
+
+    std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferA;
+    std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferB;
+    qreal m_blurFactor;
+    qreal m_prevBlurFactor;
 };
 
 #endif //QN_GL_RENDERER_H

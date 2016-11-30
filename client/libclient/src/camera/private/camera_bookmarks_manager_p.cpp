@@ -179,6 +179,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
     QnGetBookmarksRequestData requestData;
     requestData.cameras = cameras.toList();
     requestData.filter = filter;
+    requestData.format = Qn::SerializationFormat::UbjsonFormat;
 
     int requestId = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
     if (callback)

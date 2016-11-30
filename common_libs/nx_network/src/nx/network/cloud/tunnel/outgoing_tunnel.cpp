@@ -84,7 +84,7 @@ void OutgoingTunnel::establishNewConnection(
                 [handler = std::move(handler), this](
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket,
-                    bool tunnelStillValid)
+                    bool tunnelStillValid) mutable
                 {
                     onConnectFinished(
                         std::move(handler),
@@ -286,7 +286,8 @@ void OutgoingTunnel::onConnectorFinished(
     }
 
     // Reporting error to everyone who is waiting.
-    auto connectHandlers = std::move(m_connectHandlers);
+    decltype(m_connectHandlers) connectHandlers;
+    connectHandlers.swap(m_connectHandlers);
     m_state = State::closed;
     m_lastErrorCode = errorCode;
     lk.unlock();
@@ -314,7 +315,7 @@ void OutgoingTunnel::setTunnelConnection(
             [handler = std::move(connectRequest.second.handler), this](
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractStreamSocket> socket,
-                bool tunnelStillValid)
+                bool tunnelStillValid) mutable
             {
                 onConnectFinished(
                     std::move(handler),

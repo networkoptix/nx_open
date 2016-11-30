@@ -40,6 +40,8 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <nx/utils/log/log.h>
+
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
     m_accessController(accessController),
@@ -220,6 +222,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     {
         case SystemUri::ClientCommand::LoginToCloud:
         {
+            NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
             qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
             break;
         }
@@ -229,11 +232,16 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             QUrl systemUrl = QUrl::fromUserInput(systemId);
+            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+
             systemUrl.setUserName(auth.user);
             systemUrl.setPassword(auth.password);
 
             if (systemIsCloud)
+            {
                 qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+            }
 
             auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);

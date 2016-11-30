@@ -103,7 +103,7 @@ protected:
     virtual void applyChanges();
 
     /**
-    * @brief discardChanges                     Discard unsaved changes. Called on force close only.
+    * @brief discardChanges                     Discard unsaved changes.
     */
     virtual void discardChanges();
 

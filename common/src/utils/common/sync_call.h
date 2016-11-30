@@ -42,4 +42,10 @@ std::tuple<ResultType, OutArg1> makeSyncCall(
     return std::make_tuple(future.get(), std::move(result));
 }
 
+template<typename ResultType, typename OutArg1, typename FuncPtr, typename Arg1, typename ... Args>
+std::tuple<ResultType, OutArg1> makeSyncCall(FuncPtr funcPtr, Arg1 arg1, Args... args)
+{
+    return makeSyncCall<ResultType, OutArg1>(std::bind(funcPtr, arg1, args...));
+}
+
 #endif //NX_MAKE_SYNC_CALL_H

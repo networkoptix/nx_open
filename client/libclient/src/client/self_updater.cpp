@@ -109,10 +109,11 @@ bool SelfUpdater::updateApplauncher()
         + lit("/../applauncher/")
         + QnAppInfo::customizationName());
 
-    if (!targetDir.mkpath(QnClientAppInfo::binDirSuffix()))
+    QString absolutePath = targetDir.absoluteFilePath(QnClientAppInfo::binDirSuffix());
+    if (!QDir(absolutePath).mkpath(lit(".")))
     {
         NX_LOG(lit("Cannot create folder for applaucher: %1")
-            .arg(targetDir.absolutePath()), cl_logERROR);
+            .arg(absolutePath), cl_logERROR);
         return false;
     }
 
@@ -475,9 +476,9 @@ QStringList SelfUpdater::getClientInstallRoots() const
             continue;
 
         const auto clientRoot = entry.absoluteFilePath();
+        const auto binDir = QDir(clientRoot).absoluteFilePath(QnClientAppInfo::binDirSuffix());
+        const auto clientBinary = QDir(binDir).absoluteFilePath(QnClientAppInfo::clientBinaryName());
 
-        const auto clientBinary = QDir(clientRoot).absoluteFilePath(
-            QnClientAppInfo::binDirSuffix() + L'/' + QnClientAppInfo::clientBinaryName());
         if (!QFileInfo::exists(clientBinary))
         {
             NX_LOG(lit("Could not find client binary in %1").arg(clientBinary), cl_logINFO);

@@ -46,6 +46,22 @@ bool QnMobileClientSettings::isLiteClientModeEnabled() const
     return false;
 }
 
+bool QnMobileClientSettings::isAutoLoginEnabled() const
+{
+    switch (static_cast<AutoLoginMode>(autoLoginMode()))
+    {
+        case AutoLoginMode::Enabled:
+            return true;
+        case AutoLoginMode::Auto:
+            return !isLiteClientModeEnabled();
+        case AutoLoginMode::Disabled:
+            return false;
+        default:
+            break;
+    }
+    return false;
+}
+
 void QnMobileClientSettings::updateValuesFromSettings(
         QSettings* settings,
         const QList<int>& ids)
@@ -75,6 +91,7 @@ void QnMobileClientSettings::writeValueToSettings(
         case LiteMode:
         case TestMode:
         case InitialTest:
+        case WebSocketPort:
         case StartupParameters:
             break;
 

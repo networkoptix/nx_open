@@ -163,13 +163,13 @@ bool QnUserSettingsWidget::hasChanges() const
         if (m_model->user()->isEnabled() != ui->enabledButton->isChecked())
             return true;
 
-        QnUuid groupId = selectedUserGroup();
-        if (m_model->user()->userGroup() != groupId)
+        QnUuid userRoleId = selectedUserRoleId();
+        if (m_model->user()->userRoleId() != userRoleId)
             return true;
 
-        if (groupId.isNull())
+        if (userRoleId.isNull())
         {
-            /* Check if we have selected a predefined internal group. */
+            /* Check if we have selected a predefined internal user role. */
             Qn::UserRole roleType = selectedRole();
             if (roleType != Qn::UserRole::CustomPermissions
                 && (QnUserRolesManager::userRolePermissions(roleType)
@@ -284,7 +284,7 @@ void QnUserSettingsWidget::applyChanges()
     /* Here we must be sure settings widget goes before the permissions one. */
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        m_model->user()->setUserGroup(selectedUserGroup());
+        m_model->user()->setUserRoleId(selectedUserRoleId());
         if (selectedRole() != Qn::UserRole::CustomPermissions)
             m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
     }
@@ -493,7 +493,7 @@ Qn::UserRole QnUserSettingsWidget::selectedRole() const
     return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
 }
 
-QnUuid QnUserSettingsWidget::selectedUserGroup() const
+QnUuid QnUserSettingsWidget::selectedUserRoleId() const
 {
     return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
 }

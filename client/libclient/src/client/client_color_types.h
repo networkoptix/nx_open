@@ -34,6 +34,8 @@ public:
     QColor pastBookmarkBound;
     QColor futureBookmarkBound;
 
+    QColor noThumbnailsLabel;
+
     QColor separator;
 
     std::vector<QColor> dateBarBackgrounds;
@@ -51,7 +53,7 @@ public:
     (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
     (pastBookmark)(futureBookmark)(pastBookmarkHover)(futureBookmarkHover)(pastBookmarkBound)(futureBookmarkBound)\
     (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
-    (separator)(dateBarBackgrounds)(dateBarText)(tickmarkLines)(tickmarkText)
+    (noThumbnailsLabel)(separator)(dateBarBackgrounds)(dateBarText)(tickmarkLines)(tickmarkText)
 
 
 struct QnBackgroundColors {
@@ -235,9 +237,9 @@ struct QnVideowallManageWidgetColors {
 };
 #define QnVideowallManageWidgetColors_Fields (desktop)(freeSpace)(item)(text)(error)
 
-struct QnRoutingManagementColors {
+struct QnRoutingManagementColors
+{
     QnRoutingManagementColors();
-
     QColor readOnly;
 };
 #define QnRoutingManagementColors_Fields (readOnly)

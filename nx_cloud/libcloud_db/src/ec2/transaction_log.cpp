@@ -496,7 +496,7 @@ void TransactionLog::onDbTransactionCompleted(
 }
 
 TransactionLog::DbTransactionContext& TransactionLog::getTransactionContext(
-    const QnMutexLockerBase& /*lk*/,
+    const QnMutexLockerBase&,
     nx::db::QueryContext* const queryContext,
     const nx::String& systemId)
 {

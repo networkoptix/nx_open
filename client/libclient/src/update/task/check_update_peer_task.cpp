@@ -268,6 +268,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
         if (it != json.end())
         {
             qnSettings->setAlternativeUpdateServers(it.value().toArray().toVariantList());
+            qnSettings->save();
             loadServersFromSettings();
         }
     }
@@ -461,7 +462,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
         QString cloudHost;
-        bool isClient;
+        bool isClient = false;
 
         if (!verifyUpdatePackage(fileName, &version, &sysInfo, &cloudHost, &isClient))
             continue;

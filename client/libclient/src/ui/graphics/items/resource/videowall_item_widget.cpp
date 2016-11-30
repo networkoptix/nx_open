@@ -41,20 +41,24 @@
 #include <utils/math/linear_combination.h>
 
 namespace {
-    /** Background color for overlay panels. */
-    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
+/** Background color for overlay panels. */
+const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
+const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
+
 }
 
-class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor {
-    virtual QVariant get(const QObject *object) const override {
+class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor
+{
+    virtual QVariant get(const QObject *object) const override
+    {
         return static_cast<const QnVideowallItemWidget *>(object)->m_hoverProgress;
     }
 
-    virtual void set(QObject *object, const QVariant &value) const override {
+    virtual void set(QObject *object, const QVariant &value) const override
+    {
         QnVideowallItemWidget *widget = static_cast<QnVideowallItemWidget *>(object);
-        if(qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
+        if (qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
             return;
 
         widget->m_hoverProgress = value.toReal();
@@ -62,7 +66,13 @@ class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor {
     }
 };
 
-QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QnUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags):
+QnVideowallItemWidget::QnVideowallItemWidget(
+    const QnVideoWallResourcePtr &videowall,
+    const QnUuid &itemUuid,
+    QnVideowallScreenWidget *parent,
+    QGraphicsWidget* parentWidget,
+    Qt::WindowFlags windowFlags)
+    :
     base_type(parentWidget, windowFlags),
     QnWorkbenchContextAware(parent),
     m_parentWidget(parentWidget),
@@ -77,8 +87,10 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
     setClickableButtons(Qt::LeftButton | Qt::RightButton);
 
-    connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnVideowallItemWidget::at_videoWall_itemChanged);
-    connect(this, &QnClickableWidget::doubleClicked, this, &QnVideowallItemWidget::at_doubleClicked);
+    connect(m_videowall, &QnVideoWallResource::itemChanged, this,
+        &QnVideowallItemWidget::at_videoWall_itemChanged);
+    connect(this, &QnClickableWidget::doubleClicked, this,
+        &QnVideowallItemWidget::at_doubleClicked);
 
     m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
@@ -93,21 +105,30 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverEnterDelay(50);
     m_hoverProcessor->setHoverLeaveDelay(50);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this, [&]() { m_frameColorAnimator->animateTo(1.0); setOverlayVisible(true); });
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, [&]() { m_frameColorAnimator->animateTo(0.0); if (!m_infoVisible) setOverlayVisible(false); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this,
+        [this]
+        {
+            updateHud(true);
+        });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        [this]
+        {
+            updateHud(true);
+        });
 
     /* Status overlay. */
     const auto overlay = new QnStatusOverlayWidget(this);
     m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay, this);
 
     connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this, overlay, controller = m_statusOverlayController]()
+        [this, overlay, controller = m_statusOverlayController]
         {
-            const auto value = (controller->statusOverlay() == Qn::EmptyOverlay ? 0.0 : 1.0);
-            opacityAnimator(overlay)->animateTo(value);
+            const auto value = controller->statusOverlay() != Qn::EmptyOverlay;
+            setOverlayWidgetVisible(overlay, value, true);
         });
 
     addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true));
+    setOverlayWidgetVisible(overlay, false, false);
 
     initInfoOverlay();
 
@@ -116,7 +137,8 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 }
 
 
-void QnVideowallItemWidget::initInfoOverlay() {
+void QnVideowallItemWidget::initInfoOverlay()
+{
     /* Set up overlay widgets. */
     QFont font = this->font();
     font.setPixelSize(20);
@@ -134,7 +156,11 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_infoButton->setCheckable(true);
     m_infoButton->setToolTip(tr("Information"));
     m_infoButton->setFixedSize(24);
-    connect(m_infoButton, &QnImageButtonWidget::toggled, this, &QnVideowallItemWidget::at_infoButton_toggled);
+    connect(m_infoButton, &QnImageButtonWidget::toggled, this,
+        [this](bool toggled)
+        {
+            setInfoVisible(toggled);
+        });
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
@@ -161,8 +187,7 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_headerOverlayWidget = new QnViewportBoundWidget(m_parentWidget);
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
-    m_headerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_headerOverlayWidget, AutoVisible);
+    addOverlayWidget(m_headerOverlayWidget, UserVisible);
 
     /* Footer overlay. */
     m_footerLabel = new GraphicsLabel();
@@ -179,7 +204,6 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_footerWidget->setAcceptedMouseButtons(0);
     m_footerWidget->setAutoFillBackground(true);
     setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
-    m_footerWidget->setOpacity(0.0);
 
     QGraphicsWidget* footerStretch = new QGraphicsWidget();
     footerStretch->setMinimumHeight(300);
@@ -193,40 +217,44 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_footerOverlayWidget = new QnViewportBoundWidget(this);
     m_footerOverlayWidget->setLayout(footerOverlayLayout);
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
-    m_footerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_footerOverlayWidget, AutoVisible);
+    addOverlayWidget(m_footerOverlayWidget, UserVisible);
+
+    updateHud(false);
 }
 
-
-const QnResourceWidgetFrameColors &QnVideowallItemWidget::frameColors() const {
+const QnResourceWidgetFrameColors &QnVideowallItemWidget::frameColors() const
+{
     return m_frameColors;
 }
 
-void QnVideowallItemWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
+void QnVideowallItemWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors)
+{
     m_frameColors = frameColors;
     update();
 }
 
-
-void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    Q_UNUSED(widget)
+void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+    QWidget* /*widget*/)
+{
     QRectF paintRect = option->rect;
     if (!paintRect.isValid())
         return;
 
     qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
 
-    paintRect.adjust(offset*2, offset*2, -offset*2, -offset*2);
+    paintRect.adjust(offset * 2, offset * 2, -offset * 2, -offset * 2);
     painter->fillRect(paintRect, palette().color(QPalette::Window));
 
     if (!m_layout)
     {
         m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay);
     }
-    else {
+    else
+    {
         //TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
         QRectF bounding;
-        foreach (const QnLayoutItemData &data, m_layout->getItems()) {
+        foreach(const QnLayoutItemData &data, m_layout->getItems())
+        {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
                 continue; //TODO: #GDM #VW some items can be not placed yet, wtf
@@ -250,14 +278,17 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
 
         qreal targetAr = paintRect.width() / paintRect.height();
-        if (sourceAr > targetAr) {
+        if (sourceAr > targetAr)
+        {
             xscale = paintRect.width() / bounding.width();
             yscale = xscale / cellAspectRatio;
             xoffset = paintRect.left();
 
             qreal h = bounding.height() * yscale;
             yoffset = (paintRect.height() - h) * 0.5 + paintRect.top();
-        } else {
+        }
+        else
+        {
             yscale = paintRect.height() / bounding.height();
             xscale = yscale * cellAspectRatio;
             yoffset = paintRect.top();
@@ -267,7 +298,8 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         }
 
         bool allItemsAreLoaded = true;
-        foreach (const QnLayoutItemData &data, m_layout->getItems()) {
+        foreach(const QnLayoutItemData &data, m_layout->getItems())
+        {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
                 continue;
@@ -275,21 +307,22 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             // cell bounds
             qreal x1 = (itemRect.left() - bounding.left() + space) * xscale + xoffset;
             qreal y1 = (itemRect.top() - bounding.top() + space) * yscale + yoffset;
-            qreal w1 = (itemRect.width() - space*2) * xscale;
-            qreal h1 = (itemRect.height() - space*2) * yscale;
+            qreal w1 = (itemRect.width() - space * 2) * xscale;
+            qreal h1 = (itemRect.height() - space * 2) * yscale;
 
             if (!paintItem(painter, QRectF(x1, y1, w1, h1), data))
                 allItemsAreLoaded = false;
         }
 
-        m_statusOverlayController->setStatusOverlay(allItemsAreLoaded
-            ? Qn::EmptyOverlay : Qn::LoadingOverlay);
+        const auto overlay = allItemsAreLoaded ? Qn::EmptyOverlay : Qn::LoadingOverlay;
+        m_statusOverlayController->setStatusOverlay(overlay);
     }
 
     paintFrame(painter, paintRect);
 }
 
-void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRect) {
+void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRect)
+{
     if (!paintRect.isValid())
         return;
 
@@ -306,15 +339,17 @@ void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRec
     qreal y = paintRect.y();
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
-    painter->fillRect(QRectF(x - fw,    y - fw,  w + fw * 2,  fw), color);
-    painter->fillRect(QRectF(x - fw,    y + h,   w + fw * 2,  fw), color);
-    painter->fillRect(QRectF(x - fw,    y,       fw,          h),  color);
-    painter->fillRect(QRectF(x + w,     y,       fw,          h),  color);
 
+    /* Antialiasing is here for a reason. Without it border looks crappy. */
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+    painter->fillRect(QRectF(x - fw, y - fw, w + fw * 2, fw), color);
+    painter->fillRect(QRectF(x - fw, y + h, w + fw * 2, fw), color);
+    painter->fillRect(QRectF(x - fw, y, fw, h), color);
+    painter->fillRect(QRectF(x + w, y, fw, h), color);
 }
 
-void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
     const QMimeData *mimeData = event->mimeData();
 
     QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
@@ -325,14 +360,14 @@ void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
     m_dragged.resources.clear();
     m_dragged.videoWallItems.clear();
 
-    foreach( QnResourcePtr res, resources )
+    foreach(QnResourcePtr res, resources)
     {
-        if( dynamic_cast<QnMediaResource*>(res.data()) )
-            media.push_back( res );
-        if( res.dynamicCast<QnLayoutResource>() )
-            layouts.push_back( res );
-        if( res.dynamicCast<QnMediaServerResource>() )
-            servers.push_back( res );
+        if (dynamic_cast<QnMediaResource*>(res.data()))
+            media.push_back(res);
+        if (res.dynamicCast<QnLayoutResource>())
+            layouts.push_back(res);
+        if (res.dynamicCast<QnMediaServerResource>())
+            servers.push_back(res);
     }
 
     m_dragged.resources = media;
@@ -347,20 +382,23 @@ void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
     event->acceptProposedAction();
 }
 
-void QnVideowallItemWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
-    if(m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
+void QnVideowallItemWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
         return;
 
     m_hoverProcessor->forceHoverEnter();
     event->acceptProposedAction();
 }
 
-void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
+{
     Q_UNUSED(event)
-    m_hoverProcessor->forceHoverLeave();
+        m_hoverProcessor->forceHoverLeave();
 }
 
-void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
     QnActionParameters parameters;
     if (!m_dragged.videoWallItems.isEmpty())
         parameters = QnActionParameters(m_dragged.videoWallItems);
@@ -374,7 +412,8 @@ void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
     event->acceptProposedAction();
 }
 
-void QnVideowallItemWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
     base_type::mousePressEvent(event);
     if (event->button() != Qt::LeftButton)
         return;
@@ -383,12 +422,14 @@ void QnVideowallItemWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 
-void QnVideowallItemWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
     base_type::mouseMoveEvent(event);
     m_dragProcessor->mouseMoveEvent(this, event);
 }
 
-void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
     base_type::mouseReleaseEvent(event);
     if (event->button() != Qt::LeftButton)
         return;
@@ -396,7 +437,8 @@ void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     m_dragProcessor->mouseReleaseEvent(this, event);
 }
 
-void QnVideowallItemWidget::startDrag(DragInfo *info) {
+void QnVideowallItemWidget::startDrag(DragInfo *info)
+{
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
 
@@ -414,12 +456,15 @@ void QnVideowallItemWidget::startDrag(DragInfo *info) {
     m_dragProcessor->reset();
 }
 
-void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event)
+{
     if (event->button() != Qt::RightButton)
         return;
 
-    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, nullptr, QnActionParameters(m_indices)));
-    if(popupMenu->isEmpty())
+    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, nullptr,
+        QnActionParameters(m_indices)));
+
+    if (popupMenu->isEmpty())
         return;
 
     QnHiDpiWorkarounds::showMenu(popupMenu.data(), QCursor::pos());
@@ -435,7 +480,8 @@ void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePt
     updateInfo();
 }
 
-void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
+void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button)
+{
     if (button != Qt::LeftButton)
         return;
 
@@ -445,41 +491,73 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
     );
 }
 
-void QnVideowallItemWidget::updateLayout() {
+void QnVideowallItemWidget::updateLayout()
+{
     QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
-    QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
+    auto layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
     if (m_layout == layout)
         return;
 
-    if (m_layout) {
-        disconnect(m_layout, NULL, this, NULL);
-    }
-    m_layout = layout;
-    if (m_layout) {
-        connect(m_layout, &QnLayoutResource::itemAdded,                 this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::itemChanged,               this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::itemRemoved,               this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::cellAspectRatioChanged,    this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::cellSpacingChanged,        this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundImageChanged,    this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundSizeChanged,     this, &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundOpacityChanged,  this, &QnVideowallItemWidget::updateView);
+    if (m_layout)
+        m_layout->disconnect(this);
 
-        connect(m_layout, &QnResource::nameChanged,                     this, &QnVideowallItemWidget::updateInfo);
+    m_layout = layout;
+
+    if (m_layout)
+    {
+        connect(m_layout, &QnLayoutResource::itemAdded, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::itemChanged, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::itemRemoved, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::cellAspectRatioChanged, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::cellSpacingChanged, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::backgroundImageChanged, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::backgroundSizeChanged, this,
+            &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::backgroundOpacityChanged, this,
+            &QnVideowallItemWidget::updateView);
+
+        connect(m_layout, &QnResource::nameChanged, this, &QnVideowallItemWidget::updateInfo);
     }
 }
 
-void QnVideowallItemWidget::updateView() {
+void QnVideowallItemWidget::updateView()
+{
     update(); //direct connect is not so convenient because of overloaded function
 }
 
-void QnVideowallItemWidget::updateInfo() {
+void QnVideowallItemWidget::updateInfo()
+{
     if (m_layout)
         m_footerLabel->setText(m_layout->getName());
     else
         m_footerLabel->setText(QString());
     m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
+    updateHud(false);
     //TODO: #GDM #VW update layout in case of transition "long name -> short name"
+}
+
+void QnVideowallItemWidget::updateHud(bool animate)
+{
+    bool headerVisible = m_hoverProcessor->isHovered();
+    bool footerVisible = (headerVisible || m_infoVisible)
+        && !m_footerLabel->text().isEmpty();
+
+    setOverlayWidgetVisible(m_footerOverlayWidget, footerVisible, animate);
+    setOverlayWidgetVisible(m_headerOverlayWidget, headerVisible, animate);
+
+    qreal frameColorValue = headerVisible ? 1.0 : 0.0;
+    if (animate)
+        m_frameColorAnimator->animateTo(frameColorValue);
+    else
+        m_hoverProgress = frameColorValue;
+
+    update();
 }
 
 bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data)
@@ -488,11 +566,13 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
 
     bool isServer = resource && resource->flags().testFlag(Qn::server);
 
-    if (isServer && !m_widget->m_thumbs.contains(resource->getId())) {
+    if (isServer && !m_widget->m_thumbs.contains(resource->getId()))
+    {
         m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
     } //TODO: #GDM #VW local files placeholder
 
-    if (resource && m_widget->m_thumbs.contains(resource->getId())) {
+    if (resource && m_widget->m_thumbs.contains(resource->getId()))
+    {
         QPixmap pixmap = m_widget->m_thumbs[resource->getId()];
 
         QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
@@ -503,67 +583,60 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
 
         QRectF sourceRect = isServer
             ? pixmap.rect()
-            : QRectF(0, 0, pixmap.width()*mediaLayout.width(), pixmap.height() * mediaLayout.height());
+            : QRectF(0, 0, pixmap.width() * mediaLayout.width(), pixmap.height() * mediaLayout.height());
 
-        auto drawPixmap = [painter, &pixmap, &mediaLayout](const QRectF &targetRect) {
+        auto drawPixmap =
+            [painter, &pixmap, &mediaLayout](const QRectF &targetRect)
+        {
             int width = targetRect.width() / mediaLayout.width();
             int height = targetRect.height() / mediaLayout.height();
-            for (int i = 0; i < mediaLayout.width(); ++i) {
+            for (int i = 0; i < mediaLayout.width(); ++i)
+            {
                 for (int j = 0; j < mediaLayout.height(); ++j)
-                    painter->drawPixmap(QRectF(targetRect.left() + width * i, targetRect.top() + height * j, width, height).toRect(), pixmap);
+                {
+                    painter->drawPixmap(QRectF(targetRect.left() + width * i,
+                        targetRect.top() + height * j, width, height).toRect(), pixmap);
+                }
             }
         };
 
-        if (!qFuzzyIsNull(data.rotation)) {
+        if (!qFuzzyIsNull(data.rotation))
+        {
             QnScopedPainterTransformRollback guard(painter); Q_UNUSED(guard);
             painter->translate(paintRect.center());
             painter->rotate(data.rotation);
             painter->translate(-paintRect.center());
             drawPixmap(QnGeometry::encloseRotatedGeometry(paintRect, QnGeometry::aspectRatio(sourceRect), data.rotation));
-        } else {
+        }
+        else
+        {
             drawPixmap(paintRect);
         }
         return true;
     }
 
-    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         m_widget->m_thumbnailManager->selectResource(camera);
         return false;
     }
 
     return true;
-    {
-        //            QnScopedPainterPenRollback(painter, QPen(Qt::gray, 15));
-        //            painter->drawRect(paintRect);
-    }
 }
 
-bool QnVideowallItemWidget::isInfoVisible() const {
+bool QnVideowallItemWidget::isInfoVisible() const
+{
     return m_infoVisible;
 }
 
-void QnVideowallItemWidget::setInfoVisible(bool visible, bool animate) {
+void QnVideowallItemWidget::setInfoVisible(bool visible, bool animate)
+{
     if (m_infoVisible == visible)
         return;
 
     m_infoVisible = visible;
-
-    qreal opacity = visible ? 1.0 : 0.0;
-
-    if(animate) {
-        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
-    } else {
-        m_footerWidget->setOpacity(opacity);
-    }
-
-    setOverlayVisible(visible || m_hoverProcessor->isHovered(), animate);
+    updateHud(animate);
 
     m_infoButton->setChecked(visible);
     emit infoVisibleChanged(visible);
-}
-
-void QnVideowallItemWidget::at_infoButton_toggled(bool toggled) {
-    setInfoVisible(toggled);
-    setOverlayVisible(toggled || m_hoverProcessor->isHovered());
 }

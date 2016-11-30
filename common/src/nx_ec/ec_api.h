@@ -33,7 +33,7 @@
 #include <nx_ec/data/api_camera_attributes_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"

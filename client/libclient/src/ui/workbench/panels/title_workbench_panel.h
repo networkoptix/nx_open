@@ -38,6 +38,8 @@ public:
 
     virtual bool isHovered() const override;
 
+    virtual void stopAnimations() override;
+
     bool isUsed() const;
     void setUsed(bool value);
 

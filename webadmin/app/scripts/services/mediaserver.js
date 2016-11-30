@@ -200,6 +200,7 @@ angular.module('webadminApp')
                 var self = this;
 
                 function sendLogin(){
+                    $log.log("Login1: getNonce for " + login);
                     return self.getNonce(login).then(function(data){
                         var realm = data.data.reply.realm;
                         var nonce = data.data.reply.nonce;
@@ -207,17 +208,27 @@ angular.module('webadminApp')
                         var auth = self.digest(login, password, realm, nonce);
                         $localStorage.$reset();
 
+
+                        $log.log("Login2: nonce is " + nonce);
+                        $log.log("Login2: auth is " + auth);
+
+                        $log.log("Login2: cookieLogin");
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
                         }).then(function(data){
+                            $log.log("Login3: cookieLogin result");
                             if(data.data.error != "0"){
+                                $log.log("Login3: cookieLogin failed: " + data.data.error);
                                 return $q.reject(data.data);
                             }
+
                             $localStorage.login = login;
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+
+                            $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
                         });
                     });

@@ -36,10 +36,10 @@
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
 
 #include <ui/models/resource/resource_tree_model_node.h>
+#include <ui/models/resource/resource_tree_model_node_factory.h>
 #include <ui/models/resource/tree/resource_tree_model_user_nodes.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
-#include <ui/models/resource/tree/resource_tree_model_user_resources_node.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -90,6 +90,7 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::LocalResourcesNode
             << Qn::LocalSeparatorNode
             << Qn::OtherSystemsNode
+            << Qn::MyCloudNode
             << Qn::RootNode
             << Qn::BastardNode;
     }
@@ -109,19 +110,14 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
     {
-        //TODO: #GDM move to factory
-        m_rootNodes[t] = QnResourceTreeModelNodePtr(t == Qn::UserResourcesNode
-            ? new QnResourceTreeModelUserResourcesNode(this)
-            : new QnResourceTreeModelNode(this, t));
-        m_rootNodes[t]->initialize();
+        m_rootNodes[t] = QnResourceTreeModelNodeFactory::createNode(t, this);
         m_allNodes.append(m_rootNodes[t]);
     }
 
     if (scope != CamerasScope)
     {
         auto userNodes = new QnResourceTreeModelUserNodes(this);
-        userNodes->setModel(this);
-        userNodes->setRootNode(m_rootNodes[Qn::UsersNode]);
+        userNodes->initialize(this, m_rootNodes[Qn::UsersNode]);
     }
 
     /* Connect to context. */
@@ -344,6 +340,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         if (m_scope == UsersScope)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
         if (m_scope == FullScope && isAdmin)
+            return rootNode;
+        return bastardNode;
+
+    case Qn::MyCloudNode:
+        if (m_scope == FullScope)
             return rootNode;
         return bastardNode;
 
@@ -1050,7 +1051,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     {
         /* Technically it works right, but layout becomes shared and appears in "Shared layouts"
          * node, not under user, where it was dragged. Disabling to not confuse user. */
-        if (targetUser->role() == Qn::UserRole::CustomUserGroup)
+        if (targetUser->userRole() == Qn::UserRole::CustomUserRole)
             return;
 
         for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())

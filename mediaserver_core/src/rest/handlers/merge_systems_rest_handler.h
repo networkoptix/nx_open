@@ -3,6 +3,7 @@
 #include <rest/server/json_rest_handler.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/merge_systems_common.h>
+#include <media_server/serverutil.h>
 
 struct MergeSystemData;
 
@@ -45,4 +46,11 @@ private:
     void setMergeError(
         QnJsonRestResult& result,
         utils::MergeSystemsStatus::Value mergeStatus);
+
+    bool executeRemoteConfigure(
+        const ConfigureSystemData& data,
+        const QUrl &remoteUrl,
+        const QString& postKey,
+        const QnRestConnectionProcessor* owner);
+
 };

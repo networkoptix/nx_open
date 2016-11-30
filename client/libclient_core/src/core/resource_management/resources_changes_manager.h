@@ -61,7 +61,7 @@ public:
     /** Save accessible resources for the given user */
     void saveAccessibleResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& accessibleResources);
 
-    void saveUserRole(const ec2::ApiUserGroupData& role);
+    void saveUserRole(const ec2::ApiUserRoleData& role);
     void removeUserRole(const QnUuid& id);
 
     /** Apply changes to the given videoWall. */

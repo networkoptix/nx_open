@@ -17,9 +17,7 @@ namespace ec2
     {
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
-        Ec2StaticticsReporter(
-            const AbstractResourceManagerPtr& resourceManager,
-            const AbstractMediaServerManagerPtr& msManager);
+        Ec2StaticticsReporter(const AbstractMediaServerManagerPtr& msManager);
 
         ~Ec2StaticticsReporter();
 
@@ -48,7 +46,6 @@ namespace ec2
         void finishReport(nx_http::AsyncHttpClientPtr httpClient);
 
     private:
-        QnUuid m_desktopCameraTypeId;
         AbstractMediaServerManagerPtr m_msManager;
 
         nx_http::AsyncHttpClientPtr m_httpClient;

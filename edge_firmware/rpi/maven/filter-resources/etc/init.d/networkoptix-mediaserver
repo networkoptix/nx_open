@@ -73,7 +73,7 @@ startquiet() {
     start
 }
 
-SECONDS_TO_WAIT_BEFORE_KILL_9=30
+SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
 stop() {
     echo -n "Stopping $BIN_NAME..... "
@@ -92,7 +92,7 @@ stop() {
 }
 
 start_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+    WATCHDOG_PID="`ps -eO command | grep mediaserver| grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
     if [ "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is already running with pid $WATCHDOG_PID"
         return 0

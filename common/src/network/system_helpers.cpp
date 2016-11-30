@@ -118,6 +118,11 @@ bool isNewSystem(const QnCloudSystem& info)
     return info.localId.isNull();
 }
 
+bool isCloudSystem(const QnModuleInformation& info)
+{
+    return (info.version < kMinVersionWithLocalId ? false : !info.cloudSystemId.isEmpty());
+}
+
 QnUuid currentSystemLocalId()
 {
     const auto localId = qnGlobalSettings->localSystemId();

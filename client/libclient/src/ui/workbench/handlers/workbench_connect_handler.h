@@ -121,6 +121,7 @@ private:
     void at_messageProcessor_initialResourcesReceived();
 
     void at_connectAction_triggered();
+    void at_connectToCloudSystemAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
 

@@ -231,7 +231,7 @@ QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
     static const auto kIconPaths =
         []() -> IntStringHash
         {
-            const auto kLicenceIconPath = lit("item_placeholders/licence.png");;
+            const auto kLicenceIconPath = lit("item_placeholders/license.png");;
             IntStringHash result;
             result[toInt(Qn::UnauthorizedOverlay)] = lit("item_placeholders/unauthorized.png");
             result[toInt(Qn::OfflineOverlay)] = lit("item_placeholders/no_signal.png");

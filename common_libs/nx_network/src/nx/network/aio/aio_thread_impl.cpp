@@ -258,7 +258,7 @@ bool AIOThreadImpl::removeReverseTask(
             it = pollSetModificationQueue.erase(it);
             //removing futher tChangingTimeout tasks
             for (;
-            it != pollSetModificationQueue.end();
+                it != pollSetModificationQueue.end();
                 ++it)
             {
                 if (it->socket == sock && it->eventType == eventType)

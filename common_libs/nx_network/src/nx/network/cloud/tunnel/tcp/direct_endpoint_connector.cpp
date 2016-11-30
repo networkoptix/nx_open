@@ -183,7 +183,7 @@ bool DirectEndpointConnector::verifyHostResponse(
         || restResult.error != QnRestResult::Error::NoError)
     {
         NX_LOGX(lm("cross-nat %1. Error response '%2' from %3")
-            .strs(m_connectSessionId, restResult.errorString), cl_logDEBUG2);
+            .strs(m_connectSessionId, restResult.errorString, httpClient->url()), cl_logDEBUG2);
         return false;
     }
 

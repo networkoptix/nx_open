@@ -43,6 +43,8 @@ void ProxyHandler::processRequest(
         requestOptions.isSsl = m_runTimeOptions.isSslEnforsed(requestOptions.target);
 
     // TODO: #ak avoid request loop by using Via header.
+    if (requestOptions.isSsl && !m_settings.cloudConnect().sslAllowed)
+        requestOptions.isSsl = false;
 
     m_targetPeerSocket = SocketFactory::createStreamSocket(requestOptions.isSsl);
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
@@ -63,7 +65,7 @@ void ProxyHandler::processRequest(
     // TODO: #ak updating request (e.g., Host header).
     m_targetPeerSocket->connectAsync(
         requestOptions.target,
-        std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
+        std::bind(&ProxyHandler::onConnected, this, requestOptions.target, std::placeholders::_1));
 }
 
 void ProxyHandler::closeConnection(
@@ -210,28 +212,30 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
     return requestOptions;
 }
 
-void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
+void ProxyHandler::onConnected(
+    const SocketAddress& targetAddress, SystemError::ErrorCode errorCode)
 {
+    static const auto isSsl = [](const std::unique_ptr<AbstractStreamSocket>& s)
+    {
+        return (bool) dynamic_cast<nx::network::SslSocket*>(s.get());
+    };
+
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Failed to establish connection to %1 (path %2)")
-            .arg(m_targetPeerSocket->getForeignAddress().toString())
-            .arg(m_request.requestLine.url.toString()),
+        NX_LOGX(lm("Failed to establish connection to %1 (path %2) with SSL=%3")
+            .strs(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)),
             cl_logDEBUG1);
+
         auto handler = std::move(m_requestCompletionHandler);
-        handler(
-            (errorCode == SystemError::hostNotFound ||
-                errorCode == SystemError::hostUnreach)
+        return handler(
+            (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreach)
                 ? nx_http::StatusCode::notFound
                 : nx_http::StatusCode::serviceUnavailable);
-        return;
     }
 
-    NX_LOGX(lm("Successfully established connection to %1 (path %2) from %3 with SSL=%4")
-        .str(m_targetPeerSocket->getForeignAddress())
-        .str(m_request.requestLine.url)
-        .str(m_targetPeerSocket->getLocalAddress())
-        .arg(dynamic_cast<nx::network::SslSocket*>(m_targetPeerSocket.get())), cl_logDEBUG2);
+    NX_LOGX(lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
+        .strs(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
+            m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
         this,

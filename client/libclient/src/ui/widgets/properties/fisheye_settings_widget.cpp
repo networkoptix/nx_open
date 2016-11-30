@@ -9,9 +9,12 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+#include <utils/common/event_processors.h>
 
 
 QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
@@ -32,8 +35,6 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png"), kPixmapSize));
     ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png"), kPixmapSize));
     ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png"), kPixmapSize));
-
-
 
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);
@@ -103,6 +104,25 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
         {
             ui->autoCalibrationButton->setEnabled(true);
         });
+
+    const QSize kSpacing = style::Metrics::kDefaultLayoutSpacing;
+    auto updateAutoCalibrationButtonGeometry = [this, kSpacing]
+        {
+            const auto size = ui->autoCalibrationButton->sizeHint();
+            auto parentSize = ui->calibrateWidget->geometry().size();
+            const int x = parentSize.width() - size.width() - kSpacing.width();
+            const int y = parentSize.height() - size.height() - kSpacing.height();
+
+            ui->autoCalibrationButton->setGeometry(QRect(QPoint(x, y), size));
+        };
+
+    installEventHandler(ui->calibrateWidget, QEvent::Resize, this,
+        updateAutoCalibrationButtonGeometry);
+
+    updateAutoCalibrationButtonGeometry();
+
+    ui->calibrateWidget->setMinimumHeight(ui->autoCalibrationButton->sizeHint().height()
+        + kSpacing.height() * 2);
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget()

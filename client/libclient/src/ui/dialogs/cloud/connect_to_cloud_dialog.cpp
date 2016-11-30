@@ -275,9 +275,9 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
         QDialogButtonBox::Ok,
         q->parentWidget());
 
-    messageBox.exec();
     linkedSuccessfully = true;
     q->accept();
+    messageBox.exec();
 }
 
 void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
@@ -295,6 +295,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
         messageBox.setInformativeText(message);
 
     messageBox.exec();
+    lockUi(false);
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(

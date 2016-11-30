@@ -153,8 +153,7 @@ Appserver2Process::Appserver2Process(int argc, char** argv)
     m_argv(argv),
     m_terminated(false),
     m_ecConnection(nullptr),
-    m_tcpListener(nullptr),
-    m_application(nullptr)
+    m_tcpListener(nullptr)
 {
 }
 
@@ -166,8 +165,8 @@ void Appserver2Process::pleaseStop()
 {
     //m_processTerminationEvent.set_value();
     QnMutexLocker lk(&m_mutex);
-    if (m_application)
-        m_application->quit();
+    m_terminated = true;
+    m_cond.wakeAll();
 }
 
 void Appserver2Process::setOnStartedEventHandler(
@@ -180,13 +179,6 @@ int Appserver2Process::exec()
 {
     nx::utils::TimerManager timerManager;
     timerManager.start();
-
-    QCoreApplication application(m_argc, m_argv);
-
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_application = &application;
-    }
 
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -301,10 +293,12 @@ int Appserver2Process::exec()
     triggerOnStartedEventHandlerGuard.fire();
 
     m_ecConnection = ec2Connection.get();
-    application.exec();
 
     {
         QnMutexLocker lk(&m_mutex);
+        while (!m_terminated)
+            m_cond.wait(lk.mutex());
+
         m_tcpListener = nullptr;
     }
 
@@ -317,14 +311,6 @@ int Appserver2Process::exec()
     m_ecConnection = nullptr;
     ec2Connection.reset();
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_application = nullptr;
-    }
-
-    //m_processTerminationEvent.get_future().wait();
-
-    //TODO 
     return 0;
 }
 

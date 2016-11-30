@@ -53,7 +53,10 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         return false;
     }
 
-    QByteArray msgBody = client.fetchMessageBodyBuffer();
+    nx_http::BufferType msgBody;
+    while (!client.eof())
+        msgBody.append(client.fetchMessageBodyBuffer());
+
     int statusCode = client.response()->statusLine.statusCode;
     if (statusCode / 2 != 200 && msgBody.isEmpty())
     {

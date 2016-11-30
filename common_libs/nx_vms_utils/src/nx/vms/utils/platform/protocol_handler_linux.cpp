@@ -157,8 +157,8 @@ using nx::utils::SoftwareVersion;
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
-    const QString& macOsBundleId,
     const QString& applicationName,
+    const QString& macOsBundleId,
     const QString& description,
     const QString& customization,
     const SoftwareVersion& version)

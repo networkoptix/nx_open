@@ -9,7 +9,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 namespace {
 
@@ -39,8 +39,8 @@ TEST_F(QnSharedResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserGroupData role;
-    QnResourceAccessSubject subject(role);
+    ec2::ApiUserRoleData userRole;
+    QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
@@ -142,7 +142,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleAccessGranted)
     auto role = createRole(Qn::NoGlobalPermissions);
     qnUserRolesManager->addOrUpdateUserRole(role);
     auto user = addUser(Qn::NoGlobalPermissions);
-    user->setUserGroup(role.id);
+    user->setUserRoleId(role.id);
     awaitAccess(user, target, true);
     qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
 }
@@ -156,7 +156,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkUserRoleChanged)
     qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
     auto user = addUser(Qn::NoGlobalPermissions);
     awaitAccess(user, target, true);
-    user->setUserGroup(role.id);
+    user->setUserRoleId(role.id);
 }
 
 TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
@@ -166,7 +166,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
     auto role = createRole(Qn::NoGlobalPermissions);
     qnUserRolesManager->addOrUpdateUserRole(role);
     auto user = addUser(Qn::NoGlobalPermissions);
-    user->setUserGroup(role.id);
+    user->setUserRoleId(role.id);
     qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
     awaitAccess(user, target, false);

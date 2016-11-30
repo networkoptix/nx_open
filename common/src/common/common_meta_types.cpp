@@ -314,7 +314,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
-    qRegisterMetaType<ec2::ApiUserGroupData>("ec2::ApiUserGroupData");
+    qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
     qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
     qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
     qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");

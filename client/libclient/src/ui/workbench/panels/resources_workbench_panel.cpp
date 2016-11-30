@@ -250,6 +250,15 @@ QRectF ResourceTreeWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void ResourceTreeWorkbenchPanel::stopAnimations()
+{
+    if (!xAnimator->isRunning())
+        return;
+
+    xAnimator->stop();
+    item->setX(xAnimator->targetValue().toDouble());
+}
+
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 {
     if (m_updateResizerGeometryLater)
@@ -305,7 +314,12 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
         return;
     }
 
-    const qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+    qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+
+    /* Calculating real border position. */
+    x += 0.5 + kResizerWidth;
+    if (widget->isScrollBarVisible())
+        x += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
     const qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
 

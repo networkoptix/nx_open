@@ -582,6 +582,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     {
                         messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
                         qnSettings->setShowOnceMessages(messagesFilter);
+                        qnSettings->save();
                     }
 
                     if (result != QDialogButtonBox::Ok)

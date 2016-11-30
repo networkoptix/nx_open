@@ -485,13 +485,27 @@
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
-                <module>client/mobile_client</module>
                 <module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>
+            <id>desktop-nomac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>!mac</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>
+                <module>client/mobile_client</module>
+            </modules>
+        </profile>        
+        <profile>
             <id>windows</id>
-
             <activation>
                 <os>
                     <family>Windows</family>
@@ -857,6 +871,7 @@
                 </property>
             </activation>
             <properties>
+                <qt.version>5.6.2</qt.version>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>

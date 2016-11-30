@@ -72,7 +72,7 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 }
 
-bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
+bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
 {
     QnMutexLocker lock( &m_discoveryMutex );
 
@@ -270,7 +270,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing
-    markOfflineIfNeeded(discoveredResources);
+    if (searchType == SearchType::Full)
+        markOfflineIfNeeded(discoveredResources);
     // ======================
 
     m_foundSmth = !resources.isEmpty();

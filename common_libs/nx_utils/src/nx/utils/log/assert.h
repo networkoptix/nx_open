@@ -84,9 +84,9 @@ private:
 #ifdef NX_CHECK_MEASURE_TIME
     #define NX_CHECK(CONDITION, MESSAGE, ACTION) do \
     { \
-        auto begin = std::chrono::system_clock::now(); \
+        auto begin = std::chrono::steady_clock::now(); \
         bool isOk = static_cast<bool>(condition); \
-        auto time = std::chrono::system_clock::now() - begin; \
+        auto time = std::chrono::steady_clock::now() - begin; \
         \
         static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
         info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \

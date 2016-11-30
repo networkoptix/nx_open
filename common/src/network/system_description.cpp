@@ -214,6 +214,7 @@ void QnSystemDescription::addServer(const QnModuleInformation& serverInfo,
     m_prioritized.insertMulti(priority, serverInfo.id);
     m_servers.insert(serverInfo.id, serverInfo);
     m_serverTimestamps[serverInfo.id].restart();
+    setName(serverInfo.systemName);
     emit serverAdded(serverInfo.id);
 }
 
@@ -249,6 +250,7 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation& serv
     if (!changes)
         return QnServerField::NoField;
 
+    setName(serverInfo.systemName);
     emit serverChanged(serverInfo.id, changes);
     return changes;
 }

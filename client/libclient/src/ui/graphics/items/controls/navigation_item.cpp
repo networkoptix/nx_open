@@ -660,3 +660,17 @@ bool QnNavigationItem::isTimelineRelevant() const
 {
     return this->navigator() && this->navigator()->isTimelineRelevant();
 }
+
+void QnNavigationItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    /* Time slider and time scrollbar has own backgrounds.
+     * Subtract them for proper semi-transparency: */
+    QRegion clipRegion(rect().toRect());
+    if (m_timeSlider->isVisible())
+        clipRegion -= m_timeSlider->geometry().toRect();
+    if (m_timeScrollBar->isVisible())
+        clipRegion -= m_timeScrollBar->geometry().toRect();
+
+    QnScopedPainterClipRegionRollback clipRollback(painter, clipRegion);
+    base_type::paint(painter, option, widget);
+}

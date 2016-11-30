@@ -61,8 +61,8 @@ public:
 //-------------------------------------------------------------------------------------------------
 // AsyncSqlQueryExecutorTest
 
-constexpr static auto kQueryCompletionTimeout = std::chrono::seconds(10);
-constexpr static auto kDefaultMaxConnectionCount = 10;
+constexpr auto kQueryCompletionTimeout = std::chrono::seconds(10);
+constexpr int kDefaultMaxConnectionCount = 10;
 
 class AsyncSqlQueryExecutorTest:
     public ::testing::Test
@@ -85,7 +85,7 @@ public:
         QDir(m_tmpDir).removeRecursively();
     }
 
-    void setConnectionEventsReceiver(DbConnectionEventsReceiver* const eventsReceiver)
+    void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
     {
         m_eventsReceiver = eventsReceiver;
     }
@@ -210,7 +210,7 @@ private:
                 queryCompletedPromise.set_value(dbResult);
             });
 
-        //waiting for completion
+        // Waiting for completion.
         NX_GTEST_ASSERT_EQ(std::future_status::ready, future.wait_for(kQueryCompletionTimeout));
         return future.get();
     }

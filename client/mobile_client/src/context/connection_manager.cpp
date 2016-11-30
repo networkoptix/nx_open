@@ -191,7 +191,8 @@ void QnConnectionManager::connectToServer(
     connectToServer(urlWithAuth);
 }
 
-void QnConnectionManager::disconnectFromServer(bool force) {
+void QnConnectionManager::disconnectFromServer(bool force)
+{
     Q_D(QnConnectionManager);
 
     if (d->connectionHandle != kInvalidHandle)

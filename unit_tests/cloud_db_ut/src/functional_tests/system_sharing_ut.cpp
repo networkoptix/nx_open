@@ -65,7 +65,7 @@ TEST_F(SystemSharing, get_users)
     system1ToAccount2SharingData.systemId = system1.id;
     system1ToAccount2SharingData.accountEmail = account2.email;
     system1ToAccount2SharingData.accessRole = api::SystemAccessRole::viewer;
-    system1ToAccount2SharingData.groupId = "customGroupID";
+    system1ToAccount2SharingData.userRoleId = "customUserRoleId";
     system1ToAccount2SharingData.customPermissions = "customPermissions123123";
     system1ToAccount2SharingData.isEnabled = false;
     ASSERT_EQ(
@@ -75,7 +75,7 @@ TEST_F(SystemSharing, get_users)
             account1Password,
             std::move(system1ToAccount2SharingData)));
     // vmsUserId will be filled by cloud_db
-    system1ToAccount2SharingData.vmsUserId = 
+    system1ToAccount2SharingData.vmsUserId =
         guidFromArbitraryData(system1ToAccount2SharingData.accountEmail)
             .toSimpleString().toStdString();
 
@@ -1114,12 +1114,12 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     TestEmailManager testEmailManager(
         [&inviteNotification](const AbstractNotification& notification)
         {
-            const auto* inviteNotificationPtr = 
+            const auto* inviteNotificationPtr =
                 dynamic_cast<const InviteUserNotification*>(&notification);
             if (inviteNotificationPtr)
                 inviteNotification = *inviteNotificationPtr;
         });
-    
+
     EMailManagerFactory::setFactory(
         [&testEmailManager](const conf::Settings& /*settings*/)
         {
@@ -1156,11 +1156,11 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     ASSERT_TRUE(inviteNotification);
 
     // Confirmation code has format: base64(tmp_password:email).
-    const auto tmpPasswordAndEmail = 
+    const auto tmpPasswordAndEmail =
         QByteArray::fromBase64(QByteArray::fromRawData(
             inviteNotification->message.code.data(),
             inviteNotification->message.code.size()));
-    const std::string tmpPassword = 
+    const std::string tmpPassword =
         tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
 
     // Setting new password.

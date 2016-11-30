@@ -25,7 +25,11 @@ const int kAccountFontPixelSize = 24;
 QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::CloudManagementWidget)
+    ui(new Ui::CloudManagementWidget),
+    m_cloudUrlHelper(new QnCloudUrlHelper(
+        nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
+        nx::vms::utils::SystemUri::ReferralContext::SettingsDialog,
+        this))
 {
     ui->setupUi(this);
 
@@ -64,8 +68,17 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         makeHref(tr("Learn more about %1").arg(
             QnAppInfo::cloudName()), urlHelper.aboutUrl()));
 
-    connect(ui->goToCloudButton,     &QPushButton::clicked, action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
-    connect(ui->createAccountButton, &QPushButton::clicked, action(QnActions::OpenCloudRegisterUrl),   &QAction::trigger);
+    connect(ui->goToCloudButton, &QPushButton::clicked, this,
+        [this]
+        {
+            QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
+        });
+    connect(ui->createAccountButton, &QPushButton::clicked, this,
+        [this]
+        {
+            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
+        });
+
     connect(ui->unlinkButton, &QPushButton::clicked, this, &QnCloudManagementWidget::unlinkFromCloud);
     connect(ui->linkButton, &QPushButton::clicked, this,
         [this]()
@@ -96,7 +109,7 @@ void QnCloudManagementWidget::loadDataToUi()
         ui->stackedWidget->setCurrentWidget(ui->notLinkedPage);
     }
 
-    auto isOwner = context()->user() && context()->user()->role() == Qn::UserRole::Owner;
+    auto isOwner = context()->user() && context()->user()->userRole() == Qn::UserRole::Owner;
     ui->linkButton->setVisible(isOwner);
     ui->unlinkButton->setVisible(isOwner);
 }
@@ -112,7 +125,7 @@ bool QnCloudManagementWidget::hasChanges() const
 
 void QnCloudManagementWidget::unlinkFromCloud()
 {
-    auto isOwner = context()->user() && context()->user()->role() == Qn::UserRole::Owner;
+    auto isOwner = context()->user() && context()->user()->userRole() == Qn::UserRole::Owner;
     NX_ASSERT(isOwner, "Button must be unavailable for non-owner");
 
     if (!isOwner)

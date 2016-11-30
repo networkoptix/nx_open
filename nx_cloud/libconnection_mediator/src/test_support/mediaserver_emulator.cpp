@@ -38,14 +38,22 @@ public:
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override
     {
-        QnModuleInformation moduleInformation;
-        if (m_serverIdForModuleInformation)
-            moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
-        if (m_cloudSystemId)
-            moduleInformation.cloudSystemId = m_cloudSystemId.get();
-
         QnJsonRestResult restResult;
-        restResult.setReply(moduleInformation);
+        if (!m_serverIdForModuleInformation)
+        {
+            restResult.error = QnJsonRestResult::Error::CantProcessRequest;
+            restResult.errorString = lit("I am not a server");
+        }
+        else
+        {
+            QnModuleInformation moduleInformation;
+            moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
+            if (m_cloudSystemId)
+                moduleInformation.cloudSystemId = m_cloudSystemId.get();
+
+            restResult.setReply(moduleInformation);
+        }
+
         std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource =
             std::make_unique<nx_http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
@@ -55,8 +63,8 @@ public:
     }
 
 private:
-    boost::optional<nx::String> m_cloudSystemId;
-    boost::optional<nx::String> m_serverIdForModuleInformation;
+    const boost::optional<nx::String> m_cloudSystemId;
+    const boost::optional<nx::String> m_serverIdForModuleInformation;
 };
 
 MediaServerEmulator::MediaServerEmulator(
@@ -117,7 +125,7 @@ MediaServerEmulator::~MediaServerEmulator()
     m_httpServer.pleaseStop();
 }
 
-bool MediaServerEmulator::start()
+bool MediaServerEmulator::start(bool listenToConnectRequests)
 {
     if (!m_httpServer.bind(SocketAddress(HostAddress::localhost, 0)) ||
         !m_httpServer.listen())
@@ -125,11 +133,14 @@ bool MediaServerEmulator::start()
         return false;
     }
 
-    using namespace std::placeholders;
     m_serverClient = m_mediatorConnector->systemConnection();
     m_serverClient->bindToAioThread(m_timer.getAioThread());
-    m_serverClient->setOnConnectionRequestedHandler(
-        std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
+    if (listenToConnectRequests)
+    {
+        using namespace std::placeholders;
+        m_serverClient->setOnConnectionRequestedHandler(
+            std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
+    }
 
     auto client = m_mediatorConnector->systemConnection();
     client->bindToAioThread(m_timer.getAioThread());
@@ -223,6 +234,11 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
         [&promise](nx::hpm::api::ResultCode success) { promise.set_value(success); });
 
     return promise.get_future().get();
+}
+
+std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::mediatorConnection()
+{
+    return m_mediatorConnector->systemConnection();
 }
 
 void MediaServerEmulator::onConnectionRequested(

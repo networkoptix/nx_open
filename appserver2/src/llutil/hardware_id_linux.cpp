@@ -224,15 +224,15 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
     mac_eth0( MAC_str, nullptr );
 
     // Historycally hardware id is mac + '\0'
-    QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
+    QByteArray hardwareId = QByteArray(MAC_str, sizeof(MAC_str));
 
     // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
-    QStringList hardwareIdList = QStringList() << QString::fromUtf8(hardwareId);
+    QStringList hardwareIdList = QStringList() << QString::fromUtf8(MAC_str, sizeof(MAC_str));
 
     HardwareIdListForVersion macHardwareIds;
-    macHardwareIds << MacAndItsHardwareIds(kEmptyMac,  hardwareIdList);
+    macHardwareIds << MacAndItsHardwareIds(kEmptyMac, hardwareIdList);
 
     for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
         hardwareIds << macHardwareIds;

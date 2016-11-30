@@ -16,6 +16,8 @@
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
 
+#include <nx/fusion/model_functions.h>
+
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
@@ -32,6 +34,73 @@ QIcon loadIcon(const QString& name)
 
     return qnSkin->icon(name, QString(), &kResourceIconSuffixes);
 }
+
+#define QN_STRINGIFY(VALUE) case QnResourceIconCache::VALUE: return QLatin1String(BOOST_PP_STRINGIZE(VALUE))
+
+QString baseToString(QnResourceIconCache::Key base)
+{
+    switch (base)
+    {
+        QN_STRINGIFY(Unknown);
+        QN_STRINGIFY(LocalResources);
+        QN_STRINGIFY(CurrentSystem);
+
+        QN_STRINGIFY(Server);
+        QN_STRINGIFY(Servers);
+        QN_STRINGIFY(HealthMonitor);
+
+        QN_STRINGIFY(Layout);
+        QN_STRINGIFY(SharedLayout);
+        QN_STRINGIFY(VideoWallLayout);
+        QN_STRINGIFY(Layouts);
+        QN_STRINGIFY(SharedLayouts);
+
+        QN_STRINGIFY(Camera);
+        QN_STRINGIFY(Cameras);
+
+        QN_STRINGIFY(Recorder);
+        QN_STRINGIFY(Image);
+        QN_STRINGIFY(Media);
+        QN_STRINGIFY(User);
+        QN_STRINGIFY(Users);
+        QN_STRINGIFY(VideoWall);
+        QN_STRINGIFY(VideoWallItem);
+        QN_STRINGIFY(VideoWallMatrix);
+
+        QN_STRINGIFY(OtherSystem);
+        QN_STRINGIFY(OtherSystems);
+
+        QN_STRINGIFY(IOModule);
+        QN_STRINGIFY(WebPage);
+        QN_STRINGIFY(WebPages);
+        default:
+            return QString::number(base);
+    };
+}
+
+QString statusToString(QnResourceIconCache::Key status)
+{
+    switch (status)
+    {
+        QN_STRINGIFY(Offline);
+        QN_STRINGIFY(Unauthorized);
+        QN_STRINGIFY(Online);
+        QN_STRINGIFY(Locked);
+        QN_STRINGIFY(Incompatible);
+        QN_STRINGIFY(Control);
+        default:
+            return QString::number(status >> 8);
+    };
+}
+
+QString keyToString(QnResourceIconCache::Key key)
+{
+    QString basePart = baseToString(key & QnResourceIconCache::TypeMask);
+    QString statusPart = statusToString(key & QnResourceIconCache::StatusMask);
+    return basePart + L':' + statusPart;
+}
+
+#undef QN_STRINGIFY
 
 } //namespace
 
@@ -84,10 +153,6 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Server | Incompatible | ReadOnly,    loadIcon(lit("tree/server_incompatible_disabled.png")));
     /* Read-only server we are connected to. */
     m_cache.insert(Server | Control | ReadOnly,         loadIcon(lit("tree/server_incompatible.png")));
-
-    /* Overlays. Should not be used. */
-    m_cache.insert(Offline,                 loadIcon(lit("tree/offline.png")));
-    m_cache.insert(Unauthorized,            loadIcon(lit("tree/unauthorized.png")));
 }
 
 QnResourceIconCache::~QnResourceIconCache()
@@ -110,21 +175,15 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked)
     if (m_cache.contains(key))
         return m_cache.value(key);
 
-    QIcon icon = m_cache.value(key & TypeMask);
-    QIcon overlay = m_cache.value(key & StatusMask);
-    if (!icon.isNull() && !overlay.isNull())
+    const auto base = key & TypeMask;
+    const auto status = key & StatusMask;
+    if (status != QnResourceIconCache::Online)
     {
-        //NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
-
-        QPixmap pixmap = icon.pixmap(icon.actualSize(QSize(1024, 1024)));
-        {
-            QPainter painter(&pixmap);
-            QRect r = pixmap.rect();
-            r.setTopRight(r.center());
-            overlay.paint(&painter, r, Qt::AlignLeft | Qt::AlignBottom);
-        }
-        icon = QIcon(pixmap);
+        qDebug() << "Error: unknown icon" << keyToString(key);
+        NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
     }
+
+    QIcon icon = m_cache.value(base);
 
     m_cache.insert(key, icon);
     return icon;

@@ -21,39 +21,52 @@ int QnSystemSettingsHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
+    bool status = updateSettings(params, result, owner->accessRights(), owner->authSession());
+    return status ? nx_http::StatusCode::ok : nx_http::StatusCode::forbidden;
+}
+
+bool QnSystemSettingsHandler::updateSettings(
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const Qn::UserAccessData& accessRights,
+    const QnAuthSession& authSession)
+{
     QnSystemSettingsReply reply;
     bool dirty = false;
     const auto& settings = QnGlobalSettings::instance()->allSettings();
 
+    QnRequestParams filteredParams(params);
+    filteredParams.remove("auth");
+
     namespace ahlp = ec2::access_helpers;
 
-    for (QnAbstractResourcePropertyAdaptor* setting: settings)
+    for (QnAbstractResourcePropertyAdaptor* setting : settings)
     {
         bool readAllowed = ahlp::kvSystemOnlyFilter(
             ahlp::Mode::read,
-            owner->accessRights(),
+            accessRights,
             setting->key());
 
         bool writeAllowed = ec2::access_helpers::kvSystemOnlyFilter(
             ahlp::Mode::write,
-            owner->accessRights(),
+            accessRights,
             setting->key());
 
         writeAllowed &= qnResourceAccessManager->hasGlobalPermission(
-            owner->accessRights(),
+            accessRights,
             Qn::GlobalPermission::GlobalAdminPermission);
 
-        if (!params.isEmpty())
+        if (!filteredParams.isEmpty())
         {
-            auto paramIter = params.find(setting->key());
-            if (paramIter == params.end())
+            auto paramIter = filteredParams.find(setting->key());
+            if (paramIter == filteredParams.end())
                 continue;
 
             if (!writeAllowed)
-                return nx_http::StatusCode::forbidden;
+                return false;
 
             if (setting->key() == nx::settings_names::kNameSystemName)
-                systemNameChanged(owner, setting->serializedValue(), paramIter.value());
+                systemNameChanged(authSession, setting->serializedValue(), paramIter.value());
 
             setting->setSerializedValue(paramIter.value());
             dirty = true;
@@ -66,18 +79,18 @@ int QnSystemSettingsHandler::executeGet(
         QnGlobalSettings::instance()->synchronizeNow();
 
     result.setReply(std::move(reply));
-    return nx_http::StatusCode::ok;
+    return true;
 }
 
 void QnSystemSettingsHandler::systemNameChanged(
-    const QnRestConnectionProcessor* owner,
+    const QnAuthSession& authSession,
     const QString& oldValue,
     const QString& newValue)
 {
     if (oldValue == newValue)
         return;
 
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authSession, Qn::AR_SystemNameChanged);
     QString description = lit("%1 -> %2").arg(oldValue).arg(newValue);
     auditRecord.addParam("description", description.toUtf8());
     qnAuditManager->addAuditRecord(auditRecord);

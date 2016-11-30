@@ -1535,6 +1535,9 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
 
     for (const auto& query: queries)
     {
+        if (QnResource::isStopping())
+            break;
+
         status = httpClient.doGET(query);
         if ( status == CL_HTTP_SUCCESS )
         {

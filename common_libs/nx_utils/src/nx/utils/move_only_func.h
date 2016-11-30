@@ -21,6 +21,8 @@ class MoveOnlyFunc
 :
     private std::function<F>
 {
+    using BaseType = std::function<F>;
+
     template<class Func>
     class MoveOnlyFuncWrapper
     {
@@ -107,6 +109,11 @@ public:
 
     using std::function<F>::operator();
     using std::function<F>::operator bool;
+
+    void swap(MoveOnlyFunc& other)
+    {
+        BaseType::swap(static_cast<BaseType&>(other));
+    }
 };
 
 }   //utils

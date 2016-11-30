@@ -30,22 +30,38 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     CameraDiagnostics::Step::Value diagnosticsType =
         CameraDiagnostics::Step::fromString(params.value(kTypeParam));
     if (diagnosticsType == CameraDiagnostics::Step::none)
+    {
+        result.setError(QnJsonRestResult::InvalidParameter,
+            lit("Invalid value of %1 parameter").arg(kTypeParam));
         return nx_http::StatusCode::badRequest;
+    }
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
         &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
-        if (notFoundCameraId.isNull())
-            return nx_http::StatusCode::badRequest;
-        else
+        if (!notFoundCameraId.isNull())
+        {
+            result.setError(QnJsonRestResult::InvalidParameter,
+                lit("Camera %1 not found").arg(notFoundCameraId));
             return nx_http::StatusCode::notFound;
+        }
+        else
+        {
+            result.setError(QnJsonRestResult::MissingParameter,
+                lit("Parameter %1 is missing or invalid").arg(kCameraIdParam));
+            return nx_http::StatusCode::badRequest;
+        }
     }
 
     QnVideoCameraPtr videoCamera = QnVideoCameraPool::instance()->getVideoCamera(camera);
     if (!videoCamera)
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest,
+            lit("Camera %1 is not a video camera").arg(camera->getId().toString()));
         return nx_http::StatusCode::notFound;
+    }
 
     QnCameraDiagnosticsReply reply;
     reply.performedStep = diagnosticsType;
@@ -64,6 +80,9 @@ int QnCameraDiagnosticsRestHandler::executeGet(
             checkResult = checkCameraMediaStreamForErrors(camera);
             break;
         default:
+            result.setError(QnJsonRestResult::CantProcessRequest,
+                lit("Diagnostics step %1 is not implemented").arg(
+                    CameraDiagnostics::Step::toString(diagnosticsType)));
             return nx_http::StatusCode::notImplemented;
     }
 

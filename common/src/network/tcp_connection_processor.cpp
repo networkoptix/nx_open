@@ -19,6 +19,7 @@
 #include "http/custom_headers.h"
 #include "common/common_module.h"
 #include "utils/gzip/gzip_compressor.h"
+#include "nx/network/aio/unified_pollset.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -173,6 +174,20 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = 0;
         sended = d->socket->send(data, size);
+
+        if (sended < 0 && SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+        {
+            unsigned int sendTimeout = 0;
+            if (!d->socket->getSendTimeout(&sendTimeout))
+                return false;
+            static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(sendTimeout);
+            nx::network::aio::UnifiedPollSet pollSet;
+            pollSet.add(d->socket->pollable(), nx::network::aio::etWrite);
+            if (pollSet.poll(kPollTimeout) < 1)
+                return false;
+            continue; //< socket in async mode
+        }
+
         if( sended <= 0 )
             break;
         data += sended;

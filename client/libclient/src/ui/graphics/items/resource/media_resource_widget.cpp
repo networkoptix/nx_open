@@ -1130,6 +1130,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     }
 
     QRectF sourceRect = toSubRect(channelRect, paintRect);
+    m_renderer->setBlurFactor(m_statusOverlay->opacity());
     Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
     m_paintedChannels[channel] = true;
 

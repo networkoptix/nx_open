@@ -117,8 +117,15 @@ int QnSetupLocalSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    QnSystemSettingsHandler subHandler;
-    subHandler.executeGet(QString(), data.systemSettings, result, owner);
+    QnSystemSettingsHandler settingsHandler;
+    if (!settingsHandler.updateSettings(
+        data.systemSettings,
+        result,
+        Qn::kSystemAccess,
+        owner->authSession()))
+    {
+        qWarning() << "failed to write system settings";
+    }
 
     return nx_http::StatusCode::ok;
 }

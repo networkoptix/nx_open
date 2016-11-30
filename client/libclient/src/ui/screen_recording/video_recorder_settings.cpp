@@ -21,25 +21,6 @@ QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
     QObject(parent)
 {
     settings.beginGroup(QLatin1String("videoRecording"));
-
-    /*
-    // update settings from previous version
-    QString primary = settings.value(QLatin1String("primaryAudioDevice")).toString();
-    QString secondary = settings.value(QLatin1String("secondaryAudioDevice")).toString();
-    if (primary == secondary && !primary.isEmpty() && primary != QLatin1String("default") && !primary.contains(m_devNumberExpr))
-    {
-        //primary   += QLatin1String(" (1)");
-        secondary += QLatin1String(" (2)");
-        QStringList devices = availableDeviceNames(QAudio::AudioInput);
-        for (int i = 0; i < devices.size(); ++i)
-        {
-            if (devices[i] == secondary) {
-                settings.setValue(QLatin1String("primaryAudioDevice"), primary);
-                settings.setValue(QLatin1String("secondaryAudioDevice"), secondary);
-            }
-        }
-    }
-    */
 }
 
 QnVideoRecorderSettings::~QnVideoRecorderSettings()

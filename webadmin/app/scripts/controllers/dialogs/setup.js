@@ -154,7 +154,7 @@ angular.module('webadminApp')
 
         }
         function updateCredentials(login, password, isCloud){
-            $log.log("Apply credentials: " + login);
+            $log.log("Apply credentials: " + login + ":" + password + " cloud:" + isCloud);
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
@@ -336,6 +336,7 @@ angular.module('webadminApp')
                 $log.error("Mediaserver error: \n" + error.statusText);
                 $scope.errorData = error.statusText;
             }
+            $log.error(JSON.stringify(error, null, 4));
         }
         /* Connect to cloud section */
 

@@ -23,15 +23,16 @@ Rectangle
 
         Image
         {
-            id: statusImage;
-
-            width: 120;
+            width: 320;
             height: 120;
             y: ((searchEdit.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
-
             source: "qrc:/skin/welcome_page/logo.png"
+            fillMode: ((sourceSize.height < height) && (sourceSize.width < width)
+                ? Image.Pad
+                : Image.PreserveAspectFit);
         }
+
 
         NxSearchEdit
         {

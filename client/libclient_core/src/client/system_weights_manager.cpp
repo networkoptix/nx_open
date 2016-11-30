@@ -150,7 +150,7 @@ void QnSystemsWeightsManager::processSystemDiscovered(const QnSystemDescriptionP
 
     // Inserts weight for unknown system
     static const bool kFakeConnection = false;
-    const QnWeightData unknownSystemWeight({ system->localId(), m_unknownSystemWeight,
+    const QnWeightData unknownSystemWeight({ system->localId(), unknownSystemsWeight(),
         QDateTime::currentMSecsSinceEpoch(), kFakeConnection });
     addLocalWeightData(unknownSystemWeight);
 }

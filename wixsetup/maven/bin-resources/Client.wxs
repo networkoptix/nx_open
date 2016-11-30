@@ -104,10 +104,6 @@
                     <Component Id="ClientSigar">
                         <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
                     </Component>
-
-                    <Component Id="ClientVsRedistributable">
-                        <File Id="VcRedist.exe" Name="vcredist_$(var.arch).exe" Source="$(var.SourceDir)\vcredist_$(var.arch).exe" DiskId="15" />
-                    </Component>
                 </Directory>
             </Directory>
         </DirectoryRef>
@@ -318,8 +314,8 @@
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>
-            <ComponentRef Id="ClientVsRedistributable"/>
-            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="ClientVcrt12ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>

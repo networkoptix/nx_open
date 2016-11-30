@@ -21,6 +21,7 @@
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
+#include <media_server/serverutil.h>
 
 #include "health/system_health.h"
 
@@ -34,6 +35,7 @@ class QnLdapManager;
 namespace ec2 {
     class CrashReporter;
 }
+struct CloudManagerGroup;
 
 void restartServer(int restartTimeout);
 
@@ -87,17 +89,23 @@ private:
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudConnectionManager* const cloudConnectionManager);
-    bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
+    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
+    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
-    void saveAdminPswdHash();
+    void savePersistentDataBeforeDbRestore();
     bool isStopping() const;
-    void migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager);
+    void setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager);
+    void loadBeforeRestoreDbData();
+    void loadOrGenerateDefaultSystemName();
+    void clearMigrationInfo();
+    QnUuid generateSystemIdFromSystemName();
+    void setUpSystemName();
+    void setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
 
 private:
@@ -123,6 +131,7 @@ private:
     QVector<QString> m_hardwareGuidList;
     QString m_enforcedMediatorEndpoint;
     QnSoftwareVersion m_engineVersion;
+    nx::SystemName m_systemName;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

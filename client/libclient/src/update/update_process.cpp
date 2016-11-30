@@ -65,9 +65,19 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     moveToThread(this);
 }
 
-void QnUpdateProcess::pleaseStop() {
+void QnUpdateProcess::pleaseStop()
+{
+    if (!isRunning())
+        return;
+
+    QEventLoop waiter;
+    connect(this, &QThread::finished, &waiter, &QEventLoop::quit);
+
     base_type::pleaseStop();
     quit();
+
+    waiter.exec();
+
     setAllPeersStage(QnPeerUpdateStage::Init);
     setStage(QnFullUpdateStage::Init);
 }
@@ -332,7 +342,10 @@ void QnUpdateProcess::checkFreeSpace()
     checkFreeSpacePeerTask->start(m_targetPeerIds + m_incompatiblePeerIds);
 }
 
-void QnUpdateProcess::installClientUpdate() {
+void QnUpdateProcess::installClientUpdate()
+{
+    using namespace applauncher::api;
+
     /* Check if we skip this step. */
     if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
@@ -346,11 +359,18 @@ void QnUpdateProcess::installClientUpdate() {
 
     setStage(QnFullUpdateStage::Client);
 
-    QFuture<applauncher::api::ResultType::Value> future = QtConcurrent::run(&applauncher::installZip, m_target.version, m_clientUpdateFile->fileName);
-    QFutureWatcher<applauncher::api::ResultType::Value> *futureWatcher = new QFutureWatcher<applauncher::api::ResultType::Value>(this);
+    NX_LOG(lit("Update: QnUpdateProcess: Installing client update [%1] from %2.")
+        .arg(m_target.version.toString())
+        .arg(m_clientUpdateFile->fileName), cl_logDEBUG1);
+    QFuture<ResultType::Value> future = QtConcurrent::run(&applauncher::installZip,
+        m_target.version, m_clientUpdateFile->fileName);
+
+    auto futureWatcher = new QFutureWatcher<ResultType::Value>(this);
+    connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, this,
+        &QnUpdateProcess::at_clientUpdateInstalled);
+    connect(futureWatcher, &QFutureWatcher<ResultType::Value>::finished, futureWatcher,
+        &QObject::deleteLater);
     futureWatcher->setFuture(future);
-    connect(futureWatcher, &QFutureWatcher<applauncher::api::ResultType::Value>::finished, this, &QnUpdateProcess::at_clientUpdateInstalled);
-    connect(futureWatcher, &QFutureWatcher<applauncher::api::ResultType::Value>::finished, futureWatcher, &QObject::deleteLater);
 }
 
 void QnUpdateProcess::setStage(QnFullUpdateStage stage) {
@@ -360,19 +380,27 @@ void QnUpdateProcess::setStage(QnFullUpdateStage stage) {
     emit stageChanged(stage);
 }
 
-void QnUpdateProcess::at_clientUpdateInstalled() {
-    QFutureWatcher<applauncher::api::ResultType::Value> *futureWatcher = dynamic_cast<QFutureWatcher<applauncher::api::ResultType::Value>*>(sender());
+void QnUpdateProcess::at_clientUpdateInstalled()
+{
+    using namespace applauncher::api;
+
+    auto futureWatcher = dynamic_cast<QFutureWatcher<ResultType::Value>*>(sender());
+    NX_ASSERT(futureWatcher);
     if (!futureWatcher)
         return;
 
-    if (futureWatcher->result() != applauncher::api::ResultType::ok) {
-        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logERROR);
+    const auto errCode = futureWatcher->result();
+    if (errCode != ResultType::ok && errCode != ResultType::alreadyInstalled)
+    {
+        NX_LOG(lit("Update: QnUpdateProcess: Client update failed with code %1.")
+            .arg(QString::fromUtf8(ResultType::toString(errCode))), cl_logERROR);
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::ClientInstallationFailed);
         return;
     }
 
-    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logINFO);
+    NX_LOG(lit("Update: QnUpdateProcess: Client update installed with code %1.")
+        .arg(QString::fromUtf8(ResultType::toString(errCode))), cl_logINFO);
 
     checkFreeSpace();
 }
