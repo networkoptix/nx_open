@@ -535,7 +535,7 @@ void QnNxStyle::drawPrimitive(
             if (option->state.testFlag(State_Enabled))
             {
                 if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBlue);
+                    mainColor = this->mainColor(Colors::kBrand);
             }
 
             QColor buttonColor = mainColor;
@@ -607,7 +607,7 @@ void QnNxStyle::drawPrimitive(
             if (option->state.testFlag(State_Enabled))
             {
                 if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBlue);
+                    mainColor = this->mainColor(Colors::kBrand);
             }
 
             QColor buttonColor = mainColor;

@@ -5,7 +5,8 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src \
     ${root.dir}/client/libclient_core/src \
     ${root.dir}/common_libs/nx_vms_utils/src \
-    ${root.dir}/nx_cloud/cloud_db_client/src/include
+    ${root.dir}/nx_cloud/cloud_db_client/src/include \
+    ${root.dir}/nx_cloud/libvms_gateway/src
 
 unix: !mac {
     LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
