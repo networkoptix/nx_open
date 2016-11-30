@@ -30,7 +30,7 @@ static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
                 continue;
         }
 
-        // There are may be more than one service on a single node, no reason to provide
+        // There may be more than one service on a single node, no reason to provide
         // duplicates as we do not provide any extra information about the node.
         if (std::find(ipAddresses.begin(), ipAddresses.end(), newAddress) == ipAddresses.end())
             ipAddresses.push_back(std::move(newAddress));
@@ -56,9 +56,9 @@ std::deque<HostAddress> SystemResolver::resolve(const QString& hostName, int ipV
 
     addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_flags = AI_ALL;    /* For wildcard IP address */
-
-                                // Do not serach for IPv6 addresseses on IpV4 sockets
+    hints.ai_flags = AI_ALL;
+    hints.ai_family = AF_UNSPEC;
+    // Do not search for IPv6 addresses on IpV4 sockets.
     if (ipVersion == AF_INET)
         hints.ai_family = ipVersion;
 
@@ -68,7 +68,7 @@ std::deque<HostAddress> SystemResolver::resolve(const QString& hostName, int ipV
 
     if (status == EAI_BADFLAGS)
     {
-        // if the lookup failed with AI_ALL, try again without it
+        // If the lookup failed with AI_ALL, try again without it.
         hints.ai_flags = 0;
         status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
     }
@@ -85,9 +85,9 @@ std::deque<HostAddress> SystemResolver::resolve(const QString& hostName, int ipV
             case EAI_AGAIN: resultCode = SystemError::again; break;
             case EAI_MEMORY: resultCode = SystemError::nomem; break;
 
-#ifdef __linux__
+            #if defined(__linux__)
             case EAI_SYSTEM: resultCode = SystemError::getLastOSErrorCode(); break;
-#endif
+            #endif
 
                 // TODO: #mux Translate some other status codes?
             default: resultCode = SystemError::dnsServerFailure; break;
