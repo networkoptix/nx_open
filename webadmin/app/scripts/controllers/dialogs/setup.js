@@ -41,15 +41,6 @@ angular.module('webadminApp')
             $log.log("check getCredentials from client");
             return nativeClient.getCredentials().then(function (authObject) {
                 $log.log("request get credentials from client");
-                if (typeof authObject === 'string' || authObject instanceof String) {
-                    $log.log("got string from client, try to decode JSON: " + authObject);
-                    try {
-                        authObject = JSON.parse(authObject);
-                    } catch (a) {
-                        $log("could not decode JSON from string: " + authObject);
-                    }
-                }
-                $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
                 cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
                 if (cloudAuthorized) {
                     $scope.settings.presetCloudEmail = authObject.cloudEmail;
@@ -476,7 +467,7 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
-                $location.path('/settings');
+                $location.path('/');
                 setTimeout(function(){
                     window.location.reload();
                 });
