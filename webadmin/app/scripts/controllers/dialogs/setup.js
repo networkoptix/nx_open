@@ -121,8 +121,16 @@ angular.module('webadminApp')
                     $scope.serverInfo = r.data.reply;
 
                     $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
-                    $scope.IP = $scope.serverInfo.remoteAddresses[0];
+
                     $scope.port = window.location.port;
+
+                    if($scope.serverInfo.flags.canSetupNetwork){
+                        mediaserver.networkSettings().then(function(reply){
+                            var settings = r.data.reply;
+                            $scope.IP = settings[0].ipAddr;
+                            $scope.serverAddress = $scope.IP + ':' + $scope.port;
+                        });
+                    }
 
                     checkInternet(false);
 
