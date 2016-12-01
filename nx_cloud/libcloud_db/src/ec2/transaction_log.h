@@ -38,12 +38,6 @@ class AbstractOutgoingTransactionDispatcher;
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
-struct TransactionLogRecord
-{
-    nx::Buffer hash;
-    std::unique_ptr<const TransactionSerializer> serializer;
-};
-
 /**
  * Supports multiple transactions related to a single system at the same time. 
  * In this case transactions will reported to AbstractOutgoingTransactionDispatcher 
@@ -57,7 +51,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
     typedef nx::utils::MoveOnlyFunc<void(
         api::ResultCode /*resultCode*/,
-        std::vector<TransactionLogRecord> /*serializedTransactions*/,
+        std::vector<dao::TransactionLogRecord> /*serializedTransactions*/,
         ::ec2::QnTranState /*readedUpTo*/)> TransactionsReadHandler;
 
     /**
@@ -229,7 +223,7 @@ private:
     struct TransactionReadResult
     {
         api::ResultCode resultCode;
-        std::vector<TransactionLogRecord> transactions;
+        std::vector<dao::TransactionLogRecord> transactions;
         /** (Read start state) + (readed transactions). */
         ::ec2::QnTranState state;
     };
@@ -292,6 +286,11 @@ private:
         const QnMutexLockerBase& lk,
         nx::db::QueryContext* const queryContext,
         const nx::String& systemId);
+
+    void updateTimestampHiInCache(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        quint64 newValue);
 };
 
 } // namespace ec2

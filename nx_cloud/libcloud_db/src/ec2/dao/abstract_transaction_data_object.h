@@ -8,6 +8,8 @@
 #include <utils/db/types.h>
 #include <utils/db/query_context.h>
 
+#include "ec2/serialization/ubjson_serialized_transaction.h"
+
 namespace nx {
 namespace cdb {
 namespace ec2 {
@@ -21,16 +23,41 @@ struct TransactionData
     const QByteArray& ubjsonSerializedTransaction;
 };
 
+struct TransactionLogRecord
+{
+    nx::Buffer hash;
+    std::unique_ptr<const TransactionSerializer> serializer;
+};
+
 class AbstractTransactionDataObject
 {
 public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTransactionDataObject>()>;
-
     virtual ~AbstractTransactionDataObject() = default;
 
     virtual nx::db::DBResult insertOrReplaceTransaction(
         nx::db::QueryContext* queryContext,
         const TransactionData& transactionData) = 0;
+
+    virtual nx::db::DBResult updateTimestampHiForSystem(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        quint64 newValue) = 0;
+
+    // TODO: #ak Too many arguments in following method.
+    virtual nx::db::DBResult fetchTransactionsOfAPeerQuery(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        const QString& peerId,
+        const QString& dbInstanceId,
+        std::int64_t minSequence,
+        std::int64_t maxSequence,
+        std::vector<dao::TransactionLogRecord>* const transactions) = 0;
+};
+
+class TransactionDataObjectFactory
+{
+public:
+    using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTransactionDataObject>()>;
 
     static std::unique_ptr<AbstractTransactionDataObject> create();
     

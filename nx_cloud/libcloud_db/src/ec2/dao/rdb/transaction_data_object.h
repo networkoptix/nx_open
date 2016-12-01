@@ -18,6 +18,20 @@ public:
     virtual nx::db::DBResult insertOrReplaceTransaction(
         nx::db::QueryContext* queryContext,
         const TransactionData& transactionData) override;
+
+    virtual nx::db::DBResult updateTimestampHiForSystem(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        quint64 newValue) override;
+
+    virtual nx::db::DBResult fetchTransactionsOfAPeerQuery(
+        nx::db::QueryContext* queryContext,
+        const nx::String& systemId,
+        const QString& peerId,
+        const QString& dbInstanceId,
+        std::int64_t minSequence,
+        std::int64_t maxSequence,
+        std::vector<dao::TransactionLogRecord>* const transactions) override;
 };
 
 } // namespace rdb

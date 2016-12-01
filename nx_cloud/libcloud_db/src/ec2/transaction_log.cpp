@@ -27,7 +27,7 @@ TransactionLog::TransactionLog(
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_transactionSequence(0)
 {
-    m_transactionDataObject = dao::AbstractTransactionDataObject::create();
+    m_transactionDataObject = dao::TransactionDataObjectFactory::create();
 
     if (fillCache() != nx::db::DBResult::ok)
         throw std::runtime_error("Error loading transaction log from DB");
@@ -63,25 +63,12 @@ nx::db::DBResult TransactionLog::updateTimestampHiForSystem(
     const nx::String& systemId,
     quint64 newValue)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_systemIdToTransactionLog[systemId].updateTimestampSequence(
-        getDbTransactionContext(lk, queryContext, systemId).cacheTranId, newValue);
+    updateTimestampHiInCache(queryContext, systemId, newValue);
 
-    QSqlQuery saveSystemTimestampSequence(*queryContext->connection());
-    saveSystemTimestampSequence.prepare(
-        R"sql(
-        REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
-        )sql");
-    saveSystemTimestampSequence.addBindValue(QLatin1String(systemId));
-    saveSystemTimestampSequence.addBindValue(newValue);
-    if (!saveSystemTimestampSequence.exec())
-    {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Error saving transaction timestamp sequence %2 to log. %3")
-            .arg(systemId).arg(newValue).arg(saveSystemTimestampSequence.lastError().text()),
-            cl_logWARNING);
-        return nx::db::DBResult::ioError;
-    }
+    const auto dbResult = m_transactionDataObject->updateTimestampHiForSystem(
+        queryContext, systemId, newValue);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     return nx::db::DBResult::ok;
 }
@@ -241,40 +228,16 @@ nx::db::DBResult TransactionLog::fetchTransactions(
          it != currentState.values.end();
          ++it)
     {
-        QSqlQuery fetchTransactionsOfAPeerQuery(*queryContext->connection());
-        fetchTransactionsOfAPeerQuery.prepare(R"sql(
-            SELECT tran_data, tran_hash, timestamp, sequence
-            FROM transaction_log
-            WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<=?
-            ORDER BY sequence
-            )sql");
-        fetchTransactionsOfAPeerQuery.addBindValue(QLatin1String(systemId));
-        fetchTransactionsOfAPeerQuery.addBindValue(it.key().peerID.toSimpleString());
-        fetchTransactionsOfAPeerQuery.addBindValue(it.key().dbID.toSimpleString());
-        fetchTransactionsOfAPeerQuery.addBindValue(from.values.value(it.key()));
-        fetchTransactionsOfAPeerQuery.addBindValue(
-            to.values.value(it.key(), std::numeric_limits<qint32>::max()));
-        if (!fetchTransactionsOfAPeerQuery.exec())
-        {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("systemId %1. Error executing fetch_transactions request "
-                   "for peer (%2; %3). %4")
-                    .arg(it.key().peerID.toSimpleString()).arg(it.key().dbID.toSimpleString())
-                    .arg(fetchTransactionsOfAPeerQuery.lastError().text()),
-                cl_logERROR);
-            return nx::db::DBResult::ioError;
-        }
-
-        while (fetchTransactionsOfAPeerQuery.next())
-        {
-            outputData->transactions.push_back(
-                TransactionLogRecord{
-                    fetchTransactionsOfAPeerQuery.value("tran_hash").toByteArray(),
-                    std::make_unique<UbjsonTransactionPresentation>(
-                        fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray(),
-                        nx_ec::EC2_PROTO_VERSION)
-                });
-        }
+        const auto dbResult = m_transactionDataObject->fetchTransactionsOfAPeerQuery(
+            queryContext,
+            systemId,
+            it.key().peerID.toSimpleString(),
+            it.key().dbID.toSimpleString(),
+            from.values.value(it.key()),
+            to.values.value(it.key(), std::numeric_limits<qint32>::max()),
+            &outputData->transactions);
+        if (dbResult != nx::db::DBResult::ok)
+            return dbResult;
     }
 
     // TODO #ak currentState is not correct here since it can be limited by "to" and "maxTransactionsToReturn"
@@ -396,6 +359,16 @@ TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
                     queryContext, systemId, std::placeholders::_1));
         }).first;
     return newElementIter->second;
+}
+
+void TransactionLog::updateTimestampHiInCache(
+    nx::db::QueryContext* queryContext,
+    const nx::String& systemId,
+    quint64 newValue)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_systemIdToTransactionLog[systemId].updateTimestampSequence(
+        getDbTransactionContext(lk, queryContext, systemId).cacheTranId, newValue);
 }
 
 } // namespace ec2

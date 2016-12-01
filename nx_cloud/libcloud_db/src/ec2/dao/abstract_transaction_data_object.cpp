@@ -9,17 +9,17 @@ namespace cdb {
 namespace ec2 {
 namespace dao {
 
-static AbstractTransactionDataObject::FactoryFunc factoryFunc;
+static TransactionDataObjectFactory::FactoryFunc factoryFunc;
 
-std::unique_ptr<AbstractTransactionDataObject> AbstractTransactionDataObject::create()
+std::unique_ptr<AbstractTransactionDataObject> TransactionDataObjectFactory::create()
 {
     if (factoryFunc)
         return factoryFunc();
     return std::make_unique<rdb::TransactionDataObject>();
 }
 
-void AbstractTransactionDataObject::setFactoryFunc(
-    AbstractTransactionDataObject::FactoryFunc func)
+void TransactionDataObjectFactory::setFactoryFunc(
+    TransactionDataObjectFactory::FactoryFunc func)
 {
     factoryFunc = std::move(func);
 }

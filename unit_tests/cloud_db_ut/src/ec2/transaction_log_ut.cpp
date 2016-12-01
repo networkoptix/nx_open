@@ -182,6 +182,26 @@ public:
     {
         return nx::db::DBResult::ok;
     }
+
+    virtual nx::db::DBResult updateTimestampHiForSystem(
+        nx::db::QueryContext* /*queryContext*/,
+        const nx::String& /*systemId*/,
+        quint64 /*newValue*/) override
+    {
+        return nx::db::DBResult::ok;
+    }
+
+    virtual nx::db::DBResult fetchTransactionsOfAPeerQuery(
+        nx::db::QueryContext* /*queryContext*/,
+        const nx::String& /*systemId*/,
+        const QString& /*peerId*/,
+        const QString& /*dbInstanceId*/,
+        std::int64_t /*minSequence*/,
+        std::int64_t /*maxSequence*/,
+        std::vector<dao::TransactionLogRecord>* const /*transactions*/) override
+    {
+        return nx::db::DBResult::ok;
+    }
 };
 
 class TransactionLog:
@@ -197,7 +217,7 @@ public:
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
 
-        ec2::dao::AbstractTransactionDataObject::setDataObjectType<TransactionDataObject>();
+        ec2::dao::TransactionDataObjectFactory::setDataObjectType<TransactionDataObject>();
 
         m_outgoingTransactionDispatcher.setOnNewTransaction(
             std::bind(&TransactionLog::storeNewTransaction, this, _1, _2));
