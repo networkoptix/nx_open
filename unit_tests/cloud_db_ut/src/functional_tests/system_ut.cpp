@@ -11,27 +11,128 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
+#include <nx/utils/test_support/utils.h>
 
 #include "test_setup.h"
-
 
 namespace nx {
 namespace cdb {
 
 namespace {
 
-class System
-:
+class System:
     public CdbFunctionalTest
 {
+public:
+    virtual void SetUp() override
+    {
+        CdbFunctionalTest::SetUp();
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+protected:
+    api::SystemData givenSystem()
+    {
+        auto owner = addActivatedAccount2();
+        m_registeredAccounts.emplace(owner.email, owner);
+        auto system = addRandomSystemToAccount(owner);
+        return system;
+    }
+
+    AccountWithPassword givenUserOfSystem(const api::SystemData& system)
+    {
+        const auto newAccount = addActivatedAccount2();
+        const auto owner = m_registeredAccounts.find(system.ownerAccountEmail)->second;
+        shareSystemEx(owner, system, newAccount, api::SystemAccessRole::cloudAdmin);
+        return newAccount;
+    }
+
+    void havingDisabledUserInSystem(
+        const api::SystemData& system,
+        const api::AccountData& user)
+    {
+        updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, false));
+    }
+
+    void havingEnabledUserInSystem(
+        const api::SystemData& system,
+        const api::AccountData& user)
+    {
+        updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, true));
+    }
+
+    void assertIfUserCanSeeSystem(
+        const AccountWithPassword& user,
+        const api::SystemData& systemToCheck)
+    {
+        ASSERT_FALSE(isUserHasAccessToSystem(user, systemToCheck));
+    }
+
+    void assertIfUserCannotSeeSystem(
+        const AccountWithPassword& user,
+        const api::SystemData& systemToCheck)
+    {
+        ASSERT_TRUE(isUserHasAccessToSystem(user, systemToCheck));
+    }
+
+private:
+    std::map<std::string, AccountWithPassword> m_registeredAccounts;
+
+    bool isUserHasAccessToSystem(
+        const AccountWithPassword& user,
+        const api::SystemData& systemToCheck)
+    {
+        std::vector<api::SystemDataEx> systems;
+        NX_GTEST_ASSERT_EQ(api::ResultCode::ok, getSystems(user.email, user.password, &systems));
+        const auto systemToCheckIter = std::find_if(
+            systems.begin(),
+            systems.end(),
+            [&systemToCheck](const api::SystemDataEx& system)
+            {
+                return system.id == systemToCheck.id;
+            });
+        return systemToCheckIter != systems.end();
+    }
+
+    template<typename Name, typename Value>
+    struct Field
+    {
+        Name name;
+        Value value; 
+    };
+
+    template<typename Name, typename Value>
+    Field<Name, Value> makeField(Name name, Value value)
+    {
+        Field<Name, Value> f;
+        f.name = name;
+        f.value = value;
+        return f;
+    }
+
+    template<typename FieldType>
+    void updateSharing(
+        const api::SystemData& system,
+        const api::AccountData& user,
+        FieldType field)
+    {
+        api::SystemSharing sharing;
+        sharing.accountEmail = user.email;
+        sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+        sharing.isEnabled = true;
+        sharing.systemId = system.id;
+        const auto owner = m_registeredAccounts.find(system.ownerAccountEmail)->second;
+
+        sharing.*field.name = field.value;
+
+        ASSERT_EQ(api::ResultCode::ok, shareSystem(owner.email, owner.password, sharing));
+    }
 };
 
 }
 
 TEST_F(System, unbind)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
@@ -214,14 +315,11 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
 TEST_F(System, get)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
     cdbFunctionalTestSystemGet(this);
 }
 
 TEST_F(System, activation)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
@@ -294,22 +392,26 @@ TEST_F(System, activation)
     }
 }
 
-TEST_F(System, notification_of_system_removal)
+class SystemNotification:
+    public System
 {
-    constexpr const std::chrono::seconds kSystemGoneForeverPeriod =
-        std::chrono::seconds(5);
-    constexpr const std::chrono::seconds kDropExpiredSystemsPeriodSec =
-        std::chrono::seconds(1);
+public:
+    constexpr static auto kSystemGoneForeverPeriod = std::chrono::seconds(5);
+    constexpr static auto kDropExpiredSystemsPeriodSec = std::chrono::seconds(1);
 
-    addArg("-systemManager/reportRemovedSystemPeriod");
-    addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
-    addArg("-systemManager/controlSystemStatusByDb");
-    addArg("true");
-    addArg("-systemManager/dropExpiredSystemsPeriod");
-    addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
+    SystemNotification()
+    {
+        addArg("-systemManager/reportRemovedSystemPeriod");
+        addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
+        addArg("-systemManager/controlSystemStatusByDb");
+        addArg("true");
+        addArg("-systemManager/dropExpiredSystemsPeriod");
+        addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
+    }
+};
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
+TEST_F(SystemNotification, notification_of_system_removal)
+{
     enum class TestOption
     {
         withRestart,
@@ -383,8 +485,6 @@ TEST_F(System, notification_of_system_removal)
 
 TEST_F(System, rename)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     // Adding system1 to account1.
     const auto system1 = addRandomSystemToAccount(account1);
@@ -462,8 +562,6 @@ TEST_F(System, rename)
 
 TEST_F(System, persistent_sequence)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
@@ -539,7 +637,6 @@ TEST_F(System, sorting_order_weight_expiration)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
 
@@ -603,8 +700,6 @@ TEST_F(System, sorting_order_weight_expiration)
 
 TEST_F(System, sorting_order_multiple_systems)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
     const auto system2 = addRandomSystemToAccount(account);
@@ -661,8 +756,6 @@ TEST_F(System, sorting_order_multiple_systems)
 
 TEST_F(System, sorting_order_last_login_time)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
 
@@ -704,8 +797,6 @@ TEST_F(System, sorting_order_last_login_time)
 
 TEST_F(System, sorting_order_new_system_is_on_top)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
 
@@ -762,8 +853,6 @@ TEST_F(System, sorting_order_new_system_is_on_top)
 
 TEST_F(System, sorting_order_persistence_after_sharing_update)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account1);
     const auto account2 = addActivatedAccount2();
@@ -800,8 +889,6 @@ TEST_F(System, sorting_order_persistence_after_sharing_update)
 
 TEST_F(System, sorting_order_unknown_system)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account1);
 
@@ -818,8 +905,6 @@ TEST_F(System, update)
     constexpr const char kOpaqueValue[] = 
         "SELECT * FROM account WHERE email like 'test@example.com'\r\n "
         "OR email like '\\slashed_test@example.com'\n";
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto account1 = addActivatedAccount2();
     auto system1 = addRandomSystemToAccount(account1);
@@ -846,6 +931,23 @@ TEST_F(System, update)
         ASSERT_EQ(system1, systems[0]);
         ASSERT_EQ(system1.opaque, systems[0].opaque);
     }
+}
+
+TEST_F(System, disabled_user_does_not_see_system)
+{
+    const auto system = givenSystem();
+    const auto user = givenUserOfSystem(system);
+    havingDisabledUserInSystem(system, user);
+    assertIfUserCanSeeSystem(user, system);
+}
+
+TEST_F(System, DISABLED_reenabled_user_can_see_system)
+{
+    const auto system = givenSystem();
+    const auto user = givenUserOfSystem(system);
+    havingDisabledUserInSystem(system, user);
+    havingEnabledUserInSystem(system, user);
+    assertIfUserCannotSeeSystem(user, system);
 }
 
 } // namespace cdb

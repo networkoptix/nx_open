@@ -1,39 +1,42 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#include "nx/utils/nx_utils_app_info.h"
+#include "nx/utils/app_info.h"
 
-QString NxUtilsAppInfo::applicationName()
+namespace nx {
+namespace utils {
+
+QString AppInfo::applicationName()
 {
     return QStringLiteral("${product.title}");
 }
 
-QString NxUtilsAppInfo::applicationDisplayName()
+QString AppInfo::applicationDisplayName()
 {
     return QStringLiteral("${product.display.title}");
 }
 
-bool NxUtilsAppInfo::beta()
+bool AppInfo::beta()
 {
     return ${beta};
 }
 
-QString NxUtilsAppInfo::applicationVersion()
+QString AppInfo::applicationVersion()
 {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }
 
-QString NxUtilsAppInfo::applicationRevision()
+QString AppInfo::applicationRevision()
 {
     return QStringLiteral("${changeSet}");
 }
 
-QString NxUtilsAppInfo::customizationName()
+QString AppInfo::customizationName()
 {
     return QStringLiteral("${customization}");
 }
 
-QString NxUtilsAppInfo::applicationFullVersion()
+QString AppInfo::applicationFullVersion()
 {
     static const QString kBeta = beta() ? lit("-beta") : QString();
     static const QString kFullVersion = lit("%1-%2-%3%4")
@@ -44,3 +47,6 @@ QString NxUtilsAppInfo::applicationFullVersion()
 
     return kFullVersion;
 }
+
+} // namespace nx
+} // namespace utils

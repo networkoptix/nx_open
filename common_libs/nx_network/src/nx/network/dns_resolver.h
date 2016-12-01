@@ -46,14 +46,16 @@ public:
 
     /**
      * @param waitForRunningHandlerCompletion if true, this method blocks until 
-     * running completion handler (if any) has returned.
+     * running completion handler (if any) returns.
      */
     void cancel(RequestId requestId, bool waitForRunningHandlerCompletion);
 
-    /** Returns true if at least one resolve operation is scheduled with reqID. */
+    /**
+     * @return true if at least one resolve operation is scheduled with reqID.
+     */
     bool isRequestIdKnown(RequestId requestId) const;
 
-    /** Even more priority than /etc/hosts. */
+    /** Has even greater priority than /etc/hosts. */
     // TODO: #ak following two methods do not belong here.
     void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
     void removeEtcHost(const QString& name);

@@ -11,7 +11,7 @@
 
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/nx_utils_app_info.h>
+#include <nx/utils/app_info.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/scoped_thread_rollback.h>
@@ -265,7 +265,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto binName = fileName.split(QChar('_')).first();
 #endif
 
-    const auto version = NxUtilsAppInfo::applicationFullVersion();
+    const auto version = nx::utils::AppInfo::applicationFullVersion();
     const auto systemInfo = QnSystemInformation::currentSystemInformation().toString();
     const auto systemRuntime = QnSystemInformation::currentSystemRuntime();
     const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )
