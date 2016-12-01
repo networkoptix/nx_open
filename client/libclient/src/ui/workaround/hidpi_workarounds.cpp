@@ -178,13 +178,19 @@ QWindow* getParentWindow(QWidget* widget)
         return nullptr;
 
     auto item = widget;
-    while (item->parentWidget() && !dynamic_cast<QGLWidget*>(item->parentWidget()))
-        item = item->parentWidget();
 
-    if (item->parentWidget())    //< direct child of GL widget
-        return item->parentWidget()->windowHandle();
+    while (!item->isWindow() && item->parentWidget())
+    {
+        const auto parentWidget = item->parentWidget();
+        if (dynamic_cast<QGLWidget*>(parentWidget))
+            return parentWidget->windowHandle();
 
-    // We have at least
+        item = parentWidget;
+    }
+
+    if (item->isWindow())
+        return item->windowHandle();
+
     const auto proxy = item->graphicsProxyWidget();
     const QGraphicsView* view = (proxy && proxy->scene() && !proxy->scene()->views().isEmpty()
         ? proxy->scene()->views().first() : nullptr);
@@ -259,7 +265,8 @@ public:
         const auto parentWindow = getParentWindow(widget);
         if (!dynamic_cast<ProxyContextMenuEvent*>(event) && parentWindow)
         {
-            const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
+            const auto targetPos = screenRelatedToGlobal(
+                contextMenuEvent->globalPos(), parentWindow->screen());
             auto fixedEvent = ProxyContextMenuEvent(contextMenuEvent->pos(), targetPos);
             if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
                 return QObject::eventFilter(watched, event);
