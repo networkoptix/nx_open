@@ -2766,13 +2766,6 @@ QRect QnNxStyle::subElementRect(
             break;
         }
 
-        case SE_LabelLayoutItem:
-        {
-            auto rect = base_type::subElementRect(subElement, option, widget);
-            rect.setWidth(qMax(rect.width(), 64));
-            return rect;
-        }
-
         case SE_PushButtonLayoutItem:
         {
             if (auto buttonBox = qobject_cast<const QDialogButtonBox *>(widget))
