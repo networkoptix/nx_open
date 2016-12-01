@@ -1,48 +1,24 @@
 #ifdef ENABLE_ONVIF
 
-#include "hikvision_onvif_resource.h"
-#include <utils/camera/camera_diagnostics.h>
 #include <QtXml/QDomElement>
+
+#include <boost/optional.hpp>
+#include <utils/camera/camera_diagnostics.h>
+
+#include "hikvision_onvif_resource.h"
 #include "hikvision_audio_transmitter.h"
+#include "hikvision_parsing_utils.h"
 
 namespace {
 
-    const int kRequestTimeoutMs = 4 * 1000;
+const std::chrono::milliseconds kRequestTimeout(4000);
 
-    bool isResponseOK(const nx_http::HttpClient* client)
-    {
-        if (!client->response())
-            return false;
-        return client->response()->statusLine.statusCode == nx_http::StatusCode::ok;
-    }
-
-    QnAudioFormat toAudioFormat(const QString& codecName, int bitrateKbps)
-    {
-        QnAudioFormat result;
-        if (codecName == lit("G.711alaw"))
-        {
-            result.setSampleRate(8000);
-            result.setCodec("ALAW");
-        }
-        else if (codecName == lit("G.711ulaw"))
-        {
-            result.setSampleRate(8000);
-            result.setCodec("MULAW");
-        }
-        else if (codecName == lit("G.726"))
-        {
-            result.setSampleRate(8000);
-            result.setCodec("G726");
-        }
-        else if (codecName == lit("AAC"))
-        {
-            result.setSampleRate(16000);
-            result.setCodec("AAC");
-        }
-        if (bitrateKbps > 0)
-            result.setSampleRate(bitrateKbps); //< override default value
-        return result;
-    }
+bool isResponseOK(const nx_http::HttpClient* client)
+{
+    if (!client->response())
+        return false;
+    return client->response()->statusLine.statusCode == nx_http::StatusCode::ok;
+}
 
 } // namespace
 
@@ -75,9 +51,9 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
 std::unique_ptr<nx_http::HttpClient> QnHikvisionOnvifResource::getHttpClient()
 {
     std::unique_ptr<nx_http::HttpClient> httpClient(new nx_http::HttpClient);
-    httpClient->setResponseReadTimeoutMs(kRequestTimeoutMs);
-    httpClient->setSendTimeoutMs(kRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(kRequestTimeoutMs);
+    httpClient->setResponseReadTimeoutMs(kRequestTimeout.count());
+    httpClient->setSendTimeoutMs(kRequestTimeout.count());
+    httpClient->setMessageBodyReadTimeoutMs(kRequestTimeout.count());
     httpClient->setUserName(getAuth().user());
     httpClient->setUserPassword(getAuth().password());
 
@@ -89,76 +65,60 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
     auto httpClient = getHttpClient();
 
     QUrl requestUrl(getUrl());
-    requestUrl.setPath("/ISAPI/System/TwoWayAudio/channels");
+    requestUrl.setPath(lit("/ISAPI/System/TwoWayAudio/channels"));
     requestUrl.setHost(getHostAddress());
-    requestUrl.setPort(QUrl(getUrl()).port(80));
+    requestUrl.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
 
     if (!httpClient->doGet(requestUrl) || !isResponseOK(httpClient.get()))
     {
         return CameraDiagnostics::CameraResponseParseErrorResult(
             requestUrl.toString(QUrl::RemovePassword),
-            "Read two way audio info");
+            lit("Read two way audio info"));
     }
 
     QByteArray data;
     while (!httpClient->eof())
         data.append(httpClient->fetchMessageBodyBuffer());
+
     if (data.isEmpty())
         return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
 
-    QDomDocument doc;
-    doc.setContent(data);
-    QDomElement docElem = doc.documentElement();
+    auto channels = nx::plugins::hikvision::parseAvailableChannelsResponse(data);
 
-    QString outputId;
-    QStringList supportedCodecs;
-    int bitrateKbps = 0;
+    if (channels.empty())
+        return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
 
-    QDomNode node = docElem.firstChild();
-    while (!node.isNull())
+    boost::optional<nx::plugins::hikvision::ChannelStatusResponse> channel(boost::none);
+    for (const auto& ch: channels)
     {
-        QDomElement element = node.toElement();
-        if (!element.isNull() && element.tagName() == "TwoWayAudioChannel")
+        if (!ch.id.isEmpty() && !ch.audioCompression.isEmpty())
         {
-            auto params = element.firstChild();
-            while (!params.isNull())
-            {
-                element = params.toElement();
-                if (element.isNull())
-                    continue;
-                if (element.nodeName() == "id")
-                    outputId = element.text();
-                else if (element.nodeName() == "audioCompressionType")
-                    supportedCodecs = element.text().split(",");
-                else if (element.nodeName() == "audioBitRate")
-                    bitrateKbps = element.text().toInt();
-
-                params = params.nextSibling();
-            }
-        }
-        node = node.nextSibling();
-    }
-
-    if (outputId.isEmpty())
-        return CameraDiagnostics::NoErrorResult(); //< no audio outputs
-
-    for (const auto& codec: supportedCodecs)
-    {
-        QnAudioFormat outputFormat = toAudioFormat(codec, bitrateKbps);
-        if (m_audioTransmitter->isCompatible(outputFormat))
-        {
-            m_audioTransmitter->setOutputFormat(outputFormat);
-            
-            auto hikTransmitter = std::dynamic_pointer_cast<HikvisionAudioTransmitter>(m_audioTransmitter);
-            if (hikTransmitter)
-            {
-                hikTransmitter->setChannelId(outputId);
-                hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::PUT);
-            }
-
-            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+            channel = ch;
             break;
         }
+    }
+
+    if (!channel)
+        return CameraDiagnostics::NoErrorResult();
+
+    QnAudioFormat outputFormat = nx::plugins::hikvision::toAudioFormat(
+        channel->audioCompression,
+        channel->sampleRateKHz);
+
+    if (m_audioTransmitter->isCompatible(outputFormat))
+    {
+        m_audioTransmitter->setOutputFormat(outputFormat);
+
+        auto hikTransmitter = std::dynamic_pointer_cast<HikvisionAudioTransmitter>(
+            m_audioTransmitter);
+
+        if (hikTransmitter)
+        {
+            hikTransmitter->setChannelId(channel->id);
+            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::PUT);
+        }
+
+        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
     }
 
     return CameraDiagnostics::NoErrorResult();

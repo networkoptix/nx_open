@@ -1,12 +1,8 @@
 #pragma once
 
-#include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
-#include <nx/network/socket.h>
-#include <transcoding/ffmpeg_audio_transcoder.h>
 #include <nx/network/http/asynchttpclient.h>
-
 
 class ActiAudioTransmitter: public BaseHttpAudioTransmitter
 {
@@ -31,5 +27,4 @@ protected:
 private:
     nx::Buffer m_buffer;
     nx::Buffer m_chunkPrefixBuffer;
-
 };

@@ -1,12 +1,10 @@
 #include "acti_audio_transmitter.h"
 
-#include <core/resource/media_server_resource.h>
-
 namespace {
 
 const QString kEncoderCgiPath = lit("/cgi-bin/cmd/encoder");
 const QString kEncoderCgiQuery = lit("SEND_AUDIO");
-const QString kMultipartBoundary = lit("---------SomeBoundary");
+const QString kMultipartBoundary = lit("---------Nx2WayAudioBoundary");
 const AVCodecID kTransmissionCodecId = AV_CODEC_ID_PCM_S16LE;
 const QString kAudioTransmissionRequestMimeType = lit("multipart/x-mixed-replace");
 const QString kAudioMimeType = lit("audio/pcm");
@@ -36,6 +34,7 @@ bool ActiAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 
 void ActiAudioTransmitter::prepare()
 {
+    // ACTi supports only 8000kHz PCM_16LE format.
     QnMutexLocker lock(&m_mutex);
     m_transcoder.reset(new QnFfmpegAudioTranscoder(kTransmissionCodecId));
     m_transcoder->setSampleRate(kSampleRate);
@@ -43,16 +42,6 @@ void ActiAudioTransmitter::prepare()
 
 bool ActiAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 {
-    static QFile* log = nullptr;
-
-    if (!log)
-    {
-        log = new QFile(lit("C:\\misc\\audio.raw"));
-        log->open(QIODevice::WriteOnly | QIODevice::Truncate);
-    }
-
-    log->write(audioData->data(), audioData->dataSize());
-
     std::size_t totalBytesAvailable = audioData->dataSize() + m_buffer.size();
     std::size_t bufferOffset = 0;
     
@@ -103,7 +92,6 @@ bool ActiAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 
     m_buffer.append(audioData->data() + bufferOffset, totalBytesAvailable);
     return true;
-
 }
 
 void ActiAudioTransmitter::prepareHttpClient(nx_http::AsyncHttpClientPtr httpClient)
@@ -113,6 +101,11 @@ void ActiAudioTransmitter::prepareHttpClient(nx_http::AsyncHttpClientPtr httpCli
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
     httpClient->setDisablePrecalculatedAuthorization(false);
+
+    // There is a bug in ACTi authorization for SEND_AUDIO request:
+    // if we don't add authorization info to the first request all subsequent 
+    // requests will fail with "401 Unauthorized", so we have to add authorization 
+    // to the first request.
     httpClient->setAllowPrecalculatedBasicAuth(true);
 }
 

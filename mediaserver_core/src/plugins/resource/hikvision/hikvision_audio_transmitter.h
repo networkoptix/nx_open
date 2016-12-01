@@ -2,40 +2,16 @@
 
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
-#include <nx/network/socket.h>
-#include <transcoding/ffmpeg_audio_transcoder.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/httpclient.h>
 
 class HikvisionAudioTransmitter: public BaseHttpAudioTransmitter
 {
     using base_type = BaseHttpAudioTransmitter;
 
-    struct ChannelStatusResponse
-    {
-        QString id;
-        bool enabled = false;
-        QString audioCompression;
-        QString audioInputType;
-        int speakerVolume = 0;
-        bool noiseReduce = false;
-    };
-
-    struct OpenChannelResponse
-    {
-        QString sessionId;
-    };
-
-    struct CommonResponse
-    {
-        QString statusCode;
-        QString statusString;
-        QString subStatusCode;
-    };
-
 public:
     HikvisionAudioTransmitter(QnSecurityCamResource* resource);
     virtual bool isCompatible(const QnAudioFormat& format) const override;
-
     void setChannelId(QString channelId);
 
 protected:
@@ -53,12 +29,7 @@ private:
     bool openChannelIfNeeded();
     bool closeChannel();
 
-    boost::optional<ChannelStatusResponse> parseChannelStatusResponse(
-        nx_http::StringType message) const;
-    boost::optional<OpenChannelResponse> parseOpenChannelResponse(
-        nx_http::StringType message) const;
-    boost::optional<CommonResponse> parseCommonResponse(
-        nx_http::StringType message) const;
+    std::unique_ptr<nx_http::HttpClient> createHttpHelper();
 
 private:
     QString m_channelId;

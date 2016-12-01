@@ -1,8 +1,9 @@
 #include <QtXml/QDomElement>
 
 #include "hikvision_audio_transmitter.h"
+#include "hikvision_parsing_utils.h"
 
-#include <nx/network/http/httpclient.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace {
 
@@ -16,6 +17,7 @@ const QString kTransmitTwoWayAudioUrlTemplate = lit("%1/audioData");
 const QString kStatusCodeOk = lit("1");
 const QString kSubStatusCodeOk = lit("ok");
 
+const std::chrono::milliseconds kHttpHelperTimeout(4000);
 const std::chrono::milliseconds kTransmissionTimeout(4000);
 
 bool responseIsOk(const nx_http::Response* const response)
@@ -25,6 +27,8 @@ bool responseIsOk(const nx_http::Response* const response)
 
 } // namespace
 
+using namespace nx::plugins;
+
 HikvisionAudioTransmitter::HikvisionAudioTransmitter(QnSecurityCamResource* resource):
     base_type(resource)
 {
@@ -32,6 +36,7 @@ HikvisionAudioTransmitter::HikvisionAudioTransmitter(QnSecurityCamResource* reso
 
 bool HikvisionAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 {
+    // Unused function
     return true;
 }
 
@@ -87,9 +92,7 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
 {
     auto auth = m_resource->getAuth();
 
-    nx_http::HttpClient httpHelper;
-    httpHelper.setUserName(auth.user());
-    httpHelper.setUserPassword(auth.password());
+    auto httpHelper = createHttpHelper();
 
     QUrl url(m_resource->getUrl());
     auto channelStatusPath = kTwoWayAudioPrefix + kChannelStatusUrlTemplate.arg(m_channelId);
@@ -97,21 +100,31 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
 
     url.setPath(channelStatusPath);
 
-    auto result = httpHelper.doGet(url);
+    auto result = httpHelper->doGet(url);
     if (!result)
         return false;
 
     nx_http::BufferType messageBody;
-    while (!httpHelper.eof())
-        messageBody.append(httpHelper.fetchMessageBodyBuffer());
+    while (!httpHelper->eof())
+        messageBody.append(httpHelper->fetchMessageBodyBuffer());
 
-    auto channelStatus = parseChannelStatusResponse(messageBody);
+    auto channelStatus = hikvision::parseChannelStatusResponse(messageBody);
+    auto format = hikvision::toAudioFormat(
+        channelStatus->audioCompression,
+        channelStatus->sampleRateKHz);
+
+    if (format.sampleRate() != m_outputFormat.sampleRate() || 
+        format.codec() != m_outputFormat.codec())
+    {
+        m_outputFormat = format;
+        base_type::prepare();
+    }
 
     if (channelStatus && channelStatus->enabled)
         return true;
 
     url.setPath(channelOpenPath);
-    result = httpHelper.doPut(
+    result = httpHelper->doPut(
         url,
         nx_http::StringType(),
         nx_http::StringType());
@@ -121,10 +134,10 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
 
     messageBody.clear();
 
-    while (!httpHelper.eof())
-        messageBody.append(httpHelper.fetchMessageBodyBuffer());
+    while (!httpHelper->eof())
+        messageBody.append(httpHelper->fetchMessageBodyBuffer());
 
-    auto openResult = parseOpenChannelResponse(messageBody);
+    auto openResult = hikvision::parseOpenChannelResponse(messageBody);
 
     if (!openResult)
         return false;
@@ -136,26 +149,24 @@ bool HikvisionAudioTransmitter::closeChannel()
 {
     auto auth = m_resource->getAuth();
 
-    nx_http::HttpClient httpHelper;
-    httpHelper.setUserName(auth.user());
-    httpHelper.setUserPassword(auth.password());
+    auto httpHelper = createHttpHelper();
 
     QUrl url(m_resource->getUrl());
     url.setPath(kTwoWayAudioPrefix + kCloseTwoWayAudioUrlTemplate.arg(m_channelId));
 
-    auto result = httpHelper.doPut(
+    auto result = httpHelper->doPut(
         url,
         nx_http::StringType(),
         nx_http::StringType());
 
-    if (!result || !responseIsOk(httpHelper.response()))
+    if (!result || !responseIsOk(httpHelper->response()))
         return false;
 
     nx_http::StringType messageBody;
-    while (!httpHelper.eof())
-        messageBody.append(httpHelper.fetchMessageBodyBuffer());
+    while (!httpHelper->eof())
+        messageBody.append(httpHelper->fetchMessageBodyBuffer());
 
-    auto response = parseCommonResponse(messageBody);
+    auto response = hikvision::parseCommonResponse(messageBody);
 
     if (!response 
         || response->statusCode != kStatusCodeOk 
@@ -167,121 +178,16 @@ bool HikvisionAudioTransmitter::closeChannel()
     return true;
 }
 
-boost::optional<HikvisionAudioTransmitter::ChannelStatusResponse>
-HikvisionAudioTransmitter::parseChannelStatusResponse(nx_http::StringType message) const
+std::unique_ptr<nx_http::HttpClient> HikvisionAudioTransmitter::createHttpHelper()
 {
-    ChannelStatusResponse response;
-    QDomDocument doc;
-    bool status;
+    auto auth = m_resource->getAuth();
 
-    doc.setContent(message);
-    auto element = doc.documentElement();
-    if (!element.isNull() && element.tagName() == lit("TwoWayAudioChannel"))
-    {
-        auto params = element.firstChild();
-        while (!params.isNull())
-        {
-            element = params.toElement();
-            if (element.isNull())
-                continue;
+    auto httpHelper = std::make_unique<nx_http::HttpClient>();
+    httpHelper->setUserName(auth.user());
+    httpHelper->setUserPassword(auth.password());
+    httpHelper->setResponseReadTimeoutMs(kHttpHelperTimeout.count());
+    httpHelper->setSendTimeoutMs(kHttpHelperTimeout.count());
+    httpHelper->setMessageBodyReadTimeoutMs(kHttpHelperTimeout.count());
 
-            auto nodeName = element.nodeName();
-
-            if (nodeName == lit("id"))
-                response.id = element.text();
-            else if (nodeName == lit("enabled"))
-                response.enabled = element.text() == lit("true");
-            else if (nodeName == lit("audioCompressionType"))
-                response.audioCompression = element.text();
-            else if (nodeName == lit("audioInputType"))
-                response.audioInputType = element.text();
-            else if (nodeName == lit("speakerVolume"))
-            {
-                response.speakerVolume = element.text().toInt(&status);
-                if (!status)
-                    return boost::none;
-            }
-            else if (nodeName == lit("noisereduce"))
-                response.noiseReduce = element.text() == lit("true");
-
-            params = params.nextSibling();
-        }
-    }
-    else
-    {
-        return boost::none;
-    }
-
-    return response;
-}
-
-boost::optional<HikvisionAudioTransmitter::OpenChannelResponse>
-HikvisionAudioTransmitter::parseOpenChannelResponse(nx_http::StringType message) const
-{
-    OpenChannelResponse response;
-
-    QDomDocument doc;
-    bool status;
-
-    doc.setContent(message);
-
-    auto element = doc.documentElement();
-    if (!element.isNull() && element.tagName() == lit("TwoWayAudioSession"))
-    {
-        auto sessionIdNode =  element.firstChild();
-        if (sessionIdNode.isNull() || !sessionIdNode.isElement())
-            return boost::none;
-
-        auto sessionId = sessionIdNode.toElement();
-
-        if (sessionId.tagName() != lit("sessionId"))
-            return boost::none;
-
-        response.sessionId = sessionId.text();
-    }
-    else
-    {
-        return boost::none;
-    }
-
-    return response;
-}
-
-boost::optional<HikvisionAudioTransmitter::CommonResponse> 
-HikvisionAudioTransmitter::parseCommonResponse(nx_http::StringType message) const
-{
-    CommonResponse response;
-    QDomDocument doc;
-    bool status;
-
-    doc.setContent(message);
-
-    auto element = doc.documentElement();
-    if (!element.isNull() && element.tagName() == lit("ResponseStatus"))
-    {
-        auto params = element.firstChild();
-        while (!params.isNull())
-        {
-            element = params.toElement();
-            if (element.isNull())
-                continue;
-
-            auto nodeName = element.nodeName();
-
-            if (nodeName == lit("statusCode"))
-                response.statusCode = element.text();
-            else if (nodeName == lit("statusString"))
-                response.statusString = element.text();
-            else if (nodeName == lit("subStatusCode"))
-                response.subStatusCode = element.text();
-           
-            params = params.nextSibling();
-        }
-    }
-    else
-    {
-        return boost::none;
-    }
-
-    return response;
+    return httpHelper;
 }

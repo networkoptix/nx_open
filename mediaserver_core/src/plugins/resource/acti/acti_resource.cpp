@@ -1381,7 +1381,7 @@ QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCamer
 
 QnAudioTransmitterPtr QnActiResource::getAudioTransmitter()
 {
-    if (!isInitialized() && !m_audioTransmitter->isInitialized())
+    if (!isInitialized())
         return nullptr;
 
     return m_audioTransmitter;

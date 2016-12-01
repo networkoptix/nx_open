@@ -1418,7 +1418,7 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 
 QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
 {
-    if (!isInitialized() || !m_audioTransmitter->isInitialized())
+    if (!isInitialized())
         return nullptr;
 
     return m_audioTransmitter;

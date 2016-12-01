@@ -203,7 +203,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
     }
     else
     {
-        NX_ASSERT(false, lit("Only POST and PUT allowed. We should never be here."));
+        NX_ASSERT(false, lit("Only POST and PUT methods are allowed."));
     }
 
     m_timer.restart();
