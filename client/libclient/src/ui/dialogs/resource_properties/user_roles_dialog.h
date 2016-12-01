@@ -31,7 +31,7 @@ public:
     QnUserRolesDialog(QWidget* parent = NULL);
     virtual ~QnUserRolesDialog();
 
-    bool selectGroup(const QnUuid& groupId);
+    bool selectUserRole(const QnUuid& userRoleId);
 
 protected:
     virtual bool canApplyChanges() const override;

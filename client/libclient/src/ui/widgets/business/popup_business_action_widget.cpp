@@ -45,8 +45,8 @@ void QnPopupBusinessActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params;
     params.userGroup = ui->adminsCheckBox->isChecked()
-                                             ? QnBusiness::AdminOnly
-                                             : QnBusiness::EveryOne;
+        ? QnBusiness::AdminOnly
+        : QnBusiness::EveryOne;
     model()->setActionParams(params);
 }
 

@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 26, 2016
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
@@ -41,6 +36,24 @@ TEST_F(TcpTunnelConnector, general)
     generalTest();
 }
 
+TEST_F(TcpTunnelConnector, failModuleInformation)
+{
+    //starting mediator
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds(5),
+        MediaServerEmulator::ActionToTake::proceedWithConnection,
+        boost::none,
+        [](MediaServerEmulator* server)
+        {
+            server->setServerIdForModuleInformation(boost::none);
+        });
+
+    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
+}
+
 TEST_F(TcpTunnelConnector, cancellation)
 {
     cancellationTest();
@@ -75,10 +88,16 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
         { QnUuid::createUuid().toByteArray(), false },
         { boost::none, false } };
 
-    for (const auto& systemIdTestContext : testSystemIdArray)
+    for (size_t i = 0; i < sizeof(testSystemIdArray) / sizeof(*testSystemIdArray); ++i)
     {
-        for (const auto& peerIdTestContext: testPeerIdArray)
+        const auto& systemIdTestContext = testSystemIdArray[i];
+
+        for (size_t j = 0; j < sizeof(testPeerIdArray) / sizeof(*testPeerIdArray); ++j)
         {
+            const auto& peerIdTestContext = testPeerIdArray[j];
+
+            std::cout<<"test debug: "<<i<<", "<<j<<std::endl;
+
             ConnectResult connectResult;
             auto server1 = mediator().addRandomServer(system1, peerId);
 

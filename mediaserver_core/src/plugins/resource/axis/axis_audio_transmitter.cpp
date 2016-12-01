@@ -112,6 +112,7 @@ void QnAxisAudioTransmitter::at_requestHeadersHasBeenSent(
     QN_UNUSED(http);
     if (isRetryAfterUnauthorizedResponse || m_noAuth)
     {
+        QnMutexLocker lock(&m_mutex);
         m_state = TransmitterState::ReadyForTransmission;
         m_wait.wakeOne();
     }
@@ -121,6 +122,7 @@ void QnAxisAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr http)
 {
     if (http->state() == nx_http::AsyncHttpClient::State::sFailed)
     {
+        QnMutexLocker lock(&m_mutex);
         m_state = TransmitterState::Failed;
         m_wait.wakeOne();
     }
@@ -188,6 +190,8 @@ bool QnAxisAudioTransmitter::startTransmission()
     nx_http::StringType contentType(mimeType());
     nx_http::StringType contentBody;
 
+    QnMutexLocker lock(&m_mutex);
+
     httpClient
         ->doPost(
             url,
@@ -196,7 +200,6 @@ bool QnAxisAudioTransmitter::startTransmission()
             true);
 
     m_timer.restart();
-    QnMutexLocker lock(&m_mutex);
     while (m_state == TransmitterState::WaitingForConnection &&
            m_timer.elapsed() < (qint64)kTransmissionTimeout && !m_needStop)
     {
@@ -213,8 +216,9 @@ bool QnAxisAudioTransmitter::startTransmission()
     }
     else
     {
-        m_state = TransmitterState::Failed;
+        lock.unlock();
         httpClient->pleaseStopSync();
+        m_state = TransmitterState::Failed;
     }
 
     return m_socket != nullptr;

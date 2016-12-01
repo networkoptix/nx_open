@@ -9,7 +9,7 @@
 
 typedef QHash<QString, QString> QnResourcePropertyList;
 
-class QnResourcePropertyDictionary: public QObject, 
+class QnResourcePropertyDictionary: public QObject,
     public Singleton<QnResourcePropertyDictionary>
 {
     Q_OBJECT
@@ -19,13 +19,18 @@ public:
     bool saveParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);
     int saveParamsAsync(const QList<QnUuid>& resourceId);
-    
+
     QString value(const QnUuid& resourceId, const QString& key) const;
     bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true, bool replaceIfExists = true);
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     bool removeProperty(const QnUuid& resourceId, const QString& key);
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
-    
+
+    /**
+     * Mark all params for resource as unsaved
+     **/
+    void markAllParamsDirty(const QnUuid& resourceId);
+
     QHash<QnUuid, QSet<QString> > allPropertyNamesByResource() const;
 
     void clear();

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo $*
+export LESS_TERMCAP_ue=
+export vcs_info_msg_1_=
+export PAGER=less
+export LESS_TERMCAP_us=
+export VDPAU_OSD=1
+export vcs_info_msg_0_=
+export LANG=en_US.UTF-8
+export SHLVL=3
+export LESS_TERMCAP_so=
+export DISPLAY=:0
+export VDPAU_DRIVER=sunxi
+export COLORTERM=yes
+export LESS_TERMCAP_se=
+export CUSTOMIZATION=${deb.customization.company.name}
+killall gpm
+export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib
+LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
+/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* >& /opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
+echo 1>/sys/class/graphics/fb0/blank

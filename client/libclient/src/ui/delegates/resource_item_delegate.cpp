@@ -11,6 +11,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource/videowall_resource.h>
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
@@ -426,7 +427,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     if (centralItem && (centralItem->uuid() == uuid || (resource && uuid.isNull() && centralItem->resourceUid() == resource->getUniqueId())))
     {
         /* Central item: */
-        return ItemState::Accented;
+        const bool isVideoWall = resource.dynamicCast<QnVideoWallResource>();
+        return (isVideoWall ? ItemState::Selected : ItemState::Accented);
     }
     else if (!resource.isNull() && !currentLayoutResource.isNull())
     {

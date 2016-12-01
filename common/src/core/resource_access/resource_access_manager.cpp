@@ -232,7 +232,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
     const ec2::ApiUserData& data) const
 {
     NX_EXPECT(!isUpdating());
-    if (!data.groupId.isNull() && !qnUserRolesManager->hasRole(data.groupId))
+    if (!data.userRoleId.isNull() && !qnUserRolesManager->hasRole(data.userRoleId))
         return false;
 
     return canCreateUser(subject, data.permissions, data.isAdmin);
@@ -547,16 +547,19 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         };
 
     /* Layouts with desktop cameras are not to be modified but can be removed. */
-    const auto resources = layout->layoutResources();
-    bool hasDesktopCamera = std::any_of(resources.cbegin(), resources.cend(),
-        [this](const QnResourcePtr& resource)
+    const auto items = layout->getItems();
+    for (auto item: items)
+    {
+        const auto resourceId = item.resource.id;
+        if (resourceId.isNull())
+            continue;
+
+        if (const auto& resource = qnResPool->getResourceById(resourceId))
         {
-            return resource->hasFlags(Qn::desktop_camera);
-        });
-
-    if (hasDesktopCamera)
-        return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
-
+            if (resource->hasFlags(Qn::desktop_camera))
+                return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
+        }
+    }
 
     /* Calculate base layout permissions */
     auto base = [&]() -> Qn::Permissions
@@ -817,7 +820,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
     const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
-    if (!update.groupId.isNull() && !qnUserRolesManager->hasRole(update.groupId))
+    if (!update.userRoleId.isNull() && !qnUserRolesManager->hasRole(update.userRoleId))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();

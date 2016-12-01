@@ -65,7 +65,7 @@ public:
         }
 
         post(
-            [this, handler]()
+            [this, handler = std::move(handler)]()
             {
                 if (m_connectionShouldWorkFine)
                 {

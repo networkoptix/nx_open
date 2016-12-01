@@ -229,7 +229,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                         case QnBusiness::SendMailAction:
                             return m_actionParams.emailAddress;
                         case QnBusiness::ShowPopupAction:
-                            return (int)m_actionParams.userGroup;
+                            return (int) m_actionParams.userGroup;
                         default:
                             break;
                     }
@@ -248,8 +248,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                 break;
 
             if (!isValid(column))
-                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
-            return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
+                return qnGlobals->businessRuleInvalidColumnBackgroundColor();
+            return qnGlobals->businessRuleInvalidBackgroundColor();
 
         case Qn::UuidRole:
             return qVariantFromValue(m_id);
@@ -312,7 +312,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
                     // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
                     // This code will fail silently if someone changes the header. Please write it properly.
-                    params.userGroup = (QnBusiness::UserGroup)value.toInt();
+                    params.userGroup = (QnBusiness::UserGroup) value.toInt();
                     setActionParams(params);
                     break;
                 }
@@ -769,7 +769,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             auto resources = qnResPool->getResources(eventResources());
             if (!QnBusiness::isResourceRequired(m_eventType))
             {
-                return qnResIconCache->icon(QnResourceIconCache::Servers);
+                return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
             }
             else if (resources.size() == 1)
             {
@@ -828,7 +828,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             }
             else if (resources.isEmpty())
             {
-                return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+                return qnSkin->icon(lit("tree/buggy.png"));
             }
             else
             {

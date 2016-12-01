@@ -11,6 +11,7 @@ from collections import namedtuple
 import traceback
 from functest_util import JsonDiff, compareJson, get_server_guid, real_caps, textdiff
 from testbase import FuncTestError
+from pycommons.Logger import log, LOGLEVEL
 
 _MAIN_HOST = '192.168.109.8:7001'
 _SEC_HOST = '192.168.109.9:7001'
@@ -52,7 +53,7 @@ def compareResults(a, b):
         raise AssertionError("The test is broken! Trying to compare different functions results: %s and %s" %
                              (a.funcm, b.func))
     if a.length != b.length:
-        print ("Function %s. Different data lengths returned by %s (%s) and %s (%s)" %
+        log(LOGLEVEL.INFO, "Function %s. Different data lengths returned by %s (%s) and %s (%s)" %
                             (a.func, a.req_str(), a.length, b.req_str(), b.length))
         # dont raise because we want to show diff
     diff = compareJson(a.data, b.data)
@@ -74,13 +75,13 @@ class ServerProxyTest(object):
             guid = get_server_guid(h)
             if guid is not None:
                 self.uids[h] = guid
-                print "%s - %s" % (h, guid)
+                log(LOGLEVEL.DEBUG + 9, "%s - %s" % (h, guid))
             else:
                 raise FuncTestError("Can't get server %s guid!" % h)
 
     def _performRequest(self, func, peer, redirectTo=None):  # :type : Result
         action = "requesting %s from %s" % (func, peer if not redirectTo else ("%s through %s" % (redirectTo, peer)))
-        print real_caps(action)
+        log(LOGLEVEL.INFO, real_caps(action))
         try:
             req = urllib2.Request('http://%s/%s' % (peer, func))
             if redirectTo:
@@ -94,12 +95,12 @@ class ServerProxyTest(object):
             return Result(func, peer, redirectTo, data, json.loads(data), content_len)
         except urllib2.HTTPError as err:
 #        except HTTPException as err:
-            print "FAIL: %s raised %s" % (action, err)
+            log(LOGLEVEL.ERROR, "FAIL: %s raised %s" % (action, err))
             raise FuncTestError("error " + action, str(err))
 
     def run(self):
-        print "\n======================================="
-        print "Proxy Test Start"
+        log(LOGLEVEL.INFO, "\n=======================================")
+        log(LOGLEVEL.INFO, "Proxy Test Start")
         try:
             self.getUids()
             func = 'ec2/getResourceParams'
@@ -127,14 +128,14 @@ class ServerProxyTest(object):
             #    diff = compareJson(res1.data, res2.data)
             #    if not diff.hasDiff():
             #        raise FuncTestError("")
-            print "Test complete. Responses are the same."
+            log(LOGLEVEL.INFO, "Test complete. Responses are the same.")
             return True
         except FuncTestError:
             raise
         except Exception:
             raise FuncTestError(traceback.format_exc())
         finally:
-            print "======================================="
+            log(LOGLEVEL.INFO, "=======================================")
 
 
 if __name__ == '__main__':
@@ -147,5 +148,5 @@ if __name__ == '__main__':
         _prepareLoader((_MAIN_HOST, _SEC_HOST))
         ServerProxyTest(_MAIN_HOST, _SEC_HOST).run()
     except FuncTestError as err:
-        print "FAIL: %s" % err.message
+        log(LOGLEVEL.ERROR, "FAIL: %s" % err.message)
 

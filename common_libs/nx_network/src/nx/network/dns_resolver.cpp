@@ -64,7 +64,7 @@ void DnsResolver::resolveAsync(
 
 static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
 {
-    std::vector<HostAddress> ipAddresses;
+    std::deque<HostAddress> ipAddresses;
     for (addrinfo* info = addressInfo; info; info = info->ai_next)
     {
         HostAddress newAddress;
@@ -91,11 +91,7 @@ static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
     if (ipAddresses.empty())
         SystemError::setLastErrorCode(SystemError::hostNotFound);
 
-    std::deque<HostAddress> deque;
-    for (auto& a: ipAddresses)
-        deque.push_back(a);
-
-    return std::move(deque);
+    return std::move(ipAddresses);
 }
 
 std::deque<HostAddress> DnsResolver::resolveSync(const QString& hostName, int ipVersion)

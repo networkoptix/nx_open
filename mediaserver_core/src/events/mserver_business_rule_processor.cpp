@@ -931,31 +931,34 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
     return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
 }
 
-void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
+void QnMServerBusinessRuleProcessor::updateRecipientsList(
+    const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
     auto allUsers = qnResPool->getResources<QnUserResource>();
 
-    QMap<QnUuid, QnUserResourceList> groups;
-    for (const auto& user : allUsers)
-        groups[user->userGroup()].push_back(user);
+    QMap<QnUuid, QnUserResourceList> userRoles;
+    for (const auto& user: allUsers)
+        userRoles[user->userRoleId()].push_back(user);
 
-    auto addUserToList = [&unfiltered](const QnUuid& id)
-    {
-        if (auto user = qnResPool->getResourceById<QnUserResource>(id))
+    auto addUserToList =
+        [&unfiltered](const QnUuid& id)
         {
-            unfiltered << user->getEmail();
-            return true;
-        }
-        return false;
-    };
+            if (auto user = qnResPool->getResourceById<QnUserResource>(id))
+            {
+                unfiltered << user->getEmail();
+                return true;
+            }
+            return false;
+        };
 
-    for (const QnUuid& id : action->getResources())
+    for (const QnUuid& id: action->getResources())
     {
-        if (!addUserToList(id)) //< add user by id
+        if (!addUserToList(id)) //< Try to add the given user.
         {
-            for (const auto& nestedUser : groups.value(id))
-                addUserToList(nestedUser->getId());  //< add user by group id
+            // Add all users with the given role.
+            for (const auto& nestedUser: userRoles.value(id))
+                addUserToList(nestedUser->getId());
         }
     }
 

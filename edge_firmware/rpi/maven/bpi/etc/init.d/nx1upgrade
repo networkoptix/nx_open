@@ -16,7 +16,7 @@ cp -f /root/tools/uboot/* $MNTBOOTPART
 umount $BOOTPART
 rm -Rf $MNTBOOTPART
 export DEBIAN_FRONTEND=noninteractive
-dpkg -i /opt/deb/libvdpau/*.deb
+dpkg -i /opt/deb/*/*.deb
 
 LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
 if [ -z $LIBC_NEW ]; then

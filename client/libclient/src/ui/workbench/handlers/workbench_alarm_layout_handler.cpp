@@ -92,7 +92,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
                 return true;
 
-            auto roleId = user->userGroup();
+            auto roleId = user->userRoleId();
             return !roleId.isNull()
                 && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
         };
@@ -284,7 +284,7 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
 
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
-    auto clientInstanceManager = qnCommon->instance<QnClientInstanceManager>();
+    auto clientInstanceManager = qnClientInstanceManager;
     NX_ASSERT(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
     if (!clientInstanceManager)
         return true;

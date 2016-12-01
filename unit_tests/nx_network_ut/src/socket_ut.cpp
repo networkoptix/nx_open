@@ -150,42 +150,6 @@ TEST( Socket, AsyncOperationCancellation )
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
 
-TEST( Socket, ServerSocketSyncCancellation )
-{
-    static const int kTestRuns = 7;
-
-    for( int i = 0; i < kTestRuns; ++i )
-    {
-        std::unique_ptr<AbstractStreamServerSocket> serverSocket( SocketFactory::createStreamServerSocket() );
-        ASSERT_TRUE( serverSocket->setNonBlockingMode(true) );
-        ASSERT_TRUE( serverSocket->bind(SocketAddress()) );
-        ASSERT_TRUE( serverSocket->listen() );
-        serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } );
-        serverSocket->pleaseStopSync();
-    }
-
-    //waiting for some calls to deleted objects
-    QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
-}
-
-TEST( Socket, ServerSocketAsyncCancellation )
-{
-    static const int kTestRuns = 7;
-
-    for( int i = 0; i < kTestRuns; ++i )
-    {
-        std::unique_ptr<AbstractStreamServerSocket> serverSocket( SocketFactory::createStreamServerSocket() );
-        ASSERT_TRUE( serverSocket->setNonBlockingMode(true) );
-        ASSERT_TRUE( serverSocket->bind(SocketAddress()) );
-        ASSERT_TRUE( serverSocket->listen() );
-        serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } );
-        QnStoppableAsync::pleaseStop( [](){}, std::move( serverSocket ) );
-    }
-
-    //waiting for some calls to deleted objects
-    QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
-}
-
 TEST( Socket, HostNameResolve1 )
 {
     if( SocketFactory::isStreamSocketTypeEnforced() )

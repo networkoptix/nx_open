@@ -185,7 +185,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     ui->setupUi(this);
 
     NX_ASSERT(parent);
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(parent ? parent : this);
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
@@ -576,45 +576,56 @@ void QnCameraScheduleWidget::updateScheduleEnabled()
 
 void QnCameraScheduleWidget::updateMinDays()
 {
+    if (m_cameras.isEmpty())
+        return;
+
+    /* Any negative min days value means 'auto'. Storing absolute value to keep previous one. */
     auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
 
-    const int minDays = m_cameras.isEmpty()
-        ? 0
-        : (*std::min_element(m_cameras.cbegin(), m_cameras.cend(),
-            [calcMinDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
-            {
-                return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
-            }))->minDays();
+    const int minDays = (*std::min_element(m_cameras.cbegin(), m_cameras.cend(),
+        [calcMinDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
+        {
+            return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
+        }))->minDays();
+
+    const bool isAuto = minDays <= 0;
 
     bool sameMinDays = boost::algorithm::all_of(m_cameras,
-        [minDays](const QnVirtualCameraResourcePtr &camera)
+        [minDays, isAuto](const QnVirtualCameraResourcePtr &camera)
         {
-            return camera->minDays() == minDays;
+            return isAuto
+                ? camera->minDays() <= 0
+                : camera->minDays() == minDays;
         });
 
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, minDays <= 0);
+    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
     ui->spinBoxMinDays->setValue(calcMinDays(minDays));
 }
 
 void QnCameraScheduleWidget::updateMaxDays()
 {
+    if (m_cameras.isEmpty())
+        return;
+
+    /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
     auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
 
-    const int maxDays = m_cameras.isEmpty()
-        ? 0
-        : (*std::max_element(m_cameras.cbegin(), m_cameras.cend(),
-            [calcMaxDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
-            {
-                return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
-            }))->maxDays();
-
-    bool sameMaxDays = boost::algorithm::all_of(m_cameras,
-        [maxDays](const QnVirtualCameraResourcePtr &camera)
+    const int maxDays =(*std::max_element(m_cameras.cbegin(), m_cameras.cend(),
+        [calcMaxDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
         {
-            return camera->maxDays() == maxDays;
+            return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
+        }))->maxDays();
+
+    const bool isAuto = maxDays <= 0;
+    bool sameMaxDays = boost::algorithm::all_of(m_cameras,
+        [maxDays, isAuto](const QnVirtualCameraResourcePtr &camera)
+        {
+        return isAuto
+            ? camera->maxDays() <= 0
+            : camera->maxDays() == maxDays;
         });
 
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, maxDays <= 0);
+    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
     ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
 }
 

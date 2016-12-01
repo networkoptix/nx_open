@@ -322,6 +322,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     {
         pcUuid = QnUuid::createUuid();
         qnSettings->setPcUuid(pcUuid);
+        qnSettings->save();
     }
     m_controlMode.pcUuid = pcUuid.toString();
 
@@ -1279,8 +1280,11 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             if (filtered.contains(resource))
                 return;
 
-            if (!QnResourceAccessFilter::isShareableMedia(resource))
+            if (!resource->hasFlags(Qn::desktop_camera) &&
+                !QnResourceAccessFilter::isShareableMedia(resource))
+            {
                 return;
+            }
 
             filtered << resource;
             qreal ar = defaultAr;

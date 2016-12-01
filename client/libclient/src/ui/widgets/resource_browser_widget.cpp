@@ -842,6 +842,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
+            model->setFilterWildcard(L'*' + filter + L'*');
             if (filter.isEmpty())
             {
                 model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
@@ -987,14 +988,21 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
 
 void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
 {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
+    if (nodeType == Qn::CloudSystemNode)
+    {
+        menu()->trigger(QnActions::ConnectToCloudSystemAction, QnActionParameters()
+            .withArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()));
+        return;
+    }
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     /* Do not open users or fake servers. */
     if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
         return;
 
     /* Do not open servers of admin.  */
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
     if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 

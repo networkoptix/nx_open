@@ -84,7 +84,7 @@ void OutgoingTunnel::establishNewConnection(
                 [handler = std::move(handler), this](
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket,
-                    bool tunnelStillValid)
+                    bool tunnelStillValid) mutable
                 {
                     onConnectFinished(
                         std::move(handler),
@@ -315,7 +315,7 @@ void OutgoingTunnel::setTunnelConnection(
             [handler = std::move(connectRequest.second.handler), this](
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractStreamSocket> socket,
-                bool tunnelStillValid)
+                bool tunnelStillValid) mutable
             {
                 onConnectFinished(
                     std::move(handler),

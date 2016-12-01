@@ -8,7 +8,8 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage',
-    'typeahead-focus'
+    'typeahead-focus',
+    'ui.timepicker'
 ]).config(function ($routeProvider) {
 
     var universalResolves = {
@@ -35,6 +36,10 @@ angular.module('webadminApp', [
             controller: 'SettingsCtrl'
         })
         .when('/settings/server', {
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl'
+        })
+        .when('/settings/device', {
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
         })
@@ -72,7 +77,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
-        .when('/view/', {
+        .when('/client', {
+            templateUrl: 'views/client.html',
+            controller: 'ClientCtrl',
+            reloadOnSearch: false
+        })
+        .when('/view', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
@@ -94,8 +104,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/dialogs/setup.html',
             controller: 'SetupCtrl'
         })
+        .when('/', {
+            template: '',
+            controller: 'MainCtrl'
+        })
         .otherwise({
-            redirectTo: '/settings'
+            redirectTo: '/'
         });
 }).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location, $localStorage) {
     var original = $location.path;

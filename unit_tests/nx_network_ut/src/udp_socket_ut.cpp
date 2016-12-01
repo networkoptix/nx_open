@@ -6,6 +6,8 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace network {
 namespace test {
@@ -32,32 +34,33 @@ void onBytesRead(
 
 TEST(UdpSocket, Simple)
 {
-
-    static Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
+    static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
     UDPSocket sender(AF_INET);
+    const auto senderCleanupGuard = makeScopedGuard([&sender]() { sender.pleaseStopSync(); });
+
     ASSERT_TRUE(sender.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(sender.setSendTimeout(1000));
 
     SocketAddress senderEndpoint("127.0.0.1", sender.getLocalAddress().port);
     ASSERT_FALSE(senderEndpoint.address.isIpAddress());
 
-    UDPSocket reciever(AF_INET);
-    ASSERT_TRUE(reciever.bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(reciever.setRecvTimeout(1000));
+    UDPSocket receiver(AF_INET);
+    ASSERT_TRUE(receiver.bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(receiver.setRecvTimeout(1000));
 
-    SocketAddress recieverEndpoint("127.0.0.1", reciever.getLocalAddress().port);
-    ASSERT_FALSE(recieverEndpoint.address.isIpAddress());
+    SocketAddress receiverEndpoint("127.0.0.1", receiver.getLocalAddress().port);
+    ASSERT_FALSE(receiverEndpoint.address.isIpAddress());
 
     nx::utils::promise<void> sendPromise;
     ASSERT_TRUE(sender.setNonBlockingMode(true));
     sender.sendToAsync(
-        kTestMessage, recieverEndpoint,
+        kTestMessage, receiverEndpoint,
         [&](SystemError::ErrorCode code, SocketAddress ip, size_t size)
         {
             ASSERT_EQ(SystemError::noError, code);
             ASSERT_TRUE(ip.address.isIpAddress());
-            ASSERT_EQ(recieverEndpoint.toString(), ip.toString());
+            ASSERT_EQ(receiverEndpoint.toString(), ip.toString());
             ASSERT_EQ(kTestMessage.size(), size);
             sendPromise.set_value();
         });
@@ -65,7 +68,7 @@ TEST(UdpSocket, Simple)
     Buffer buffer;
     buffer.resize(1024);
     SocketAddress remoteEndpoint;
-    ASSERT_EQ(kTestMessage.size(), reciever.recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
+    ASSERT_EQ(kTestMessage.size(), receiver.recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
     ASSERT_EQ(kTestMessage, buffer.left(kTestMessage.size()));
     ASSERT_TRUE(remoteEndpoint.address.isIpAddress());
     ASSERT_EQ(senderEndpoint.toString(), remoteEndpoint.toString());
@@ -75,10 +78,20 @@ TEST(UdpSocket, Simple)
 
 TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
 {
+    constexpr int socketCount = 2;
+
     std::vector<SocketContext> sockets;
-    sockets.resize(2);
-    for (std::size_t i = 0; i < sockets.size(); ++i)
+    const auto socketsCleanupGuard = makeScopedGuard(
+        [&sockets]()
+        {
+            for (auto& ctx : sockets)
+                ctx.socket->pleaseStopSync();
+        });
+
+    for (std::size_t i = 0; i < socketCount; ++i)
     {
+        sockets.push_back(SocketContext());
+
         sockets[i].socket = std::make_unique<UDPSocket>();
         sockets[i].readBuffer.reserve(1024);
         ASSERT_TRUE(sockets[i].socket->setReuseAddrFlag(true));

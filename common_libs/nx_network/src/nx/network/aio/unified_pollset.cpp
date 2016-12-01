@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <nx/utils/std/cpp14.h>
 #include <udt/udt.h>
 
 #include "../udt/udt_common.h"
@@ -12,9 +13,36 @@ namespace nx {
 namespace network {
 namespace aio {
 
+namespace {
+
+class UdtEpollWrapper:
+    public AbstractUdtEpollWrapper
+{
+public:
+    virtual int epollWait(
+        int epollFd,
+        std::map<UDTSOCKET, int>* readReadyUdtSockets,
+        std::map<UDTSOCKET, int>* writeReadyUdtSockets,
+        int64_t timeoutMillis,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) override
+    {
+        return UDT::epoll_wait(
+            epollFd,
+            readReadyUdtSockets,
+            writeReadyUdtSockets,
+            timeoutMillis,
+            readReadySystemSockets,
+            writeReadySystemSockets);
+    }
+};
+
+} // namespace
+
 static const int kInterruptBufferSize = 128;
 
 namespace {
+
 int mapAioEventToUdtEvent(aio::EventType et)
 {
     switch (et)
@@ -28,7 +56,8 @@ int mapAioEventToUdtEvent(aio::EventType et)
             return 0;
     }
 }
-}
+
+} // namespace
 
 /*********************************
 ConstIteratorImpl
@@ -39,19 +68,27 @@ public:
     UnifiedPollSet* pollSet;
     CurrentSet currentSet;
     std::map<UDTSOCKET, int>::const_iterator udtSocketIter;
+    bool udtSocketIterAtEnd;
     std::map<AbstractSocket::SOCKET_HANDLE, int>::const_iterator sysSocketIter;
+    bool sysSocketIterAtEnd;
 
-    ConstIteratorImpl(UnifiedPollSet* _pollSet)
-    :
+    ConstIteratorImpl(UnifiedPollSet* _pollSet):
         pollSet(_pollSet),
-        currentSet(CurrentSet::none)
+        currentSet(CurrentSet::none),
+        udtSocketIterAtEnd(false),
+        sysSocketIterAtEnd(false)
     {
         pollSet->m_iterators.insert(this);
     }
 
+    ConstIteratorImpl(const ConstIteratorImpl&) = delete;
+    ConstIteratorImpl& operator=(const ConstIteratorImpl&) = delete;
+    ConstIteratorImpl(ConstIteratorImpl&&) = delete;
+    ConstIteratorImpl& operator=(ConstIteratorImpl&&) = delete;
+
     ~ConstIteratorImpl()
     {
-        const int elementsRemoved = pollSet->m_iterators.erase(this);
+        const auto elementsRemoved = pollSet->m_iterators.erase(this);
         NX_ASSERT(elementsRemoved == 1);
     }
 };
@@ -116,10 +153,18 @@ Pollable* UnifiedPollSet::const_iterator::socket()
     {
         case CurrentSet::udtRead:
         case CurrentSet::udtWrite:
-            return m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_udtSockets.end());
+            return it->second.socket;
+        }
         case CurrentSet::sysRead:
         case CurrentSet::sysWrite:
-            return m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_sysSockets.end());
+            return it->second.socket;
+        }
         default:
             return nullptr;
     }
@@ -131,10 +176,18 @@ const Pollable* UnifiedPollSet::const_iterator::socket() const
     {
         case CurrentSet::udtRead:
         case CurrentSet::udtWrite:
-            return m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_udtSockets.end());
+            return it->second.socket;
+        }
         case CurrentSet::sysRead:
         case CurrentSet::sysWrite:
-            return m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first)->second.socket;
+        {
+            const auto it = m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first);
+            NX_CRITICAL(it != m_impl->pollSet->m_sysSockets.end());
+            return it->second.socket;
+        }
         default:
             return nullptr;
     }
@@ -193,10 +246,18 @@ bool UnifiedPollSet::const_iterator::operator!=(
 UnifiedPollSet
 **********************************/
 
-UnifiedPollSet::UnifiedPollSet()
-:
-    m_epollFd(-1)
+UnifiedPollSet::UnifiedPollSet():
+    UnifiedPollSet(nullptr)
 {
+}
+
+UnifiedPollSet::UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper> udtEpollWrapper):
+    m_epollFd(-1),
+    m_udtEpollWrapper(std::move(udtEpollWrapper))
+{
+    if (!m_udtEpollWrapper)
+        m_udtEpollWrapper = std::make_unique<UdtEpollWrapper>();
+
     m_epollFd = UDT::epoll_create();
     m_interruptSocket.setNonBlockingMode(true);
     m_interruptSocket.bind(SocketAddress(HostAddress::localhost, 0));
@@ -284,7 +345,7 @@ int UnifiedPollSet::poll(int millisToWait)
     m_readSysFds.clear();
     m_writeSysFds.clear();
 
-    int result = UDT::epoll_wait(
+    int result = m_udtEpollWrapper->epollWait(
         m_epollFd,
         &m_readUdtFds, &m_writeUdtFds,
         millisToWait,
@@ -327,7 +388,9 @@ UnifiedPollSet::const_iterator UnifiedPollSet::end() const
     iter.m_impl = new ConstIteratorImpl(const_cast<UnifiedPollSet*>(this));
     iter.m_impl->currentSet = CurrentSet::sysWrite;
     iter.m_impl->sysSocketIter = m_writeSysFds.end();
+    iter.m_impl->sysSocketIterAtEnd = true;
     iter.m_impl->udtSocketIter = m_writeUdtFds.end();
+    iter.m_impl->udtSocketIterAtEnd = true;
     return iter;
 }
 
@@ -459,9 +522,10 @@ bool UnifiedPollSet::isUdtElementBeingUsed(
     CurrentSet currentSet,
     UDTSOCKET handle) const
 {
-    for (auto iter : m_iterators)
+    for (auto iter: m_iterators)
     {
         if (iter->currentSet == currentSet &&
+            !iter->udtSocketIterAtEnd &&
             iter->udtSocketIter->first == handle)
         {
             //cannot remove element since it is being used
@@ -476,9 +540,10 @@ bool UnifiedPollSet::isSysElementBeingUsed(
     CurrentSet currentSet,
     AbstractSocket::SOCKET_HANDLE handle) const
 {
-    for (auto iter : m_iterators)
+    for (auto iter: m_iterators)
     {
         if (iter->currentSet == currentSet &&
+            !iter->sysSocketIterAtEnd &&
             iter->sysSocketIter->first == handle)
         {
             //cannot remove element since it is being used
@@ -516,6 +581,7 @@ void UnifiedPollSet::moveIterToTheNextEvent(ConstIteratorImpl* const iter) const
                     ++(iter->udtSocketIter);
                 if (iter->udtSocketIter == m_writeUdtFds.end())
                 {
+                    iter->udtSocketIterAtEnd = true;
                     iter->currentSet = CurrentSet::sysRead;
                     iter->sysSocketIter = m_readSysFds.begin();
                     continue;
@@ -536,6 +602,7 @@ void UnifiedPollSet::moveIterToTheNextEvent(ConstIteratorImpl* const iter) const
             case CurrentSet::sysWrite:
                 if (i == 0)
                     ++(iter->sysSocketIter);
+                iter->sysSocketIterAtEnd = iter->sysSocketIter == m_writeSysFds.end();
                 break;
         }
         break;
@@ -553,6 +620,6 @@ void UnifiedPollSet::removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdS
     }
 }
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

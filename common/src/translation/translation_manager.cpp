@@ -140,7 +140,9 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
             continue;
 
         QString mask = m_prefixes[0] + lit("*.qm");
-        for(const QString &fileName: dir.entryList(QStringList(mask))) {
+        for(const QString &fileName: dir.entryList(QStringList(mask)))
+        {
+            qDebug() << "found translation" << fileName;
             QnTranslation translation = loadTranslationInternal(dir.absolutePath(), fileName);
             if(!translation.isEmpty())
                 result.push_back(translation);

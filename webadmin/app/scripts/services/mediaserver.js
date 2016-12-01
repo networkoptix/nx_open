@@ -3,10 +3,12 @@
 angular.module('webadminApp')
     .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log) {
 
+        var mediaserver = {};
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
         var proxy = '';
+        // Support proxy mode
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');
             for (var i=0;i<params.length;i++) {
@@ -23,7 +25,40 @@ angular.module('webadminApp')
 
         function getModuleInformation(){
             var salt = (new Date().getTime()) + '_' + Math.ceil(Math.random()*1000);
-            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt);
+            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
+                var data = r.data.reply;
+                if(!Config.cloud.portalUrl) {
+                    Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                }
+
+                var ips = data.remoteAddresses;
+                var wrongNetwork = true;
+                for (var ip in ips) {
+                    if (ip == '127.0.0.1') { // Localhost
+                        continue;
+                    }
+                    if (ip.indexOf('169.254.') == 0) { // No DHCP address
+                        continue;
+                    }
+                    wrongNetwork = false;
+                    break;
+                }
+
+                data.flags = {
+                    noHDD: data.ecDbReadOnly,
+                    noNetwork: ips.length <= 1,
+                    wrongNetwork: wrongNetwork,
+                    hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
+                    cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
+                    canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0,
+                    canSetupTime: data.serverFlags.indexOf(Config.timeCtrlFlag) >= 0
+                };
+                data.flags.newSystem = data.flags.cleanSystem &&
+                                        !data.flags.noHDD &&
+                                        !data.flags.noNetwork &&
+                                        !(data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                return r;
+            });
         }
 
         var offlineDialog = null;
@@ -49,8 +84,22 @@ angular.module('webadminApp')
                 return; // inline mode - do not do anything
             }
             if(error.status === 403 || error.status === 401) {
-                callLogin();
-                return;
+                // Try to get credentials from native client
+                return nativeClient.init().then(function(){
+                    return nativeClient.getCredentials().then(function(credentials) {
+                        var login = credentials.localLogin;
+                        var password = credentials.localPassword;
+                        if(!(login && password)) {
+                            return $q.reject();
+                        }
+                        return mediaserver.login(login, password).then(function(){
+                            setTimeout(function(){
+                                window.location.reload();
+                            },20);
+                            return true;
+                        });
+                    });
+                }, callLogin);
             }
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
@@ -78,8 +127,12 @@ angular.module('webadminApp')
         function wrapPost(url,data){
             return wrapRequest($http.post(url,data));
         }
-        function wrapGet(url){
+        function wrapGet(url, data){
             var canceller = $q.defer();
+            if(data){
+                url += (url.indexOf('?')>0)?'&':'?';
+                url += $.param(data);
+            }
             var obj =  wrapRequest($http.get(url, { timeout: canceller.promise }));
             obj.then(function(){
                 canceller = null;
@@ -95,6 +148,7 @@ angular.module('webadminApp')
         }
 
 
+        // Special hack to make our json recognizable by fusion on mediaserver
         function stringifyValues(object){
             if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
                 return object;
@@ -107,7 +161,7 @@ angular.module('webadminApp')
         }
 
 
-        return {
+        mediaserver = {
             checkCurrentPassword:function(password){
                 var login = $localStorage.login;
                 var realm = $localStorage.realm;
@@ -217,9 +271,7 @@ angular.module('webadminApp')
             },
             getUser:function(reload){
                 if(this.hasProxy()){ // Proxy means read-only
-                    var deferred = $q.defer();
-                    deferred.resolve(false);
-                    return deferred.promise;
+                    return $q.resolve(false);
                 }
 
                 return this.getCurrentUser(reload).then(function(result){
@@ -424,6 +476,9 @@ angular.module('webadminApp')
             getTime:function(){
                 return wrapGet(proxy + '/web/api/gettime');
             },
+            getTimeZones:function(){
+                return wrapGet(proxy + '/web/api/getTimeZones');
+            },
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/web/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
@@ -516,7 +571,7 @@ angular.module('webadminApp')
 
                 return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly &&
+                    if(r.data.reply.flags.newSystem &&
                         $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
                         $location.path('/setup');
                         return null;
@@ -527,14 +582,33 @@ angular.module('webadminApp')
             checkInternet:function(reload){
                 return this.getModuleInformation(reload).then(function(r){
                     var serverInfo = r.data.reply;
-                    return  (serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
+                    return serverInfo.flags.hasInternet;
                 });
             },
             createEvent:function(params){
-                return wrapGet(proxy + '/web/api/createEvent?' +  $.param(params));
+                return wrapGet(proxy + '/web/api/createEvent',params);
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+
+            networkSettings:function(settings){
+                if(!settings) {
+                    return wrapGet(proxy + '/web/api/iflist');
+                }
+                return wrapPost(proxy + '/web/api/ifconfig', settings);
+            },
+
+            timeSettings:function(dateTime, timeZone){
+                if(!dateTime || !timeZone) {
+                    return wrapGet(proxy + '/web/api/gettime');
+                }
+                return wrapPost(proxy + '/web/api/setTime', {
+                    timeZoneId: timeZone,
+                    dateTime: dateTime
+                });
             }
         };
+
+        return mediaserver;
     });

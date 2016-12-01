@@ -32,22 +32,19 @@
 #include "server/hole_punching_processor.h"
 #include "settings.h"
 
-
 namespace nx {
 namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
 :
-    QtService<QCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
     m_argc( argc ),
     m_argv( argv )
 {
-    setServiceDescription(QnLibConnectionMediatorAppInfo::applicationDisplayName());
 }
 
 void MediatorProcess::pleaseStop()
 {
-    application()->quit();
+    m_processTerminationEvent.set_value();
 }
 
 void MediatorProcess::setOnStartedEventHandler(
@@ -66,7 +63,7 @@ const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
     return m_stunEndpoints;
 }
 
-int MediatorProcess::executeApplication()
+int MediatorProcess::exec()
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -185,30 +182,12 @@ int MediatorProcess::executeApplication()
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
 
-    //TODO #ak remove qt event loop
-    //application's main loop
-    const int result = application()->exec();
+    // This is actually the main loop.
+    m_processTerminationEvent.get_future().wait();
 
     //stopping accepting incoming connections
 
-    return result;
-}
-
-void MediatorProcess::start()
-{
-    //QtSingleCoreApplication* application = this->application();
-
-    //if( application->isRunning() )
-    //{
-    //    NX_LOGX( "Server already started", cl_logERROR );
-    //    application->quit();
-    //    return;
-    //}
-}
-
-void MediatorProcess::stop()
-{
-    application()->quit();
+    return 0;
 }
 
 bool MediatorProcess::launchHttpServerIfNeeded(

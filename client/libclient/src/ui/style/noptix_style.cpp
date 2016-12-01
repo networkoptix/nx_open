@@ -62,8 +62,6 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_skin(qnSkin),
     m_customizer(qnCustomizer)
 {
-    m_branchClosed = m_skin->icon("tree/branch_closed.png");
-    m_branchOpen = m_skin->icon("tree/branch_open.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {
@@ -133,24 +131,22 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
     base_type::drawControl(element, option, painter, widget);
 }
 
-void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
 {
-    const auto workaround = make3xHiDpiWorkaround(painter);
+    switch(element)
+    {
+        case PE_IndicatorBranch:
+        case PE_PanelItemViewItem:
+        case PE_PanelItemViewRow:
+            if (skipItemViewPrimitive(element, option, painter, widget))
+                return;
+            break;
 
-    switch(element) {
-    case PE_IndicatorBranch:
-        if(drawBranchPrimitive(option, painter, widget))
-            return;
-        break;
-    case PE_PanelItemViewItem:
-    case PE_PanelItemViewRow:
-        if(drawPanelItemViewPrimitive(element, option, painter, widget))
-            return;
-        break;
-    default:
-        break;
+        default:
+            break;
     }
 
+    const auto workaround = make3xHiDpiWorkaround(painter);
     base_type::drawPrimitive(element, option, painter, widget);
 }
 
@@ -268,37 +264,17 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     return true;
 }
 
-bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
-{
-    Q_UNUSED(widget);
-
-    const auto workaround = make3xHiDpiWorkaround(painter);
-
-    if(!option->rect.isValid())
-        return false;
-
-    if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
-        return true;
-
-    if (option->state & State_Children) {
-        const QIcon &icon = (option->state & State_Open) ? m_branchOpen : m_branchClosed;
-        icon.paint(painter, option->rect);
-    }
-
-    return true;
-}
-
-bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+bool QnNoptixStyle::skipItemViewPrimitive(PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
 {
     QN_UNUSED(element);
     QN_UNUSED(painter);
 
     const auto workaround = make3xHiDpiWorkaround(painter);
 
-    if(!widget)
+    if (!widget)
         return false;
 
-    if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
+    if (widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
         return true; /* Draw nothing. */
 
     return false; /* Let the default implementation handle it. */

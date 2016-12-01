@@ -2,6 +2,8 @@
 
 #include <core/resource_management/resource_pool.h>
 
+#include <core/resource_access/helpers/layout_item_aggregator.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/layout_resource.h>
@@ -47,6 +49,14 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
 {
     if (!isMediaResource(resource))
         return false;
+
+    /* Method is called under the mutex. */
+    QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(subject.id());
+    NX_ASSERT(aggregator);
+    if (aggregator)
+        return aggregator->hasItem(resource->getId());
+
+    /* Leaving old code for safety. */
 
     auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
         qnSharedResourcesManager->sharedResources(subject));
@@ -105,22 +115,10 @@ void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& 
         connect(layout, &QnResource::parentIdChanged, this,
             [this, layout]
             {
-                updateAccessToLayoutItems(layout);
+                updateAccessToLayout(layout);
             });
 
-        auto handleItemChanged =
-            [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
-            {
-                /* Only remote resources with correct id can be accessed. */
-                if (item.resource.id.isNull())
-                    return;
-                if (auto resource = qnResPool->getResourceById(item.resource.id))
-                    updateAccessToResource(resource);
-            };
-        connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
-        connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
-
-        updateAccessToLayoutItems(layout);
+        updateAccessToLayout(layout);
     }
 }
 
@@ -128,7 +126,48 @@ void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr
 {
     base_type::handleResourceRemoved(resource);
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
-        updateAccessToLayoutItems(layout);
+    {
+        if (!layout->isShared())
+            return;
+
+        QList<QnLayoutItemAggregatorPtr> aggregators;
+
+        {
+            QnMutexLocker lk(&m_mutex);
+            for (auto iter = m_aggregatorsBySubject.cbegin();
+                iter != m_aggregatorsBySubject.cend();
+                ++iter)
+            {
+                if ((*iter)->hasLayout(layout))
+                    aggregators.push_back(*iter);
+            }
+        }
+
+        for (auto aggregator: aggregators)
+            aggregator->removeWatchedLayout(layout);
+    }
+
+}
+
+void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccessSubject& subject)
+{
+    auto aggregator = ensureAggregatorForSubject(subject);
+
+    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
+        qnSharedResourcesManager->sharedResources(subject));
+    for (auto layout : sharedLayouts)
+        aggregator->addWatchedLayout(layout);
+
+    base_type::handleSubjectAdded(subject);
+}
+
+void QnSharedLayoutItemAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
+{
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_aggregatorsBySubject.remove(subject.id());
+    }
+    base_type::handleSubjectRemoved(subject);
 }
 
 void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
@@ -140,25 +179,69 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     if (!subject.isValid())
         return;
 
-    auto changed = (newValues | oldValues) - (newValues & oldValues);
+    auto aggregator = ensureAggregatorForSubject(subject);
 
-    QSet<QnUuid> changedResources;
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(changed);
-    for (const auto& layout : sharedLayouts)
+    auto added = (newValues - oldValues);
+    auto removed = (oldValues - newValues);
+
+    for (const auto& layout: qnResPool->getResources<QnLayoutResource>(added))
     {
-        if (!layout->isShared())
-            continue;
-
-        changedResources += layoutItems(layout);
+        if (layout->isShared())
+           aggregator->addWatchedLayout(layout);
     }
 
-    for (auto resource: qnResPool->getResources(changedResources))
-        updateAccess(subject, resource);
+    for (const auto& layout: qnResPool->getResources<QnLayoutResource>(removed))
+    {
+        if (layout->isShared())
+            aggregator->removeWatchedLayout(layout);
+    }
 }
 
-void QnSharedLayoutItemAccessProvider::updateAccessToLayoutItems(const QnLayoutResourcePtr& layout)
+void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
 {
-    for (auto resource : qnResPool->getResources(layoutItems(layout)))
-        updateAccessToResource(resource);
+    if (!layout->isShared())
+        return;
+
+    const auto layoutId = layout->getId();
+    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    {
+        auto shared = qnSharedResourcesManager->sharedResources(subject);
+        if (!shared.contains(layoutId))
+            continue;
+
+        ensureAggregatorForSubject(subject)->addWatchedLayout(layout);
+    }
+}
+
+QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForSubject(
+    const QnResourceAccessSubject& subject)
+{
+    auto id = subject.id();
+
+    auto updateAccessToResourceBySubject = [this, subject](const QnUuid& resourceId)
+        {
+            if (isUpdating())
+                return;
+
+            auto resource = qnResPool->getResourceById(resourceId);
+            if (!resource || !isMediaResource(resource))
+                return;
+
+            updateAccess(subject, resource);
+        };
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_aggregatorsBySubject.contains(id))
+            return m_aggregatorsBySubject.value(id);
+
+        QnLayoutItemAggregatorPtr aggregator(new QnLayoutItemAggregator());
+        connect(aggregator, &QnLayoutItemAggregator::itemAdded, this,
+            updateAccessToResourceBySubject);
+        connect(aggregator, &QnLayoutItemAggregator::itemRemoved, this,
+            updateAccessToResourceBySubject);
+        m_aggregatorsBySubject.insert(id, aggregator);
+        return aggregator;
+    }
 }
 

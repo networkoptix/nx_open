@@ -558,6 +558,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
     dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     dbStructureUpdater.addUpdateScript(db::kAddVmsOpaqueData);
+    dbStructureUpdater.addUpdateScript(db::kRenameGroupToRole);
     return dbStructureUpdater.updateStructSync();
 }
 

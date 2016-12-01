@@ -662,20 +662,7 @@ private:
 template<class T>
 void PostProcessTransactionFunction::operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const
 {
-    // Local transactions (such as setStatus for servers) should only be sent to clients.
-    if (tran.isLocal())
-    {
-        QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
-        // Important check. Empty target means "send to all peers".
-        if (!clients.isEmpty())
-            qnTransactionBus->sendTransaction(tran, clients);
-    }
-    else
-    {
-        // Send transaction to all peers.
-        qnTransactionBus->sendTransaction(tran);
-    }
-
+    qnTransactionBus->sendTransaction(tran);
     processor->triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
 }
 

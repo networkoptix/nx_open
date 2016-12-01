@@ -20,6 +20,7 @@ if [[ "${box}" == "bananapi" ]]; then
     TOOLCHAIN_ROOT=$environment/packages/bpi/gcc-${gcc.version}
 fi
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
+SYSROOT_PREFIX=$PACKAGES_ROOT/sysroot/usr/lib/arm-linux-gnueabihf
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -53,6 +54,7 @@ USR_DIR=$BUILD_OUTPUT_DIR/usr
 VOX_SOURCE_DIR=${ClientVoxSourceDir}
 
 STRIP=
+WITH_CLIENT=1
 
 for i in "$@"
 do
@@ -63,6 +65,8 @@ do
         TARGET_DIR="`echo $i | sed 's/--target-dir=\(.*\)/\1/'`"
     elif [ "$i" == "--no-strip" ] ; then
         STRIP=
+    elif [ "$i" == "--no-client" ] ; then
+        WITH_CLIENT=
     fi
 done
 
@@ -89,27 +93,30 @@ libnx_fusion \
 libnx_network \
 libnx_streaming \
 libnx_utils \
-libnx_vms_utils \
 libpostproc \
 libudt )
 
 #additional libs for nx1 client
 if [[ "${box}" == "bpi" ]]; then
-    LIBS_TO_COPY+=( \
-    ldpreloadhook \
-    libcedrus \
-    libclient_core \
-    libnx_audio \
-    libnx_media \
-    libopenal \
-    libproxydecoder \
-    libEGL \
-    libGLESv1_CM \
-    libGLESv2 \
-    libMali \
-    libpixman-1 \
-    libUMP \
-    libvdpau_sunxi )
+    LIBS_TO_COPY+=(
+        libGLESv2 \
+        libMali \
+        libUMP )
+    if [[ ! -z "$WITH_CLIENT" ]]; then
+        LIBS_TO_COPY+=( \
+            ldpreloadhook \
+            libcedrus \
+            libnx_vms_utils \
+            libclient_core \
+            libnx_audio \
+            libnx_media \
+            libopenal \
+            libproxydecoder \
+            libEGL \
+            libGLESv1_CM \
+            libpixman-1 \
+            libvdpau_sunxi )
+    fi
 fi
 
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
@@ -137,8 +144,8 @@ done
 
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
-if [[ "${box}" == "bpi" ]]; then
-    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns"
+if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
+    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns DBus Web*"
 fi
 for var in $QTLIBS
 do
@@ -166,7 +173,7 @@ cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREF
 cp -R ./etc $BUILD_DIR
 cp -R ./opt $BUILD_DIR
 
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   #copying ffmpeg 3.0.2 libs
   cp -av $LIBS_DIR/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
   #copying lite client bin
@@ -203,7 +210,11 @@ if [[ "${box}" == "bpi" ]]; then
   
   #additional platform specific files
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
-  cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
+  cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
+  cp -Rf ${qt.dir}/translations $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -Rf ${qt.dir}/resources $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -f ${qt.dir}/resources/* $BUILD_DIR/$PREFIX_DIR/lite_client/bin/libexec
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
   cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
@@ -225,6 +236,20 @@ if [ -e "$BINS_DIR/plugins" ]; then
     done
 fi
 
+#copying additional sysroot:
+if [[ "${box}" == "bpi" ]]; then
+    SYSROOT_LIBS_TO_COPY+=(
+        libopus \
+        libvpx \
+        libwebpdemux \
+        libwebp )
+    for var in "${SYSROOT_LIBS_TO_COPY[@]}"
+    do
+      echo "Adding lib" ${var}
+      cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
+done
+fi
+
 #copying vox
 VOX_TARGET_DIR=$BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/vox
 mkdir -p $VOX_TARGET_DIR
@@ -232,6 +257,7 @@ cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
+    mv -f $BUILD_DIR/etc/init.d/networkoptix-lite_client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite_client
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
@@ -244,7 +270,11 @@ chmod -R 755 $BUILD_DIR/etc/init.d
 
 pushd $BUILD_DIR
     if [[ "${box}" == "bpi" ]]; then
-        tar czf $PACKAGE_NAME ./opt ./etc ./root ./usr
+        if [[ ! -z "$WITH_CLIENT" ]]; then
+            tar czf $PACKAGE_NAME ./opt ./etc ./root ./usr
+        else
+            tar czf $PACKAGE_NAME ./opt ./etc
+        fi
     else
         tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
     fi

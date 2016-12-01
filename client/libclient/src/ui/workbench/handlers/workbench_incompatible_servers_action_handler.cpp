@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 
 #include <core/resource/resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -19,9 +20,10 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
+#include <utils/merge_systems_common.h>
+#include <network/system_helpers.h>
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(
     QObject* parent)
@@ -52,16 +54,30 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
         return;
     }
 
-    for (const auto& resource: menu()->currentParameters(sender()).resources())
-    {
-        const auto status = resource->getStatus();
+    const auto resources = menu()->currentParameters(sender()).resources();
+    NX_ASSERT(resources.size() == 1, "We can't connect/merge more then one server");
+    if (resources.isEmpty())
+        return;
 
-        if (status == Qn::Incompatible || status == Qn::Unauthorized)
-        {
-            connectToCurrentSystem(resource->getId());
-            return;
-        }
+    const auto resource = resources.first();
+    const auto status = resource->getStatus();
+    if (status != Qn::Incompatible && status != Qn::Unauthorized)
+        return;
+
+    const auto serverResource = resource.dynamicCast<QnFakeMediaServerResource>();
+    const auto moduleInformation = serverResource->getModuleInformation();
+
+    if (helpers::isCloudSystem(moduleInformation))
+    {
+        static const auto kStatus = utils::MergeSystemsStatus::dependentSystemBoundToCloud;
+
+        const auto message = utils::MergeSystemsStatus::getErrorMessage(
+             kStatus, moduleInformation).prepend(lit("\n"));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Cannot merge systems.") + message);
+        return;
     }
+
+    connectToCurrentSystem(resource->getId());
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(

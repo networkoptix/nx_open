@@ -116,8 +116,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(userManager, &ec2::AbstractUserNotificationManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData), Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged, Qt::DirectConnection);
-    connect(userManager, &ec2::AbstractUserNotificationManager::groupAddedOrUpdated,            this, &QnCommonMessageProcessor::on_userGroupChanged, Qt::DirectConnection);
-    connect(userManager, &ec2::AbstractUserNotificationManager::groupRemoved,                   this, &QnCommonMessageProcessor::on_userGroupRemoved, Qt::DirectConnection);
+    connect(userManager, &ec2::AbstractUserNotificationManager::userRoleAddedOrUpdated,         this, &QnCommonMessageProcessor::on_userRoleChanged, Qt::DirectConnection);
+    connect(userManager, &ec2::AbstractUserNotificationManager::userRoleRemoved,                this, &QnCommonMessageProcessor::on_userRoleRemoved, Qt::DirectConnection);
 
     auto layoutManager = connection->getLayoutNotificationManager();
     connect(layoutManager, &ec2::AbstractLayoutNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData), Qt::DirectConnection);
@@ -294,18 +294,18 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
     }
 }
 
-void QnCommonMessageProcessor::on_userGroupChanged(const ec2::ApiUserGroupData& userGroup)
+void QnCommonMessageProcessor::on_userRoleChanged(const ec2::ApiUserRoleData& userRole)
 {
-    qnUserRolesManager->addOrUpdateUserRole(userGroup);
+    qnUserRolesManager->addOrUpdateUserRole(userRole);
 }
 
-void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& groupId)
+void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 {
-    qnUserRolesManager->removeUserRole(groupId);
+    qnUserRolesManager->removeUserRole(userRoleId);
     for (const auto& user : qnResPool->getResources<QnUserResource>())
     {
-        if (user->userGroup() == groupId)
-            user->setUserGroup(QnUuid());
+        if (user->userRoleId() == userRoleId)
+            user->setUserRoleId(QnUuid());
     }
 }
 
@@ -518,7 +518,7 @@ void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataL
     qnSharedResourcesManager->reset(accessRights);
 }
 
-void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserGroupDataList& roles)
+void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserRoleDataList& roles)
 {
     qnUserRolesManager->resetUserRoles(roles);
 }
@@ -617,7 +617,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
     resetAccessRights(fullData.accessRights);
-    resetUserRoles(fullData.userGroups);
+    resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
     resetTime();
 

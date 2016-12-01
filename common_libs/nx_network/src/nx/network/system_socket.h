@@ -201,7 +201,6 @@ public:
     virtual bool shutdown() override;
 
 protected:
-    friend class aio::AsyncSocketImplHelper<SelfType>;
     bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;

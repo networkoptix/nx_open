@@ -1035,6 +1035,7 @@ int QnMediaServerConnection::addBookmarkAsync(
     const QnCameraBookmark& bookmark, QObject* target, const char* slot)
 {
     QnUpdateBookmarkRequestData request(bookmark);
+    request.format = Qn::SerializationFormat::UbjsonFormat;
     return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);
 }
 
@@ -1042,6 +1043,7 @@ int QnMediaServerConnection::updateBookmarkAsync(
     const QnCameraBookmark& bookmark, QObject* target, const char* slot)
 {
     QnUpdateBookmarkRequestData request(bookmark);
+    request.format = Qn::SerializationFormat::UbjsonFormat;
     return sendAsyncGetRequestLogged(ec2BookmarkUpdateObject, request.toParams(), nullptr ,target, slot);
 }
 
@@ -1049,6 +1051,7 @@ int QnMediaServerConnection::deleteBookmarkAsync(
     const QnUuid& bookmarkId, QObject* target, const char* slot)
 {
     QnDeleteBookmarkRequestData request(bookmarkId);
+    request.format = Qn::SerializationFormat::UbjsonFormat;
     return sendAsyncGetRequestLogged(ec2BookmarkDeleteObject, request.toParams(), nullptr ,target, slot);
 }
 

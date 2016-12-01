@@ -25,5 +25,16 @@ std::function<void()> BarrierHandler::fork()
     return [holder]() { holder->reset(); };
 }
 
+BarrierWaiter::BarrierWaiter():
+    BarrierHandler([this](){ this->m_promise.set_value(); })
+{
+}
+
+BarrierWaiter::~BarrierWaiter()
+{
+    m_handlerHolder.reset();
+    m_promise.get_future().wait();
+}
+
 } // namespace utils
 } // namespace nx

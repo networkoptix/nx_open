@@ -16,6 +16,7 @@ namespace Qn
         CurrentSystemNode,      /**< Root node, displaying current system name. */
         CurrentUserNode,        /**< Root node, displaying current user. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
+        MyCloudNode,            /**< Root node for available cloud systems. */
         ServersNode,            /**< Root node for servers for admin user. */
         UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
@@ -47,6 +48,7 @@ namespace Qn
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
         SystemNode,             /**< Node that represents systems but the current. */
+        CloudSystemNode,        /**< Node that represents available cloud system. */
 
         NodeTypeCount
     };
@@ -202,6 +204,7 @@ namespace Qn
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
+        CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */

@@ -35,6 +35,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -170,9 +171,7 @@ namespace {
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::BusinessRulesDialog()),
-    m_popupMenu(new QMenu(this)),
-    m_advancedAction(NULL),
-    m_advancedMode(false)
+    m_popupMenu(new QMenu(this))
 {
     ui->setupUi(this);
     retranslateUi();
@@ -190,8 +189,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     m_currentDetailsWidget = ui->detailsWidget;
 
-    //TODO: #GDM #3.0 fix icon
-    ui->advancedButton->setIcon(qnSkin->icon(lit("buttons/down.png")));
     ui->eventLogButton->setIcon(qnSkin->icon(lit("buttons/event_log.png")));
 
     createActions();
@@ -251,9 +248,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->deleteRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_deleteButton_clicked);
 
-    connect(ui->advancedButton, &QPushButton::clicked, this,
-        &QnBusinessRulesDialog::toggleAdvancedMode);
-
     connect(m_rulesViewModel, &QnBusinessRulesActualModel::businessRuleDeleted, this,
         &QnBusinessRulesDialog::at_message_ruleDeleted);
     connect(m_rulesViewModel, &QnBusinessRulesActualModel::beforeModelChanged, this,
@@ -271,6 +265,12 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     updateFilter();
     updateControlButtons();
+
+    /*
+    * Create auto-hider which will hide empty table and show a message instead. Table will be
+    * reparented. Snapped scrollbar is already created and will stay in the correct parent.
+    */
+    QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
@@ -452,15 +452,6 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     updateFilter();
 }
 
-void QnBusinessRulesDialog::toggleAdvancedMode() {
-    setAdvancedMode(!advancedMode());
-}
-
-void QnBusinessRulesDialog::updateAdvancedAction() {
-    m_currentDetailsWidget->setVisible(advancedMode());
-    m_advancedAction->setText(advancedMode() ? tr("Hide Advanced") : tr("Show Advanced"));
-}
-
 void QnBusinessRulesDialog::createActions() {
     m_newAction = new QAction(tr("&New..."), this);
     connect(m_newAction, &QAction::triggered, this, &QnBusinessRulesDialog::at_newRuleButton_clicked);
@@ -468,17 +459,12 @@ void QnBusinessRulesDialog::createActions() {
     m_deleteAction = new QAction(tr("&Delete"), this);
     connect(m_deleteAction, &QAction::triggered, this, &QnBusinessRulesDialog::at_deleteButton_clicked);
 
-    m_advancedAction = new QAction(this);
-    connect(m_advancedAction, &QAction::triggered, this, &QnBusinessRulesDialog::toggleAdvancedMode);
-    updateAdvancedAction();
-
     QAction* scheduleAct = new QAction(tr("&Schedule..."), this);
     connect(scheduleAct, &QAction::triggered, m_currentDetailsWidget, &QnBusinessRuleWidget::at_scheduleButton_clicked);
 
     m_popupMenu->addAction(m_newAction);
     m_popupMenu->addAction(m_deleteAction);
     m_popupMenu->addSeparator();
-    m_popupMenu->addAction(m_advancedAction);
     m_popupMenu->addAction(scheduleAct);
 }
 
@@ -530,7 +516,9 @@ void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr &ruleMod
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !qnCommon->isReadOnly();
+    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+        && !qnCommon->isReadOnly();
+
     bool hasChanges = hasRights && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
@@ -544,12 +532,9 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->deleteRuleButton->setEnabled(canDelete);
     m_deleteAction->setEnabled(canDelete);
 
-    ui->advancedButton->setEnabled(m_currentDetailsWidget->model());
-    m_advancedAction->setEnabled(m_currentDetailsWidget->model());
+    m_currentDetailsWidget->setVisible(hasRights && m_currentDetailsWidget->model());
     ui->addRuleButton->setEnabled(hasRights);
     m_newAction->setEnabled(hasRights);
-
-    setAdvancedMode(hasRights && advancedMode());
 }
 
 void QnBusinessRulesDialog::updateFilter() {
@@ -573,25 +558,10 @@ void QnBusinessRulesDialog::retranslateUi()
     ));
 }
 
-bool QnBusinessRulesDialog::advancedMode() const {
-    return m_advancedMode;
-}
-
-void QnBusinessRulesDialog::setAdvancedMode(bool value) {
-    if (m_advancedMode == value)
-        return;
-
-    if (value && !m_currentDetailsWidget->model())
-        return; // advanced options cannot be displayed
-
-    m_advancedMode = value;
-    updateAdvancedAction();
-}
-
 bool QnBusinessRulesDialog::tryClose(bool force) {
-    if (force || isHidden()) {
+    if (force || isHidden())
+    {
         m_rulesViewModel->reset();
-        setAdvancedMode(false);
         hide();
         return true;
     }
@@ -614,11 +584,9 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     case QDialogButtonBox::Yes:
         if (!saveAll())
             return false;   // Cancel was pressed in the confirmation dialog
-        setAdvancedMode(false);
         break;
     case QDialogButtonBox::No:
         m_rulesViewModel->reset();
-        setAdvancedMode(false);
         break;
     default:
         return false;   // Cancel was pressed

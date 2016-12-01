@@ -58,17 +58,17 @@ public:
         invalidateFilter();
     }
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
     {
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole)
         {
-            Qt::CheckState checkState = static_cast<Qt::CheckState>(value.toInt());
+            //TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
             emit beforeRecursiveOperation();
-            setCheckStateRecursive(index, checkState);
-            setCheckStateRecursiveUp(index, checkState);
+            base_type::setData(index, value, Qt::CheckStateRole);
             emit afterRecursiveOperation();
             return true;
         }
+
         return base_type::setData(index, value, role);
     }
 
@@ -134,31 +134,6 @@ protected:
         }
 
         return resourceLessThan(left, right);
-    }
-
-    void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state)
-    {
-        QModelIndex root = index.sibling(index.row(), Qn::NameColumn);
-        for (int i = 0; i < rowCount(root); ++i)
-            setCheckStateRecursive(this->index(i, Qn::CheckColumn, root), state);
-        base_type::setData(index, state, Qt::CheckStateRole);
-    }
-
-    void setCheckStateRecursiveUp(const QModelIndex &index, Qt::CheckState state)
-    {
-        QModelIndex root = index.parent();
-        if (!root.isValid())
-            return;
-
-        for (int i = 0; (i < rowCount(root)) && (state == Qt::Checked); ++i)
-            if (this->index(i, Qn::CheckColumn, root).data(Qt::CheckStateRole).toInt() != Qt::Checked)
-                state = Qt::Unchecked;
-
-        QModelIndex checkRoot = root.sibling(root.row(), Qn::CheckColumn);
-        if (checkRoot.data(Qt::CheckStateRole).toInt() == state)
-            return;
-        base_type::setData(checkRoot, state, Qt::CheckStateRole);
-        setCheckStateRecursiveUp(root, state);
     }
 
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override
@@ -309,6 +284,27 @@ void QnResourceTreeWidget::expand(const QModelIndex &index)
 void QnResourceTreeWidget::expandAll()
 {
     ui->resourcesTreeView->expandAll();
+}
+
+void QnResourceTreeWidget::expandChecked()
+{
+    auto model = ui->resourcesTreeView->model();
+
+    for (int i = 0; i < model->rowCount(ui->resourcesTreeView->rootIndex()); ++i)
+        expandCheckedRecursively(model->index(i, Qn::NameColumn));
+}
+
+void QnResourceTreeWidget::expandCheckedRecursively(const QModelIndex& from)
+{
+    if (!from.isValid())
+        return;
+
+    auto checkStateIndex = from.sibling(from.row(), Qn::CheckColumn);
+    if (checkStateIndex.data(Qt::CheckStateRole).toInt() != Qt::Unchecked)
+        expand(from);
+
+    for (int i = 0; i < from.model()->rowCount(from); ++i)
+        expandCheckedRecursively(from.child(i, Qn::NameColumn));
 }
 
 QPoint QnResourceTreeWidget::selectionPos() const

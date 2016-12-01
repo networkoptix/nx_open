@@ -50,7 +50,7 @@ public:
     void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
     void resetStatusList(const ec2::ApiResourceStatusDataList& params);
     void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
-    void resetUserRoles(const ec2::ApiUserGroupDataList& roles);
+    void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -120,8 +120,8 @@ private slots:
     void on_resourceRemoved(const QnUuid& resourceId );
 
     void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
-    void on_userGroupChanged(const ec2::ApiUserGroupData& userGroup);
-    void on_userGroupRemoved(const QnUuid& groupId);
+    void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);
+    void on_userRoleRemoved(const QnUuid& userRoleId);
 
     void on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraId);

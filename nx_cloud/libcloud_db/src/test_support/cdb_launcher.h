@@ -117,6 +117,7 @@ public:
         const std::string& password,
         const std::string& systemId,
         api::SystemDataEx* const system);
+
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,
@@ -127,6 +128,12 @@ public:
         const std::string& systemId,
         const std::string& accountEmail,
         api::SystemAccessRole accessRole);
+    api::ResultCode shareSystem(
+        const AccountWithPassword& grantor,
+        const std::string& systemId,
+        const std::string& accountEmail,
+        api::SystemAccessRole accessRole);
+
     api::ResultCode updateSystemSharing(
         const std::string& email,
         const std::string& password,
@@ -224,13 +231,11 @@ namespace api {
 }
 
 
-class EmailManagerStub
-    :
+class EmailManagerStub:
     public nx::cdb::AbstractEmailManager
 {
 public:
-    EmailManagerStub(nx::cdb::AbstractEmailManager* const target)
-        :
+    EmailManagerStub(nx::cdb::AbstractEmailManager* const target):
         m_target(target)
     {
     }

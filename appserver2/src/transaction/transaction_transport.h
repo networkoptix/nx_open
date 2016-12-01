@@ -107,6 +107,9 @@ private:
     template<class T>
     bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)
     {
+        if (transaction.isLocal() && !remotePeer().isClient())
+            return false;
+
         if (remotePeer().peerType == Qn::PT_CloudServer)
         {
             if (transaction.transactionType != TransactionType::Cloud &&

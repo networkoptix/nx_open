@@ -9,20 +9,20 @@ class QnScrollBarProxy : public QScrollBar
     typedef QScrollBar base_type;
 
 public:
-    QnScrollBarProxy(QWidget *parent = nullptr);
-    QnScrollBarProxy(QScrollBar *scrollBar, QWidget *parent = nullptr);
-    ~QnScrollBarProxy();
+    QnScrollBarProxy(QWidget* parent = nullptr);
+    QnScrollBarProxy(QScrollBar* scrollBar, QWidget* parent = nullptr);
+    virtual ~QnScrollBarProxy();
 
-    void setScrollBar(QScrollBar *scrollBar);
+    void setScrollBar(QScrollBar* scrollBar);
 
-    QSize sizeHint() const override;
+    virtual QSize sizeHint() const override;
+    virtual bool event(QEvent* event) override;
 
-    bool event(QEvent *event) override;
-
-    static void makeProxy(QScrollBar *scrollBar, QAbstractScrollArea *scrollArea);
+    static void makeProxy(QScrollBar* scrollBar, QAbstractScrollArea* scrollArea);
 
 protected:
-    void paintEvent(QPaintEvent *) override;
+    virtual void paintEvent(QPaintEvent*) override;
+    virtual void sliderChange(SliderChange change) override;
 
 private:
     void setScrollBarVisible(bool visible);

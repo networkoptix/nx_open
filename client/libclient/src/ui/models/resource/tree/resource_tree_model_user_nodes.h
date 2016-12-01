@@ -14,14 +14,18 @@
 class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
 {
     using base_type = Connective<QObject>;
+
 public:
     QnResourceTreeModelUserNodes(QObject* parent = nullptr);
     virtual ~QnResourceTreeModelUserNodes();
 
     QnResourceTreeModel* model() const;
-    void setModel(QnResourceTreeModel* value);
-
     QnResourceTreeModelNodePtr rootNode() const;
+
+    void initialize(QnResourceTreeModel* model, const QnResourceTreeModelNodePtr& rootNode);
+
+protected:
+    void setModel(QnResourceTreeModel* value);
     void setRootNode(const QnResourceTreeModelNodePtr& node);
 
 private:
@@ -43,7 +47,7 @@ private:
     QnResourceTreeModelNodePtr ensureSubjectNode(const QnResourceAccessSubject& subject);
 
     /** Get or create user role node. */
-    QnResourceTreeModelNodePtr ensureRoleNode(const ec2::ApiUserGroupData& role);
+    QnResourceTreeModelNodePtr ensureRoleNode(const ec2::ApiUserRoleData& role);
 
     /** Get or create user node. */
     QnResourceTreeModelNodePtr ensureUserNode(const QnUserResourcePtr& user);

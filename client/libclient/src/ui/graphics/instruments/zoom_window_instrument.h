@@ -8,7 +8,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/utils/viewport_scale_watcher.h>
 
 class FixedArSelectionItem;
 class ZoomOverlayWidget;
@@ -117,8 +116,6 @@ private:
     QPointer<QnMediaResourceWidget> m_zoomedWidget;
     QPointer<ZoomWindowWidget> m_windowTarget;
     QPointer<ZoomWindowWidget> m_storedWindowWidget;
-
-    QnViewportScaleWatcher m_scaleWatcher;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H

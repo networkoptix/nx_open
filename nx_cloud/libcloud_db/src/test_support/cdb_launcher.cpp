@@ -544,6 +544,15 @@ api::ResultCode CdbLauncher::shareSystem(
     return shareSystem(email, password, std::move(systemSharing));
 }
 
+api::ResultCode CdbLauncher::shareSystem(
+    const AccountWithPassword& grantor,
+    const std::string& systemId,
+    const std::string& accountEmail,
+    api::SystemAccessRole accessRole)
+{
+    return shareSystem(grantor.email, grantor.password, systemId, accountEmail, accessRole);
+}
+
 api::ResultCode CdbLauncher::updateSystemSharing(
     const std::string& email,
     const std::string& password,

@@ -99,10 +99,12 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             if (!menu)
                 return;
 
+            static const QPoint kVerticalOffset(0, 2);
+
             Q_D(const QnMainWindowTitleBarWidget);
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
-                    d->mainMenuButton->rect().bottomLeft()));
+                    d->mainMenuButton->rect().bottomLeft() + kVerticalOffset));
 
             d->mainMenuButton->setDown(false);
     });

@@ -309,6 +309,7 @@ void QnStatisticsManager::sendStatistics()
     QnSendStatisticsRequestData request;
     request.statisticsServerUrl = settings.statisticsServerUrl;
     request.metricsList = totalFiltered;
+    request.format = Qn::SerializationFormat::UbjsonFormat;
     m_handle = connection->sendStatisticsAsync(request, callback, QThread::currentThread());
 }
 

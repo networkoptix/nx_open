@@ -49,7 +49,7 @@ public:
     QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras = QnVirtualCameraResourceSet(),
                                           const QnCameraBookmarkSearchFilter &filter = QnCameraBookmarkSearchFilter());
 
-    /// @brief                  Get locally chached bookmarks for the given query.
+    /// @brief                  Get locally cached bookmarks for the given query.
     /// @param query            Target query.
     QnCameraBookmarkList cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const;
 

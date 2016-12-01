@@ -22,6 +22,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
@@ -118,6 +119,7 @@ QnResourceWidget::OverlayWidgets::OverlayWidgets()
 QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent) :
     base_type(parent),
     QnWorkbenchContextAware(context),
+    m_statusOverlay(new QnStatusOverlayWidget(this)),
     m_item(item),
     m_options(DisplaySelection),
     m_localActive(false),
@@ -159,18 +161,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     /* Status overlay. */
-    const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusController = new QnStatusOverlayController(m_resource, overlay, this);
+    m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this, overlay, controller = m_statusController]()
+        [this, controller = m_statusController]()
         {
             const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
-            setOverlayWidgetVisible(overlay, !isEmptyOverlay, false);
+            setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, true);
         });
 
-    addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
-    setOverlayWidgetVisible(overlay, false, false);
+    addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
+    setOverlayWidgetVisible(m_statusOverlay, false, false);
 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
@@ -179,6 +180,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_aspectRatio = defaultAspectRatio();
 
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this, [this, itemId = item->uuid()](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        {
+            if (id != itemId)
+                return;
+            at_itemDataChanged(role);
+        });
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
     /* Videowall license changes helper */
@@ -965,15 +973,13 @@ void QnResourceWidget::updateSelectedState()
 
 void QnResourceWidget::updateFrameWidth()
 {
-    m_framePainter.setFrameWidth(calculateFrameWidth() * m_scaleWatcher.scale());
+    m_framePainter.setFrameWidth(calculateFrameWidth());
     updateFrameGeometry();
 }
 
 void QnResourceWidget::updateFrameGeometry()
 {
-    static const qreal kPadding = 1.5;
-    const auto frameWidth = m_framePainter.frameWidth();
-    const auto offsetValue = frameWidth + kPadding * m_scaleWatcher.scale();
+    const auto offsetValue = (0.9 + m_framePainter.frameWidth()) * m_scaleWatcher.scale();
     const auto offset = QPointF(offsetValue, offsetValue);
     const auto targetRect = QRectF(-offset, size() + QSizeF(offsetValue, offsetValue) * 2);
     m_framePainter.setBoundingRect(targetRect);

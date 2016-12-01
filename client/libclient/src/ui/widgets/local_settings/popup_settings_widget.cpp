@@ -42,6 +42,9 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
         checkbox->setText(QnBusinessStringsHelper::eventName(eventType));
         ui->businessEventsLayout->addWidget(checkbox);
         m_businessRulesCheckBoxes[eventType] = checkbox;
+
+        connect(checkbox, &QCheckBox::toggled, this,
+            &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
     static_assert(QnSystemHealth::Count < 64, "We are packing messages to single quint64");
@@ -56,6 +59,9 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
         checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
         ui->systemHealthLayout->addWidget(checkbox);
         m_systemHealthCheckBoxes[messageType] = checkbox;
+
+        connect(checkbox, &QCheckBox::toggled, this,
+            &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
@@ -71,6 +77,8 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
             for (QCheckBox* checkbox : m_systemHealthCheckBoxes)
                 checkbox->setEnabled(!checked);
+
+            emit hasChangesChanged();
         });
 
 }

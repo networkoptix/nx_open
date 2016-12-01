@@ -16,10 +16,17 @@ Object
 
         onDisconnectRequested:
         {
+            if (liteMode)
+                autoLoginEnabled = false
+
             clearLastUsedConnection()
             sideNavigation.close()
             connectionManager.disconnectFromServer(false)
-            Workflow.openSessionsScreen()
+
+            if (liteMode)
+                Workflow.openLiteClientWelcomeScreen()
+            else
+                Workflow.openSessionsScreen()
         }
         onResourcesScreenRequested: Workflow.openResourcesScreen(connectionManager.systemName)
         onVideoScreenRequested: Workflow.openVideoScreen(resourceId)
