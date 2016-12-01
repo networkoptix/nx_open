@@ -208,8 +208,20 @@ struct CreateHashByUserIdHelper
 
 struct CreateHashByIdRfc4122Helper
 {
+    CreateHashByIdRfc4122Helper(const QByteArray additionalData = QByteArray()) :
+        m_additionalData(additionalData)
+    {}
+
     template<typename Param>
-    QnUuid operator ()(const Param &param) { return QnTransactionLog::makeHash(param.id.toRfc4122()); }
+    QnUuid operator ()(const Param &param) \
+    {
+        if (m_additionalData.isNull())
+            return QnTransactionLog::makeHash(param.id.toRfc4122());
+        return QnTransactionLog::makeHash(param.id.toRfc4122(), m_additionalData);
+    }
+
+private:
+    QByteArray m_additionalData;
 };
 
 struct CreateHashForResourceParamWithRefDataHelper

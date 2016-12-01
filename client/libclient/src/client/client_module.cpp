@@ -11,7 +11,7 @@
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include <camera/camera_bookmarks_manager.h>
 

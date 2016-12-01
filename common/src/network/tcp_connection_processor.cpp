@@ -180,9 +180,10 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
             unsigned int sendTimeout = 0;
             if (!d->socket->getSendTimeout(&sendTimeout))
                 return false;
-            static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(sendTimeout);
+            const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(sendTimeout);
             nx::network::aio::UnifiedPollSet pollSet;
-            pollSet.add(d->socket->pollable(), nx::network::aio::etWrite);
+            if (!pollSet.add(d->socket->pollable(), nx::network::aio::etWrite))
+                return false;
             if (pollSet.poll(kPollTimeout) < 1)
                 return false;
             continue; //< socket in async mode

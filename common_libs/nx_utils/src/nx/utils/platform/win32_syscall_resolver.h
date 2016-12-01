@@ -3,20 +3,19 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef WIN32_SYSCALL_RESOLVER_H
-#define WIN32_SYSCALL_RESOLVER_H
+#pragma once
 
 #ifdef _WIN32
 
 #include <list>
-#include <mutex>
 #include <string>
 
+struct Win32FuncResolverImpl;
 
 /*!
     \note Caches all functions it had resolved
 */
-class Win32FuncResolver
+class NX_UTILS_API Win32FuncResolver
 {
 public:
     Win32FuncResolver();
@@ -38,26 +37,9 @@ public:
     static Win32FuncResolver* instance();
 
 private:
-    class LibFunctions
-    {
-    public:
-        HMODULE hLib;
-        std::map<std::string, void*> funcByName;
-
-        LibFunctions()
-        :
-            hLib( NULL )
-        {
-        }
-    };
-
-    std::mutex m_mutex;
-    //!map<libname, function addresses>
-    std::map<std::wstring, LibFunctions> m_loadedLibraries;
+    Win32FuncResolverImpl* m_impl;
 
     void* resolveFunction( const std::wstring& libName, const std::string& funcName );
 };
 
 #endif
-
-#endif  //WIN32_SYSCALL_RESOLVER_H

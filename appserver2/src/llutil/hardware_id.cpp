@@ -133,7 +133,8 @@ namespace LLUtil {
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             g_storedMac = saveMac(macs, settings);
-            g_hardwareInfo.mac = g_storedMac;
+            if (!g_storedMac.isEmpty())
+                g_hardwareInfo.mac = g_storedMac;
 
             g_hardwareIdInitialized = true;
 

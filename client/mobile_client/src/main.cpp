@@ -41,7 +41,7 @@
 using mobile_client::conf;
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 using namespace nx::mobile_client;
 

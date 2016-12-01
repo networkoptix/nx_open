@@ -4,6 +4,10 @@
 
 #include <nx/utils/log/assert.h>
 
+#ifdef _WIN32
+#include "../crash_dump/systemexcept_win.h"
+#endif
+
 namespace nx {
 namespace utils {
 
@@ -58,6 +62,22 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 
     if (const auto value = arguments.get("load-mode"))
         setLoadMode(*value);
+
+#ifdef _WIN32
+    bool enableCrashDump = true;
+    if (arguments.get("disable-crash-dump"))
+        enableCrashDump = false;
+
+    bool generateFullCrashDump = false;
+    if (arguments.get("enable-full-crash-dump"))
+        generateFullCrashDump = true;
+
+    if (enableCrashDump)
+    {
+        win32_exception::installGlobalUnhandledExceptionHandler();
+        win32_exception::setCreateFullCrashDump(generateFullCrashDump);
+    }
+#endif
 }
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);

@@ -1439,6 +1439,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncVideoWall = true;
         }
     }
+    else if (updateName == lit(":/updates/81_changed_status_stransaction_hash.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needClearLog = true;
+            m_needResyncLog = true;
+        }
+    }
 
     return true;
 }
@@ -1496,7 +1504,12 @@ bool QnDbManager::createDatabase()
     }
 
     if (!applyUpdates(":/updates"))
+    {
+        NX_LOG(lit("%1 Applying migration updates failed").arg(Q_FUNC_INFO), cl_logWARNING);
         return false;
+    }
+
+    NX_LOG(lit("%1 Applying migration updates succeded").arg(Q_FUNC_INFO), cl_logDEBUG2);
 
     if (!lockStatic.commit())
         return false;

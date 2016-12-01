@@ -9,7 +9,8 @@ import unittest
 from collections import OrderedDict
 from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
-from pycommons.Logger import log, LOGLEVEL
+import pycommons.Logger
+from pycommons.Logger import log, logger, LOGLEVEL
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
     checkResultsEqual, TestDigestAuthHandler, ManagerAddPassword, \
@@ -167,7 +168,7 @@ class FuncTestCase(unittest.TestCase):
     _configured = False
     _stopped = set()
     _worker = None
-    _suits = ()
+    _suites = ()
     _init_suites_done = False
     _serv_version = None  # here I suppose that all servers being created from the same image have the same version
     before_2_5 = False # TODO remove it!
@@ -244,13 +245,13 @@ class FuncTestCase(unittest.TestCase):
     # These 3 methods used in a caller (see the RunTests and functest.CallTest funcions)
     @classmethod
     def _check_suites(cls):
-        if not cls._suits:
+        if not cls._suites:
             raise RuntimeError("%s's test suites list is empty!" % cls.__name__)
 
     @classmethod
     def iter_suites(cls):
         cls._check_suites()
-        return (s[0] for s in cls._suits)
+        return (s[0] for s in cls._suites)
 
     @classmethod
     def init_suites(cls):
@@ -258,7 +259,7 @@ class FuncTestCase(unittest.TestCase):
         if cls._init_suites_done:
             return
         cls._check_suites()
-        for name, tests in cls._suits:
+        for name, tests in cls._suites:
             if hasattr(cls, name):
                 raise AssertionError("Test suite naming error: class %s already has attrinute %s" % (cls.__name__, name))
             setattr(cls, name, tests)
@@ -364,13 +365,15 @@ class FuncTestCase(unittest.TestCase):
 
     def _mediaserver_ctl(self, box, cmd):
         "Perform a service control command for a mediaserver on one of boxes"
+        log(LOGLEVEL.DEBUG + 9, "_mediaserver_ctl[%s]: performing %s" % (box, cmd))
         if cmd == 'safe-stop':
             rcmd = '/vagrant/safestop.sh'
         elif cmd == 'safe-start':
             rcmd = '/vagrant/safestart.sh'
         else:
             rcmd = cmd
-        self._call_box(box, rcmd, 'networkoptix-mediaserver')
+        out = self._call_box(box, rcmd, 'networkoptix-mediaserver')
+        log(LOGLEVEL.DEBUG + 9, "_mediaserver_ctl[%s] output: %s" % (box, out.rstrip()))
         if cmd in ('stop', 'safe-stop'):
             self._stopped.add(box)
         elif cmd in ('start', 'safe-stop', 'restart'): # for 'restart' - just in case it was off unexpectedly
@@ -468,7 +471,7 @@ class FuncTestCase(unittest.TestCase):
             if tocheck:
                 time.sleep(0.5)
         if tocheck:
-            self.fail("Servers' startup timed out: %s" % (', '.join(self.sl[b] for b in tocheck)))
+            self.fail("Servers startup timed out: %s" % (', '.join(self.sl[b] for b in tocheck)))
             #TODO: Report the last error on each unready server!
 
     def _change_system_name(self, host, newName):
@@ -479,14 +482,15 @@ class FuncTestCase(unittest.TestCase):
 
 
     def setUp(self):
-        log(LOGLEVEL.INFO, "Just prints \n after unittest module prints a test name")
-        pass
+        if pycommons.Logger.logger.isSystem():
+            print  # this is because the unittest module desn't add \n after printing new test name,
+            #  so the first log message would be printed in the same line
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)
     ####################################################
 
     @classmethod
     def filterSuites(cls, *names):
-        return tuple(sw for sw in cls._suits if sw[0] in names)
+        return tuple(sw for sw in cls._suites if sw[0] in names)
 
 
 # Rollback support
@@ -1048,7 +1052,7 @@ class LegacyTestWrapperOld(FuncTestCase):
     """
     Provides an object to use virtual box control methods
     """
-    _suits = "dummy"
+    _suites = "dummy"
     _test_key = "legacy"
 
     def __init__(self, config):

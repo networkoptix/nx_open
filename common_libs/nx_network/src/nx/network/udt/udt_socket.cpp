@@ -922,6 +922,11 @@ void UdtStreamServerSocket::pleaseStop(
     m_aioHelper->cancelIOAsync( std::move( handler ) );
 }
 
+void UdtStreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+{
+    m_aioHelper->cancelIOSync();
+}
+
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
 {
     NX_ASSERT(m_state == detail::SocketState::connected);

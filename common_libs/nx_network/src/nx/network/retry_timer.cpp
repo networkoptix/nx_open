@@ -5,6 +5,7 @@
 
 #include "retry_timer.h"
 
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -99,40 +100,20 @@ RetryTimer::RetryTimer(const RetryPolicy& policy)
     m_triesMade(0)
 {
     reset();
+
+    m_timer = std::make_unique<aio::Timer>();
+    m_timer->bindToAioThread(getAioThread());
 }
 
 RetryTimer::~RetryTimer()
 {
-}
-
-void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    m_timer.pleaseStop(std::move(completionHandler));
-}
-
-void RetryTimer::pleaseStopSync(bool checkForLocks)
-{
-    m_timer.pleaseStopSync(checkForLocks);
-}
-
-aio::AbstractAioThread* RetryTimer::getAioThread() const
-{
-    return m_timer.getAioThread();
+    stopWhileInAioThread();
 }
 
 void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_timer.bindToAioThread(aioThread);
-}
-
-void RetryTimer::post(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.post(std::move(func));
-}
-
-void RetryTimer::dispatch(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.dispatch(std::move(func));
+    aio::BasicPollable::bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
 }
 
 bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc)
@@ -161,7 +142,7 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
     }
 
     ++m_triesMade;
-    m_timer.start(m_currentDelay, std::move(doAnotherTryFunc));
+    m_timer->start(m_currentDelay, std::move(doAnotherTryFunc));
     return true;
 }
 
@@ -178,6 +159,11 @@ void RetryTimer::reset()
         ? std::chrono::milliseconds::max()
         : m_retryPolicy.maxDelay();
     m_triesMade = 0;
+}
+
+void RetryTimer::stopWhileInAioThread()
+{
+    m_timer.reset();
 }
 
 }   //network

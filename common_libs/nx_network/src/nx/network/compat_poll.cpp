@@ -5,7 +5,7 @@
 
 #include "compat_poll.h"
 
-#include <platform/win32_syscall_resolver.h>
+#include <nx/utils/platform/win32_syscall_resolver.h>
 
 
 #ifdef _WIN32

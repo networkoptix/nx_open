@@ -68,7 +68,5 @@ public:
     static Q_INVOKABLE bool isAndroid();
     static Q_INVOKABLE bool isIos();
     static Q_INVOKABLE bool isMobile();
-
-    static Q_INVOKABLE QString applicationFullVersion();
 };
 

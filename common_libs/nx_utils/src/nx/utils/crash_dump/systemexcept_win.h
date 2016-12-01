@@ -11,7 +11,7 @@
     \note QnLongRunnable instance calls \a win32_exception::translate after thread creation
     \todo some refactoring is required
 */
-class win32_exception
+class NX_UTILS_API win32_exception
 {
 public:
     //!Registers handler to intercept system exceptions (e.g., Access violation)
