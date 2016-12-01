@@ -60,7 +60,6 @@ bool QnFfmpegAudioDecoder::isInitialized() const
 QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 {
     QnFfmpegHelper::deleteAvCodecContext(m_audioDecoderCtx);
-    m_audioDecoderCtx = m_audioDecoderCtx;
     av_frame_free(&m_outFrame);
 }
 
@@ -88,7 +87,7 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         int got_frame = 0;
         // todo: ffmpeg-test
-        // TODO: #dmishin get rid of deprecated functions 
+        // TODO: #dmishin get rid of deprecated functions
         int inputConsumed = avcodec_decode_audio4(m_audioDecoderCtx, m_outFrame, &got_frame, &avpkt);
         if (inputConsumed < 0)
             return false;
