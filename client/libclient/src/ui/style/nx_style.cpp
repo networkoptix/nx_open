@@ -3042,9 +3042,12 @@ QSize QnNxStyle::sizeFromContents(
                 const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
                 if (spinBox && spinBox->subControls.testFlag(SC_ComboBoxArrow))
                 {
+                    constexpr int kSafetyMargin = 8; //< as QDateTimeEdit calcs size not by the longest possible string
                     int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
                     int height = qMax(size.height(), Metrics::kButtonHeight);
-                    int width = qMax(Metrics::kMinimumButtonWidth, size.width() + hMargin + height);
+                    int buttonWidth = height;
+                    int width = qMax(Metrics::kMinimumButtonWidth,
+                        size.width() + hMargin + kSafetyMargin + buttonWidth);
                     return QSize(width, height);
                 }
             }
