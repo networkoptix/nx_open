@@ -341,7 +341,7 @@ void TransactionTransport::forwardStateChangedEvent(
 
 void TransactionTransport::onTransactionsReadFromLog(
     api::ResultCode resultCode,
-    std::vector<TransactionLogRecord> serializedTransactions,
+    std::vector<dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo)
 {
     using namespace std::placeholders;

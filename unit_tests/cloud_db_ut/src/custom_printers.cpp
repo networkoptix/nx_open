@@ -31,12 +31,23 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-void PrintTo(ResultCode val, ::std::ostream* os) {
+void PrintTo(ResultCode val, ::std::ostream* os)
+{
     *os << QnLexical::serialized(val).toStdString();
 }
 
 } // namespace api
 } // namespace cdb
+
+namespace db {
+
+void PrintTo(const DBResult val, ::std::ostream* os)
+{
+    *os << QnLexical::serialized(val).toStdString();
+}
+
+} // namespace db
+
 } // namespace nx
 
 

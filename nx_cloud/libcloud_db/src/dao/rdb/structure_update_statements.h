@@ -644,6 +644,13 @@ ALTER TABLE system ADD COLUMN opaque VARCHAR(1024) NULL;
 
 )sql";
 
+static const char kDropGlobalTransactionSequenceTable[] =
+R"sql(
+
+DROP TABLE cloud_db_transaction_sequence;
+
+)sql";
+
 /**
  * #VMS-4425. Rename user group - > user role.
  */

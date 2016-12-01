@@ -14,6 +14,7 @@
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
+#include "dao/rdb/account_data_object.h"
 #include "data/account_data.h"
 #include "managers_types.h"
 #include "notification.h"
@@ -143,6 +144,7 @@ private:
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     QnCounter m_startedAsyncCallsCounter;
     UpdateAccountSubroutine m_updateAccountSubroutine;
+    dao::rdb::AccountDataObject m_accountDbController;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);
