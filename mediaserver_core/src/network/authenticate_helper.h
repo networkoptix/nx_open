@@ -29,7 +29,8 @@
 
 
 struct QnLdapDigestAuthContext;
-class CloudConnectionManager;
+class TimeBasedNonceProvider;
+struct CloudManagerGroup;
 
 class QnAuthHelper
 :
@@ -41,7 +42,9 @@ class QnAuthHelper
 public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
-    QnAuthHelper(CloudConnectionManager* const cloudConnectionManager);
+    QnAuthHelper(
+        TimeBasedNonceProvider* timeBasedNonceProvider,
+        CloudManagerGroup* cloudManagerGroup);
     virtual ~QnAuthHelper();
 
     //!Authenticates request on server side
@@ -160,9 +163,9 @@ private:
 #endif
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
-    std::shared_ptr<AbstractNonceProvider> m_timeBasedNonceProvider;
-    std::unique_ptr<AbstractNonceProvider> m_nonceProvider;
-    std::unique_ptr<AbstractUserDataProvider> m_userDataProvider;
+    AbstractNonceProvider* m_timeBasedNonceProvider;
+    AbstractNonceProvider* m_nonceProvider;
+    AbstractUserDataProvider* m_userDataProvider;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;

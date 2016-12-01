@@ -304,9 +304,9 @@ angular.module('webadminApp')
                  */
             }
             dialogs.confirmWithPassword(
-                L.settings.confirmDisconnectFromCloudTitle,
-                L.settings.confirmDisconnectFromCloud,
-                L.settings.confirmDisconnectFromCloudAction,
+                L.settings.confirmDisconnectFromCloudTitle.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                L.settings.confirmDisconnectFromCloud.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                L.settings.confirmDisconnectFromCloudAction.replace("{{CLOUD_NAME}}",Config.cloud.productName),
                 'danger').then(function (oldPassword) {
                 //1. Check password
                 return mediaserver.checkCurrentPassword(oldPassword).then(function() {

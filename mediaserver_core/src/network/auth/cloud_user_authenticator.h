@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_MS_CLOUD_USER_AUTHENTICATOR_H
-#define NX_MS_CLOUD_USER_AUTHENTICATOR_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -26,16 +25,16 @@
 class CdbNonceFetcher;
 class CloudConnectionManager;
 
-//!Add support for authentication using cloud account credentials
+/** Add support for authentication using cloud account credentials. */
 class CloudUserAuthenticator
 :
     public AbstractUserDataProvider,
     public Qn::EnableSafeDirectConnection
 {
 public:
-    /*!
-        \param defaultAuthenticator Used to authenticate requests with local user credentials
-    */
+    /**
+     * @param defaultAuthenticator Used to authenticate requests with local user credentials.
+     */
     CloudUserAuthenticator(
         CloudConnectionManager* const cloudConnectionManager,
         std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
@@ -76,12 +75,12 @@ private:
     const CdbNonceFetcher& m_cdbNonceFetcher;
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_cond;
-    //!map<pair<username, nonce>, auth_data>
+    /** map<pair<username, nonce>, auth_data> */
     std::map<
         std::pair<nx_http::StringType, nx_http::BufferType>,
         CloudAuthenticationData> m_authorizationCache;
     QElapsedTimer m_monotonicClock;
-    //!set<pair<username, nonce>, auth_data>
+    /** set<pair<username, nonce>, auth_data> */
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
 
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
@@ -104,5 +103,3 @@ private:
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);
 };
-
-#endif  //NX_MS_CLOUD_USER_AUTHENTICATOR_H

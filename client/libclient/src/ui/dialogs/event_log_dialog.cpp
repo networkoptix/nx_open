@@ -241,11 +241,6 @@ void QnEventLogDialog::updateData()
     // update UI
 
     m_resetFilterAction->setEnabled(isFilterExist());
-    if (m_resetFilterAction->isEnabled())
-        m_resetFilterAction->setIcon(qnSkin->icon("tree/clear_hovered.png"));
-    else
-        m_resetFilterAction->setIcon(qnSkin->icon("tree/clear.png"));
-
     if (!m_requests.isEmpty()) {
         ui->gridEvents->setDisabled(true);
         ui->stackedWidget->setCurrentWidget(ui->gridPage);

@@ -496,23 +496,26 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 //#define ENABLE_DYNAMIC_CUSTOMIZATION
 void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 {
-#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    QString skinRoot = startupParams.dynamicCustomizationPath.isEmpty()
-        ? lit(":")
-        : startupParams.dynamicCustomizationPath;
+    QStringList paths;
+    paths << lit(":/skin");
+    paths << lit(":/skin_dark");
 
-    QString customizationPath = skinRoot + lit("/skin_dark");
-    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
+    if (!startupParams.dynamicCustomizationPath.isEmpty())
+    {
+        QDir base(startupParams.dynamicCustomizationPath);
+        paths << base.absoluteFilePath(lit("skin"));
+        paths << base.absoluteFilePath(lit("skin_dark"));
+    }
 #else
     Q_UNUSED(startupParams);
-    QString customizationPath = lit(":/skin_dark");
-    QScopedPointer<QnSkin> skin(new QnSkin({lit(":/skin"), customizationPath}));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
+
+    QScopedPointer<QnSkin> skin(new QnSkin(paths));
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
     customization.add(QnCustomization(skin->path("customization_base.json")));
-    customization.add(QnCustomization(skin->path("customization_child.json")));
 
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);

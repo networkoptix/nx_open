@@ -491,7 +491,7 @@ void QnNxStyle::drawPrimitive(
             if (option->state.testFlag(State_Enabled))
             {
                 if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBlue);
+                    mainColor = this->mainColor(Colors::kBrand);
             }
 
             QColor buttonColor = mainColor;
@@ -563,7 +563,7 @@ void QnNxStyle::drawPrimitive(
             if (option->state.testFlag(State_Enabled))
             {
                 if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBlue);
+                    mainColor = this->mainColor(Colors::kBrand);
             }
 
             QColor buttonColor = mainColor;
@@ -3515,9 +3515,10 @@ void QnNxStyle::polish(QWidget *widget)
 
         /* Workaround to update scroll areas hover when they're scrolled: */
         auto updateScrollAreaHover =
-            [d, scrollBar]()
+            [d, guardedScrollBar = QPointer<QScrollBar>(scrollBar)]()
             {
-                d->updateScrollAreaHover(scrollBar);
+                if (guardedScrollBar)
+                    d->updateScrollAreaHover(guardedScrollBar);
             };
 
         connect(scrollBar, &QScrollBar::valueChanged,

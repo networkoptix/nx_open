@@ -849,7 +849,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return all event rules.
      * %param[default] format
      * %param[opt] id Object unique id.
-     * %return Return list of object statuses in the requested format. 
+     * %return Return list of object statuses in the requested format.
      *     If "id" parameter is specified, the list will contain only one
      *     object with that id, or nothing, if there is no such object found.
      * %// AbstractBusinessEventManager::getBusinessRules
@@ -1558,6 +1558,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     connectionInfoCopy.ecUrl = ecUrl;
     connectionInfoCopy.ecUrl.setScheme(
         connectionInfoCopy.allowSslConnections ? lit("https") : lit("http"));
+    connectionInfoCopy.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
@@ -1707,6 +1708,7 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
         {
             auto infoWithUrl = connectionInfo;
             infoWithUrl.ecUrl = addr;
+            infoWithUrl.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
             remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<nullptr_t, QnConnectionInfo>(

@@ -47,7 +47,7 @@
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
-        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
+        <!-- <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/> -->
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
@@ -134,7 +134,6 @@
         <Media Id="12" Cabinet="clqtpl.cab" EmbedCab="yes" />
         <Media Id="13" Cabinet="cllibs.cab" EmbedCab="yes" />
         <Media Id="14" Cabinet="clexec.cab" EmbedCab="yes" />
-        <Media Id="15" Cabinet="clvc.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">

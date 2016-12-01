@@ -70,7 +70,8 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes"> ${display.product.name} indítása, ha a telepítő végzett.</String>
-    <String Id="Product_ArchMismatch"                               Overridable="yes">Ezt a csomagot 32-bites operációs rendszerre tervezték. A telepítő most kilép.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">Ezt a csomagot 32-bites operációs rendszerre tervezték. A telepítő most kilép.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">Ezt a csomagot 64-bites operációs rendszerre tervezték. A telepítő most kilép.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Legalább egy összetevőt kell választani</String>
