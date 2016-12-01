@@ -1,7 +1,7 @@
 #include "file_system.h"
 
 #if defined(Q_OS_UNIX)
-#include <unistd.h>
+    #include <unistd.h>
 #endif
 
 #include <QtCore/QFileInfo>

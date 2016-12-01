@@ -3,7 +3,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
-#include <QDebug>
 
 #include <nx/utils/file_system.h>
 
@@ -279,8 +278,6 @@ TEST_F(CopyTest, copyFileLink)
 
     const auto srcName = createSymLink(linkName, "file");
     ASSERT_FALSE(srcName.isEmpty());
-
-    qDebug() << QFileInfo(srcName).symLinkTarget();
 
     auto result = file_system::copy(srcName, targetDir.absolutePath());
     ASSERT_EQ(result.code, file_system::Result::ok);
