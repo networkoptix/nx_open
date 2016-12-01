@@ -50,14 +50,19 @@ angular.module('webadminApp')
         }
 
         /* Funсtions for external calls (open links) */
-        $scope.createAccount = function(event){
-            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext, true);
+        $scope.createAccount = function($event){
+            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext,
+                L.setup.createAccount, true);
             $scope.next('cloudLogin');
+            $event.preventDefault();
+            $event.stopPropagation();
         };
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.openLink = function($event){
-            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext,true);
+            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext,
+                $event.target.title, true);
             $event.preventDefault();
+            $event.stopPropagation();
         };
 
         function sendCredentialsToNativeClient(){

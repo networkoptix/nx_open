@@ -380,8 +380,7 @@ angular.module('webadminApp')
         };
 
         $scope.openLink = function($event){
-            var url = $event.target.baseURI;
-            nativeClient.openUrlInBrowser(url,true);
+            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
             $event.stopPropagation();
             $event.preventDefault();
         };

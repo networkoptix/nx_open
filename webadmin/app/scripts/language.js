@@ -3,7 +3,11 @@
 var L = {
     dialogs:{
         okButton: 'Ok',
-        openLink: 'Visit this link'
+        openLink: 'Visit this link',
+        openLinkWithTitle: 'To {{title}} visit this link'
+    },
+    setup:{
+        createAccount: 'create account'
     },
     passwordRequirements:
     {

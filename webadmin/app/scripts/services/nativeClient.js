@@ -91,7 +91,7 @@ angular.module('webadminApp')
                     return authObject;
                 });
             },
-            openUrlInBrowser:function(url, windowFallback){
+            openUrlInBrowser:function(url, title, windowFallback){
                 $log.log("openUrlInBrowser", url, windowFallback);
 
                 if(nativeClientObject && nativeClientObject.openUrlInBrowser){
@@ -107,7 +107,8 @@ angular.module('webadminApp')
                 }
 
                 if(socketClientController){
-                    dialogs.alert(url, L.dialogs.openLink);
+                    var header = !title?L.dialogs.openLink:L.dialogs.openLinkWithTitle.replace("{{title}}", title);
+                    dialogs.alert(url, header);
                     return $q.resolve();
                 }
 
