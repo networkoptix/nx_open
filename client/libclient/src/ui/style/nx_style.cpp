@@ -539,9 +539,9 @@ void QnNxStyle::drawPrimitive(
 
             if (isAccented(widget))
             {
-                mainColor = enabled
-                    ? this->mainColor(Colors::kBrand)
-                    : this->mainColor(Colors::kBrand).darker(7);
+                mainColor = this->mainColor(Colors::kBrand);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -612,9 +612,9 @@ void QnNxStyle::drawPrimitive(
 
             if (isAccented(widget))
             {
-                mainColor = enabled
-                    ? this->mainColor(Colors::kBrand)
-                    : this->mainColor(Colors::kBrand).darker(7);
+                mainColor = this->mainColor(Colors::kBrand);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
 
             QColor buttonColor = mainColor;
