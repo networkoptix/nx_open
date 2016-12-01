@@ -21,7 +21,7 @@ TEST( UpnpAsyncClient, DISABLED_Cancel )
     for (size_t testNumber = 0; testNumber <= 5; ++testNumber)
     {
         AsyncClient client;
-        client.externalIp( URL, [&]( const HostAddress& v ) { } );
+        client.externalIp( URL, [&]( const HostAddress& ) { } );
         if (testNumber)
         {
             std::chrono::milliseconds delay(testNumber * testNumber * 200);

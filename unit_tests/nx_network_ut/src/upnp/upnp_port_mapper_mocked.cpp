@@ -32,10 +32,10 @@ void AsyncClientMock::externalIp(
 }
 
 void AsyncClientMock::addMapping(
-        const QUrl& /*url*/, const HostAddress& internalIp,
-        quint16 internalPort, quint16 externalPort,
-        Protocol protocol, const QString& description, quint64 duration,
-        std::function< void( bool ) > callback )
+    const QUrl& /*url*/, const HostAddress& internalIp,
+    quint16 internalPort, quint16 externalPort,
+    Protocol protocol, const QString& description, quint64 /*duration*/,
+    std::function< void( bool ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     if( externalPort == m_disabledPort ||

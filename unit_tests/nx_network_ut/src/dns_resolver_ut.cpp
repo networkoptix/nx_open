@@ -108,7 +108,7 @@ private:
         const QString& hostName,
         std::size_t requestId,
         SystemError::ErrorCode errorCode,
-        std::deque<HostAddress> resolvedAddresses)
+        std::deque<HostAddress> /*resolvedAddresses*/)
     {
         QnMutexLocker lock(&m_mutex);
         m_hostNameToResolveResult.emplace(hostName, errorCode);

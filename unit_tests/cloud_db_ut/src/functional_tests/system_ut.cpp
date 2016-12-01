@@ -392,13 +392,13 @@ TEST_F(System, activation)
     }
 }
 
+constexpr static auto kSystemGoneForeverPeriod = std::chrono::seconds(5);
+constexpr static auto kDropExpiredSystemsPeriodSec = std::chrono::seconds(1);
+
 class SystemNotification:
     public System
 {
 public:
-    constexpr static auto kSystemGoneForeverPeriod = std::chrono::seconds(5);
-    constexpr static auto kDropExpiredSystemsPeriodSec = std::chrono::seconds(1);
-
     SystemNotification()
     {
         addArg("-systemManager/reportRemovedSystemPeriod");
