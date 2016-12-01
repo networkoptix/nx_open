@@ -800,15 +800,18 @@ void QnNxStyle::drawPrimitive(
                 bool hasSelection = item->state.testFlag(State_Selected);
                 bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
-                bool hasHover = item->state.testFlag(State_MouseOver);
-                bool suppressHover = selectionOpaque;
+                /* Obtain hover information: */
+                auto hoverBrush = option->palette.midlight();
+                bool hoverTransparent = hoverBrush.color().alpha() == 0;
+                bool hasHover = item->state.testFlag(State_MouseOver) && !hoverTransparent;
+                bool skipHoverDrawing = selectionOpaque;
 
-                if (widget && !suppressHover)
+                if (widget && !hoverTransparent)
                 {
                     if (!widget->isEnabled() || widget->property(Properties::kSuppressHoverPropery).toBool())
                     {
-                        /* Itemviews with kSuppressHoverProperty should suppress hover. */
-                        suppressHover = true;
+                        /* Itemviews with kSuppressHoverProperty should never draw hover. */
+                        hasHover = false;
                     }
                     else
                     {
@@ -821,27 +824,25 @@ void QnNxStyle::drawPrimitive(
 
                             /* For items without Qt::ItemIsEnabled flag we should
                              * draw hover only if selection behavior is SelectRows. */
-                            suppressHover = hoverDrawn
+                            skipHoverDrawing = hoverDrawn
                                 || treeView->selectionBehavior() != QAbstractItemView::SelectRows;
                         }
 
-                        if (!suppressHover)
-                        {
-                            /* Obtain Nx hovered row information: */
-                            QVariant value = widget->property(Properties::kHoveredRowProperty);
-                            if (value.isValid())
-                                hasHover = value.toInt() == item->index.row();
-                        }
+                        /* Obtain Nx hovered row information: */
+                        QVariant value = widget->property(Properties::kHoveredRowProperty);
+                        if (value.isValid())
+                            hasHover = value.toInt() == item->index.row();
                     }
                 }
 
+                /* Draw model-enforced background if needed: */
                 QVariant background = item->index.data(Qt::BackgroundRole);
                 if (background.isValid() && background.canConvert<QBrush>())
                     painter->fillRect(item->rect, background.value<QBrush>());
 
                 /* Draw hover marker if needed: */
-                if (hasHover && !suppressHover)
-                    painter->fillRect(item->rect, option->palette.midlight());
+                if (hasHover && !skipHoverDrawing)
+                    painter->fillRect(item->rect, hoverBrush);
 
                 /* Draw selection marker if needed: */
                 if (hasSelection)
