@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
 
         var mediaserver = {};
         var cacheModuleInfo = null;

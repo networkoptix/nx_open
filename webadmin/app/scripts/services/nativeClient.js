@@ -92,6 +92,8 @@ angular.module('webadminApp')
                 });
             },
             openUrlInBrowser:function(url, windowFallback){
+                $log.log("openUrlInBrowser", url, windowFallback);
+
                 if(nativeClientObject && nativeClientObject.openUrlInBrowser){
                     return $q.resolve(nativeClientObject.openUrlInBrowser(url));
                 }
