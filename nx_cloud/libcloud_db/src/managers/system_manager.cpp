@@ -2,8 +2,6 @@
 
 #include <limits>
 
-#include <QtSql/QSqlQuery>
-
 #include <nx_ec/data/api_resource_data.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/fusion/serialization/sql.h>
@@ -57,7 +55,8 @@ SystemManager::SystemManager(
     m_emailManager(emailManager),
     m_ec2SyncronizationEngine(ec2SyncronizationEngine),
     m_dropSystemsTimerId(0),
-    m_dropExpiredSystemsTaskStillRunning(false)
+    m_dropExpiredSystemsTaskStillRunning(false),
+    m_systemDao(settings)
 {
     using namespace std::placeholders;
 
@@ -162,7 +161,7 @@ void SystemManager::authenticateByName(
     using namespace std::placeholders;
 
     m_dbManager->executeUpdate<std::string>(
-        std::bind(&SystemManager::activateSystem, this, _1, _2),
+        std::bind(&dao::rdb::SystemDataObject::activateSystem, &m_systemDao, _1, _2),
         systemIter->id,
         std::bind(&SystemManager::systemActivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
@@ -820,35 +819,11 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     nx::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
-    QSqlQuery markSystemAsRemoved(*queryContext->connection());
-    markSystemAsRemoved.prepare(
-        R"sql(
-        UPDATE system
-        SET status_code=:statusCode,
-            expiration_utc_timestamp=:expiration_utc_timestamp
-        WHERE id=:id
-        )sql");
-    markSystemAsRemoved.bindValue(
-        ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
-    markSystemAsRemoved.bindValue(
-        ":expiration_utc_timestamp",
-        (int)(nx::utils::timeSinceEpoch().count() +
-            std::chrono::duration_cast<std::chrono::seconds>(
-                m_settings.systemManager().reportRemovedSystemPeriod).count()));
-    markSystemAsRemoved.bindValue(
-        ":id",
-        QnSql::serialized_field(systemId));
-    if (!markSystemAsRemoved.exec())
-    {
-        NX_LOG(lm("Error marking system %1 as deleted. %2")
-            .arg(systemId).arg(markSystemAsRemoved.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
+    auto dbResult = m_systemDao.markSystemAsDeleted(queryContext, systemId);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
-    // Deleting system-to-account relation.
-    auto dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId);
+    dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
@@ -900,21 +875,13 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
     nx::db::QueryContext* const queryContext,
     const data::SystemId& systemId)
 {
-    const auto dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId.systemId);
+    auto dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId.systemId);
     if (dbResult != nx::db::DBResult::ok)
         return nx::db::DBResult::ioError;
 
-    QSqlQuery removeSystem(*queryContext->connection());
-    removeSystem.prepare(
-        "DELETE FROM system WHERE id=:systemId");
-    QnSql::bind(systemId, &removeSystem);
-    if (!removeSystem.exec())
-    {
-        NX_LOG(lm("Could not delete system %1. %2")
-            .arg(systemId.systemId).arg(removeSystem.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
+    dbResult = m_systemDao.deleteSystem(queryContext, systemId.systemId);
+    if (dbResult != nx::db::DBResult::ok)
+        return nx::db::DBResult::ioError;
 
     return nx::db::DBResult::ok;
 }
@@ -1408,7 +1375,7 @@ nx::db::DBResult SystemManager::updateSystem(
 
     if (data.opaque)
     {
-        dbResult = execSystemOpaqueUpdate(queryContext, data);
+        dbResult = m_systemDao.execSystemOpaqueUpdate(queryContext, data);
         if (dbResult != nx::db::DBResult::ok)
             return dbResult;
     }
@@ -1429,7 +1396,7 @@ nx::db::DBResult SystemManager::renameSystem(
     NX_LOGX(lm("Renaming system %1 to %2")
         .arg(data.systemId).arg(data.name.get()), cl_logDEBUG2);
 
-    const auto result = execSystemNameUpdate(queryContext, data);
+    const auto result = m_systemDao.execSystemNameUpdate(queryContext, data);
     if (result != db::DBResult::ok)
         return result;
 
@@ -1444,50 +1411,6 @@ nx::db::DBResult SystemManager::renameSystem(
             queryContext,
             data.systemId.c_str(),
             std::move(systemNameData));
-}
-
-nx::db::DBResult SystemManager::execSystemNameUpdate(
-    nx::db::QueryContext* const queryContext,
-    const data::SystemAttributesUpdate& data)
-{
-    QSqlQuery updateSystemNameQuery(*queryContext->connection());
-    updateSystemNameQuery.prepare(
-        "UPDATE system "
-        "SET name=:name "
-        "WHERE id=:systemId");
-    updateSystemNameQuery.bindValue(":name", QnSql::serialized_field(data.name.get()));
-    updateSystemNameQuery.bindValue(":systemId", QnSql::serialized_field(data.systemId));
-    if (!updateSystemNameQuery.exec())
-    {
-        NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
-            .arg(data.systemId).arg(data.name.get())
-            .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
-    }
-    return db::DBResult::ok;
-}
-
-nx::db::DBResult SystemManager::execSystemOpaqueUpdate(
-    nx::db::QueryContext* const queryContext,
-    const data::SystemAttributesUpdate& data)
-{
-    // TODO: #ak: this is a copy-paste of a previous method. Refactor!
-
-    QSqlQuery updateSystemOpaqueQuery(*queryContext->connection());
-    updateSystemOpaqueQuery.prepare(
-        "UPDATE system "
-        "SET opaque=:opaque "
-        "WHERE id=:systemId");
-    updateSystemOpaqueQuery.bindValue(":opaque", QnSql::serialized_field(data.opaque.get()));
-    updateSystemOpaqueQuery.bindValue(":systemId", QnSql::serialized_field(data.systemId));
-    if (!updateSystemOpaqueQuery.exec())
-    {
-        NX_LOGX(lm("Error updating system %1. %2")
-            .arg(data.systemId).arg(updateSystemOpaqueQuery.lastError().text()),
-            cl_logWARNING);
-        return db::DBResult::ioError;
-    }
-    return db::DBResult::ok;
 }
 
 void SystemManager::updateSystemAttributesInCache(
@@ -1528,34 +1451,6 @@ void SystemManager::systemNameUpdated(
         dbResult == nx::db::DBResult::ok
         ? api::ResultCode::ok
         : api::ResultCode::dbError);
-}
-
-nx::db::DBResult SystemManager::activateSystem(
-    nx::db::QueryContext* const queryContext,
-    const std::string& systemId)
-{
-    QSqlQuery updateSystemStatusQuery(*queryContext->connection());
-    updateSystemStatusQuery.prepare(
-        "UPDATE system "
-        "SET status_code=:statusCode, expiration_utc_timestamp=:expirationTimeUtc "
-        "WHERE id=:id");
-    updateSystemStatusQuery.bindValue(
-        ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssActivated)));
-    updateSystemStatusQuery.bindValue(
-        ":id",
-        QnSql::serialized_field(systemId));
-    updateSystemStatusQuery.bindValue(
-        ":expirationTimeUtc",
-        std::numeric_limits<int>::max());
-    if (!updateSystemStatusQuery.exec())
-    {
-        NX_LOG(lit("Failed to read system list from DB. %1").
-            arg(updateSystemStatusQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
-    }
-
-    return db::DBResult::ok;
 }
 
 void SystemManager::systemActivated(
@@ -1712,7 +1607,8 @@ nx::db::DBResult SystemManager::fillCache()
 
     std::vector<data::SystemData> systems;
     auto result = doBlockingDbQuery(
-        std::bind(&SystemManager::fetchSystems, this, _1, db::InnerJoinFilterFields(), &systems));
+        std::bind(&dao::rdb::SystemDataObject::fetchSystems, m_systemDao,
+            _1, db::InnerJoinFilterFields(), &systems));
     if (result != db::DBResult::ok)
         return result;
 
@@ -1762,52 +1658,13 @@ nx::db::DBResult SystemManager::fetchSystemById(
         {{"system.id", ":systemId", QnSql::serialized_field(systemId)}};
 
     std::vector<data::SystemData> systems;
-    auto dbResult = fetchSystems(queryContext, sqlFilter, &systems);
+    auto dbResult = m_systemDao.fetchSystems(queryContext, sqlFilter, &systems);
     if (dbResult != db::DBResult::ok)
         return dbResult;
     if (systems.empty())
         return db::DBResult::notFound;
     NX_ASSERT(systems.size() == 1);
     *system = std::move(systems[0]);
-    return db::DBResult::ok;
-}
-
-nx::db::DBResult SystemManager::fetchSystems(
-    nx::db::QueryContext* queryContext,
-    const nx::db::InnerJoinFilterFields& filterFields,
-    std::vector<data::SystemData>* const systems)
-{
-    constexpr const char kSelectAllSystemsQuery[] =
-        R"sql(
-        SELECT system.id, system.name, system.customization, system.auth_key as authKey,
-               account.email as ownerAccountEmail, system.status_code as status,
-               system.expiration_utc_timestamp as expirationTimeUtc,
-               system.seq as systemSequence, system.opaque as opaque
-        FROM system, account
-        WHERE system.owner_account_id = account.id
-        )sql";
-
-    QString sqlQueryStr = QString::fromLatin1(kSelectAllSystemsQuery);
-    QString filterStr;
-    if (!filterFields.empty())
-    {
-        filterStr = db::joinFields(filterFields, " AND ");
-        sqlQueryStr += " AND " + filterStr;
-    }
-
-    QSqlQuery readSystemsQuery(*queryContext->connection());
-    readSystemsQuery.setForwardOnly(true);
-    readSystemsQuery.prepare(sqlQueryStr);
-    db::bindFields(&readSystemsQuery, filterFields);
-    if (!readSystemsQuery.exec())
-    {
-        NX_LOG(lit("Failed to read system list with filter \"%1\" from DB. %2")
-            .arg(filterStr).arg(readSystemsQuery.lastError().text()),
-            cl_logWARNING);
-        return db::DBResult::ioError;
-    }
-
-    QnSql::fetch_many(readSystemsQuery, systems);
     return db::DBResult::ok;
 }
 
@@ -1847,37 +1704,10 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate(
-        std::bind(&SystemManager::deleteExpiredSystemsFromDb, this, _1),
+        std::bind(&dao::rdb::SystemDataObject::deleteExpiredSystems, m_systemDao, _1),
         std::bind(&SystemManager::expiredSystemsDeletedFromDb, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             _1, _2));
-}
-
-nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(nx::db::QueryContext* queryContext)
-{
-    //dropping expired not-activated systems and expired marked-for-removal systems
-    QSqlQuery dropExpiredSystems(*queryContext->connection());
-    dropExpiredSystems.prepare(
-        "DELETE FROM system "
-        "WHERE (status_code=:notActivatedStatusCode OR status_code=:deletedStatusCode) "
-            "AND expiration_utc_timestamp < :currentTime");
-    dropExpiredSystems.bindValue(
-        ":notActivatedStatusCode",
-        static_cast<int>(api::SystemStatus::ssNotActivated));
-    dropExpiredSystems.bindValue(
-        ":deletedStatusCode",
-        static_cast<int>(api::SystemStatus::ssDeleted));
-    dropExpiredSystems.bindValue(
-        ":currentTime",
-        (int)nx::utils::timeSinceEpoch().count());
-    if (!dropExpiredSystems.exec())
-    {
-        NX_LOGX(lit("Error deleting expired systems from DB. %1").
-            arg(dropExpiredSystems.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
-    }
-
-    return db::DBResult::ok;
 }
 
 void SystemManager::expiredSystemsDeletedFromDb(
@@ -2078,7 +1908,7 @@ nx::db::DBResult SystemManager::processSetResourceParam(
 
     systemNameUpdate->systemId = systemId.toStdString();
     systemNameUpdate->name = data.value.toStdString();
-    return execSystemNameUpdate(queryContext, *systemNameUpdate);
+    return m_systemDao.execSystemNameUpdate(queryContext, *systemNameUpdate);
 }
 
 void SystemManager::onEc2SetResourceParamDone(

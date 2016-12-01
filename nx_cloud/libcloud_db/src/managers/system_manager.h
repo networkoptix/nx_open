@@ -377,12 +377,6 @@ private:
     nx::db::DBResult renameSystem(
         nx::db::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data);
-    nx::db::DBResult execSystemNameUpdate(
-        nx::db::QueryContext* const queryContext,
-        const data::SystemAttributesUpdate& data);
-    nx::db::DBResult execSystemOpaqueUpdate(
-        nx::db::QueryContext* const queryContext,
-        const data::SystemAttributesUpdate& data);
     void updateSystemAttributesInCache(
         data::SystemAttributesUpdate data);
     void systemNameUpdated(
@@ -392,9 +386,6 @@ private:
         data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
-    nx::db::DBResult activateSystem(
-        nx::db::QueryContext* const queryContext,
-        const std::string& systemId);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
@@ -418,10 +409,6 @@ private:
 
     nx::db::DBResult fillCache();
     template<typename Func> nx::db::DBResult doBlockingDbQuery(Func func);
-    nx::db::DBResult fetchSystems(
-        nx::db::QueryContext* queryContext,
-        const nx::db::InnerJoinFilterFields& filter,
-        std::vector<data::SystemData>* const systems);
     nx::db::DBResult fetchSystemById(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,
@@ -431,7 +418,6 @@ private:
         int* const /*dummy*/);
 
     void dropExpiredSystems(uint64_t timerId);
-    nx::db::DBResult deleteExpiredSystemsFromDb(nx::db::QueryContext* queryContext);
     void expiredSystemsDeletedFromDb(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
         nx::db::QueryContext* /*queryContext*/,

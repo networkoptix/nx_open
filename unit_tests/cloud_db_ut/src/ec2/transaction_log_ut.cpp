@@ -16,6 +16,7 @@
 #include <ec2/transaction_log.h>
 #include <test_support/business_data_generator.h>
 #include <test_support/test_with_db_helper.h>
+#include <libcloud_db/src/settings.h>
 
 #include "data/account_data.h"
 #include "data/system_data.h"
@@ -40,7 +41,8 @@ public:
         delayed
     };
 
-    BasePersistentDataTest(DbInitializationType dbInitializationType)
+    BasePersistentDataTest(DbInitializationType dbInitializationType):
+        m_systemDbController(m_settings)
     {
         if (dbInitializationType == DbInitializationType::immediate)
             initializeDatabase();
@@ -136,6 +138,7 @@ protected:
     }
 
 private:
+    conf::Settings m_settings;
     std::unique_ptr<DbInstanceController> m_persistentDbManager;
     AccountDataObject m_accountDbController;
     SystemDataObject m_systemDbController;
