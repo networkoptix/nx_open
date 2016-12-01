@@ -7,7 +7,7 @@ namespace nx {
 namespace utils {
 namespace file_system {
 
-struct Result
+struct NX_UTILS_API Result
 {
     enum ResultCode
     {
@@ -36,9 +36,9 @@ enum Option
 };
 Q_DECLARE_FLAGS(Options, Option)
 
-QString symLinkTarget(const QString& linkPath);
+QString NX_UTILS_API symLinkTarget(const QString& linkPath);
 
-Result copy(const QString& sourcePath, const QString& targetPath,
+Result NX_UTILS_API copy(const QString& sourcePath, const QString& targetPath,
     Options options = NoOption);
 
 } // namespace file_system
