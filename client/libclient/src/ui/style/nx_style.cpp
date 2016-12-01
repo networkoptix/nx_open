@@ -178,6 +178,11 @@ namespace
         return false;
     }
 
+    bool isAccented(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kAccentStyleProperty).toBool();
+    }
+
     bool isSwitchButtonCheckbox(const QWidget* widget)
     {
         return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
@@ -511,9 +516,9 @@ void QnNxStyle::drawPrimitive(
             if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
-            QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ?
-                                        option->palette.color(QPalette::HighlightedText) :
-                                        option->palette.color(QPalette::Highlight);
+            QColor color = isAccented(widget)
+                ? option->palette.color(QPalette::HighlightedText)
+                : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
             QnScopedPainterPenRollback penRollback(painter, QPen(color, 0, Qt::DotLine));
@@ -532,10 +537,11 @@ void QnNxStyle::drawPrimitive(
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
-            if (option->state.testFlag(State_Enabled))
+            if (isAccented(widget))
             {
-                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBrand);
+                mainColor = enabled
+                    ? this->mainColor(Colors::kBrand)
+                    : this->mainColor(Colors::kBrand).darker(7);
             }
 
             QColor buttonColor = mainColor;
@@ -604,10 +610,11 @@ void QnNxStyle::drawPrimitive(
                 }
             }
 
-            if (option->state.testFlag(State_Enabled))
+            if (isAccented(widget))
             {
-                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBrand);
+                mainColor = enabled
+                    ? this->mainColor(Colors::kBrand)
+                    : this->mainColor(Colors::kBrand).darker(7);
             }
 
             QColor buttonColor = mainColor;
@@ -2251,17 +2258,21 @@ void QnNxStyle::drawControl(
                 QPalette::ColorRole foregroundRole = widget
                     ? widget->foregroundRole()
                     : QPalette::ButtonText;
+                const bool isDefaultForegroundRole = (foregroundRole == QPalette::ButtonText);
 
                 /* Draw text button: */
                 if (isTextButton(option))
                 {
                     /* Foreground role override: */
-                    if (foregroundRole == QPalette::ButtonText)
+                    if (isDefaultForegroundRole)
                         foregroundRole = QPalette::WindowText;
 
                     d->drawTextButton(painter, buttonOption, foregroundRole, widget);
                     return;
                 }
+
+                if (isDefaultForegroundRole && isAccented(widget))
+                    foregroundRole = QPalette::HighlightedText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
