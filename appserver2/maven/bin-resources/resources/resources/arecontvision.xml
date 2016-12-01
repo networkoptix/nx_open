@@ -126,5 +126,12 @@
         <resource name = "20565" public = "20175"/>
         <resource name = "12565" public = "12176"/>
         <resource name = "12566" public = "12176"/>
+        <resource name = "08ZMD-400" public ="ArecontVision_Abstract">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "3840"/>
+                <param name = "MaxSensorHeight" default_value = "2160"/>
+                <param name = "MaxFPS" default_value = "30"/>
+            </params>
+        </resource>        
     </oem>
 </resources>
