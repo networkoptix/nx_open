@@ -60,6 +60,7 @@ bool QnLayoutsHandlerMessages::changeUserLocalLayout(QWidget* parent,
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::ChangeUserLocalLayout;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -91,6 +92,7 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::AddToRoleLocalLayout;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -123,6 +125,7 @@ bool QnLayoutsHandlerMessages::removeFromRoleLocalLayout(QWidget* parent,
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::RemoveFromRoleLocalLayout;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -150,6 +153,7 @@ bool QnLayoutsHandlerMessages::sharedLayoutEdit(QWidget* parent)
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::SharedLayoutEdit;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -221,6 +225,7 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::DeleteLocalLayouts;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;

@@ -20,6 +20,7 @@
 
 #include <ui/workbench/workbench_context.h>
 
+
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
     :
@@ -68,6 +69,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
             if (m_roles.contains(role.id))
                 removeNode(m_roles.take(role.id));
         });
+
 }
 
 QnResourceTreeModelUserNodes::~QnResourceTreeModelUserNodes()
@@ -94,6 +96,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::rootNode() const
 void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr& node)
 {
     m_rootNode = node;
+}
+
+void QnResourceTreeModelUserNodes::initialize(QnResourceTreeModel* model,
+    const QnResourceTreeModelNodePtr& rootNode)
+{
+    setModel(model);
+    setRootNode(rootNode);
+    handleUserChanged(context()->user());
 }
 
 void QnResourceTreeModelUserNodes::rebuild()

@@ -491,7 +491,7 @@ void QnNxStyle::drawPrimitive(
             if (option->state.testFlag(State_Enabled))
             {
                 if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBlue);
+                    mainColor = this->mainColor(Colors::kBrand);
             }
 
             QColor buttonColor = mainColor;
@@ -563,7 +563,7 @@ void QnNxStyle::drawPrimitive(
             if (option->state.testFlag(State_Enabled))
             {
                 if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBlue);
+                    mainColor = this->mainColor(Colors::kBrand);
             }
 
             QColor buttonColor = mainColor;
@@ -894,6 +894,23 @@ void QnNxStyle::drawPrimitive(
                 proxy()->drawPrimitive(PE_FrameFocusRect, &focusOption, painter, widget);
             }
 #endif
+            return;
+        }
+
+        case PE_IndicatorBranch:
+        {
+            if (!option->state.testFlag(State_Children))
+                return;
+
+            /* Do not draw branch marks in dropdowns: */
+            if (isWidgetOwnedBy<QComboBox>(widget))
+                return;
+
+            auto icon = option->state.testFlag(State_Open)
+                ? qnSkin->icon("tree/branch_closed.png")
+                : qnSkin->icon("tree/branch_open.png");
+
+            icon.paint(painter, option->rect);
             return;
         }
 
@@ -1926,7 +1943,7 @@ void QnNxStyle::drawControl(
                     int padding = asDropdown ? Metrics::kStandardPadding: Metrics::kMenuItemHPadding;
                     painter->drawLine(padding, y,
                                       menuItem->rect.right() - padding, y);
-                    break;
+                    return;
                 }
 
                 bool enabled = menuItem->state.testFlag(State_Enabled);
@@ -1946,19 +1963,17 @@ void QnNxStyle::drawControl(
                 if (selected)
                     painter->fillRect(menuItem->rect, backgroundColor);
 
-                int xPos = asDropdown
+                int xMargin = asDropdown
                     ? Metrics::kStandardPadding
                     : Metrics::kMenuItemTextLeftPadding;
 
                 int y = menuItem->rect.y();
 
-                int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
-                if (!styleHint(SH_UnderlineShortcut, menuItem, widget, nullptr))
-                    textFlags |= Qt::TextHideMnemonic;
+                int textFlags = Qt::AlignVCenter | Qt::TextHideMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
 
-                QRect textRect(xPos,
+                QRect textRect(menuItem->rect.left() + xMargin,
                                y + Metrics::kMenuItemVPadding,
-                               menuItem->rect.width() - xPos - Metrics::kMenuItemHPadding,
+                               menuItem->rect.width() - xMargin - Metrics::kMenuItemHPadding,
                                menuItem->rect.height() - 2 * Metrics::kMenuItemVPadding);
 
                 if (!menuItem->text.isEmpty())

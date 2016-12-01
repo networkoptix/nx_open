@@ -18,5 +18,5 @@ export CUSTOMIZATION=${deb.customization.company.name}
 killall gpm
 export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib
 LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
-/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $*
+/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* >& /opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
 echo 1>/sys/class/graphics/fb0/blank

@@ -8,7 +8,7 @@
             Name="$(var.productName) Bundle"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="Binary\eve\eve_logo.ico"
+            IconSourceFile="favicon.ico"
             UpgradeCode="$(var.fullBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />

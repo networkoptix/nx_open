@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMenu>
 
+#include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -33,7 +34,7 @@ public:
 #ifdef DIRECT_CLOUD_CONNECT
     QMenu* systemsMenu;
 #endif
-    QPalette originalPalette;
+    QColor originalTextColor;
     QIcon loggedInIcon;     /*< User is logged in. */
     QIcon offlineIcon;      /*< User is logged in, but cloud is unreachable. */
 };
@@ -97,7 +98,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu(nullptr),
 #endif
-    originalPalette(parent->palette()),
+    originalTextColor(parent->palette().color(QPalette::ButtonText)),
     loggedInIcon(qnSkin->icon("titlebar/cloud_logged.png")),
     offlineIcon(qnSkin->icon("titlebar/cloud_offline.png"))
 {
@@ -138,7 +139,6 @@ void QnCloudStatusPanelPrivate::updateUi()
     QFont font = qApp->font();
     font.setPixelSize(kFontPixelSize);
 
-    QPalette palette(originalPalette);
 
     QString effectiveUserName = qnCloudStatusWatcher->effectiveUserName();
     if (effectiveUserName.isEmpty())
@@ -150,13 +150,14 @@ void QnCloudStatusPanelPrivate::updateUi()
             effectiveUserName = QnCloudStatusPanel::tr("Logging in...");
     }
 
+    QColor fontColor = originalTextColor;
     switch (qnCloudStatusWatcher->status())
     {
         case QnCloudStatusWatcher::LoggedOut:
             q->setText(QnCloudStatusPanel::tr("Log in to %1...").arg(QnAppInfo::cloudName()));
             q->setIcon(QIcon());
             font.setWeight(QFont::Normal);
-            palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));
+            fontColor = q->palette().color(QPalette::Light);
             break;
         case QnCloudStatusWatcher::Online:
             q->setText(effectiveUserName);
@@ -174,7 +175,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     }
     q->setFont(font);
     q->adjustIconSize();
-    q->setPalette(palette);
+    setPaletteColor(q, QPalette::ButtonText, fontColor);
 }
 
 #ifdef DIRECT_CLOUD_CONNECT

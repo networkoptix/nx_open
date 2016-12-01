@@ -179,6 +179,7 @@ void QnUserProfileWidget::applyChanges()
             {
                 lastUsed.url = url;
                 qnSettings->setLastUsedConnection(lastUsed);
+                qnSettings->save();
             }
 
         }

@@ -268,6 +268,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
         if (it != json.end())
         {
             qnSettings->setAlternativeUpdateServers(it.value().toArray().toVariantList());
+            qnSettings->save();
             loadServersFromSettings();
         }
     }

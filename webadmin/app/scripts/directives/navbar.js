@@ -5,9 +5,6 @@ angular.module('webadminApp')
         return {
             restrict: 'E',
             templateUrl: 'views/navbar.html',
-            controller: 'NavigationCtrl',
-            scope:{
-                noPanel:'='
-            }
+            controller: 'NavigationCtrl'
         };
     });
