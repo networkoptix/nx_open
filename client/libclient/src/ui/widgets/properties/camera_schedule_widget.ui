@@ -140,6 +140,9 @@
                 <property name="text">
                  <string>FPS</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
                 <property name="buddy">
                  <cstring>fpsSpinBox</cstring>
                 </property>
@@ -162,6 +165,9 @@
                <widget class="QLabel" name="qualityLabel">
                 <property name="text">
                  <string>Quality</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="buddy">
                  <cstring>qualityComboBox</cstring>
