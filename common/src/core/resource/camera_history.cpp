@@ -175,7 +175,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
         return StartResult::failed;
 
     // if camera belongs to a single server not need to do API request to build detailed history information. generate it instead.
-    QnMediaServerResourceList serverList = getCameraFootageData(camera->getId());
+    QnMediaServerResourceList serverList = getCameraFootageData(camera->getId(), true);
     if (serverList.size() <= 1)
     {
         ec2::ApiCameraHistoryItemDataList items;
@@ -436,7 +436,7 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
     QnMutexLocker lock( &m_mutex );
 
     QSet<QnUuid> currentServerList;
-    for (const auto& server: getCameraFootageDataUnsafe(cameraId))
+    for (const auto& server: getCameraFootageDataUnsafe(cameraId, true))
         currentServerList.insert(server->getId());
     if (currentServerList != serverList)
         return false;
