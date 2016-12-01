@@ -24,6 +24,7 @@ class _unique(object):
     CameraSeedNumber = 0
     UserSeedNumber = 0
     MediaServerSeedNumber = 0
+    LayoutSeednumber = 0
 
 
 class BasicGenerator(object):
@@ -51,8 +52,7 @@ class BasicGenerator(object):
     def generateRandomId(self):
         return self.generateUUIdFromMd5(self.generateRandomString(random.randint(6,12)))
 
-    @staticmethod
-    def generateIpV4():
+    def generateIpV4(self):
         return '.'.join(str(random.randint(0,255)) for _ in xrange(4))
 
     def generateIpV4Endpoint(self):
@@ -97,6 +97,12 @@ class BasicGenerator(object):
         _unique.MediaServerSeedNumber += 1
         return ret
 
+    def generateLayoutName(self):
+        try:
+            return "ec2_test_layout_%s_%s" % (_unique.SessionNumber, _unique.LayoutSeednumber)
+        finally:
+            _unique.LayoutSeednumber += 1
+
 
 class UserDataGenerator(BasicGenerator):
     _template = """
@@ -107,12 +113,15 @@ class UserDataGenerator(BasicGenerator):
         "id": "%s",
         "isAdmin": %s,
         "name": "%s",
-        "parentId": "{00000000-0000-0000-0000-000000000000}",
-        "permissions": "GlobalAdminPermission",
+        "parentId": "",
+        "permissions": "%s",
         "typeId": "{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}",
         "url": ""
     }
     """
+    #         "parentId": "{00000000-0000-0000-0000-000000000000}",
+
+    _permissions = "GlobalAdminPermission"
     # (ealier was permissions =  "247")
     # about permissions value: 0x08 flag removed since it's internal use only,
     # see common/src/common/common_globals.h, GlobalPermission enum
@@ -125,7 +134,7 @@ class UserDataGenerator(BasicGenerator):
             ret.append((self._template % (digest,
                     self.generateEmail(),
                     self.generatePasswordHash(pwd),
-                    id, "false", un),
+                    id, "false", un, self._permissions),
                 id))
 
         return ret
@@ -135,43 +144,52 @@ class UserDataGenerator(BasicGenerator):
         return (self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                id, "false", un), id)
+                id, "false", un, self._permissions), id)
 
-    def createManualUpdateData(self, id, username, password, admin, email):
+    def createManualUpdateData(self, id, username, password, admin, email, perm=None):
+        if perm is None:
+            perm = self._permissions
         digest = self.generateDigest(username, password)
         hash = self.generatePasswordHash(password)
-        return self._template % (digest, email, hash, id, "true" if admin else "false", username)
+        return self._template % (
+            digest, email, hash, id, "true" if admin else "false", username, perm)
 
 
 class MediaServerGenerator(BasicGenerator):
+    _serverVersion = "3.0.0.0"
     _template = """
     {
         "apiUrl": "%s",
+        "url": "rtsp://%s",
         "authKey": "%s",
         "flags": "SF_HasPublicIP",
         "id": "%s",
         "name": "%s",
-        "networkAddresses": "192.168.0.1;10.0.2.141;192.168.88.1;95.31.23.214",
+        "networkAddresses": "%s",
         "panicMode": "PM_None",
         "parentId": "{00000000-0000-0000-0000-000000000000}",
         "systemInfo": "windows x64 win78",
         "systemName": "%s",
         "typeId": "{be5d1ee0-b92c-3b34-86d9-bca2dab7826f}",
-        "url": "rtsp://%s",
-        "version": "2.3.0.0"
+        "version": "%s"
     }
     """
 
+    def _genServerIPs(self):
+        return "192.168.0.1;10.0.2.141;95.31.23.214"
+
     def generateMediaServerData(self, number):
 
-        return [ (self._template % (self.generateIpV4Endpoint(),
+        return [ (self._template % (addr, addr,
                    self.generateRandomId(),
                    id,
                    self.generateMediaServerName(),
+                   ';'.join((addr.split(':')[0], self._genServerIPs())),
                    self.generateRandomString(random.randint(5,20)),
-                   self.generateIpV4Endpoint()),
+                   self._serverVersion),
                 id)
-                for id in (self.generateRandomId() for _ in xrange(number))
+                for id, addr in (
+                     (self.generateRandomId(), self.generateIpV4Endpoint()) for _ in xrange(number))
         ]
 
 
@@ -396,13 +414,14 @@ class CameraDataGenerator(BasicGenerator):
 
     def generateCameraData(self, number, mediaServer):
         return [
-            self.generateUpdateData(self._generateCameraId(mac), mediaServer, mac) for mac in
-            (self.generateMac() for _ in xrange(number))
+            self.generateUpdateData(None, mediaServer, None) for _ in xrange(number)
         ]
 
     def generateUpdateData(self, id, mediaServer, mac=None):
         if mac is None:
             mac = self.generateMac()
+        if id is None:
+            id = self._generateCameraId(mac)
         name_and_model = self.generateCameraName()
         return (self._template % (self.generateBool(),
                 self.generateBool(),
@@ -413,7 +432,8 @@ class CameraDataGenerator(BasicGenerator):
                 self._getServerUUID(mediaServer),
                 mac,
                 self.generateIpV4(),
-                self.generateRandomString(4)), id)
+                self.generateRandomString(4)),
+            id)
 
 
 # This class serves as an in-memory data base.
