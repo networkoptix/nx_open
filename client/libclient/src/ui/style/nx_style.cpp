@@ -451,7 +451,7 @@ QnNxStyle::QnNxStyle() :
                     return;
 
                 auto window = QGuiApplication::topLevelAt(globalPos);
-                if (!window)
+                if (!window || window->flags().testFlag(Qt::Popup))
                     return;
 
                 auto localPos = window->mapFromGlobal(globalPos);
@@ -2764,6 +2764,13 @@ QRect QnNxStyle::subElementRect(
                 //TODO #vkutin See why this ugly "6" is here and not somewhere else
                 return base_type::subElementRect(subElement, option, widget).adjusted(6, 0, 0, 0);
             break;
+        }
+
+        case SE_LabelLayoutItem:
+        {
+            auto rect = base_type::subElementRect(subElement, option, widget);
+            rect.setWidth(qMax(rect.width(), 64));
+            return rect;
         }
 
         case SE_PushButtonLayoutItem:
