@@ -242,8 +242,8 @@ private:
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
-    dao::rdb::SystemDataObject m_systemDbController;
-    dao::rdb::SystemSharingDataObject m_systemSharingController;
+    dao::rdb::SystemDataObject m_systemDao;
+    dao::rdb::SystemSharingDataObject m_systemSharingDao;
 
     nx::db::DBResult insertSystemToDB(
         nx::db::QueryContext* const queryContext,
@@ -288,10 +288,10 @@ private:
         std::function<void(api::ResultCode)> completionHandler);
 
     //---------------------------------------------------------------------------------------------
-    // system sharing methods. TODO: #ak: move to a separate class
+    // System sharing methods. TODO: #ak: move to a separate class
 
     /**
-     * @param inviteeAccount Filled with attributes of account sharing.accountEmail
+     * @param inviteeAccount Filled with attributes of account sharing.accountEmail.
      */
     nx::db::DBResult shareSystem(
         nx::db::QueryContext* const queryContext,
@@ -316,17 +316,6 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const api::SystemSharing& sharing);
-
-    nx::db::DBResult fetchSharing(
-        nx::db::QueryContext* const queryContext,
-        const std::string& accountEmail,
-        const std::string& systemId,
-        api::SystemSharingEx* const sharing);
-
-    nx::db::DBResult fetchSharing(
-        nx::db::QueryContext* const queryContext,
-        const nx::db::InnerJoinFilterFields& filter,
-        api::SystemSharingEx* const sharing);
 
     /**
      * Fetch existing account or create a new one sending corresponding notification.
@@ -353,14 +342,6 @@ private:
         const data::AccountData& inviteeAccount,
         const std::string& systemId,
         InviteUserNotification* const notification);
-    /**
-     * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
-     */
-    nx::db::DBResult calculateUsageFrequencyForANewSystem(
-        nx::db::QueryContext* const queryContext,
-        const std::string& accountId,
-        const std::string& systemId,
-        float* const newSystemInitialUsageFrequency);
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
@@ -425,12 +406,6 @@ private:
         nx::db::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
         SaveUserSessionResult* const result);
-    nx::db::DBResult updateUserLoginStatistics(
-        nx::db::QueryContext* queryContext,
-        const std::string& accountId,
-        const std::string& systemId,
-        std::chrono::system_clock::time_point lastloginTime,
-        float usageFrequency);
     void updateSystemUsageStatisticsCache(
         const data::UserSessionDescriptor& userSessionDescriptor,
         const SaveUserSessionResult& usageStatistics);
@@ -505,10 +480,6 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const data::AccountData& inviteeAccount);
-    nx::db::DBResult deleteSharing(
-        nx::db::QueryContext* queryContext,
-        const std::string& systemId,
-        const nx::db::InnerJoinFilterFields& filter = nx::db::InnerJoinFilterFields());
     static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);

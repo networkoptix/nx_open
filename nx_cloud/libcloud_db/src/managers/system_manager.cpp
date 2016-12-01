@@ -122,9 +122,7 @@ void SystemManager::authenticateByName(
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
     auto scopedGuard = makeScopedGuard(
-        [&completionHandler, &result]() {
-            completionHandler(result);
-        });
+        [&completionHandler, &result]() { completionHandler(result); });
 
     QnMutexLocker lk(&m_mutex);
 
@@ -244,12 +242,14 @@ void SystemManager::unbindSystem(
 }
 
 namespace {
-//!Returns \a true, if \a record contains every single resource present in \a filter
+/**
+ * Returns true, if record contains every single resource present in filter.
+ */
 bool applyFilter(
     const stree::AbstractResourceReader& record,
     const stree::AbstractIteratableContainer& filter)
 {
-    //TODO #ak this method should be moved to stree and have linear complexity, not n*log(n)!
+    // TODO: #ak this method should be moved to stree and have linear complexity, not n*log(n)!
     for (auto it = filter.begin(); !it->atEnd(); it->next())
     {
         auto val = record.get(it->resID());
@@ -752,11 +752,11 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         nx::utils::timeSinceEpoch().count() +
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
-    dbResult = m_systemDbController.insert(queryContext, result->systemData, account.id);
+    dbResult = m_systemDao.insert(queryContext, result->systemData, account.id);
     if (dbResult != db::DBResult::ok)
         return dbResult;
 
-    return m_systemDbController.selectSystemSequence(
+    return m_systemDao.selectSystemSequence(
         queryContext,
         result->systemData.id,
         &result->systemData.systemSequence);
@@ -848,14 +848,9 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     }
 
     // Deleting system-to-account relation.
-    auto dbResult = deleteSharing(queryContext, systemId);
+    auto dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId);
     if (dbResult != nx::db::DBResult::ok)
-    {
-        NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
-            arg(systemId).arg(queryContext->connection()->lastError().text()),
-            cl_logDEBUG1);
         return dbResult;
-    }
 
     return nx::db::DBResult::ok;
 }
@@ -905,14 +900,9 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
     nx::db::QueryContext* const queryContext,
     const data::SystemId& systemId)
 {
-    const auto dbResult = deleteSharing(queryContext, systemId.systemId);
+    const auto dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId.systemId);
     if (dbResult != nx::db::DBResult::ok)
-    {
-        NX_LOG(lm("Could not delete system %1 from system_to_account. %2")
-            .arg(systemId.systemId).arg(queryContext->connection()->lastError().text()),
-            cl_logDEBUG1);
         return nx::db::DBResult::ioError;
-    }
 
     QSqlQuery removeSystem(*queryContext->connection());
     removeSystem.prepare(
@@ -971,7 +961,7 @@ nx::db::DBResult SystemManager::shareSystem(
     }
 
     api::SystemSharingEx existingSharing;
-    dbResult = fetchSharing(
+    dbResult = m_systemSharingDao.fetchSharing(
         queryContext, inviteeAccount->email, sharing.systemId, &existingSharing);
     if (dbResult == nx::db::DBResult::ok)   //< Sharing already exists.
     {
@@ -989,7 +979,7 @@ nx::db::DBResult SystemManager::shareSystem(
     sharingWithCalculatedData.lastLoginTime = std::chrono::system_clock::now();
     sharingWithCalculatedData.accountId = inviteeAccount->id;
 
-    dbResult = calculateUsageFrequencyForANewSystem(
+    dbResult = m_systemSharingDao.calculateUsageFrequencyForANewSystem(
         queryContext,
         inviteeAccount->id,
         sharingWithCalculatedData.systemId,
@@ -1026,7 +1016,7 @@ nx::db::DBResult SystemManager::insertOrReplaceSharing(
     nx::db::QueryContext* const queryContext,
     api::SystemSharingEx sharing)
 {
-    auto dbResult = m_systemSharingController.insertOrReplaceSharing(queryContext, sharing);
+    auto dbResult = m_systemSharingDao.insertOrReplaceSharing(queryContext, sharing);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
@@ -1103,91 +1093,15 @@ nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::fetchSharing(
-    nx::db::QueryContext* const queryContext,
-    const std::string& accountEmail,
-    const std::string& systemId,
-    api::SystemSharingEx* const sharing)
-{
-    const auto dbResult = fetchSharing(
-        queryContext,
-        {{"email", ":accountEmail", QnSql::serialized_field(accountEmail)},
-         {"system_id", ":systemId", QnSql::serialized_field(systemId)}},
-        sharing);
-    if (dbResult != nx::db::DBResult::ok &&
-        dbResult != nx::db::DBResult::notFound)
-    {
-        NX_LOGX(lm("Error fetching sharing of system %1 to account %2")
-            .arg(systemId).arg(accountEmail),
-            cl_logWARNING);
-    }
-
-    return dbResult;
-}
-
 nx::db::DBResult SystemManager::fetchUserSharings(
     nx::db::QueryContext* const queryContext,
     const nx::db::InnerJoinFilterFields& filterFields,
     std::vector<api::SystemSharingEx>* const sharings)
 {
-    QString sqlRequestStr =
-        R"sql(
-        SELECT a.id as accountId,
-               a.email as accountEmail,
-               sa.system_id as systemId,
-               sa.access_role_id as accessRole,
-               sa.user_role_id as userRoleId,
-               sa.custom_permissions as customPermissions,
-               sa.is_enabled as isEnabled,
-               sa.vms_user_id as vmsUserId,
-               sa.last_login_time_utc as lastLoginTime,
-               sa.usage_frequency as usageFrequency
-        FROM system_to_account sa, account a
-        WHERE sa.account_id=a.id
-        )sql";
-
-    QString filterStr;
-    if (!filterFields.empty())
-    {
-        filterStr = db::joinFields(filterFields, " AND ");
-        sqlRequestStr += " AND " + filterStr;
-    }
-
-    QSqlQuery selectSharingQuery(*queryContext->connection());
-    selectSharingQuery.setForwardOnly(true);
-    selectSharingQuery.prepare(sqlRequestStr);
-    db::bindFields(&selectSharingQuery, filterFields);
-    if (!selectSharingQuery.exec())
-    {
-        NX_LOGX(lm("Error executing request to select sharings with filter \"%1\". %2")
-            .arg(filterStr).arg(selectSharingQuery.lastError().text()),
-            cl_logWARNING);
-        return nx::db::DBResult::ioError;
-    }
-    QnSql::fetch_many(selectSharingQuery, sharings);
-
-    return nx::db::DBResult::ok;
-}
-
-nx::db::DBResult SystemManager::fetchSharing(
-    nx::db::QueryContext* const queryContext,
-    const nx::db::InnerJoinFilterFields& filterFields,
-    api::SystemSharingEx* const sharing)
-{
-    std::vector<api::SystemSharingEx> sharings;
-    const auto result = fetchUserSharings(
+    return m_systemSharingDao.fetchUserSharings(
         queryContext,
         filterFields,
-        &sharings);
-    if (result != nx::db::DBResult::ok)
-        return result;
-    if (sharings.empty())
-        return nx::db::DBResult::notFound;
-
-    NX_ASSERT(sharings.size() == 1);
-    *sharing = std::move(sharings[0]);
-
-    return nx::db::DBResult::ok;
+        sharings);
 }
 
 nx::db::DBResult SystemManager::fetchAccountToShareWith(
@@ -1309,38 +1223,6 @@ nx::db::DBResult SystemManager::prepareInviteNotification(
     notification->setActivationCode(std::move(accountConfirmationCode.code));
 
     return db::DBResult::ok;
-}
-
-nx::db::DBResult SystemManager::calculateUsageFrequencyForANewSystem(
-    nx::db::QueryContext* const queryContext,
-    const std::string& accountId,
-    const std::string& systemId,
-    float* const newSystemInitialUsageFrequency)
-{
-    QSqlQuery calculateUsageFrequencyForTheNewSystem(*queryContext->connection());
-    calculateUsageFrequencyForTheNewSystem.setForwardOnly(true);
-    calculateUsageFrequencyForTheNewSystem.prepare(
-        R"sql(
-            SELECT MAX(usage_frequency) + 1
-            FROM system_to_account
-            WHERE account_id = :accountId
-            )sql");
-    calculateUsageFrequencyForTheNewSystem.bindValue(
-        ":accountId",
-        QnSql::serialized_field(accountId));
-    if (!calculateUsageFrequencyForTheNewSystem.exec() ||
-        !calculateUsageFrequencyForTheNewSystem.next())
-    {
-        NX_LOGX(lm("Failed to fetch usage_frequency for the new system %1 of account %2. %3")
-            .arg(systemId).arg(accountId)
-            .arg(calculateUsageFrequencyForTheNewSystem.lastError().text()),
-            cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
-    }
-
-    *newSystemInitialUsageFrequency =
-        calculateUsageFrequencyForTheNewSystem.value(0).toFloat();
-    return nx::db::DBResult::ok;
 }
 
 nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
@@ -1715,7 +1597,7 @@ nx::db::DBResult SystemManager::saveUserSessionStart(
     NX_ASSERT(userSessionDescriptor.accountEmail && userSessionDescriptor.systemId);
 
     api::SystemSharingEx sharing;
-    auto dbResult = fetchSharing(
+    auto dbResult = m_systemSharingDao.fetchSharing(
         queryContext,
         *userSessionDescriptor.accountEmail,
         *userSessionDescriptor.systemId,
@@ -1738,7 +1620,7 @@ nx::db::DBResult SystemManager::saveUserSessionStart(
     const auto newUsageFrequency = usageStatistics->usageFrequency + 1;
 
     // Saving new statistics to DB.
-    dbResult = updateUserLoginStatistics(
+    dbResult = m_systemSharingDao.updateUserLoginStatistics(
         queryContext,
         sharing.accountId,
         sharing.systemId,
@@ -1757,39 +1639,6 @@ nx::db::DBResult SystemManager::saveUserSessionStart(
                 userSessionDescriptor,
                 usageStatistics);
         });
-
-    return nx::db::DBResult::ok;
-}
-
-nx::db::DBResult SystemManager::updateUserLoginStatistics(
-    nx::db::QueryContext* queryContext,
-    const std::string& accountId,
-    const std::string& systemId,
-    std::chrono::system_clock::time_point lastloginTime,
-    float usageFrequency)
-{
-    QSqlQuery updateUsageStatisticsQuery(*queryContext->connection());
-    updateUsageStatisticsQuery.prepare(
-        R"sql(
-        UPDATE system_to_account
-        SET last_login_time_utc=:last_login_time_utc, usage_frequency=:usage_frequency
-        WHERE account_id=:account_id AND system_id=:system_id
-        )sql");
-    updateUsageStatisticsQuery.bindValue(
-        ":last_login_time_utc",
-        QnSql::serialized_field(lastloginTime));
-    updateUsageStatisticsQuery.bindValue(":usage_frequency", usageFrequency);
-    updateUsageStatisticsQuery.bindValue(
-        ":account_id", QnSql::serialized_field(accountId));
-    updateUsageStatisticsQuery.bindValue(
-        ":system_id", QnSql::serialized_field(systemId));
-    if (!updateUsageStatisticsQuery.exec())
-    {
-        NX_LOGX(lm("Error executing request to update system %1 usage by %2 in db. %3")
-            .arg(systemId).arg(accountId)
-            .arg(updateUsageStatisticsQuery.lastError().text()), cl_logWARNING);
-        return nx::db::DBResult::ioError;
-    }
 
     return nx::db::DBResult::ok;
 }
@@ -2081,7 +1930,7 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
         {{"vms_user_id", ":vmsUserId",
            QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())}};
     api::SystemSharingEx grantorInfo;
-    auto dbResult = fetchSharing(
+    auto dbResult = m_systemSharingDao.fetchSharing(
         queryContext,
         sqlFilter,
         &grantorInfo);
@@ -2145,11 +1994,11 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     systemSharingData->systemId = systemId.toStdString();
     systemSharingData->vmsUserId = data.id.toSimpleString().toStdString();
 
-    const auto dbResult = deleteSharing(
+    const auto dbResult = m_systemSharingDao.deleteSharing(
         queryContext,
         systemId.toStdString(),
         {{"vms_user_id", ":vmsUserId",
-            QnSql::serialized_field(systemSharingData->vmsUserId)}});
+          QnSql::serialized_field(systemSharingData->vmsUserId)}});
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOGX(
@@ -2169,7 +2018,7 @@ nx::db::DBResult SystemManager::deleteSharing(
     const std::string& systemId,
     const data::AccountData& inviteeAccount)
 {
-    const auto dbResult = deleteSharing(
+    const auto dbResult = m_systemSharingDao.deleteSharing(
         queryContext,
         systemId,
         {{"account_id", ":accountId", QnSql::serialized_field(inviteeAccount.id)}});
@@ -2189,40 +2038,6 @@ nx::db::DBResult SystemManager::deleteSharing(
         });
 
     return dbResult;
-}
-
-nx::db::DBResult SystemManager::deleteSharing(
-    nx::db::QueryContext* queryContext,
-    const std::string& systemId,
-    const nx::db::InnerJoinFilterFields& filterFields)
-{
-    QSqlQuery removeSharingQuery(*queryContext->connection());
-    QString sqlQueryStr =
-        R"sql(
-        DELETE FROM system_to_account WHERE system_id=:systemId
-        )sql";
-
-    QString filterStr;
-    if (!filterFields.empty())
-    {
-        filterStr = db::joinFields(filterFields, " AND ");
-        sqlQueryStr += " AND " + filterStr;
-    }
-    removeSharingQuery.prepare(sqlQueryStr);
-    removeSharingQuery.bindValue(
-        ":systemId",
-        QnSql::serialized_field(systemId));
-    db::bindFields(&removeSharingQuery, filterFields);
-    if (!removeSharingQuery.exec())
-    {
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
-            lm("Failed to remove sharing. system %1, filter \"%2\". %3")
-                .arg(systemId).str(filterStr).arg(removeSharingQuery.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
-    return db::DBResult::ok;
 }
 
 void SystemManager::onEc2RemoveUserDone(
