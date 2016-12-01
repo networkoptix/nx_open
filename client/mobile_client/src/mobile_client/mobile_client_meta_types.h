@@ -11,7 +11,8 @@ enum class LiteModeType
 
 enum class AutoLoginMode
 {
-    Auto = -1,
+    Undefined = -1,
+    Auto,
     Enabled,
     Disabled
 };

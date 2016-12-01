@@ -243,6 +243,9 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
     if (startupParameters.url.isValid())
         NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
 
+    if (startupParameters.autoLoginMode != AutoLoginMode::Undefined)
+        qnSettings->setAutoLoginMode(static_cast<int>(startupParameters.autoLoginMode));
+
     if (startupParameters.testMode)
     {
         qnSettings->setTestMode(true);
