@@ -48,7 +48,7 @@ namespace {
 
 QnHikvisionOnvifResource::QnHikvisionOnvifResource():
     QnPlOnvifResource(),
-    m_audioTransmitter(new QnHikvisionAudioTransmitter(this))
+    m_audioTransmitter(new HikvisionAudioTransmitter(this))
 {
 }
 
@@ -67,11 +67,12 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
     if (result != CameraDiagnostics::NoErrorResult())
         return result;
 
+    saveParams();
+
     return CameraDiagnostics::NoErrorResult();
 }
 
 std::unique_ptr<nx_http::HttpClient> QnHikvisionOnvifResource::getHttpClient()
-
 {
     std::unique_ptr<nx_http::HttpClient> httpClient(new nx_http::HttpClient);
     httpClient->setResponseReadTimeoutMs(kRequestTimeoutMs);
@@ -147,8 +148,16 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
         if (m_audioTransmitter->isCompatible(outputFormat))
         {
             m_audioTransmitter->setOutputFormat(outputFormat);
-            m_audioTransmitter->setOutputId(outputId);
+            
+            auto hikTransmitter = std::dynamic_pointer_cast<HikvisionAudioTransmitter>(m_audioTransmitter);
+            if (hikTransmitter)
+            {
+                hikTransmitter->setChannelId(outputId);
+                hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::PUT);
+            }
+
             setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+            break;
         }
     }
 
@@ -157,7 +166,7 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
 
 QnAudioTransmitterPtr QnHikvisionOnvifResource::getAudioTransmitter()
 {
-    if (!isInitialized() || !m_audioTransmitter->isInitialized())
+    if (!isInitialized())
         return nullptr;
 
     return m_audioTransmitter;

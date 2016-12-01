@@ -26,7 +26,8 @@ BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     m_resource(res),
     m_state(TransmitterState::WaitingForConnection),
     m_transcoder(nullptr),
-    m_socket(nullptr)
+    m_socket(nullptr),
+    m_uploadMethod(nx_http::Method::POST)
 {
     connect(
         m_resource, &QnResource::parentIdChanged, this,
@@ -53,6 +54,12 @@ void BaseHttpAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
 {
     QnMutexLocker lock(&m_mutex);
     m_outputFormat = format;
+}
+
+void BaseHttpAudioTransmitter::setAudioUploadHttpMethod(nx_http::StringType method)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_uploadMethod = method;
 }
 
 bool BaseHttpAudioTransmitter::isInitialized() const
@@ -177,12 +184,27 @@ bool BaseHttpAudioTransmitter::startTransmission()
 
     QnMutexLocker lock(&m_mutex);
 
-    httpClient
-        ->doPost(
-            url,
-            contentType,
-            contentBody,
-            true);
+    if (m_uploadMethod == nx_http::Method::POST)
+    {
+        httpClient
+            ->doPost(
+                url,
+                contentType,
+                contentBody,
+                true);
+    }
+    else if (m_uploadMethod == nx_http::Method::PUT)
+    {
+        httpClient
+            ->doPut(
+                url,
+                contentType,
+                contentBody);
+    }
+    else
+    {
+        NX_ASSERT(false, lit("Only POST and PUT allowed. We should never be here."));
+    }
 
     m_timer.restart();
     while (m_state == TransmitterState::WaitingForConnection &&

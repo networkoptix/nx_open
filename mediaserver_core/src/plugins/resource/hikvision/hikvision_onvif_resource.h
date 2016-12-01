@@ -11,6 +11,7 @@ class QnHikvisionOnvifResource: public QnPlOnvifResource
 public:
     QnHikvisionOnvifResource();
     virtual ~QnHikvisionOnvifResource() override;
+    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 private:
