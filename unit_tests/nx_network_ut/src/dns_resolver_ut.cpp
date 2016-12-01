@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/dns_resolver.h>
+#include <nx/network/resolve/custom_resolver.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -12,31 +13,6 @@ namespace test {
 
 static const QString hardToResolveHost("takes_more_than_timeout_to_resolve");
 static const QString easyToResolveHost("resolves_immediately");
-
-template<typename Func>
-class CustomResolver:
-    public AbstractResolver
-{
-public:
-    CustomResolver(Func func):
-        m_func(std::move(func))
-    {
-    }
-
-    virtual std::deque<HostAddress> resolve(const QString& hostName, int ipVersion) override
-    {
-        return m_func(hostName, ipVersion);
-    }
-
-private:
-    Func m_func;
-};
-
-template<typename Func>
-static std::unique_ptr<CustomResolver<Func>> makeCustomResolver(Func func)
-{
-    return std::make_unique<CustomResolver<Func>>(std::move(func));
-}
 
 class DnsResolver:
     public ::testing::Test
