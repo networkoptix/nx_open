@@ -145,7 +145,7 @@ qreal QnToolTipWidget::tailWidth() const {
 }
 
 void QnToolTipWidget::setTailWidth(qreal tailWidth) {
-    if(qFuzzyCompare(tailWidth, m_tailWidth))
+    if (qFuzzyEquals(tailWidth, m_tailWidth))
         return;
 
     m_tailWidth = tailWidth;

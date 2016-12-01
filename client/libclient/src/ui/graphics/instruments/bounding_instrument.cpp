@@ -89,9 +89,9 @@ namespace {
     }
 
     /**
-     * Calculates fixed point of an affine transformation. Perspective 
+     * Calculates fixed point of an affine transformation. Perspective
      * transformations are not handled.
-     * 
+     *
      * \param t                         Transformation to calculate fixed point of.
      * \param[out] exists               Whether the fixed point exists.
      * \returns                         Fixed point, or (0, 0) if it doesn't exist.
@@ -141,8 +141,8 @@ namespace {
 
 class BoundingInstrument::ViewData: protected QnSceneTransformations {
 public:
-    ViewData(): 
-        m_view(NULL) 
+    ViewData():
+        m_view(NULL)
     {
         qreal d = 1.0e3;
         setPositionBounds(QRectF(QPointF(-d, -d), QPointF(d, d)));
@@ -264,7 +264,7 @@ public:
 
         /* Scene viewport center at the end of the last tick. */
         QPointF oldCenter = m_sceneViewportCenter;
-        
+
         /* Check if we are currently zooming in. */
         if (m_view->viewportTransform().m11() > m_sceneToViewport.m11())
             m_zoomInStopTimeMs = time;
@@ -287,7 +287,7 @@ public:
             if(m_isSizeCorrected) {
                 qreal logScale, powFactor;
                 calculateRelativeScale(&logScale, &powFactor);
-                if(!qFuzzyBetween(m_stickyLogScaleLo, logScale, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
+                if(!qFuzzyBetween(m_stickyLogScaleLo, logScale, m_stickyLogScaleHi) && !qFuzzyEquals(logScale, logOldScale)) {
                     qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
 
                     scaleViewport(m_view, std::exp(logFactor * powFactor));
@@ -369,7 +369,7 @@ public:
 
             m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
             m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
-            if (!qFuzzyCompare(logScale, m_stickyLogScaleResettingThreshold))
+            if (!qFuzzyEquals(logScale, m_stickyLogScaleResettingThreshold))
                 m_stickyLogScaleResettingThreshold = m_defaultStickyLogScaleResettingThreshold;
         }
 
@@ -403,7 +403,7 @@ protected:
     /**
      * Calculates viewport's relative current scale, presuming lower and upper
      * scale bounds are at -1.0 and 1.0.
-     */ 
+     */
     void calculateRelativeScale(qreal *logScale, qreal *powFactor = NULL) const {
         qreal logLowerScale = std::log(scaleFactor(m_sceneViewportRect.size(), m_extendedSizeLowerBound, m_lowerMode));
         qreal logUpperScale = std::log(scaleFactor(m_sceneViewportRect.size(), m_extendedSizeUpperBound, m_upperMode));
@@ -426,7 +426,7 @@ protected:
         if(sceneRect.height() < m_sizeUpperBounds.height())
             dy = (m_sizeUpperBounds.height() - sceneRect.height()) / 2.0;
         sceneRect.adjust(-dx, -dy, dx, dy);
-            
+
         /* Expand. */
         sceneRect = QnGeometry::dilated(sceneRect, sceneRect.size() * 3);
 
@@ -450,7 +450,7 @@ public:
     /** Viewport position boundary, in scene coordinates. */
     QRectF m_positionBounds;
 
-    /** Viewport position boundary extension multipliers. 
+    /** Viewport position boundary extension multipliers.
      * Viewport size is multiplied by the extension factor and added to the sides of position boundary. */
     MarginsF m_positionBoundsExtension;
 
@@ -472,13 +472,13 @@ public:
     /** Extension of the upper bound of viewport size, relative to this upper bound. */
     QSizeF m_sizeUpperExtension;
 
-    /** Movement speed, in viewports. 
+    /** Movement speed, in viewports.
      * This is a speed at one viewport away from movement boundary.
      * Effective move speed varies depending on the distance to movement boundary. */
     qreal m_movementSpeed;
 
-    /** Logarithmic viewport scaling speed. 
-     * This is a speed at 2x scale away from the size boundary. 
+    /** Logarithmic viewport scaling speed.
+     * This is a speed at 2x scale away from the size boundary.
      * Effective scaling speed varies depending on current viewport size. */
     qreal m_logScaleSpeed;
 
@@ -586,7 +586,7 @@ bool BoundingInstrument::registeredNotify(QGraphicsView *view) {
 
 void BoundingInstrument::unregisteredNotify(QGraphicsView *view) {
     ViewData *d = m_data.take(view);
-    
+
     NX_ASSERT(d != NULL);
 
     delete d;
@@ -608,7 +608,7 @@ BoundingInstrument::ViewData *BoundingInstrument::checkView(QGraphicsView *view)
     ViewData *d = m_data.value(view, NULL);
     if(d == NULL)
         qnWarning("Given graphics view is not registered with this bounding instrument.");
-    
+
     return d;
 }
 

@@ -26,7 +26,7 @@ VariantAnimator::~VariantAnimator() {
 }
 
 void VariantAnimator::setSpeed(qreal speed) {
-    if(qFuzzyCompare(speed, m_speed))
+    if (qFuzzyEquals(speed, m_speed))
         return;
 
     if(speed <= 0.0) {

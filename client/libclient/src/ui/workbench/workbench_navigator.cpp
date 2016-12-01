@@ -638,7 +638,7 @@ qreal QnWorkbenchNavigator::speed() const
 void QnWorkbenchNavigator::setSpeed(qreal speed)
 {
     speed = qBound(minimalSpeed(), speed, maximalSpeed());
-    if (qFuzzyCompare(speed, this->speed()))
+    if (qFuzzyEquals(speed, this->speed()))
         return;
 
     if (!m_currentMediaWidget)
@@ -1811,7 +1811,7 @@ void QnWorkbenchNavigator::updatePlayingSupported()
 void QnWorkbenchNavigator::updateSpeed()
 {
     qreal speed = this->speed();
-    if (qFuzzyCompare(m_lastSpeed, speed))
+    if (qFuzzyEquals(m_lastSpeed, speed))
         return;
 
     m_lastSpeed = speed;
@@ -1826,7 +1826,7 @@ void QnWorkbenchNavigator::updateSpeedRange()
 {
     qreal minimalSpeed = this->minimalSpeed();
     qreal maximalSpeed = this->maximalSpeed();
-    if (qFuzzyCompare(minimalSpeed, m_lastMinimalSpeed) && qFuzzyCompare(maximalSpeed, m_lastMaximalSpeed))
+    if (qFuzzyEquals(minimalSpeed, m_lastMinimalSpeed) && qFuzzyEquals(maximalSpeed, m_lastMaximalSpeed))
         return;
 
     m_lastMinimalSpeed = minimalSpeed;

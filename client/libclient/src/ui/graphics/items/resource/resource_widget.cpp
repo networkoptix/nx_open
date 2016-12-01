@@ -367,7 +367,7 @@ float QnResourceWidget::aspectRatio() const
 
 void QnResourceWidget::setAspectRatio(float aspectRatio)
 {
-    if (qFuzzyCompare(m_aspectRatio, aspectRatio))
+    if (qFuzzyEquals(m_aspectRatio, aspectRatio))
         return;
 
     m_aspectRatio = aspectRatio;

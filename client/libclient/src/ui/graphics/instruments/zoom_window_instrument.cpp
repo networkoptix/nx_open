@@ -339,16 +339,16 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowF
             QPointF pinPoint = Qn::calculatePinPoint(geometry, pinSection);
 
             qreal xScaleFactor = 1.0;
-            if(result.left() < constraint.left() && !qFuzzyCompare(result.left(), pinPoint.x())) {
+            if(result.left() < constraint.left() && !qFuzzyEquals(result.left(), pinPoint.x())) {
                 xScaleFactor = (constraint.left() - pinPoint.x()) / (result.left() - pinPoint.x());
-            } else if(result.right() > constraint.right() && !qFuzzyCompare(result.right(), pinPoint.x())) {
+            } else if(result.right() > constraint.right() && !qFuzzyEquals(result.right(), pinPoint.x())) {
                 xScaleFactor = (constraint.right() - pinPoint.x()) / (result.right() - pinPoint.x());
             }
 
             qreal yScaleFactor = 1.0;
-            if(result.top() < constraint.top() && !qFuzzyCompare(result.top(), pinPoint.y())) {
+            if(result.top() < constraint.top() && !qFuzzyEquals(result.top(), pinPoint.y())) {
                 yScaleFactor = (constraint.top() - pinPoint.y()) / (result.top() - pinPoint.y());
-            } else if(result.bottom() > constraint.bottom() && !qFuzzyCompare(result.bottom(), pinPoint.y())) {
+            } else if(result.bottom() > constraint.bottom() && !qFuzzyEquals(result.bottom(), pinPoint.y())) {
                 yScaleFactor = (constraint.bottom() - pinPoint.y()) / (result.bottom() - pinPoint.y());
             }
 
