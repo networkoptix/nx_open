@@ -82,12 +82,9 @@ void QnVideoWallItemAccessProvider::fillProviders(
     /* Access to layout may be granted only by parent videowall resource. */
     auto resourceId = resource->getId();
 
-    for (auto iter = m_itemAggregator->layoutBegin();
-        iter != m_itemAggregator->layoutEnd();
-        ++iter)
+    for (const auto& layout: m_itemAggregator->watchedLayouts())
     {
-        const auto layout = *iter;
-        for (const auto& item : layout->getItems())
+        for (const auto& item: layout->getItems())
         {
             if (item.resource.id == resourceId)
             {
