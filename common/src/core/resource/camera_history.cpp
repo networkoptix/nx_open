@@ -174,6 +174,18 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     if (!server)
         return StartResult::failed;
 
+    // if camera belongs to a single server not need to do API request to build detailed history information. generate it instead.
+    QnMediaServerResourceList serverList = getCameraFootageData(camera->getId());
+    if (serverList.size() <= 1)
+    {
+        ec2::ApiCameraHistoryItemDataList items;
+        if (serverList.size() == 1)
+            items.push_back(ec2::ApiCameraHistoryItemData(serverList.front()->getId(), 0));
+
+        if (testAndSetHistoryDetails(camera->getId(), items))
+            return StartResult::ommited;
+    }
+
     QnChunksRequestData request;
     request.format = Qn::UbjsonFormat;
     request.resList << camera;
@@ -228,9 +240,14 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
             emit cameraHistoryChanged(camera);
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId, bool filterOnlineServers) const {
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId, bool filterOnlineServers) const
+{
     QnMutexLocker lock(&m_mutex);
+    return getCameraFootageDataUnsafe(cameraId, filterOnlineServers);
+}
 
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageDataUnsafe(const QnUuid &cameraId, bool filterOnlineServers) const
+{
     QnMediaServerResourceList result;
     for(auto itr = m_archivedCamerasByServer.cbegin(); itr != m_archivedCamerasByServer.cend(); ++itr) {
         const auto &data = itr.value();
@@ -399,6 +416,38 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
         }
     }
     return toMediaServer(detailItr->serverGuid);
+}
+
+ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(const QnUuid& cameraId, bool* isValid)
+{
+    QnMutexLocker lock( &m_mutex );
+    *isValid = m_historyValidCameras.contains(cameraId);
+    return *isValid ? m_historyDetail.value(cameraId) : ec2::ApiCameraHistoryItemDataList();
+}
+
+bool QnCameraHistoryPool::testAndSetHistoryDetails(
+    const QnUuid& cameraId,
+    const ec2::ApiCameraHistoryItemDataList& historyDetails)
+{
+    QSet<QnUuid> serverList;
+    for (const auto& value: historyDetails)
+        serverList.insert(value.serverGuid);
+
+    QnMutexLocker lock( &m_mutex );
+
+    QSet<QnUuid> currentServerList;
+    for (const auto& server: getCameraFootageDataUnsafe(cameraId))
+        currentServerList.insert(server->getId());
+    if (currentServerList != serverList)
+        return false;
+
+    m_historyDetail[cameraId] = historyDetails;
+    m_historyValidCameras.insert(cameraId);
+
+    lock.unlock();
+    if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+        emit cameraHistoryChanged(camera);
+    return true;
 }
 
 void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageDataList& cameraHistoryList)

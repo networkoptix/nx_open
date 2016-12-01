@@ -7,6 +7,7 @@
 
 #include "camera_history_rest_handler.h"
 #include "core/resource/camera_resource.h"
+#include <core/resource/camera_history.h>
 
 namespace {
 
@@ -74,13 +75,20 @@ int QnCameraHistoryRestHandler::executeGet(
     ec2::ApiCameraHistoryDataList outputData;
     for (const auto& camera: request.resList)
     {
-        QnChunksRequestData updatedRequest = request;
-        updatedRequest.resList.clear();
-        updatedRequest.resList.push_back(camera);
-        MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
         ec2::ApiCameraHistoryData outputRecord;
         outputRecord.cameraId = camera->getId();
-        outputRecord.items = buildHistoryData(chunks);
+
+        bool isValid = false;
+        outputRecord.items = qnCameraHistoryPool->getHistoryDetails(outputRecord.cameraId, &isValid);
+        if (!isValid)
+        {
+            QnChunksRequestData updatedRequest = request;
+            updatedRequest.resList.clear();
+            updatedRequest.resList.push_back(camera);
+            MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
+            outputRecord.items = buildHistoryData(chunks);
+            qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items);
+        }
         outputData.push_back(std::move(outputRecord));
     }
 
