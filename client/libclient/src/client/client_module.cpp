@@ -496,7 +496,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     qnCommon->store(new QnServerInterfaceWatcher(router));
 }
 
-#define ENABLE_DYNAMIC_CUSTOMIZATION
+//#define ENABLE_DYNAMIC_CUSTOMIZATION
 void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 {
     QStringList paths;
