@@ -474,6 +474,6 @@ void QnNotificationListWidget::ItemData::animationTick(qreal deltaMSecs)
 
 bool QnNotificationListWidget::ItemData::animationFinished()
 {
-    return qFuzzyCompare(animation.value, animation.target);
+    return qFuzzyEquals(animation.value, animation.target);
 }
 

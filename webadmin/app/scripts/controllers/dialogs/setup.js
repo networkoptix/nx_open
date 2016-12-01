@@ -41,15 +41,6 @@ angular.module('webadminApp')
             $log.log("check getCredentials from client");
             return nativeClient.getCredentials().then(function (authObject) {
                 $log.log("request get credentials from client");
-                if (typeof authObject === 'string' || authObject instanceof String) {
-                    $log.log("got string from client, try to decode JSON: " + authObject);
-                    try {
-                        authObject = JSON.parse(authObject);
-                    } catch (a) {
-                        $log("could not decode JSON from string: " + authObject);
-                    }
-                }
-                $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
                 cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
                 if (cloudAuthorized) {
                     $scope.settings.presetCloudEmail = authObject.cloudEmail;
@@ -59,14 +50,19 @@ angular.module('webadminApp')
         }
 
         /* Funсtions for external calls (open links) */
-        $scope.createAccount = function(event){
-            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext, true);
+        $scope.createAccount = function($event){
+            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext,
+                L.setup.createAccount, true);
             $scope.next('cloudLogin');
+            $event.preventDefault();
+            $event.stopPropagation();
         };
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.openLink = function($event){
-            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext,true);
+            nativeClient.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext,
+                $event.target.title, true);
             $event.preventDefault();
+            $event.stopPropagation();
         };
 
         function sendCredentialsToNativeClient(){
@@ -130,8 +126,16 @@ angular.module('webadminApp')
                     $scope.serverInfo = r.data.reply;
 
                     $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
-                    $scope.IP = $scope.serverInfo.remoteAddresses[0];
+
                     $scope.port = window.location.port;
+
+                    if($scope.serverInfo.flags.canSetupNetwork){
+                        mediaserver.networkSettings().then(function(reply){
+                            var settings = r.data.reply;
+                            $scope.IP = settings[0].ipAddr;
+                            $scope.serverAddress = $scope.IP + ':' + $scope.port;
+                        });
+                    }
 
                     checkInternet(false);
 
@@ -477,7 +481,7 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
-                $location.path('/settings');
+                $location.path('/');
                 setTimeout(function(){
                     window.location.reload();
                 });

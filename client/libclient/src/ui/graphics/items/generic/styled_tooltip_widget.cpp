@@ -8,6 +8,8 @@
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 
+#include <nx/utils/math/fuzzy.h>
+
 namespace {
 
 const qreal kDefaultRoundingRadius = 2.0;
@@ -40,7 +42,7 @@ qreal QnStyledTooltipWidget::tailLength() const
 
 void QnStyledTooltipWidget::setTailLength(qreal tailLength)
 {
-    if (qFuzzyCompare(tailLength, m_tailLength))
+    if (qFuzzyEquals(tailLength, m_tailLength))
         return;
 
     m_tailLength = tailLength;

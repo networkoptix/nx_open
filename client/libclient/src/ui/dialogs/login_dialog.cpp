@@ -57,6 +57,8 @@
 namespace {
 static const QnUuid kCustomConnectionLocalId;
 
+constexpr int kMinIntroWidth = 550;
+
 static std::array<const char*, 5> kIntroNames {
     "intro.mkv",
     "intro.avi",
@@ -162,6 +164,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
 
+    m_renderingWidget->setEffectiveWidth(kMinIntroWidth);
+
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
     NX_ASSERT(bbLayout);
     if (bbLayout)
@@ -173,7 +177,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
         versionLabel->setFont(font);
         bbLayout->insertWidget(0, versionLabel);
     }
-
 
     QString introPath;
     for (auto name: kIntroNames)
@@ -191,7 +194,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
     layout->setSpacing(0);
-    layout->setContentsMargins(0, 0, 0, 10);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_renderingWidget);
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 

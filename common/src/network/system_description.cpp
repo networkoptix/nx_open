@@ -299,10 +299,11 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
 
 void QnSystemDescription::setName(const QString& value)
 {
-    if (m_systemName == value)
+    const auto newValue = extractSystemName(value);
+    if (m_systemName == newValue)
         return;
 
-    m_systemName = value;
+    m_systemName = newValue;
     emit systemNameChanged();
 }
 

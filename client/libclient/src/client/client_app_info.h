@@ -23,8 +23,9 @@ struct QnClientAppInfo
     /** Resource file id for videowall shortcut. */
     static int videoWallIconId();
 
-    /** Mac OS Installer Bundle Name */
-    static QString macOsBundleName();
+    static QString protocolHandlerBundleName();
+
+    static QString protocolHandlerBundleId();
 
     static QString launcherVersionFile();
 

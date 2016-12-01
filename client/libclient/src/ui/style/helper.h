@@ -69,6 +69,8 @@ namespace style
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
         static const char* kItemViewRadioButtons;   /**< Name of a property to change item view checkboxes to radio buttons (bool). */
         static const char* kPushButtonMargin;       /**< Name of a property to hold custom push button margin (int). Buttons with custom margin are left-aligned. */
+        static const char* kMenuNoMouseReplayRect;  /**< Name of a property to hold rectangle in global logical coordinates (QRect).
+                                                            If menu is closed by click in this rectangle it won't replay mouse event. */
     };
 
     /** Flags of additional slider features */

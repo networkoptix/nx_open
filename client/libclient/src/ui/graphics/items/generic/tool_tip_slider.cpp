@@ -10,8 +10,9 @@
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
+#include <ui/graphics/items/generic/slider_tooltip_widget.h>
 
-#include "slider_tooltip_widget.h"
+#include <nx/utils/math/fuzzy.h>
 
 namespace {
 const int toolTipHideDelay = 2500;
@@ -83,7 +84,7 @@ qreal QnToolTipSlider::tooltipMargin() const
 
 void QnToolTipSlider::setTooltipMargin(qreal margin)
 {
-    if (qFuzzyCompare(margin, m_tooltipMargin))
+    if (qFuzzyEquals(margin, m_tooltipMargin))
         return;
 
     m_tooltipMargin = margin;
