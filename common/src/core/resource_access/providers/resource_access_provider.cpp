@@ -30,7 +30,7 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     const QnResourcePtr& resource,
     QnResourceList* providers) const
 {
-    for (auto provider : m_providers)
+    for (auto provider: m_providers)
     {
         if (providers)
             providers->clear();
@@ -86,15 +86,15 @@ void QnResourceAccessProvider::beginUpdateInternal()
 
 void QnResourceAccessProvider::endUpdateInternal()
 {
-    for (auto p : m_providers)
+    for (auto p: m_providers)
         p->endUpdate();
 }
 
 void QnResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
     {
-        for (const QnResourcePtr& resource : qnResPool->getResources())
+        for (const QnResourcePtr& resource: qnResPool->getResources())
         {
             auto value = accessibleVia(subject, resource);
             if (value != QnAbstractResourceAccessProvider::Source::none)
