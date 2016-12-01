@@ -45,12 +45,6 @@ public:
 
     static const TranId InvalidTranId = -1;
 
-    nx::String systemId;
-    /** map<peer, transport sequence> */
-    std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
-    VmsDataState committedData;
-    std::unique_ptr<TransactionTimestampCalculator> timestampCalculator;
-
     VmsTransactionLogCache();
 
     bool isShouldBeIgnored(
@@ -77,9 +71,12 @@ public:
     /**
      * @return nullptr if tranId is unknown.
      */
-    const VmsDataState* getState(TranId tranId) const;
+    const VmsDataState* state(TranId tranId) const;
+    ::ec2::Timestamp generateTransactionTimestamp(TranId tranId);
+    int generateTransactionSequence(const ::ec2::QnTranStateKey& tranStateKey);
 
-    ::ec2::Timestamp generateNewTransactionTimestamp(TranId tranId);
+    ::ec2::QnTranState committedTransactionState() const;
+    std::uint64_t committedTimstampSequence() const;
 
 private:
     struct TranContext
@@ -91,13 +88,17 @@ private:
     std::map<TranId, TranContext> m_tranIdToContext;
     mutable QnMutex m_mutex;
     TranId m_tranIdSequence;
+    TransactionTimestampCalculator m_timestampCalculator;
+    VmsDataState m_committedData;
+    /** map<peer, transport sequence> */
+    //std::map<::ec2::QnTranStateKey, int> m_lastTransportSeq;
 
-    std::uint64_t timestampSequence(TranId tranId) const;
+    std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;
 
-    TranContext& getTranContext(TranId tranId);
-    TranContext& getTranContext(const QnMutexLockerBase& lock, TranId tranId);
-    const TranContext* getTranContext(TranId tranId) const;
-    const TranContext* getTranContext(
+    TranContext& findTranContext(TranId tranId);
+    TranContext& findTranContext(const QnMutexLockerBase& lock, TranId tranId);
+    const TranContext* findTranContext(TranId tranId) const;
+    const TranContext* findTranContext(
         const QnMutexLockerBase& lock,
         TranId tranId) const;
 };

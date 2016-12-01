@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <nx/network/buffer.h>
+#include <nx/utils/data_structures/safe_map.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
@@ -24,7 +25,6 @@
 #include "transaction_transport_header.h"
 
 namespace nx {
-
 namespace db {
 
 class AsyncSqlQueryExecutor;
@@ -44,6 +44,13 @@ struct TransactionLogRecord
     std::unique_ptr<const TransactionSerializer> serializer;
 };
 
+/**
+ * Supports multiple transactions related to a single system at the same time. 
+ * In this case transactions will reported to AbstractOutgoingTransactionDispatcher 
+ * in ascending sequence order.
+ * 
+ * @note Calls with the same nx::db::QueryContext object MUST happen within single thread.
+ */
 class TransactionLog
 {
 public:
@@ -111,14 +118,6 @@ public:
             return nx::db::DBResult::cancelled;
         }
 
-        // Updating timestamp if needed.
-        {
-            QnMutexLocker lk(&m_mutex);
-            auto& transactionLogData = m_systemIdToTransactionLog[systemId];
-            transactionLogData.timestampCalculator->shiftTimestampIfNeeded(
-                transaction.get().persistentInfo.timestamp);
-        }
-
         return saveToDb(
             connection,
             systemId,
@@ -137,7 +136,7 @@ public:
         TransactionDataType transactionData)
     {
         QnMutexLocker lock(&m_mutex);
-        DbTransactionContext& dbTranContext = getTransactionContext(lock, queryContext, systemId);
+        DbTransactionContext& dbTranContext = getDbTransactionContext(lock, queryContext, systemId);
         lock.unlock();
 
         const int tranSequence = generateNewTransactionSequence(queryContext, systemId);
@@ -183,7 +182,7 @@ public:
 
         // Saving transactions, generated under current DB transaction,
         //  so that we can send "new transaction" notifications after commit.
-        dbTranContext.transactions.push_back(std::move(transactionSerializer));
+        dbTranContext.transactionsAdded.push_back(std::move(transactionSerializer));
 
         return nx::db::DBResult::ok;
     }
@@ -213,9 +212,7 @@ private:
     struct DbTransactionContext
     {
     public:
-        nx::String systemId;
-        /** List of transactions, added within this DB transaction. */
-        std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions;
+        std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactionsAdded;
         VmsTransactionLogCache::TranId cacheTranId;
 
         DbTransactionContext():
@@ -223,6 +220,11 @@ private:
         {
         }
     };
+
+    typedef nx::utils::SafeMap<
+        std::pair<nx::db::QueryContext*, nx::String>,
+        DbTransactionContext
+    > DbTransactionContextMap;
 
     struct TransactionReadResult
     {
@@ -236,10 +238,7 @@ private:
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
-    std::map<
-        std::pair<nx::db::QueryContext*, nx::String>,
-        DbTransactionContext
-    > m_dbTransactionContexts;
+    DbTransactionContextMap m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogCache> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
@@ -289,7 +288,7 @@ private:
         const nx::String& systemId,
         nx::db::DBResult dbResult);
 
-    DbTransactionContext& getTransactionContext(
+    DbTransactionContext& getDbTransactionContext(
         const QnMutexLockerBase& lk,
         nx::db::QueryContext* const queryContext,
         const nx::String& systemId);

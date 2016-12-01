@@ -96,13 +96,13 @@ private:
     CacheState readState()
     {
         CacheState result;
-        result.timestampSequence = *m_cache.committedData.timestampSequence;
+        result.timestampSequence = m_cache.committedTimstampSequence();
         return result;
     }
 
     void assertIfNotEqual(const CacheState& cacheState, const VmsTransactionLogCache& cache)
     {
-        ASSERT_EQ(cacheState.timestampSequence, cache.committedData.timestampSequence);
+        ASSERT_EQ(cacheState.timestampSequence, cache.committedTimstampSequence());
     }
 };
 
