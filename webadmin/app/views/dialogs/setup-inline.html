@@ -122,7 +122,8 @@
     <p class="master-description">
         Available from everywhere<br>
         Requires Internet connection<br>
-        <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a>
+        <a class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
+           target="_blank" ng-click="openLink($event)">Learn more</a>
     </p>
 </div>
 
@@ -315,7 +316,8 @@
     <p>Log in</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Sharing and account settings</p>
-    <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
+    <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
+           ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
