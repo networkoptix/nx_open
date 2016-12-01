@@ -41,6 +41,19 @@ TimePeriodEx findMinStartTimePeriod(
     return result;
 }
 
+QnMutex* getMutex(const QnUuid& id)
+{
+    static QnMutex access;
+    QnMutexLocker lock(&access);
+
+    static std::map<QnUuid, std::unique_ptr<QnMutex>> loadDataMutex;
+    auto itr = loadDataMutex.find(id);
+    if (itr == loadDataMutex.end())
+        itr = loadDataMutex.emplace(id, std::unique_ptr<QnMutex>(new QnMutex())).first;
+
+    return itr->second.get();
+}
+
 } // namespace
 
 ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
@@ -79,6 +92,9 @@ int QnCameraHistoryRestHandler::executeGet(
         outputRecord.cameraId = camera->getId();
 
         bool isValid = false;
+
+        QnMutexLocker lock(getMutex(outputRecord.cameraId));
+
         outputRecord.items = qnCameraHistoryPool->getHistoryDetails(outputRecord.cameraId, &isValid);
         if (!isValid)
         {
