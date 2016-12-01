@@ -89,7 +89,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::LocalResourcesNode:
-        setNameInternal(tr("Local"));
+        setNameInternal(tr("Local Files"));
         break;
     case Qn::CurrentSystemNode:
         break;
