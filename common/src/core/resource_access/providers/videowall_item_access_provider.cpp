@@ -146,7 +146,7 @@ void QnVideoWallItemAccessProvider::afterUpdate()
 void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResourcePtr& videoWall)
 {
     /* Layouts and videowalls can be added independently. */
-    for (auto layout : getLayoutsForVideoWall(videoWall))
+    for (auto layout: getLayoutsForVideoWall(videoWall))
     {
         if (m_itemAggregator->addWatchedLayout(layout))
             updateAccessToResource(layout);
