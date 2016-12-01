@@ -87,8 +87,8 @@ nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     fetchTransactionsOfAPeerQuery.addBindValue(QLatin1String(systemId));
     fetchTransactionsOfAPeerQuery.addBindValue(peerId);
     fetchTransactionsOfAPeerQuery.addBindValue(dbInstanceId);
-    fetchTransactionsOfAPeerQuery.addBindValue(minSequence);
-    fetchTransactionsOfAPeerQuery.addBindValue(maxSequence);
+    fetchTransactionsOfAPeerQuery.addBindValue((qint64)minSequence);
+    fetchTransactionsOfAPeerQuery.addBindValue((qint64)maxSequence);
     if (!fetchTransactionsOfAPeerQuery.exec())
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
