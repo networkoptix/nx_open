@@ -82,7 +82,7 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
         toShare.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(tr("To remove access go to User Settings."));
+    messageBox.setInformativeText(tr("To remove access go to User Roles Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
     messageBox.addCustomWidget(new QnResourceListView(toShare, true));
 
