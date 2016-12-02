@@ -86,8 +86,7 @@ private:
 
 TEST_F(QnLayoutItemAggregatorTest, checkInit)
 {
-    const auto layoutsNumber = std::distance(aggregator->layoutBegin(), aggregator->layoutEnd());
-    ASSERT_TRUE(layoutsNumber == 0);
+    ASSERT_TRUE(aggregator->watchedLayouts().isEmpty());
 }
 
 TEST_F(QnLayoutItemAggregatorTest, checkAddLayout)
@@ -280,6 +279,5 @@ TEST_F(QnLayoutItemAggregatorTest, iterateOverLayouts)
     for (int i = 0; i < N; ++i)
         aggregator->addWatchedLayout(createLayout());
 
-    const auto layoutsNumber = std::distance(aggregator->layoutBegin(), aggregator->layoutEnd());
-    ASSERT_EQ(N, layoutsNumber);
+    ASSERT_EQ(N, aggregator->watchedLayouts().size());
 }

@@ -58,7 +58,6 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
     QString queryItemsStr(R"sql(
         SELECT
             r.guid as layoutId,
-            li.id,
             li.uuid as id,
             li.resource_guid as resourceId,
             li.left,

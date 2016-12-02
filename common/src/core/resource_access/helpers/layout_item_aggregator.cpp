@@ -52,14 +52,9 @@ bool QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layo
     return true;
 }
 
-QnLayoutItemAggregator::key_iterator QnLayoutItemAggregator::layoutBegin() const
+QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
 {
-    return m_watchedLayouts.cbegin();
-}
-
-QnLayoutItemAggregator::key_iterator QnLayoutItemAggregator::layoutEnd() const
-{
-    return m_watchedLayouts.cend();
+    return m_watchedLayouts;
 }
 
 bool QnLayoutItemAggregator::hasLayout(const QnLayoutResourcePtr& layout) const

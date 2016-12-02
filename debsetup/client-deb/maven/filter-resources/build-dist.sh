@@ -125,6 +125,7 @@ chmod 755 $BINSTAGE/*
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
+chmod g-s $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
@@ -138,6 +139,9 @@ install -m 644 debian/templates $STAGE/DEBIAN
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
+
+mkdir -p $STAGETARGET/share/icons
+cp -r $ICONSTAGE/* $STAGETARGET/share/icons
 cp -r bin/update.json $STAGETARGET
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
 echo "zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip $STAGETARGET"
