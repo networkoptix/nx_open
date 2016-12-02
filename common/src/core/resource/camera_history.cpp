@@ -441,6 +441,18 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
     if (currentServerList != serverList)
         return false;
 
+    if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+    {
+        if (camera->getStatus() == Qn::Recording)
+        {
+            if (historyDetails.empty())
+                return false;
+
+            if (camera->getParentId() != historyDetails[historyDetails.size()-1].serverGuid)
+                return false;
+        }
+    }
+
     m_historyDetail[cameraId] = historyDetails;
     m_historyValidCameras.insert(cameraId);
 
