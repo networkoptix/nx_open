@@ -1195,7 +1195,7 @@ class MainFunctests(FuncTestCase):
     helpStr = "The main minimal functional tests set"
     _test_name = "Main functests"
     _test_key = "legacy"
-    _suits = (("Main", [
+    _suites = (("Main", [
         "ConnectionTest",
         "InitialClusterTest",
         "BasicClusterTest",
@@ -1505,12 +1505,12 @@ def main(args, other):
     if args.help_arg is not None:
         showHelp(args.help_arg)
         return True
+    if args.list_auto_test:
+        ListAutoTests()
+        return True
     initLog(args.loglevel, args.log, rewrite=True)
     if args.recover:
         UnitTestRollback(autorollback=True, nocreate=True)
-        return True
-    if args.list_auto_test:
-        ListAutoTests()
         return True
     testMaster.applyArgs(args)
     try:

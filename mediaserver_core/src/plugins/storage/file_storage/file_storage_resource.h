@@ -60,8 +60,8 @@ public:
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
-private:
     qint64 calcInitialSpaceLimit();
+private:
 
     QString removeProtocolPrefix(const QString& url);
     Qn::StorageInitResult initOrUpdateInternal();

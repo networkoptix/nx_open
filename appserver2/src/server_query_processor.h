@@ -447,9 +447,14 @@ private:
             case ApiObject_Storage:
             {
                 RUN_AND_CHECK_ERROR(
+                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
+                    lit("Remove storage params failed"));
+
+                RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList),
+                        transactionsPostProcessList,
+                        tran.transactionType),
                     lit("Remove resource status failed"));
 
                 break;
@@ -564,6 +569,10 @@ private:
                 return removeResourceSync(tran, ApiObject_User, transactionsPostProcessList);
             case ApiCommand::removeCamera:
                 return removeResourceSync(tran, ApiObject_Camera, transactionsPostProcessList);
+            case ApiCommand::removeStorage:
+                return removeResourceSync(tran, ApiObject_Storage, transactionsPostProcessList);
+            case ApiCommand::removeVideowall:
+                return removeResourceSync(tran, ApiObject_Videowall, transactionsPostProcessList);
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;

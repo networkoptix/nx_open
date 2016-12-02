@@ -81,6 +81,7 @@
 #include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -230,7 +231,7 @@ ec2::ApiClientInfoData clientInfo()
 {
     ec2::ApiClientInfoData clientData;
     clientData.id = qnSettings->pcUuid();
-    clientData.fullVersion = QnAppInfo::applicationFullVersion();
+    clientData.fullVersion = nx::utils::AppInfo::applicationFullVersion();
     clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
     clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
 

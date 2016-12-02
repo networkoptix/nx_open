@@ -269,7 +269,7 @@ class BackupStorageTest(StorageBasedTest):
     num_serv = _NUM_SERV_BAK
     _fill_storage_script = 'fill_stor.py'
 
-    _suits = (
+    _suites = (
         ('BackupTests', [
             'Initialization',
             'ScheduledBackupTest',
@@ -410,7 +410,7 @@ class MultiserverArchiveTest(StorageBasedTest):
     time_periods_single = []
     time_periods_joined = []
 
-    _suits = (
+    _suites = (
         ('MultiserverArchiveTest', [
             'Initialization',
             'CheckArchiveMultiserv',

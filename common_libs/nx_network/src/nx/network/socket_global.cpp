@@ -37,12 +37,8 @@ bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
 }
 
 SocketGlobals::SocketGlobals():
-    m_log(QnLog::logs()),
-    m_mediatorConnector(new hpm::api::MediatorConnector),
-    m_addressPublisher(m_mediatorConnector->systemConnection()),
-    m_tcpReversePool(m_mediatorConnector->clientConnection())
+    m_log(QnLog::logs())
 {
-    m_addressResolver.reset(new cloud::AddressResolver(m_mediatorConnector->clientConnection()));
 }
 
 SocketGlobals::~SocketGlobals()
@@ -55,10 +51,10 @@ SocketGlobals::~SocketGlobals()
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
         m_debugConfigurationTimer.pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
-        m_addressPublisher.pleaseStop(barrier.fork());
+        m_addressPublisher->pleaseStop(barrier.fork());
         m_mediatorConnector->pleaseStop(barrier.fork());
         m_outgoingTunnelPool.pleaseStop(barrier.fork());
-        m_tcpReversePool.pleaseStop(barrier.fork());
+        m_tcpReversePool->pleaseStop(barrier.fork());
     }
 
     promise.get_future().wait();
@@ -78,6 +74,15 @@ void SocketGlobals::init()
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals;
+
+        s_instance->m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>();
+        s_instance->m_addressPublisher = std::make_unique<cloud::MediatorAddressPublisher>(
+            s_instance->m_mediatorConnector->systemConnection());
+        s_instance->m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
+            s_instance->m_mediatorConnector->clientConnection());
+        s_instance->m_addressResolver = std::make_unique<cloud::AddressResolver>(
+            s_instance->m_mediatorConnector->clientConnection());
+
         s_initState = InitState::done;
 
         lock.unlock();
@@ -102,6 +107,11 @@ void SocketGlobals::verifyInitialization()
     NX_CRITICAL(
         s_initState != InitState::none,
         "SocketGlobals::InitGuard must be initialized before using Sockets");
+}
+
+bool SocketGlobals::isInitialized()
+{
+    return s_instance != nullptr;
 }
 
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)

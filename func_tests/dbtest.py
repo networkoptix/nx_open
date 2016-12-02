@@ -17,6 +17,7 @@ SERVERS_MERGE_WAIT=20
 BACKUP_RESTORE_TIMEOUT=40
 REALM_FIX_TIMEOUT=10
 BACKUP_DB_FILE="" # "data-backup"
+DUMP_BEGIN="" # "data-begin"
 DUMP_BEFORE="" # "data-before"
 DUMP_AFTER="" # "data-after"
 
@@ -52,7 +53,7 @@ class DBTest(StorageBasedTest):
     _test_name = "Database"
     _test_key = 'db'
 
-    _suits = (
+    _suites = (
         ('DBTest', [
             'DBUpgradeTest',
             'BackupRestoreTest',
@@ -136,6 +137,15 @@ class DBTest(StorageBasedTest):
             self._mediaserver_ctl(box, 'safe-start')
         self._wait_servers_up()
 
+    def _restartServers(self):
+        log(LOGLEVEL.INFO, "Restarting servers. Srop...")
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-stop')
+        time.sleep(1)
+        log(LOGLEVEL.INFO, "Start...")
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-start')
+        self._wait_servers_up()
 
     def BackupRestoreTest(self):
         """ Check if backup/restore preserve all necessary data. """
@@ -148,6 +158,10 @@ class DBTest(StorageBasedTest):
         WORK_HOST = 0  # which server do we check with backup/restore
         #self._get_db_copy('before')
         getInfoFunc = 'ec2/getFullInfo?extraFormatting'
+        if 0:
+            fulldataBegin = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
+            _saveDump(DUMP_BEGIN, fulldataBegin[1])
+            self._restartServers()
         self._waitOrInput("Before dump")
         fulldataBefore = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
         _saveDump(DUMP_BEFORE, fulldataBefore[1])

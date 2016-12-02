@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
 
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
@@ -184,7 +185,7 @@ namespace ec2
         {
             m_firstTime = false;
             const auto reportedVersion = qnGlobalSettings->statisticsReportLastVersion();
-            const auto currentVersion = QnAppInfo::applicationFullVersion();
+            const auto currentVersion = nx::utils::AppInfo::applicationFullVersion();
 
             QCollator collator;
             collator.setNumericMode(true);
@@ -274,7 +275,7 @@ namespace ec2
             const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
             qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
             qnGlobalSettings->setStatisticsReportLastTime(now);
-            qnGlobalSettings->setStatisticsReportLastVersion(QnAppInfo::applicationFullVersion());
+            qnGlobalSettings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
             qnGlobalSettings->synchronizeNow();
         }
         else

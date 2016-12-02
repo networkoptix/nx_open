@@ -435,6 +435,8 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
+    NX_LOGX(lm("dnsResolve. %1. %2").str(info->first).arg((int)info->second.dnsState()), cl_logDEBUG2);
+
     switch (info->second.dnsState())
     {
         case HostAddressInfo::State::resolved:
@@ -446,6 +448,8 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
+    NX_LOGX(lm("dnsResolve async. %1").str(info->first), cl_logDEBUG2);
+
     info->second.dnsProgress();
     QnMutexUnlocker ulk(lk);
     m_dnsResolver.resolveAsync(
@@ -453,6 +457,8 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
+            NX_LOGX(lm("dnsResolve async done. %1, %2").str(code).str(ips.size()), cl_logDEBUG2);
+
             std::vector<Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
@@ -468,6 +474,7 @@ void AddressResolver::dnsResolve(
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
+            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").str(guards.size()), cl_logDEBUG2);
             if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },

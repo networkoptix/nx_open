@@ -150,7 +150,7 @@ APPLY(201, removeResource, ApiIdData, \
 APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        true,  /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdRfc4122Helper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("status"), /* getHash*/ \
                        ResourceNotificationManagerHelper(), \
                        AllowForAllAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -161,7 +161,7 @@ APPLY(202, setResourceStatus, ApiResourceStatusData, \
 APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_status by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("status"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -400,7 +400,7 @@ APPLY(313, getCamerasEx, ApiCameraDataExList, \
 APPLY(314, removeCameraUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("camera_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -477,7 +477,7 @@ APPLY(405, getMediaServerUserAttributesList, ApiMediaServerUserAttributesDataLis
 APPLY(406, removeServerUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("server_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -609,7 +609,7 @@ APPLY(504, setAccessRights, ApiAccessRightsData, \
 APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_rights by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("access_rights"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \

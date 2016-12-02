@@ -410,7 +410,7 @@ class HTTPStressTest(FuncTestCase):
     helpStr = "HTTP(S) stress tests"
     _test_name = "HTTP(S) stress tests"
     _test_key = "stress"
-    _suits = (("HTTP stress", [
+    _suites = (("HTTP stress", [
         "NormalRequests",
         "FloodRequests",
     ]),)
