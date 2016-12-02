@@ -78,7 +78,10 @@ void QnIOMonitorConnectionProcessor::run()
 
         setData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
-        while (d->socket->isConnected() && camera->getStatus() >= Qn::Online && camera->getParentId() == qnCommon->moduleGUID())
+        while (!needToStop()
+               && d->socket->isConnected()
+               && camera->getStatus() >= Qn::Online
+               && camera->getParentId() == qnCommon->moduleGUID())
         {
             sendMultipartData();
             d->waitCond.wait(&d->waitMutex);
@@ -88,6 +91,7 @@ void QnIOMonitorConnectionProcessor::run()
         camera->inputPortListenerDetached();
         d->socket->pleaseStopSync();
     }
+    d->socket->close();
 }
 
 void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &resource)
@@ -157,8 +161,6 @@ void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)
 void QnIOMonitorConnectionProcessor::pleaseStop()
 {
     Q_D(QnIOMonitorConnectionProcessor);
-    if (d->socket)
-        d->socket->pleaseStopSync();
-    QnTCPConnectionProcessor::pleaseStop();
+    QnLongRunnable::pleaseStop();
     d->waitCond.wakeAll();
 }
