@@ -1060,17 +1060,6 @@ nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::fetchUserSharings(
-    nx::db::QueryContext* const queryContext,
-    const nx::db::InnerJoinFilterFields& filterFields,
-    std::vector<api::SystemSharingEx>* const sharings)
-{
-    return m_systemSharingDao.fetchUserSharings(
-        queryContext,
-        filterFields,
-        sharings);
-}
-
 nx::db::DBResult SystemManager::fetchAccountToShareWith(
     nx::db::QueryContext* const queryContext,
     const std::string& grantorEmail,
@@ -1305,11 +1294,9 @@ nx::db::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
     if (!accountUpdate.fullName)
         return nx::db::DBResult::ok;
 
-    std::vector<api::SystemSharingEx> sharings;
-    auto dbResult = fetchUserSharings(
-        queryContext,
-        {{ "email", ":accountEmail", QnSql::serialized_field(accountUpdate.email) }},
-        &sharings);
+    std::deque<api::SystemSharingEx> sharings;
+    auto dbResult = m_systemSharingDao.fetchUserSharingsByAccountEmail(
+        queryContext, accountUpdate.email, &sharings);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
     for (const auto& sharing: sharings)
@@ -1672,11 +1659,11 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     nx::db::QueryContext* queryContext,
     int* const /*dummy*/)
 {
-    std::vector<api::SystemSharingEx> sharings;
-    const auto result = fetchUserSharings(
-        queryContext,
-        nx::db::InnerJoinFilterFields(),
-        &sharings);
+    // TODO: #ak Do it without 
+
+    std::deque<api::SystemSharingEx> sharings;
+    const auto result = m_systemSharingDao.fetchAllUserSharings(
+        queryContext, &sharings);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOG(lit("Failed to read system list from DB"), cl_logWARNING);

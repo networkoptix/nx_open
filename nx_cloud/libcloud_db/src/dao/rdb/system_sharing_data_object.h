@@ -1,5 +1,7 @@
 #pragma once
 
+#include <deque>
+
 #include <utils/db/filter.h>
 #include <utils/db/types.h>
 #include <utils/db/query_context.h>
@@ -18,10 +20,14 @@ public:
         nx::db::QueryContext* const queryContext,
         const api::SystemSharingEx& sharing);
 
-    nx::db::DBResult fetchUserSharings(
+    nx::db::DBResult fetchAllUserSharings(
         nx::db::QueryContext* const queryContext,
-        const nx::db::InnerJoinFilterFields& filterFields,
-        std::vector<api::SystemSharingEx>* const sharings);
+        std::deque<api::SystemSharingEx>* const sharings);
+
+    nx::db::DBResult fetchUserSharingsByAccountEmail(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        std::deque<api::SystemSharingEx>* const sharings);
 
     nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
@@ -54,6 +60,12 @@ public:
         const std::string& systemId,
         std::chrono::system_clock::time_point lastloginTime,
         float usageFrequency);
+
+private:
+    nx::db::DBResult fetchUserSharings(
+        nx::db::QueryContext* const queryContext,
+        const nx::db::InnerJoinFilterFields& filterFields,
+        std::deque<api::SystemSharingEx>* const sharings);
 };
 
 } // namespace rdb

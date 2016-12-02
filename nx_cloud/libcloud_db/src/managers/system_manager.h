@@ -157,11 +157,6 @@ public:
 
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
-        
-    nx::db::DBResult fetchUserSharings(
-        nx::db::QueryContext* const queryContext,
-        const nx::db::InnerJoinFilterFields& filter,
-        std::vector<api::SystemSharingEx>* const sharings);
 
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
