@@ -257,18 +257,20 @@ TEST_F(CopyTest, copyDirectoryOverwrite)
         targetDir.absoluteFilePath("dir/subdir/subsubdir/inner_file")));
 }
 
-TEST_F(CopyTest, readSymLinkTarget)
-{
-    const QString linkName("link");
+#if defined(Q_OS_UNIX)
+    TEST_F(CopyTest, readSymLinkTarget)
+    {
+        const QString linkName("link");
 
-    createFile("file");
+        createFile("file");
 
-    const auto srcName = createSymLink(linkName, "file");
-    ASSERT_FALSE(srcName.isEmpty());
+        const auto srcName = createSymLink(linkName, "file");
+        ASSERT_FALSE(srcName.isEmpty());
 
-    QString symLinkTarget = file_system::symLinkTarget(srcName);
-    ASSERT_EQ(symLinkTarget, "file");
-}
+        QString symLinkTarget = file_system::symLinkTarget(srcName);
+        ASSERT_EQ(symLinkTarget, "file");
+    }
+#endif //defined(Q_OS_UNIX)
 
 TEST_F(CopyTest, copyFileLink)
 {

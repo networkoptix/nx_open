@@ -101,10 +101,12 @@ Result copy(const QString& sourcePath, const QString& targetPath, Options option
 
 QString symLinkTarget(const QString& linkPath)
 {
-    #if defined(Q_OS_UNIX)
-        if (!QFileInfo(linkPath).isSymLink())
-            return QString();
+    const QFileInfo linkInfo(linkPath);
 
+    if (!linkInfo.isSymLink())
+        return QString();
+
+    #if defined(Q_OS_UNIX)
         char target[PATH_MAX + 1];
         const auto path = QFile::encodeName(linkPath);
         int len = readlink(path, target, PATH_MAX);
@@ -113,7 +115,7 @@ QString symLinkTarget(const QString& linkPath)
         target[len] = '\0';
         return QFile::decodeName(QByteArray(target));
     #else
-        return QString();
+        return linkInfo.symLinkTarget();
     #endif
 }
 
