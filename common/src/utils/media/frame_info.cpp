@@ -374,14 +374,14 @@ void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
     channel = other->channel;
 }
 
-bool CLVideoDecoderOutput::canPerformScale(const QSize& size) const
+bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
 {
     return size.width() != 0 && size.height() != 0 && height != 0 && width != 0;
 }
 
 CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)
 {
-    if (!canPerformScale(newSize))
+    if (invalidScaleParameters(newSize))
         return nullptr;
 
     if (newFormat == AV_PIX_FMT_NONE)
