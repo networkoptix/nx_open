@@ -76,7 +76,7 @@ bool SelfUpdater::registerUriHandler()
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
         QnAppInfo::productNameLong(),
-        QnClientAppInfo::protocolHandlerBundleId(),
+        QnClientAppInfo::protocolHandlerBundleIdBase(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);

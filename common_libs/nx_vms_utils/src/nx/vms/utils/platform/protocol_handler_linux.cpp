@@ -158,12 +158,12 @@ bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
-    const QString& macOsBundleId,
+    const QString& macHandlerBundleIdBase,
     const QString& description,
     const QString& customization,
     const SoftwareVersion& version)
 {
-    Q_UNUSED(macOsBundleId)
+    Q_UNUSED(macHandlerBundleIdBase)
     
     const auto appsLocation = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (appsLocation.isEmpty())

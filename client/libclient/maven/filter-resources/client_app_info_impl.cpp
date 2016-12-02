@@ -45,9 +45,9 @@ QString QnClientAppInfo::protocolHandlerBundleName()
     return QStringLiteral("protocol_handler.app");
 }
 
-QString QnClientAppInfo::protocolHandlerBundleId()
+QString QnClientAppInfo::protocolHandlerBundleIdBase()
 {
-    return QStringLiteral("${mac.protocol_handler_bundle.identifier}${buildNumber}");
+    return QStringLiteral("${mac.protocol_handler_bundle.identifier}");
 }
 
 QString QnClientAppInfo::launcherVersionFile()

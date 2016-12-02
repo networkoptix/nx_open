@@ -7,6 +7,8 @@
 
 #include <platform/core_foundation_mac/cf_url.h>
 #include <platform/core_foundation_mac/cf_string.h>
+#include <platform/core_foundation_mac/cf_array.h>
+#include <nx/utils/software_version.h>
 
 #include <QDebug>
 
@@ -35,13 +37,36 @@ bool registerAsLaunchService(const QString& applicationPath)
     return (status == noErr);
 }
 
+bool isBundleExist(const QString& bundleId)
+{
+    const auto cfBundleId = cf::QnCFString(bundleId);
+    const cf::QnCFArray urls(
+        LSCopyApplicationURLsForBundleIdentifier(cfBundleId.ref(), nullptr));
+    return urls.ref();
+}
+
+QStringList getBundlesForProtocol(const QString& protocol)
+{
+    const auto cfProtocol = cf::QnCFString(protocol);
+    const cf::QnCFArray bundleIds(LSCopyAllHandlersForURLScheme(cfProtocol.ref()));
+
+    QStringList result;
+    const int count = bundleIds.size();
+    for (int i = 0; i != count; ++i)
+    {
+        const auto cfBundleId = cf::QnCFString(bundleIds.at<CFStringRef>(i));
+        result.push_back(cfBundleId.toString());
+    }
+    return result;
+}
+
 } // Unnamed namespace
 
 bool nx::vms::utils::registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
-    const QString& macOsBundleId,
+    const QString& macHandlerBundleIdBase,
     const QString& description,
     const QString& customization,
     const nx::utils::SoftwareVersion& version)
@@ -49,10 +74,43 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     Q_UNUSED(applicationName);
     Q_UNUSED(customization);
     Q_UNUSED(description);
-    Q_UNUSED(version);
+
+    const int currentBuild = version.build();
+    const auto handlerBundleId = lit("%1%2").arg(
+        macHandlerBundleIdBase, QString::number(currentBuild));
+    const auto currentHandlers = getBundlesForProtocol(protocol);
+    bool foundNewerHandler = false;
+
+    for(const auto& bundleId: currentHandlers)
+    {
+        if (!bundleId.startsWith(macHandlerBundleIdBase)) //< Checks if it is NX handlers only
+            continue;
+
+        if (!isBundleExist(bundleId)) //< Skips removed apps
+            continue;
+
+        const int buildNumberLen = (bundleId.size() - macHandlerBundleIdBase.size());
+        if (buildNumberLen <= 0)
+            continue;
+
+        // We can rely on build number - it will always growing
+        bool correctConversion = false;
+        const int buildNumber = bundleId.right(buildNumberLen).toInt(&correctConversion);
+        if (!correctConversion)
+            continue;
+
+        if (buildNumber > currentBuild)
+        {
+            foundNewerHandler = true;
+            break;
+        }
+    }
+
+    if (foundNewerHandler) //< Do not register handler if we have newer one
+        return false;
 
     return registerAsLaunchService(applicationBinaryPath) &&
-        LSSetDefaultHandlerForURLScheme(cf::QnCFString(protocol).ref(),
-            cf::QnCFString(macOsBundleId).ref());
+        (LSSetDefaultHandlerForURLScheme(cf::QnCFString(protocol).ref(),
+            cf::QnCFString(handlerBundleId).ref()) != noErr);
 }
 

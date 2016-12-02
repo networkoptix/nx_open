@@ -25,7 +25,7 @@ struct QnClientAppInfo
 
     static QString protocolHandlerBundleName();
 
-    static QString protocolHandlerBundleId();
+    static QString protocolHandlerBundleIdBase();
 
     static QString launcherVersionFile();
 
