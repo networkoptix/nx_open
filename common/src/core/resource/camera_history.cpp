@@ -420,9 +420,27 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
 
 ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(const QnUuid& cameraId, bool* isValid)
 {
-    QnMutexLocker lock( &m_mutex );
-    *isValid = m_historyValidCameras.contains(cameraId);
+    QnMutexLocker lock(&m_mutex);
+    *isValid = m_historyValidCameras.contains(cameraId) &&
+        isValidHistoryDetails(cameraId, m_historyDetail.value(cameraId));
     return *isValid ? m_historyDetail.value(cameraId) : ec2::ApiCameraHistoryItemDataList();
+}
+
+bool QnCameraHistoryPool::isValidHistoryDetails(
+    const QnUuid& cameraId,
+    const ec2::ApiCameraHistoryItemDataList& historyDetails) const
+{
+    QnVirtualCameraResourcePtr camera = toCamera(cameraId);
+    if (!camera || camera->getStatus() != Qn::Recording)
+        return true; //< nothing to check if no camera or not int recording state
+
+    if (historyDetails.empty())
+        return false;
+
+    if (camera->getParentId() != historyDetails[historyDetails.size()-1].serverGuid)
+        return false;
+
+    return true;
 }
 
 bool QnCameraHistoryPool::testAndSetHistoryDetails(
@@ -441,17 +459,8 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
     if (currentServerList != serverList)
         return false;
 
-    if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
-    {
-        if (camera->getStatus() == Qn::Recording)
-        {
-            if (historyDetails.empty())
-                return false;
-
-            if (camera->getParentId() != historyDetails[historyDetails.size()-1].serverGuid)
-                return false;
-        }
-    }
+    if (!isValidHistoryDetails(cameraId, historyDetails))
+        return false;
 
     m_historyDetail[cameraId] = historyDetails;
     m_historyValidCameras.insert(cameraId);

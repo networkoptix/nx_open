@@ -164,6 +164,9 @@ private:
     QnMediaServerResourceList getCameraFootageDataUnsafe(
         const QnUuid &cameraId,
         bool filterOnlineServers = false) const;
+    bool isValidHistoryDetails(
+        const QnUuid& cameraId,
+        const ec2::ApiCameraHistoryItemDataList& historyDetails) const;
 private:
 
     mutable QnMutex m_mutex;
