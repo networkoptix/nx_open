@@ -75,12 +75,15 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     Q_UNUSED(customization);
     Q_UNUSED(description);
 
-    const int currentBuild = version.build();
+    int currentBuild = version.build();
     const auto handlerBundleId = lit("%1%2").arg(
         macHandlerBundleIdBase, QString::number(currentBuild));
     const auto currentHandlers = getBundlesForProtocol(protocol);
-    bool foundNewerHandler = false;
 
+    /**
+     * Looking for maximal available version of application and reregister it anyway
+     * because lesser version could register itself automatically after installation
+     */
     for(const auto& bundleId: currentHandlers)
     {
         if (!bundleId.startsWith(macHandlerBundleIdBase)) //< Checks if it is NX handlers only
@@ -100,14 +103,8 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
             continue;
 
         if (buildNumber > currentBuild)
-        {
-            foundNewerHandler = true;
-            break;
-        }
+            currentBuild = buildNumber;
     }
-
-    if (foundNewerHandler) //< Do not register handler if we have newer one
-        return false;
 
     return registerAsLaunchService(applicationBinaryPath) &&
         (LSSetDefaultHandlerForURLScheme(cf::QnCFString(protocol).ref(),
