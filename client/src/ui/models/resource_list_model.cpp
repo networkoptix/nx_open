@@ -37,10 +37,11 @@ void QnResourceListModel::setResources(const QnResourceList &resouces) {
 
     m_resources = resouces;
 
-    foreach(const QnResourcePtr &resource, m_resources) {
-        connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-        connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    foreach(const QnResourcePtr &resource, m_resources)
+    {
+        connect(resource.data(), &QnResource::nameChanged,     this, &QnResourceListModel::at_resource_resourceChanged));
+        connect(resource.data(), &QnResource::statusChanged,   this, &QnResourceListModel::at_resource_resourceChanged));
+        connect(resource.data(), &QnResource::resourceChanged, this, &QnResourceListModel::at_resource_resourceChanged));
     }
 
     endResetModel();

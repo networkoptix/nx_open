@@ -280,7 +280,8 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 }
 
-void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
+void QnResource::update(const QnResourcePtr& other)
+{
     /*
     Q_ASSERT_X(other->metaObject()->className() == this->metaObject()->className(),
         Q_FUNC_INFO,
@@ -302,8 +303,6 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
         updateInner(other, modifiedFields);
     }
 
-    silenceMode |= other->hasFlags(Qn::foreigner);
-    //setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
     {
@@ -574,7 +573,7 @@ Qn::ResourceStatus QnResource::getStatus() const
     return qnStatusDictionary->value(getId());
 }
 
-void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus)
+void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, StatusChangeReason reason)
 {
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
@@ -591,10 +590,10 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
         init();
 
-    emit statusChanged(toSharedPointer(this));
+    emit statusChanged(toSharedPointer(this), reason);
 }
 
-void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnResource::setStatus(Qn::ResourceStatus newStatus, StatusChangeReason reason)
 {
     if (newStatus == Qn::NotDefined)
         return;
@@ -609,8 +608,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     if (oldStatus == newStatus)
         return;
     qnStatusDictionary->setValue(id, newStatus);
-    if (!silenceMode)
-        doStatusChanged(oldStatus, newStatus);
+    doStatusChanged(oldStatus, newStatus, reason);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const

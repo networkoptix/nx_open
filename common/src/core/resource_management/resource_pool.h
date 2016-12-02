@@ -199,7 +199,7 @@ signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
-    void statusChanged(const QnResourcePtr &resource);
+    void statusChanged(const QnResourcePtr &resource, StatusChangeReason reason);
 
     void aboutToBeDestroyed();
 private:

@@ -34,6 +34,13 @@ class QnInitResPool: public QThreadPool
 public:
 };
 
+enum class StatusChangeReason
+{
+    Default,
+    CreateInitialData,
+    GotFromRemotePeer
+};
+
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
@@ -50,6 +57,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
+
     QnResource();
     QnResource(const QnResource&);
     virtual ~QnResource();
@@ -72,7 +80,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false);
+    virtual void setStatus(Qn::ResourceStatus newStatus, StatusChangeReason reason = StatusChangeReason::Default);
     QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
@@ -217,7 +225,7 @@ public:
     void setRemovedFromPool(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
-    void statusChanged(const QnResourcePtr &resource);
+    void statusChanged(const QnResourcePtr &resource, StatusChangeReason reason);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -256,7 +264,7 @@ public:
     static int commandProcQueueSize();
 #endif
 
-    void update(const QnResourcePtr& other, bool silenceMode = false);
+    void update(const QnResourcePtr& other);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
@@ -307,7 +315,7 @@ private:
     bool emitDynamicSignal(const char *signal, void **arguments);
     void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
     void emitPropertyChanged(const QString& key);
-    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus);
+    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, StatusChangeReason reason);
 
     friend class InitAsyncTask;
 

@@ -184,4 +184,6 @@ typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
 class QnAdamResource;
 typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
 
+enum class StatusChangeReason;
+
 #endif // QN_RESOURCE_FWD_H

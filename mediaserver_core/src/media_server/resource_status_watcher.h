@@ -12,8 +12,8 @@ class QnResourceStatusWatcher : public QObject
     Q_OBJECT
 public:
     QnResourceStatusWatcher();
-    private slots:
-        void at_resource_statusChanged(const QnResourcePtr& resource);
+private slots:
+    void at_resource_statusChanged(const QnResourcePtr& resource, StatusChangeReason reason);
 private:
     bool isSetStatusInProgress(const QnResourcePtr &resource);
     void updateResourceStatusAsync(const QnResourcePtr &resource);

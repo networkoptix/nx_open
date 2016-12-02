@@ -16,16 +16,15 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
     return m_setStatusInProgress.contains(resource->getId());
 }
 
-void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource)
+void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, StatusChangeReason reason)
 {
-    //Q_ASSERT_X(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-    //if (resource.dynamicCast<QnMediaServerResource>())
-    //    return;
-
-    if (!isSetStatusInProgress(resource))
-        updateResourceStatusAsync(resource);
-    else
-        m_awaitingSetStatus << resource->getId();
+    if (reason == StatusChangeReason::Default)
+    {
+        if (!isSetStatusInProgress(resource))
+            updateResourceStatusAsync(resource);
+        else
+            m_awaitingSetStatus << resource->getId();
+    }
 }
 
 void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &resource)

@@ -26,6 +26,7 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
+
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
@@ -113,7 +114,7 @@ public:
     void setOriginalGuid(const QnUuid &guid);
     static bool isFakeServer(const QnResourcePtr &resource);
 
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, StatusChangeReason reason = StatusChangeReason::Default) override;
     qint64 currentStatusTime() const;
 
     void beforeDestroy();
