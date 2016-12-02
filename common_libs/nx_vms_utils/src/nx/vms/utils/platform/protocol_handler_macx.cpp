@@ -107,6 +107,10 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     const auto handlerBundleId = lit("%1%2").arg(
         macHandlerBundleIdBase, QString::number(currentBuild));
 
+    qDebug() << "<<";
+    qDebug() << handlerBundleId;
+    qDebug() << version.build();
+
     bool result = true;
     if (currentBuild == version.build())
         result = registerAsLaunchService(applicationBinaryPath);
