@@ -132,6 +132,9 @@
               <property name="labelAlignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
+              <property name="horizontalSpacing">
+               <number>8</number>
+              </property>
               <property name="verticalSpacing">
                <number>8</number>
               </property>
