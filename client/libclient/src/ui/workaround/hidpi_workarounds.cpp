@@ -172,39 +172,22 @@ void installMenuMouseEventCorrector(QMenu* menu)
 
 QWindow* getParentWindow(QWidget* widget)
 {
-    // Checks if widget is in graphics view
-
     if (!widget)
         return nullptr;
 
-    auto item = widget;
+    auto topLevel = widget->window();
+    if (topLevel->isWindow())
+        return topLevel->windowHandle();
 
-    while (!item->isWindow() && item->parentWidget())
-    {
-        const auto parentWidget = item->parentWidget();
-        if (dynamic_cast<QGLWidget*>(parentWidget))
-            return parentWidget->windowHandle();
+    const auto proxy = topLevel->graphicsProxyWidget();
+    if (!proxy)
+        return nullptr;
 
-        item = parentWidget;
-    }
+    const auto scene = proxy->scene();
+    if (!scene || scene->views().isEmpty())
+        return nullptr;
 
-    if (item->isWindow())
-        return item->windowHandle();
-
-    const auto proxy = item->graphicsProxyWidget();
-    const QGraphicsView* view = (proxy && proxy->scene() && !proxy->scene()->views().isEmpty()
-        ? proxy->scene()->views().first() : nullptr);
-    if (view)
-        return view->viewport()->windowHandle();
-
-    while (widget)
-    {
-        if (widget->windowHandle())
-            return widget->windowHandle();
-
-        widget = widget->parentWidget();
-    }
-    return nullptr;
+    return getParentWindow(scene->views().first());
 }
 
 QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = nullptr)
