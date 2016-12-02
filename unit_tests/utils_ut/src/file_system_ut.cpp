@@ -314,6 +314,7 @@ TEST_F(CopyTest, copyDirectoryLink)
 
 TEST_F(CopyTest, followSymLinks)
 {
+    createPath("dir");
     createFile("dir/file");
     createSymLink("link", "dir");
     createSymLink("dir/link", "file");
@@ -329,6 +330,59 @@ TEST_F(CopyTest, followSymLinks)
     const QFileInfo fileInfo(targetDir.filePath("link/link"));
     ASSERT_TRUE(fileInfo.isFile());
     ASSERT_FALSE(dirInfo.isSymLink());
+}
+
+TEST_F(CopyTest, simpleOverlap)
+{
+    const auto srcFile = createFile("file");
+    ASSERT_FALSE(srcFile.isEmpty());
+
+    auto result = file_system::copy(srcFile, srcFile);
+    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
+
+    const auto srcDir = createFile("dir");
+    ASSERT_FALSE(srcDir.isEmpty());
+
+    result = file_system::copy(srcDir, srcDir);
+    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
+}
+
+TEST_F(CopyTest, symLinkOverlap)
+{
+    const auto srcFile = createFile("file");
+    ASSERT_FALSE(srcFile.isEmpty());
+    const auto srcLink = createSymLink("link", "file");
+    ASSERT_FALSE(srcLink.isEmpty());
+
+    auto result = file_system::copy(srcLink, srcFile);
+    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
+}
+
+TEST_F(CopyTest, directoryOverlap)
+{
+    createPath("dir/dir/dir");
+    createFile("dir/dir/dir/file");
+
+    const auto initialEntriesCount = entriesCount(sourceDir, true);
+
+    auto result = file_system::copy(
+        sourceDir.absoluteFilePath("dir/dir"), sourceDir.absolutePath());
+    ASSERT_EQ(result.code, file_system::Result::ok);
+
+    ASSERT_TRUE(QFile(sourceDir.absoluteFilePath("dir/dir/file")).exists());
+
+    const auto newEntriesCount = entriesCount(sourceDir, true);
+    ASSERT_EQ(initialEntriesCount + 1, newEntriesCount);
+}
+
+TEST_F(CopyTest, directorySelfOverlap)
+{
+    createPath("dir/dir/dir");
+    createSymLink("dir/dir/dir/dir", "../dir");
+
+    auto result = file_system::copy(
+        sourceDir.absoluteFilePath("dir/dir"), sourceDir.absolutePath());
+    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
 }
 
 } // namespace test

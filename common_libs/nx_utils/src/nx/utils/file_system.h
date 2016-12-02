@@ -15,7 +15,8 @@ struct NX_UTILS_API Result
         sourceDoesNotExist,
         alreadyExists,
         cannotCopy,
-        cannotCreateDirectory
+        cannotCreateDirectory,
+        sourceAndTargetAreSame
     };
 
     ResultCode code;

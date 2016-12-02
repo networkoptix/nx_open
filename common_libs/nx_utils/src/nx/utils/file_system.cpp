@@ -28,6 +28,9 @@ Result copy(const QString& sourcePath, const QString& targetPath, Options option
         tgtFileInfo = QFileInfo(fullTargetPath);
     }
 
+    if (srcFileInfo.absoluteFilePath() == tgtFileInfo.absoluteFilePath())
+        return Result(Result::sourceAndTargetAreSame, sourcePath);
+
     {
         auto targetDir = tgtFileInfo.dir();
         if (!targetDir.exists())
@@ -37,6 +40,12 @@ Result copy(const QString& sourcePath, const QString& targetPath, Options option
         }
     }
 
+    if (srcFileInfo.isSymLink()
+        && srcFileInfo.symLinkTarget() == tgtFileInfo.absoluteFilePath())
+    {
+        return Result(Result::sourceAndTargetAreSame, sourcePath);
+    }
+
     if (srcFileInfo.isDir() && (!srcFileInfo.isSymLink() || options.testFlag(FollowSymLinks)))
     {
         if (!tgtFileInfo.exists())
@@ -44,6 +53,10 @@ Result copy(const QString& sourcePath, const QString& targetPath, Options option
             auto targetDir = tgtFileInfo.dir();
             if (!targetDir.mkdir(tgtFileInfo.fileName()))
                 return Result(Result::cannotCreateDirectory, targetPath);
+        }
+        else if (!tgtFileInfo.isDir())
+        {
+            return Result(Result::cannotCreateDirectory, targetPath);
         }
 
         const auto sourceDir = QDir(sourcePath);
