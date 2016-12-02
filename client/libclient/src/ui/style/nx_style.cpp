@@ -959,8 +959,8 @@ void QnNxStyle::drawPrimitive(
                 return;
 
             auto icon = option->state.testFlag(State_Open)
-                ? qnSkin->icon("tree/branch_closed.png")
-                : qnSkin->icon("tree/branch_open.png");
+                ? qnSkin->icon("tree/branch_open.png")
+                : qnSkin->icon("tree/branch_closed.png");
 
             icon.paint(painter, option->rect);
             return;
