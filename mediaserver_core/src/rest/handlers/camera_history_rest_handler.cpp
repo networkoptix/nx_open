@@ -11,6 +11,8 @@
 
 namespace {
 
+static const int kHistoryCacheTimeoutMs = 1000 * 60 * 10;
+
 struct TimePeriodEx: public QnTimePeriod
 {
     int index;
@@ -41,15 +43,27 @@ TimePeriodEx findMinStartTimePeriod(
     return result;
 }
 
-QnMutex* getMutex(const QnUuid& id)
+struct LoadDataContext
+{
+    LoadDataContext()
+    {
+        timer.invalidate();
+    }
+
+    QnMutex mutex;
+    QElapsedTimer timer;
+};
+
+LoadDataContext* getContext(const QnUuid& id)
 {
     static QnMutex access;
     QnMutexLocker lock(&access);
 
-    static std::map<QnUuid, std::unique_ptr<QnMutex>> loadDataMutex;
-    auto itr = loadDataMutex.find(id);
-    if (itr == loadDataMutex.end())
-        itr = loadDataMutex.emplace(id, std::unique_ptr<QnMutex>(new QnMutex())).first;
+    static std::map<QnUuid, std::unique_ptr<LoadDataContext>> loadDataContext;
+
+    auto itr = loadDataContext.find(id);
+    if (itr == loadDataContext.end())
+        itr = loadDataContext.emplace(id, std::unique_ptr<LoadDataContext>(new LoadDataContext)).first;
 
     return itr->second.get();
 }
@@ -93,9 +107,11 @@ int QnCameraHistoryRestHandler::executeGet(
 
         bool isValid = false;
 
-        QnMutexLocker lock(getMutex(outputRecord.cameraId));
+        LoadDataContext* context = getContext(outputRecord.cameraId);
+        QnMutexLocker lock(&context->mutex);
 
-        outputRecord.items = qnCameraHistoryPool->getHistoryDetails(outputRecord.cameraId, &isValid);
+        if (context->timer.isValid() && !context->timer.hasExpired(kHistoryCacheTimeoutMs))
+            outputRecord.items = qnCameraHistoryPool->getHistoryDetails(outputRecord.cameraId, &isValid);
         if (!isValid)
         {
             QnChunksRequestData updatedRequest = request;
@@ -103,7 +119,8 @@ int QnCameraHistoryRestHandler::executeGet(
             updatedRequest.resList.push_back(camera);
             MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
             outputRecord.items = buildHistoryData(chunks);
-            qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items);
+            if (qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
+                context->timer.restart();
         }
         outputData.push_back(std::move(outputRecord));
     }
