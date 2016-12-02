@@ -17,15 +17,15 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
+#include <nx/utils/raii_guard.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
-#include <utils/directory_backup.h>
 
 namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
-
-typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
+const QString kApplauncherDirectory = lit("applauncher");
+const QString kApplauncherBackupDirectory = lit("applauncher-backup");
 
 QDir applicationRootDir(const QDir& binDir)
 {
@@ -82,53 +82,96 @@ bool SelfUpdater::registerUriHandler()
         m_clientVersion);
 }
 
-QnDirectoryBackupPtr copyApplauncherInstance(const QDir& from, const QDir& to)
+bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
 {
-    const auto backup = new QnMultipleDirectoriesBackup();
+    using namespace nx::utils::file_system;
 
-    // Copy launcher executable
-    backup->addDirectoryBackup(QnDirectoryBackupPtr(new QnDirectoryBackup(
-        from.absoluteFilePath(QnClientAppInfo::binDirSuffix()),
-        QStringList{QnClientAppInfo::applauncherBinaryName(), lit("*.dll")},
-        to.absoluteFilePath(QnClientAppInfo::binDirSuffix()))));
+    auto checkedCopy = [](const QString& src, const QString& dst)
+        {
+            auto result = copy(src, dst);
+            if (!result.isOk())
+            {
+                NX_LOG(lit("SelfUpdater: Cannot copy %2. Code: %1").arg(result.code).arg(result.path),
+                    cl_logERROR);
+                return false;
+            }
+            return true;
+        };
 
-    // Copy libs
-    if (QnAppInfo::applicationPlatform() != lit("windows"))
+    const bool windows = QnAppInfo::applicationPlatform() == lit("windows");
+
+    const QDir sourceBinDir(sourceDir.absoluteFilePath(QnClientAppInfo::binDirSuffix()));
+    const QDir targetBinDir(targetDir.absoluteFilePath(QnClientAppInfo::binDirSuffix()));
+
+    if (!ensureDir(targetBinDir))
+        return false;
+
+    if (!checkedCopy(
+        sourceBinDir.absoluteFilePath(QnClientAppInfo::applauncherBinaryName()),
+        targetBinDir.absoluteFilePath(QnClientAppInfo::applauncherBinaryName())))
     {
-        backup->addDirectoryBackup(QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
-            from.absoluteFilePath(QnClientAppInfo::libDirSuffix()),
-            to.absoluteFilePath(QnClientAppInfo::libDirSuffix()))));
+        return false;
     }
 
-    return QnDirectoryBackupPtr(backup);
+    if (windows)
+    {
+        for (const auto& entry: sourceBinDir.entryList(QStringList{lit("*.dll")}, QDir::Files))
+        {
+            if (!checkedCopy(sourceBinDir.absoluteFilePath(entry), targetBinDir.absolutePath()))
+                return false;
+        }
+    }
+    else
+    {
+        const QDir sourceLibDir(sourceDir.absoluteFilePath(QnClientAppInfo::libDirSuffix()));
+        const QDir targetLibDir(targetDir.absoluteFilePath(QnClientAppInfo::libDirSuffix()));
+
+        if (!ensureDir(targetLibDir))
+            return false;
+
+        for (const auto& entry:
+             sourceLibDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+        {
+            if (!checkedCopy(sourceLibDir.absoluteFilePath(entry), targetLibDir.absolutePath()))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 bool SelfUpdater::updateApplauncher()
 {
     using namespace applauncher::api;
+    using namespace nx::utils::file_system;
 
     /* Check if applauncher binary exists in our installation. */
 
-    QDir targetDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation)
-        + lit("/../applauncher/")
-        + QnAppInfo::customizationName());
-
-    QString absolutePath = targetDir.absoluteFilePath(QnClientAppInfo::binDirSuffix());
-    if (!QDir(absolutePath).mkpath(lit(".")))
+    const QDir companyDataDir(
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+            + lit("/.."));
+    if (!ensureDir(companyDataDir))
     {
-        NX_LOG(lit("Cannot create folder for applaucher: %1")
-            .arg(absolutePath), cl_logERROR);
+        NX_LOGX(
+            lit("Cannot create a folder for application data: %1")
+               .arg(companyDataDir.absolutePath()),
+            cl_logERROR);
         return false;
     }
 
-    const auto lockFilePath = targetDir.absoluteFilePath(lit("update.lock"));
+    const QDir targetDir(companyDataDir.absoluteFilePath(kApplauncherDirectory)
+        + L'/' + QnAppInfo::customizationName());
+    const QDir backupDir(companyDataDir.absoluteFilePath(kApplauncherBackupDirectory)
+        + L'-' + QnAppInfo::customizationName());
+
+    const auto lockFilePath = companyDataDir.absoluteFilePath(lit("applauncher-update.lock"));
 
     /* Lock update file to make sure we will not try to update applauncher
        by several client instances. */
     QLockFile applauncherLock(lockFilePath);
     if (!applauncherLock.tryLock(kUpdateLockTimeoutMs))
     {
-        NX_LOG(lit("Lock file is not available: %1").arg(lockFilePath), cl_logERROR);
+        NX_LOGX(lit("Lock file is not available: %1").arg(lockFilePath), cl_logERROR);
         return false;
     }
 
@@ -137,65 +180,106 @@ bool SelfUpdater::updateApplauncher()
     const auto applauncherVersion = getVersionFromFile(versionFile);
     if (m_clientVersion <= applauncherVersion)
     {
-        NX_LOG(lit("Applauncher is up to date"), cl_logINFO);
+        NX_LOGX(lit("Applauncher is up to date"), cl_logINFO);
+
+        if (backupDir.exists())
+        {
+            NX_LOGX(lit("Removing the outdated backup %1").arg(backupDir.absolutePath()),
+                cl_logINFO);
+            QDir(backupDir).removeRecursively();
+        }
+
         return true;
     }
 
-    NX_LOG(lit("Applauncher is too old, updating from %1")
-        .arg(applauncherVersion.toString()), cl_logINFO);
+    NX_LOGX(lit("Updating applauncher from %1").arg(applauncherVersion.toString()), cl_logINFO);
 
     /* Check if no applauncher instance is running. If there is, try to kill it. */
     const auto killApplauncherResult = applauncher::quitApplauncher();
     if (killApplauncherResult != ResultType::ok &&          /*< Successfully killed. */
         killApplauncherResult != ResultType::connectError)  /*< Not running. */
     {
-        NX_LOG(lit("Could not kill running applauncher instance. Error code %1")
+        NX_LOGX(lit("Could not kill running applauncher instance. Error code %1")
             .arg(QString::fromUtf8(ResultType::toString(killApplauncherResult))), cl_logERROR);
         return false;
     }
 
-    QDir backupDir(targetDir.absoluteFilePath(lit("backup")));
-    const auto backup = copyApplauncherInstance(targetDir, backupDir);
-    if (!backup->backup(QnDirectoryBackupBehavior::Move))
+    if (backupDir.exists())
     {
-        NX_LOG(lit("Could not backup to %1").arg(backupDir.absolutePath()), cl_logERROR);
+        NX_LOGX(lit("Using the existing backup %1").arg(backupDir.absolutePath()), cl_logINFO);
+        QDir(targetDir).removeRecursively();
+    }
+    else if (targetDir.exists())
+    {
+        if (!QDir().rename(targetDir.absolutePath(), backupDir.absolutePath()))
+        {
+            NX_LOGX(lit("Could not backup applauncher to %1").arg(backupDir.absolutePath()),
+                cl_logERROR);
+            return false;
+        }
+    }
+
+    auto guard = QnRaiiGuard::createEmpty();
+    if (backupDir.exists())
+    {
+        guard = QnRaiiGuard::createDestructible(
+            [this, backupDir, targetDir]()
+            {
+                QDir(targetDir).removeRecursively();
+                if (!QDir().rename(backupDir.absolutePath(), targetDir.absolutePath()))
+                {
+                    NX_LOGX(
+                        lit("Could not restore applauncher from %1!")
+                            .arg(backupDir.absolutePath()),
+                        cl_logERROR);
+                }
+            });
+    }
+
+    if (!ensureDir(targetDir))
+    {
+        NX_LOGX(lit("Cannot create a folder for applauncher: %1").arg(targetDir.absolutePath()),
+            cl_logERROR);
         return false;
     }
 
     /* Copy our applauncher with all libs to destination folder. */
-    auto updatedSource = copyApplauncherInstance(
+    const bool updateSuccess = copyApplauncherInstance(
         applicationRootDir(qApp->applicationDirPath()), targetDir);
 
-    //TODO: #GDM may be rename class and its methods to something else?
-    const bool updateSuccess = updatedSource->backup(QnDirectoryBackupBehavior::Copy);
-    if (!updateSuccess)
+    if (guard)
     {
-        NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
-        backup->restore(QnDirectoryBackupBehavior::Copy);
+        if (updateSuccess)
+            guard->disableDestructionHandler();
+        else
+            guard.reset(); // Restore old applauncher.
     }
 
     /* Run newest applauncher via our own minilauncher. */
     if (!runMinilaucher())
         return false;
 
-    if (!updateApplauncherDesktopIcon())
-        return false;
-
     /* If we failed, return now. */
     if (!updateSuccess)
         return false;
 
-    /* Finally, is case of success, save version to file. */
-    if (!saveVersionToFile(versionFile, m_clientVersion))
+    if (!updateApplauncherDesktopIcon())
     {
-        NX_LOG(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
-        NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
+        NX_LOGX(lit("Failed to update desktop icon."), cl_logERROR);
         return false;
     }
 
-    backupDir.removeRecursively();
+    /* Finally, is case of success, save version to file. */
+    if (!saveVersionToFile(versionFile, m_clientVersion))
+    {
+        NX_LOGX(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
+        NX_LOGX(lit("Failed to update Applauncher."), cl_logERROR);
+        return false;
+    }
 
-    NX_LOG(lit("Applauncher updated successfully."), cl_logINFO);
+    QDir(backupDir).removeRecursively();
+
+    NX_LOGX(lit("Applauncher updated successfully."), cl_logINFO);
     return true;
 }
 
@@ -204,7 +288,7 @@ bool SelfUpdater::updateMinilauncher()
     /* Do not try to update minilauncher when started from the default directory. */
     if (qApp->applicationDirPath().startsWith(QnClientAppInfo::installationRoot(), Qt::CaseInsensitive))
     {
-        NX_LOG(lit("Minilauncher will not be updated."), cl_logINFO);
+        NX_LOGX(lit("Minilauncher will not be updated."), cl_logINFO);
         return true;
     }
 
@@ -219,13 +303,13 @@ nx::utils::SoftwareVersion SelfUpdater::getVersionFromFile(const QString& filena
     QFile versionFile(filename);
     if (!versionFile.exists())
     {
-        NX_LOG(lit("Version file does not exist: %1").arg(filename), cl_logERROR);
+        NX_LOGX(lit("Version file does not exist: %1").arg(filename), cl_logERROR);
         return nx::utils::SoftwareVersion();
     }
 
     if (!versionFile.open(QIODevice::ReadOnly))
     {
-        NX_LOG(lit("Version file could not be open for reading: %1").arg(filename), cl_logERROR);
+        NX_LOGX(lit("Version file could not be open for reading: %1").arg(filename), cl_logERROR);
         return nx::utils::SoftwareVersion();
     }
 
@@ -237,7 +321,7 @@ bool SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::So
     QFile versionFile(filename);
     if (!versionFile.open(QIODevice::WriteOnly))
     {
-        NX_LOG(lit("Version file could not be open for writing: %1").arg(filename), cl_logERROR);
+        NX_LOGX(lit("Version file could not be open for writing: %1").arg(filename), cl_logERROR);
         return false;
     }
 
@@ -330,10 +414,11 @@ bool SelfUpdater::runMinilaucher()
     const QStringList args = { lit("--exec") }; /*< We don't want another client instance here. */
     if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
-        NX_LOG(lit("Minilauncher process started successfully."), cl_logINFO);
+        NX_LOG(lit("SelfUpdater: Minilauncher process started successfully."), cl_logINFO);
         return true;
     }
-    NX_LOG(lit("Minilauncher process could not be started %1.").arg(minilauncherPath), cl_logERROR);
+    NX_LOG(lit("SelfUpdater: Minilauncher process could not be started %1.").arg(minilauncherPath),
+        cl_logERROR);
     return false;
 }
 
@@ -348,36 +433,36 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
             installRoot.absoluteFilePath(QnClientAppInfo::applauncherBinaryName());
         if (!QFileInfo::exists(applauncherPath))
         {
-            NX_LOG(lit("Renaming applauncher..."), cl_logINFO);
+            NX_LOGX(lit("Renaming applauncher..."), cl_logINFO);
             const auto sourceApplauncherPath =
                 installRoot.absoluteFilePath(QnClientAppInfo::minilauncherBinaryName());
             if (!QFileInfo::exists(sourceApplauncherPath))
             {
-                NX_LOG(lit("Source applauncher could not be found at %1!")
+                NX_LOGX(lit("Source applauncher could not be found at %1!")
                    .arg(sourceApplauncherPath), cl_logERROR);
                 return false;
             }
 
             if (!QFile(sourceApplauncherPath).copy(applauncherPath))
             {
-                NX_LOG(lit("Could not copy applauncher from %1 to %2")
+                NX_LOGX(lit("Could not copy applauncher from %1 to %2")
                        .arg(sourceApplauncherPath)
                        .arg(applauncherPath),
                        cl_logERROR);
                 return false;
             }
-            NX_LOG(lit("Applauncher renamed successfully"), cl_logINFO);
+            NX_LOGX(lit("Applauncher renamed successfully"), cl_logINFO);
         }
     }
 
     /* On linux (and mac?) applaucher binary should not be renamed, we only update shell script. */
 
-    NX_LOG(lit("Updating minilauncher..."), cl_logINFO);
+    NX_LOGX(lit("Updating minilauncher..."), cl_logINFO);
     const auto sourceMinilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
         QnClientAppInfo::minilauncherBinaryName());
     if (!QFileInfo::exists(sourceMinilauncherPath))
     {
-        NX_LOG(lit("Source minilauncher could not be found at %1!")
+        NX_LOGX(lit("Source minilauncher could not be found at %1!")
             .arg(sourceMinilauncherPath), cl_logERROR);
         return false;
     }
@@ -393,14 +478,14 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
     {
         if (QFileInfo::exists(minilauncherBackupPath) && !QFile(minilauncherBackupPath).remove())
         {
-            NX_LOG(lit("Could not clean minilauncher backup %1")
+            NX_LOGX(lit("Could not clean minilauncher backup %1")
                .arg(minilauncherBackupPath), cl_logERROR);
             return false;
         }
 
         if (!QFile(minilauncherPath).rename(minilauncherBackupPath))
         {
-            NX_LOG(lit("Could not backup minilauncher from %1 to %2")
+            NX_LOGX(lit("Could not backup minilauncher from %1 to %2")
                 .arg(minilauncherPath, minilauncherBackupPath), cl_logERROR);
             return false;
         }
@@ -408,7 +493,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
 
     if (!QFile(sourceMinilauncherPath).copy(minilauncherPath))
     {
-        NX_LOG(lit("Could not copy minilauncher from %1 to %2")
+        NX_LOGX(lit("Could not copy minilauncher from %1 to %2")
             .arg(sourceMinilauncherPath, minilauncherPath), cl_logERROR);
 
         /* Silently trying to restore backup. */
@@ -422,12 +507,12 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
     const auto versionFile = installRoot.absoluteFilePath(QnClientAppInfo::launcherVersionFile());
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
-        NX_LOG(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
-        NX_LOG(lit("Failed to update Minilauncher."), cl_logERROR);
+        NX_LOGX(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
+        NX_LOGX(lit("Failed to update Minilauncher."), cl_logERROR);
         return false;
     }
 
-    NX_LOG(lit("Minilauncher updated successfully"), cl_logINFO);
+    NX_LOGX(lit("Minilauncher updated successfully"), cl_logINFO);
     NX_EXPECT(isMinilaucherUpdated(installRoot));
 
     return true;
@@ -493,8 +578,8 @@ QStringList SelfUpdater::getClientInstallRoots() const
 
         if (!QFileInfo::exists(clientBinary))
         {
-            NX_LOG(lit("Could not find client binary in %1").arg(clientBinary), cl_logINFO);
-            NX_LOG(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
+            NX_LOGX(lit("Could not find client binary in %1").arg(clientBinary), cl_logINFO);
+            NX_LOGX(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
             continue;
         }
 
