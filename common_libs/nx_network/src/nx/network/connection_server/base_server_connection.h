@@ -277,8 +277,8 @@ private:
 
     void triggerConnectionClosedEvent()
     {
-        auto connectionClosedHandlers = std::move(m_connectionClosedHandlers);
-        m_connectionClosedHandlers.clear();
+        decltype(m_connectionClosedHandlers) connectionClosedHandlers;
+        connectionClosedHandlers.swap(m_connectionClosedHandlers);
         for (auto& connectionCloseHandler: connectionClosedHandlers)
             connectionCloseHandler();
     }
