@@ -40,6 +40,7 @@ enum class StatusChangeReason
     CreateInitialData,
     GotFromRemotePeer
 };
+Q_DECLARE_METATYPE(StatusChangeReason)
 
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {

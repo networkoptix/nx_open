@@ -318,6 +318,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
+    qRegisterMetaType<StatusChangeReason>();
+
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
     QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
