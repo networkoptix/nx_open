@@ -376,7 +376,7 @@ void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
 
 bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
 {
-    return size.width() != 0 && size.height() != 0 && height != 0 && width != 0;
+    return size.width() == 0 || size.height() == 0 || height == 0 || width == 0;
 }
 
 CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)

@@ -109,23 +109,28 @@ private:
     {
         ASSERT_TRUE(m_step != 0);
 
-        for (int i = m_startSize.width(); i < m_endSize.width(); i += m_step)
-            for (int j = m_startSize.height(); j < m_endSize.height(); j += m_step)
-                testWithExactFrame(QSize(i, j));
+        forEachSize([this] (const QSize& size) { return testWithExactFrame(size); });
     }
 
     void testWithExactFrame(const QSize& frameSize)
     {
         m_filterTest.setFrame(generateFrame(frameSize));
 
-        for (int i = m_startSize.width(); i <= m_endSize.width(); i += m_step)
-            for (int j = m_startSize.height(); j <= m_endSize.height(); j += m_step)
+        forEachSize([this] (const QSize& size)
             {
                 if (m_shouldFail)
-                    m_filterTest.testCertainFailWithSize(QSize(i, j));
+                    m_filterTest.testCertainFailWithSize(size);
                 else
-                    m_filterTest.testSuccessWithSize(QSize(i, j));
-            }
+                    m_filterTest.testSuccessWithSize(size);
+            });
+    }
+
+    template <typename F>
+    void forEachSize(F f)
+    {
+        for (int i = m_startSize.width(); i <= m_endSize.width(); i += m_step)
+            for (int j = m_startSize.height(); j <= m_endSize.height(); j += m_step)
+                f(QSize(i, j));
     }
 
 private:
