@@ -11,7 +11,7 @@
 #include <axclient/axclient_module.h>
 #include <axclient/axclient_window.h>
 
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
