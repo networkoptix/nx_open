@@ -234,7 +234,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             checkForUpdates(true);
         });
 
-    selectUpdateTypeMenu->addAction(tr("Select Specific Build..."),
+    selectUpdateTypeMenu->addAction(tr("Specific Build..."),
         [this]()
         {
             QnBuildNumberDialog dialog(this);
