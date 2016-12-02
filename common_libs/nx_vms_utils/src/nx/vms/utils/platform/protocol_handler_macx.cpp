@@ -76,8 +76,6 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     Q_UNUSED(description);
 
     int currentBuild = version.build();
-    const auto handlerBundleId = lit("%1%2").arg(
-        macHandlerBundleIdBase, QString::number(currentBuild));
     const auto currentHandlers = getBundlesForProtocol(protocol);
 
     /**
@@ -106,8 +104,15 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
             currentBuild = buildNumber;
     }
 
-    return registerAsLaunchService(applicationBinaryPath) &&
-        (LSSetDefaultHandlerForURLScheme(cf::QnCFString(protocol).ref(),
-            cf::QnCFString(handlerBundleId).ref()) != noErr);
+    const auto handlerBundleId = lit("%1%2").arg(
+        macHandlerBundleIdBase, QString::number(currentBuild));
+
+    bool result = true;
+    if (currentBuild == version.build())
+        result = registerAsLaunchService(applicationBinaryPath);
+
+    const auto cfId = cf::QnCFString(handlerBundleId);
+    return  (result
+        && (LSSetDefaultHandlerForURLScheme(cf::QnCFString(protocol).ref(), cfId.ref()) != noErr));
 }
 
