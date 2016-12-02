@@ -113,6 +113,15 @@ protected:
     QDir targetDir;
 };
 
+TEST_F(CopyTest, ensureDirectory)
+{
+    const QDir dir(sourceDir.absoluteFilePath("dir/subdir"));
+    ASSERT_TRUE(file_system::ensureDir(dir));
+
+    ASSERT_TRUE(dir.exists());
+    ASSERT_TRUE(QFileInfo(dir.absolutePath()).isDir());
+}
+
 TEST_F(CopyTest, copyFile)
 {
     const QString fileName("file");

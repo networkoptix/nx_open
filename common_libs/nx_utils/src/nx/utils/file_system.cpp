@@ -119,6 +119,11 @@ QString symLinkTarget(const QString& linkPath)
     #endif
 }
 
+bool ensureDir(const QDir& dir)
+{
+    return dir.exists() || dir.mkpath(lit("."));
+}
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx
