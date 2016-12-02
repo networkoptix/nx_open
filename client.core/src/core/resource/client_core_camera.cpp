@@ -58,7 +58,7 @@ void QnClientCoreCamera::setParentId(const QnUuid& parent) {
     if (oldValue != parent) {
         base_type::setParentId(parent);
         if (!oldValue.isNull())
-            emit statusChanged(toSharedPointer(this));
+            emit statusChanged(toSharedPointer(this), StatusChangeReason::Default);
     }
 }
 
