@@ -43,7 +43,7 @@ QString NX_UTILS_API symLinkTarget(const QString& linkPath);
 Result NX_UTILS_API copy(const QString& sourcePath, const QString& targetPath,
     Options options = NoOption);
 
-bool ensureDir(const QDir& dir);
+bool NX_UTILS_API ensureDir(const QDir& dir);
 
 } // namespace file_system
 } // namespace utils
