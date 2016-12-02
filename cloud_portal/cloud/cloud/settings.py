@@ -147,7 +147,7 @@ LOGGING = {
         },
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
+            'class': 'cloud.logger.LimitAdminEmailHandler',
             'formatter': 'verbose'
         },
     },
