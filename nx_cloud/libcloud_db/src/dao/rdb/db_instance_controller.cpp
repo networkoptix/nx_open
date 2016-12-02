@@ -58,6 +58,9 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     m_dbStructureUpdater.addUpdateScript(db::kDropGlobalTransactionSequenceTable);
     m_dbStructureUpdater.addUpdateScript(db::kRenameGroupToRole);
     m_dbStructureUpdater.addUpdateScript(db::kSetIsEnabledToTrueWhereUndefined);
+
+    m_dbStructureUpdater.addUpdateScript(db::kRestoreSystemToAccountReferenceUniquenessSqlite);
+    m_dbStructureUpdater.addUpdateScript(db::kRestoreSystemToAccountReferenceUniquenessMySql);
 }
 
 bool DbInstanceController::initialize()
