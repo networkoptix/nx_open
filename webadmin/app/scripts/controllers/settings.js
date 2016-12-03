@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver,
+    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
 
@@ -19,6 +19,15 @@ angular.module('webadminApp')
             killSubscription();
         });
 
+        function pingModule(){
+            return mediaserver.getModuleInformation().then(function(r){
+                if(!data.flags.brokenSystem){
+                     window.location.reload();
+                }
+                return true;
+            });
+        };
+
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
 
@@ -33,6 +42,7 @@ angular.module('webadminApp')
             $scope.oldPort = data.port;
 
             if(data.flags.brokenSystem){
+                $poll(pingModule,1000);
                 return;
             }
             checkUserRights();
