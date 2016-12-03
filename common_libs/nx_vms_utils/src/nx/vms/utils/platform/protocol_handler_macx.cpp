@@ -10,8 +10,6 @@
 #include <platform/core_foundation_mac/cf_array.h>
 #include <nx/utils/software_version.h>
 
-#include <QDebug>
-
 namespace {
 
 // Searches for bundle path. Bundle path should be a folder with ".app" ending
@@ -40,9 +38,16 @@ bool registerAsLaunchService(const QString& applicationPath)
 bool isBundleExist(const QString& bundleId)
 {
     const auto cfBundleId = cf::QnCFString(bundleId);
-    const cf::QnCFArray urls(
-        LSCopyApplicationURLsForBundleIdentifier(cfBundleId.ref(), nullptr));
-    return urls.ref();
+    const cf::QnCFArray urls(LSCopyApplicationURLsForBundleIdentifier(cfBundleId.ref(), nullptr));
+    int realCount = urls.size();
+    const auto count = urls.size();
+    for (int i = 0; i != count; ++i)
+    {
+        const auto path = cf::QnCFUrl::toString(urls.at<CFURLRef>(i));
+        if (path.startsWith(lit("file:///Volumes"))) //< Excludes systems from mounted 'dmg' disks
+            --realCount;
+    }
+    return (realCount > 0);
 }
 
 QStringList getBundlesForProtocol(const QString& protocol)
@@ -54,7 +59,8 @@ QStringList getBundlesForProtocol(const QString& protocol)
     const int count = bundleIds.size();
     for (int i = 0; i != count; ++i)
     {
-        const auto cfBundleId = cf::QnCFString(bundleIds.at<CFStringRef>(i));
+        const auto pathRef = bundleIds.at<CFStringRef>(i);
+        const auto cfBundleId = cf::QnCFString::makeOwned(pathRef);
         result.push_back(cfBundleId.toString());
     }
     return result;
@@ -76,15 +82,16 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     Q_UNUSED(description);
 
     int currentBuild = version.build();
-    const auto currentHandlers = getBundlesForProtocol(protocol);
 
-    /**
-     * Looking for maximal available version of application and reregister it anyway
-     * because lesser version could register itself automatically after installation
-     */
+    // Looking for maximal available version of application and reregister it anyway
+    const auto currentHandlers = getBundlesForProtocol(protocol);
     for(const auto& bundleId: currentHandlers)
     {
-        if (!bundleId.startsWith(macHandlerBundleIdBase)) //< Checks if it is NX handlers only
+        /** Checks if it is NX handlers only.
+          * We HAVE TO use insensetive case for string compare because from time to time
+          * LSCopyApplicationURLsForBundleIdentifier return bundle ids in lower case only
+          */
+        if (!bundleId.startsWith(macHandlerBundleIdBase, Qt::CaseInsensitive))
             continue;
 
         if (!isBundleExist(bundleId)) //< Skips removed apps
@@ -106,10 +113,6 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
 
     const auto handlerBundleId = lit("%1%2").arg(
         macHandlerBundleIdBase, QString::number(currentBuild));
-
-    qDebug() << "<<";
-    qDebug() << handlerBundleId;
-    qDebug() << version.build();
 
     bool result = true;
     if (currentBuild == version.build())

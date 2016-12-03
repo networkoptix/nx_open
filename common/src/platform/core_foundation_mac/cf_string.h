@@ -13,13 +13,18 @@ class QnCFString : public QnCFRefHolder<CFStringRef>
 public:
     QnCFString();
 
+    QnCFString(const QnCFString& other);
+
     QnCFString(CFStringRef ref);
 
     explicit QnCFString(const QString& value);
 
+    static QnCFString makeOwned(CFStringRef ref);
+
     ~QnCFString();
 
     QString toString() const;
+
 };
 
 }
