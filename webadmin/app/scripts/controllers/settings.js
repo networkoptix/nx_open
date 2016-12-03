@@ -20,7 +20,7 @@ angular.module('webadminApp')
         });
 
         function pingModule(){
-            return mediaserver.getModuleInformation().then(function(r){
+            return mediaserver.getModuleInformation(true).then(function(r){
                 if(!data.flags.brokenSystem){
                      window.location.reload();
                 }

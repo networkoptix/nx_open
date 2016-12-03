@@ -46,7 +46,7 @@ angular.module('webadminApp')
 
                 data.flags = {
                     noHDD: data.ecDbReadOnly,
-                    noNetwork: ips.length <= 1,
+                    noNetwork: !ips.length,
                     wrongNetwork: wrongNetwork,
                     hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
                     cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
