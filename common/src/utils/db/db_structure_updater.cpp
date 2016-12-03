@@ -6,6 +6,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <nx/utils/log/log.h>
+
 #include <utils/db/db_helper.h>
 
 #include "async_sql_query_executor.h"
@@ -45,19 +46,20 @@ static const ReplacementsDictionary kSqlReplacements = initializeReplacements();
 
 static const char kCreateDbVersionTable[] = 
 R"sql(
+
 CREATE TABLE db_version_data (
     db_version      integer NOT NULL DEFAULT 0
 );
 
 INSERT INTO db_version_data (db_version) VALUES (0);
+
 )sql";
 
 } // namespace
 
 
-DBStructureUpdater::DBStructureUpdater(AsyncSqlQueryExecutor* const dbManager)
-:
-    m_dbManager(dbManager),
+DBStructureUpdater::DBStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor):
+    m_queryExecutor(queryExecutor),
     m_initialVersion(0)
 {
     m_updateScripts.emplace_back(QByteArray(kCreateDbVersionTable));
@@ -92,7 +94,7 @@ bool DBStructureUpdater::updateStructSync()
     auto future = m_dbUpdatePromise.get_future();
 
     //starting async operation
-    m_dbManager->executeUpdate(
+    m_queryExecutor->executeUpdate(
         std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
         [this](nx::db::QueryContext* /*connection*/, DBResult dbResult)
         {
@@ -201,7 +203,7 @@ bool DBStructureUpdater::execSQLScript(
     QByteArray script,
     nx::db::QueryContext* const queryContext)
 {
-    const auto driverType = m_dbManager->connectionOptions().driverType;
+    const auto driverType = m_queryExecutor->connectionOptions().driverType;
 
     // Applying replacements.
     for (const auto& replacementCtx: kSqlReplacements)
@@ -213,7 +215,7 @@ bool DBStructureUpdater::execSQLScript(
             script.replace(replacementCtx.key, replacementCtx.defaultValue);
     }
 
-    return QnDbHelper::execSQLScript(script, *queryContext->connection());
+    return m_queryExecutor->execSqlScriptSync(script, queryContext) == DBResult::ok;
 }
 
 } // namespace db

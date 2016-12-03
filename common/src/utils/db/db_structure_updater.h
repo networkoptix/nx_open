@@ -12,13 +12,13 @@
 namespace nx {
 namespace db {
 
-class AsyncSqlQueryExecutor;
+class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
 /**
  * Updates are executed in order they have been added to DBStructureUpdater istance.
- * \note Database is not created, it MUST already exist
- * \note This class methods are not thread-safe
+ * @note Database is not created, it MUST already exist.
+ * @note This class methods are not thread-safe.
  */
 class DBStructureUpdater
 {
@@ -26,7 +26,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)>
         DbUpdateFunc;
 
-    DBStructureUpdater(AsyncSqlQueryExecutor* const);
+    DBStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor);
 
     /**
      * Used to aggregate update scripts.
@@ -34,7 +34,7 @@ public:
      * @warning DB of version less than initial will fail to be upgraded!
      */
     void setInitialVersion(unsigned int version);
-    /** First script corresponds to version set with \a DBStructureUpdater::setInitialVersion. */
+    /** First script corresponds to version set with DBStructureUpdater::setInitialVersion. */
     void addUpdateScript(QByteArray updateScript);
     void addUpdateFunc(DbUpdateFunc dbUpdateFunc);
     void addFullSchemaScript(
@@ -62,7 +62,7 @@ private:
         }
     };
 
-    AsyncSqlQueryExecutor* const m_dbManager;
+    AbstractAsyncSqlQueryExecutor* const m_queryExecutor;
     unsigned int m_initialVersion;
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<DbUpdate> m_updateScripts;
