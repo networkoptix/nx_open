@@ -4,7 +4,6 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-
             <alert type="danger" ng-if="settings.flags.noHDD">
                 This device is intended to work with hard disk drive installed.<br>
                 Please turn off the device and install a hard disk drive.
@@ -19,7 +18,7 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.noHDD || settings.flags.cleanSystem">
+            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <tab heading="Server" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >

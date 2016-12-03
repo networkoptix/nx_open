@@ -31,6 +31,10 @@ angular.module('webadminApp')
 
             $scope.oldSystemName = data.systemName;
             $scope.oldPort = data.port;
+
+            if(data.flags.brokenSystem){
+                return;
+            }
             checkUserRights();
         });
 

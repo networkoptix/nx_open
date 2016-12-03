@@ -53,10 +53,8 @@ angular.module('webadminApp')
                     canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0,
                     canSetupTime: data.serverFlags.indexOf(Config.timeCtrlFlag) >= 0
                 };
-                data.flags.newSystem = data.flags.cleanSystem &&
-                                        !data.flags.noHDD &&
-                                        !data.flags.noNetwork &&
-                                        !(data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.brokenSystem = data.flags.noHDD || data.flags.noNetwork || (data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.newSystem = data.flags.cleanSystem && !data.flags.brokenSystem;
                 return r;
             });
         }
@@ -571,9 +569,15 @@ angular.module('webadminApp')
 
                 return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.flags.newSystem &&
-                        $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
+                    if($location.path()==='/advanced' ||  $location.path()==='/debug'){ // Do not redirect from advanced and debug pages
+                        return self.getUser();
+                    }
+                    if(r.data.reply.flags.newSystem){  // New system - redirect to setup
                         $location.path('/setup');
+                        return null;
+                    }
+                    if((r.data.reply.flags.brokenSystem)){ // No drives - redirect to settings and hide everything else
+                        $location.path('/settings/system');
                         return null;
                     }
                     return self.getUser();
