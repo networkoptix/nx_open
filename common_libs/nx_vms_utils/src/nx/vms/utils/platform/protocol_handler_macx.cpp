@@ -89,7 +89,7 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     {
         /** Checks if it is NX handlers only.
           * We HAVE TO use insensetive case for string compare because from time to time
-          * LSCopyApplicationURLsForBundleIdentifier return bundle ids in lower case only
+          * LSCopyApplicationURLsForBundleIdentifier returns bundle ids in lower case only
           */
         if (!bundleId.startsWith(macHandlerBundleIdBase, Qt::CaseInsensitive))
             continue;
