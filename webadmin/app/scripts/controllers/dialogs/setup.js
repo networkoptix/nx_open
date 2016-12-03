@@ -130,7 +130,7 @@ angular.module('webadminApp')
                     $scope.port = window.location.port;
 
                     if($scope.serverInfo.flags.canSetupNetwork){
-                        mediaserver.networkSettings().then(function(reply){
+                        mediaserver.networkSettings().then(function(r){
                             var settings = r.data.reply;
                             $scope.IP = settings[0].ipAddr;
                             $scope.serverAddress = $scope.IP + ':' + $scope.port;
