@@ -11,7 +11,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
@@ -142,7 +141,7 @@ private:
     };
 
     const unsigned int m_discoverTryTimeoutMS;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     quint64 m_timerID;
     nx::utils::AsyncOperationGuard m_handlerGuard;
     std::map< QString, std::map< SearchHandler*, uint > > m_handlers;

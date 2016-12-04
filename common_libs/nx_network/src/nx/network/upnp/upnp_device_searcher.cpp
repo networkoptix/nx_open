@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <memory>
 
-#include <QtCore/QMutexLocker>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <api/global_settings.h>
@@ -64,7 +63,7 @@ void DeviceSearcher::pleaseStop()
 {
     //stopping dispatching discover packets
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
     //m_timerID cannot be changed after m_terminated set to true
@@ -148,7 +147,7 @@ void DeviceSearcher::unregisterHandler( SearchHandler* handler, const QString& d
 
 void DeviceSearcher::saveDiscoveredDevicesSnapshot()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_discoveredDevicesToProcess.swap( m_discoveredDevices );
     m_discoveredDevices.clear();
 }
@@ -192,7 +191,7 @@ void DeviceSearcher::onTimer( const quint64& /*timerID*/ )
 {
     dispatchDiscoverPackets();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( !m_terminated )
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
             this, std::chrono::milliseconds(m_discoverTryTimeoutMS) );
@@ -208,7 +207,7 @@ void DeviceSearcher::onSomeBytesRead(
     {
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             //removing socket from m_socketList
             for( map<QString, SocketReadCtx>::iterator
                 it = m_socketList.begin();
@@ -337,7 +336,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
     std::unique_ptr<AbstractDatagramSocket> oldSock;
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         if(isInterfaceListChanged())
             oldSock = updateReceiveSocket();
     }
@@ -349,7 +348,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
 
     pair<map<QString, SocketReadCtx>::iterator, bool> p;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         p = m_socketList.insert( make_pair( localAddress, SocketReadCtx() ) );
     }
     if( !p.second )
@@ -400,7 +399,7 @@ void DeviceSearcher::startFetchDeviceXml(
     nx_http::AsyncHttpClientPtr httpClient;
     //checking, whether new http request is needed
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         //checking upnp description cache
         const UPNPDescriptionCacheItem* cacheItem = findDevDescriptionInCache( uuidStr );
@@ -453,7 +452,7 @@ void DeviceSearcher::processDeviceXml(
     devInfoFull.xmlDevInfo = foundDeviceDescription;
     devInfoFull.devInfo = xmlHandler.deviceInfo();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_discoveredDevices.emplace( devInfo.deviceAddress, devInfoFull );
     updateItemInCache( std::move(devInfoFull) );
 }
@@ -537,7 +536,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
 {
     DiscoveredDeviceInfo* ctx = NULL;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         HttpClientsDict::iterator it = m_httpClients.find( httpClient );
         if (it == m_httpClients.end())
             return;
@@ -552,7 +551,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
         processDeviceXml( *ctx, msgBody );
     }
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_terminated )
         return;
     httpClient->pleaseStopSync();
