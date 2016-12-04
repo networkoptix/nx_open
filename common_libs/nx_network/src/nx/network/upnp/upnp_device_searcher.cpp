@@ -302,8 +302,6 @@ bool DeviceSearcher::isInterfaceListChanged() const
 
 std::unique_ptr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocket()
 {
-    using namespace std::placeholders;
-
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
 
     std::unique_ptr<AbstractDatagramSocket> oldSock;
@@ -325,7 +323,10 @@ std::unique_ptr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocket()
         std::bind(
             &DeviceSearcher::onSomeBytesRead,
             this,
-            m_receiveSocket.get(), _1, &m_receiveBuffer, _2 ) );
+            m_receiveSocket.get(),
+            std::placeholders::_1,
+            &m_receiveBuffer,
+            std::placeholders::_2 ) );
 
     return oldSock;
 }
