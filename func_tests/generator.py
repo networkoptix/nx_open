@@ -24,7 +24,8 @@ class _unique(object):
     CameraSeedNumber = 0
     UserSeedNumber = 0
     MediaServerSeedNumber = 0
-    LayoutSeednumber = 0
+    LayoutSeedNumber = 0
+    UserRoleSeedNumber = 0
 
 
 class BasicGenerator(object):
@@ -99,9 +100,15 @@ class BasicGenerator(object):
 
     def generateLayoutName(self):
         try:
-            return "ec2_test_layout_%s_%s" % (_unique.SessionNumber, _unique.LayoutSeednumber)
+            return "ec2_test_layout_%s_%s" % (_unique.SessionNumber, _unique.LayoutSeedNumber)
         finally:
-            _unique.LayoutSeednumber += 1
+            _unique.LayoutSeedNumber += 1
+
+    def generateUserRoleName(self):
+        try:
+            return "ec2_test_user_role_%s_%s" % (_unique.SessionNumber, _unique.UserRoleSeedNumber)
+        finally:
+            _unique.UserRoleSeedNumber += 1
 
 
 class UserDataGenerator(BasicGenerator):
@@ -115,18 +122,16 @@ class UserDataGenerator(BasicGenerator):
         "name": "%s",
         "parentId": "",
         "permissions": "%s",
+        "userRoleId": "%s",
         "typeId": "{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}",
         "url": ""
     }
     """
     #         "parentId": "{00000000-0000-0000-0000-000000000000}",
 
-    _permissions = "GlobalAdminPermission"
-    # (ealier was permissions =  "247")
-    # about permissions value: 0x08 flag removed since it's internal use only,
-    # see common/src/common/common_globals.h, GlobalPermission enum
+    # about permissions see common/src/common/common_globals.h, GlobalPermission enum
 
-    def generateUserData(self, number):
+    def generateUserData(self, number, permissions="GlobalAdminPermission", role=''):
         ret = []
         for i in xrange(number):
             id = self.generateRandomId()
@@ -134,7 +139,8 @@ class UserDataGenerator(BasicGenerator):
             ret.append((self._template % (digest,
                     self.generateEmail(),
                     self.generatePasswordHash(pwd),
-                    id, "false", un, self._permissions),
+                    id, "false", un,
+                    permissions if role == '' else '', role),
                 id))
 
         return ret

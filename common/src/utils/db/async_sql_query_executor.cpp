@@ -9,6 +9,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <utils/db/db_helper.h>
+
 #include "request_executor_factory.h"
 
 namespace nx {
@@ -51,6 +53,38 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     for (auto& dbConnection: dbThreadPool)
         dbConnection->pleaseStop();
     dbThreadPool.clear();
+}
+
+const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
+{
+    return m_connectionOptions;
+}
+
+void AsyncSqlQueryExecutor::executeUpdate(
+    nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
+{
+    scheduleQuery<UpdateWithoutAnyDataExecutor>(
+        std::move(dbUpdateFunc),
+        std::move(completionHandler));
+}
+
+void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
+    nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
+{
+    scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
+        std::move(dbUpdateFunc),
+        std::move(completionHandler));
+}
+
+DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
+    const QByteArray& script,
+    nx::db::QueryContext* const queryContext)
+{
+    return QnDbHelper::execSQLScript(script, *queryContext->connection())
+        ? DBResult::ok
+        : DBResult::ioError;
 }
 
 bool AsyncSqlQueryExecutor::init()

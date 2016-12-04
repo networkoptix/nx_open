@@ -5,7 +5,9 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+
 #include <utils/db/db_helper.h>
 
 #include "async_sql_query_executor.h"
@@ -45,19 +47,20 @@ static const ReplacementsDictionary kSqlReplacements = initializeReplacements();
 
 static const char kCreateDbVersionTable[] = 
 R"sql(
+
 CREATE TABLE db_version_data (
     db_version      integer NOT NULL DEFAULT 0
 );
 
 INSERT INTO db_version_data (db_version) VALUES (0);
+
 )sql";
 
 } // namespace
 
 
-DBStructureUpdater::DBStructureUpdater(AsyncSqlQueryExecutor* const dbManager)
-:
-    m_dbManager(dbManager),
+DBStructureUpdater::DBStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor):
+    m_queryExecutor(queryExecutor),
     m_initialVersion(0)
 {
     m_updateScripts.emplace_back(QByteArray(kCreateDbVersionTable));
@@ -71,6 +74,12 @@ void DBStructureUpdater::setInitialVersion(unsigned int version)
 void DBStructureUpdater::addUpdateScript(QByteArray updateScript)
 {
     m_updateScripts.emplace_back(std::move(updateScript));
+}
+
+void DBStructureUpdater::addUpdateScript(
+    std::map<RdbmsDriverType, QByteArray> scriptByDbType)
+{
+    m_updateScripts.emplace_back(std::move(scriptByDbType));
 }
 
 void DBStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
@@ -88,15 +97,15 @@ void DBStructureUpdater::addFullSchemaScript(
 
 bool DBStructureUpdater::updateStructSync()
 {
-    m_dbUpdatePromise = nx::utils::promise<DBResult>();
-    auto future = m_dbUpdatePromise.get_future();
+    nx::utils::promise<DBResult> dbUpdatePromise;
+    auto future = dbUpdatePromise.get_future();
 
     //starting async operation
-    m_dbManager->executeUpdate(
+    m_queryExecutor->executeUpdate(
         std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
-        [this](nx::db::QueryContext* /*connection*/, DBResult dbResult)
+        [&dbUpdatePromise](nx::db::QueryContext* /*connection*/, DBResult dbResult)
         {
-            m_dbUpdatePromise.set_value(dbResult);
+            dbUpdatePromise.set_value(dbResult);
         });
 
     //waiting for completion
@@ -128,7 +137,7 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
 
     if (!someSchemaExists)
     {
-        if (!execSQLScript(kCreateDbVersionTable, queryContext))
+        if (!execSqlScript(queryContext, kCreateDbVersionTable, RdbmsDriverType::unknown))
         {
             NX_LOG(lit("DBStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
                 .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
@@ -139,7 +148,10 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
         if (!m_fullSchemaScriptByVersion.empty())
         {
             //applying full schema
-            if (!execSQLScript(m_fullSchemaScriptByVersion.rbegin()->second, queryContext))
+            if (!execSqlScript(
+                    queryContext,
+                    m_fullSchemaScriptByVersion.rbegin()->second,
+                    RdbmsDriverType::unknown))
             {
                 NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2").
                     arg(m_fullSchemaScriptByVersion.rbegin()->first)
@@ -155,8 +167,8 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
         static_cast< size_t >(dbVersion) < (m_initialVersion + m_updateScripts.size());
         ++dbVersion)
     {
-        NX_LOGX(lm("Updating structure to version %1. %2")
-            .arg(dbVersion).arg(m_updateScripts[dbVersion - m_initialVersion].sqlScript),
+        NX_LOGX(lm("Updating structure to version %1")
+            .arg(dbVersion)/*.arg(m_updateScripts[dbVersion - m_initialVersion].sqlScript)*/,
             cl_logDEBUG2);
 
         if (!execDbUpdate(m_updateScripts[dbVersion - m_initialVersion], queryContext))
@@ -179,9 +191,9 @@ bool DBStructureUpdater::execDbUpdate(
     const DbUpdate& dbUpdate,
     nx::db::QueryContext* const queryContext)
 {
-    if (!dbUpdate.sqlScript.isEmpty())
+    if (!dbUpdate.dbTypeToSqlScript.empty())
     {
-        if (!execSQLScript(dbUpdate.sqlScript, queryContext))
+        if (!execStructureUpdateTask(dbUpdate.dbTypeToSqlScript, queryContext))
             return false;
     }
 
@@ -197,23 +209,67 @@ bool DBStructureUpdater::execDbUpdate(
     return true;
 }
 
-bool DBStructureUpdater::execSQLScript(
-    QByteArray script,
+bool DBStructureUpdater::execStructureUpdateTask(
+    const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
     nx::db::QueryContext* const queryContext)
 {
-    const auto driverType = m_dbManager->connectionOptions().driverType;
+    const auto driverType = m_queryExecutor->connectionOptions().driverType;
 
-    // Applying replacements.
+    std::map<RdbmsDriverType, QByteArray>::const_iterator selectedScriptIter =
+        selectSuitableScript(dbTypeToScript, driverType);
+    if (selectedScriptIter == dbTypeToScript.end())
+    {
+        NX_LOGX(lm("Could not find script version for DB %1. Aborting...")
+            .arg(QnLexical::serialized(driverType)), cl_logDEBUG1);
+        return false;
+    }
+
+    return execSqlScript(
+        queryContext,
+        selectedScriptIter->second,
+        selectedScriptIter->first);
+}
+
+std::map<RdbmsDriverType, QByteArray>::const_iterator DBStructureUpdater::selectSuitableScript(
+    const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
+    RdbmsDriverType driverType) const
+{
+    auto properScriptIter = dbTypeToScript.find(driverType);
+    if (properScriptIter == dbTypeToScript.end())
+        properScriptIter = dbTypeToScript.find(RdbmsDriverType::unknown);
+    if (properScriptIter == dbTypeToScript.end())
+        return dbTypeToScript.end();
+
+    return properScriptIter;
+}
+
+bool DBStructureUpdater::execSqlScript(
+    nx::db::QueryContext* const queryContext,
+    QByteArray sqlScript,
+    RdbmsDriverType dbType)
+{
+    QByteArray scriptText;
+    if (dbType == RdbmsDriverType::unknown)
+        scriptText = applyReplacements(sqlScript, dbType);
+    else
+        scriptText = sqlScript;
+
+    return m_queryExecutor->execSqlScriptSync(scriptText, queryContext) == DBResult::ok;
+}
+
+QByteArray DBStructureUpdater::applyReplacements(
+    QByteArray initialScript, RdbmsDriverType dbType)
+{
+    QByteArray script = initialScript;
     for (const auto& replacementCtx: kSqlReplacements)
     {
-        const auto it = replacementCtx.replacementsByDriverName.find(driverType);
+        const auto it = replacementCtx.replacementsByDriverName.find(dbType);
         if (it != replacementCtx.replacementsByDriverName.end())
             script.replace(replacementCtx.key, it->second);
         else
             script.replace(replacementCtx.key, replacementCtx.defaultValue);
     }
-
-    return QnDbHelper::execSQLScript(script, *queryContext->connection());
+    return script;
 }
 
 } // namespace db
