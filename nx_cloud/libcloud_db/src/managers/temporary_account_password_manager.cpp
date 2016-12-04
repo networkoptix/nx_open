@@ -209,12 +209,11 @@ db::DBResult TemporaryAccountPasswordManager::fillCache()
     nx::utils::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
     using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1, _2),
+    m_dbManager->executeSelect(
+        std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummyResult*/)
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -225,8 +224,7 @@ db::DBResult TemporaryAccountPasswordManager::fillCache()
 }
 
 nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
-    nx::db::QueryContext* queryContext,
-    int* const /*dummyResult*/)
+    nx::db::QueryContext* queryContext)
 {
     QSqlQuery readPasswordsQuery(*queryContext->connection());
     readPasswordsQuery.setForwardOnly(true);

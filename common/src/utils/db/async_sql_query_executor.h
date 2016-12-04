@@ -41,6 +41,10 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) = 0;
 
+    virtual void executeSelect(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) = 0;
+
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
 
@@ -71,6 +75,10 @@ public:
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) override;
+
+    virtual void executeSelect(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) override;
 
     virtual DBResult execSqlScriptSync(
@@ -122,18 +130,6 @@ public:
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));
-    }
-
-    template<typename OutputData>
-    void executeSelect(
-        nx::utils::MoveOnlyFunc<
-            DBResult(nx::db::QueryContext*, OutputData* const)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<
-            void(nx::db::QueryContext*, DBResult, OutputData)> completionHandler)
-    {
-        scheduleQuery<SelectExecutor<OutputData>>(
-            std::move(dbSelectFunc),
-            std::move(completionHandler));
     }
 
 private:

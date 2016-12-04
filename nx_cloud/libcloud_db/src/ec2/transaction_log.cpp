@@ -91,21 +91,22 @@ void TransactionLog::readTransactions(
 {
     using namespace std::placeholders;
 
-    m_dbManager->executeSelect<TransactionReadResult>(
+    auto outputData = std::make_unique<TransactionReadResult>();
+    auto outputDataPtr = outputData.get();
+    m_dbManager->executeSelect(
         std::bind(
             &TransactionLog::fetchTransactions, this,
-            _1, systemId, from, to, maxTransactionsToReturn, _2),
-        [completionHandler = std::move(completionHandler)](
+            _1, systemId, from, to, maxTransactionsToReturn, outputDataPtr),
+        [completionHandler = std::move(completionHandler), outputData = std::move(outputData)](
             nx::db::QueryContext* /*queryContext*/,
-            nx::db::DBResult dbResult,
-            TransactionReadResult outputData)
+            nx::db::DBResult dbResult)
         {
             completionHandler(
                 dbResult == nx::db::DBResult::ok
-                    ? outputData.resultCode
+                    ? outputData->resultCode
                     : dbResultToApiResult(dbResult),
-                std::move(outputData.transactions),
-                std::move(outputData.state));
+                std::move(outputData->transactions),
+                std::move(outputData->state));
         });
 }
 
@@ -125,12 +126,11 @@ nx::db::DBResult TransactionLog::fillCache()
 
     // Starting async operation.
     using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&TransactionLog::fetchTransactionState, this, _1, _2),
+    m_dbManager->executeSelect(
+        std::bind(&TransactionLog::fetchTransactionState, this, _1),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummyResult*/)
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -141,8 +141,7 @@ nx::db::DBResult TransactionLog::fillCache()
 }
 
 nx::db::DBResult TransactionLog::fetchTransactionState(
-    nx::db::QueryContext* queryContext,
-    int* const /*dummyResult*/)
+    nx::db::QueryContext* queryContext)
 {
     // TODO: Filling in m_systemIdToTransactionLog.
     QSqlQuery selectTransactionStateQuery(*queryContext->connection());

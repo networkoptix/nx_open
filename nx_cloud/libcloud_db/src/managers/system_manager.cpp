@@ -1609,7 +1609,7 @@ nx::db::DBResult SystemManager::fillCache()
     }
 
     result = doBlockingDbQuery(
-        std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2));
+        std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1));
     if (result != db::DBResult::ok)
         return result;
 
@@ -1623,12 +1623,11 @@ nx::db::DBResult SystemManager::doBlockingDbQuery(Func func)
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation
-    m_dbManager->executeSelect<int>(
+    m_dbManager->executeSelect(
         std::move(func),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummy*/)
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -1656,8 +1655,7 @@ nx::db::DBResult SystemManager::fetchSystemById(
 }
 
 nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
-    nx::db::QueryContext* queryContext,
-    int* const /*dummy*/)
+    nx::db::QueryContext* queryContext)
 {
     // TODO: #ak Do it without 
 

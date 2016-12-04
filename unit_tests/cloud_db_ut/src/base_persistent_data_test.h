@@ -53,18 +53,16 @@ protected:
         return queryDonePromise.get_future().get();
     }
 
-    template<typename QueryFunc, typename OutputData>
-    nx::db::DBResult executeSelectQuerySync(QueryFunc queryFunc, OutputData* outputData)
+    template<typename QueryFunc>
+    nx::db::DBResult executeSelectQuerySync(QueryFunc queryFunc)
     {
         std::promise<nx::db::DBResult> queryDonePromise;
-        m_persistentDbManager->queryExecutor()->executeSelect<OutputData>(
+        m_persistentDbManager->queryExecutor()->executeSelect(
             queryFunc,
-            [&queryDonePromise, outputData](
+            [&queryDonePromise](
                 nx::db::QueryContext*,
-                nx::db::DBResult dbResult,
-                OutputData localOutputData)
+                nx::db::DBResult dbResult)
             {
-                *outputData = std::move(localOutputData);
                 queryDonePromise.set_value(dbResult);
             });
         return queryDonePromise.get_future().get();

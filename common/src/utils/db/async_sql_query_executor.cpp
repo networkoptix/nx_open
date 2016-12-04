@@ -78,6 +78,15 @@ void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
         std::move(completionHandler));
 }
 
+void AsyncSqlQueryExecutor::executeSelect(
+    nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
+{
+    scheduleQuery<SelectExecutor>(
+        std::move(dbSelectFunc),
+        std::move(completionHandler));
+}
+
 DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
     const QByteArray& script,
     nx::db::QueryContext* const queryContext)

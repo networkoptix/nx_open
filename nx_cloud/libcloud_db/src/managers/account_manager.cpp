@@ -532,12 +532,11 @@ db::DBResult AccountManager::fillCache()
 
     //starting async operation
     using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&AccountManager::fetchAccounts, this, _1, _2),
+    m_dbManager->executeSelect(
+        std::bind(&AccountManager::fetchAccounts, this, _1),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummyResult*/ )
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value( dbResult );
         });
@@ -547,9 +546,7 @@ db::DBResult AccountManager::fillCache()
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts( 
-    nx::db::QueryContext* queryContext,
-    int* const /*dummyResult*/ )
+db::DBResult AccountManager::fetchAccounts(nx::db::QueryContext* queryContext)
 {
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);

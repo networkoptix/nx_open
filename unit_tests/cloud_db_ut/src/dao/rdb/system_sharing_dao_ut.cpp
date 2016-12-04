@@ -35,14 +35,14 @@ protected:
         insertOrReplaceSystemSharing(api::SystemAccessRole::advancedViewer);
     }
 
-    void verifySharingRecordHasBeenReplaced()
+    void assertIfSharingRecordHasNotBeenReplaced()
     {
         using namespace std::placeholders;
 
         std::deque<api::SystemSharingEx> sharings;
         const auto dbResult = executeSelectQuerySync(
-            std::bind(&dao::rdb::SystemSharingDataObject::fetchAllUserSharings, systemSharingDao(), _1, _2),
-            &sharings);
+            std::bind(&dao::rdb::SystemSharingDataObject::fetchAllUserSharings,
+                systemSharingDao(), _1, &sharings));
         ASSERT_EQ(db::DBResult::ok, dbResult);
 
         ASSERT_EQ(1, sharings.size());
@@ -69,7 +69,7 @@ TEST_F(SystemSharingDataObject, system_sharing_update_replaces_record)
 {
     insertSystemSharing();
     updateSystemSharing();
-    verifySharingRecordHasBeenReplaced();
+    assertIfSharingRecordHasNotBeenReplaced();
 }
 
 } // namespace test

@@ -52,6 +52,13 @@ public:
             std::move(dbUpdateFunc), std::move(completionHandler));
     }
 
+    virtual void executeSelect(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) override
+    {
+        m_delegate->executeSelect(std::move(dbSelectFunc), std::move(completionHandler));
+    }
+
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
 

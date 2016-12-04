@@ -34,32 +34,29 @@ protected:
         nx::utils::promise<nx::db::DBResult> queryCompletedPromise;
         auto future = queryCompletedPromise.get_future();
 
-        std::vector<RecordStructure> outputRecords;
+        std::vector<RecordStructure> records;
 
-        asyncSqlQueryExecutor()->executeSelect<std::vector<RecordStructure>>(
-            [queryText](
-                nx::db::QueryContext* queryContext,
-                std::vector<RecordStructure>* const records)
+        asyncSqlQueryExecutor()->executeSelect(
+            [queryText, &records](
+                nx::db::QueryContext* queryContext)
             {
                 QSqlQuery query(*queryContext->connection());
                 query.prepare(queryText);
                 if (!query.exec())
                     return DBResult::ioError;
-                QnSql::fetch_many(query, records);
+                QnSql::fetch_many(query, &records);
                 return DBResult::ok;
             },
-            [&queryCompletedPromise, &outputRecords](
+            [&queryCompletedPromise](
                 nx::db::QueryContext* /*queryContext*/,
-                DBResult dbResult,
-                std::vector<RecordStructure> records)
+                DBResult dbResult)
             {
-                outputRecords = std::move(records);
                 queryCompletedPromise.set_value(dbResult);
             });
 
         NX_GTEST_ASSERT_EQ(DBResult::ok, future.get());
 
-        return outputRecords;
+        return records;
     }
 
     template<typename DbQueryFunc>

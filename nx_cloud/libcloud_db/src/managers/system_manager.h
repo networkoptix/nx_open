@@ -409,8 +409,7 @@ private:
         const std::string& systemId,
         data::SystemData* const system);
     nx::db::DBResult fetchSystemToAccountBinder(
-        nx::db::QueryContext* queryContext,
-        int* const /*dummy*/);
+        nx::db::QueryContext* queryContext);
 
     void dropExpiredSystems(uint64_t timerId);
     void expiredSystemsDeletedFromDb(
