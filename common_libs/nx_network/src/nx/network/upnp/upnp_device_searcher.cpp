@@ -81,6 +81,9 @@ void DeviceSearcher::pleaseStop()
     }
     m_socketList.clear();
 
+    if (m_receiveSocket)
+        m_receiveSocket->pleaseStopSync();
+
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
     for( auto it = m_httpClients.begin();
@@ -287,8 +290,61 @@ void DeviceSearcher::dispatchDiscoverPackets()
     }
 }
 
+bool DeviceSearcher::isInterfaceListChanged() const
+{
+    auto ifaces = getAllIPv4Interfaces().toSet();
+    bool changed = ifaces != m_interfacesCache;
+
+    if (changed)
+        m_interfacesCache = ifaces;
+
+    return changed;
+}
+
+std::unique_ptr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocket()
+{
+    using namespace std::placeholders;
+
+    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
+
+    std::unique_ptr<AbstractDatagramSocket> oldSock;
+    if(m_receiveSocket)
+        oldSock  = std::move(m_receiveSocket);
+
+    m_receiveSocket.reset(new UDPSocket(AF_INET));
+
+    m_receiveSocket->setNonBlockingMode(true);
+    m_receiveSocket->setReuseAddrFlag(true);
+    m_receiveSocket->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
+    m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
+
+    for(const auto iface: getAllIPv4Interfaces())
+        m_receiveSocket->joinGroup( groupAddress.toString(), iface.address.toString() );
+
+    m_receiveSocket->readSomeAsync(
+        &m_receiveBuffer,
+        std::bind(
+            &DeviceSearcher::onSomeBytesRead,
+            this,
+            m_receiveSocket.get(), _1, &m_receiveBuffer, _2 ) );
+
+    return oldSock;
+}
+
 std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
+
+    std::unique_ptr<AbstractDatagramSocket> oldSock;
+
+    {
+        QMutexLocker lock(&m_mutex);
+        if(isInterfaceListChanged())
+            oldSock = updateReceiveSocket();
+    }
+
+    if (oldSock)
+        oldSock->pleaseStopSync(true);
+
     const QString& localAddress = iface.address.toString();
 
     pair<map<QString, SocketReadCtx>::iterator, bool> p;
@@ -308,8 +364,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
     if (!sock->setNonBlockingMode( true ) ||
         !sock->setReuseAddrFlag( true ) ||
-        !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
-        !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
+        !sock->bind( SocketAddress(localAddress) ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ))
     {
