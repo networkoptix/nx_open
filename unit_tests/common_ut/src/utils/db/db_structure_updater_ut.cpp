@@ -84,7 +84,8 @@ class DBStructureUpdater:
     public BaseDbTest
 {
 public:
-    DBStructureUpdater()
+    DBStructureUpdater():
+        m_updateResult(false)
     {
         using namespace std::placeholders;
 
@@ -102,7 +103,13 @@ protected:
     void registerUpdateScriptFor(RdbmsDriverType dbType)
     {
         const auto script = QnLexical::serialized(dbType).toLatin1();
-        m_dbUpdater->addUpdateScript(/*dbType,*/ script);
+        m_registeredScripts.emplace(script, dbType);
+        m_dbTypeToScript.emplace(dbType, script);
+    }
+
+    void registerDefaultUpdateScript()
+    {
+        registerUpdateScriptFor(RdbmsDriverType::unknown);
     }
 
     void emulateConnectionToDb(RdbmsDriverType dbType)
@@ -112,11 +119,19 @@ protected:
 
     void whenUpdatedDb()
     {
-        ASSERT_TRUE(m_dbUpdater->updateStructSync());
+        m_dbUpdater->addUpdateScript(m_dbTypeToScript);
+        m_updateResult = m_dbUpdater->updateStructSync();
+    }
+
+    void assertIfInvokedNotDefaultScript()
+    {
+        assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType::unknown);
     }
 
     void assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType dbType)
     {
+        ASSERT_TRUE(m_updateResult);
+
         for (const auto& executedScript: m_executedScripts)
         {
             const auto range = m_registeredScripts.equal_range(executedScript);
@@ -134,11 +149,18 @@ protected:
         }
     }
 
+    void assertIfUpdateSucceeded()
+    {
+        ASSERT_FALSE(m_updateResult);
+    }
+
 private:
     std::unique_ptr<TestAsyncSqlQueryExecutor> m_testAsyncSqlQueryExecutor;
     std::unique_ptr<db::DBStructureUpdater> m_dbUpdater;
     std::list<QByteArray> m_executedScripts;
     std::multimap<QByteArray, RdbmsDriverType> m_registeredScripts;
+    std::map<RdbmsDriverType, QByteArray> m_dbTypeToScript;
+    bool m_updateResult;
 
     DBResult execSqlScript(
         const QByteArray& script,
@@ -160,6 +182,26 @@ TEST_F(DBStructureUpdater, different_sql_scripts_for_different_dbms)
 
     whenUpdatedDb();
     assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType::mysql);
+}
+
+TEST_F(DBStructureUpdater, default_script_gets_called_if_no_dbms_specific_script_supplied)
+{
+    registerUpdateScriptFor(RdbmsDriverType::mysql);
+    registerDefaultUpdateScript();
+    emulateConnectionToDb(RdbmsDriverType::oracle);
+
+    whenUpdatedDb();
+    assertIfInvokedNotDefaultScript();
+}
+
+TEST_F(DBStructureUpdater, update_fails_if_no_suitable_script_found)
+{
+    registerUpdateScriptFor(RdbmsDriverType::mysql);
+    registerUpdateScriptFor(RdbmsDriverType::sqlite);
+    emulateConnectionToDb(RdbmsDriverType::oracle);
+
+    whenUpdatedDb();
+    assertIfUpdateSucceeded();
 }
 
 } // namespace test
