@@ -698,6 +698,8 @@ UPDATE system_to_account SET is_enabled = 1 WHERE is_enabled IS NULL;
 static const char kRestoreSystemToAccountReferenceUniquenessSqlite[] =
 R"sql(
 
+DROP INDEX system_to_account_primary;
+
 DELETE FROM system_to_account WHERE rowid NOT IN 
 (SELECT MAX(rowid) FROM system_to_account GROUP BY account_id, system_id);
 
@@ -712,6 +714,8 @@ ON system_to_account (account_id, system_id);
  */
 static const char kRestoreSystemToAccountReferenceUniquenessMySql[] =
 R"sql(
+
+DROP INDEX system_to_account_primary;
 
 CREATE TABLE system_to_account_temp (
     id                          INTEGER,
