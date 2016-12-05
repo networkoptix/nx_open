@@ -162,8 +162,6 @@ private slots:
     void showToolTip();
     void updateIcons();
 
-    void forceUpdateFilter() { updateFilter(true); }
-
     void at_tabWidget_currentChanged(int index);
 
     void at_workbench_currentLayoutAboutToBeChanged();
