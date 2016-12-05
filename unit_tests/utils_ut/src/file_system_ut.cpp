@@ -279,95 +279,91 @@ TEST_F(CopyTest, copyDirectoryOverwrite)
         QString symLinkTarget = file_system::symLinkTarget(srcName);
         ASSERT_EQ(symLinkTarget, "file");
     }
+
+    TEST_F(CopyTest, copyFileLink)
+    {
+        const QString linkName("link");
+
+        createFile("file");
+
+        const auto srcName = createSymLink(linkName, "file");
+        ASSERT_FALSE(srcName.isEmpty());
+
+        auto result = file_system::copy(srcName, targetDir.absolutePath());
+        ASSERT_EQ(result.code, file_system::Result::ok);
+        const QFileInfo linkInfo(targetDir.filePath(linkName));
+
+        ASSERT_FALSE(linkInfo.exists());
+
+        result = file_system::copy(sourceDir.absoluteFilePath("file"), targetDir.absolutePath());
+        ASSERT_EQ(result.code, file_system::Result::ok);
+
+        ASSERT_TRUE(linkInfo.isSymLink());
+    }
+
+    TEST_F(CopyTest, copyDirectoryLink)
+    {
+        const auto srcName = createPath("dir");
+        createFile("dir/file");
+        createSymLink("link", "dir");
+
+        auto result = file_system::copy(sourceDir.absoluteFilePath("link"), targetDir.absolutePath());
+        ASSERT_EQ(result.code, file_system::Result::ok);
+
+        const QFileInfo linkInfo(targetDir.filePath("link"));
+        ASSERT_FALSE(linkInfo.exists());
+
+        result = file_system::copy(sourceDir.absoluteFilePath("dir"), targetDir.absolutePath());
+        ASSERT_EQ(result.code, file_system::Result::ok);
+
+        ASSERT_TRUE(linkInfo.isSymLink());
+        ASSERT_EQ(
+            entriesCount(srcName, true),
+            entriesCount(targetDir.absoluteFilePath("dir"), true));
+    }
+
+    TEST_F(CopyTest, followSymLinks)
+    {
+        createPath("dir");
+        createFile("dir/file");
+        createSymLink("link", "dir");
+        createSymLink("dir/link", "file");
+
+        auto result = file_system::copy(sourceDir.absoluteFilePath("link"), targetDir.absolutePath(),
+            file_system::FollowSymLinks);
+        ASSERT_EQ(result.code, file_system::Result::ok);
+
+        const QFileInfo dirInfo(targetDir.filePath("link"));
+        ASSERT_TRUE(dirInfo.isDir());
+        ASSERT_FALSE(dirInfo.isSymLink());
+
+        const QFileInfo fileInfo(targetDir.filePath("link/link"));
+        ASSERT_TRUE(fileInfo.isFile());
+        ASSERT_FALSE(dirInfo.isSymLink());
+    }
+
+    TEST_F(CopyTest, symLinkOverlap)
+    {
+        const auto srcFile = createFile("file");
+        ASSERT_FALSE(srcFile.isEmpty());
+        const auto srcLink = createSymLink("link", "file");
+        ASSERT_FALSE(srcLink.isEmpty());
+
+        auto result = file_system::copy(srcLink, srcFile);
+        ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
+    }
+
+    TEST_F(CopyTest, directorySelfOverlap)
+    {
+        createPath("dir/dir/dir");
+        createSymLink("dir/dir/dir/dir", "../dir");
+
+        auto result = file_system::copy(
+            sourceDir.absoluteFilePath("dir/dir"), sourceDir.absolutePath());
+        ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
+    }
+
 #endif //defined(Q_OS_UNIX)
-
-TEST_F(CopyTest, copyFileLink)
-{
-    const QString linkName("link");
-
-    createFile("file");
-
-    const auto srcName = createSymLink(linkName, "file");
-    ASSERT_FALSE(srcName.isEmpty());
-
-    auto result = file_system::copy(srcName, targetDir.absolutePath());
-    ASSERT_EQ(result.code, file_system::Result::ok);
-    const QFileInfo linkInfo(targetDir.filePath(linkName));
-
-    ASSERT_FALSE(linkInfo.exists());
-
-    result = file_system::copy(sourceDir.absoluteFilePath("file"), targetDir.absolutePath());
-    ASSERT_EQ(result.code, file_system::Result::ok);
-
-    ASSERT_TRUE(linkInfo.isSymLink());
-}
-
-TEST_F(CopyTest, copyDirectoryLink)
-{
-    const auto srcName = createPath("dir");
-    createFile("dir/file");
-    createSymLink("link", "dir");
-
-    auto result = file_system::copy(sourceDir.absoluteFilePath("link"), targetDir.absolutePath());
-    ASSERT_EQ(result.code, file_system::Result::ok);
-
-    const QFileInfo linkInfo(targetDir.filePath("link"));
-    ASSERT_FALSE(linkInfo.exists());
-
-    result = file_system::copy(sourceDir.absoluteFilePath("dir"), targetDir.absolutePath());
-    ASSERT_EQ(result.code, file_system::Result::ok);
-
-    ASSERT_TRUE(linkInfo.isSymLink());
-    ASSERT_EQ(
-        entriesCount(srcName, true),
-        entriesCount(targetDir.absoluteFilePath("dir"), true));
-}
-
-TEST_F(CopyTest, followSymLinks)
-{
-    createPath("dir");
-    createFile("dir/file");
-    createSymLink("link", "dir");
-    createSymLink("dir/link", "file");
-
-    auto result = file_system::copy(sourceDir.absoluteFilePath("link"), targetDir.absolutePath(),
-        file_system::FollowSymLinks);
-    ASSERT_EQ(result.code, file_system::Result::ok);
-
-    const QFileInfo dirInfo(targetDir.filePath("link"));
-    ASSERT_TRUE(dirInfo.isDir());
-    ASSERT_FALSE(dirInfo.isSymLink());
-
-    const QFileInfo fileInfo(targetDir.filePath("link/link"));
-    ASSERT_TRUE(fileInfo.isFile());
-    ASSERT_FALSE(dirInfo.isSymLink());
-}
-
-TEST_F(CopyTest, simpleOverlap)
-{
-    const auto srcFile = createFile("file");
-    ASSERT_FALSE(srcFile.isEmpty());
-
-    auto result = file_system::copy(srcFile, srcFile);
-    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
-
-    const auto srcDir = createFile("dir");
-    ASSERT_FALSE(srcDir.isEmpty());
-
-    result = file_system::copy(srcDir, srcDir);
-    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
-}
-
-TEST_F(CopyTest, symLinkOverlap)
-{
-    const auto srcFile = createFile("file");
-    ASSERT_FALSE(srcFile.isEmpty());
-    const auto srcLink = createSymLink("link", "file");
-    ASSERT_FALSE(srcLink.isEmpty());
-
-    auto result = file_system::copy(srcLink, srcFile);
-    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
-}
 
 TEST_F(CopyTest, directoryOverlap)
 {
@@ -386,13 +382,19 @@ TEST_F(CopyTest, directoryOverlap)
     ASSERT_EQ(initialEntriesCount + 1, newEntriesCount);
 }
 
-TEST_F(CopyTest, directorySelfOverlap)
-{
-    createPath("dir/dir/dir");
-    createSymLink("dir/dir/dir/dir", "../dir");
 
-    auto result = file_system::copy(
-        sourceDir.absoluteFilePath("dir/dir"), sourceDir.absolutePath());
+TEST_F(CopyTest, simpleOverlap)
+{
+    const auto srcFile = createFile("file");
+    ASSERT_FALSE(srcFile.isEmpty());
+
+    auto result = file_system::copy(srcFile, srcFile);
+    ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
+
+    const auto srcDir = createFile("dir");
+    ASSERT_FALSE(srcDir.isEmpty());
+
+    result = file_system::copy(srcDir, srcDir);
     ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
 }
 
