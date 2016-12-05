@@ -56,7 +56,7 @@ public:
 
 private:
     QnStorageDb::UuidToCatalogs &m_readData;
-    nx::media_db::Error m_error;
+    nx::media_db::Error m_error = nx::media_db::Error::NoError;
 };
 
 } // namespace <anonynous>
