@@ -16,14 +16,13 @@ nx::db::DBResult SystemSharingDataObject::insertOrReplaceSharing(
     const api::SystemSharingEx& sharing)
 {
     QSqlQuery replaceSharingQuery(*queryContext->connection());
-    replaceSharingQuery.prepare(
-        R"sql(
+    replaceSharingQuery.prepare(R"sql(
         REPLACE INTO system_to_account(
             account_id, system_id, access_role_id, user_role_id, custom_permissions,
             is_enabled, vms_user_id, last_login_time_utc, usage_frequency)
         VALUES(:accountId, :systemId, :accessRole, :userRoleId, :customPermissions,
                 :isEnabled, :vmsUserId, :lastLoginTime, :usageFrequency)
-        )sql");
+    )sql");
     QnSql::bind(sharing, &replaceSharingQuery);
     if (!replaceSharingQuery.exec())
     {
@@ -108,10 +107,9 @@ nx::db::DBResult SystemSharingDataObject::deleteSharing(
     const nx::db::InnerJoinFilterFields& filterFields)
 {
     QSqlQuery removeSharingQuery(*queryContext->connection());
-    QString sqlQueryStr =
-        R"sql(
+    QString sqlQueryStr = R"sql(
         DELETE FROM system_to_account WHERE system_id=:systemId
-        )sql";
+    )sql";
 
     QString filterStr;
     if (!filterFields.empty())
@@ -144,12 +142,11 @@ nx::db::DBResult SystemSharingDataObject::calculateUsageFrequencyForANewSystem(
 {
     QSqlQuery calculateUsageFrequencyForTheNewSystem(*queryContext->connection());
     calculateUsageFrequencyForTheNewSystem.setForwardOnly(true);
-    calculateUsageFrequencyForTheNewSystem.prepare(
-        R"sql(
-            SELECT MAX(usage_frequency) + 1
-            FROM system_to_account
-            WHERE account_id = :accountId
-            )sql");
+    calculateUsageFrequencyForTheNewSystem.prepare(R"sql(
+        SELECT MAX(usage_frequency) + 1
+        FROM system_to_account
+        WHERE account_id = :accountId
+    )sql");
     calculateUsageFrequencyForTheNewSystem.bindValue(
         ":accountId",
         QnSql::serialized_field(accountId));
@@ -176,12 +173,11 @@ nx::db::DBResult SystemSharingDataObject::updateUserLoginStatistics(
     float usageFrequency)
 {
     QSqlQuery updateUsageStatisticsQuery(*queryContext->connection());
-    updateUsageStatisticsQuery.prepare(
-        R"sql(
+    updateUsageStatisticsQuery.prepare(R"sql(
         UPDATE system_to_account
         SET last_login_time_utc=:last_login_time_utc, usage_frequency=:usage_frequency
         WHERE account_id=:account_id AND system_id=:system_id
-        )sql");
+    )sql");
     updateUsageStatisticsQuery.bindValue(
         ":last_login_time_utc",
         QnSql::serialized_field(lastloginTime));
@@ -206,8 +202,7 @@ nx::db::DBResult SystemSharingDataObject::fetchUserSharings(
     const nx::db::InnerJoinFilterFields& filterFields,
     std::deque<api::SystemSharingEx>* const sharings)
 {
-    QString sqlRequestStr =
-        R"sql(
+    QString sqlRequestStr = R"sql(
         SELECT a.id as accountId,
                a.email as accountEmail,
                sa.system_id as systemId,
@@ -220,7 +215,7 @@ nx::db::DBResult SystemSharingDataObject::fetchUserSharings(
                sa.usage_frequency as usageFrequency
         FROM system_to_account sa, account a
         WHERE sa.account_id=a.id
-        )sql";
+    )sql"; 
 
     QString filterStr;
     if (!filterFields.empty())
