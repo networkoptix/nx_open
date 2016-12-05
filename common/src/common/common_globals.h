@@ -358,8 +358,6 @@ public:
         CreateInitialData,
         GotFromRemotePeer
     };
-    Q_DECLARE_METATYPE(StatusChangeReason)
-
 
     enum BitratePerGopType {
         BPG_None,
@@ -847,6 +845,7 @@ public:
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 
