@@ -158,17 +158,18 @@ PageBase
         }
     }
 
+    WheelSwitchArea
+    {
+        anchors.fill: parent
+        onPreviousRequested: previousCameraRequested()
+        onNextRequested: nextCameraRequested()
+        maxConsequentRequests: camerasModel.count - 1
+    }
+
     MouseArea
     {
         anchors.fill: parent
         onDoubleClicked: Workflow.popCurrentScreen()
-        onWheel:
-        {
-            if (wheel.angleDelta.y > 0)
-                previousCameraRequested()
-            else
-                nextCameraRequested()
-        }
     }
 
     onNextCameraRequested:
