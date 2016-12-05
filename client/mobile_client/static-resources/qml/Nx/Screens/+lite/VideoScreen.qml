@@ -86,19 +86,54 @@ PageBase
         id: dummyLoader
         anchors.fill: parent
         visible: active
-        sourceComponent: dummyComponent
+        sourceComponent: Component
+        {
+            VideoDummy
+            {
+                width: videoScreen.width
+                state: videoScreenController.dummyState
+            }
+        }
+
         active: d.cameraWarningVisible
     }
 
-    Component
+    Loader
     {
-        id: dummyComponent
-
-        VideoDummy
+        id: noCameraDummyLoader
+        anchors.fill: parent
+        visible: active
+        sourceComponent: Rectangle
         {
-            width: videoScreen.width
-            state: videoScreenController.dummyState
+            color: ColorTheme.base3
+
+            Column
+            {
+                width: parent.width
+                anchors.centerIn: parent
+
+                Text
+                {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Select camera")
+                    color: ColorTheme.base13
+                    font.pixelSize: 24
+                    font.capitalization: Font.AllUppercase
+                    wrapMode: Text.WordWrap
+                }
+
+                Text
+                {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Press Ctrl + Arrow or use mouse wheel")
+                    color: ColorTheme.base13
+                    font.pixelSize: 11
+                    wrapMode: Text.WordWrap
+                }
+            }
         }
+
+        active: resourceId == ""
     }
 
     Keys.onPressed:
@@ -139,9 +174,11 @@ PageBase
     onNextCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
+        videoScreenController.mediaPlayer.play()
     }
     onPreviousCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
+        videoScreenController.mediaPlayer.play()
     }
 }
