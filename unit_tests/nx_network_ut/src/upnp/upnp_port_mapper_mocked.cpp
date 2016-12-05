@@ -37,7 +37,7 @@ void AsyncClientMock::addMapping(
     Protocol protocol, const QString& description, quint64 /*duration*/,
     std::function< void( bool ) > callback )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     if( externalPort == m_disabledPort ||
             m_mappings.find( std::make_pair( externalPort, protocol ) )
                 != m_mappings.end() )
@@ -55,7 +55,7 @@ void AsyncClientMock::deleteMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         std::function< void( bool ) > callback )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     const bool isErased = m_mappings.erase( std::make_pair( externalPort, protocol ) );
     m_tasks.push( [ isErased, callback ]{ callback( isErased ); } );
 }
@@ -64,7 +64,7 @@ void AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
         std::function< void( MappingInfo ) > callback )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     if( m_mappings.size() <= index )
         return m_tasks.push( [ callback ]{ callback( MappingInfo() ); } );
 
@@ -85,7 +85,7 @@ void AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         std::function< void( MappingInfo ) > callback )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     const auto it = m_mappings.find( std::make_pair( externalPort, protocol ) );
     if( it == m_mappings.end() )
         return m_tasks.push( [ callback ]{ callback( MappingInfo() ); } );
@@ -105,26 +105,26 @@ void AsyncClientMock::getMapping(
 
 AsyncClientMock::Mappings AsyncClientMock::mappings() const
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_mappings;
 }
 
 size_t AsyncClientMock::mappingsCount() const
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_mappings.size();
 }
 
 bool AsyncClientMock::mkMapping( const Mappings::value_type& value )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_mappings.insert( value ).second;
 }
 
 
 bool AsyncClientMock::rmMapping( quint16 port, Protocol protocol )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_mappings.erase( std::make_pair( port, protocol ) );
 }
 
