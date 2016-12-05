@@ -28,6 +28,13 @@ const int defaultSmtpTimeout = 300; //seconds, 5 min
 
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SmtpOperationResult), (json), _Fields)
+
+QString SmtpOperationResult::toString() const
+{
+    return QString::fromUtf8(QJson::serialized(*this));
+}
+
 bool nx::email::isValidAddress(const QString& address)
 {
     return QnEmailAddress(address).isValid();
@@ -195,3 +202,4 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnEmailSmtpServerPreset)(QnEmailSettings), (json)(eq), _Fields)
+

@@ -7,6 +7,82 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include "email_fwd.h"
 
+
+enum class SmtpReplyCode
+{
+    NoReply = 0,
+    NonStandardSuccess = 200,
+    SystemStatus = 211,
+    Help = 214,
+    ServiceReady = 220,
+    ServiceClosedChannel = 221,
+    AuthSuccessful = 235,
+    MailActionOK = 250,
+    UserNotLocal = 251,
+    CannotVerifyUser = 252,
+    ServerChallenge = 334,
+    StartMailInput = 354,
+    ServiceNotAvailable = 421,
+    MailboxTemporaryUnavailable = 450,
+    ProcessingError = 451,
+    InsufficientStorage = 452,
+    CommandSyntaxError = 500,
+    ParameterSyntaxError = 501,
+    CommandNotImplemented = 502,
+    BadCommandSequence = 503,
+    ParameterNotImplemented = 504,
+    MailIsNotAccepted = 521,
+    AccessDenied = 530,
+    MailboxUnavailable = 550,
+    UserNotLocalError = 551,
+    ActionAborted = 552,
+    InvalidMailboxName = 553,
+    TransactionFailed = 554,
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SmtpReplyCode)
+
+enum class SmtpError
+{
+    Success,
+    ConnectionTimeoutError,
+    ResponseTimeoutError,
+    SendDataTimeoutError,
+    AuthenticationFailedError,
+    ServerError,    // 4xx SMTP error
+    ClientError     // 5xx SMTP error
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SmtpError)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SmtpReplyCode)(SmtpError), (metatype)(numeric))
+
+struct SmtpOperationResult
+{
+    SmtpError error = SmtpError::Success;
+    SmtpReplyCode lastCode = SmtpReplyCode::NoReply;
+
+    SmtpOperationResult() {}
+    SmtpOperationResult(SmtpError error):
+        error(error)
+    {
+    }
+    SmtpOperationResult(SmtpError error, SmtpReplyCode lastCode):
+        error(error), lastCode(lastCode)
+    {
+    }
+
+    explicit operator bool() const
+    {
+        return error == SmtpError::Success;
+    }
+
+    /** Note: untranslatable */
+    QString toString() const;
+};
+
+#define SmtpOperationResult_Fields (error)(lastCode)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SmtpOperationResult), (metatype)(lexical)(json))
+
 //TODO: #GDM move other methods to this namespace, then move module to nx/email (?) lib
 namespace nx {
 namespace email {
