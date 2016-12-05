@@ -147,6 +147,13 @@ public:
         return *this;
     }
 
+    QnActionBuilder iconVisibleInMenu(bool visible)
+    {
+        m_action->setIconVisibleInMenu(visible);
+
+        return *this;
+    }
+
     QnActionBuilder role(QAction::MenuRole role)
     {
         m_action->setMenuRole(role);
@@ -1046,10 +1053,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("Exit")).
         shortcut(lit("Alt+F4")).
+        shortcut(lit("Ctrl+Q"), QnActionBuilder::Mac, true).
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/window_close.png"));
+        icon(qnSkin->icon("titlebar/window_close.png")).
+        iconVisibleInMenu(false);
 
     factory(QnActions::DelayedForcedExitAction).
         flags(Qn::NoTarget);

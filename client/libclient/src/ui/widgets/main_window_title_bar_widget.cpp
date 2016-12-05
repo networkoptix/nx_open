@@ -113,11 +113,10 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
         QnActions::MainMenuAction,
         Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(d->mainMenuButton, &QnToolButton::justPressed, this,
-        [this]()
+        [this, mainMenu = QSharedPointer<QMenu>(menu()->newMenu(Qn::MainScope, nullptr))]()
         {
             Q_D(const QnMainWindowTitleBarWidget);
             static const QPoint kVerticalOffset(0, 2);
-            QScopedPointer<QMenu> mainMenu(menu()->newMenu(Qn::MainScope, nullptr));
             executeButtonMenu(d->mainMenuButton, mainMenu.data(), kVerticalOffset);
         });
 
