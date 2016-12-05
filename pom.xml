@@ -707,6 +707,8 @@
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>macsetup/client-dmg</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
             </modules>
         </profile>
 
