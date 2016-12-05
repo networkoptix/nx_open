@@ -28,11 +28,18 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
         lit("url"));
     parser.addOption(urlOption);
 
-    const auto videowallInstanceGuidOption = QCommandLineOption(
+    auto videowallInstanceGuidOption = QCommandLineOption(
         lit("videowall-instance-guid"),
         lit("GUID which is used to check Videowall Control messages."),
         lit("videowallInstanceGuid"));
     parser.addOption(videowallInstanceGuidOption);
+    videowallInstanceGuidOption.setHidden(true);
+
+    const auto autoLoginModeOption = QCommandLineOption(
+        lit("auto-login"),
+        lit("Auto-login mode: enabled, disabled or auto (default)."),
+        lit("autoLoginMode"));
+    parser.addOption(autoLoginModeOption);
 
     auto testOption = QCommandLineOption(
         lit("test"),
@@ -60,6 +67,17 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
 
     if (parser.isSet(videowallInstanceGuidOption))
         videowallInstanceGuid = QnUuid::fromStringSafe(parser.value(videowallInstanceGuidOption));
+
+    if (parser.isSet(autoLoginModeOption))
+    {
+        const auto value = parser.value(autoLoginModeOption);
+        if (value == lit("disabled"))
+            autoLoginMode = AutoLoginMode::Disabled;
+        else if (value == lit("enabled"))
+            autoLoginMode = AutoLoginMode::Enabled;
+        else if (value == lit("auto"))
+            autoLoginMode = AutoLoginMode::Auto;
+    }
 
     if (parser.isSet(testOption))
     {

@@ -261,12 +261,16 @@ void CloudStreamSocket::connectAsync(
     const SocketAddress& address,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    NX_LOGX(lm("connectAsync. %1").str(address), cl_logDEBUG2);
+
     nx::network::SocketGlobals::addressResolver().resolveAsync(
         address.address,
         [this, operationGuard = m_asyncConnectGuard.sharedGuard(),
             port = address.port, handler = std::move(handler)](
                 SystemError::ErrorCode code, std::deque<AddressEntry> dnsEntries) mutable
         {
+            NX_LOGX(lm("done resolve. %1, %2").str(code).arg(dnsEntries.size()), cl_logDEBUG2);
+
             if (operationGuard->lock())
             {
                 m_aioThreadBinder->post(
@@ -332,9 +336,12 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 }
 
 void CloudStreamSocket::connectToEntriesAsync(
-    std::deque<AddressEntry> dnsEntries, int port,
+    std::deque<AddressEntry> dnsEntries,
+    int port,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    NX_LOGX(lm("connectToEntriesAsync. %1, port %2").str(dnsEntries.front()).arg(port), cl_logDEBUG2);
+
     AddressEntry firstEntry(std::move(dnsEntries.front()));
     dnsEntries.pop_front();
     connectToEntryAsync(
@@ -350,13 +357,17 @@ void CloudStreamSocket::connectToEntriesAsync(
 }
 
 void CloudStreamSocket::connectToEntryAsync(
-    const AddressEntry& dnsEntry, int port,
+    const AddressEntry& dnsEntry,
+    int port,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    NX_LOGX(lm("connectToEntryAsync. %1, port %2").str(dnsEntry).arg(port), cl_logDEBUG2);
+
     using namespace std::placeholders;
     switch (dnsEntry.type)
     {
         case AddressType::direct:
+            NX_LOGX(lm("connectToEntryAsync. direct %1:%2").str(dnsEntry.host).arg(port), cl_logDEBUG2);
             //using tcp connection
             m_socketDelegate.reset(new TCPSocket(m_ipVersion));
             setDelegate(m_socketDelegate.get());
@@ -377,6 +388,8 @@ void CloudStreamSocket::connectToEntryAsync(
         case AddressType::cloud:
         case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
         {
+            NX_LOGX(lm("connectToEntryAsync. cloud %1:%2").str(dnsEntry.host).arg(port), cl_logDEBUG2);
+
             //establishing cloud connect
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
@@ -441,6 +454,8 @@ SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
 
 void CloudStreamSocket::onDirectConnectDone(SystemError::ErrorCode errorCode)
 {
+    NX_LOGX(lm("onDirectConnectDone. %1").str(errorCode), cl_logDEBUG2);
+
     if (errorCode == SystemError::noError)
         errorCode = applyRealNonBlockingMode(m_socketDelegate.get());
 
@@ -452,6 +467,8 @@ void CloudStreamSocket::onCloudConnectDone(
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractStreamSocket> cloudConnection)
 {
+    NX_LOGX(lm("onCloudConnectDone. %1").str(errorCode), cl_logDEBUG2);
+    
     if (errorCode == SystemError::noError)
         errorCode = applyRealNonBlockingMode(cloudConnection.get());
 

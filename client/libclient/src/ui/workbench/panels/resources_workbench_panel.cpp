@@ -330,7 +330,7 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
     const qreal targetWidth = qBound(minWidth, x, maxWidth);
 
     QRectF geometry = item->geometry();
-    if (!qFuzzyCompare(geometry.width(), targetWidth))
+    if (!qFuzzyEquals(geometry.width(), targetWidth))
     {
         geometry.setWidth(targetWidth);
         geometry.setLeft(0);

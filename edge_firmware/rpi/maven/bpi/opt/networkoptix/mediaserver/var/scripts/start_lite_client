@@ -15,8 +15,16 @@ export VDPAU_DRIVER=sunxi
 export COLORTERM=yes
 export LESS_TERMCAP_se=
 export CUSTOMIZATION=${deb.customization.company.name}
-killall gpm
 export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib
+
+killall gpm
+
+if (get-edid | parse-edid | grep -Fxq 'Section "Monitor"') &> /dev/null
+then
+    AUTO_LOGIN_MODE="--auto-login=disabled"
+fi
+
 LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
-/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* >& /opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
-echo 1>/sys/class/graphics/fb0/blank
+/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $AUTO_LOGIN_MODE $* >& /opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
+
+echo 1 > /sys/class/graphics/fb0/blank

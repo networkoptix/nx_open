@@ -1,5 +1,5 @@
 #include <nx/network/socket_global.h>
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #ifdef _WIN32
     #include <windows.h>

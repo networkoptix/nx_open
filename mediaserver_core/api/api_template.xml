@@ -1913,7 +1913,7 @@ the respective JSON fields can be empty.</description>
                       </param>
                       <param>
                         <name>datetime</name>
-                        <description>Time in milliseconds since UNIX epoch, or a UTC time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                        <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
                         <optional>false</optional>
                       </param>
                     </params>
@@ -1945,7 +1945,7 @@ the respective JSON fields can be empty.</description>
                   </param>
                   <param>
                     <name>dateTime</name>
-                    <description>Time in milliseconds since UNIX epoch, or a UTC time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                    <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
                     <optional>false</optional>
                   </param>
                 </params>

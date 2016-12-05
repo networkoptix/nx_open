@@ -52,6 +52,7 @@ namespace
     static const QString kAdminPasswordRealm = lit("adminRealm");
     static const QString kLocalSystemId = lit("localSystemId");
     static const QString kLocalSystemName = lit("localSystemName");
+    static const QString kServerName= lit("serverName");
 }
 
 void BeforeRestoreDbData::saveToSettings(QSettings* settings)
@@ -62,6 +63,7 @@ void BeforeRestoreDbData::saveToSettings(QSettings* settings)
     settings->setValue(kAdminPasswordRealm, realm);
     settings->setValue(kLocalSystemId, localSystemId);
     settings->setValue(kLocalSystemName, localSystemName);
+    settings->setValue(kServerName, serverName);
 }
 
 void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
@@ -72,6 +74,7 @@ void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
     realm = settings->value(kAdminPasswordRealm, QnAppInfo::realm()).toByteArray();
     localSystemId = settings->value(kLocalSystemId).toByteArray();
     localSystemName = settings->value(kLocalSystemName).toByteArray();
+    serverName = settings->value(kServerName).toByteArray();
 }
 
 void BeforeRestoreDbData::clearSettings(QSettings* settings)
@@ -82,6 +85,7 @@ void BeforeRestoreDbData::clearSettings(QSettings* settings)
     settings->remove(kAdminPasswordRealm);
     settings->remove(kLocalSystemId);
     settings->remove(kLocalSystemName);
+    settings->remove(kServerName);
 }
 
 bool BeforeRestoreDbData::isEmpty() const

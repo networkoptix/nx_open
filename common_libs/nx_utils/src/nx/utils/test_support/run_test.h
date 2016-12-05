@@ -8,7 +8,8 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
-#include <nx/utils/test_support/test_options.h>
+
+#include "test_options.h"
 
 namespace nx {
 namespace utils {

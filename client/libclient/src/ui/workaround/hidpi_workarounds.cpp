@@ -172,33 +172,22 @@ void installMenuMouseEventCorrector(QMenu* menu)
 
 QWindow* getParentWindow(QWidget* widget)
 {
-    // Checks if widget is in graphics view
-
     if (!widget)
         return nullptr;
 
-    auto item = widget;
-    while (item->parentWidget() && !dynamic_cast<QGLWidget*>(item->parentWidget()))
-        item = item->parentWidget();
+    auto topLevel = widget->window();
+    if (topLevel->isWindow())
+        return topLevel->windowHandle();
 
-    if (item->parentWidget())    //< direct child of GL widget
-        return item->parentWidget()->windowHandle();
+    const auto proxy = topLevel->graphicsProxyWidget();
+    if (!proxy)
+        return nullptr;
 
-    // We have at least
-    const auto proxy = item->graphicsProxyWidget();
-    const QGraphicsView* view = (proxy && proxy->scene() && !proxy->scene()->views().isEmpty()
-        ? proxy->scene()->views().first() : nullptr);
-    if (view)
-        return view->viewport()->windowHandle();
+    const auto scene = proxy->scene();
+    if (!scene || scene->views().isEmpty())
+        return nullptr;
 
-    while (widget)
-    {
-        if (widget->windowHandle())
-            return widget->windowHandle();
-
-        widget = widget->parentWidget();
-    }
-    return nullptr;
+    return getParentWindow(scene->views().first());
 }
 
 QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = nullptr)
@@ -259,7 +248,8 @@ public:
         const auto parentWindow = getParentWindow(widget);
         if (!dynamic_cast<ProxyContextMenuEvent*>(event) && parentWindow)
         {
-            const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
+            const auto targetPos = screenRelatedToGlobal(
+                contextMenuEvent->globalPos(), parentWindow->screen());
             auto fixedEvent = ProxyContextMenuEvent(contextMenuEvent->pos(), targetPos);
             if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
                 return QObject::eventFilter(watched, event);

@@ -328,7 +328,7 @@ void SystemManager::getSystems(
             const auto sharingData = getSystemSharingData(
                 *accountEmail,
                 systemDataEx.id);
-            if (sharingData)
+            if (sharingData && sharingData->isEnabled)
             {
                 systemDataEx.accessRole = sharingData->accessRole;
                 // Calculating system weight.
@@ -336,14 +336,24 @@ void SystemManager::getSystems(
                     sharingData->lastLoginTime,
                     sharingData->usageFrequency + 1);
                 systemDataEx.lastLoginTime = sharingData->lastLoginTime;
+                systemDataEx.sharingPermissions =
+                    std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
             }
             else
             {
                 systemDataEx.accessRole = api::SystemAccessRole::none;
             }
-            systemDataEx.sharingPermissions =
-                std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
         }
+
+        // Omitting systems in which current user is disabled
+        const auto unallowedSystemsRangeStartIter = std::remove_if(
+            resultData.systems.begin(),
+            resultData.systems.end(),
+            [](const api::SystemDataEx& system)
+            {
+                return system.accessRole == api::SystemAccessRole::none;
+            });
+        resultData.systems.erase(unallowedSystemsRangeStartIter, resultData.systems.end());
     }
 
     //adding system health

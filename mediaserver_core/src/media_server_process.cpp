@@ -185,8 +185,9 @@
 #include <network/router.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
@@ -199,7 +200,7 @@
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include "platform/hardware_information.h"
 #include "platform/platform_abstraction.h"
@@ -242,6 +243,7 @@
 #include <media_server/master_server_status_watcher.h>
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
+#include "misc/migrate_oldwin_dir.h"
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -465,6 +467,35 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
 
+    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto it = std::find_if(partitions.begin(), partitions.end(),
+        [&](const QnPlatformMonitor::PartitionSpace& part)
+    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+
+    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    storage->setStorageType(QnLexical::serialized(storageType));
+
+    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+    {
+        const qint64 totalSpace = fileStorage->getTotalSpaceWithoutInit();
+        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < fileStorage->calcInitialSpaceLimit())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
+                .arg(Q_FUNC_INFO)
+                .arg(path)
+                .arg(totalSpace)
+                .arg(storage->getSpaceLimit()), cl_logDEBUG1);
+            return QnStorageResourcePtr(); // if storage size isn't known or small do not add it by default
+        }
+    }
+    else
+    {
+        NX_ASSERT(false);
+        NX_LOG(lit("%1 Failed to create to storage %2").arg(Q_FUNC_INFO).arg(path), cl_logWARNING);
+        return QnStorageResourcePtr();
+    }
+
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
     NX_LOG(lit("%1 Storage %2 is operational: %3")
@@ -477,15 +508,6 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     if (resType)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
-
-    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
-    const auto it = std::find_if(partitions.begin(), partitions.end(),
-                                 [&](const QnPlatformMonitor::PartitionSpace& part)
-        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
-
-    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -577,6 +599,13 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         }
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
+
+        NX_LOG(lit("%1 Candidate %2, isFileStorage = %3, totalSpace = %4, spaceLimit = %5")
+               .arg(Q_FUNC_INFO)
+               .arg(storage->getUrl())
+               .arg((bool)fileStorage)
+               .arg(totalSpace)
+               .arg(storage->getSpaceLimit()), cl_logDEBUG2);
     }
     return result;
 }
@@ -610,17 +639,8 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
         }
         // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
-        const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
-        {
-            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
-                    .arg(Q_FUNC_INFO)
-                    .arg(folderPath)
-                    .arg(totalSpace)
-                    .arg(storage->getSpaceLimit()), cl_logDEBUG1);
-            continue; // if storage size isn't known do not add it by default
-        }
-
+        if (!storage)
+            continue;
 
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
@@ -723,10 +743,25 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             if (m_needStop)
                 return;
         }
+
         for(const auto& storage: storages)
+        {
+            NX_LOG(lit("%1 Existing storage: %2, spaceLimit = %3")
+                   .arg(Q_FUNC_INFO)
+                   .arg(storage.url)
+                   .arg(storage.spaceLimit), cl_logDEBUG2);
             messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+        }
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+
+        NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
+        for (const auto& storage: storagesToRemove)
+            NX_LOG(lit("%1 Storage to remove: %2, id: %3")
+                   .arg(Q_FUNC_INFO)
+                   .arg(storage->getUrl())
+                   .arg(storage->getId().toString()), cl_logDEBUG2);
+
         if (!storagesToRemove.isEmpty())
         {
             ec2::ApiIdDataList idList;
@@ -1773,6 +1808,8 @@ void MediaServerProcess::savePersistentDataBeforeDbRestore()
 
     data.localSystemId = qnGlobalSettings->localSystemId().toByteArray();
     data.localSystemName = qnGlobalSettings->systemName().toLocal8Bit();
+    if (m_mediaServer)
+        data.serverName = m_mediaServer->getName().toLocal8Bit();
 
     data.saveToSettings(MSSettings::roSettings());
 }
@@ -1993,14 +2030,15 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 
 void MediaServerProcess::run()
 {
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
 
     if (!m_engineVersion.isNull())
         qnCommon->setEngineVersion(m_engineVersion);
 
     QnCallCountStart(std::chrono::milliseconds(5000));
-
+#ifdef Q_OS_WIN32
+    misc::migrateFilesFromWindowsOldDir(QDir::toNativeSeparators(getDataDirectory()));
+#endif
     ffmpegInit();
 
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
@@ -2333,7 +2371,11 @@ void MediaServerProcess::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
-            server->setName(getDefaultServerName());
+
+            if (!beforeRestoreDbData.serverName.isEmpty())
+                server->setName(QString::fromLocal8Bit(beforeRestoreDbData.serverName));
+            else
+                server->setName(getDefaultServerName());
 
             if (!noSetupWizardFlag && beforeRestoreDbData.localSystemId.isNull())
                 isNewServerInstance = true;
@@ -2387,7 +2429,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
 
         server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-        server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
+        server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
         server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
         server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
@@ -3173,7 +3215,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.parse(argc, argv, stderr);
     if( showVersion )
     {
-        std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;
+        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
         return 0;
     }
     if( showHelp )

@@ -93,13 +93,12 @@ CloudServerSocket::~CloudServerSocket()
     {
         // Unfortunatelly we have to block here, cloud server socket uses
         // nonblocking operations even if user uses blocking mode.
-        pleaseStopSync();
+        pleaseStopSync(true);
     }
-    else
-    if (m_mediatorConnection->isInSelfAioThread())
+    else if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
     {
         // Will not block as all delegates are in the same AIO thread
-        pleaseStopSync(false);
+        stopWhileInAioThread();
     }
     else
     {
@@ -110,7 +109,7 @@ CloudServerSocket::~CloudServerSocket()
             // It looks like IO has been canceled, but it's not enought for CloudServerSocket
             // because of acceptAsync (and accept) optimization.
             // It's better to block here, then end up with SIGSEGV isnt it?
-            pleaseStopSync();
+            pleaseStopSync(true);
         }
     }
 }
@@ -203,15 +202,24 @@ AbstractStreamSocket* CloudServerSocket::accept()
 
 void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_mediatorRegistrationRetryTimer.pleaseStop(
+    m_mediatorRegistrationRetryTimer.post(
         [this, handler = std::move(handler)]()
         {
-            // shell not block as they are in the same AIO thread
-            m_mediatorConnection->pleaseStopSync();
-            m_acceptors.clear();
-            m_tunnelPool.reset();
+            stopWhileInAioThread();
             handler();
         });
+}
+
+void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+{
+    if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
+    {
+        stopWhileInAioThread();
+    }
+    else
+    {
+        AbstractStreamServerSocket::pleaseStopSync(assertIfCalledUnderLock);
+    }
 }
 
 void CloudServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
@@ -543,6 +551,14 @@ void CloudServerSocket::onMediatorConnectionRestored()
         NX_LOGX(lm("Register on mediator after reconnect"), cl_logDEBUG1);
         issueRegistrationRequest();
     }
+}
+
+void CloudServerSocket::stopWhileInAioThread()
+{
+    m_mediatorRegistrationRetryTimer.pleaseStopSync();
+    m_mediatorConnection->pleaseStopSync();
+    m_acceptors.clear();
+    m_tunnelPool.reset();
 }
 
 } // namespace cloud

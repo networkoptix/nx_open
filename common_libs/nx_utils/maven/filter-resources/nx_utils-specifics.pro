@@ -8,3 +8,5 @@ win* {
     PRECOMPILED_HEADER = StdAfx.h
     PRECOMPILED_SOURCE = StdAfx.cpp
 }    
+
+SOURCES += ${project.build.directory}/app_info_impl.cpp

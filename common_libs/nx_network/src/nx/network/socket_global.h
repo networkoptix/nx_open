@@ -53,15 +53,16 @@ public:
     static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
     static aio::AIOService& aioService() { return s_instance->m_aioService; }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
-    static AddressPublisher& addressPublisher() { return s_instance->m_addressPublisher; }
+    static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
     static OutgoingTunnelPool& outgoingTunnelPool() { return s_instance->m_outgoingTunnelPool; }
     static CloudSettings& cloudConnectSettings() { return s_instance->m_cloudConnectSettings; }
-    static TcpReversePool& tcpReversePool() { return s_instance->m_tcpReversePool; }
+    static TcpReversePool& tcpReversePool() { return *s_instance->m_tcpReversePool; }
 
     static void init(); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
     static void verifyInitialization();
+    static bool isInitialized();
 
     static void applyArguments(const utils::ArgumentParser& arguments);
 
@@ -114,10 +115,10 @@ private:
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
 
-    cloud::MediatorAddressPublisher m_addressPublisher;
+    std::unique_ptr<cloud::MediatorAddressPublisher> m_addressPublisher;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
-    cloud::tcp::ReverseConnectionPool m_tcpReversePool;
+    std::unique_ptr<cloud::tcp::ReverseConnectionPool> m_tcpReversePool;
 
     QnMutex m_mutex;
     std::map<CustomInit, CustomDeinit> m_customInits;

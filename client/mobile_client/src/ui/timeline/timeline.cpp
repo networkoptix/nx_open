@@ -17,6 +17,8 @@
 #include "kinetic_helper.h"
 #include "camera/camera_chunk_provider.h"
 
+#include <nx/utils/math/fuzzy.h>
+
 namespace {
 
     const bool drawDebugTicks = false;
@@ -1205,7 +1207,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         }
     }
 
-    if (!qFuzzyCompare(zoomLevel, targetZoomLevel)) {
+    if (!qFuzzyEquals(zoomLevel, targetZoomLevel)) {
         if (targetZoomLevel > zoomLevel) {
             if (targetZoomLevel - zoomLevel > maxZoomLevelDiff)
                 zoomLevel = targetZoomLevel - maxZoomLevelDiff;
@@ -1221,7 +1223,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         updateRequired = true;
     }
 
-    if (!qFuzzyCompare(textLevel, targetTextLevel)) {
+    if (!qFuzzyEquals(textLevel, targetTextLevel)) {
         if (targetTextLevel > textLevel) {
             if (targetTextLevel - textLevel > maxZoomLevelDiff)
                 textLevel = targetTextLevel - maxZoomLevelDiff;
@@ -1258,7 +1260,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     updateRequired = (updateRequired || windowUpdateRequired);
 
     qreal targetTextOpacity = hasArchive() ? 1.0 : 0.0;
-    if (!qFuzzyCompare(textOpacity, targetTextOpacity)) {
+    if (!qFuzzyEquals(textOpacity, targetTextOpacity)) {
         if (textOpacity < targetTextOpacity)
             textOpacity = qMin(targetTextOpacity, textOpacity + textOpacityAnimationSpeed * dt);
         else
@@ -1270,7 +1272,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     bool live = parent->position() + 1000 >= QDateTime::currentMSecsSinceEpoch();
 
     qreal targetLiveOpacity = hasArchive() ? 1.0 : 0.0;
-    if (!qFuzzyCompare(liveOpacity, targetLiveOpacity)) {
+    if (!qFuzzyEquals(liveOpacity, targetLiveOpacity)) {
         if (liveOpacity < targetLiveOpacity)
             liveOpacity = qMin(targetLiveOpacity, liveOpacity + liveOpacityAnimationSpeed * dt);
         else
@@ -1280,7 +1282,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     }
 
     qreal targetActiveLiveOpacity = live ? 1.0 : 0.0;
-    if (!qFuzzyCompare(activeLiveOpacity, targetActiveLiveOpacity)) {
+    if (!qFuzzyEquals(activeLiveOpacity, targetActiveLiveOpacity)) {
         if (activeLiveOpacity < targetActiveLiveOpacity)
             activeLiveOpacity = qMin(targetActiveLiveOpacity, activeLiveOpacity + liveOpacityAnimationSpeed * dt);
         else

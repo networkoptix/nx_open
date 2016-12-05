@@ -11,6 +11,8 @@
         "brand_d4":     "#678615",
         "brand_d5":     "#57730e",
         "brand_d6":     "#496207",
-        "brand_d7":     "#3e5502"
+        "brand_d7":     "#3e5502",
+        
+        "brand_contrast":"#121517"
     }
 }

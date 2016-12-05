@@ -291,7 +291,7 @@ QnWorkbenchItem *QnWorkbenchItem::zoomTargetItem() const
 
 void QnWorkbenchItem::setRotation(qreal rotation)
 {
-    if (qFuzzyCompare(m_rotation, rotation))
+    if (qFuzzyEquals(m_rotation, rotation))
         return;
 
     m_rotation = rotation;

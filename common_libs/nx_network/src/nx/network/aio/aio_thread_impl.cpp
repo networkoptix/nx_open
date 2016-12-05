@@ -167,8 +167,10 @@ void AIOThreadImpl::addSockToPollset(
         if (!pollSet.add(socket, eventType, handlingData.get()))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-            NX_LOG(QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
             failedToAddToPollset = true;
+            NX_LOG(lm("Failed to add %1(%2) to pollset. %3")
+                .strs(boost::core::demangle(typeid(*socket).name()), (void*)socket,
+                    SystemError::toString(errorCode)), cl_logWARNING);
         }
     }
     socket->impl()->eventTypeToUserData[eventType] = handlingData.get();

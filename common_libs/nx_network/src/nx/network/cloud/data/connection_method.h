@@ -15,6 +15,7 @@ namespace ConnectionMethod
 {
     enum Value
     {
+        none = 0,
         udpHolePunching = 1,
         tcpHolePunching = 2,
         proxy = 4,

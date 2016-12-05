@@ -41,7 +41,7 @@
 using mobile_client::conf;
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 using namespace nx::mobile_client;
 
@@ -242,6 +242,9 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
     if (startupParameters.url.isValid())
         NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
+
+    if (startupParameters.autoLoginMode != AutoLoginMode::Undefined)
+        qnSettings->setAutoLoginMode(static_cast<int>(startupParameters.autoLoginMode));
 
     if (startupParameters.testMode)
     {

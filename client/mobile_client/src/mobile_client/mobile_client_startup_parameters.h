@@ -1,6 +1,10 @@
 #pragma once
 
+#include <QtCore/QUrl>
+#include <QtCore/QCoreApplication>
+
 #include <utils/common/id.h>
+#include <mobile_client/mobile_client_meta_types.h>
 
 class QCoreApplication;
 
@@ -16,6 +20,7 @@ struct QnMobileClientStartupParameters
     bool testMode = false;
     QString initialTest;
     qint16 webSocketPort = 0;
+    AutoLoginMode autoLoginMode = AutoLoginMode::Undefined;
 };
 
 Q_DECLARE_METATYPE(QnMobileClientStartupParameters)

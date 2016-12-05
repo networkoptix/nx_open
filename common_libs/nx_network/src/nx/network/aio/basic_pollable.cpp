@@ -7,6 +7,8 @@
 
 #include <nx/utils/std/future.h>
 
+#include "../socket_global.h"
+
 namespace nx {
 namespace network {
 namespace aio {
@@ -37,6 +39,7 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
     }
     else
     {
+        NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
         QnStoppableAsync::pleaseStopSync(checkForLocks);
     }
 }

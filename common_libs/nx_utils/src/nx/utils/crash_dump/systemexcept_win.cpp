@@ -8,16 +8,16 @@
 #include <Dbghelp.h>
 #include <Windows.h>
 #include <ShlObj.h>
-#include <platform/win32_syscall_resolver.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
 
-#include "utils/common/app_info.h"
+#include "nx/utils/app_info.h"
+#include "../platform/win32_syscall_resolver.h"
 
 #define MAX_SYMBOL_SIZE 1024
 
-static const std::string fullVersionId = QnAppInfo::applicationFullVersion().toStdString();
+static const std::string fullVersionId = nx::utils::AppInfo::applicationFullVersion().toStdString();
 
 class GlobalCrashDumpSettings
 {

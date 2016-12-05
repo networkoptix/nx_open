@@ -66,7 +66,7 @@ qreal QnTextButtonWidget::relativeFrameWidth() const {
 }
 
 void QnTextButtonWidget::setRelativeFrameWidth(qreal relativeFrameWidth) {
-    if(qFuzzyCompare(m_relativeFrameWidth, relativeFrameWidth))
+    if (qFuzzyEquals(m_relativeFrameWidth, relativeFrameWidth))
         return;
 
     m_relativeFrameWidth = relativeFrameWidth;

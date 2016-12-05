@@ -5,6 +5,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include "ui/common/palette.h"
 
+#include <nx/utils/math/fuzzy.h>
+
 QnFramedLabel::QnFramedLabel(QWidget *parent):
     base_type(parent),
     m_opacity(1.0)
@@ -22,7 +24,7 @@ qreal QnFramedLabel::opacity() const {
 
 void QnFramedLabel::setOpacity(qreal value) {
     value = qBound(0.0, value, 1.0);
-    if (qFuzzyCompare(m_opacity, value))
+    if (qFuzzyEquals(m_opacity, value))
         return;
 
     m_opacity = value;

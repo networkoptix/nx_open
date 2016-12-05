@@ -93,7 +93,7 @@ start_server() {
 }
 
 start_lite_client() {
-    /etc/init.d/$CUSTOMIZATION-lite_client start
+    /etc/init.d/$CUSTOMIZATION-lite-client start
 }
 
 tweak_charger() {

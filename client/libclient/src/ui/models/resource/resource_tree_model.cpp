@@ -154,6 +154,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
 QnResourceTreeModel::~QnResourceTreeModel()
 {
+    QSignalBlocker scopedSignalBlocker(this);
+
     for (auto node: m_allNodes)
         node->deinitialize();
 }
@@ -886,6 +888,9 @@ Qt::DropActions QnResourceTreeModel::supportedDropActions() const
 // -------------------------------------------------------------------------- //
 void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource)
 {
+    if (m_scope == UsersScope)
+        return;
+
     NX_ASSERT(resource);
     if (!resource)
         return;

@@ -1408,7 +1408,7 @@ qreal QnWorkbenchDisplay::widgetsFrameOpacity() const
 
 void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity)
 {
-    if (qFuzzyCompare(m_frameOpacity, opacity))
+    if (qFuzzyEquals(m_frameOpacity, opacity))
         return;
 
     m_frameOpacity = opacity;
