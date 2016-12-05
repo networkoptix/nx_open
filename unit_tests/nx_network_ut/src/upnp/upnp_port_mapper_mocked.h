@@ -55,7 +55,7 @@ private:
     const HostAddress m_externalIp;
     const quint16 m_disabledPort;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     Mappings m_mappings;
     nx::utils::thread m_thread;
     nx::utils::SyncQueue< std::function< void() > > m_tasks;
