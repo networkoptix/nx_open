@@ -90,6 +90,8 @@ private:
 class DBStructureUpdater:
     public BaseDbTest
 {
+    using BaseType = BaseDbTest;
+
 public:
     DBStructureUpdater():
         m_updateResult(false)
@@ -107,16 +109,19 @@ public:
     }
 
 protected:
-    void registerUpdateScriptFor(RdbmsDriverType dbType)
+    void registerUpdateScriptFor(
+        RdbmsDriverType dbType,
+        QByteArray script = QByteArray())
     {
-        const auto script = QnLexical::serialized(dbType).toLatin1();
+        if (script.isEmpty())
+            script = QnLexical::serialized(dbType).toLatin1();
         m_registeredScripts.emplace(script, dbType);
         m_dbTypeToScript.emplace(dbType, script);
     }
 
-    void registerDefaultUpdateScript()
+    void registerDefaultUpdateScript(QByteArray script = QByteArray())
     {
-        registerUpdateScriptFor(RdbmsDriverType::unknown);
+        registerUpdateScriptFor(RdbmsDriverType::unknown, std::move(script));
     }
 
     void emulateConnectionToDb(RdbmsDriverType dbType)
@@ -161,6 +166,13 @@ protected:
         ASSERT_FALSE(m_updateResult);
     }
 
+    void assertIfThereWasNoInvokationOf(const QByteArray& script)
+    {
+        ASSERT_TRUE(
+            std::find(m_executedScripts.cbegin(), m_executedScripts.cend(), script) !=
+            m_executedScripts.cend());
+    }
+
 private:
     std::unique_ptr<TestAsyncSqlQueryExecutor> m_testAsyncSqlQueryExecutor;
     std::unique_ptr<db::DBStructureUpdater> m_dbUpdater;
@@ -169,14 +181,24 @@ private:
     std::map<RdbmsDriverType, QByteArray> m_dbTypeToScript;
     bool m_updateResult;
 
+    void initializeDatabase()
+    {
+        BaseType::initializeDatabase();
+
+        // Creating initial structure.
+        db::DBStructureUpdater updater(asyncSqlQueryExecutor().get());
+        ASSERT_TRUE(updater.updateStructSync());
+    }
+
     DBResult execSqlScript(
         const QByteArray& script,
         nx::db::QueryContext* const queryContext)
     {
+        m_executedScripts.push_back(script);
+
         if (m_registeredScripts.find(script) == m_registeredScripts.end())
             return asyncSqlQueryExecutor()->execSqlScriptSync(script, queryContext);
 
-        m_executedScripts.push_back(script);
         return DBResult::ok;
     }
 };
@@ -209,6 +231,17 @@ TEST_F(DBStructureUpdater, update_fails_if_no_suitable_script_found)
 
     whenUpdatedDb();
     assertIfUpdateSucceeded();
+}
+
+TEST_F(DBStructureUpdater, proper_dialect_fix_is_applied)
+{
+    const char initialScript[] = "%bigint_primary_key_auto_increment%";
+    const char sqliteAdaptedScript[] = "INTEGER PRIMARY KEY AUTOINCREMENT";
+
+    registerDefaultUpdateScript(initialScript);
+    emulateConnectionToDb(RdbmsDriverType::sqlite);
+    whenUpdatedDb();
+    assertIfThereWasNoInvokationOf(sqliteAdaptedScript);
 }
 
 } // namespace test

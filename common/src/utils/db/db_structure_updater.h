@@ -90,8 +90,8 @@ private:
     bool execSqlScript(
         nx::db::QueryContext* const queryContext,
         QByteArray sqlScript,
-        RdbmsDriverType dbType);
-    QByteArray applyReplacements(QByteArray initialScript, RdbmsDriverType dbType);
+        RdbmsDriverType sqlScriptDialect);
+    QByteArray fixSqlDialect(QByteArray initialScript, RdbmsDriverType targetDialect);
 };
 
 } // namespace db

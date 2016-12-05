@@ -153,8 +153,8 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
                     m_fullSchemaScriptByVersion.rbegin()->second,
                     RdbmsDriverType::unknown))
             {
-                NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2").
-                    arg(m_fullSchemaScriptByVersion.rbegin()->first)
+                NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2")
+                    .arg(m_fullSchemaScriptByVersion.rbegin()->first)
                     .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
                 return DBResult::ioError;
             }
@@ -173,8 +173,8 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
 
         if (!execDbUpdate(m_updateScripts[dbVersion - m_initialVersion], queryContext))
         {
-            NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2").
-                arg(dbVersion).arg(queryContext->connection()->lastError().text()),
+            NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2")
+                .arg(dbVersion).arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);
             return DBResult::ioError;
         }
@@ -246,24 +246,24 @@ std::map<RdbmsDriverType, QByteArray>::const_iterator DBStructureUpdater::select
 bool DBStructureUpdater::execSqlScript(
     nx::db::QueryContext* const queryContext,
     QByteArray sqlScript,
-    RdbmsDriverType dbType)
+    RdbmsDriverType sqlScriptDialect)
 {
     QByteArray scriptText;
-    if (dbType == RdbmsDriverType::unknown)
-        scriptText = applyReplacements(sqlScript, dbType);
+    if (sqlScriptDialect == RdbmsDriverType::unknown)
+        scriptText = fixSqlDialect(sqlScript, m_queryExecutor->connectionOptions().driverType);
     else
         scriptText = sqlScript;
 
     return m_queryExecutor->execSqlScriptSync(scriptText, queryContext) == DBResult::ok;
 }
 
-QByteArray DBStructureUpdater::applyReplacements(
-    QByteArray initialScript, RdbmsDriverType dbType)
+QByteArray DBStructureUpdater::fixSqlDialect(
+    QByteArray initialScript, RdbmsDriverType targetDialect)
 {
     QByteArray script = initialScript;
     for (const auto& replacementCtx: kSqlReplacements)
     {
-        const auto it = replacementCtx.replacementsByDriverName.find(dbType);
+        const auto it = replacementCtx.replacementsByDriverName.find(targetDialect);
         if (it != replacementCtx.replacementsByDriverName.end())
             script.replace(replacementCtx.key, it->second);
         else
