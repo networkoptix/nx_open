@@ -50,7 +50,7 @@ angular.module('cloudApp')
                     return this._get('/ec2/getCurrentUser');
                 },
                 getAggregatedUsersData: function(){
-                    return this._get('/api/aggregator?exec_cmd=ec2%2FgetUsers&exec_cmd=ec2%2FgetPredefinedRoles&exec_cmd=ec2%2FgetUserGroups');
+                    return this._get('/api/aggregator?exec_cmd=ec2%2FgetUsers&exec_cmd=ec2%2FgetPredefinedRoles&exec_cmd=ec2%2FgetUserRoles');
                 },
                 saveUser: function(user){
                     return this._post('/ec2/saveUser', this.cleanUserObject(user));
@@ -63,13 +63,13 @@ angular.module('cloudApp')
                     if(user.id){
                         cleanedUser.id = user.id;
                     }
-                    var supportedFields = ['email', 'name', 'fullName', 'userId', 'groupId', 'permissions', 'isCloud', 'isEnabled'];
+                    var supportedFields = ['email', 'name', 'fullName', 'userId', 'userRoleId', 'permissions', 'isCloud', 'isEnabled'];
 
                     for(var i in supportedFields){
                         cleanedUser[supportedFields[i]] = user[supportedFields[i]];
                     }
-                    if(!cleanedUser.groupId){
-                        cleanedUser.groupId = '{00000000-0000-0000-0000-000000000000}';
+                    if(!cleanedUser.userRoleId){
+                        cleanedUser.userRoleId = '{00000000-0000-0000-0000-000000000000}';
                     }
                     return cleanedUser;
                 },
@@ -83,7 +83,7 @@ angular.module('cloudApp')
                         'isCloud': true,
                         'isEnabled': true,
     
-                        'groupId': '{00000000-0000-0000-0000-000000000000}',
+                        'userRoleId': '{00000000-0000-0000-0000-000000000000}',
                         'permissions': '',
 
                         //TODO: Remove the trash below after #VMS-2968
