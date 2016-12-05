@@ -352,6 +352,15 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
+    enum class StatusChangeReason
+    {
+        Default,
+        CreateInitialData,
+        GotFromRemotePeer
+    };
+    Q_DECLARE_METATYPE(StatusChangeReason)
+
+
     enum BitratePerGopType {
         BPG_None,
         BPG_Predefined,

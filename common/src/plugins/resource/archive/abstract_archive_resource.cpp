@@ -56,7 +56,7 @@ Qn::ResourceStatus QnAbstractArchiveResource::getStatus() const
     return m_localStatus;
 }
 
-void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, StatusChangeReason reason)
+void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     Q_UNUSED(reason)
     m_localStatus = newStatus;

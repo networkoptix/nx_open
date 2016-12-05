@@ -677,7 +677,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr, bool isNewServerInstance)
 {
     QnMediaServerResourcePtr savedServer;
-    serverPtr->setStatus(Qn::Online, StatusChangeReason::CreateInitialData);
+    serverPtr->setStatus(Qn::Online, Qn::StatusChangeReason::CreateInitialData);
 
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
     if (rez != ec2::ErrorCode::ok)
@@ -1507,7 +1507,7 @@ bool MediaServerProcess::initTcpListener()
 
     int maxConnections = MSSettings::roSettings()->value("maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
     NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
-    
+
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
         rtspPort,

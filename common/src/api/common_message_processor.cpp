@@ -435,7 +435,7 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
     qnStatusDictionary->clear();
     for(const QnUuid& id: keys) {
         if (QnResourcePtr resource = qnResPool->getResourceById(id))
-            emit resource->statusChanged(resource, StatusChangeReason::Default);
+            emit resource->statusChanged(resource, Qn::StatusChangeReason::Default);
     }
 
     for(const ec2::ApiResourceStatusData& statusData: params)

@@ -34,14 +34,6 @@ class QnInitResPool: public QThreadPool
 public:
 };
 
-enum class StatusChangeReason
-{
-    Default,
-    CreateInitialData,
-    GotFromRemotePeer
-};
-Q_DECLARE_METATYPE(StatusChangeReason)
-
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
@@ -81,7 +73,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
-    virtual void setStatus(Qn::ResourceStatus newStatus, StatusChangeReason reason = StatusChangeReason::Default);
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default);
     QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
@@ -226,7 +218,7 @@ public:
     void setRemovedFromPool(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
-    void statusChanged(const QnResourcePtr &resource, StatusChangeReason reason);
+    void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -316,7 +308,7 @@ private:
     bool emitDynamicSignal(const char *signal, void **arguments);
     void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
     void emitPropertyChanged(const QString& key);
-    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, StatusChangeReason reason);
+    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
 
     friend class InitAsyncTask;
 

@@ -115,6 +115,8 @@ int QnCameraHistoryRestHandler::executeGet(
         if (!isValid)
         {
             QnChunksRequestData updatedRequest = request;
+            updatedRequest.startTimeMs = 0;
+            updatedRequest.endTimeMs = DATETIME_NOW;
             updatedRequest.resList.clear();
             updatedRequest.resList.push_back(camera);
             MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
@@ -122,6 +124,24 @@ int QnCameraHistoryRestHandler::executeGet(
             if (qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
                 context->timer.restart();
         }
+
+        // filter time range
+        auto comparator = [](
+            const ec2::ApiCameraHistoryItemData& data, qint64 value) -> bool
+        {
+            return data.timestampMs < value;
+        };
+
+        auto& items = outputRecord.items;
+        if (!items.empty())
+        {
+            auto itrMinTime = std::lower_bound(items.begin(), items.end(), request.startTimeMs, comparator);
+            items.erase(items.begin(), itrMinTime);
+
+            auto itrMaxTime = std::lower_bound(items.begin(), items.end(), request.endTimeMs, comparator);
+            items.erase(itrMaxTime, items.end());
+        }
+
         outputData.push_back(std::move(outputRecord));
     }
 

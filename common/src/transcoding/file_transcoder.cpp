@@ -31,7 +31,7 @@ public:
 
     virtual void setStatus(
         Qn::ResourceStatus newStatus,
-        StatusChangeReason reason = StatusChangeReason::Default) override
+        Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override
     {
         Q_UNUSED(newStatus);
         Q_UNUSED(reason);

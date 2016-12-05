@@ -16,9 +16,9 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
     return m_setStatusInProgress.contains(resource->getId());
 }
 
-void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, StatusChangeReason reason)
+void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason)
 {
-    if (reason == StatusChangeReason::Default)
+    if (reason == Qn::StatusChangeReason::Default)
     {
         if (!isSetStatusInProgress(resource))
             updateResourceStatusAsync(resource);

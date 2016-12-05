@@ -538,7 +538,7 @@ bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
     return false;
 }
 
-void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, StatusChangeReason reason)
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (getStatus() != newStatus)
     {
@@ -555,7 +555,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, StatusChange
         for(const QnResourcePtr& res: childList)
         {
             if (res->hasFlags(Qn::depend_on_parent_status))
-                emit res->statusChanged(res, StatusChangeReason::Default);
+                emit res->statusChanged(res, Qn::StatusChangeReason::Default);
         }
     }
 }
