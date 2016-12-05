@@ -99,6 +99,13 @@ int QnCameraHistoryRestHandler::executeGet(
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
+    static std::atomic<int> staticRequestNum;
+
+    QElapsedTimer timer;
+    timer.restart();
+    int requestNum = ++staticRequestNum;
+    qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "started";
+
     ec2::ApiCameraHistoryDataList outputData;
     for (const auto& camera: request.resList)
     {
@@ -123,6 +130,8 @@ int QnCameraHistoryRestHandler::executeGet(
             outputRecord.items = buildHistoryData(chunks);
             if (qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
                 context->timer.restart();
+
+            qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "cache miss. exec time=" << timer.elapsed();
         }
 
         // filter time range
@@ -146,5 +155,7 @@ int QnCameraHistoryRestHandler::executeGet(
     }
 
     QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format);
+
+    qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "finished. exec time=" << timer.elapsed();
     return nx_http::StatusCode::ok;
 }
