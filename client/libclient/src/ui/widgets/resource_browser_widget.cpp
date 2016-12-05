@@ -286,6 +286,9 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &QnResourceBrowserWidget::updateIcons);
 
+    connect(this->context(), &QnWorkbenchContext::userChanged,
+        this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
+
     installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
         ui->searchTreeWidget->treeView()->verticalScrollBar() }, { QEvent::Show, QEvent::Hide },
         this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
