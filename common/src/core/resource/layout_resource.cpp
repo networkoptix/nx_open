@@ -355,6 +355,14 @@ bool QnLayoutResource::isShared() const
     return getParentId().isNull() && !isFile();
 }
 
+QSet<QnUuid> QnLayoutResource::layoutResourceIds() const
+{
+    QSet<QnUuid> result;
+    for (const auto& item: m_items->getItems())
+        result << item.resource.id;
+    return result;
+}
+
 QSet<QnResourcePtr> QnLayoutResource::layoutResources() const
 {
     return layoutResources(m_items->getItems());
