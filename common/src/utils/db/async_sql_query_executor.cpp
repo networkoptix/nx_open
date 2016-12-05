@@ -113,7 +113,7 @@ bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*
         effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
     if (queueSize < maxDesiredQueueSize)
         return false;    //< Task number is not too high.
-    if (effectiveDBConnectionCount >= (unsigned)m_connectionOptions.maxConnectionCount)
+    if (effectiveDBConnectionCount >= static_cast<size_t>(m_connectionOptions.maxConnectionCount))
         return false;    //< Pool size is already at maximum.
 
     return true;
