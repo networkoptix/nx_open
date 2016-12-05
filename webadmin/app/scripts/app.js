@@ -43,7 +43,7 @@ angular.module('webadminApp', [
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
         })
-        .when('/settings/', {
+        .when('/settings', {
             redirectTo: '/settings/server'
         })
         .when('/join', {

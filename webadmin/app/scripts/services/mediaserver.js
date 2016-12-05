@@ -34,10 +34,10 @@ angular.module('webadminApp')
                 var ips = data.remoteAddresses;
                 var wrongNetwork = true;
                 for (var ip in ips) {
-                    if (ip == '127.0.0.1') { // Localhost
+                    if (ips[ip] == '127.0.0.1') { // Localhost
                         continue;
                     }
-                    if (ip.indexOf('169.254.') == 0) { // No DHCP address
+                    if (ips[ip].indexOf('169.254.') == 0) { // No DHCP address
                         continue;
                     }
                     wrongNetwork = false;
@@ -46,17 +46,15 @@ angular.module('webadminApp')
 
                 data.flags = {
                     noHDD: data.ecDbReadOnly,
-                    noNetwork: ips.length <= 1,
+                    noNetwork: !ips.length,
                     wrongNetwork: wrongNetwork,
                     hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
                     cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
                     canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0,
                     canSetupTime: data.serverFlags.indexOf(Config.timeCtrlFlag) >= 0
                 };
-                data.flags.newSystem = data.flags.cleanSystem &&
-                                        !data.flags.noHDD &&
-                                        !data.flags.noNetwork &&
-                                        !(data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.brokenSystem = data.flags.noHDD || data.flags.noNetwork || (data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.newSystem = data.flags.cleanSystem && !data.flags.brokenSystem;
                 return r;
             });
         }
@@ -571,9 +569,15 @@ angular.module('webadminApp')
 
                 return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.flags.newSystem &&
-                        $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
+                    if($location.path()==='/advanced' ||  $location.path()==='/debug'){ // Do not redirect from advanced and debug pages
+                        return self.getUser();
+                    }
+                    if(r.data.reply.flags.newSystem){  // New system - redirect to setup
                         $location.path('/setup');
+                        return null;
+                    }
+                    if((r.data.reply.flags.brokenSystem)){ // No drives - redirect to settings and hide everything else
+                        $location.path('/settings/system');
                         return null;
                     }
                     return self.getUser();
