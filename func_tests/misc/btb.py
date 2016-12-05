@@ -4,7 +4,8 @@
 """
 __author__ = 'Danil Lavrentyuk'
 
-import argparse
+#import argparse
+import base64
 import json
 import random
 import requests
@@ -15,8 +16,7 @@ import urllib2
 sys.path.append('..')  # FIXME create an abs path
 from generator import BasicGenerator, MediaServerGenerator, CameraDataGenerator, UserDataGenerator
 
-REAL_SERVERS = ('192.168.109.8', '192.168.109.9')
-ADDR = REAL_SERVERS[0] + ":7001"
+ADDR = "192.168.109.8:7001"
 AUTH = ('admin', 'admin')
 
 WEB_PAGES = (  # several pages used as a part of layouts content
@@ -36,17 +36,28 @@ WEB_PAGES = (  # several pages used as a part of layouts content
     ('http://grib-info.ru/syedobnie/syroezhki-2.html', "Zyroezhka"),
 )
 
-NUM_SERVERS = 5
-CAMERAS_PER_SERVER = 5
-NUM_USERS = 10
-NUM_SHARED_LAYOUTS = 10
-SHARED_PER_USER = 3  # and per role too
-RES_PER_USER = 15
-LAYOUTS_PER_USER = 3  # private layouts
-RES_PER_LAYOUT = 5
-NUM_ROLES = 3
-USERS_PER_ROLE = 3
-RES_PER_ROLE = 15
+# This images aren't stored in Mercurial
+# I've left them on smb://10.0.2.106//public/BigTestBase,
+# think you'd choose a better place for them.
+# ( Danil )
+ToStore = (
+    {'path': 'wallpapers/image%02d.jpeg', 'file': 'bgimage.jpeg'},
+    {'path': 'wallpapers/image%02d.png', 'file': 'bgimage.png'},
+)
+
+NUM_SERVERS = 20
+CAMERAS_PER_SERVER = 10
+NUM_USERS = 100
+NUM_SHARED_LAYOUTS = 50
+SHARED_PER_USER = 10  # and per role too
+RES_PER_USER = 20
+LAYOUTS_PER_USER =  10 # private layouts
+RES_PER_LAYOUT = 10
+NUM_ROLES = 20
+USERS_PER_ROLE = 10
+RES_PER_ROLE = 20
+
+NUM_BGIMAGES = 25  # per each format: jpeg and png
 
 Servers = dict()
 Cameras = dict()
@@ -57,6 +68,7 @@ PvtLayouts = dict()  # user -> {layoutId -> data}
 SharedLayouts = dict()  # uid -> (json_data, ids_set)
 Rules = dict()
 UserRoles = dict()  # uid -> (json_data, resIds)
+Images = []
 
 
 def sendRequest(url, data, notify=False, noparsae=False, allowEmpty=False):
@@ -85,12 +97,14 @@ def sendRequest(url, data, notify=False, noparsae=False, allowEmpty=False):
             else:
                 raise Exception("%s returned empty response" % url)
         # ok, let it raise in case of bad json
-        data = json.loads(response.text)
-        if type(data) == dict and data.get('error', 0):
-            raise Exception("%s returned error: %s" % (url, data))
-        return data
+        respData = json.loads(response.text)
+        if type(respData) == dict and respData.get('error', 0):
+            print "Failed on data: %s" % (data,)
+            raise Exception("%s returned error: %s" % (url, respData))
+        return respData
     except urllib2.HTTPError as err:
-        pass
+        print "HTTP Error %s at %s with data %s" % (err, url, data)
+        raise
     except Exception as err:
         print "Failed at %s with data %s" % (url, data)
         raise
@@ -173,7 +187,8 @@ class UserGenerator(UserDataGenerator, UniqGenerator):
             ec2Request("saveUser", data)
             Users[uId] = data
             created.append(uId)
-            print "User created: %s: %s" % (uId, data)
+#            print "User created: %s: %s" % (uId, data)
+            print "User created: %s" % (uId,)
         return created
 
 
@@ -203,7 +218,11 @@ class LayoutGenerator(UniqGenerator):
         "parentId": "%(parent)s",
         "name": "%(name)s",
         "items": [%(items)s],
-        "locked": false
+        "locked": false,
+        "backgroundImageFilename": "%(bgfile)s",
+        "backgroundWidth": 5,
+        "backgroundHeight": 5,
+        "backgroundOpacity": 0.5
     }
     """
 
@@ -246,6 +265,7 @@ class LayoutGenerator(UniqGenerator):
                 'parent': "" if owner is None else owner,
                 'name': self.generateLayoutName(),
                 'items': contentStr,
+                'bgfile': random.choice(Images),
             }
             response = ec2Request("saveLayout", data)
             if owner is None:
@@ -290,11 +310,27 @@ def setAccessRights(userId, resList):
             "userId": "%s",
             "resourceIds": [%s]
         }""" % (userId, ",\n ".join('"%s"' % rId for rId in resList))
-        print rights
+        #print rights
         resp = ec2Request("setAccessRights", rights)
+
+
+def storeFiles(number):
+    for fdesk in ToStore:
+        img = base64.b64encode(open(fdesk['file'], "rb").read())
+        data = {
+                'data': img,
+        }
+        for n in xrange(number):
+            data['path'] = fdesk['path'] % n
+            ec2Request('addStoredFile', json.dumps(data))
+            data['path'] = data['path'].split('/',1)[1]
+            Images.append(data['path'])
+        print "%s %s images loaded" % (number, fdesk['path'].split('.')[-1])
+
 
 def main():
     loadRealServers()
+    storeFiles(NUM_BGIMAGES)
     ServerGenerator().createServers(NUM_SERVERS)
     CameraGenerator().createCameras()
     WebPageGenerator().createWebPages()
@@ -314,7 +350,7 @@ def main():
 
     UserRoleGenerator().createUserRoles(uGen, lGen)
     for roleId, roleData in UserRoles.iteritems():
-        print "Granting layouts for role %s" % (roleId,)
+        #print "Granting layouts for role %s" % (roleId,)
         sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
         print "Role %s, shared layouts %s" % (roleId, sh)
         setAccessRights(roleId, roleData[1] + sh)
