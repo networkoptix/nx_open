@@ -37,7 +37,7 @@ namespace {
     // on painter.
     const QnRaiiGuardPtr make3xHiDpiWorkaround(QPainter *painter)
     {
-        if (painter->device()->devicePixelRatio() <= 2)
+        if (!painter || !painter->device() || painter->device()->devicePixelRatio() <= 2)
             return QnRaiiGuardPtr();
 
         const bool isSmooth = painter->testRenderHint(QPainter::SmoothPixmapTransform);
