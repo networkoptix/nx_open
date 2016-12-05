@@ -11,7 +11,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
@@ -142,10 +141,11 @@ private:
     };
 
     const unsigned int m_discoverTryTimeoutMS;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     quint64 m_timerID;
     nx::utils::AsyncOperationGuard m_handlerGuard;
     std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
+    mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
@@ -157,6 +157,9 @@ private:
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
 
+    std::unique_ptr<AbstractDatagramSocket> m_receiveSocket;
+    nx::Buffer m_receiveBuffer;
+
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
     void onSomeBytesRead(
@@ -166,6 +169,8 @@ private:
         size_t bytesRead ) noexcept;
 
     void dispatchDiscoverPackets();
+    bool isInterfaceListChanged() const;
+    std::unique_ptr<AbstractDatagramSocket> updateReceiveSocket();
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml(
         const QByteArray& uuidStr,
