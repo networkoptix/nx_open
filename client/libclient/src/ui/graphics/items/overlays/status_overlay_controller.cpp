@@ -102,7 +102,7 @@ void QnStatusOverlayController::updateWidgetItems()
     m_widget->setIconOverlayPixmap(qnSkin->pixmap(statusIcon(statusOverlay())));
 }
 
-void QnStatusOverlayController::onStatusOverlayChanged()
+void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
 {
     NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
     if (!m_widget)
@@ -156,13 +156,14 @@ Qn::ResourceStatusOverlay QnStatusOverlayController::statusOverlay() const
     return m_statusOverlay;
 }
 
-void QnStatusOverlayController::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay)
+void QnStatusOverlayController::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay,
+    bool animated)
 {
     if (m_statusOverlay == statusOverlay)
         return;
 
     m_statusOverlay = statusOverlay;
-    emit statusOverlayChanged();
+    emit statusOverlayChanged(animated);
 }
 
 QnStatusOverlayController::Button QnStatusOverlayController::currentButton() const
@@ -220,7 +221,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
     return extractValue(overlay, kCaptions);
 }
 
-QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay overlay)
+QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay /*overlay*/)
 {
     // TODO: add description and state for no access rights situation
     return QString();

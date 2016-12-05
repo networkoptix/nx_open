@@ -12,16 +12,7 @@ class QnStatusOverlayController: public Connective<QObject>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QnStatusOverlayWidget::Controls visibleItems READ visibleItems
-        NOTIFY visibleItemsChanged);
-    Q_PROPERTY(Qn::ResourceStatusOverlay statusOverlay READ statusOverlay
-        WRITE setStatusOverlay NOTIFY statusOverlayChanged)
-    Q_PROPERTY(Button currentButton READ currentButton WRITE setCurrentButton
-        NOTIFY currentButtonChanged)
-    Q_PROPERTY(bool isErrorOverlay READ isErrorOverlay NOTIFY isErrorOverlayChanged)
-
     typedef QPointer<QnStatusOverlayWidget> StatusOverlayWidgetPtr;
-
     using base_type = Connective<QObject>;
 public:
     enum class Button
@@ -39,7 +30,7 @@ public:
     virtual ~QnStatusOverlayController() = default;
 
     Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animated);
 
     Button currentButton() const;
     void setCurrentButton(Button button);
@@ -58,7 +49,7 @@ public:
     static QString statusIcon(Qn::ResourceStatusOverlay overlay);
 
 signals:
-    void statusOverlayChanged();
+    void statusOverlayChanged(bool animated);
 
     void currentButtonChanged();
 
@@ -73,7 +64,7 @@ private:
 
     void updateWidgetItems();
 
-    void onStatusOverlayChanged();
+    void onStatusOverlayChanged(bool animated);
 
     QnStatusOverlayWidget::Controls errorVisibleItems();
     QnStatusOverlayWidget::Controls normalVisibleItems();

@@ -121,10 +121,10 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay, this);
 
     connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this, overlay, controller = m_statusOverlayController]
+        [this, overlay, controller = m_statusOverlayController](bool animated)
         {
             const auto value = controller->statusOverlay() != Qn::EmptyOverlay;
-            setOverlayWidgetVisible(overlay, value, true);
+            setOverlayWidgetVisible(overlay, value, animated);
         });
 
     addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true));
@@ -247,7 +247,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     if (!m_layout)
     {
-        m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay);
+        m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay, true);
     }
     else
     {
@@ -263,7 +263,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
         if (bounding.isNull())
         {
-            m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay);
+            m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay, true);
             paintFrame(painter, paintRect);
             return;
         }
@@ -315,7 +315,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         }
 
         const auto overlay = allItemsAreLoaded ? Qn::EmptyOverlay : Qn::LoadingOverlay;
-        m_statusOverlayController->setStatusOverlay(overlay);
+        m_statusOverlayController->setStatusOverlay(overlay, true);
     }
 
     paintFrame(painter, paintRect);
