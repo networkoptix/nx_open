@@ -1580,7 +1580,7 @@
 		},
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA"
+                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
