@@ -34,10 +34,10 @@ angular.module('webadminApp')
                 var ips = data.remoteAddresses;
                 var wrongNetwork = true;
                 for (var ip in ips) {
-                    if (ip == '127.0.0.1') { // Localhost
+                    if (ips[ip] == '127.0.0.1') { // Localhost
                         continue;
                     }
-                    if (ip.indexOf('169.254.') == 0) { // No DHCP address
+                    if (ips[ip].indexOf('169.254.') == 0) { // No DHCP address
                         continue;
                     }
                     wrongNetwork = false;
