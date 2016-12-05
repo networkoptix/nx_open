@@ -38,7 +38,7 @@ protected:
     void initializeDatabase();
 
     template<typename QueryFunc, typename... OutputData>
-    nx::db::DBResult BasePersistentDataTest::executeUpdateQuerySync(QueryFunc queryFunc)
+    nx::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
     {
         std::promise<nx::db::DBResult> queryDonePromise;
         m_persistentDbManager->queryExecutor()->executeUpdate(

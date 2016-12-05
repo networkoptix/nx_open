@@ -3,6 +3,10 @@
 #include <gtest/gtest.h>
 
 #include <QtCore/QString>
+#include <QtSql/QSqlQuery>
+
+#include <nx/fusion/serialization/sql.h>
+#include <nx/utils/test_support/utils.h>
 
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/types.h>
