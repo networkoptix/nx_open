@@ -127,6 +127,8 @@ public:
     bool testAndSetHistoryDetails(
         const QnUuid& cameraId,
         const ec2::ApiCameraHistoryItemDataList& historyDetails);
+
+    void setHistoryCheckDelay(int value);
 signals:
     /**
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
@@ -168,7 +170,7 @@ private:
         const QnUuid& cameraId,
         const ec2::ApiCameraHistoryItemDataList& historyDetails) const;
 private:
-
+    int m_historyCheckDelay;
     mutable QnMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 

@@ -22,7 +22,7 @@
 
 
 namespace {
-    static const int HistoryCheckDelay = 1000 * 15;
+    static const int kDefaultHistoryCheckDelay = 1000 * 15;
 
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) {
         /* Find first data with timestamp not less than given. */
@@ -44,6 +44,11 @@ namespace {
 
 // ------------------- CameraHistory Pool ------------------------
 
+
+void QnCameraHistoryPool::setHistoryCheckDelay(int value)
+{
+    m_historyCheckDelay = value;
+}
 
 void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam)
 {
@@ -79,11 +84,12 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr c
         auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
         if (cam && server && server->getId() != cam->getParentId())
             invalidateCameraHistory(id);
-    }, HistoryCheckDelay);
+    }, m_historyCheckDelay);
 }
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
+    m_historyCheckDelay(kDefaultHistoryCheckDelay),
     m_mutex(QnMutex::Recursive)
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {

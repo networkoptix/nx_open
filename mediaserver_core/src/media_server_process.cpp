@@ -1148,6 +1148,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
         qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+        qnCameraHistoryPool->setHistoryCheckDelay(1000);
     }
 
     {
