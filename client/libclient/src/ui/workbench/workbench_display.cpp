@@ -917,7 +917,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
         gridBackgroundItem()->update(layout);
 
     synchronizeSceneBounds();
-    fitInView();
+    fitInView(false);
 
     QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
     if (raisedWidget)
