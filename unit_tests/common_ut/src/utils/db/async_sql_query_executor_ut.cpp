@@ -13,7 +13,7 @@
 #include <utils/db/request_executor_factory.h>
 #include <utils/db/request_execution_thread.h>
 
-#include "test_setup.h"
+#include "base_db_test.h"
 
 namespace nx {
 namespace db {
@@ -61,11 +61,10 @@ public:
 //-------------------------------------------------------------------------------------------------
 // AsyncSqlQueryExecutorTest
 
-constexpr auto kQueryCompletionTimeout = std::chrono::seconds(10);
 constexpr int kDefaultMaxConnectionCount = 10;
 
 class AsyncSqlQueryExecutorTest:
-    public ::testing::Test
+    public test::BaseDbTest
 {
 public:
     AsyncSqlQueryExecutorTest():
@@ -75,14 +74,11 @@ public:
         RequestExecutorFactory::setFactoryFunc(
             std::bind(&AsyncSqlQueryExecutorTest::createConnection, this, _1, _2));
 
-        m_connectionOptions.maxConnectionCount = kDefaultMaxConnectionCount;
-
-        init();
+        connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
     }
 
     ~AsyncSqlQueryExecutorTest()
     {
-        QDir(m_tmpDir).removeRecursively();
     }
 
     void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
@@ -91,85 +87,11 @@ public:
     }
 
 protected:
-    const ConnectionOptions& connectionOptions() const
-    {
-        return m_connectionOptions;
-    }
-
-    ConnectionOptions& connectionOptions()
-    {
-        return m_connectionOptions;
-    }
-
-    const std::unique_ptr<AsyncSqlQueryExecutor>& asyncSqlQueryExecutor()
-    {
-        return m_asyncSqlQueryExecutor;
-    }
-
     void initializeDatabase()
     {
-        m_connectionOptions.driverType = RdbmsDriverType::sqlite;
-        m_connectionOptions.dbName = m_tmpDir + "/db.sqlite";
-
-        m_asyncSqlQueryExecutor =
-            std::make_unique<AsyncSqlQueryExecutor>(m_connectionOptions);
-        ASSERT_TRUE(m_asyncSqlQueryExecutor->init());
+        BaseDbTest::initializeDatabase();
         
         executeUpdate("CREATE TABLE company(name VARCHAR(256), yearFounded INTEGER)");
-    }
-
-    void closeDatabase()
-    {
-        m_asyncSqlQueryExecutor.reset();
-    }
-
-    void executeUpdate(const QString& queryText)
-    {
-        const auto dbResult = executeQuery(
-            [queryText](nx::db::QueryContext* queryContext)
-            {
-                QSqlQuery query(*queryContext->connection());
-                query.prepare(queryText);
-                if (!query.exec())
-                    return DBResult::ioError;
-                return DBResult::ok;
-            });
-        NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);
-    }
-
-    template<typename RecordStructure>
-    std::vector<RecordStructure> executeSelect(const QString& queryText)
-    {
-        nx::utils::promise<nx::db::DBResult> queryCompletedPromise;
-        auto future = queryCompletedPromise.get_future();
-
-        std::vector<RecordStructure> outputRecords;
-
-        m_asyncSqlQueryExecutor->executeSelect<std::vector<RecordStructure>>(
-            [queryText](
-                nx::db::QueryContext* queryContext,
-                std::vector<RecordStructure>* const records)
-            {
-                QSqlQuery query(*queryContext->connection());
-                query.prepare(queryText);
-                if (!query.exec())
-                    return DBResult::ioError;
-                QnSql::fetch_many(query, records);
-                return DBResult::ok;
-            },
-            [&queryCompletedPromise, &outputRecords](
-                nx::db::QueryContext* /*queryContext*/,
-                DBResult dbResult,
-                std::vector<RecordStructure> records)
-            {
-                outputRecords = std::move(records);
-                queryCompletedPromise.set_value(dbResult);
-            });
-
-        NX_GTEST_ASSERT_EQ(std::future_status::ready, future.wait_for(kQueryCompletionTimeout));
-        NX_GTEST_ASSERT_EQ(DBResult::ok, future.get());
-
-        return outputRecords;
     }
 
     void emulateUnrecoverableQueryError()
@@ -183,37 +105,7 @@ protected:
     }
 
 private:
-    ConnectionOptions m_connectionOptions;
-    std::unique_ptr<AsyncSqlQueryExecutor> m_asyncSqlQueryExecutor;
-    QString m_tmpDir;
     DbConnectionEventsReceiver* m_eventsReceiver;
-
-    void init()
-    {
-        m_tmpDir = TestSetup::getTemporaryDirectoryPath() + "/db_test/";
-        QDir(m_tmpDir).removeRecursively();
-        ASSERT_TRUE(QDir().mkpath(m_tmpDir));
-    }
-
-    template<typename DbQueryFunc>
-    DBResult executeQuery(DbQueryFunc dbQueryFunc)
-    {
-        nx::utils::promise<nx::db::DBResult> queryCompletedPromise;
-        auto future = queryCompletedPromise.get_future();
-
-        //starting async operation
-        m_asyncSqlQueryExecutor->executeUpdate(
-            dbQueryFunc,
-            [&queryCompletedPromise](
-                nx::db::QueryContext* /*queryContext*/, DBResult dbResult)
-            {
-                queryCompletedPromise.set_value(dbResult);
-            });
-
-        // Waiting for completion.
-        NX_GTEST_ASSERT_EQ(std::future_status::ready, future.wait_for(kQueryCompletionTimeout));
-        return future.get();
-    }
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {

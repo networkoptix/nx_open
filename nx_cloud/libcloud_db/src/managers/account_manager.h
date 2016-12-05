@@ -147,7 +147,7 @@ private:
     dao::rdb::AccountDataObject m_accountDbController;
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);
+    nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext);
 
     nx::db::DBResult registerNewAccountInDb(
         nx::db::QueryContext* const queryContext,

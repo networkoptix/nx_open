@@ -239,9 +239,7 @@ private:
 
     /** Fills transaction state cache. */
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchTransactionState(
-        nx::db::QueryContext* connection,
-        int* const /*dummyResult*/);
+    nx::db::DBResult fetchTransactionState(nx::db::QueryContext* connection);
     /**
      * Selects transactions from DB by condition.
      */

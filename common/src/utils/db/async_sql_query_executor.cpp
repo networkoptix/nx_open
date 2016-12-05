@@ -9,6 +9,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <utils/db/db_helper.h>
+
 #include "request_executor_factory.h"
 
 namespace nx {
@@ -53,6 +55,47 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     dbThreadPool.clear();
 }
 
+const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
+{
+    return m_connectionOptions;
+}
+
+void AsyncSqlQueryExecutor::executeUpdate(
+    nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
+{
+    scheduleQuery<UpdateWithoutAnyDataExecutor>(
+        std::move(dbUpdateFunc),
+        std::move(completionHandler));
+}
+
+void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
+    nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
+{
+    scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
+        std::move(dbUpdateFunc),
+        std::move(completionHandler));
+}
+
+void AsyncSqlQueryExecutor::executeSelect(
+    nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
+{
+    scheduleQuery<SelectExecutor>(
+        std::move(dbSelectFunc),
+        std::move(completionHandler));
+}
+
+DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
+    const QByteArray& script,
+    nx::db::QueryContext* const queryContext)
+{
+    return QnDbHelper::execSQLScript(script, *queryContext->connection())
+        ? DBResult::ok
+        : DBResult::ioError;
+}
+
 bool AsyncSqlQueryExecutor::init()
 {
     QnMutexLocker lk(&m_mutex);
@@ -70,7 +113,7 @@ bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*
         effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
     if (queueSize < maxDesiredQueueSize)
         return false;    //< Task number is not too high.
-    if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
+    if (effectiveDBConnectionCount >= (unsigned)m_connectionOptions.maxConnectionCount)
         return false;    //< Pool size is already at maximum.
 
     return true;

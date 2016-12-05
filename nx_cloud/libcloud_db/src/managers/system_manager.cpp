@@ -1060,17 +1060,6 @@ nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::fetchUserSharings(
-    nx::db::QueryContext* const queryContext,
-    const nx::db::InnerJoinFilterFields& filterFields,
-    std::vector<api::SystemSharingEx>* const sharings)
-{
-    return m_systemSharingDao.fetchUserSharings(
-        queryContext,
-        filterFields,
-        sharings);
-}
-
 nx::db::DBResult SystemManager::fetchAccountToShareWith(
     nx::db::QueryContext* const queryContext,
     const std::string& grantorEmail,
@@ -1305,11 +1294,9 @@ nx::db::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
     if (!accountUpdate.fullName)
         return nx::db::DBResult::ok;
 
-    std::vector<api::SystemSharingEx> sharings;
-    auto dbResult = fetchUserSharings(
-        queryContext,
-        {{ "email", ":accountEmail", QnSql::serialized_field(accountUpdate.email) }},
-        &sharings);
+    std::deque<api::SystemSharingEx> sharings;
+    auto dbResult = m_systemSharingDao.fetchUserSharingsByAccountEmail(
+        queryContext, accountUpdate.email, &sharings);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
     for (const auto& sharing: sharings)
@@ -1622,7 +1609,7 @@ nx::db::DBResult SystemManager::fillCache()
     }
 
     result = doBlockingDbQuery(
-        std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2));
+        std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1));
     if (result != db::DBResult::ok)
         return result;
 
@@ -1636,12 +1623,11 @@ nx::db::DBResult SystemManager::doBlockingDbQuery(Func func)
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation
-    m_dbManager->executeSelect<int>(
+    m_dbManager->executeSelect(
         std::move(func),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummy*/)
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -1669,14 +1655,13 @@ nx::db::DBResult SystemManager::fetchSystemById(
 }
 
 nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
-    nx::db::QueryContext* queryContext,
-    int* const /*dummy*/)
+    nx::db::QueryContext* queryContext)
 {
-    std::vector<api::SystemSharingEx> sharings;
-    const auto result = fetchUserSharings(
-        queryContext,
-        nx::db::InnerJoinFilterFields(),
-        &sharings);
+    // TODO: #ak Do it without 
+
+    std::deque<api::SystemSharingEx> sharings;
+    const auto result = m_systemSharingDao.fetchAllUserSharings(
+        queryContext, &sharings);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOG(lit("Failed to read system list from DB"), cl_logWARNING);

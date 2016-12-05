@@ -157,11 +157,6 @@ public:
 
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
-        
-    nx::db::DBResult fetchUserSharings(
-        nx::db::QueryContext* const queryContext,
-        const nx::db::InnerJoinFilterFields& filter,
-        std::vector<api::SystemSharingEx>* const sharings);
 
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
@@ -414,8 +409,7 @@ private:
         const std::string& systemId,
         data::SystemData* const system);
     nx::db::DBResult fetchSystemToAccountBinder(
-        nx::db::QueryContext* queryContext,
-        int* const /*dummy*/);
+        nx::db::QueryContext* queryContext);
 
     void dropExpiredSystems(uint64_t timerId);
     void expiredSystemsDeletedFromDb(

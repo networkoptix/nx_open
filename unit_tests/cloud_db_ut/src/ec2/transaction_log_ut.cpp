@@ -7,17 +7,12 @@
 
 #include <utils/db/async_sql_query_executor.h>
 
-#include <dao/rdb/db_instance_controller.h>
-#include <dao/rdb/account_data_object.h>
-#include <dao/rdb/system_data_object.h>
-#include <dao/rdb/system_sharing_data_object.h>
 #include <ec2/data_conversion.h>
 #include <ec2/outgoing_transaction_dispatcher.h>
 #include <ec2/transaction_log.h>
-#include <test_support/business_data_generator.h>
 #include <test_support/test_with_db_helper.h>
-#include <libcloud_db/src/settings.h>
 
+#include "base_persistent_data_test.h"
 #include "data/account_data.h"
 #include "data/system_data.h"
 
@@ -25,127 +20,6 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 namespace test {
-
-using DbInstanceController = cdb::dao::rdb::DbInstanceController;
-using AccountDataObject = cdb::dao::rdb::AccountDataObject;
-using SystemDataObject = cdb::dao::rdb::SystemDataObject;
-using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
-
-class BasePersistentDataTest:
-    public TestWithDbHelper
-{
-public:
-    enum class DbInitializationType
-    {
-        immediate,
-        delayed
-    };
-
-    BasePersistentDataTest(DbInitializationType dbInitializationType):
-        m_systemDbController(m_settings)
-    {
-        if (dbInitializationType == DbInitializationType::immediate)
-            initializeDatabase();
-    }
-
-protected:
-    const std::unique_ptr<DbInstanceController>& persistentDbManager() const
-    {
-        return m_persistentDbManager;
-    }
-
-    void insertRandomAccount()
-    {
-        using namespace std::placeholders;
-
-        auto account = cdb::test::BusinessDataGenerator::generateRandomAccount();
-        const auto dbResult = executeUpdateQuerySync(
-            std::bind(&AccountDataObject::insert, &m_accountDbController,
-                _1, account));
-        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
-        m_accounts.push_back(std::move(account));
-    }
-
-    void insertRandomSystem(const api::AccountData& account)
-    {
-        using namespace std::placeholders;
-
-        auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
-        const auto dbResult = executeUpdateQuerySync(
-            std::bind(&SystemDataObject::insert, &m_systemDbController,
-                _1, system, account.id));
-        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
-        m_systems.push_back(std::move(system));
-    }
-
-    void insertSystemSharing(const api::SystemSharingEx& sharing)
-    {
-        using namespace std::placeholders;
-
-        const auto dbResult = executeUpdateQuerySync(
-            std::bind(&SystemSharingDataObject::insertOrReplaceSharing,
-                &m_systemSharingController, _1, sharing));
-        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
-    }
-
-    const api::AccountData& getAccount(std::size_t index) const
-    {
-        return m_accounts[index];
-    }
-
-    const data::SystemData& getSystem(std::size_t index) const
-    {
-        return m_systems[index];
-    }
-
-protected:
-    const std::vector<api::AccountData>& accounts() const
-    {
-        return m_accounts;
-    }
-
-    const std::vector<data::SystemData>& systems() const
-    {
-        return m_systems;
-    }
-
-    SystemSharingDataObject& systemSharingController()
-    {
-        return m_systemSharingController;
-    }
-
-    template<typename QueryFunc, typename... OutputData>
-    nx::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
-    {
-        std::promise<nx::db::DBResult> queryDonePromise;
-        m_persistentDbManager->queryExecutor()->executeUpdate(
-            queryFunc,
-            [&queryDonePromise](
-                nx::db::QueryContext*,
-                nx::db::DBResult dbResult,
-                OutputData... outputData)
-            {
-                queryDonePromise.set_value(dbResult);
-            });
-        return queryDonePromise.get_future().get();
-    }
-
-    void initializeDatabase()
-    {
-        m_persistentDbManager =
-            std::make_unique<DbInstanceController>(dbConnectionOptions());
-        ASSERT_TRUE(m_persistentDbManager->initialize());
-    }
-
-private:
-    conf::Settings m_settings;
-    std::unique_ptr<DbInstanceController> m_persistentDbManager;
-    AccountDataObject m_accountDbController;
-    SystemDataObject m_systemDbController;
-    SystemSharingDataObject m_systemSharingController;
-    std::vector<api::AccountData> m_accounts;
-    std::vector<data::SystemData> m_systems;
-};
 
 class TestOutgoingTransactionDispatcher:
     public AbstractOutgoingTransactionDispatcher
@@ -205,7 +79,7 @@ public:
 };
 
 class TransactionLog:
-    public BasePersistentDataTest,
+    public cdb::test::BasePersistentDataTest,
     public ::testing::Test
 {
 public:
