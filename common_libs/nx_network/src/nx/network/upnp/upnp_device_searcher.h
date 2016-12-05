@@ -23,6 +23,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
+#include <nx/utils/atomic_unique_ptr.h>
 
 namespace nx_upnp {
 
@@ -157,8 +158,9 @@ private:
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
 
-    std::unique_ptr<AbstractDatagramSocket> m_receiveSocket;
+    nx::utils::AtomicUniquePtr<AbstractDatagramSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
+    bool m_needToUpdateReceiveSocket;
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
@@ -169,8 +171,8 @@ private:
         size_t bytesRead ) noexcept;
 
     void dispatchDiscoverPackets();
-    bool isInterfaceListChanged() const;
-    std::unique_ptr<AbstractDatagramSocket> updateReceiveSocket();
+    bool needToUpdateReceiveSocket() const;
+    nx::utils::AtomicUniquePtr<AbstractDatagramSocket> updateReceiveSocketUnsafe();
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml(
         const QByteArray& uuidStr,

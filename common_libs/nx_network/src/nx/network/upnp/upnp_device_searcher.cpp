@@ -38,7 +38,8 @@ DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_readBuf( new char[READ_BUF_CAPACITY] ),
-    m_terminated( false )
+    m_terminated( false ),
+    m_needToUpdateReceiveSocket(false)
 {
     m_timerID = nx::utils::TimerManager::instance()->addTimer(
         this,
@@ -80,8 +81,9 @@ void DeviceSearcher::pleaseStop()
     }
     m_socketList.clear();
 
-    if (m_receiveSocket)
-        m_receiveSocket->pleaseStopSync();
+    auto socket = std::move(m_receiveSocket);
+    if (socket)
+        socket->pleaseStopSync();
 
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
@@ -208,21 +210,31 @@ void DeviceSearcher::onSomeBytesRead(
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QnMutexLocker lk( &m_mutex );
-            //removing socket from m_socketList
-            for( map<QString, SocketReadCtx>::iterator
-                it = m_socketList.begin();
-                it != m_socketList.end();
-                ++it )
+            if (m_terminated)
+                return;
+
+            if (sock == m_receiveSocket.get())
             {
-                if( it->second.sock.get() == sock )
+                m_needToUpdateReceiveSocket = true;
+            }
+            else
+            {
+                //removing socket from m_socketList
+                for (auto it = m_socketList.begin(); it != m_socketList.end(); ++it )
                 {
-                    udpSock = std::move(it->second.sock);
-                    m_socketList.erase( it );
-                    break;
+                    if( it->second.sock.get() == sock )
+                    {
+                        udpSock = std::move(it->second.sock);
+                        m_socketList.erase( it );
+                        break;
+                    }
                 }
             }
         }
-        udpSock->pleaseStopSync();
+
+        if (udpSock)
+            udpSock->pleaseStopSync();
+
         return;
     }
 
@@ -289,7 +301,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
     }
 }
 
-bool DeviceSearcher::isInterfaceListChanged() const
+bool DeviceSearcher::needToUpdateReceiveSocket() const
 {
     auto ifaces = getAllIPv4Interfaces().toSet();
     bool changed = ifaces != m_interfacesCache;
@@ -297,16 +309,14 @@ bool DeviceSearcher::isInterfaceListChanged() const
     if (changed)
         m_interfacesCache = ifaces;
 
-    return changed;
+    return changed || m_needToUpdateReceiveSocket;
 }
 
-std::unique_ptr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocket()
+nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocketUnsafe()
 {
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
 
-    std::unique_ptr<AbstractDatagramSocket> oldSock;
-    if(m_receiveSocket)
-        oldSock  = std::move(m_receiveSocket);
+    auto oldSock = std::move(m_receiveSocket);
 
     m_receiveSocket.reset(new UDPSocket(AF_INET));
 
@@ -328,18 +338,20 @@ std::unique_ptr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocket()
             &m_receiveBuffer,
             std::placeholders::_2 ) );
 
+    m_needToUpdateReceiveSocket = false;
+
     return oldSock;
 }
 
 std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
 
-    std::unique_ptr<AbstractDatagramSocket> oldSock;
+    nx::utils::AtomicUniquePtr<AbstractDatagramSocket> oldSock;
 
     {
         QnMutexLocker lock(&m_mutex);
-        if(isInterfaceListChanged())
-            oldSock = updateReceiveSocket();
+        if(needToUpdateReceiveSocket())
+            oldSock = updateReceiveSocketUnsafe();
     }
 
     if (oldSock)
