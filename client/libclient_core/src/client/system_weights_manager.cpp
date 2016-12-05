@@ -23,6 +23,20 @@ void addOrUpdateWeightData(
         *it = data;
 }
 
+QnWeightsDataHash filterWeights(const QnWeightsDataHash& data)
+{
+    QnWeightsDataHash result;
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        const auto systemId = it.key();
+        const auto weightData = it.value();
+        const auto localId = weightData.localId.toString();
+        if (systemId == localId) //< It is weight for local system - store it
+            addOrUpdateWeightData(localId, weightData, result);
+    }
+    return result;
+}
+
 QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
 {
     QnWeightsDataHash result;
@@ -32,8 +46,7 @@ QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
             cloudData.lastLoginTimeUtcMs, true});
 
         result.insert(cloudData.cloudId, weightData);
-        const auto localSystemId = cloudData.localId.toString();
-        addOrUpdateWeightData(localSystemId, weightData, result);
+        addOrUpdateWeightData(cloudData.localId.toString(), weightData, result);
     }
     return result;
 }
@@ -128,7 +141,8 @@ void QnSystemsWeightsManager::addLocalWeightData(const QnWeightData& data)
     m_baseWeights.insert(localId, data);
     afterBaseWeightsUpdated();
 
-    qnClientCoreSettings->setLocalSystemWeightsData(m_baseWeights.values());
+    qnClientCoreSettings->setLocalSystemWeightsData(
+        filterWeights(m_baseWeights).values());
 }
 
 void QnSystemsWeightsManager::processSystemDiscovered(const QnSystemDescriptionPtr& system)
