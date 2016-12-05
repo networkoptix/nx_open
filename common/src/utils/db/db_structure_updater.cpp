@@ -100,7 +100,7 @@ bool DBStructureUpdater::updateStructSync()
     nx::utils::promise<DBResult> dbUpdatePromise;
     auto future = dbUpdatePromise.get_future();
 
-    //starting async operation
+    // Starting async operation.
     m_queryExecutor->executeUpdate(
         std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
         [&dbUpdatePromise](nx::db::QueryContext* /*connection*/, DBResult dbResult)
@@ -108,83 +108,118 @@ bool DBStructureUpdater::updateStructSync()
             dbUpdatePromise.set_value(dbResult);
         });
 
-    //waiting for completion
+    // Waiting for completion.
     future.wait();
     return future.get() == DBResult::ok;
 }
 
 DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryContext)
 {
-    //reading current DB version
-    QSqlQuery fetchDbVersionQuery(*queryContext->connection());
-    fetchDbVersionQuery.prepare(lit("SELECT db_version FROM db_version_data"));
-    qint64 dbVersion = m_initialVersion;
-    //absense of table db_version_data is normal: DB is just empty
-    bool someSchemaExists = false;
-    if (fetchDbVersionQuery.exec() && fetchDbVersionQuery.next())
-    {
-        dbVersion = fetchDbVersionQuery.value(lit("db_version")).toUInt();
-        someSchemaExists = true;
-    }
-    fetchDbVersionQuery.finish();
-
-    if (dbVersion < m_initialVersion)
+    DbSchemaState dbState = analyzeDbSchemaState(queryContext);
+    if (dbState.version < m_initialVersion)
     {
         NX_LOGX(lit("DB of version %1 cannot be upgraded! Minimal supported version is %2")
-            .arg(dbVersion).arg(m_initialVersion), cl_logERROR);
+            .arg(dbState.version).arg(m_initialVersion), cl_logERROR);
         return DBResult::notFound;
     }
 
-    if (!someSchemaExists)
+    if (!dbState.someSchemaExists)
     {
-        if (!execSqlScript(queryContext, kCreateDbVersionTable, RdbmsDriverType::unknown))
+        const auto dbResult = createInitialSchema(queryContext, &dbState);
+        if (dbResult != DBResult::ok)
+            return dbResult;
+    }
+
+    auto dbResult = applyScriptsMissingInCurrentDb(queryContext, &dbState);
+    if (dbResult != DBResult::ok)
+        return dbResult;
+
+    return updateDbVersion(queryContext, dbState);
+}
+
+DBStructureUpdater::DbSchemaState DBStructureUpdater::analyzeDbSchemaState(
+    nx::db::QueryContext* const queryContext)
+{
+    DBStructureUpdater::DbSchemaState dbSchemaState{ m_initialVersion, false };
+
+    //reading current DB version
+    QSqlQuery fetchDbVersionQuery(*queryContext->connection());
+    fetchDbVersionQuery.prepare(lit("SELECT db_version FROM db_version_data"));
+    //absense of table db_version_data is normal: DB is just empty
+    if (fetchDbVersionQuery.exec() && fetchDbVersionQuery.next())
+    {
+        dbSchemaState.version = fetchDbVersionQuery.value(lit("db_version")).toUInt();
+        dbSchemaState.someSchemaExists = true;
+    }
+
+    return dbSchemaState;
+}
+
+DBResult DBStructureUpdater::createInitialSchema(
+    nx::db::QueryContext* const queryContext,
+    DbSchemaState* dbSchemaState)
+{
+    if (!execSqlScript(queryContext, kCreateDbVersionTable, RdbmsDriverType::unknown))
+    {
+        NX_LOG(lit("DBStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
+            .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
+        return DBResult::ioError;
+    }
+    dbSchemaState->version = 1;
+
+    if (!m_fullSchemaScriptByVersion.empty())
+    {
+        // Applying full schema.
+        if (!execSqlScript(
+                queryContext,
+                m_fullSchemaScriptByVersion.rbegin()->second,
+                RdbmsDriverType::unknown))
         {
-            NX_LOG(lit("DBStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
+            NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2")
+                .arg(m_fullSchemaScriptByVersion.rbegin()->first)
                 .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
             return DBResult::ioError;
         }
-        dbVersion = 1;
-
-        if (!m_fullSchemaScriptByVersion.empty())
-        {
-            //applying full schema
-            if (!execSqlScript(
-                    queryContext,
-                    m_fullSchemaScriptByVersion.rbegin()->second,
-                    RdbmsDriverType::unknown))
-            {
-                NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2")
-                    .arg(m_fullSchemaScriptByVersion.rbegin()->first)
-                    .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
-                return DBResult::ioError;
-            }
-            dbVersion = m_fullSchemaScriptByVersion.rbegin()->first;
-        }
+        dbSchemaState->version = m_fullSchemaScriptByVersion.rbegin()->first;
     }
 
-    // Applying scripts missing in current DB.
+    dbSchemaState->someSchemaExists = true;
+
+    return DBResult::ok;
+}
+
+DBResult DBStructureUpdater::applyScriptsMissingInCurrentDb(
+    nx::db::QueryContext* const queryContext,
+    DbSchemaState* const dbState)
+{
     for (;
-        static_cast< size_t >(dbVersion) < (m_initialVersion + m_updateScripts.size());
-        ++dbVersion)
+        static_cast<size_t>(dbState->version) < (m_initialVersion + m_updateScripts.size());
+        ++dbState->version)
     {
         NX_LOGX(lm("Updating structure to version %1")
-            .arg(dbVersion)/*.arg(m_updateScripts[dbVersion - m_initialVersion].sqlScript)*/,
+            .arg(dbState->version)/*.arg(m_updateScripts[dbState->version - m_initialVersion].sqlScript)*/,
             cl_logDEBUG2);
 
-        if (!execDbUpdate(m_updateScripts[dbVersion - m_initialVersion], queryContext))
+        if (!execDbUpdate(m_updateScripts[dbState->version - m_initialVersion], queryContext))
         {
             NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2")
-                .arg(dbVersion).arg(queryContext->connection()->lastError().text()),
+                .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);
             return DBResult::ioError;
         }
     }
 
-    //updating db version
-    QSqlQuery updateDbVersion(*queryContext->connection());
-    updateDbVersion.prepare(lit("UPDATE db_version_data SET db_version = :dbVersion"));
-    updateDbVersion.bindValue(lit(":dbVersion"), dbVersion);
-    return updateDbVersion.exec() ? DBResult::ok : DBResult::ioError;
+    return DBResult::ok;
+}
+
+DBResult DBStructureUpdater::updateDbVersion(
+    nx::db::QueryContext* const queryContext,
+    const DbSchemaState& dbSchemaState)
+{
+    QSqlQuery updateDbVersionQuery(*queryContext->connection());
+    updateDbVersionQuery.prepare(lit("UPDATE db_version_data SET db_version = :dbVersion"));
+    updateDbVersionQuery.bindValue(lit(":dbVersion"), dbSchemaState.version);
+    return updateDbVersionQuery.exec() ? DBResult::ok : DBResult::ioError;
 }
 
 bool DBStructureUpdater::execDbUpdate(

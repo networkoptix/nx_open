@@ -72,25 +72,50 @@ private:
         }
     };
 
+    struct DbSchemaState
+    {
+        unsigned int version;
+        bool someSchemaExists;
+    };
+
     AbstractAsyncSqlQueryExecutor* const m_queryExecutor;
     unsigned int m_initialVersion;
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<DbUpdate> m_updateScripts;
 
     DBResult updateDbInternal(nx::db::QueryContext* const dbConnection);
+
+    DbSchemaState analyzeDbSchemaState(nx::db::QueryContext* const queryContext);
+
+    DBResult createInitialSchema(
+        nx::db::QueryContext* const queryContext,
+        DbSchemaState* dbSchemaState);
+
+    DBResult applyScriptsMissingInCurrentDb(
+        nx::db::QueryContext* const queryContext,
+        DbSchemaState* const dbState);
+
+    DBResult updateDbVersion(
+        nx::db::QueryContext* const queryContext,
+        const DbSchemaState& dbSchemaState);
+
     bool execDbUpdate(
         const DbUpdate& dbUpdate,
         nx::db::QueryContext* const queryContext);
+
     bool execStructureUpdateTask(
         const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
         nx::db::QueryContext* const dbConnection);
+
     std::map<RdbmsDriverType, QByteArray>::const_iterator selectSuitableScript(
         const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
         RdbmsDriverType driverType) const;
+
     bool execSqlScript(
         nx::db::QueryContext* const queryContext,
         QByteArray sqlScript,
         RdbmsDriverType sqlScriptDialect);
+
     QByteArray fixSqlDialect(QByteArray initialScript, RdbmsDriverType targetDialect);
 };
 
