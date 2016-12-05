@@ -79,6 +79,7 @@ public:
 
     ~AsyncSqlQueryExecutorTest()
     {
+        RequestExecutorFactory::setFactoryFunc(nullptr);
     }
 
     void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
