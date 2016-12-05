@@ -31,7 +31,7 @@ QnRenderingWidget::~QnRenderingWidget()
         m_display->removeRenderer(m_renderer);
         m_renderer->destroyAsync();
         m_display->beforeDestroy();
-        delete m_display;
+        m_display.clear();
     }
 }
 
@@ -60,8 +60,7 @@ void QnRenderingWidget::stopPlayback()
     m_renderer = NULL;
 
     m_display->beforeDestroy();
-    delete m_display;
-    m_display = NULL;
+    m_display.clear();
 
     m_channelScreenSize = QSize();
 }
@@ -128,8 +127,7 @@ void QnRenderingWidget::invalidateDisplay()
     if (m_display)
     {
         m_renderer->disconnect(this);
-        delete m_display;
-        m_display = NULL;
+        m_display.reset();
         m_renderer = NULL; /*< Owned by display */
     }
 }
@@ -139,7 +137,7 @@ void QnRenderingWidget::ensureDisplay()
     if (m_display || !m_resource)
         return;
 
-    m_display = new QnResourceDisplay(m_resource->toResourcePtr(), this);
+    m_display.reset(new QnResourceDisplay(m_resource->toResourcePtr(), this));
     m_renderer = new QnResourceWidgetRenderer(NULL, context());
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QWidget::updateGeometry);

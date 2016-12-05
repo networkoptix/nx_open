@@ -8,6 +8,7 @@
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
+typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 
 /**
  * Widget for displaying video from the given resource without constructing
@@ -43,7 +44,7 @@ protected:
 
 private:
     QnMediaResourcePtr m_resource;
-    QnResourceDisplay *m_display;
+    QnResourceDisplayPtr m_display;
     QnResourceWidgetRenderer *m_renderer;
     QSize m_channelScreenSize;
     int m_effectiveWidth = 0;

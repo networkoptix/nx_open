@@ -963,18 +963,18 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
     return m_widgetsByResource.value(resource);
 }
 
-QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
+QnResourceDisplayPtr QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
 {
     if (QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(this->widget(item)))
-        return widget->display().data();
-    return NULL;
+        return widget->display();
+    return QnResourceDisplayPtr();
 }
 
 QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const
 {
-    QnResourceDisplay *display = this->display(item);
-    if (display == NULL)
-        return NULL;
+    auto display = this->display(item);
+    if (!display)
+        return nullptr;
 
     return display->camera();
 }
