@@ -39,7 +39,7 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 
     ui->cameraIdInputField->setReadOnly(true);
 
-    ui->primaryStreamUrlInputField->setTitle(tr("Primary Stream"));
+ /* ui->primaryStreamUrlInputField->setTitle() is called from updateFromResource() */
     ui->primaryStreamUrlInputField->setReadOnly(true);
 
     ui->secondaryStreamUrlInputField->setTitle(tr("Secondary Stream"));
@@ -50,8 +50,7 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
     aligner->addWidgets({
         ui->cameraIdInputField,
         ui->primaryStreamUrlInputField,
-        ui->secondaryStreamUrlInputField
-    });
+        ui->secondaryStreamUrlInputField });
 
     initWebView();
 
@@ -98,6 +97,12 @@ void QnCameraAdvancedSettingsWidget::updateFromResource()
     ui->noSettingsLabel->setText(isIoModule
         ? tr("This I/O module has no advanced settings")
         : tr("This camera has no advanced settings"));
+
+    ui->primaryStreamUrlInputField->setTitle(isIoModule
+        ? tr("Audio Stream")
+        : tr("Primary Stream"));
+
+    ui->secondaryStreamUrlInputField->setHidden(isIoModule);
 
     QString urlPlaceholder = isIoModule
         ? tr("URL is not available. Open stream and try again.")
@@ -172,19 +177,16 @@ void QnCameraAdvancedSettingsWidget::updateUrls()
 
         bool isIoModule = m_camera->isIOModule();
         bool hasPrimaryStream = !isIoModule || m_camera->isAudioSupported();
-        bool hasSecondaryStream = m_camera->hasDualStreaming2();
-
         ui->primaryStreamUrlInputField->setEnabled(hasPrimaryStream);
         ui->primaryStreamUrlInputField->setText(hasPrimaryStream
             ? m_camera->sourceUrl(Qn::CR_LiveVideo)
-            : tr("I/O module has no primary stream"));
+            : tr("I/O module has no audio stream"));
 
+        bool hasSecondaryStream = m_camera->hasDualStreaming2();
         ui->secondaryStreamUrlInputField->setEnabled(hasSecondaryStream);
         ui->secondaryStreamUrlInputField->setText(hasSecondaryStream
             ? m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo)
-            : isIoModule
-                ? tr("I/O module has no secondary stream")
-                : tr("Camera has no secondary stream"));
+            : tr("Camera has no secondary stream"));
     }
 }
 
