@@ -941,7 +941,7 @@ TEST_F(System, disabled_user_does_not_see_system)
     assertIfUserCanSeeSystem(user, system);
 }
 
-TEST_F(System, DISABLED_reenabled_user_can_see_system)
+TEST_F(System, reenabled_user_can_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
