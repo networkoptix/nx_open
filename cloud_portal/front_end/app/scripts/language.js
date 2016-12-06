@@ -89,7 +89,7 @@ var L = {
         cloudInvalidResponse: 'Cloud DB returned an unexpected response.',
         notAuthorized: 'Login or password are incorrect.',
         wrongParameters: 'Some parameters on the form are incorrect.',
-        wrongCode: 'Wrong confirmation code.',
+        wrongCode: 'Account was already activated or confirmation code is incorrect.',
 
         forbidden: 'You do not have permissions to perform this action.',
         accountNotActivated: 'This account hasn\'t been activated yet. <a href="/activate">Send activation link again</a>',
