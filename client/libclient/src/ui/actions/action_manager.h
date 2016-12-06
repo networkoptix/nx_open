@@ -171,7 +171,7 @@ protected:
     void hideAllMenus();
 
 private slots:
-    void at_menu_destroyed(QObject *menu);
+    void at_menu_destroyed(QObject* menuObj);
 
 private:
     /** Root action. Also contained in the maps. */
@@ -185,7 +185,7 @@ private:
 
     /** Mapping from a menu created by this manager to the parameters that were
      * passed to it at construction time. NULL key is used for shortcut actions. */
-    QHash<QObject *, QnActionParameters> m_parametersByMenu;
+    QHash<QMenu*, QnActionParameters> m_parametersByMenu;
 
     /** Target provider for actions. */
     QnActionTargetProvider *m_targetProvider;
@@ -197,7 +197,7 @@ private:
     QnAction *m_shortcutAction;
 
     /** Last menu that was clicked by the user. */
-    QObject *m_lastClickedMenu;
+    QMenu* m_lastClickedMenu;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::CreationOptions)
