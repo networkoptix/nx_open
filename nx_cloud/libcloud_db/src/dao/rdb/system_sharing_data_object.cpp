@@ -55,7 +55,7 @@ nx::db::DBResult SystemSharingDataObject::fetchUserSharingsByAccountEmail(
 {
     return fetchUserSharings(
         queryContext,
-        { { "email", ":accountEmail", QnSql::serialized_field(accountEmail) } },
+        {{"email", ":accountEmail", QnSql::serialized_field(accountEmail)}},
         sharings);
 }
 

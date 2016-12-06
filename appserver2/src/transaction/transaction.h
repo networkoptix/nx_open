@@ -1314,6 +1314,11 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
     {
         /** Id of user or entity who created transaction. */
         QnUuid author;
+
+        bool operator==(const HistoryAttributes& rhs) const
+        {
+            return author == rhs.author;
+        }
     };
 
     #define HistoryAttributes_Fields (author)
@@ -1383,6 +1388,15 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         TransactionType::Value transactionType;
         HistoryAttributes historyAttributes;
 
+        bool operator==(const QnAbstractTransaction& rhs) const
+        {
+            return command == rhs.command
+                && peerID == rhs.peerID
+                && persistentInfo == rhs.persistentInfo
+                && transactionType == rhs.transactionType
+                && historyAttributes == rhs.historyAttributes;
+        }
+
         QString toString() const;
         bool isLocal() const { return transactionType == TransactionType::Local; }
         bool isCloud() const { return transactionType == TransactionType::Cloud; }
@@ -1432,6 +1446,17 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         }
 
         T params;
+
+        bool operator==(const QnTransaction& rhs) const
+        {
+            return QnAbstractTransaction::operator==(rhs)
+                && params == rhs.params;
+        }
+
+        bool operator!=(const QnTransaction& rhs) const
+        {
+            return !(*this == rhs);
+        }
     };
 
     QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson)(xml)(csv_record))

@@ -33,15 +33,15 @@ void TransactionLogReader::stopWhileInAioThread()
 }
 
 void TransactionLogReader::readTransactions(
-    const ::ec2::QnTranState& from,
-    const ::ec2::QnTranState& to,
+    boost::optional<::ec2::QnTranState> from,
+    boost::optional<::ec2::QnTranState> to,
     int maxTransactionsToReturn,
     TransactionsReadHandler completionHandler)
 {
     m_transactionLog->readTransactions(
         m_systemId,
-        from,
-        to,
+        std::move(from),
+        std::move(to),
         maxTransactionsToReturn,
         [this, 
             sharedGuard = m_asyncOperationGuard.sharedGuard(),

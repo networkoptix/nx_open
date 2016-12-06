@@ -56,6 +56,11 @@ DBResult Transaction::rollback()
     return m_connection->rollback() ? DBResult::ok : DBResult::ioError;
 }
 
+bool Transaction::isActive() const
+{
+    return m_started;
+}
+
 void Transaction::addOnSuccessfulCommitHandler(
     nx::utils::MoveOnlyFunc<void()> func)
 {

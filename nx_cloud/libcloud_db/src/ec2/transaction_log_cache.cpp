@@ -172,13 +172,22 @@ int VmsTransactionLogCache::generateTransactionSequence(
     return currentSequence;
 }
 
+void VmsTransactionLogCache::shiftTransactionSequence(
+    const ::ec2::QnTranStateKey& tranStateKey,
+    int delta)
+{
+    QnMutexLocker lock(&m_mutex);
+    int& currentSequence = m_committedData.transactionState.values[tranStateKey];
+    currentSequence += delta;
+}
+
 ::ec2::QnTranState VmsTransactionLogCache::committedTransactionState() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_committedData.transactionState;
 }
 
-std::uint64_t VmsTransactionLogCache::committedTimstampSequence() const
+std::uint64_t VmsTransactionLogCache::committedTimestampSequence() const
 {
     QnMutexLocker lock(&m_mutex);
     return *m_committedData.timestampSequence;
@@ -187,6 +196,9 @@ std::uint64_t VmsTransactionLogCache::committedTimstampSequence() const
 std::uint64_t VmsTransactionLogCache::timestampSequence(
     const QnMutexLockerBase& lock, TranId tranId) const
 {
+    if (tranId == InvalidTranId)
+        return *m_committedData.timestampSequence;
+
     const auto tranContext = findTranContext(lock, tranId);
     NX_ASSERT(tranContext != nullptr);
     return tranContext->data.timestampSequence
