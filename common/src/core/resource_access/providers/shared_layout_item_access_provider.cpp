@@ -230,7 +230,7 @@ QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForS
 
     {
         QnMutexLocker lk(&m_mutex);
-        auto existing = m_aggregatorsBySubject.constFind(id);
+        const auto existing = m_aggregatorsBySubject.constFind(id);
         if (existing != m_aggregatorsBySubject.cend())
             return *existing;
 

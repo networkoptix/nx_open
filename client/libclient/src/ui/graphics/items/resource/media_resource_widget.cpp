@@ -1924,7 +1924,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     updateOverlayWidgetsVisibility(animate);
 
     const auto statusOverlay = calculateStatusOverlay();
-    statusOverlayController()->setStatusOverlay(statusOverlay);
+    statusOverlayController()->setStatusOverlay(statusOverlay, animate);
     updateOverlayButton(statusOverlay);
 }
 

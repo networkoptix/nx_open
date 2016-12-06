@@ -251,6 +251,14 @@ Control
         }
     }
 
+    WheelSwitchArea
+    {
+        anchors.fill: parent
+        onPreviousRequested: previousCameraRequested()
+        onNextRequested: nextCameraRequested()
+        maxConsequentRequests: camerasModel.count - 1
+    }
+
     MouseArea
     {
         id: mouseArea
@@ -258,15 +266,6 @@ Control
         onClicked: cameraItem.clicked()
         onDoubleClicked: cameraItem.doubleClicked()
         hoverEnabled: true
-
-        onWheel:
-        {
-            activityDetected()
-            if (wheel.angleDelta.y > 0)
-                previousCameraRequested()
-            else
-                nextCameraRequested()
-        }
 
         onMouseXChanged: activityDetected()
         onMouseYChanged: activityDetected()

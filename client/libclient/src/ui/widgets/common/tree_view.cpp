@@ -22,6 +22,14 @@ int QnTreeView::rowHeight(const QModelIndex &index) const {
     return base_type::rowHeight(index);
 }
 
+void QnTreeView::wheelEvent(QWheelEvent* event)
+{
+    if (m_editorOpen)
+        return;
+
+    base_type::wheelEvent(event);
+}
+
 void QnTreeView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)

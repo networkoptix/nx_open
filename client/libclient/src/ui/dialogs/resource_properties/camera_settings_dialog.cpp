@@ -26,7 +26,7 @@
 
 namespace {
 
-static const QSize kMinimumSize(900, -1); //< do not set minimum height
+static const int kMinimumWidth = 900; //< do not set minimum height
 static const QSize kOptimalSize(900, 880);
 
 /* Initial dialog height - 40px less than screen height. */
@@ -38,7 +38,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
     m_ignoreAccept(false)
 {
-    setMinimumSize(kMinimumSize);
+    setMinimumWidth(kMinimumWidth);
 
     int maximumHeight = mainWindow()->geometry().height();
     if (auto windowHandle = mainWindow()->windowHandle())
@@ -48,7 +48,6 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     }
     int optimalHeight = std::min(kOptimalSize.height(),
         maximumHeight - kSizeOffset);
-    optimalHeight = std::max(optimalHeight, kMinimumSize.height());
 
     QSize optimalSize(kOptimalSize.width(), optimalHeight);
     QRect targetGeometry(QPoint(0, 0), optimalSize);

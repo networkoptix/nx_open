@@ -25,6 +25,8 @@ private:
 
     void at_timer_timeout();
 
+    QString errorString(const QnTestEmailSettingsReply& result) const;
+
 private slots:
     void at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle);
 

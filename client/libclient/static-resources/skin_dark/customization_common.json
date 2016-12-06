@@ -196,7 +196,6 @@
     "QComboBox": {
         "palette": {
             "default": {
-                "midlight":         "transparent",
                 "highlight":        "brand_d1"
             }
         }

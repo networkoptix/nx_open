@@ -432,8 +432,10 @@ Item
                     bkgColor: tileArea.color;
                     onClicked:
                     {
-                        var id = (isCloudTile ? control.systemId : control.localId);
-                        context.hideSystem(id);
+                        // Hides both cloud and local offline tiles
+                        if (isCloudTile)
+                            context.hideSystem(control.systemId);
+                        context.hideSystem(control.localId);
                     }
                 }
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          ${deb.customization.company.name}-lite_client
+# Provides:          ${deb.customization.company.name}-lite-client
 # Required-Start:    networking
 # Required-Stop:
 # Default-Start:     2 3 4 5
@@ -12,12 +12,14 @@
 
 RETVAL=0
 
-SERVICE_NAME=lite_client
+SERVICE_NAME=lite-client
 CUSTOMIZATION=${deb.customization.company.name}
 PREFIX=/opt/$CUSTOMIZATION/lite_client/
 BIN_NAME=mobile_client
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 PORT=$(cat /opt/networkoptix/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
+if [ -z "$PORT" ]; then $PORT=7001; fi
+echo connecting to $CUSTOMIZATION server on port $PORT...
 
 export LD_LIBRARY_PATH=$PREFIX/lib:/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
 
@@ -87,23 +89,23 @@ stop() {
 }
 
 start_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep lite_client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+    WATCHDOG_PID="`ps -eO command | grep lite-client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
     if [ "$WATCHDOG_PID" ]; then
-        echo "$CUSTOMIZATION-lite_client watchdog is already running with pid $WATCHDOG_PID"
+        echo "$CUSTOMIZATION-lite-client watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
-    bash -c "/etc/init.d/$CUSTOMIZATION-lite_client run_watchdog" 2>/dev/null 1>&2&
+    bash -c "/etc/init.d/$CUSTOMIZATION-lite-client run_watchdog" 2>/dev/null 1>&2&
     echo "$SERVICE_NAME watchdog has been started"
 }
 
 stop_watchdog() {
     WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
     if [ ! "$WATCHDOG_PID" ]; then
-        echo "$CUSTOMIZATION-lite_client watchdog is not running"
+        echo "$CUSTOMIZATION-lite-client watchdog is not running"
         return 0
     fi
 
-    echo -n "Stopping $CUSTOMIZATION-lite_client watchdog..... "
+    echo -n "Stopping $CUSTOMIZATION-lite-client watchdog..... "
     kill $WATCHDOG_PID
     sleep 1
     echo "OK"

@@ -462,7 +462,7 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 {
     setVisibleControls(false);
-    const auto controlsGuard = QnRaiiGuard::createDestructable(
+    const auto controlsGuard = QnRaiiGuard::createDestructible(
         [this]() { setVisibleControls(true); });
 
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()

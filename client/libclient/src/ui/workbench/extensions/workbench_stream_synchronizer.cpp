@@ -39,7 +39,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(display(),                  &QnWorkbenchDisplay::widgetAdded,               this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAdded);
     connect(display(),                  &QnWorkbenchDisplay::widgetAboutToBeRemoved,    this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved);
     connect(workbench(),                &QnWorkbench::currentLayoutChanged,             this,       &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
-    
+
     /* Prepare counter. */
     m_counter = new QnCounter(1, this);
     connect(this,                       &QObject::destroyed,                            m_counter,  &QnCounter::decrement);
@@ -59,7 +59,7 @@ void QnWorkbenchStreamSynchronizer::stop() {
         return;
 
     m_syncPlay->disableSync();
-    
+
     emit runningChanged();
 }
 
@@ -82,13 +82,13 @@ bool QnWorkbenchStreamSynchronizer::isEffective() const {
 
 QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
     QnStreamSynchronizationState result;
-    
+
     result.started = m_syncPlay->isEnabled();
     if(result.started) {
         result.speed = m_syncPlay->getSpeed();
         result.time = m_syncPlay->getCurrentTime();
     }
-    
+
     return result;
 }
 
@@ -124,9 +124,9 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
         return;
     }
 
-    if(mediaWidget->display()->archiveReader() == NULL) 
+    if(mediaWidget->display()->archiveReader() == NULL)
         return;
-    
+
     QnClientVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
 
@@ -139,7 +139,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
 
     m_widgetCount++;
-    if(m_widgetCount == 1) 
+    if(m_widgetCount == 1)
         emit effectiveChanged();
 }
 
@@ -155,7 +155,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
     if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync))
         return;
 
-    if(mediaWidget->display()->archiveReader() == NULL) 
+    if(mediaWidget->display()->archiveReader() == NULL)
         return;
 
     m_syncPlay->removeArchiveReader(mediaWidget->display()->archiveReader());
@@ -172,7 +172,9 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         emit effectiveChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged(QnResourceDisplay *display) {
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged(
+    const QnResourceDisplayPtr& display)
+{
     m_syncPlay->onConsumerBlocksReader(display->dataProvider(), !m_watcher->isDisplaying(display));
 }
 

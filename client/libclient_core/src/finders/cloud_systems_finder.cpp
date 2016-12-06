@@ -170,7 +170,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
              * Forces "manual" deletion instead of "deleteLater" because we don't
              * have event loop in this thread.
             **/
-            const auto replyDeleter = QnRaiiGuard::createDestructable(
+            const auto replyDeleter = QnRaiiGuard::createDestructible(
                 [&replyHolder]() { replyHolder.reset(); });
 
             const QnMutexLocker lock(&m_mutex);
@@ -188,7 +188,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                         systemDescription->removeServer(current.id);
                 };
 
-            auto clearServersTask = QnRaiiGuard::createDestructable(clearServers);
+            auto clearServersTask = QnRaiiGuard::createDestructible(clearServers);
             if (reply->isFailed())
                 return;
 
