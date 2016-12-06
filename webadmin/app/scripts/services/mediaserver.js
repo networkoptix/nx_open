@@ -97,7 +97,11 @@ angular.module('webadminApp')
                             return true;
                         });
                     });
-                }, callLogin);
+                }).catch(function(error){
+                    $log.error(error);
+                    $log.log("fall back to login dialog");
+                    callLogin();
+                });
             }
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
