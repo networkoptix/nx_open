@@ -660,8 +660,7 @@ angular.module('webadminApp')
                             $scope.next('noInternetOnClient');
                             return;
                         }
-
-                        $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
+                        $scope.next($scope.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
                     },
                     skip: 'chooseLocal'
                 },
@@ -680,7 +679,7 @@ angular.module('webadminApp')
                     }
                 },
                 cloudLogin: {
-                    back: cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro',
+                    back: $scope.liteClient? 'chooseCloud' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
                     next: 'cloudProcess',
                     valid: function () {
                         return checkForm($scope.forms.cloudForm);
