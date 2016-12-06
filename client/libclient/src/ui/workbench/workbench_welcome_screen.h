@@ -119,6 +119,8 @@ public slots:
     void forceActiveFocus();
 
 public slots:
+    QColor getContrastColor(const QString& group);
+
     QColor getPaletteColor(const QString& group, int index);
 
     QColor getDarkerColor(const QColor& color, int offset = 1);
