@@ -403,21 +403,9 @@ db::DBResult AccountManager::insertAccount(
     if (account.customization.empty())
         account.customization = QnAppInfo::customizationName().toStdString();
 
-    QSqlQuery insertAccountQuery(*queryContext->connection());
-    insertAccountQuery.prepare(
-        R"sql(
-        INSERT INTO account (id, email, password_ha1, password_ha1_sha256, full_name, customization, status_code)
-        VALUES  (:id, :email, :passwordHa1, :passwordHa1Sha256, :fullName, :customization, :statusCode)
-        )sql");
-    QnSql::bind(account, &insertAccountQuery);
-    if (!insertAccountQuery.exec())
-    {
-        NX_LOG(lm("Could not insert account (%1, %2) into DB. %3")
-            .arg(account.email).arg(QnLexical::serialized(account.statusCode))
-            .arg(insertAccountQuery.lastError().text()),
-            cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
-    }
+    const auto dbResult = m_accountDbController.insert(queryContext, account);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, account = std::move(account)]()
@@ -544,12 +532,11 @@ db::DBResult AccountManager::fillCache()
 
     //starting async operation
     using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&AccountManager::fetchAccounts, this, _1, _2),
+    m_dbManager->executeSelect(
+        std::bind(&AccountManager::fetchAccounts, this, _1),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummyResult*/ )
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value( dbResult );
         });
@@ -559,9 +546,7 @@ db::DBResult AccountManager::fillCache()
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts( 
-    nx::db::QueryContext* queryContext,
-    int* const /*dummyResult*/ )
+db::DBResult AccountManager::fetchAccounts(nx::db::QueryContext* queryContext)
 {
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);

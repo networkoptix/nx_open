@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <chrono>
@@ -17,7 +16,7 @@
 
 #include "cloud_db_process_public.h"
 #include "managers/email_manager.h"
-
+#include "test_with_db_helper.h"
 
 namespace nx {
 namespace cdb {
@@ -29,9 +28,9 @@ public:
     std::string password;
 };
 
-class CdbLauncher
-:
-    public utils::test::ModuleLauncher<CloudDBProcessPublic>
+class CdbLauncher:
+    public utils::test::ModuleLauncher<CloudDBProcessPublic>,
+    public TestWithDbHelper
 {
 public:
     //!Calls \a start
@@ -47,8 +46,6 @@ public:
         const std::string& login,
         const std::string& password);
     api::ModuleInfo moduleInfo() const;
-
-    QString testDataDir() const;
 
     api::ResultCode addAccount(
         api::AccountData* const accountData,
@@ -210,14 +207,7 @@ public:
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);
 
-    static void setTemporaryDirectoryPath(const QString& path);
-    static QString temporaryDirectoryPath();
-    static void setDbConnectionOptions(
-        const nx::db::ConnectionOptions& connectionOptions);
-    static nx::db::ConnectionOptions dbConnectionOptions();
-
 private:
-    QString m_tmpDir;
     int m_port;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
@@ -227,33 +217,24 @@ private:
 };
 
 namespace api {
-    bool operator==(const api::AccountData& left, const api::AccountData& right);
-}
 
+bool operator==(const api::AccountData& left, const api::AccountData& right);
+
+} // namespace api
 
 class EmailManagerStub:
     public nx::cdb::AbstractEmailManager
 {
 public:
-    EmailManagerStub(nx::cdb::AbstractEmailManager* const target):
-        m_target(target)
-    {
-    }
+    EmailManagerStub(nx::cdb::AbstractEmailManager* const target);
 
     virtual void sendAsync(
         const AbstractNotification& notification,
-        std::function<void(bool)> completionHandler) override
-    {
-        if (!m_target)
-            return;
-        m_target->sendAsync(
-            notification,
-            std::move(completionHandler));
-    }
+        std::function<void(bool)> completionHandler) override;
 
 private:
     nx::cdb::AbstractEmailManager* const m_target;
 };
 
-}   // namespace cdb
-}   // namespace nx
+} // namespace cdb
+} // namespace nx

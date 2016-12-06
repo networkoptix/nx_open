@@ -57,12 +57,23 @@ start() {
        return 0
     fi
 
-    echo -n "Starting $BIN_NAME..... "
-    curl http://127.0.0.1:$PORT/api/startLiteClient
+    # TODO: #boris: Properly wait for Mediaserver to be ready.
+    echo "Sleeping for 20 seconds..."
+    sleep 20
 
-    if [ `/bin/pidof $BIN_NAME` ]
-    then
+    echo -n "Starting $BIN_NAME..... "
+    # TODO: #boris: Decide whether to use curl here after fixing its crash.
+    #curl http://127.0.0.1:$PORT/api/startLiteClient
+    wget http://127.0.0.1:$PORT/api/startLiteClient
+
+    # TODO: #boris: Properly wait for Lite Client to start.
+    echo "Sleeping for 10 seconds..."
+    sleep 10
+
+    if [ `/bin/pidof $BIN_NAME` ]; then
         echo "OK"
+    else
+        echo "FAILURE"
     fi
 }
 
@@ -115,7 +126,8 @@ run_watchdog() {
     while true
     do
         start
-        sleep 20
+        # TODO: #boris After other todos are fixed, restore the period of 20.
+        sleep 60
     done
 }
 

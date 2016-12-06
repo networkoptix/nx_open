@@ -1,0 +1,7 @@
+#!/bin/bash
+
+BIN_NAME=mobile_client
+
+killall "$BIN_NAME"
+
+# Lite Client will be started again by its watchdog script.

@@ -75,4 +75,16 @@ ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
         transactionType);
 }
 
+detail::ServerQueryProcessor::PostProcessList& detail::ServerQueryProcessor::getStaticPostProcessList()
+{
+    static detail::ServerQueryProcessor::PostProcessList postProcessList;
+    return postProcessList;
+}
+
+QnMutex& detail::ServerQueryProcessor::getStaticUpdateMutex()
+{
+    static QnMutex updateMutex;
+    return updateMutex;
+}
+
 } //namespace ec2
