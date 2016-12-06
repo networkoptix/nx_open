@@ -46,6 +46,7 @@ TEST(UdpSocket, Simple)
     ASSERT_FALSE(senderEndpoint.address.isIpAddress());
 
     UDPSocket receiver(AF_INET);
+    const auto receiverCleanupGuard = makeScopedGuard([&receiver]() { receiver.pleaseStopSync(); });
     ASSERT_TRUE(receiver.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(receiver.setRecvTimeout(1000));
 

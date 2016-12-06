@@ -229,6 +229,52 @@ TEST_F(StunClientServerTest, AsyncClientUser)
     }
 }
 
+class StunClient:
+    public StunClientServerTest
+{
+protected:
+    void givenClientConnectedToServer()
+    {
+        const auto address = startServer();
+        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
+        m_stunClient.setOnConnectionClosedHandler(
+            [this](SystemError::ErrorCode closeReason)
+            {
+                m_connectionClosedPromise.set_value(closeReason);
+            });
+        m_stunClient.connect(
+            address,
+            false,
+            [&connectedPromise](SystemError::ErrorCode sysErrorCode)
+            {
+                connectedPromise.set_value(sysErrorCode);
+            });
+        ASSERT_EQ(SystemError::noError, connectedPromise.get_future().get());
+    }
+
+    void whenServerTerminatedAbruptly()
+    {
+        server->pleaseStop();
+        server.reset();
+    }
+
+    void verifyClientProcessedConnectionCloseProperly()
+    {
+        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
+    }
+
+private:
+    nx::stun::AsyncClient m_stunClient;
+    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
+};
+
+TEST_F(StunClient, proper_cancellation_when_connection_terminated_by_remote_side)
+{
+    givenClientConnectedToServer();
+    whenServerTerminatedAbruptly();
+    verifyClientProcessedConnectionCloseProperly();
+}
+
 } // namespace test
 } // namespace hpm
 } // namespase nx

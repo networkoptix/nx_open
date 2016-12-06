@@ -51,6 +51,18 @@ int QnMiscManager<QueryProcessorType>::changeSystemId(
     return reqId;
 }
 
+namespace {
+void updateRuntimeInfoAfterLicenseOverflowTransaction(const ApiLicenseOverflowData& params)
+{
+    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    if (localInfo.data.prematureLicenseExperationDate != params.time) 
+    {
+        localInfo.data.prematureLicenseExperationDate = params.time;
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+    }
+}
+}
+
 template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
         bool value,
@@ -65,9 +77,11 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::markLicenseOverflow, params,
-        [handler, reqId](ErrorCode errorCode)
+        [handler, reqId, &params](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
+            if (errorCode == ErrorCode::ok)
+                updateRuntimeInfoAfterLicenseOverflowTransaction(params);
         }
     );
 

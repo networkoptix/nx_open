@@ -266,8 +266,8 @@ void Settings::loadConfiguration()
     m_dbConnectionOptions.password = m_settings.value(kDbPassword, kDefaultDbPassword).toString();
     m_dbConnectionOptions.connectOptions = m_settings.value(kDbConnectOptions, kDefaultDbConnectOptions).toString();
     m_dbConnectionOptions.encoding = m_settings.value(kDbEncoding, kDefaultDbEncoding).toString();
-    m_dbConnectionOptions.maxConnectionCount = m_settings.value(kDbMaxConnections, kDefaultDbMaxConnections).toUInt();
-    if (m_dbConnectionOptions.maxConnectionCount == 0)
+    m_dbConnectionOptions.maxConnectionCount = m_settings.value(kDbMaxConnections, kDefaultDbMaxConnections).toInt();
+    if (m_dbConnectionOptions.maxConnectionCount <= 0)
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
     m_dbConnectionOptions.inactivityTimeout = duration_cast<seconds>(
         nx::utils::parseTimerDuration(

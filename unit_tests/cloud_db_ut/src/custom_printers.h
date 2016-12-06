@@ -16,6 +16,7 @@
 
 #include <cdb/result_code.h>
 #include <nx_ec/impl/ec_api_impl.h>
+#include <utils/db/types.h>
 
 
 //!Used by google test to print QByteArray as text
@@ -31,6 +32,13 @@ void PrintTo(ResultCode val, ::std::ostream* os);
 
 } // namespace api
 } // namespace cdb
+
+namespace db {
+
+void PrintTo(const DBResult val, ::std::ostream* os);
+
+} // namespace db
+
 } // namespace nx
 
 namespace std {

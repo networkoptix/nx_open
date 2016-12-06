@@ -50,13 +50,10 @@ public:
      */
     void cancel(RequestId requestId, bool waitForRunningHandlerCompletion);
 
-    /**
-     * @return true if at least one resolve operation is scheduled with reqID.
-     */
     bool isRequestIdKnown(RequestId requestId) const;
 
-    /** Has even greater priority than /etc/hosts. */
     // TODO: #ak following two methods do not belong here.
+    /** Has even greater priority than /etc/hosts. */
     void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
     void removeEtcHost(const QString& name);
 

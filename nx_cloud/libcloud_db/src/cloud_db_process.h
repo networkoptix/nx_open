@@ -62,8 +62,7 @@ class ConnectionManager;
 }   // namespace ec2
 class MaintenanceManager;
 
-class CloudDBProcess
-:
+class CloudDBProcess:
     public QnStoppable
 {
 public:
@@ -81,8 +80,7 @@ public:
 
 private:
     template<typename ManagerType>
-    class CustomHttpHandler
-        :
+    class CustomHttpHandler:
         public nx_http::AbstractHttpRequestHandler
     {
     public:
@@ -132,8 +130,6 @@ private:
 
     //following pointers are here for debugging convenience
     conf::Settings* m_settings;
-    nx::db::AsyncSqlQueryExecutor* m_dbManager;
-    nx::utils::TimerManager* m_timerManager;
     AbstractEmailManager* m_emailManager;
     StreeManager* m_streeManager;
     nx_http::MessageDispatcher* m_httpMessageDispatcher;
@@ -154,9 +150,6 @@ private:
         EventManager* const eventManager,
         ec2::ConnectionManager* const ec2ConnectionManager,
         MaintenanceManager* const maintenanceManager);
-    bool initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
-    bool configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
-    bool updateDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
 
     /** input & output */
     template<typename ManagerType, typename InputData, typename... OutputData>
@@ -188,7 +181,7 @@ private:
         ManagerType* manager);
 };
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
 
 #endif  //HOLE_PUNCHER_SERVICE_H

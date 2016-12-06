@@ -39,10 +39,7 @@ AsyncClient::~AsyncClient()
 
 void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
 {
-    QnMutexLocker lock( &m_mutex );
-    m_endpoint = std::move( endpoint );
-    m_useSsl = useSsl;
-    openConnectionImpl( &lock );
+    connect(std::move(endpoint), useSsl, nullptr);
 }
 
 bool AsyncClient::setIndicationHandler(
@@ -146,10 +143,12 @@ void AsyncClient::closeConnection(
     BaseConnectionType* connection)
 {
 	std::unique_ptr< BaseConnectionType > baseConnection;
+    decltype(m_onConnectionClosedHandler) onConnectionClosedHandler;
     {
         QnMutexLocker lock( &m_mutex );
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
+        onConnectionClosedHandler.swap(m_onConnectionClosedHandler);
     }
 
     if (baseConnection)
@@ -158,6 +157,28 @@ void AsyncClient::closeConnection(
     NX_ASSERT( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
+
+    if (onConnectionClosedHandler)
+        onConnectionClosedHandler(errorCode);
+}
+
+void AsyncClient::setOnConnectionClosedHandler(
+    OnConnectionClosedHandler onConnectionClosedHandler)
+{
+    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
+}
+
+void AsyncClient::connect(
+    SocketAddress endpoint,
+    bool useSsl,
+    ConnectCompletionHandler completionHandler)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_endpoint = std::move(endpoint);
+    m_useSsl = useSsl;
+    NX_ASSERT(!m_connectCompletionHandler);
+    m_connectCompletionHandler = std::move(completionHandler);
+    openConnectionImpl(&lock);
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
@@ -212,7 +233,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 }
 
 void AsyncClient::closeConnectionImpl(
-        QnMutexLockerBase* lock, SystemError::ErrorCode code)
+    QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
     auto connectingSocket = std::move(m_connectingSocket);
     auto requestQueue = std::move(m_requestQueue);
@@ -279,7 +300,17 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
 
 void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
+    ConnectCompletionHandler connectCompletionHandler;
+    const auto executeOnConnectedHandlerGuard = makeScopedGuard(
+        [&connectCompletionHandler, code]()
+        {
+            if (connectCompletionHandler)
+                connectCompletionHandler(code);
+        });
+
     QnMutexLocker lock( &m_mutex );
+    connectCompletionHandler.swap(m_connectCompletionHandler);
+
     if( m_state == State::terminated )
         return;
 

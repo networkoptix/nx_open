@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <memory>
 
-#include <QtCore/QMutexLocker>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <api/global_settings.h>
@@ -39,11 +38,15 @@ DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_readBuf( new char[READ_BUF_CAPACITY] ),
-    m_terminated( false )
+    m_terminated( false ),
+    m_needToUpdateReceiveSocket(false)
 {
-    m_timerID = nx::utils::TimerManager::instance()->addTimer(
-        this,
-        std::chrono::milliseconds(m_discoverTryTimeoutMS));
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+            this,
+            std::chrono::milliseconds(m_discoverTryTimeoutMS));
+    }
     m_cacheTimer.start();
 
     NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
@@ -64,7 +67,7 @@ void DeviceSearcher::pleaseStop()
 {
     //stopping dispatching discover packets
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
     //m_timerID cannot be changed after m_terminated set to true
@@ -80,6 +83,10 @@ void DeviceSearcher::pleaseStop()
         it->second.sock->pleaseStopSync();
     }
     m_socketList.clear();
+
+    auto socket = std::move(m_receiveSocket);
+    if (socket)
+        socket->pleaseStopSync();
 
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
@@ -145,7 +152,7 @@ void DeviceSearcher::unregisterHandler( SearchHandler* handler, const QString& d
 
 void DeviceSearcher::saveDiscoveredDevicesSnapshot()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_discoveredDevicesToProcess.swap( m_discoveredDevices );
     m_discoveredDevices.clear();
 }
@@ -189,7 +196,7 @@ void DeviceSearcher::onTimer( const quint64& /*timerID*/ )
 {
     dispatchDiscoverPackets();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( !m_terminated )
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
             this, std::chrono::milliseconds(m_discoverTryTimeoutMS) );
@@ -205,22 +212,32 @@ void DeviceSearcher::onSomeBytesRead(
     {
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
-            QMutexLocker lk( &m_mutex );
-            //removing socket from m_socketList
-            for( map<QString, SocketReadCtx>::iterator
-                it = m_socketList.begin();
-                it != m_socketList.end();
-                ++it )
+            QnMutexLocker lk( &m_mutex );
+            if (m_terminated)
+                return;
+
+            if (sock == m_receiveSocket.get())
             {
-                if( it->second.sock.get() == sock )
+                m_needToUpdateReceiveSocket = true;
+            }
+            else
+            {
+                //removing socket from m_socketList
+                for (auto it = m_socketList.begin(); it != m_socketList.end(); ++it )
                 {
-                    udpSock = std::move(it->second.sock);
-                    m_socketList.erase( it );
-                    break;
+                    if( it->second.sock.get() == sock )
+                    {
+                        udpSock = std::move(it->second.sock);
+                        m_socketList.erase( it );
+                        break;
+                    }
                 }
             }
         }
-        udpSock->pleaseStopSync();
+
+        if (udpSock)
+            udpSock->pleaseStopSync();
+
         return;
     }
 
@@ -287,13 +304,67 @@ void DeviceSearcher::dispatchDiscoverPackets()
     }
 }
 
+bool DeviceSearcher::needToUpdateReceiveSocket() const
+{
+    auto ifaces = getAllIPv4Interfaces().toSet();
+    bool changed = ifaces != m_interfacesCache;
+
+    if (changed)
+        m_interfacesCache = ifaces;
+
+    return changed || m_needToUpdateReceiveSocket;
+}
+
+nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocketUnsafe()
+{
+    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
+
+    auto oldSock = std::move(m_receiveSocket);
+
+    m_receiveSocket.reset(new UDPSocket(AF_INET));
+
+    m_receiveSocket->setNonBlockingMode(true);
+    m_receiveSocket->setReuseAddrFlag(true);
+    m_receiveSocket->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
+    m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
+
+    for(const auto iface: getAllIPv4Interfaces())
+        m_receiveSocket->joinGroup( groupAddress.toString(), iface.address.toString() );
+
+    m_receiveSocket->readSomeAsync(
+        &m_receiveBuffer,
+        std::bind(
+            &DeviceSearcher::onSomeBytesRead,
+            this,
+            m_receiveSocket.get(),
+            std::placeholders::_1,
+            &m_receiveBuffer,
+            std::placeholders::_2 ) );
+
+    m_needToUpdateReceiveSocket = false;
+
+    return oldSock;
+}
+
 std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
+
+    nx::utils::AtomicUniquePtr<AbstractDatagramSocket> oldSock;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        if(needToUpdateReceiveSocket())
+            oldSock = updateReceiveSocketUnsafe();
+    }
+
+    if (oldSock)
+        oldSock->pleaseStopSync(true);
+
     const QString& localAddress = iface.address.toString();
 
     pair<map<QString, SocketReadCtx>::iterator, bool> p;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         p = m_socketList.insert( make_pair( localAddress, SocketReadCtx() ) );
     }
     if( !p.second )
@@ -308,8 +379,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
     if (!sock->setNonBlockingMode( true ) ||
         !sock->setReuseAddrFlag( true ) ||
-        !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
-        !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
+        !sock->bind( SocketAddress(localAddress) ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ))
     {
@@ -345,7 +415,7 @@ void DeviceSearcher::startFetchDeviceXml(
     nx_http::AsyncHttpClientPtr httpClient;
     //checking, whether new http request is needed
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         //checking upnp description cache
         const UPNPDescriptionCacheItem* cacheItem = findDevDescriptionInCache( uuidStr );
@@ -398,7 +468,7 @@ void DeviceSearcher::processDeviceXml(
     devInfoFull.xmlDevInfo = foundDeviceDescription;
     devInfoFull.devInfo = xmlHandler.deviceInfo();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_discoveredDevices.emplace( devInfo.deviceAddress, devInfoFull );
     updateItemInCache( std::move(devInfoFull) );
 }
@@ -482,7 +552,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
 {
     DiscoveredDeviceInfo* ctx = NULL;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         HttpClientsDict::iterator it = m_httpClients.find( httpClient );
         if (it == m_httpClients.end())
             return;
@@ -497,7 +567,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
         processDeviceXml( *ctx, msgBody );
     }
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_terminated )
         return;
     httpClient->pleaseStopSync();
