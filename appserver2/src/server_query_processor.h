@@ -22,6 +22,37 @@ namespace ec2 {
 
 namespace detail {
 
+namespace aux {
+template<typename Handler>
+struct ScopeHandlerGuard
+{
+    const ErrorCode *ecode;
+    Handler handler;
+
+    ScopeHandlerGuard(const ErrorCode *ecode, Handler handler):
+        ecode(ecode),
+        handler(std::move(handler))
+    {}
+
+    ScopeHandlerGuard(const ScopeHandlerGuard<Handler>&) = delete;
+    ScopeHandlerGuard<Handler>& operator=(const ScopeHandlerGuard<Handler>&) = delete;
+
+    ScopeHandlerGuard(ScopeHandlerGuard<Handler>&&) = default;
+    ScopeHandlerGuard<Handler>& operator=(ScopeHandlerGuard<Handler>&&) = default;
+
+    ~ScopeHandlerGuard()
+    {
+        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
+    }
+};
+
+template<typename Handler>
+ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler handler)
+{
+    return ScopeHandlerGuard<Handler>(&errorCode, handler); 
+}
+}
+
 class ServerQueryProcessor;
 
 struct PostProcessTransactionFunction
@@ -272,6 +303,9 @@ public:
     }
 
 private:
+    static PostProcessList& getStaticPostProcessList();
+    static QnMutex& getStaticUpdateMutex();
+
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
      *     PostProcessList*)
@@ -283,19 +317,12 @@ private:
         SyncFunctionType syncFunction)
     {
         ErrorCode errorCode = ErrorCode::ok;
-        auto SCOPED_GUARD_FUNC =
-            [&errorCode, &completionHandler](ServerQueryProcessor*)
-            {
-                QnConcurrent::run(
-                    Ec2ThreadPool::instance(), std::bind(completionHandler, errorCode));
-            };
-        std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD(
-            this, SCOPED_GUARD_FUNC);
+        auto scopeGuard = aux::createScopeHandlerGuard(errorCode, completionHandler);
 
-        static PostProcessList transactionsPostProcessList;
+        PostProcessList& transactionsPostProcessList = getStaticPostProcessList();
+        QnMutex& updateDataMutex = getStaticUpdateMutex();
         // Starting transaction.
         {
-            static QnMutex updateDataMutex;
             QnMutexLocker lock(&updateDataMutex);
             std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
             PostProcessList localPostProcessList;

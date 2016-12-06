@@ -17,6 +17,7 @@
 
 namespace nx {
 namespace db {
+namespace test {
 
 //-------------------------------------------------------------------------------------------------
 // DbRequestExecutionThreadTestWrapper
@@ -49,7 +50,7 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// AsyncSqlQueryExecutorTest
+// AsyncSqlQueryExecutor
 
 class DbConnectionEventsReceiver
 {
@@ -59,26 +60,27 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-// AsyncSqlQueryExecutorTest
+// AsyncSqlQueryExecutor
 
 constexpr int kDefaultMaxConnectionCount = 10;
 
-class AsyncSqlQueryExecutorTest:
+class AsyncSqlQueryExecutor:
     public test::BaseDbTest
 {
 public:
-    AsyncSqlQueryExecutorTest():
+    AsyncSqlQueryExecutor():
         m_eventsReceiver(nullptr)
     {
         using namespace std::placeholders;
         RequestExecutorFactory::setFactoryFunc(
-            std::bind(&AsyncSqlQueryExecutorTest::createConnection, this, _1, _2));
+            std::bind(&AsyncSqlQueryExecutor::createConnection, this, _1, _2));
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
     }
 
-    ~AsyncSqlQueryExecutorTest()
+    ~AsyncSqlQueryExecutor()
     {
+        RequestExecutorFactory::setFactoryFunc(nullptr);
     }
 
     void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
@@ -147,18 +149,18 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (sql_record),
     _Fields)
 
-TEST_F(AsyncSqlQueryExecutorTest, able_to_execute_query)
+TEST_F(AsyncSqlQueryExecutor, able_to_execute_query)
 {
     initializeDatabase();
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('NetworkOptix', 2010)");
     const auto companies = executeSelect<Company>("SELECT * FROM company");
 
-    ASSERT_EQ(1, companies.size());
+    ASSERT_EQ(1U, companies.size());
     ASSERT_EQ("NetworkOptix", companies[0].name);
     ASSERT_EQ(2010, companies[0].yearFounded);
 }
 
-TEST_F(AsyncSqlQueryExecutorTest, db_connection_reopens_after_error)
+TEST_F(AsyncSqlQueryExecutor, db_connection_reopens_after_error)
 {
     DbConnectionEventsReceiver connectionEventsReceiver;
     setConnectionEventsReceiver(&connectionEventsReceiver);
@@ -176,7 +178,7 @@ TEST_F(AsyncSqlQueryExecutorTest, db_connection_reopens_after_error)
     closeDatabase();
 }
 
-TEST_F(AsyncSqlQueryExecutorTest, db_connection_does_not_reopen_after_recoverable_error)
+TEST_F(AsyncSqlQueryExecutor, db_connection_does_not_reopen_after_recoverable_error)
 {
     DbConnectionEventsReceiver connectionEventsReceiver;
     setConnectionEventsReceiver(&connectionEventsReceiver);
@@ -194,7 +196,7 @@ TEST_F(AsyncSqlQueryExecutorTest, db_connection_does_not_reopen_after_recoverabl
     closeDatabase();
 }
 
-TEST_F(AsyncSqlQueryExecutorTest, many_recoverable_errors_in_a_row_cause_reconnect)
+TEST_F(AsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect)
 {
     connectionOptions().maxErrorsInARowBeforeClosingConnection = 10;
 
@@ -215,5 +217,6 @@ TEST_F(AsyncSqlQueryExecutorTest, many_recoverable_errors_in_a_row_cause_reconne
     closeDatabase();
 }
 
+} // namespace test
 } // namespace db
 } // namespace nx

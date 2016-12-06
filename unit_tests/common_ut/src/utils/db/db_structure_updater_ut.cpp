@@ -186,7 +186,7 @@ private:
         BaseType::initializeDatabase();
 
         // Creating initial structure.
-        db::DBStructureUpdater updater(asyncSqlQueryExecutor().get());
+        nx::db::DBStructureUpdater updater(asyncSqlQueryExecutor().get());
         ASSERT_TRUE(updater.updateStructSync());
     }
 

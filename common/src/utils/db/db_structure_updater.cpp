@@ -189,25 +189,41 @@ DBResult DBStructureUpdater::createInitialSchema(
 }
 
 DBResult DBStructureUpdater::applyScriptsMissingInCurrentDb(
-    nx::db::QueryContext* const queryContext,
-    DbSchemaState* const dbState)
+    nx::db::QueryContext* queryContext,
+    DbSchemaState* dbState)
 {
-    for (;
-        static_cast<size_t>(dbState->version) < (m_initialVersion + m_updateScripts.size());
-        ++dbState->version)
+    while (gotScriptForUpdate(dbState))
     {
-        NX_LOGX(lm("Updating structure to version %1")
-            .arg(dbState->version)/*.arg(m_updateScripts[dbState->version - m_initialVersion].sqlScript)*/,
-            cl_logDEBUG2);
-
-        if (!execDbUpdate(m_updateScripts[dbState->version - m_initialVersion], queryContext))
-        {
-            NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2")
-                .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
-                cl_logWARNING);
-            return DBResult::ioError;
-        }
+        const auto dbResult = applyNextUpdateScript(queryContext, dbState);
+        if (dbResult != DBResult::ok)
+            return dbResult;
     }
+
+    return DBResult::ok;
+}
+
+bool DBStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
+{
+    return static_cast<size_t>(dbState->version) < (m_initialVersion + m_updateScripts.size());
+}
+
+DBResult DBStructureUpdater::applyNextUpdateScript(
+    nx::db::QueryContext* queryContext,
+    DbSchemaState* dbState)
+{
+    NX_LOGX(lm("Updating structure to version %1")
+        .arg(dbState->version)/*.arg(m_updateScripts[dbState->version - m_initialVersion].sqlScript)*/,
+        cl_logDEBUG2);
+
+    if (!execDbUpdate(m_updateScripts[dbState->version - m_initialVersion], queryContext))
+    {
+        NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2")
+            .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
+            cl_logWARNING);
+        return DBResult::ioError;
+    }
+
+    ++dbState->version;
 
     return DBResult::ok;
 }

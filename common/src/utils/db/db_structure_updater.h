@@ -92,8 +92,14 @@ private:
         DbSchemaState* dbSchemaState);
 
     DBResult applyScriptsMissingInCurrentDb(
-        nx::db::QueryContext* const queryContext,
-        DbSchemaState* const dbState);
+        nx::db::QueryContext* queryContext,
+        DbSchemaState* dbState);
+
+    bool gotScriptForUpdate(DbSchemaState* dbState) const;
+
+    DBResult applyNextUpdateScript(
+        nx::db::QueryContext* queryContext,
+        DbSchemaState* dbState);
 
     DBResult updateDbVersion(
         nx::db::QueryContext* const queryContext,

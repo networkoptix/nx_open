@@ -4567,12 +4567,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
         return ErrorCode::failure;
     }
 
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if (localInfo.data.prematureLicenseExperationDate != tran.params.time) {
-        localInfo.data.prematureLicenseExperationDate = tran.params.time;
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-    }
-
     return ErrorCode::ok;
 }
 
