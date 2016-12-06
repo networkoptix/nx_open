@@ -42,10 +42,10 @@ namespace
         {
             MultiServerPeriodDataList remoteData;
             bool success = false;
-            if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
+            if(osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
                 remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
 
-            ctx->executeGuarded([ctx, success, remoteData, &outputData]()
+            ctx->executeGuarded([ctx, success, &remoteData, &outputData]()
             {
                 if (success && !remoteData.empty())
                     outputData.push_back(std::move(remoteData.front()));
@@ -72,7 +72,7 @@ namespace
         record.periods = QnChunksRequestHelper::load(ctx->request());
 
         if (!record.periods.empty()) {
-            ctx->executeGuarded([&outputData, record]()
+            ctx->executeGuarded([&outputData, &record]()
             {
                 outputData.push_back(std::move(record));
             });
