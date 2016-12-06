@@ -100,6 +100,7 @@ private:
     bool isStopping() const;
     void migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+    void performActionsOnExit();
 
 private:
     int m_argc;
