@@ -1075,6 +1075,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param item.flags Should have fixed value.
      *     %value 0
      * %param item.left Left coordinate of the layout item (floating-point).
+     * %param item.top Top coordinate of the layout item (floating-point).
      * %param item.right Right coordinate of the layout item (floating-point).
      * %param item.bottom Bottom coordinate of the layout item (floating-point).
      * %param item.rotation Degree of image tilt; a positive value rotates
@@ -1141,6 +1142,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param item.flags Should have fixed value.
      *     %value 0
      * %param item.left Left coordinate of the layout item (floating-point).
+     * %param item.top Top coordinate of the layout item (floating-point).
      * %param item.right Right coordinate of the layout item (floating-point).
      * %param item.bottom Bottom coordinate of the layout item (floating-point).
      * %param item.rotation Degree of image tilt; a positive value rotates

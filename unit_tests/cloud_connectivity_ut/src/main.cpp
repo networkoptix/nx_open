@@ -1,3 +1,4 @@
+#include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 
 #define USE_GMOCK
@@ -9,6 +10,12 @@ int main(int argc, char **argv)
         argc, argv,
         [](const nx::utils::ArgumentParser&)
         {
+            const auto sslCert = nx::network::SslEngine::makeCertificateAndKey(
+                "cloud_connectivity_ut", "US", "Network Optix");
+
+            NX_CRITICAL(!sslCert.isEmpty());
+            nx::network::SslEngine::useCertificateAndPkey(sslCert);
+
             nx::network::SocketGlobals::mediatorConnector().mockupAddress(
                 SocketAddress::anyAddress);
         });

@@ -116,7 +116,7 @@ int runUi(QGuiApplication *application) {
     engine.rootContext()->setContextObject(&context);
 
     QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
-    QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
+    QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
@@ -146,7 +146,7 @@ int runUi(QGuiApplication *application) {
 
     prepareWindow();
     std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
-        mainWindow.data()));
+        mainWindow));
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     if (maxFfmpegResolution.isEmpty())

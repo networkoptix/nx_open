@@ -164,10 +164,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this, controller = m_statusController]()
+        [this, controller = m_statusController](bool animated)
         {
             const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
-            setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, true);
+            setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, animated);
         });
 
     addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
@@ -823,7 +823,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const
 
 void QnResourceWidget::updateStatusOverlay()
 {
-    m_statusController->setStatusOverlay(calculateStatusOverlay());
+    m_statusController->setStatusOverlay(calculateStatusOverlay(), true);
 }
 
 void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)

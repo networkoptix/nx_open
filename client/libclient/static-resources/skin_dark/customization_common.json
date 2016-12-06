@@ -196,7 +196,6 @@
     "QComboBox": {
         "palette": {
             "default": {
-                "midlight":         "transparent",
                 "highlight":        "brand_d1"
             }
         }
@@ -525,7 +524,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "dark5.setAlpha(230)",
+            "window": "dark5.setAlpha(217)",
             "windowText": "#801010c0"
         }}
     },

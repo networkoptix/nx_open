@@ -47,7 +47,7 @@ void TransactionLogReader::readTransactions(
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
-                std::vector<TransactionLogRecord> serializedTransactions,
+                std::vector<dao::TransactionLogRecord> serializedTransactions,
                 ::ec2::QnTranState readedUpTo) mutable
         {
             const auto locker = sharedGuard->lock();
@@ -74,7 +74,7 @@ void TransactionLogReader::readTransactions(
 
 void TransactionLogReader::onTransactionsRead(
     api::ResultCode resultCode,
-    std::vector<TransactionLogRecord> serializedTransactions,
+    std::vector<dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo,
     TransactionsReadHandler completionHandler)
 {

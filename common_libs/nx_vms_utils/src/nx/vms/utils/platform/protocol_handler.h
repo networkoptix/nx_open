@@ -24,7 +24,7 @@ NX_VMS_UTILS_API bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
-    const QString& macOsBundleId,
+    const QString& macHandlerBundleIdBase,
     const QString& description,
     const QString& customization,
     const nx::utils::SoftwareVersion& version);

@@ -51,7 +51,7 @@ private:
 
     void onTransactionsRead(
         api::ResultCode resultCode,
-        std::vector<TransactionLogRecord> serializedTransactions,
+        std::vector<dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo,
         TransactionsReadHandler completionHandler);
 };

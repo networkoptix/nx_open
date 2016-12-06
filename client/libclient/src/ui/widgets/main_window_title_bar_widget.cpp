@@ -73,6 +73,7 @@ public:
     QnCloudStatusPanel* cloudPanel;
     QnResourceList dropResources;
     bool skipDoubleClickFlag;
+    QSharedPointer<QMenu> mainMenuHolder;
 };
 
 QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
@@ -85,7 +86,8 @@ QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
     newTabButton(nullptr),
     currentLayoutsButton(nullptr),
     cloudPanel(nullptr),
-    skipDoubleClickFlag(false)
+    skipDoubleClickFlag(false),
+    mainMenuHolder()
 {
 }
 
@@ -115,10 +117,10 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->mainMenuButton, &QnToolButton::justPressed, this,
         [this]()
         {
-            Q_D(const QnMainWindowTitleBarWidget);
+            Q_D(QnMainWindowTitleBarWidget);
             static const QPoint kVerticalOffset(0, 2);
-            QScopedPointer<QMenu> mainMenu(menu()->newMenu(Qn::MainScope, nullptr));
-            executeButtonMenu(d->mainMenuButton, mainMenu.data(), kVerticalOffset);
+            d->mainMenuHolder.reset(menu()->newMenu(Qn::MainScope, nullptr));
+            executeButtonMenu(d->mainMenuButton, d->mainMenuHolder.data(), kVerticalOffset);
         });
 
     d->tabBar = new QnLayoutTabBar(this);

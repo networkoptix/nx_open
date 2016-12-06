@@ -268,7 +268,7 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     for (int i = 0; i < kIterations; ++i)
     {
         // blur A->B, B->A several times
-        const float blurStep = (kIterations - i - 1) * m_blurFactor;
+        const float blurStep = (kIterations - i - 1) * m_blurFactor * 1.2;
         const QVector2D textureOffset(
             1.0 / kMaxBlurSize * blurStep,
             1.0 / kMaxBlurSize * blurStep);

@@ -644,6 +644,13 @@ ALTER TABLE system ADD COLUMN opaque VARCHAR(1024) NULL;
 
 )sql";
 
+static const char kDropGlobalTransactionSequenceTable[] =
+R"sql(
+
+DROP TABLE cloud_db_transaction_sequence;
+
+)sql";
+
 /**
  * #VMS-4425. Rename user group - > user role.
  */
@@ -685,15 +692,65 @@ UPDATE system_to_account SET is_enabled = 1 WHERE is_enabled IS NULL;
 )sql";
 
 /**
- * TODO in #CLOUD-737
+ * #CLOUD-737 Dropping duplicate account<->system records and restoring unique index.
+ * Sqlite specific script.
  */
-//static const char kRestoreSystemToAccountReferenceUniqueness[] =
-//R"sql(
-//
-//CREATE UNIQUE INDEX system_to_account_primary
-//ON system_to_account (account_id, system_id);
-//
-//)sql";
+static const char kRestoreSystemToAccountReferenceUniquenessSqlite[] =
+R"sql(
+
+DELETE FROM system_to_account WHERE rowid NOT IN 
+(SELECT MAX(rowid) FROM system_to_account GROUP BY account_id, system_id);
+
+CREATE UNIQUE INDEX system_to_account_primary
+ON system_to_account (account_id, system_id);
+
+)sql";
+
+/**
+ * #CLOUD-737 Dropping duplicate account<->system records and restoring unique index.
+ * MySql specific script.
+ */
+static const char kRestoreSystemToAccountReferenceUniquenessMySql[] =
+R"sql(
+
+CREATE TABLE system_to_account_temp (
+    id                          INTEGER,
+    account_id                  VARCHAR(64) NOT NULL,
+    system_id                   VARCHAR(64) NOT NULL,
+    access_role_id              INTEGER NOT NULL,
+    user_role_id                VARCHAR(64) NULL,
+    custom_permissions          VARCHAR(1024) NULL,
+    is_enabled                  INTEGER NULL,
+    vms_user_id                 VARCHAR(64) NULL,
+    last_login_time_utc         BIGINT,
+    usage_frequency             FLOAT
+);
+
+INSERT into system_to_account_temp (id, account_id, system_id, access_role_id, user_role_id, custom_permissions, is_enabled, vms_user_id, last_login_time_utc, usage_frequency)
+SELECT @rowid:=@rowid+1 as id, account_id, system_id, access_role_id, user_role_id, custom_permissions, is_enabled, vms_user_id, last_login_time_utc, usage_frequency
+FROM system_to_account, (SELECT @rowid:=0) as init;
+
+CREATE table system_to_account_temp_id_to_keep (id INTEGER);
+
+INSERT INTO system_to_account_temp_id_to_keep (SELECT MAX(s1.id) FROM system_to_account_temp s1 GROUP BY s1.account_id, s1.system_id);
+
+DELETE FROM system_to_account_temp WHERE id NOT IN 
+(SELECT id FROM system_to_account_temp_id_to_keep);
+
+DELETE FROM system_to_account;
+
+INSERT into system_to_account (account_id, system_id, access_role_id, user_role_id, custom_permissions, is_enabled, vms_user_id, last_login_time_utc, usage_frequency)
+SELECT account_id, system_id, access_role_id, user_role_id, custom_permissions, is_enabled, vms_user_id, last_login_time_utc, usage_frequency
+FROM system_to_account_temp;
+
+DROP TABLE system_to_account_temp;
+DROP TABLE system_to_account_temp_id_to_keep;
+
+
+CREATE UNIQUE INDEX system_to_account_primary
+ON system_to_account (account_id, system_id);
+
+)sql";
 
 } // namespace db
 } // namespace cdb

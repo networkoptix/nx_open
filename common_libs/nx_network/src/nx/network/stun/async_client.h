@@ -1,13 +1,13 @@
 #pragma once
 
+#include <map>
+
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/utils/thread/mutex.h>
-
-#include <map>
 
 namespace nx {
 namespace stun {
@@ -20,33 +20,36 @@ typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
 /**
  * Connects to STUN server, sends requests, receives responses and indications
  */
-class NX_NETWORK_API AsyncClient
-:
+class NX_NETWORK_API AsyncClient:
     public AbstractAsyncClient,
     public StreamConnectionHolder<MessagePipeline>
 {
 public:
     typedef MessagePipeline BaseConnectionType;
-
     typedef BaseConnectionType ConnectionType;
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectCompletionHandler;
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
 
     AsyncClient(Settings timeouts = kDefaultSettings);
     ~AsyncClient() override;
 
     Q_DISABLE_COPY( AsyncClient );
 
-    void connect(SocketAddress endpoint, bool useSsl = false) override;
-    bool setIndicationHandler(int method, IndicationHandler handler, void* client = 0) override;
-    void addOnReconnectedHandler(ReconnectHandler handler, void* client = 0) override;
-    void sendRequest(Message request, RequestHandler handler, void* client = 0) override;
-    SocketAddress localAddress() const override;
-    SocketAddress remoteAddress() const override;
-    void closeConnection(SystemError::ErrorCode errorCode) override;
-    void cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler) override;
+    virtual void connect(SocketAddress endpoint, bool useSsl = false) override;
+    virtual bool setIndicationHandler(
+        int method, IndicationHandler handler, void* client = 0) override;
+    virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = 0) override;
+    virtual void sendRequest(Message request, RequestHandler handler, void* client = 0) override;
+    virtual SocketAddress localAddress() const override;
+    virtual SocketAddress remoteAddress() const override;
+    virtual void closeConnection(SystemError::ErrorCode errorCode) override;
+    virtual void cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler) override;
 
-    /*! \note Required by \a nx_api::BaseServerConnection */
-    virtual void closeConnection(
-        SystemError::ErrorCode errorCode, BaseConnectionType* connection) override;
+    void setOnConnectionClosedHandler(OnConnectionClosedHandler onConnectionClosedHandler);
+    void connect(
+        SocketAddress endpoint,
+        bool useSsl, 
+        ConnectCompletionHandler completionHandler);
 
 private:
     enum class State
@@ -56,6 +59,9 @@ private:
         connected,
         terminated,
     };
+
+    virtual void closeConnection(
+        SystemError::ErrorCode errorCode, BaseConnectionType* connection) override;
 
     void openConnectionImpl(QnMutexLockerBase* lock);
     void closeConnectionImpl(QnMutexLockerBase* lock, SystemError::ErrorCode code);
@@ -80,6 +86,9 @@ private:
     std::map<int, std::pair<void*, IndicationHandler>> m_indicationHandlers;
     std::multimap<void*, ReconnectHandler> m_reconnectHandlers;
     std::map<Buffer, std::pair<void*, RequestHandler>> m_requestsInProgress;
+
+    OnConnectionClosedHandler m_onConnectionClosedHandler;
+    ConnectCompletionHandler m_connectCompletionHandler;
 };
 
 } // namespase stun

@@ -17,6 +17,7 @@
 class QnCounter;
 class QnResourceWidget;
 class QnResourceDisplay;
+typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnMediaResourceWidget;
 class QnArchiveSyncPlayWrapper;
 class QnWorkbenchRenderWatcher;
@@ -42,14 +43,14 @@ public:
     QnWorkbenchStreamSynchronizer(QObject *parent = NULL);
 
     /**
-     * Stops this stream synchronizer. 
+     * Stops this stream synchronizer.
      * When stopped, UTC video streams on the scene are not synchronized.
      */
     void stop();
 
     /**
-     * Starts this stream synchronizer. 
-     * 
+     * Starts this stream synchronizer.
+     *
      * \param timeUSec                  Starting time for all synchronizable streams, in microseconds since epoch.
      * \param speed                     Playback speed for all synchronizable streams.
      */
@@ -81,7 +82,7 @@ signals:
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_renderWatcher_displayChanged(QnResourceDisplay *display);
+    void at_renderWatcher_displayChanged(const QnResourceDisplayPtr& display);
 
     void at_workbench_currentLayoutChanged();
 

@@ -3,31 +3,34 @@
 
 #include <QtWidgets/QInputDialog>
 
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
 
-#include "common/common_module.h"
+#include <common/common_module.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
-
-#include "nx_ec/ec_api.h"
-#include "nx_ec/dummy_handler.h"
-
-#include "ui/help/help_topics.h"
-#include "ui/help/help_topic_accessor.h"
-#include <ui/common/read_only.h>
-#include "ui/models/resource/resource_list_model.h"
-#include "ui/models/server_addresses_model.h"
-#include "ui/style/custom_style.h"
-#include <ui/delegates/switch_item_delegate.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <core/resource/fake_media_server.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <nx/network/socket_common.h>
-#include "nx/utils/string.h"
-#include "utils/common/util.h"
-#include <core/resource/fake_media_server.h>
+#include <nx/utils/string.h>
+
+#include <nx_ec/ec_api.h>
+#include <nx_ec/dummy_handler.h>
+
+#include <ui/common/read_only.h>
+#include <ui/delegates/switch_item_delegate.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/models/resource/resource_list_model.h>
+#include <ui/models/server_addresses_model.h>
+#include <ui/style/custom_style.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
+
+#include <utils/common/event_processors.h>
+#include <utils/common/util.h>
 
 namespace {
+
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
@@ -78,7 +81,8 @@ namespace {
         for (const QUrl &url: server->getIgnoredUrls())
             ignoredUrls.insert(url);
     }
-}
+
+} // namespace
 
 class RoutingChange {
 public:
@@ -237,9 +241,19 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 
     updateUi();
+
+    /* Immediate selection screws up initial size, so update on 1st show: */
+    installEventHandler(this, QEvent::Show, this,
+        [this]()
+        {
+            if (!ui->serversView->currentIndex().isValid())
+                ui->serversView->setCurrentIndex(ui->serversView->model()->index(0, 0));
+        });
 }
 
-QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
+QnRoutingManagementWidget::~QnRoutingManagementWidget()
+{
+}
 
 void QnRoutingManagementWidget::loadDataToUi() {
     m_changes->changes.clear();

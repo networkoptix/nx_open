@@ -271,7 +271,11 @@ QImage QnCamDisplay::getScreenshot(const QnImageFilterHelper& imageProcessingPar
                     filters = imageProcessingParams.createFilterChain(QSize(frame->width, frame->height));
                 }
                 for(auto filter: filters)
+                {
                     frame = filter->updateImage(frame);
+                    if (!frame)
+                        break;
+                }
             }
         }
     }

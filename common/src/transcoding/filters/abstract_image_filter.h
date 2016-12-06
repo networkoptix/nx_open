@@ -4,6 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QRectF>
+#include <QSharedPointer>
 
 class CLVideoDecoderOutput;
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;

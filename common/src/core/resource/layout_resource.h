@@ -97,7 +97,13 @@ public:
     /** Check if layout is shared. */
     bool isShared() const;
 
+    /** Get all resources ids placed on the layout. */
+    QSet<QnUuid> layoutResourceIds() const;
+
+    /** Get all resources placed on the layout. WARNING: method is SLOW! */
     QSet<QnResourcePtr> layoutResources() const;
+
+    /** Get all resources placed on the layout. WARNING: method is SLOW! */
     static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
 
 signals:
