@@ -18,7 +18,7 @@ PREFIX=/opt/$CUSTOMIZATION/lite_client/
 BIN_NAME=mobile_client
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 PORT=$(cat /opt/networkoptix/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
-if [ -z "$PORT" ]; then $PORT=7001; fi
+if [ -z "$PORT" ]; then PORT=7001; fi
 echo connecting to $CUSTOMIZATION server on port $PORT...
 
 export LD_LIBRARY_PATH=$PREFIX/lib:/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
