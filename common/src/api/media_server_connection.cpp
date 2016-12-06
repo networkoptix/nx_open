@@ -115,10 +115,11 @@
     );
 
 namespace {
-    void trace(int handle, int obj, const QString& message = QString())
+    void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
     {
         RequestObject object = static_cast<RequestObject>(obj);
-        NX_LOG(lit("QnMediaServerConnection %1: %2 %3")
+        NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
+            .arg(serverId)
             .arg(handle)
             .arg(message)
             .arg(QnLexical::serialized(object)),
@@ -127,13 +128,12 @@ namespace {
 
 } // anonymous namespace
 
-
 // -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor
 // -------------------------------------------------------------------------- //
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle)
 {
-    trace(handle, object(), lit("Received reply"));
+    trace(m_serverId, handle, object(), lit("Received reply"));
 
     switch(object()) {
     case StorageStatusObject:
@@ -311,6 +311,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid &videowallGuid, bool enableOfflineRequests, QObject *parent):
     base_type(parent, mserver),
+    m_serverId(mserver->getId().toString()),
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
 {
@@ -320,12 +321,12 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     QnUuid guid = mserver->getOriginalGuid();
 
     QnRequestHeaderList queryParameters;
-	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
+	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), m_serverId);
 
     setExtraQueryParameters(queryParameters);
 
     QnRequestHeaderList extraHeaders;
-	extraHeaders.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), guid.isNull() ? mserver->getId().toString() : guid.toString());
+	extraHeaders.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), guid.isNull() ? m_serverId : guid.toString());
 
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
@@ -340,7 +341,7 @@ QnMediaServerConnection::~QnMediaServerConnection() {
 }
 
 QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object) {
-    return new QnMediaServerReplyProcessor(object);
+    return new QnMediaServerReplyProcessor(object, m_serverId);
 }
 
 bool QnMediaServerConnection::isReady() const {
@@ -378,6 +379,11 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
     int handle = sendAsyncPostRequest(object, headers, params, data, replyTypeName, target, slot);
     trace(handle, object);
     return handle;
+}
+
+void QnMediaServerConnection::trace(int handle, int obj, const QString& message /*= QString()*/)
+{
+    ::trace(m_serverId, handle, obj, message);
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const

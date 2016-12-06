@@ -24,9 +24,13 @@ namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
     static const size_t TcpConnectTimeoutMs   = 5 * 1000;
 
-    void trace(int handle, const QString& message)
+    void trace(const QString& serverId, int handle, const QString& message)
     {
-        NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
+        NX_LOG(lit("rest::ServerConnection %1 <%2>: %3")
+            .arg(serverId)
+            .arg(handle)
+            .arg(message),
+            cl_logDEBUG1);
     }
 }
 
@@ -87,6 +91,11 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
             return server;
     }
     return QnMediaServerResourcePtr(); //< no internet access found
+}
+
+void ServerConnection::trace(int handle, const QString& message) const
+{
+    ::trace(m_serverId.toString(), handle, message);
 }
 
 Handle ServerConnection::getStatisticsSettingsAsync(
@@ -190,20 +199,25 @@ Handle ServerConnection::executePost(const QString& path,
 }
 
 template <typename ResultType>
-void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool success, const Handle& id, const ResultType& result)
+void invoke(REST_CALLBACK(ResultType) callback,
+            QThread* targetThread,
+            bool success,
+            const Handle& id,
+            const ResultType& result,
+            const QString &serverId
+            )
 {
+    trace(serverId, id, lit("Reply %1").arg(success));
     if (targetThread)
     {
         executeDelayed(
         [callback, success, id, result]
         {
-            trace(id, lit("Reply"));
             callback(success, id, result);
         }, 0, targetThread);
     }
     else
     {
-        trace(id, lit("Reply"));
         callback(success, id, result);
     }
 }
@@ -211,17 +225,20 @@ void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool succ
 template <typename ResultType>
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
+    const QString serverId = m_serverId.toString();
     if (callback)
-        return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
-    {
-        bool success = false;
-        ResultType result;
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok) {
-            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
-            result = parseMessageBody<ResultType>(format, msgBody, &success);
-        }
-        invoke(callback, targetThread, success, id, result);
-    });
+        return sendRequest(request,
+        [callback, targetThread, serverId]
+        (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+        {
+            bool success = false;
+            ResultType result;
+            if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok) {
+                Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
+                result = parseMessageBody<ResultType>(format, msgBody, &success);
+            }
+            invoke(callback, targetThread, success, id, result, serverId);
+        });
 
     return sendRequest(request);
 }
@@ -230,17 +247,20 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QB
 {
     if (callback)
     {
+        const QString serverId = m_serverId.toString();
         QPointer<QThread> targetThreadGuard(targetThread);
-        return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
-        {
-            Q_UNUSED(contentType)
-            bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        return sendRequest(request,
+            [callback, targetThread, targetThreadGuard, serverId]
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+            {
+                Q_UNUSED(contentType)
+                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
 
-            if (targetThread && targetThreadGuard.isNull())
-                return;
+                if (targetThread && targetThreadGuard.isNull())
+                    return;
 
-            invoke(callback, targetThread, success, id, msgBody);
-        });
+                invoke(callback, targetThread, success, id, msgBody, serverId);
+            });
     }
 
     return sendRequest(request);
@@ -250,16 +270,19 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Em
 {
     if (callback)
     {
+        const QString serverId = m_serverId.toString();
         QPointer<QThread> targetThreadGuard(targetThread);
-        return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
-        {
-            bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        return sendRequest(request,
+            [callback, targetThread, targetThreadGuard, serverId]
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+            {
+                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
 
-            if (targetThread && targetThreadGuard.isNull())
-                return;
+                if (targetThread && targetThreadGuard.isNull())
+                    return;
 
-            invoke(callback, targetThread, success, id, EmptyResponseType());
-        });
+                invoke(callback, targetThread, success, id, EmptyResponseType(), serverId);
+            });
     }
 
     return sendRequest(request);
