@@ -259,7 +259,7 @@ APPLY(211, getStatusList, ApiResourceStatusDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(212, removeResources, ApiIdDataList, \
