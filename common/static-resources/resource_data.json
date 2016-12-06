@@ -223,6 +223,12 @@
             "forceSingleStream": true
         },
         {
+            "keys":[
+                "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
