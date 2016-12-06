@@ -131,9 +131,16 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor
 // -------------------------------------------------------------------------- //
+QnMediaServerReplyProcessor::QnMediaServerReplyProcessor(int object, const QString& serverId):
+    QnAbstractReplyProcessor(object),
+    m_serverId(serverId)
+{
+    timer.start();
+}
+
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle)
 {
-    trace(m_serverId, handle, object(), lit("Received reply"));
+    trace(m_serverId, handle, object(), lit("Received reply (%1ms)").arg(timer.elapsed()));
 
     switch(object()) {
     case StorageStatusObject:
