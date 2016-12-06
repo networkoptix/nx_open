@@ -17,11 +17,8 @@
 #include <utils/common/scoped_timer.h>
 
 namespace {
-    /** Live queries should be updated once in a time even if data is actual. */
-    const int updateLiveBookmarksTimeoutMs = 10000;
-
     /** Each query can be updated no more often than once in that period. */
-    const int minimimumRequestTimeoutMs = 3000;
+    const int minimimumRequestTimeoutMs = 10000;
 
     /** Timer precision to update all queries. */
     const int queriesCheckTimoutMs = 1000;
@@ -29,7 +26,8 @@ namespace {
     /** Reserved value for invalid requests. */
     const int invalidRequestId = 0;
 
-    const int pendingDiscardTimeout = updateLiveBookmarksTimeoutMs;
+    /** Cache of bookmarks we have just added or removed. */
+    const int pendingDiscardTimeout = 30000;
 }
 
 namespace {
@@ -261,10 +259,8 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
     case QueryInfo::QueryState::Queued:
         return !info.requestTimer.isValid() || info.requestTimer.hasExpired(minimimumRequestTimeoutMs) || !query->isValid();
     case QueryInfo::QueryState::Requested:
-        return false;
     case QueryInfo::QueryState::Actual:
         return false;
-        //(query->filter().endTimeMs > qnSyncTime->currentMSecsSinceEpoch()) && info.requestTimer.hasExpired(updateLiveBookmarksTimeoutMs);
     default:
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;

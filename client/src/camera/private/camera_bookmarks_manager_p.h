@@ -13,7 +13,7 @@ class QnCameraBookmarksManagerPrivate : public Connective<QObject> {
     typedef Connective<QObject> base_type;
 public:
     QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent);
-    
+
     virtual ~QnCameraBookmarksManagerPrivate();
 
     /* Direct API section */
@@ -165,5 +165,7 @@ private:
         PendingInfo(const QnUuid &bookmarkId, Type type);
     };
 
+    /* Cache for case when we have sent getBookmarks request and THEN added/removed a bookmark
+     * locally. So when we've got reply for getBookmarks, we may fix it correspondingly. */
     QHash<QnUuid, PendingInfo> m_pendingBookmarks;
 };
