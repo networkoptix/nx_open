@@ -41,9 +41,12 @@ DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_terminated( false ),
     m_needToUpdateReceiveSocket(false)
 {
-    m_timerID = nx::utils::TimerManager::instance()->addTimer(
-        this,
-        std::chrono::milliseconds(m_discoverTryTimeoutMS));
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+            this,
+            std::chrono::milliseconds(m_discoverTryTimeoutMS));
+    }
     m_cacheTimer.start();
 
     NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
