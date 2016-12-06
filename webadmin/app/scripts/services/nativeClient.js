@@ -22,6 +22,7 @@ angular.module('webadminApp')
 
         return {
             init:function(){
+                $log.log("try to init native client");
                 if(nativeClientObject){
                     return $q.resolve({thick:true});
                 }
@@ -62,6 +63,7 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
             getCredentialsRaw:function(){
+                $log.log("try to get credentials from native client");
                 if(nativeClientObject && nativeClientObject.getCredentials){
                     return $q.resolve(nativeClientObject.getCredentials());
                 }
@@ -118,6 +120,7 @@ angular.module('webadminApp')
                 return $q.reject();
             },
             updateCredentials:function(login,password,isCloud){
+                $log.log("try to update credentials for native client");
                 if(nativeClientObject && nativeClientObject.updateCredentials){
                     return $q.resolve(nativeClientObject.updateCredentials (login,password,isCloud));
                 }
@@ -155,6 +158,7 @@ angular.module('webadminApp')
                 return $q.reject(); // No client - reject
             },
             startCamerasMode:function(){
+                $log.log("try to start cameras mode in native client");
                 if(nativeClientObject && nativeClientObject.startCamerasMode){
                     return $q.resolve(nativeClientObject.startCamerasMode());
                 }
