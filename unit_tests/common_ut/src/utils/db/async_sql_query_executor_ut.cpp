@@ -155,7 +155,7 @@ TEST_F(AsyncSqlQueryExecutor, able_to_execute_query)
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('NetworkOptix', 2010)");
     const auto companies = executeSelect<Company>("SELECT * FROM company");
 
-    ASSERT_EQ(1, companies.size());
+    ASSERT_EQ(1U, companies.size());
     ASSERT_EQ("NetworkOptix", companies[0].name);
     ASSERT_EQ(2010, companies[0].yearFounded);
 }
