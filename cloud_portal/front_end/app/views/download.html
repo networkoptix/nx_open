@@ -25,7 +25,7 @@
                         <a ng-href="{{platform.installers[0].src}}" class="btn btn-lg btn-default download-button">
                             <span class="download-link pull-left"></span>
                             <h2><b>Download VMS_NAME</b></h2>
-                            {{platform.installers[0].name}}
+                            <span class="installer-name">{{platform.installers[0].name}}</span>
                         </a>
 
                         <p class="small" ng-if="platform.description" ng-bind-html="platform.description"></p>
