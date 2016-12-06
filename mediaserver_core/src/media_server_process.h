@@ -107,6 +107,7 @@ private:
     void setUpSystemName();
     void setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+    void performActionsOnExit();
 
 private:
     int m_argc;
