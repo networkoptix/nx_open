@@ -393,6 +393,9 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
         return getMediaServerOnTime(camera, timestamp);
 
     foundPeriod->clear();
+
+    QnMutexLocker lock(&m_mutex);
+
     const auto& itr = m_historyDetail.find(camera->getId());
     if (itr == m_historyDetail.end())
         return QnMediaServerResourcePtr(); // no history data, there isn't  next server
