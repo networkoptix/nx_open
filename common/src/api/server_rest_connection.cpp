@@ -204,10 +204,14 @@ void invoke(REST_CALLBACK(ResultType) callback,
             bool success,
             const Handle& id,
             const ResultType& result,
-            const QString &serverId
+            const QString &serverId,
+            const QElapsedTimer& elapsed
             )
 {
-    trace(serverId, id, lit("Reply %1").arg(success));
+    if (success)
+        trace(serverId, id, lit("Reply success for %1ms").arg(elapsed.elapsed()));
+    else
+        trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
     if (targetThread)
     {
         executeDelayed(
@@ -225,10 +229,14 @@ void invoke(REST_CALLBACK(ResultType) callback,
 template <typename ResultType>
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
-    const QString serverId = m_serverId.toString();
     if (callback)
+    {
+        const QString serverId = m_serverId.toString();
+        QElapsedTimer timer;
+        timer.start();
+
         return sendRequest(request,
-        [callback, targetThread, serverId]
+        [callback, targetThread, serverId, timer]
         (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
         {
             bool success = false;
@@ -237,8 +245,9 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
                 Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
                 result = parseMessageBody<ResultType>(format, msgBody, &success);
             }
-            invoke(callback, targetThread, success, id, result, serverId);
+            invoke(callback, targetThread, success, id, result, serverId, timer);
         });
+    }
 
     return sendRequest(request);
 }
@@ -248,9 +257,12 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QB
     if (callback)
     {
         const QString serverId = m_serverId.toString();
+        QElapsedTimer timer;
+        timer.start();
+
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback, targetThread, targetThreadGuard, serverId]
+            [callback, targetThread, targetThreadGuard, serverId, timer]
             (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
             {
                 Q_UNUSED(contentType)
@@ -259,7 +271,7 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QB
                 if (targetThread && targetThreadGuard.isNull())
                     return;
 
-                invoke(callback, targetThread, success, id, msgBody, serverId);
+                invoke(callback, targetThread, success, id, msgBody, serverId, timer);
             });
     }
 
@@ -271,9 +283,12 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Em
     if (callback)
     {
         const QString serverId = m_serverId.toString();
+        QElapsedTimer timer;
+        timer.start();
+
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback, targetThread, targetThreadGuard, serverId]
+            [callback, targetThread, targetThreadGuard, serverId, timer]
             (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
             {
                 bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
@@ -281,7 +296,7 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Em
                 if (targetThread && targetThreadGuard.isNull())
                     return;
 
-                invoke(callback, targetThread, success, id, EmptyResponseType(), serverId);
+                invoke(callback, targetThread, success, id, EmptyResponseType(), serverId, timer);
             });
     }
 
