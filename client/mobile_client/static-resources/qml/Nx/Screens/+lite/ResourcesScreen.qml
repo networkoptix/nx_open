@@ -21,8 +21,7 @@ Page
         id: d
 
         readonly property bool serverOffline:
-                connectionManager.connectionState === QnConnectionManager.Connecting &&
-                !loadingDummy.visible
+            connectionManager.connectionState === QnConnectionManager.Reconnecting
         readonly property bool enabled: !warningVisible && !loadingDummy.visible
 
         onServerOfflineChanged:
@@ -89,7 +88,7 @@ Page
         color: ColorTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
-        opacity: 0.0
+        opacity: connectionManager.online ? 0.0 : 1.0
 
         Column
         {
@@ -150,9 +149,7 @@ Page
 
         onConnectionStateChanged:
         {
-            if (connectionManager.connectionState === QnConnectionManager.Disconnected)
-                loadingDummy.opacity = 1
-            else
+            if (connectionManager.connectionState !== QnConnectionManager.Disconnected)
                 connectionFailureDummy.visible = false
         }
 
@@ -161,21 +158,6 @@ Page
             var systemName = title ? title : getLastUsedSystemName()
             connectionFailureDummy.visible = true
         }
-
-        onInitialResourcesReceivedChanged:
-        {
-            if (connectionManager.initialResourcesReceived)
-            {
-                loadingDummy.opacity = 0
-                autoLoginEnabled = true
-            }
-        }
-    }
-
-    Component.onCompleted:
-    {
-        if (!connectionManager.online || !connectionManager.initialResourcesReceived)
-            loadingDummy.opacity = 1
     }
 
     Keys.onPressed:
