@@ -2028,6 +2028,34 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
     }
 }
 
+namespace {
+
+static const char* const kOnExitScriptName = "mediaserver_on_exit";
+
+} // namespace
+
+void MediaServerProcess::performActionsOnExit()
+{
+    // Call the script if it exists.
+
+    QString fileName = getDataDirectory() + "/scripts/" + kOnExitScriptName;
+    if (!QFile::exists(fileName))
+    {
+        NX_LOG(lit("Script '%1' is missing at the server").arg(fileName), cl_logDEBUG2);
+        return;
+    }
+
+    // Currently, no args are needed, hence the empty list.
+    QStringList args{};
+
+    NX_LOG(lit("Calling the script: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
+    if (!QProcess::startDetached(fileName, args))
+    {
+        NX_LOG(lit("Unable to start script '%1' because of a system error").arg(kOnExitScriptName),
+            cl_logDEBUG2);
+    }
+}
+
 void MediaServerProcess::run()
 {
     QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
@@ -2789,6 +2817,8 @@ void MediaServerProcess::run()
     if (m_mediaServer)
         m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
+
+    performActionsOnExit();
 }
 
 void MediaServerProcess::at_appStarted()
