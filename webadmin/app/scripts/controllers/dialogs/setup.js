@@ -660,7 +660,10 @@ angular.module('webadminApp')
                             $scope.next('noInternetOnClient');
                             return;
                         }
-
+                        if ($scope.liteClient){
+                            $scope.next('cloudLogin');
+                            return;
+                        }
                         $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
                     },
                     skip: 'chooseLocal'
