@@ -96,6 +96,10 @@ start_lite_client() {
     /etc/init.d/$CUSTOMIZATION-lite-client start
 }
 
+stop_lite_client() {
+    /etc/init.d/$CUSTOMIZATION-lite-client stop
+}
+
 tweak_charger() {
     #tweak to enable battery charge function for AXP209
 i2cset -f -y 0 0x34 0x35 0x83
@@ -205,6 +209,7 @@ system_restore () {
 
     if [ -f /restore ]; then
         stop_server
+        stop_lite_client        
         read_hdd_environment
         /etc/init.d/nx1led restore
         rm /etc/udev/rules.d/70-persistent-net.rules
