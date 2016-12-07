@@ -113,7 +113,7 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
 
 /*
 int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
-{ 
+{
     _wsse__Security *security = soap_wsse_add_Security(soap);
     soap_wsse_add_UsernameTokenText(soap, id, username, password);
     security->UsernameToken->Password->Type = (char*) wsse_PasswordTextURI;
@@ -209,7 +209,7 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
 template <class T>
 SoapWrapper<T>::~SoapWrapper()
 {
-    if (m_invoked) 
+    if (m_invoked)
     {
         soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
@@ -300,8 +300,7 @@ bool SoapWrapper<T>::isConflictError()
 // DeviceSoapWrapper
 // -------------------------------------------------------------------------- //
 DeviceSoapWrapper::DeviceSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -336,12 +335,12 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
         result.setUser(parts[0]);
         result.setPassword(parts[1]);
     }
-    
+
     return result;
 }
 
 std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
-    const QString& manufacturer, 
+    const QString& manufacturer,
     const QString& model) const
 {
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
@@ -377,7 +376,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
 
     std::list<QnCredentials> possibleCredentials;
     const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
-    auto& oldPasswords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
+    const auto& oldPasswords = PasswordHelper::instance()->getPasswordsByManufacturer(manufacturer);
 
     std::set<QnCredentials> oldCredentialsSet;
 
@@ -527,8 +526,7 @@ int DeviceIOWrapper::setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSetti
 // MediaSoapWrapper
 // -------------------------------------------------------------------------- //
 MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 
 }
@@ -681,8 +679,7 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 // ImagingSoapWrapper
 // -------------------------------------------------------------------------- //
 ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -708,12 +705,12 @@ int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetIm
     return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
 }
 
-int ImagingSoapWrapper::getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response) 
+int ImagingSoapWrapper::getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response)
 {
     return invokeMethod(&ImagingBindingProxy::GetMoveOptions, &request, &response);
 }
 
-int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &response) 
+int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &response)
 {
     return invokeMethod(&ImagingBindingProxy::Move, &request, &response);
 }
@@ -723,8 +720,7 @@ int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &
 // PtzSoapWrapper
 // -------------------------------------------------------------------------- //
 PtzSoapWrapper::PtzSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 

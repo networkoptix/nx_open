@@ -9,15 +9,18 @@
 
 #include "version.h"
 #include "server/server_globals.h"
+#include <plugins/resource/onvif/onvif_helper.h>
 
 QnMediaServerModule::QnMediaServerModule(QObject *parent):
-    QObject(parent) 
+    QObject(parent)
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(mediaserver_core_additional);
     Q_INIT_RESOURCE(appserver2);
 
 #ifdef ENABLE_ONVIF
+    store<PasswordHelper>(new PasswordHelper());
+
     QnSoapServer *soapServer = new QnSoapServer();
     store<QnSoapServer>(soapServer);
     soapServer->bind();
