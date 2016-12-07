@@ -18,6 +18,7 @@ angular.module('webadminApp')
         $scope.lockNextButton = false;
         // Common model
         $scope.settings = {
+            chooseCloudSystem: false,
             systemName: '',
 
             cloudEmail: '',
@@ -43,6 +44,7 @@ angular.module('webadminApp')
                 $log.log("request get credentials from client");
                 cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
                 if (cloudAuthorized) {
+                    $scope.settings.chooseCloudSystem = true;
                     $scope.settings.presetCloudEmail = authObject.cloudEmail;
                     $scope.settings.presetCloudPassword = authObject.cloudPassword;
                 }
@@ -230,7 +232,7 @@ angular.module('webadminApp')
                 'DIFFERENT_CLOUD_HOST':'fail'
             };
             return errorClasses[error] || 'fail';
-        };
+        }
         function formatError(errorToShow){
             var errorMessages = {
 
@@ -598,9 +600,7 @@ angular.module('webadminApp')
                 systemName: {
                     back: 'start',
                     skip: 'merge',
-                    next: function () {
-                        $scope.next(cloudAuthorized ? 'chooseCloud' : 'chooseLocal');
-                    },
+                    next: 'chooseCloudOrLocal',
                     valid: function () {
                         return checkForm($scope.forms.systemNameForm);
                     }
@@ -630,7 +630,7 @@ angular.module('webadminApp')
                             $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
                         });
                     },
-                    back: 'chooseCloud',
+                    back: 'chooseCloudOrLocal',
                     skip: 'localLogin'
                 },
                 noInternetOnClient: {
@@ -639,18 +639,17 @@ angular.module('webadminApp')
                             $scope.next(cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro');
                         });
                     },
-                    back: 'chooseCloud',
+                    back: 'chooseCloudOrLocal',
                     skip: 'localLogin'
                 },
 
-                chooseLocal: {
-                    back: 'systemName',
-                    next: 'localLogin',
-                    skip: 'chooseCloud'
-                },
-                chooseCloud: {
+                chooseCloudOrLocal:{
                     back: 'systemName',
                     next: function () {
+                        if(!$scope.settings.chooseCloudSystem){
+                            return $scope.next('localLogin');
+                        }
+
                         if (!$scope.hasInternetOnServer) {
                             $scope.next('noInternetOnServer');
                             return;
@@ -661,16 +660,16 @@ angular.module('webadminApp')
                             return;
                         }
                         $scope.next($scope.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
-                    },
-                    skip: 'chooseLocal'
+                    }
                 },
 
+
                 cloudIntro: {
-                    back: 'chooseCloud',
+                    back: 'chooseCloudOrLocal',
                     skip: 'localLogin'
                 },
                 cloudAuthorizedIntro: {
-                    back: 'chooseCloud',
+                    back: 'chooseCloudOrLocal',
                     skip: 'localLogin',
                     next: function () {
                         $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
@@ -679,7 +678,7 @@ angular.module('webadminApp')
                     }
                 },
                 cloudLogin: {
-                    back: $scope.liteClient? 'chooseCloud' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
+                    back: $scope.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
                     next: 'cloudProcess',
                     valid: function () {
                         return checkForm($scope.forms.cloudForm);
@@ -721,7 +720,7 @@ angular.module('webadminApp')
                     back: function () {
                         $scope.settings.localPassword = '';
                         $scope.settings.localPasswordConfirmation = '';
-                        $scope.next('chooseLocal', true);
+                        $scope.next('chooseCloudOrLocal', true);
                     },
                     next: initOfflineSystem,
                     valid: function () {
