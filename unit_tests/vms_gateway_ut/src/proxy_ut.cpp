@@ -83,8 +83,8 @@ public:
             testPath,
             [this]()
             {
-                return std::make_unique<VmsGatewayProxyTestHandler>(
-                    m_securityExpectation.load());
+                QnMutexLocker lock(&m_mutex);
+                return std::make_unique<VmsGatewayProxyTestHandler>(m_securityExpectation);
             });
     }
 
@@ -122,13 +122,15 @@ public:
         ASSERT_EQ(testMsgBody, msgBody);
     }
 
-    void expectSecurity(bool isEnabled)
+    void expectSecurity(boost::optional<bool> isEnabled)
     {
+        QnMutexLocker lock(&m_mutex);
         m_securityExpectation = isEnabled;
     }
 
 private:
-    std::atomic<boost::optional<bool>> m_securityExpectation{false};
+    QnMutex m_mutex;
+    boost::optional<bool> m_securityExpectation{boost::none};
 };
 
 TEST_F(VmsGatewayProxyTest, IpSpecified)
