@@ -33,6 +33,11 @@ public:
         m_items.push({std::move(item), std::chrono::steady_clock::now()});
     }
 
+    QueueReaderId generateReaderId()
+    {
+        return m_items.generateReaderId();
+    }
+
     boost::optional<Item> pop(
         boost::optional<std::chrono::milliseconds> timeout = boost::none,
         QueueReaderId readerId = kInvalidQueueReaderId)
