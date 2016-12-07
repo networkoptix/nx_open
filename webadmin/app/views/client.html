@@ -1,9 +1,9 @@
 <div class="container-fluid">
 
     <div>
-        <h2 class="text-center">Welcome to Nx1 Lite Client</h2>
+        <h2 class="text-center">Welcome to Lite Client</h2>
         <p class="text-center">After being launched, Lite Client can show up to 4 live videos, <br>
-            and can be controlled either by keyboard or mouse connected to Nx1,<br> or through mobile app</p>
+            and can be controlled either by keyboard or mouse connected to the device,<br> or through mobile app</p>
     </div>
     <div class="text-center">
         <div class="panel panel-default panel-inline system-info">
@@ -28,7 +28,7 @@
                         <tr>
                             <td>Enter / exit fullscreen</td>
                             <td class="text-right"><img src="images/lite_client/keyboard_enter.png"></td>
-                            <td class="grey-text">or <img src="../images/lite_client/mouse_clickclick.png"> Double click</td>
+                            <td class="grey-text">or <img src="images/lite_client/mouse_clickclick.png"> Double click</td>
                         </tr>
                         <tr>
                             <td>Exit lite client</td>
@@ -47,9 +47,9 @@
                 <h3 class="text-center">With mobile app</h3>
                 <table>
                     <tbody>
-                        <tr><td>Install <b>Nx Witness</b> app via Google Play or App Store</td></tr>
-                        <tr><td>Connect to system "System" (192.168.154.131:7001)</td></tr>
-                        <tr><td>Select "Nx1" screen in side menu</td></tr>
+                        <tr><td>Install <b>{{Config.productName}}</b> app via Google Play or App Store</td></tr>
+                        <tr><td>Connect to system "{{settings.systemName}}" ({{IP}}:{{port}})</td></tr>
+                        <tr><td>Select "{{settings.name}}" screen in side menu</td></tr>
                         <tr><td>Turn Lite Client on and select cameras to display</td></tr>
                     </tbody>
                 </table>
