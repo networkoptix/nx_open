@@ -323,7 +323,7 @@
        <item>
         <widget class="QLabel" name="warningLabel">
          <property name="text">
-          <string>Server is offline. Statistics is not available.</string>
+          <string>Server is offline. Statistics are not available.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
