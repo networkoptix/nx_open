@@ -46,9 +46,11 @@ private:
 
     struct TargetWithOptions
     {
-        nx_http::StatusCode::Value status;
+        enum class Ssl { undefined, enabled, disabled };
+
+        nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
         SocketAddress target;
-        bool isSsl;
+        Ssl isSsl = Ssl::undefined;
 
         TargetWithOptions(nx_http::StatusCode::Value status_, SocketAddress target_ = {});
     };

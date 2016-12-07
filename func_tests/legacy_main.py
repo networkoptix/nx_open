@@ -16,13 +16,24 @@ from pycommons.Logger import log, LOGLEVEL
 
 testMaster = getTestMaster()  # it's a singleton
 
+class DummyLock:
+
+    def __enter__(self):
+        pass
+    
+    def __exit__(self, t, v, tb):
+        pass
+
+
 class _pvt(object):
     "Used to hide LegacyFuncTestBase from default test loader."
     class LegacyFuncTestBase(unittest.TestCase):
         """Base class for test classes, called by unittest.main().
         Legacy from the first generation of functests.
         """
-        _Lock = threading.Lock()  # Note: this lock is commin for all ancestor classes!
+        _Lock = DummyLock()
+        # threading.Lock()  # Note: this lock is commin for all ancestor classes!
+
         failureException = LegacyTestFailure
 
         def _generateModifySeq(self):
@@ -108,10 +119,15 @@ class _pvt(object):
             if postDataList is None:
                 return
 
-            workerQueue = ClusterWorker(testMaster.threadNumber, len(postDataList))
+            event = threading.Event()
+            
+            workerQueue = ClusterWorker(testMaster.threadNumber, len(postDataList), True, event)
 
+            
             for test in postDataList:
-                workerQueue.enqueue(self._sendRequest , (self._getMethodName(), test[0], test[1],))
+                workerQueue.enqueue(self._sendRequest , (self._getMethodName(), test[0], test[1]))
+
+            event.set()
 
             workerQueue.join()
             self.assertTrue(workerQueue.allOk(), workerQueue.getFailsMsg())
@@ -276,8 +292,8 @@ class CameraUserAttributeListTest(_pvt.LegacyFuncTestBase):
     def _getObserverNames(self):
         return [testMaster.api.getCameraAttr.split('/')[1]]
 
-    #def _dump_post_data(self, data):
-        #print "CameraUserAttributeListTest data: %s" % (data,)
+    def _dump_post_data(self, data):
+        log(LOGLEVEL.DEBUG, "CameraUserAttributeListTest data: '%s'" % data)
         #with open("%s-fails" % self._getMethodName(), "a") as f:
         #    f.write("%s\n" % data)
 
@@ -339,7 +355,8 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
     # Overwrite the test function since the base method doesn't work here
 
     def test(self):
-        workerQueue = ClusterWorker(testMaster.threadNumber, self._testCase * 2)
+        event = threading.Event()
+        workerQueue = ClusterWorker(testMaster.threadNumber, self._testCase * 2, True, event)
 
         log(LOGLEVEL.INFO, "===================================")
         log(LOGLEVEL.INFO,"Test: ResourceConfliction start\n")
@@ -352,6 +369,8 @@ class ResourceConflictionTest(_pvt.LegacyFuncTestBase):
             # modify the resource
             workerQueue.enqueue(self._sendRequest, (conf[1],data[0][0],s1,))
             workerQueue.enqueue(self._sendRequest, (conf[0],data[0][1],s2,))
+
+        event.set()
 
         workerQueue.join()
 

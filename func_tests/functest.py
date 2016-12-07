@@ -36,6 +36,7 @@ from proxytest import ServerProxyTest
 from mergetest import MergeSystemTest
 from stresst import HTTPStressTest
 from pycommons.Logger import initLog, log, LOGLEVEL
+from pycommons.Config import config
 
 
 #class AuthH(urllib2.HTTPDigestAuthHandler):
@@ -1502,6 +1503,7 @@ def ListAutoTests():
 def main(args, other):
     #print "Args: %s" % (args,)
     #print "Remaining argv: %s" % (other,)
+    config.read(args.config)
     if args.help_arg is not None:
         showHelp(args.help_arg)
         return True

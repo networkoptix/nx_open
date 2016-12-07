@@ -107,6 +107,20 @@ int QnSetTimeRestHandler::execute(
     const QnRestConnectionProcessor* /*owner*/,
     QnJsonRestResult& result)
 {
+    #if defined(Q_OS_LINUX)
+        // NOTE: Setting the time zone should be done before converting date-time from the
+        // formatted string, because the convertion depends on the current time zone.
+        if (!data.timeZoneId.isEmpty())
+        {
+            if (!setTimeZone(data.timeZoneId))
+            {
+                result.setError(
+                    QnJsonRestResult::CantProcessRequest, lit("Invalid time zone specified"));
+                return CODE_OK;
+            }
+        }
+    #endif // defined(Q_OS_LINUX)
+
     qint64 dateTime = -1;
     if (data.dateTime.toLongLong() > 0)
     {
@@ -117,7 +131,6 @@ int QnSetTimeRestHandler::execute(
         dateTime = QDateTime::fromString(
             data.dateTime, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
     }
-
     if (dateTime < 1)
     {
         result.setError(
@@ -140,24 +153,12 @@ int QnSetTimeRestHandler::execute(
     }
 
     #if defined(Q_OS_LINUX)
-
-        if (!data.timeZoneId.isEmpty())
-        {
-            if (!setTimeZone(data.timeZoneId))
-            {
-                result.setError(
-                    QnJsonRestResult::CantProcessRequest, lit("Invalid time zone specified"));
-                return CODE_OK;
-            }
-        }
-
         if (!setDateTime(dateTime))
         {
             result.setError(
                 QnJsonRestResult::CantProcessRequest, lit("Can't set new date-time value"));
             return CODE_OK;
         }
-
     #endif // defined(Q_OS_LINUX)
 
     //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
