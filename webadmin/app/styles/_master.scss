@@ -46,6 +46,12 @@
     margin-bottom: 16px;
   }
 
+  h3{
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
   p.master-description {
     height: 32px;
     line-height: 1.6;
@@ -123,16 +129,9 @@
 
     .icon-localSystem{
       @include icon;
-      width: 176px;
-      height: 68px;
-      background-position: 0 -99px;
-
-    }
-    .icon-cloudSystem{
-      @include icon;
-      width: 176px;
-      height: 68px;
-      background-position: -176px -99px;
+      width: 86px;
+      height: 86px;
+      background-position: -1px -90px;
 
     }
     .icon-arrow-right{
@@ -251,5 +250,45 @@ button, select, .form-control{
     appearance: none !important;
     border-color: $input-border;
     box-shadow: none;
+  }
+}
+
+.radio-panels {
+  margin: 0;
+
+  .radio-panel {
+    padding: 0 2px;
+    .radio-panel-body {
+      border-radius: 2px;
+      padding: 0px 16px 2px;
+
+      .checkbox-icon{
+        position: absolute;
+        left: 16px;
+        top: 16px;
+
+        @include icon;
+        width: 20px;
+        height: 20px;
+
+        background-position:  -40px -176px;
+      }
+
+
+      &:hover {
+        background-color: $radio-panels-hover-bg;
+        border-color: 1px solid $radio-panels-hover-border;
+      }
+
+      &.selected {
+        .checkbox-icon{
+
+          background-position:  -20px -176px;
+        }
+        background-color: $radio-panels-selected-bg;
+        border-color: 1px solid $radio-panels-selected-border;
+      }
+
+    }
   }
 }
