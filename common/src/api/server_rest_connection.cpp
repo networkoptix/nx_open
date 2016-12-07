@@ -187,6 +187,8 @@ Handle ServerConnection::saveCloudSystemCredentials(
 
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
+    QnRequestParamList params;
+    params.append({lit("startCamerasMode"), lit("true")});
     return executeGet(lit("/api/startLiteClient"), QnRequestParamList(), callback, targetThread);
 }
 
