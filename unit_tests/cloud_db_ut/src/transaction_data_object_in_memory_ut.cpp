@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <nx_ec/data/api_user_data.h>
-#include <transaction/transaction_descriptor.h>
+#include <nx/utils/test_support/utils.h>
 
 #include <ec2/dao/memory/transaction_data_object_in_memory.h>
 #include <ec2/data_conversion.h>
+#include <nx_ec/data/api_user_data.h>
+#include <transaction/transaction_descriptor.h>
 #include <test_support/business_data_generator.h>
+#include <utils/db/request_execution_thread.h>
+
+#include "base_persistent_data_test.h"
 
 namespace nx {
 namespace cdb {
@@ -15,7 +19,8 @@ namespace memory {
 namespace test {
 
 class TransactionDataObjectInMemory:
-    public ::testing::Test
+    public ::testing::Test,
+    public nx::cdb::test::BasePersistentDataTest
 {
 public:
     TransactionDataObjectInMemory():
@@ -23,7 +28,8 @@ public:
         m_peerDbId(QnUuid::createUuid()),
         m_systemId(QnUuid::createUuid().toSimpleByteArray()),
         m_peerSequence(0),
-        m_lastAddedTransaction(m_peerGuid)
+        m_lastAddedTransaction(m_peerGuid),
+        m_dbConnectionHolder(dbConnectionOptions())
     {
         init();
     }
@@ -55,24 +61,34 @@ protected:
         }
     }
 
-    void expectThatOnlyLastOneIsPresent()
+    void verifyThatOnlyLastOneIsPresent()
     {
-        std::vector<dao::TransactionLogRecord> transactions;
-
-        const auto resultCode = m_transactionDataObject.fetchTransactionsOfAPeerQuery(
-            nullptr,
-            m_systemId,
-            m_peerGuid.toSimpleString(),
-            m_peerDbId.toSimpleString(),
-            0,
-            std::numeric_limits<int64_t>::max(),
-            &transactions);
-        ASSERT_EQ(db::DBResult::ok, resultCode);
+        const std::vector<dao::TransactionLogRecord> transactions = readAllTransaction();
 
         ASSERT_EQ(1U, transactions.size());
         ASSERT_EQ(
             QnUbjson::serialized(m_lastAddedTransaction),
             transactions[0].serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION));
+    }
+
+    void verifyThatDataObjectIsEmpty()
+    {
+        const std::vector<dao::TransactionLogRecord> transactions = readAllTransaction();
+        ASSERT_EQ(0U, transactions.size());
+    }
+
+    void beginTran()
+    {
+        m_currentTran = m_dbConnectionHolder.begin();
+    }
+
+    void rollbackTran()
+    {
+        if (m_currentTran)
+        {
+            m_currentTran->transaction()->rollback();
+            m_currentTran.reset();
+        }
     }
 
 private:
@@ -83,6 +99,8 @@ private:
     ec2::dao::memory::TransactionDataObject m_transactionDataObject;
     ::ec2::ApiUserData m_transactionData;
     ::ec2::QnTransaction<::ec2::ApiUserData> m_lastAddedTransaction;
+    nx::db::DbConnectionHolder m_dbConnectionHolder;
+    std::shared_ptr<nx::db::QueryContext> m_currentTran;
 
     void init()
     {
@@ -105,7 +123,7 @@ private:
             ubjsonSerializedTransaction};
 
         const auto dbResult = m_transactionDataObject.insertOrReplaceTransaction(
-            nullptr,
+            m_currentTran ? m_currentTran.get() : nullptr,
             transactionData);
         ASSERT_EQ(db::DBResult::ok, dbResult);
     }
@@ -121,18 +139,41 @@ private:
 
         return transaction;
     }
+
+    std::vector<dao::TransactionLogRecord> readAllTransaction()
+    {
+        std::vector<dao::TransactionLogRecord> transactions;
+        const auto resultCode = m_transactionDataObject.fetchTransactionsOfAPeerQuery(
+            m_currentTran ? m_currentTran.get() : nullptr,
+            m_systemId,
+            m_peerGuid.toSimpleString(),
+            m_peerDbId.toSimpleString(),
+            0,
+            std::numeric_limits<int64_t>::max(),
+            &transactions);
+        NX_GTEST_ASSERT_EQ(db::DBResult::ok, resultCode);
+        return transactions;
+    }
 };
 
 TEST_F(TransactionDataObjectInMemory, checking_tran_hash_unique_index)
 {
     havingAddedMultipleTransactionsWithSameHash();
-    expectThatOnlyLastOneIsPresent();
+    verifyThatOnlyLastOneIsPresent();
 }
 
 TEST_F(TransactionDataObjectInMemory, checking_peer_guid_db_guid_sequence_unique_index)
 {
     havingAddedMultipleTransactionsWithSameSequenceFromSamePeer();
-    expectThatOnlyLastOneIsPresent();
+    verifyThatOnlyLastOneIsPresent();
+}
+
+TEST_F(TransactionDataObjectInMemory, DISABLED_tran_rollback)
+{
+    beginTran();
+    havingAddedMultipleTransactionsWithSameHash();
+    rollbackTran();
+    verifyThatDataObjectIsEmpty();
 }
 
 } // namespace test

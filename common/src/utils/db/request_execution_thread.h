@@ -31,12 +31,16 @@ public:
 
     void close();
 
+    std::shared_ptr<nx::db::QueryContext> begin();
+
 private:
     QSqlDatabase m_dbConnection;
     const ConnectionOptions m_connectionOptions;
 
     bool tuneConnection();
     bool tuneMySqlConnection();
+
+    std::shared_ptr<nx::db::QueryContext> createNewTran();
 
     DbConnectionHolder(const DbConnectionHolder&) = delete;
     DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;

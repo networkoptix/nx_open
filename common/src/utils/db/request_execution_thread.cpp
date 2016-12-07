@@ -6,6 +6,7 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <utils/common/guard.h>
 
@@ -67,6 +68,11 @@ void DbConnectionHolder::close()
     m_dbConnection.close();
 }
 
+std::shared_ptr<nx::db::QueryContext> DbConnectionHolder::begin()
+{
+    return createNewTran();
+}
+
 bool DbConnectionHolder::tuneConnection()
 {
     switch (connectionOptions().driverType)
@@ -94,6 +100,25 @@ bool DbConnectionHolder::tuneMySqlConnection()
     }
 
     return true;
+}
+
+std::shared_ptr<nx::db::QueryContext> DbConnectionHolder::createNewTran()
+{
+    auto deleter =
+        [](nx::db::QueryContext* queryContext)
+        {
+            if (queryContext->transaction()->isActive())
+                queryContext->transaction()->rollback();
+            delete queryContext->transaction();
+            delete queryContext;
+        };
+
+    auto transaction = std::make_unique<nx::db::Transaction>(dbConnection());
+    if (transaction->begin() != nx::db::DBResult::ok)
+        return nullptr;
+    return std::shared_ptr<nx::db::QueryContext>(
+        new nx::db::QueryContext(dbConnection(), transaction.release()),
+        deleter);
 }
 
 //-------------------------------------------------------------------------------------------------
