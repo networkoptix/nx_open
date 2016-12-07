@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <set>
 #include <tuple>
@@ -22,6 +23,11 @@ class SyncQueue
 {
 public:
     using ResultType = Result;
+
+    SyncQueue();
+
+    QueueReaderId generateReaderId();
+
     Result pop();
     boost::optional<Result> pop(QueueReaderId readerId);
     boost::optional<Result> pop(
@@ -49,6 +55,7 @@ private:
     QnWaitCondition m_condition;
     std::queue<Result> m_queue;
     std::set<QueueReaderId> m_terminatedReaders;
+    std::atomic<QueueReaderId> m_prevReaderId;
 };
 
 template<typename R1, typename R2>
@@ -62,6 +69,18 @@ public:
 };
 
 // --- implementation ---
+
+template<typename Result>
+SyncQueue<Result>::SyncQueue():
+    m_prevReaderId(0)
+{
+}
+
+template<typename Result>
+QueueReaderId SyncQueue<Result>::generateReaderId()
+{
+    return ++m_prevReaderId;
+}
 
 template< typename Result>
 Result SyncQueue<Result>::pop()
