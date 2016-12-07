@@ -43,20 +43,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 
 bool QnResourcePropertyDictionary::removeParams(const QnUuid& resourceId)
 {
-    if (removeParamsFromDb(resourceId) != ec2::ErrorCode::ok)
-        return false;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_items.remove(resourceId);
-    }
-
-    return true;
-}
-
-ec2::ErrorCode QnResourcePropertyDictionary::removeParamsFromDb(const QnUuid& resourceId)
-{
-    ec2::ErrorCode ecode = ec2::ErrorCode::notImplemented;
+    ec2::ErrorCode ecode;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
 
     ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->removeKvPairsSync(
@@ -67,11 +54,14 @@ ec2::ErrorCode QnResourcePropertyDictionary::removeParamsFromDb(const QnUuid& re
         });
 
     if (ecode != ec2::ErrorCode::ok)
+    {
         NX_LOG(lit("%1 Failed to remove params for resource %2")
                 .arg(QString::fromLatin1(Q_FUNC_INFO))
                 .arg(resourceId.toString()), cl_logWARNING);
+        return false;
+    }
 
-    return ecode;
+    return true;
 }
 
 ec2::ApiResourceParamWithRefDataList QnResourcePropertyDictionary::getParamsForRemove(const QnUuid& resourceId)

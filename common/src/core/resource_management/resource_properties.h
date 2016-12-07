@@ -46,7 +46,6 @@ private:
     //!Removes those elements from \a m_requestInProgress for which comp(ec2::ApiResourceParamWithRefData) returns \a true
     template<class Pred> void cancelOngoingRequest(const Pred& pred);
     ec2::ApiResourceParamWithRefDataList getParamsForRemove(const QnUuid& resourceId);
-    ec2::ErrorCode removeParamsFromDb(const QnUuid& resourceId);
 
 private:
     QMap<QnUuid, QnResourcePropertyList> m_items;
