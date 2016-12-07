@@ -97,38 +97,42 @@
 </div>
 
 
-<div class="panel-body text-center" ng-if="stepIs('chooseLocal')">
+<div class="panel-body text-center"  ng-if="stepIs('chooseCloudOrLocal')">
     <h2>Choose system type</h2>
-    <div class="master-icon">
-        <a class="pull-left" href="" ng-click="skip()"><span class="icon-arrow-left"></span></a>
-        <span class="icon-localSystem"></span>
-        <a class="pull-right" href="" ng-click="skip()"><span class="icon-arrow-right"></span></a>
+    <div class="row radio-panels">
+        <div class="col-xs-6 radio-panel ">
+            <div class="radio-panel-body"
+                 ng-class="{'selected':!settings.chooseCloudSystem}"
+                 ng-click="settings.chooseCloudSystem = false">
+                <div class="checkbox-icon"></div>
+                <div class="master-icon"><span class="icon-localSystem"></span></div>
+                <h3>Local</h3>
+                <p>
+                    Works in local network only<br>
+                    Does not require Internet connection
+                </p>
+            </div>
+        </div>
+        <div class="col-xs-6 radio-panel">
+            <div class="radio-panel-body"
+                 ng-class="{'selected':settings.chooseCloudSystem}"
+                 ng-click="settings.chooseCloudSystem = true">
+                <div class="checkbox-icon"></div>
+                <div class="master-icon"><span class="icon-cloud"></span></div>
+                <h3>Cloud</h3>
+                <p>
+                    Available from everywhere<br>
+                    Requires Internet connection
+                </p>
+            </div>
+        </div>
     </div>
-    <h2>Local</h2>
-    <p class="master-description">
-        Works in local network only<br>
-        Does not require Internet connection
-    </p>
-</div>
-
-<div class="panel-body text-center" ng-if="stepIs('chooseCloud')">
-    <h2>Choose system type</h2>
-    <div class="master-icon">
-        <a class="pull-left" href="" ng-click="skip()"><span class="icon-arrow-left"></span></a>
-        <span class="icon-cloudSystem"></span>
-        <a class="pull-right" href="" ng-click="skip()"><span class="icon-arrow-right"></span></a>
-    </div>
-    <h2>Cloud</h2>
-    <p class="master-description">
-        Available from everywhere<br>
-        Requires Internet connection<br>
+    <p class="vertical-bottom">
         <a ng-if="!liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
-           target="_blank" ng-click="openLink($event)">Learn more</a>
+           target="_blank" ng-click="openLink($event)">Help me decide</a>
         <span ng-if="liteClient">Learn more: {{portalUrl}}</span>
     </p>
 </div>
-
-
 
 
 <div class="panel-body text-center" ng-if="stepIs('cloudIntro')">

@@ -8,6 +8,7 @@ angular.module('webadminApp')
         if($location.path() == '/'){ // Do redirects
             nativeClient.init().then(function(mode){
                 if(mode.lite){
+                    $('body').addClass('lite-client-mode');
                     $location.path("/client");
                     return;
                 }
