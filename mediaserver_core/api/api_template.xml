@@ -1793,7 +1793,6 @@ should be specified in the respective JSON fields.</description>
                                     <name>true</name>
                                     <description>IP address and other parameters assigned via DHCP,
 the respective JSON fields can be empty.</description>
-<<<<<<< local
                                 </value>
                             </values>
                           </param>
@@ -1808,22 +1807,7 @@ the respective JSON fields can be empty.</description>
                             <optional>false</optional>
                           </param>
                         </params>
-=======
-                            </value>
-                        </values>
-                      </param>
-                      <param>
-                        <name>extraParams</name>
-                        <description>JSON object with data in the internal format.</description>
-                        <optional>false</optional>
-                      </param>
-                      <param>
-                        <name>dns_servers</name>
-                        <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
-                        <optional>false</optional>
-                      </param>
-                    </params>
-                </function>
+                    </function>
                 <function proprietary="true">
                     <name>settime</name>
                     <description>
@@ -1845,7 +1829,6 @@ the respective JSON fields can be empty.</description>
                         <optional>false</optional>
                       </param>
                     </params>
->>>>>>> graft
                 </function>
               <function>
                 <name>setTime</name>
