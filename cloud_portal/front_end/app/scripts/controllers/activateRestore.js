@@ -103,6 +103,7 @@ angular.module('cloudApp')
                 errorPrefix:'Couldn\'t activate your account:'
             }).then(function(){
                 setContext("activateSuccess");
+                $scope.activationSuccess = true;
                 $location.path("/activate/success", false); // Change url, do not reload
             });
 
@@ -117,7 +118,6 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:'Couldn\'t send confirmation email:'
             }).then(function(){
-
                 setContext("reactivatingSuccess");
                 $location.path("/activate/send", false); // Change url, do not reload
                 $scope.reactivating = false;

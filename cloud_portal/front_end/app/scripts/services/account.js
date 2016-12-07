@@ -64,6 +64,10 @@ angular.module('cloudApp')
                 this.setEmail(email);
                 var self = this;
                 return cloudApi.login(email, password, remember).then(function(result){
+                    if(cloudApi.checkResponseHasError(result)){
+                        return $q.reject(result);
+                    }
+
                     if(result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                         self.setEmail(result.data.email);
                         $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface

@@ -103,7 +103,7 @@ angular.module('cloudApp', [
         })
         .when('/activate', {
             title: L.pageTitles.activate,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
@@ -111,7 +111,7 @@ angular.module('cloudApp', [
         })
         .when('/activate/sent', {
             title: L.pageTitles.activateSent,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
@@ -119,7 +119,7 @@ angular.module('cloudApp', [
         })
         .when('/activate/success',{
             title: L.pageTitles.activateSuccess,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.activationSuccess = true; }]
@@ -127,12 +127,12 @@ angular.module('cloudApp', [
         })
         .when('/activate/:activateCode', {
             title: L.pageTitles.activateCode,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/restore_password', {
             title: L.pageTitles.restorePassword,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoring = true; }]
@@ -140,7 +140,7 @@ angular.module('cloudApp', [
         })
         .when('/restore_password/sent', {
             title: L.pageTitles.restorePassword,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoringSuccess = true; }]
@@ -148,7 +148,7 @@ angular.module('cloudApp', [
         })
         .when('/restore_password/success', {
             title: L.pageTitles.restorePasswordSuccess,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.changeSuccess = true; }]
@@ -156,7 +156,7 @@ angular.module('cloudApp', [
         })
         .when('/restore_password/:restoreCode', {
             title: L.pageTitles.restorePasswordCode,
-            templateUrl: 'static/views/activate_restore.html',
+            templateUrl: 'static/views/activeActions.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/content/:page', {

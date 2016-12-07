@@ -172,7 +172,11 @@ class Account(object):
                 raise APIRequestException('Activation code doesn\'t match email:' + code, ErrorCodes.wrong_code)
 
             request = CLOUD_DB_URL + '/account/update'
-            return requests.post(request, json=params, auth=HTTPDigestAuth(code_email, temp_password))
+
+            response = requests.post(request, json=params, auth=HTTPDigestAuth(code_email, temp_password))
+            if response.json()['resultCode'] == ErrorCodes.not_authorized:
+                raise APIRequestException('Activation code was already used', ErrorCodes.wrong_code)
+            return response
 
     @staticmethod
     def restore_password(code, new_password):
