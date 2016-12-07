@@ -1,4 +1,5 @@
 #include "resource_properties.h"
+#include <nx/utils/log/log.h>
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 
@@ -38,6 +39,45 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
         return false;
     }
     return true;
+}
+
+bool QnResourcePropertyDictionary::removeParams(const QnUuid& resourceId)
+{
+    ec2::ErrorCode ecode;
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+
+    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->removeKvPairsSync(
+        getParamsForRemove(resourceId),
+        [&ecode](ec2::ErrorCode _ecode)
+        {
+            ecode = _ecode;
+        });
+
+    if (ecode != ec2::ErrorCode::ok)
+    {
+        NX_LOG(lit("%1 Failed to remove params for resource %2")
+                .arg(QString::fromLatin1(Q_FUNC_INFO))
+                .arg(resourceId.toString()), cl_logWARNING);
+        return false;
+    }
+
+    return true;
+}
+
+ec2::ApiResourceParamWithRefDataList QnResourcePropertyDictionary::getParamsForRemove(const QnUuid& resourceId)
+{
+    ec2::ApiResourceParamWithRefDataList result;
+    {
+        QnMutexLocker lock( &m_mutex );
+        auto itr = m_items.find(resourceId);
+        if (itr == m_items.end())
+            return result;
+        QnResourcePropertyList& properties = itr.value();
+        for (auto itrParams = properties.begin(); itrParams != properties.end(); ++itrParams)
+            result.push_back(ec2::ApiResourceParamWithRefData(resourceId, itrParams.key(), itrParams.value()));
+    }
+
+    return result;
 }
 
 void QnResourcePropertyDictionary::fromModifiedDataToSavedData(const QnUuid& resourceId, ec2::ApiResourceParamWithRefDataList& outData)

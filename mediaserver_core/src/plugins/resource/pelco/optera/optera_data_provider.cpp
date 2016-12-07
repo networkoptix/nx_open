@@ -7,6 +7,7 @@
 #include <utils/common/sleep.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_properties.h>
 
 
 namespace
@@ -114,6 +115,17 @@ void QnOpteraDataProvider::pleaseStop()
     m_needStop = true;
 }
 
+namespace {
+class OnvifResourceRemoveParamsAdaptor : public QnPlOnvifResource
+{
+public:
+    ~OnvifResourceRemoveParamsAdaptor() override
+    {
+         propertyDictionary->removeParams(getId());
+    }
+};
+}
+
 QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channelNumber)
 {
     QUrl url(m_onvifRes->getUrl());
@@ -128,7 +140,7 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
 
     url.setQuery(urlQuery);
 
-    QnPlOnvifResourcePtr subChannelResource(new QnPlOnvifResource());
+    QnPlOnvifResourcePtr subChannelResource(new OnvifResourceRemoveParamsAdaptor());
 
     subChannelResource->setId(QnUuid::createUuid());
     subChannelResource->setTypeId(m_onvifRes->getTypeId());

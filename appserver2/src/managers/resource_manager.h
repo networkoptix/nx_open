@@ -71,6 +71,9 @@ namespace ec2
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getKvPairs
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) override;
+        virtual void removeKvPairs(
+            const ec2::ApiResourceParamWithRefDataList& params, 
+            std::function<void(ErrorCode)> handler) override;
 
         //!Implementation of AbstractResourceManager::getStatusList
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) override;

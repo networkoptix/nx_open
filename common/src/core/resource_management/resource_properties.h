@@ -17,6 +17,7 @@ public:
     QnResourcePropertyDictionary(QObject *parent = NULL);
 
     bool saveParams(const QnUuid& resourceId);
+    bool removeParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);
     int saveParamsAsync(const QList<QnUuid>& resourceId);
 
@@ -44,6 +45,8 @@ private:
     int saveData(const ec2::ApiResourceParamWithRefDataList&& data);
     //!Removes those elements from \a m_requestInProgress for which comp(ec2::ApiResourceParamWithRefData) returns \a true
     template<class Pred> void cancelOngoingRequest(const Pred& pred);
+    ec2::ApiResourceParamWithRefDataList getParamsForRemove(const QnUuid& resourceId);
+
 private:
     QMap<QnUuid, QnResourcePropertyList> m_items;
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;

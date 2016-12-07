@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <future>
 
 #include <QtCore/QObject>
 #include <QtCore/QPair>
@@ -138,6 +139,25 @@ class ECConnectionNotificationManager;
             );
         }
 
+        ErrorCode removeKvPairsSync(
+            const ApiResourceParamWithRefDataList& params, 
+            std::function<void(ErrorCode)> handler) 
+        {
+            std::promise<ErrorCode> removePromise;
+            std::future<ErrorCode> removeFuture = removePromise.get_future();
+            ErrorCode result;
+
+            removeKvPairs(
+                params, 
+                [&removePromise](ErrorCode ecode)
+                {
+                    removePromise.set_value(ecode);
+                });
+            result = removeFuture.get();
+            handler(result);
+            return result;
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, const ApiResourceStatusDataList&)
         */
@@ -191,6 +211,9 @@ class ECConnectionNotificationManager;
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
+        virtual void removeKvPairs(
+            const ApiResourceParamWithRefDataList& params, 
+            std::function<void(ErrorCode)> handler) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
