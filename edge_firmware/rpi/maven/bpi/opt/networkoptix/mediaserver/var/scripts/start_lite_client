@@ -24,15 +24,8 @@ if (get-edid | parse-edid | grep -Fxq 'Section "Monitor"') 2>/dev/null; then
     AUTO_LOGIN_MODE="--auto-login=disabled"
 fi
 
-# Prevent running several processes of Lite Client.
-SERVICE_PID="`/bin/pidof $BIN_NAME`"
-if [ ! -z "$SERVICE_PID" ]; then
-    echo "Lite Client is already running with pid $SERVICE_PID"
-    exit 0
-fi
-
 LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
-/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $AUTO_LOGIN_MODE $* >>/opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
+/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE >>/opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
 
 # Turning the screen blank after Lite Client terminates.
 echo "1" >/sys/class/graphics/fb0/blank

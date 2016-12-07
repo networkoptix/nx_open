@@ -27,8 +27,9 @@ int QnStartLiteClientRestHandler::executeGet(
     const QnRestConnectionProcessor* connectionProcessor)
 {
     Q_UNUSED(path);
-    Q_UNUSED(params);
     Q_UNUSED(connectionProcessor);
+
+    const bool startCamerasMode = params.contains(lit("startCamerasMode"));
 
     QString fileName = getDataDirectory() + "/scripts/" + kScriptName;
     if (!QFile::exists(fileName))
@@ -80,6 +81,9 @@ int QnStartLiteClientRestHandler::executeGet(
         "--url", url.toString(),
         "--videowall-instance-guid", videowallInstanceGuid.toString(),
         "--log-level", QnLog::logLevelToString(QnLog::instance()->logLevel())};
+
+    if (startCamerasMode)
+        args.append(QStringList{"--auto-login", "enabled"});
 
     NX_LOG(lit("startLiteClient: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
 
