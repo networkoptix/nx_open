@@ -19,7 +19,7 @@ class QnTcpListenerPrivate;
 class QnTcpListener: public QnLongRunnable
 {
 public:
-    static const int DEFAULT_MAX_CONNECTIONS = 1000;
+    static const int DEFAULT_MAX_CONNECTIONS = 2000;
 
     bool authenticate(const nx_http::Request& headers, nx_http::Response& responseHeaders) const;
 
