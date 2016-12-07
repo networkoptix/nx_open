@@ -656,7 +656,7 @@ class ClusterWorker(object):
     _prestarted = False
     _working = False
 
-    def __init__(self, num, queue_size=0, doStart=False):
+    def __init__(self, num, queue_size=0, doStart=False, startEvent = None):
         self._threadNum = num
         if queue_size == 0:
             queue_size = num
@@ -666,6 +666,7 @@ class ClusterWorker(object):
         self._threadList = []
         self._oks = []
         self._fails = []
+        self._startEvent = startEvent
         if doStart:
             self._prestarted = True
             self.startThreads()
@@ -676,6 +677,7 @@ class ClusterWorker(object):
     def _worker(self, num):
         while self._do_work():
             func, args = self._queue.get(True)
+            if self._startEvent: self._startEvent.wait()
             try:
                 func(*args)
             except LegacyTestFailure as err:
@@ -830,11 +832,14 @@ def sendRequest(lock, url, data, notify=False):
     req = urllib2.Request(url, data=data, headers={'Content-Type': 'application/json'})
     try:
         with lock:
-            if notify:
-                log(LOGLEVEL.DEBUG + 9, "Requesting " + url)
             response = urllib2.urlopen(req)
+            if notify:
+                if data:
+                    log(LOGLEVEL.DEBUG + 9, "Requesting '%s': '%s'" % (url, data))
+                else:
+                    log(LOGLEVEL.DEBUG + 9, "Requesting '%s'" % url)
     except Exception as err:
-        raise TestRequestError(url, err.message or str(err), data)
+        raise TestRequestError(url, str(err), data)
     if response.getcode() != 200:
         raise TestRequestError(url, "HTTP error code %s" % (response.getcode(),), data)
     response.close()
