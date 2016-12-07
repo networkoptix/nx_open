@@ -68,20 +68,6 @@ namespace ec2
         return reqID;
     }
 
-    template<typename ProcessorType>
-    void QnResourceManager<ProcessorType>::removeKvPairs(
-        const ec2::ApiResourceParamWithRefDataList& params, 
-        std::function<void(ErrorCode)> handler)
-    {
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::removeResourceParams, 
-            params,
-            [handler](ErrorCode ecode)
-            {
-                handler(ecode);
-            });
-    }
-
     template<class T>
     int QnResourceManager<T>::getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler )
     {

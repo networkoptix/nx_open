@@ -439,8 +439,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
             }
         }
 
-        cleanupDanglingDbObjects();
-
         if (QnTransactionLog::instance())
             if (!QnTransactionLog::instance()->init())
             {
