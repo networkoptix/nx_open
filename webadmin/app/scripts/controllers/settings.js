@@ -1,11 +1,13 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope,$rootScope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
+    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
+                                          cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
 
         function updateActive(){
             $scope.active={
+                device: $location.path() === '/settings/device',
                 system: $location.path() === '/settings/system',
                 server: $location.path() === '/settings/server'
             };
@@ -17,23 +19,32 @@ angular.module('webadminApp')
             killSubscription();
         });
 
-        mediaserver.getModuleInformation().then(function (r) {
-            Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
+        function pingModule(){
+            return mediaserver.getModuleInformation(true).then(function(r){
+                if(!data.flags.brokenSystem){
+                     window.location.reload();
+                }
+                return true;
+            });
+        };
 
-            if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
+        mediaserver.getModuleInformation().then(function (r) {
+            var data = r.data.reply;
+
+            if(data.flags.newSystem){
                 return;
             }
 
+            $scope.settings = data;
+            // $scope.noNetwork =
 
-            $scope.settings = {
-                systemName: r.data.reply.systemName,
-                port: r.data.reply.port,
-                id: r.data.reply.id,
-                ecDbReadOnly:r.data.reply.ecDbReadOnly
-            };
+            $scope.oldSystemName = data.systemName;
+            $scope.oldPort = data.port;
 
-            $scope.oldSystemName = r.data.reply.systemName;
-            $scope.oldPort = r.data.reply.port;
+            if(data.flags.brokenSystem){
+                $poll(pingModule,1000);
+                return;
+            }
             checkUserRights();
         });
 
@@ -44,14 +55,19 @@ angular.module('webadminApp')
                     return false;
                 }
 
+                $scope.$watch("active.device",function(){
+                    if( $scope.active.device){
+                        $location.path('/settings/device',false);
+                    }
+                });
                 $scope.$watch("active.system",function(){
                     if( $scope.active.system){
-                        $location.path('/settings/system');
+                        $location.path('/settings/system',false);
                     }
                 });
                 $scope.$watch("active.server",function(){
                     if( $scope.active.server){
-                        $location.path('/settings/server');
+                        $location.path('/settings/server',false);
                     }
                 });
 
@@ -166,15 +182,16 @@ angular.module('webadminApp')
         $scope.canHardwareRestart = false;
         $scope.canRestoreSettings = false;
         $scope.canRestoreSettingsNotNetwork = false;
-
         function requestScripts() {
             return mediaserver.getScripts().then(function (data) {
                 if (data.data && data.data.reply) {
+
+                    // Has any scripts
+                    $scope.controlDevice = data.data.reply && data.data.reply.length>0;
+
                     $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                     $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                     $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
-                    $scope.canRunClient = data.data.reply.indexOf('start_lite_client') >= 0;
-                    $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
                 }
             });
         }
@@ -183,21 +200,14 @@ angular.module('webadminApp')
         function runResultHandler(result){
             resultHandler(result, L.settings.nx1ControlHint);
         }
-        $scope.runClient = function(){
-            mediaserver.execute('start_lite_client').then(runResultHandler, errorHandler);
-        };
-
-        $scope.stopClient = function(){
-            mediaserver.execute('stop_lite_client').then(resultHandler, errorHandler);
-        };
 
         $scope.renameSystem = function(){
             mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
         };
 
-        $scope.hardwareRestart = function(){
-            dialogs.confirm(L.settings.confirmHardwareRestart).then(function(){
-                mediaserver.execute('reboot').then(resultHandler, errorHandler);
+        $scope.hardwareRestart = function(settingsSaved){
+            dialogs.confirm(settingsSaved?L.settings.restartNeeded:L.settings.confirmHardwareRestart).then(function(){
+                mediaserver.execute('reboot').then(restartServer, errorHandler);
             });
         };
 
@@ -333,7 +343,59 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(true); //Open Connect Dialog
         };
+        mediaserver.networkSettings().then(function(r){
+            $scope.networkSettings = r.data.reply;
+        });
+        $scope.saveNetworkSettings = function(){
+            mediaserver.networkSettings($scope.networkSettings).then(function(){
+                $scope.hardwareRestart(true);
+            }, errorHandler);
+        };
 
+        mediaserver.getTimeZones().then(function(reply){
 
+            var zones = reply.data.reply;
+            zones = _.sortBy(zones,function(zone){
+                return zone.comment;
+            });
+            /*$scope.alltimeZones = _.indexBy(zones,function(zone){
+                return zone.id;
+            });
+            zones = _.uniq(zones, false, function(zone){
+                return zone.comment;
+            });*/
+            $scope.timeZones = zones;
 
+            return mediaserver.timeSettings().then(function(reply){
+                var time = reply.data.reply;
+                $scope.dateTimeSettings = {
+                    timeZone: time.timezoneId,
+                    dateTime: new Date(time.utcTime * 1),
+                    openDate: true
+                };
+                /*
+                var currentZone = $scope.alltimeZones[time.timezoneId];
+                if($scope.timeZones.indexOf(currentZone)<=0){
+                    $scope.timeZones.push(currentZone);
+                }
+                */
+            });
+        });
+
+        $scope.openDatePicker = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dateTimeSettings.openDate = true;
+        };
+
+        $scope.saveDateTime = function(){
+            mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
+                then(resultHandler,errorHandler);
+        };
+
+        $scope.openLink = function($event){
+            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
     });

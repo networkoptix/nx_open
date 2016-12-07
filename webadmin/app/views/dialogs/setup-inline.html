@@ -17,11 +17,31 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('start')">
-    <div class="vertical-center">
+    <div ng-class="{'vertical-center':!liteClient,'master-description':liteClient}">
         <h2>Get Started with {{Config.productName}}</h2>
         <p>You need to configure your server before using it.<br>
         Don't worry. This won't take long.</p>
+        <div class="row" ng-if="liteClient">
+            <div class="col-xs-12">
+               <p>
+                   You also can set it up from another computer by connecting<br>
+                   to this device by one of the next ways:
+               </p>
+            </div>
+            <div class="col-xs-6">
+                <div class="text-center"><b>Using web browser</b></div>
+                <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            </div>
+            <div class="col-xs-6">
+                <div class="text-center"><b>Using {{Config.productName}} application</b></div>
+                <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+                <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+                <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+                <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            </div>
+        </div>
     </div>
+
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
@@ -102,7 +122,9 @@
     <p class="master-description">
         Available from everywhere<br>
         Requires Internet connection<br>
-        <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a>
+        <a ng-if="!liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
+           target="_blank" ng-click="openLink($event)">Learn more</a>
+        <span ng-if="liteClient">Learn more: {{portalUrl}}</span>
     </p>
 </div>
 
@@ -169,6 +191,12 @@
         <div class="form-group has-error" ng-if="settings.cloudError">
             <p class="help-block">
                 {{settings.cloudError}}
+            </p>
+        </div>
+
+        <div class="form-group" ng-if="liteClient">
+            <p class="help-block">
+                To create an account please visit {{portalUrl}}
             </p>
         </div>
     </form>
@@ -295,7 +323,8 @@
     <p>Log in</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Sharing and account settings</p>
-    <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
+    <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
+           ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
@@ -308,6 +337,24 @@
 </div>
 
 
+<div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
+    <p><b>You need to configure network settings first</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
+    <p><b>Configure network to set up Internet connection</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
+    </p>
+</div>
+
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>Connect your server to the Internet</h2>
@@ -317,6 +364,9 @@
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
         <button class="btn btn-default" ng-click="skip()">Setup local system</button>
+    </p>
+    <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
+        <a href="" ng-click="next('configureNetworkForInternet')">Configure network settings</a>
     </p>
 </div>
 
