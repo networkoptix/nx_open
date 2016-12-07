@@ -1,14 +1,10 @@
-/**********************************************************
-* Feb 24, 2016
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
-#include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/test_support/test_options.h>
@@ -85,6 +81,14 @@ NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE_EX(
     [&](){ return cloudServerSocket(); },
     [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
     SocketAddress(m_server->fullName()));
+
+TEST_F(UdpHolePunching, SimpleSyncSsl)
+{
+    network::test::socketSimpleSync(
+        [&]() { return std::make_unique<SslServerSocket>(cloudServerSocket().release(), false); },
+        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        SocketAddress(m_server->fullName()));
+}
 
 TEST_F(UdpHolePunching, loadTest)
 {
