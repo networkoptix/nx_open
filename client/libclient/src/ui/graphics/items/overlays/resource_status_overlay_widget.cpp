@@ -38,7 +38,7 @@ void setupButton(QPushButton& button)
 {
     static const auto kDefaultButtonHeight = 28.0;
 
-    button.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     button.setFixedHeight(kDefaultButtonHeight);
 
     static const auto kButtonName = lit("itemStateExtraActionButton");
@@ -207,6 +207,7 @@ void QnStatusOverlayWidget::setCaption(const QString& caption)
 void QnStatusOverlayWidget::setButtonText(const QString& text)
 {
     m_button->setText(text);
+    m_button->adjustSize();
     updateAreasSizes();
 }
 

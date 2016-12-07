@@ -57,6 +57,7 @@ namespace style
     const int Metrics::kPushButtonIconMargin = 6;
 
     const qreal Hints::kDisabledItemOpacity = 0.3;
+    const int Hints::kMinimumFormLabelWidth = 64;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";
@@ -72,6 +73,7 @@ namespace style
     const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
     const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
     const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
+    const char* Properties::kMenuNoMouseReplayRect = "_qn_menuNoMouseReplayRect";
 
 
     bool isDark(const QColor &color)

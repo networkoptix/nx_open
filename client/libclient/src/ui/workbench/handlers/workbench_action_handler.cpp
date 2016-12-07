@@ -545,7 +545,7 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
 {
     qreal value = workbench()->currentLayout()->cellSpacing();
 
-    if (qFuzzyCompare(0.0, value))
+    if (qFuzzyIsNull(value))
         action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
     else if (qFuzzyCompare(0.1, value))
         action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
@@ -1875,7 +1875,7 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
     QnLayoutResourcePtr layout = wlayout->resource();
 
     layout->setBackgroundImageFilename(filename);
-    if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
+    if (qFuzzyIsNull(layout->backgroundOpacity()))
         layout->setBackgroundOpacity(0.7);
 
     wlayout->centralizeItems();

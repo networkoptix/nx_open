@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver,
+    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
 
@@ -19,6 +19,15 @@ angular.module('webadminApp')
             killSubscription();
         });
 
+        function pingModule(){
+            return mediaserver.getModuleInformation(true).then(function(r){
+                if(!data.flags.brokenSystem){
+                     window.location.reload();
+                }
+                return true;
+            });
+        };
+
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
 
@@ -31,6 +40,11 @@ angular.module('webadminApp')
 
             $scope.oldSystemName = data.systemName;
             $scope.oldPort = data.port;
+
+            if(data.flags.brokenSystem){
+                $poll(pingModule,1000);
+                return;
+            }
             checkUserRights();
         });
 
@@ -178,8 +192,6 @@ angular.module('webadminApp')
                     $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                     $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                     $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
-                    $scope.canRunClient = data.data.reply.indexOf('start_lite_client') >= 0;
-                    $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
                 }
             });
         }
@@ -188,13 +200,6 @@ angular.module('webadminApp')
         function runResultHandler(result){
             resultHandler(result, L.settings.nx1ControlHint);
         }
-        $scope.runClient = function(){
-            mediaserver.execute('start_lite_client').then(runResultHandler, errorHandler);
-        };
-
-        $scope.stopClient = function(){
-            mediaserver.execute('stop_lite_client').then(resultHandler, errorHandler);
-        };
 
         $scope.renameSystem = function(){
             mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
@@ -309,9 +314,9 @@ angular.module('webadminApp')
                  */
             }
             dialogs.confirmWithPassword(
-                L.settings.confirmDisconnectFromCloudTitle,
-                L.settings.confirmDisconnectFromCloud,
-                L.settings.confirmDisconnectFromCloudAction,
+                L.settings.confirmDisconnectFromCloudTitle.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                L.settings.confirmDisconnectFromCloud.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                L.settings.confirmDisconnectFromCloudAction.replace("{{CLOUD_NAME}}",Config.cloud.productName),
                 'danger').then(function (oldPassword) {
                 //1. Check password
                 return mediaserver.checkCurrentPassword(oldPassword).then(function() {
@@ -389,8 +394,7 @@ angular.module('webadminApp')
         };
 
         $scope.openLink = function($event){
-            var url = $event.target.baseURI;
-            nativeClient.openUrlInBrowser(url,true);
+            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
             $event.stopPropagation();
             $event.preventDefault();
         };

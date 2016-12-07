@@ -3,8 +3,11 @@
 var L = {
     dialogs:{
         okButton: 'Ok',
-        loginTitle: 'Login to Nx Cloud',
-        openLink: 'Visit this link'
+        openLink: 'Visit this link',
+        openLinkWithTitle: 'To {{title}} visit this link'
+    },
+    setup:{
+        createAccount: 'create account'
     },
     passwordRequirements:
     {
@@ -30,7 +33,7 @@ var L = {
         confirmRestoreSettingsNotNetwork: 'Do you want to restart all server\'s settings? Archive and network settings will be saved.',
         unavailable: 'Unavailable',
 
-        confirmDisconnectFromCloud:'Disconnect system from the Nx Cloud',
+        confirmDisconnectFromCloud:'Disconnect system from the {{CLOUD_NAME}}',
         confirmDisconnectFromCloudTitle:'Do you want to disconnect your system? It will be unreachable from the internet then.',
         confirmDisconnectFromCloudAction: 'Disconnect',
         createLocalOwner:null,

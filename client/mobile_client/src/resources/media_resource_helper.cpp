@@ -63,6 +63,7 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
     emit customAspectRatioChanged();
     emit customRotationChanged();
     emit resourceStatusChanged();
+    emit videoLayoutChanged();
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const
@@ -98,7 +99,7 @@ int QnMediaResourceHelper::channelCount() const
 QSize QnMediaResourceHelper::layoutSize() const
 {
     Q_D(const QnMediaResourceHelper);
-    return d->camera ? d->camera->getVideoLayout()->size() : QSize();
+    return d->camera ? d->camera->getVideoLayout()->size() : QSize(1, 1);
 }
 
 QPoint QnMediaResourceHelper::channelPosition(int channel) const

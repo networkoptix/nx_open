@@ -134,12 +134,10 @@ void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr
 
         {
             QnMutexLocker lk(&m_mutex);
-            for (auto iter = m_aggregatorsBySubject.cbegin();
-                iter != m_aggregatorsBySubject.cend();
-                ++iter)
+            for (const auto& aggregator: m_aggregatorsBySubject)
             {
-                if ((*iter)->hasLayout(layout))
-                    aggregators.push_back(*iter);
+                if (aggregator->hasLayout(layout))
+                    aggregators.push_back(aggregator);
             }
         }
 
@@ -232,8 +230,9 @@ QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForS
 
     {
         QnMutexLocker lk(&m_mutex);
-        if (m_aggregatorsBySubject.contains(id))
-            return m_aggregatorsBySubject.value(id);
+        const auto existing = m_aggregatorsBySubject.constFind(id);
+        if (existing != m_aggregatorsBySubject.cend())
+            return *existing;
 
         QnLayoutItemAggregatorPtr aggregator(new QnLayoutItemAggregator());
         connect(aggregator, &QnLayoutItemAggregator::itemAdded, this,

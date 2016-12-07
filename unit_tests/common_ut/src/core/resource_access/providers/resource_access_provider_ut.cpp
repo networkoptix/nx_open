@@ -195,17 +195,22 @@ TEST_F(QnResourceAccessProviderTest, checkAccessProviders)
 
     QnResourceList providers;
 
+    /* Now function will return full list of all providers. */
+    QnResourceList expectedProviders;
+
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    expectedProviders << videoWall;
     accessProvider()->accessibleVia(user, camera, &providers);
-    ASSERT_EQ(providers, QnResourceList() << videoWall);
+    ASSERT_EQ(expectedProviders, providers);
 
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId();
     qnSharedResourcesManager->setSharedResources(user, sharedIds);
+    expectedProviders.prepend(sharedLayout);
     accessProvider()->accessibleVia(user, camera, &providers);
-    ASSERT_EQ(providers, QnResourceList() << sharedLayout);
+    ASSERT_EQ(expectedProviders, providers);
 
     sharedIds << camera->getId();
     qnSharedResourcesManager->setSharedResources(user, sharedIds);
     accessProvider()->accessibleVia(user, camera, &providers);
-    ASSERT_TRUE(providers.empty());
+    ASSERT_EQ(expectedProviders, providers);
 }

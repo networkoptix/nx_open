@@ -22,3 +22,4 @@ CircleBusyIndicator 1.0 CircleBusyIndicator.qml
 WarningPanel 1.0 WarningPanel.qml
 FieldWarning 1.0 FieldWarning.qml
 ZoomableFlickable 1.0 ZoomableFlickable.qml
+WheelSwitchArea 1.0 WheelSwitchArea.qml

@@ -217,9 +217,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
 
         //TODO: #vkutin #GDM #common Refactor/replace this role
         case Qn::DisabledRole:
-            return m_checkedResources.contains(resource->getId())
-                ? false
-                : true;
+            return !m_checkedResources.contains(resource->getId());
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(resource);

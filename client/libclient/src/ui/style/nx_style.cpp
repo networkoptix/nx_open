@@ -39,13 +39,18 @@
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-
-#define CUSTOMIZE_POPUP_SHADOWS
-
 using namespace style;
 
 namespace
 {
+    constexpr bool kCustomizePopupShadows = true;
+
+#if defined(Q_OS_WIN) || defined(Q_OS_OSX)
+    constexpr bool kForceMenuMouseReplay = true;
+#else
+    constexpr bool kForceMenuMouseReplay = false;
+#endif
+
     const char* kDelegateClassBackupId = "delegateClass";
     const char* kViewportMarginsBackupId = "viewportMargins";
     const char* kContentsMarginsBackupId = "contentsMargins";
@@ -171,6 +176,11 @@ namespace
             return button->features.testFlag(QStyleOptionButton::Flat);
 
         return false;
+    }
+
+    bool isAccented(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kAccentStyleProperty).toBool();
     }
 
     bool isSwitchButtonCheckbox(const QWidget* widget)
@@ -401,17 +411,56 @@ QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
     //TODO: Think through how to make it better
-    /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates: */
-    installEventHandler(qApp, QEvent::WindowDeactivate, this,
+    /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates.
+     * Menu popups do not cause deactivation but steal focus so we should handle that too. */
+    installEventHandler(qApp, { QEvent::WindowDeactivate, QEvent::FocusOut }, this,
         [this](QObject* watched, QEvent*)
-    {
-        auto view = qobject_cast<QGraphicsView*>(watched);
-        if (!view || !view->scene())
-            return;
+        {
+            auto view = qobject_cast<QGraphicsView*>(watched);
+            if (!view || !view->scene())
+                return;
 
-        if (auto grabber = view->scene()->mouseGrabberItem())
-            grabber->ungrabMouse();
-    });
+            while (auto grabber = view->scene()->mouseGrabberItem())
+                grabber->ungrabMouse();
+        });
+
+    /* Windows-style handling of mouse clicks outside of popup menu. */
+    //QTBUG: Qt is supposed to handle this, but currently it seems broken.
+    if (kForceMenuMouseReplay)
+    {
+        installEventHandler(qApp, QEvent::MouseButtonPress, this,
+            [this](QObject* watched, QEvent* event)
+            {
+                if (!event->spontaneous())
+                    return;
+
+                auto activeMenu = qobject_cast<QMenu*>(qApp->activePopupWidget());
+                if (activeMenu != watched)
+                    return;
+
+                auto mouseEvent = static_cast<QMouseEvent*>(event);
+                auto globalPos = mouseEvent->globalPos();
+
+                if (activeMenu->geometry().contains(globalPos))
+                    return;
+
+                /* If menu was invoked by a click on some area we most probably want to
+                 * prevent re-invoking menu if it was closed by click in the same area: */
+                QRect noReplayRect = activeMenu->property(Properties::kMenuNoMouseReplayRect).value<QRect>();
+                if (noReplayRect.isValid() && noReplayRect.contains(globalPos))
+                    return;
+
+                auto window = QGuiApplication::topLevelAt(globalPos);
+                if (!window || window->flags().testFlag(Qt::Popup))
+                    return;
+
+                auto localPos = window->mapFromGlobal(globalPos);
+
+                qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
+                    localPos, globalPos, mouseEvent->button(),
+                    mouseEvent->buttons(), mouseEvent->modifiers()), Qt::HighEventPriority);
+            });
+    }
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
@@ -467,9 +516,9 @@ void QnNxStyle::drawPrimitive(
             if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
-            QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ?
-                                        option->palette.color(QPalette::HighlightedText) :
-                                        option->palette.color(QPalette::Highlight);
+            QColor color = isAccented(widget)
+                ? option->palette.color(QPalette::HighlightedText)
+                : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
             QnScopedPainterPenRollback penRollback(painter, QPen(color, 0, Qt::DotLine));
@@ -488,10 +537,11 @@ void QnNxStyle::drawPrimitive(
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
-            if (option->state.testFlag(State_Enabled))
+            if (isAccented(widget))
             {
-                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBrand);
+                mainColor = this->mainColor(Colors::kBrand);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -560,10 +610,11 @@ void QnNxStyle::drawPrimitive(
                 }
             }
 
-            if (option->state.testFlag(State_Enabled))
+            if (isAccented(widget))
             {
-                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
-                    mainColor = this->mainColor(Colors::kBrand);
+                mainColor = this->mainColor(Colors::kBrand);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -749,15 +800,18 @@ void QnNxStyle::drawPrimitive(
                 bool hasSelection = item->state.testFlag(State_Selected);
                 bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
-                bool hasHover = item->state.testFlag(State_MouseOver);
-                bool suppressHover = selectionOpaque;
+                /* Obtain hover information: */
+                auto hoverBrush = option->palette.midlight();
+                bool hoverTransparent = hoverBrush.color().alpha() == 0;
+                bool hasHover = item->state.testFlag(State_MouseOver) && !hoverTransparent;
+                bool skipHoverDrawing = selectionOpaque;
 
-                if (widget && !suppressHover)
+                if (widget && !hoverTransparent)
                 {
                     if (!widget->isEnabled() || widget->property(Properties::kSuppressHoverPropery).toBool())
                     {
-                        /* Itemviews with kSuppressHoverProperty should suppress hover. */
-                        suppressHover = true;
+                        /* Itemviews with kSuppressHoverProperty should never draw hover. */
+                        hasHover = false;
                     }
                     else
                     {
@@ -770,27 +824,25 @@ void QnNxStyle::drawPrimitive(
 
                             /* For items without Qt::ItemIsEnabled flag we should
                              * draw hover only if selection behavior is SelectRows. */
-                            suppressHover = hoverDrawn
+                            skipHoverDrawing = hoverDrawn
                                 || treeView->selectionBehavior() != QAbstractItemView::SelectRows;
                         }
 
-                        if (!suppressHover)
-                        {
-                            /* Obtain Nx hovered row information: */
-                            QVariant value = widget->property(Properties::kHoveredRowProperty);
-                            if (value.isValid())
-                                hasHover = value.toInt() == item->index.row();
-                        }
+                        /* Obtain Nx hovered row information: */
+                        QVariant value = widget->property(Properties::kHoveredRowProperty);
+                        if (value.isValid())
+                            hasHover = value.toInt() == item->index.row();
                     }
                 }
 
+                /* Draw model-enforced background if needed: */
                 QVariant background = item->index.data(Qt::BackgroundRole);
                 if (background.isValid() && background.canConvert<QBrush>())
                     painter->fillRect(item->rect, background.value<QBrush>());
 
                 /* Draw hover marker if needed: */
-                if (hasHover && !suppressHover)
-                    painter->fillRect(item->rect, option->palette.midlight());
+                if (hasHover && !skipHoverDrawing)
+                    painter->fillRect(item->rect, hoverBrush);
 
                 /* Draw selection marker if needed: */
                 if (hasSelection)
@@ -907,8 +959,8 @@ void QnNxStyle::drawPrimitive(
                 return;
 
             auto icon = option->state.testFlag(State_Open)
-                ? qnSkin->icon("tree/branch_closed.png")
-                : qnSkin->icon("tree/branch_open.png");
+                ? qnSkin->icon("tree/branch_open.png")
+                : qnSkin->icon("tree/branch_closed.png");
 
             icon.paint(painter, option->rect);
             return;
@@ -2207,17 +2259,21 @@ void QnNxStyle::drawControl(
                 QPalette::ColorRole foregroundRole = widget
                     ? widget->foregroundRole()
                     : QPalette::ButtonText;
+                const bool isDefaultForegroundRole = (foregroundRole == QPalette::ButtonText);
 
                 /* Draw text button: */
                 if (isTextButton(option))
                 {
                     /* Foreground role override: */
-                    if (foregroundRole == QPalette::ButtonText)
+                    if (isDefaultForegroundRole)
                         foregroundRole = QPalette::WindowText;
 
                     d->drawTextButton(painter, buttonOption, foregroundRole, widget);
                     return;
                 }
+
+                if (isDefaultForegroundRole && isAccented(widget))
+                    foregroundRole = QPalette::HighlightedText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
@@ -2987,9 +3043,12 @@ QSize QnNxStyle::sizeFromContents(
                 const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
                 if (spinBox && spinBox->subControls.testFlag(SC_ComboBoxArrow))
                 {
+                    constexpr int kSafetyMargin = 8; //< as QDateTimeEdit calcs size not by the longest possible string
                     int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
                     int height = qMax(size.height(), Metrics::kButtonHeight);
-                    int width = qMax(Metrics::kMinimumButtonWidth, size.width() + hMargin + height);
+                    int buttonWidth = height;
+                    int width = qMax(Metrics::kMinimumButtonWidth,
+                        size.width() + hMargin + kSafetyMargin + buttonWidth);
                     return QSize(width, height);
                 }
             }
@@ -3627,8 +3686,7 @@ void QnNxStyle::polish(QWidget *widget)
     if (auto label = qobject_cast<QLabel*>(widget))
         QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
 
-#ifdef CUSTOMIZE_POPUP_SHADOWS
-    if (popupToCustomizeShadow)
+    if (kCustomizePopupShadows && popupToCustomizeShadow)
     {
         /* Create customized shadow: */
         if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
@@ -3641,7 +3699,6 @@ void QnNxStyle::polish(QWidget *widget)
             shadow->setSpread(0);
         }
     }
-#endif
 
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
@@ -3694,10 +3751,8 @@ void QnNxStyle::unpolish(QWidget* widget)
         }
     }
 
-#ifdef CUSTOMIZE_POPUP_SHADOWS
-    if (popupWithCustomizedShadow)
+    if (kCustomizePopupShadows && popupWithCustomizedShadow)
         QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
-#endif
 
     if (auto label = qobject_cast<QLabel*>(widget))
         QnObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);

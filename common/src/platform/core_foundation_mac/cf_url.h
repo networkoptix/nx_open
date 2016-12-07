@@ -14,7 +14,10 @@ class QnCFUrl : public QnCFRefHolder<CFURLRef>
 public:
     static QnCFUrl createFileUrl(const QString& fileName);
 
+    static QString toString(const CFURLRef ref);
+
     ~QnCFUrl();
+
 
 private:
     QnCFUrl();

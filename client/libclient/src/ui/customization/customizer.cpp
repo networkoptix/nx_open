@@ -307,31 +307,73 @@ private:
 // -------------------------------------------------------------------------- //
 // Palette extraction
 // -------------------------------------------------------------------------- //
-namespace
+namespace {
+
+static const QString kCorePattern = lit("_core");
+static const QString kDarkerPattern = lit("_d%1");
+static const QString kLighterPattern = lit("_l%1");
+
+QnColorList extractCoreBasedColors(const QString &group, const QnCustomizationSerializer &serializer)
 {
-    QnColorList extractColors(const QString &group, const QnCustomizationSerializer &serializer)
+    QnColorList colors;
+    QString coreKey = group + kCorePattern;
+    QColor coreColor = serializer.globalConstant(coreKey).value<QColor>();
+    NX_ASSERT(coreColor.isValid());
+    colors.append(coreColor);
+
     {
-        QnColorList colors;
-
-        auto colorLess = [](const QColor &c1, const QColor &c2)
+        int idx = 1;
+        QString darkKey = group + kDarkerPattern.arg(idx);
+        while (serializer.globals().contains(darkKey))
         {
-            return c1.convertTo(QColor::Hsl).lightness() < c2.convertTo(QColor::Hsl).lightness();
-        };
-
-        for (const QString &constant: serializer.globals().keys())
-        {
-            if (!constant.startsWith(group))
-                continue;
-
-            QColor color = serializer.globalConstant(constant).value<QColor>();
-            if (!color.isValid())
-                continue;
-
-            colors.insert(std::lower_bound(colors.begin(), colors.end(), color, colorLess), color);
+            QColor darkColor = serializer.globalConstant(darkKey).value<QColor>();
+            NX_ASSERT(darkColor.isValid());
+            colors.prepend(darkColor);
+            darkKey = group + kDarkerPattern.arg(++idx);
         }
-
-        return colors;
     }
+
+    {
+        int idx = 1;
+        QString lightKey = group + kLighterPattern.arg(idx);
+        while (serializer.globals().contains(lightKey))
+        {
+            QColor lightColor = serializer.globalConstant(lightKey).value<QColor>();
+            NX_ASSERT(lightColor.isValid());
+            colors.append(lightColor);
+            lightKey = group + kLighterPattern.arg(++idx);
+        }
+    }
+
+    return colors;
+}
+
+QnColorList extractColors(const QString &group, const QnCustomizationSerializer &serializer)
+{
+    if (serializer.globals().contains(group + kCorePattern))
+        return extractCoreBasedColors(group, serializer);
+
+    QnColorList colors;
+
+    auto colorLess = [](const QColor &c1, const QColor &c2)
+    {
+        return c1.convertTo(QColor::Hsl).lightness() < c2.convertTo(QColor::Hsl).lightness();
+    };
+
+    for (const QString &constant : serializer.globals().keys())
+    {
+        if (!constant.startsWith(group))
+            continue;
+
+        QColor color = serializer.globalConstant(constant).value<QColor>();
+        if (!color.isValid())
+            continue;
+
+        colors.insert(std::lower_bound(colors.begin(), colors.end(), color, colorLess), color);
+    }
+
+    return colors;
+}
 }
 
 

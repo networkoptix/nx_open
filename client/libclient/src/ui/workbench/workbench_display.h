@@ -40,6 +40,7 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnResourceWidget;
 class QnResourceDisplay;
+typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class ViewportAnimator;
 class VariantAnimator;
 class WidgetAnimator;
@@ -182,7 +183,7 @@ public:
 
     QnResourceWidget* activeWidget() const;
 
-    QnResourceDisplay *display(QnWorkbenchItem *item) const;
+    QnResourceDisplayPtr display(QnWorkbenchItem *item) const;
 
     QnClientVideoCamera *camera(QnWorkbenchItem *item) const;
 

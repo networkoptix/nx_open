@@ -31,9 +31,7 @@ public:
     /** Stops watching layout. Returns false if layout was not watched. */
     bool removeWatchedLayout(const QnLayoutResourcePtr& layout);
 
-    using key_iterator = QSet<QnLayoutResourcePtr>::const_iterator;
-    key_iterator layoutBegin() const;
-    key_iterator layoutEnd() const;
+    QSet<QnLayoutResourcePtr> watchedLayouts() const;
 
     bool hasLayout(const QnLayoutResourcePtr& layout) const;
     bool hasItem(const QnUuid& id) const;

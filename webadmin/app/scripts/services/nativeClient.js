@@ -22,6 +22,7 @@ angular.module('webadminApp')
 
         return {
             init:function(){
+                $log.log("try to init native client");
                 if(nativeClientObject){
                     return $q.resolve({thick:true});
                 }
@@ -61,7 +62,8 @@ angular.module('webadminApp')
 
                 return deferred.promise;
             },
-            getCredentials:function(){
+            getCredentialsRaw:function(){
+                $log.log("try to get credentials from native client");
                 if(nativeClientObject && nativeClientObject.getCredentials){
                     return $q.resolve(nativeClientObject.getCredentials());
                 }
@@ -76,7 +78,24 @@ angular.module('webadminApp')
 
                 return $q.reject();
             },
-            openUrlInBrowser:function(url, windowFallback){
+
+            getCredentials:function(){
+                return this.getCredentialsRaw().then(function(authObject){
+                    if (typeof authObject === 'string' || authObject instanceof String) {
+                        $log.log("got string from client, try to decode JSON: " + authObject);
+                        try {
+                            authObject = JSON.parse(authObject);
+                        } catch (a) {
+                            $log("could not decode JSON from string: " + authObject);
+                        }
+                    }
+                    $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
+                    return authObject;
+                });
+            },
+            openUrlInBrowser:function(url, title, windowFallback){
+                $log.log("openUrlInBrowser", url, windowFallback);
+
                 if(nativeClientObject && nativeClientObject.openUrlInBrowser){
                     return $q.resolve(nativeClientObject.openUrlInBrowser(url));
                 }
@@ -90,7 +109,8 @@ angular.module('webadminApp')
                 }
 
                 if(socketClientController){
-                    dialogs.alert(url, L.dialogs.openLink);
+                    var header = !title?L.dialogs.openLink:L.dialogs.openLinkWithTitle.replace("{{title}}", title);
+                    dialogs.alert(url, header);
                     return $q.resolve();
                 }
 
@@ -100,6 +120,7 @@ angular.module('webadminApp')
                 return $q.reject();
             },
             updateCredentials:function(login,password,isCloud){
+                $log.log("try to update credentials for native client");
                 if(nativeClientObject && nativeClientObject.updateCredentials){
                     return $q.resolve(nativeClientObject.updateCredentials (login,password,isCloud));
                 }
@@ -134,18 +155,10 @@ angular.module('webadminApp')
                     return $q.resolve();
                 }
 
-                if(socketClientController){ // Lite client - go to invitation page and reload
-                    $log.log("navigate to client tab");
-                    $location.path("/client");
-                    setTimeout(function(){
-                        window.location.reload();
-                    });
-                    return $q.resolve();
-                }
-
                 return $q.reject(); // No client - reject
             },
             startCamerasMode:function(){
+                $log.log("try to start cameras mode in native client");
                 if(nativeClientObject && nativeClientObject.startCamerasMode){
                     return $q.resolve(nativeClientObject.startCamerasMode());
                 }

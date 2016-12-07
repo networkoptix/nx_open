@@ -191,7 +191,7 @@ void QnSpeedSlider::sliderChange(SliderChange change)
         emit speedChanged(speed());
 
         qreal roundedSpeed = this->roundedSpeed();
-        if (!qFuzzyCompare(roundedSpeed, m_roundedSpeed))
+        if (!qFuzzyEquals(roundedSpeed, m_roundedSpeed))
         {
             m_roundedSpeed = roundedSpeed;
             setToolTip(!qFuzzyIsNull(roundedSpeed) ? tr("%1x").arg(roundedSpeed) : tr("Paused"));

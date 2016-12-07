@@ -15,6 +15,9 @@ public:
 
     explicit QnCFRefHolder(CFRefType ref);
 
+    template<typename Target, typename Source>
+    static Target makeOwned(Source ref);
+
     ~QnCFRefHolder();
 
     CFRefType ref();
@@ -57,11 +60,19 @@ QnCFRefHolder<CFRefType>::QnCFRefHolder(CFRefType ref)
 {
 }
 
+
+template<typename CFRefType>
+template<typename Target, typename Source>
+Target QnCFRefHolder<CFRefType>::makeOwned(Source ref)
+{
+    return Target(reinterpret_cast<Source>(CFRetain(ref)));
+}
+
 template<typename CFRefType>
 QnCFRefHolder<CFRefType>::~QnCFRefHolder()
 {
     if (m_ref)
-        CFRetain(m_ref);
+        CFRelease(m_ref);
 }
 
 template<typename CFRefType>

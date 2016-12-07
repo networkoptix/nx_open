@@ -43,7 +43,7 @@ angular.module('webadminApp', [
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
         })
-        .when('/settings/', {
+        .when('/settings', {
             redirectTo: '/settings/server'
         })
         .when('/join', {
@@ -104,8 +104,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/dialogs/setup.html',
             controller: 'SetupCtrl'
         })
+        .when('/', {
+            template: '',
+            controller: 'MainCtrl'
+        })
         .otherwise({
-            redirectTo: '/settings'
+            redirectTo: '/'
         });
 }).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location, $localStorage) {
     var original = $location.path;

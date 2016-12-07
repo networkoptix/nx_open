@@ -762,7 +762,7 @@ void QnTimeSlider::setLineStretch(int line, qreal stretch)
     if (!checkLine(line))
         return;
 
-    if (qFuzzyCompare(m_lineData[line].stretch, stretch))
+    if (qFuzzyEquals(m_lineData[line].stretch, stretch))
         return;
 
     m_lineData[line].stretch = stretch;
@@ -1956,7 +1956,7 @@ void QnTimeSlider::updateTotalLineStretch()
     for (int line = 0; line < m_lineCount; line++)
         totalLineStretch += effectiveLineStretch(line);
 
-    if (qFuzzyCompare(m_totalLineStretch, totalLineStretch))
+    if (qFuzzyEquals(m_totalLineStretch, totalLineStretch))
         return;
 
     m_totalLineStretch = totalLineStretch;
@@ -2228,7 +2228,7 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
 
 void QnTimeSlider::drawSeparator(QPainter* painter, const QRectF& rect)
 {
-    if (qFuzzyCompare(rect.top(), this->rect().top()))
+    if (qFuzzyEquals(rect.top(), this->rect().top()))
         return; /* Don't draw separator at the top of the widget. */
 
     QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.separator, 0));
@@ -2401,10 +2401,10 @@ void QnTimeSlider::drawSolidBackground(QPainter* painter, const QRectF& rect)
     qreal rightPos = quickPositionFromValue(windowEnd());
     qreal centralPos = quickPositionFromValue(sliderPosition());
 
-    if (!qFuzzyCompare(leftPos, centralPos))
+    if (!qFuzzyEquals(leftPos, centralPos))
         painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), palette().window());
 
-    if (!qFuzzyCompare(rightPos, centralPos))
+    if (!qFuzzyEquals(rightPos, centralPos))
         painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), palette().window());
 }
 

@@ -89,7 +89,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_state = Invalid;
         break;
     case Qn::LocalResourcesNode:
-        setNameInternal(tr("Local"));
+        setNameInternal(tr("Local Files"));
         break;
     case Qn::CurrentSystemNode:
         break;
@@ -378,14 +378,17 @@ void QnResourceTreeModelNode::initialize()
 
 void QnResourceTreeModelNode::deinitialize()
 {
-    NX_ASSERT(m_initialized);
-    m_state = Invalid;
+    if (!m_initialized)
+        return;
 
     for (auto child: children())
         child->deinitialize();
 
     setParent(QnResourceTreeModelNodePtr());
     setResource(QnResourcePtr());
+
+    m_state = Invalid;
+    m_initialized = false;
 }
 
 Qn::NodeType QnResourceTreeModelNode::type() const

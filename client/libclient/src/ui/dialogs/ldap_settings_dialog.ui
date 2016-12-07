@@ -55,6 +55,9 @@
      <item>
       <widget class="QWidget" name="fieldsWidget" native="true">
        <layout class="QFormLayout" name="formLayout_2">
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -70,7 +73,10 @@
         <item row="0" column="0">
          <widget class="QLabel" name="serverLabel">
           <property name="text">
-           <string>Server URL:</string>
+           <string>Server URL</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
            <cstring>serverLineEdit</cstring>
@@ -87,7 +93,10 @@
         <item row="1" column="0">
          <widget class="QLabel" name="adminDnLabel">
           <property name="text">
-           <string>Admin DN:</string>
+           <string>Admin DN</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
            <cstring>adminDnLineEdit</cstring>
@@ -100,7 +109,10 @@
         <item row="2" column="0">
          <widget class="QLabel" name="passwordLabel">
           <property name="text">
-           <string>Password:</string>
+           <string>Password</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
            <cstring>passwordLineEdit</cstring>
@@ -117,7 +129,10 @@
         <item row="3" column="0">
          <widget class="QLabel" name="searchBaseLabel">
           <property name="text">
-           <string>Search Base:</string>
+           <string>Search Base</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -127,7 +142,10 @@
         <item row="4" column="0">
          <widget class="QLabel" name="searchFilterLabel">
           <property name="text">
-           <string>Search Filter:</string>
+           <string>Search Filter</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>

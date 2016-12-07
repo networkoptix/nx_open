@@ -292,7 +292,7 @@ void PlayerPrivate::setLiveMode(bool value)
 
 void PlayerPrivate::setAspectRatio(double value)
 {
-    if (qFuzzyCompare(aspectRatio, value))
+    if (qFuzzyEquals(aspectRatio, value))
         return;
 
     aspectRatio = value;

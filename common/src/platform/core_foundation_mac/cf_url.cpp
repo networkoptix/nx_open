@@ -24,3 +24,11 @@ cf::QnCFUrl cf::QnCFUrl::createFileUrl(const QString& fileName)
     return result;
 }
 
+QString cf::QnCFUrl::toString(const CFURLRef ref)
+{
+    if (!ref)
+        return QString();
+
+    return cf::QnCFString::makeOwned(CFURLGetString(ref)).toString();
+}
+
