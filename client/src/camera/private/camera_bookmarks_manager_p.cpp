@@ -119,6 +119,7 @@ QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnUuid &bookmark
 QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
     : base_type(parent)
     , q_ptr(parent)
+    , m_operationsTimer(new QTimer(this))
     , m_requests()
 {
     /*
@@ -133,16 +134,35 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
      * update chunks on history change and bookmarks adding/deleting, then forcefully re-request required periods
      */
 
-    QTimer* timer = new QTimer(this);
-    timer->setInterval(queriesCheckTimoutMs);
-    timer->setSingleShot(false);
-    connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
-    connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
-    timer->start();
+    m_operationsTimer->setInterval(queriesCheckTimoutMs);
+    m_operationsTimer->setSingleShot(false);
+    connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
+    connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 {}
+
+bool QnCameraBookmarksManagerPrivate::isEnabled() const
+{
+    return m_operationsTimer->isActive();
+}
+
+void QnCameraBookmarksManagerPrivate::setEnabled(bool value)
+{
+    if (isEnabled() == value)
+        return;
+
+    if (value)
+    {
+        m_operationsTimer->start();
+        checkQueriesUpdate();
+    }
+    else
+    {
+        m_operationsTimer->stop();
+    }
+}
 
 int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
                                                         , const QnCameraBookmarkSearchFilter &filter
@@ -187,6 +207,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
         return;
     }
 
+    setEnabled(true); // Forcefully enable on modifying operation
     int handle = server->apiConnection()->addBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, bookmark.guid, callback);
 
@@ -199,13 +220,16 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmar
     if (!bookmark.isValid())
         return;
 
+    setEnabled(true); // Forcefully enable on modifying operation
     int handle = qnCommon->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);
 }
 
-void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
+void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback)
+{
+    setEnabled(true); // Forcefully enable on modifying operation
     int handle =  qnCommon->currentServer()->apiConnection()->deleteBookmarkAsync(bookmarkId, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, bookmarkId, callback);
 

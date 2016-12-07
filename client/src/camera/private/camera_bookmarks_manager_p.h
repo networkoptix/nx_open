@@ -16,6 +16,9 @@ public:
 
     virtual ~QnCameraBookmarksManagerPrivate();
 
+    bool isEnabled() const;
+    void setEnabled(bool value);
+
     /* Direct API section */
 
     /// @brief                  Asynchronously gathers bookmarks using specified filter.
@@ -109,6 +112,8 @@ private:
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
+
+    QTimer* m_operationsTimer;
 
     QMap<int, BookmarksInternalCallbackType> m_requests;
 
