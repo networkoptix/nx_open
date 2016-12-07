@@ -78,7 +78,8 @@ int QnStartLiteClientRestHandler::executeGet(
 
     QStringList args{
         "--url", url.toString(),
-        "--videowall-instance-guid", videowallInstanceGuid.toString()};
+        "--videowall-instance-guid", videowallInstanceGuid.toString(),
+        "--log-level", QnLog::logLevelToString(QnLog::instance()->logLevel())};
 
     NX_LOG(lit("startLiteClient: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
 

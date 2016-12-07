@@ -87,7 +87,7 @@ Drawer
         {
             anchors.fill: layoutsList
             anchors.margins: 16
-            visible: connectionManager.connectionState == QnConnectionManager.Disconnected
+            visible: connectionManager.connectionState === QnConnectionManager.Disconnected
         }
 
         Column
@@ -107,7 +107,7 @@ Drawer
             {
                 icon: lp("/images/plus.png")
                 text: qsTr("New connection")
-                visible: connectionManager.connectionState == QnConnectionManager.Disconnected
+                visible: connectionManager.connectionState === QnConnectionManager.Disconnected
                 onClicked:
                 {
                     sideNavigation.close()
@@ -121,8 +121,7 @@ Drawer
 
                 icon: lp("/images/disconnect.png")
                 text: qsTr("Disconnect from system")
-                visible: connectionManager.online ||
-                         connectionManager.connectionState == QnConnectionManager.Connecting
+                visible: connectionManager.connectionState !== QnConnectionManager.Disconnected
                 onClicked: uiController.disconnectFromSystem()
             }
 

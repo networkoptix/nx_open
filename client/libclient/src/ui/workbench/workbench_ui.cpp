@@ -645,7 +645,7 @@ void QnWorkbenchUi::at_activityStarted()
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
 {
-    bool alreadyZoomed = m_widgetByRole[role] != nullptr;
+    bool alreadyZoomed = m_widgetByRole[Qn::ZoomedRole] != nullptr;
 
     QnResourceWidget* newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;

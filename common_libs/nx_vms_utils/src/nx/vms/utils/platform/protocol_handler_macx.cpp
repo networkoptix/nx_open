@@ -81,7 +81,7 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     Q_UNUSED(customization);
     Q_UNUSED(description);
 
-    int currentBuild = version.build();
+    nx::utils::SoftwareVersion targetVersion = version;
 
     // Looking for maximal available version of application and reregister it anyway
     const auto currentHandlers = getBundlesForProtocol(protocol);
@@ -97,25 +97,23 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
         if (!isBundleExist(bundleId)) //< Skips removed apps
             continue;
 
-        const int buildNumberLen = (bundleId.size() - macHandlerBundleIdBase.size());
-        if (buildNumberLen <= 0)
+        const int versionLen = (bundleId.size() - macHandlerBundleIdBase.size());
+        if (versionLen <= 0)
             continue;
 
-        // We can rely on build number - it will always growing
-        bool correctConversion = false;
-        const int buildNumber = bundleId.right(buildNumberLen).toInt(&correctConversion);
-        if (!correctConversion)
+        const nx::utils::SoftwareVersion handlerVersion(bundleId.right(versionLen));
+        if (handlerVersion.isNull())
             continue;
 
-        if (buildNumber > currentBuild)
-            currentBuild = buildNumber;
+        if (handlerVersion > targetVersion)
+            targetVersion = handlerVersion;
     }
 
     const auto handlerBundleId = lit("%1%2").arg(
-        macHandlerBundleIdBase, QString::number(currentBuild));
+        macHandlerBundleIdBase, targetVersion.toString());
 
     bool result = true;
-    if (currentBuild == version.build())
+    if (targetVersion == version)
         result = registerAsLaunchService(applicationBinaryPath);
 
     const auto cfId = cf::QnCFString(handlerBundleId);

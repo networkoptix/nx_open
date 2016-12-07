@@ -193,9 +193,9 @@ int runApplication(QGuiApplication *application)
     return result;
 }
 
-void initLog()
+void initLog(const QString& logLevel)
 {
-    QnLog::initLog(lit("INFO"));
+    QnLog::initLog(logLevel);
 
     if (conf.enableEc2TranLog)
     {
@@ -269,10 +269,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
 
-    conf.reload();
-    initLog();
-
     QnMobileClientStartupParameters startupParams(application);
+
+    conf.reload();
+    initLog(startupParams.logLevel);
 
     QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);
