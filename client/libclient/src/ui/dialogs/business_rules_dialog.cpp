@@ -229,7 +229,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
 
-    ui->tableView->clearSelection();
     ui->tableView->horizontalHeader()->setSortIndicator(kSortColumn, Qt::AscendingOrder);
 
     installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
@@ -266,11 +265,21 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     updateFilter();
     updateControlButtons();
 
+    auto updateSelection =
+        [this](bool tableIsEmpty)
+        {
+            if (!tableIsEmpty && !ui->tableView->currentIndex().isValid())
+                ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
+        };
+
+    updateSelection(ui->tableView->model()->rowCount() == 0);
+
     /*
     * Create auto-hider which will hide empty table and show a message instead. Table will be
     * reparented. Snapped scrollbar is already created and will stay in the correct parent.
     */
-    QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
+    auto autoHider = QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
+    connect(autoHider, &QnItemViewAutoHider::viewVisibilityChanged, this, updateSelection);
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);

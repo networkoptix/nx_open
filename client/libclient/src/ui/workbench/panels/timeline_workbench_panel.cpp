@@ -113,6 +113,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
     m_showWidget->setVisible(false);
     m_showWidget->setZValue(BackgroundItemZOrder);
+
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
         [this](Qn::ItemRole role)
         {
@@ -393,7 +394,6 @@ void TimelineWorkbenchPanel::setVisible(bool visible, bool animate)
 
     m_visible = visible;
 
-    item->setEnabled(visible); /* So that it doesn't handle mouse events while disappearing. */
     updateOpacity(animate);
 
     if (m_autoHideTimer)

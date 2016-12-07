@@ -1,10 +1,11 @@
 #include <QtCore/QDir>
-#include <QtGui/QGuiApplication>
 #include <QtGui/QFont>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
+
+#include <qtsingleguiapplication.h>
 
 #include <time.h>
 
@@ -20,6 +21,7 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_uri_handler.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
+#include <mobile_client/mobile_client_ui_controller.h>
 
 #include <ui/camera_thumbnail_provider.h>
 #include <ui/window_utils.h>
@@ -45,7 +47,8 @@ using mobile_client::conf;
 
 using namespace nx::mobile_client;
 
-int runUi(QGuiApplication *application) {
+int runUi(QtSingleGuiApplication* application)
+{
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
@@ -174,10 +177,20 @@ int runUi(QGuiApplication *application) {
             QDesktopServices::openUrl(initialIntentData);
     #endif
 
+    QObject::connect(application, &QtSingleGuiApplication::messageReceived,
+        [&context](const QString& message)
+        {
+            if (message == lit("startCamerasMode"))
+            {
+                context.uiController()->openResourcesScreen();
+                context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+            }
+        });
+
     return application->exec();
 }
 
-int runApplication(QGuiApplication *application)
+int runApplication(QtSingleGuiApplication* application)
 {
     NX_ASSERT(nx::utils::TimerManager::instance());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
@@ -193,9 +206,9 @@ int runApplication(QGuiApplication *application)
     return result;
 }
 
-void initLog()
+void initLog(const QString& logLevel)
 {
-    QnLog::initLog(lit("INFO"));
+    QnLog::initLog(logLevel);
 
     if (conf.enableEc2TranLog)
     {
@@ -267,12 +280,19 @@ int main(int argc, char *argv[])
     #endif
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-    QGuiApplication application(argc, argv);
-
-    conf.reload();
-    initLog();
+    QtSingleGuiApplication application(argc, argv);
 
     QnMobileClientStartupParameters startupParams(application);
+
+    if (application.isRunning())
+    {
+        if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
+            application.sendMessage(lit("startCamerasMode"));
+        return 0;
+    }
+
+    conf.reload();
+    initLog(startupParams.logLevel);
 
     QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);

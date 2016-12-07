@@ -524,6 +524,11 @@ void QnWorkbenchWelcomeScreen::createAccount()
 
 //
 
+QColor QnWorkbenchWelcomeScreen::getContrastColor(const QString& group)
+{
+    return m_palette.colors(group).contrastColor();
+}
+
 QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString& group, int index)
 {
     return m_palette.color(group, index);
