@@ -7,7 +7,8 @@ var Config = {
 
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
     updateInterval:  30 * 1000, // Update content on pages every 30 seconds
-    openClientTimeout: 5 * 1000, // 30 second we wait for client to open
+    openClientTimeout: 20 * 1000, // 20 seconds we wait for client to open
+
     openMobileClientTimeout: 300, // 300ms for mobile browsers
 
     alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds

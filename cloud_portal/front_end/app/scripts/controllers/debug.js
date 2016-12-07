@@ -110,7 +110,8 @@ angular.module('cloudApp')
                 $scope.actionParametersError = true
             }
 
-            urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(link){
+            urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(data){
+                var link = data.link;
                 window.protocolCheck(link, function () {
                     alert("protocol not recognized");
                 },function () {
