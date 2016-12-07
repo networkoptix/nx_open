@@ -4058,10 +4058,6 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (user) // Do not load user roles if there is no current user.
         DB_LOAD(user->userRoleId, data->userRoles);
 
-    // Admin user is required for global properties.
-    if (userId != QnUserResource::kAdminGuid)
-        DB_LOAD(QnUserResource::kAdminGuid, data->users);
-
     DB_LOAD(QnUuid(), data->layouts);
     if (user) // Remove layouts belonging to other users.
     {
@@ -4078,6 +4074,10 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
             }),
             data->layouts.end());
     }
+
+    // Admin user is required for global properties.
+    if (userId != QnUserResource::kAdminGuid)
+        DB_LOAD(QnUserResource::kAdminGuid, data->users);
 
     DB_LOAD(nullptr, data->cameraHistory);
     DB_LOAD(QnUuid(), data->discoveryData);
