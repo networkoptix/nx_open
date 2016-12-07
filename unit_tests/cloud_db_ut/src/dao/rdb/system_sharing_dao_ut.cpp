@@ -45,7 +45,7 @@ protected:
                 systemSharingDao(), _1, &sharings));
         ASSERT_EQ(db::DBResult::ok, dbResult);
 
-        ASSERT_EQ(1, sharings.size());
+        ASSERT_EQ(1U, sharings.size());
         ASSERT_EQ(api::SystemAccessRole::advancedViewer, sharings[0].accessRole);
     }
 
