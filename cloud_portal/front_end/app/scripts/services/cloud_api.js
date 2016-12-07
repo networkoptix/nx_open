@@ -22,8 +22,7 @@ angular.module('cloudApp')
                 var haveValueInCache = typeof(cachedResults[url]) !== 'undefined';
                 var cacheMiss = !haveValueInCache || // clear cache miss
                     forceReload || // ignore cache
-                    !cacheForever && (now - cacheReceived[url]) > Config.cacheTimeout; // outdated cache
-
+                    !cacheForever && ((now - cacheReceived[url]) > Config.cacheTimeout); // outdated cache
 
                 if(clearCache){
                     delete(cachedResults[url]);
@@ -146,7 +145,7 @@ angular.module('cloudApp')
                     return $http.get(apiBase + '/systems/' + systemId);
                 }
 
-                return getSystems('fromCache').then(function(systemsCache){
+                return getSystems().then(function(systemsCache){
                     //Search our system in cache
                     var system = _.find(systemsCache.data,function(system){
                         return system.id == systemId;
