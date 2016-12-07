@@ -14,22 +14,19 @@ angular.module('cloudApp')
 
         var service = {
             get:function(){
-                var defer = $q.defer();
-                cloudApi.account().then(function(account){
-                    defer.resolve(account.data);
-                },function(no_account){
-                    defer.reject(null);
+                return cloudApi.account().then(function(account){
+                    return account.data;
                 });
-                return defer.promise;
             },
             authKey:function(){
-                var defer = $q.defer();
-                cloudApi.authKey().then(function(result){
-                    defer.resolve(result.data.auth_key);
-                },function(no_account){
-                    defer.reject(null);
+                return cloudApi.authKey().then(function(result){
+                    return result.data.auth_key;
                 });
-                return defer.promise;
+            },
+            checkVisitedKey:function(key){
+                return cloudApi.visitedKey(key).then(function(result){
+                    return result.data.visited;
+                });
             },
             requireLogin:function(){
                 var res = this.get();
