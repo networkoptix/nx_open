@@ -232,6 +232,7 @@ EMAIL_USE_TLS = conf['smtp']['tls']
 
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+LINKS_LIVE_TIMEOUT = 300  # Five minutes
 
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
