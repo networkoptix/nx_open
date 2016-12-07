@@ -588,3 +588,17 @@ h3 {
 .grey-text{
   color: #698796;
 }
+
+
+/* Kill visual effects for nx1 */
+.lite-client-mode{
+  * {
+    outline: none !important;
+    text-shadow:none !important;
+    box-shadow:none !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-timing-function: linear !important;
+    opacity: 1 !important;
+  }
+}

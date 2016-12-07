@@ -815,6 +815,9 @@ angular.module('webadminApp')
         nativeClient.init().then(function(result){
             $scope.thickClient = result.thick;
             $scope.liteClient = result.lite;
+            if($scope.liteClient) {
+                $('body').addClass('lite-client-mode');
+            }
             $log.log("check client Thick:" + result.thick);
             $log.log("check client Lite:" + result.lite);
             return getCredentialsFromClient();
