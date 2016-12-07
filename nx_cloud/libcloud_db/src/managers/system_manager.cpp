@@ -7,6 +7,7 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/system_utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
@@ -334,7 +335,7 @@ void SystemManager::getSystems(
             {
                 systemDataEx.accessRole = sharingData->accessRole;
                 // Calculating system weight.
-                systemDataEx.usageFrequency = calculateSystemUsageFrequency(
+                systemDataEx.usageFrequency = nx::utils::calculateSystemUsageFrequency(
                     sharingData->lastLoginTime,
                     sharingData->usageFrequency + 1);
                 systemDataEx.lastLoginTime = sharingData->lastLoginTime;
@@ -1467,8 +1468,6 @@ void SystemManager::systemActivated(
     completionHandler(dbResultToApiResult(dbResult));
 }
 
-constexpr const int kSecondsPerDay = 60*60*24;
-
 nx::db::DBResult SystemManager::saveUserSessionStart(
     nx::db::QueryContext* queryContext,
     const data::UserSessionDescriptor& userSessionDescriptor,
@@ -1496,7 +1495,7 @@ nx::db::DBResult SystemManager::saveUserSessionStart(
 
     // Calculating usage frequency.
     usageStatistics->lastloginTime = nx::utils::utcTime();
-    usageStatistics->usageFrequency = calculateSystemUsageFrequency(
+    usageStatistics->usageFrequency = nx::utils::calculateSystemUsageFrequency(
         sharing.lastLoginTime,
         sharing.usageFrequency);
     const auto newUsageFrequency = usageStatistics->usageFrequency + 1;
@@ -1657,7 +1656,7 @@ nx::db::DBResult SystemManager::fetchSystemById(
 nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     nx::db::QueryContext* queryContext)
 {
-    // TODO: #ak Do it without 
+    // TODO: #ak Do it without
 
     std::deque<api::SystemSharingEx> sharings;
     const auto result = m_systemSharingDao.fetchAllUserSharings(
@@ -1927,18 +1926,6 @@ void SystemManager::onEc2RemoveResourceParamDone(
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult /*dbResult*/)
 {
-}
-
-float SystemManager::calculateSystemUsageFrequency(
-    std::chrono::system_clock::time_point lastLoginTime,
-    float currentUsageFrequency)
-{
-    const auto fullDaysSinceLastLogin =
-        std::chrono::duration_cast<std::chrono::seconds>(
-            nx::utils::utcTime() - lastLoginTime).count() / kSecondsPerDay;
-    return std::max<float>(
-        (1 - fullDaysSinceLastLogin / 30.0) * currentUsageFrequency,
-        0);
 }
 
 } // namespace cdb
