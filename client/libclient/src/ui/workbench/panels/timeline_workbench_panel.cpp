@@ -114,12 +114,15 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_showWidget->setVisible(false);
     m_showWidget->setZValue(BackgroundItemZOrder);
 
-    connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
+    auto handleWidgetChanged =
         [this](Qn::ItemRole role)
         {
             if (role == Qn::ZoomedRole)
                 m_showWidget->setVisible(!isPinned());
-        });
+        };
+
+    connect(display(), &QnWorkbenchDisplay::widgetChanged,
+        this, handleWidgetChanged, Qt::QueuedConnection);
 
     m_showingProcessor->addTargetItem(m_showButton);
     m_showingProcessor->addTargetItem(m_showWidget);
