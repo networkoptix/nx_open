@@ -223,6 +223,12 @@
             "forceSingleStream": true
         },
         {
+            "keys":[
+                "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
@@ -454,7 +460,8 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98", 
-                "UNIVIEW|IPC6242SR-X22"
+                "UNIVIEW|IPC6242SR-X22",
+                "TRUEN Co., Ltd.|TN-P4230CSLXIR"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -1580,7 +1587,7 @@
 		},
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA"
+                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
