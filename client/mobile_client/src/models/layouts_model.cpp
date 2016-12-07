@@ -219,7 +219,7 @@ void QnLayoutsModelUnsorted::resetModel()
 
         m_itemsList.append(layout);
     }
-/*
+
     const auto servers = qnResPool->getResources<QnMediaServerResource>();
     for (const auto& server : servers)
     {
@@ -231,7 +231,7 @@ void QnLayoutsModelUnsorted::resetModel()
 
         m_itemsList.append(server);
     }
-*/
+
     endResetModel();
 }
 
