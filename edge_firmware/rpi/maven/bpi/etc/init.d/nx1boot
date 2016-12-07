@@ -92,6 +92,14 @@ start_server() {
     /etc/init.d/$CUSTOMIZATION-mediaserver start
 }
 
+start_lite_client() {
+    /etc/init.d/$CUSTOMIZATION-lite-client start
+}
+
+stop_lite_client() {
+    /etc/init.d/$CUSTOMIZATION-lite-client stop
+}
+
 tweak_charger() {
     #tweak to enable battery charge function for AXP209
 i2cset -f -y 0 0x34 0x35 0x83
@@ -201,6 +209,7 @@ system_restore () {
 
     if [ -f /restore ]; then
         stop_server
+        stop_lite_client        
         read_hdd_environment
         /etc/init.d/nx1led restore
         rm /etc/udev/rules.d/70-persistent-net.rules
@@ -361,29 +370,34 @@ upgrade() {
 
 #only if boot from SD Card for the first time after upgrading 2.5 to 3.0
 upgrade_sd() {
-    export DEBIAN_FRONTEND=noninteractive
-    dpkg -i /opt/deb/libvdpau/*.deb
-    cp /etc/apt/sources.list /etc/apt/sources.list_bk
-    echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
-    apt-get update
-    apt-get install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales -y -qq --force-yes
-    mv /etc/apt/sources.list_bk /etc/apt/sources.list
     touch /dev/cedar_dev
     chmod 777 /dev/disp
     chmod 777 /dev/cedar_dev
     usermod -aG video root
     sync
-    reboot_from_sd
-    exit 0
+    LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1)
+    if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
+
+    FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11)
+    if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
+    
+    LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+    if [ -z $LIBC_NEW ]; then
+        cp /etc/apt/sources.list /etc/apt/sources.list_bk
+        echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
+        apt-get update
+        apt-get install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales -y -qq --force-yes
+        mv /etc/apt/sources.list_bk /etc/apt/sources.list
+        dpkg -i /opt/deb/curl/*.deb
+        reboot_from_sd
+        exit 0      
+    fi
 }    
 
 default_sequence () {
     get_serial_number
     #upgrading from 2.x to 3.x on first boot
-    if [ "$BOOTDEVICE" = "mmc" ]; then
-        LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
-        if [ -z $LIBC_NEW ]; then upgrade_sd; fi
-    fi
+    if [ "$BOOTDEVICE" = "mmc" ]; then upgrade_sd; fi
     if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi    
     stop_server
     setup_hdd_environment
@@ -417,6 +431,7 @@ default_sequence () {
         /etc/init.d/nx1led boot_hdd
     fi
     start_server
+    start_lite_client
 }
 
 case "$1" in

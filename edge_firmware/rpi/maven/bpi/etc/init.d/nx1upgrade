@@ -16,7 +16,9 @@ cp -f /root/tools/uboot/* $MNTBOOTPART
 umount $BOOTPART
 rm -Rf $MNTBOOTPART
 export DEBIAN_FRONTEND=noninteractive
-dpkg -i /opt/deb/libvdpau/*.deb
+
+LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1)
+if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
 
 LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
 if [ -z $LIBC_NEW ]; then
@@ -25,7 +27,11 @@ if [ -z $LIBC_NEW ]; then
   apt-get update
   apt-get install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales -y -qq --force-yes
   mv /etc/apt/sources.list_bk /etc/apt/sources.list
+  dpkg -i /opt/deb/curl/*.deb
 fi
+
+FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11)
+if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
 
 touch /dev/cedar_dev
 chmod 777 /dev/disp
