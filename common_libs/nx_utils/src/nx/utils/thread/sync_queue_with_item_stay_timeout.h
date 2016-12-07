@@ -17,7 +17,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(Item)> ItemStayTimeoutHandler;
 
     /**
-     * @param timeoutHandler This handler is called from \a SyncQueueWithItemStayTimeout::pop, 
+     * @param timeoutHandler This handler is called from SyncQueueWithItemStayTimeout::pop, 
      * so it MUST NOT block
      */
     void enableItemStayTimeoutEvent(
@@ -34,7 +34,8 @@ public:
     }
 
     boost::optional<Item> pop(
-        boost::optional<std::chrono::milliseconds> timeout = boost::none)
+        boost::optional<std::chrono::milliseconds> timeout = boost::none,
+        QueueReaderId readerId = kInvalidQueueReaderId)
     {
         using namespace std::chrono;
 
@@ -50,7 +51,7 @@ public:
             auto popTimeout = milliseconds::zero();
             if (timeToWaitUntil)
                 popTimeout = duration_cast<milliseconds>(*timeToWaitUntil - currentTime);
-            auto itemContext = m_items.pop(popTimeout);
+            auto itemContext = m_items.pop(popTimeout, readerId);
             if (!itemContext)
                 return boost::none;
 
@@ -68,6 +69,16 @@ public:
     std::size_t size() const
     {
         return m_items.size();
+    }
+
+    void addReaderToTerminatedList(QueueReaderId readerId)
+    {
+        m_items.addReaderToTerminatedList(readerId);
+    }
+
+    void removeReaderFromTerminatedList(QueueReaderId readerId)
+    {
+        m_items.removeReaderFromTerminatedList(readerId);
     }
 
 private:

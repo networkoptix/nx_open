@@ -2,8 +2,9 @@
 # Artem V. Nikitin
 # Client emulator
 
-import urllib2, FuncTest, json, base64
+import urllib2, FuncTest, json, base64, httplib
 from Logger import LOGLEVEL
+from Config import config
 
 DEFAULT_TIMEOUT =  10.0
 DEFAULT_USER = 'admin'
@@ -37,19 +38,19 @@ class Client:
             return None
 
     def __init__(self, user = None, password = None, timeout = None):
-        self.default_user = user or DEFAULT_USER
-        self.default_password = password or DEFAULT_PASSWORD
-        self.default_timeout = timeout or DEFAULT_TIMEOUT
+        self.__user = user or config.get_safe("General", "username", DEFAULT_USER)
+        self.__password = password or config.get_safe("General", "password", DEFAULT_PASSWORD)
+        self._timeout = timeout or DEFAULT_TIMEOUT
         Client.currentIdx += 1
         self.index = Client.currentIdx
 
     @property
     def user(self):
-        return self.default_user
+        return self.__user
 
     @property
     def password(self):
-        return self.default_password
+        return self.__password
 
     def _params2url(self, params):
         def param2str(r):
@@ -61,7 +62,7 @@ class Client:
         base64string = \
           base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
         request.add_header("Authorization", "Basic %s" % base64string)
-        return urllib2.urlopen(request, timeout = self.default_timeout)
+        return urllib2.urlopen(request, timeout = self._timeout)
 
     def httpRequest(
         self, address,  command,
@@ -69,8 +70,8 @@ class Client:
         headers={},
         auth_user = None,
         auth_password = None,  **kw):
-        user = auth_user or self.default_user
-        password = auth_password or self.default_password
+        user = auth_user or self.__user
+        password = auth_password or self.__password
         url = "http://%s/%s" % (address, command)
         params = self._params2url(kw)
         if params:
@@ -94,6 +95,8 @@ class Client:
 
 class DigestAuthClient(Client):
 
+    RETRY_COUNT=3
+
     def __init__(self, user = None, password = None, timeout = None):
         Client.__init__(self, user, password, timeout)
         self.__handler = None
@@ -109,9 +112,18 @@ class DigestAuthClient(Client):
             self._update()
         self.__handler.add_password(
           None, request.get_full_url(), user, password)
-        try:
-            return self.__urlOpener.open(request, timeout = self.default_timeout)
-        except urllib2.HTTPError, x:
-            if x.code == 401:
-                self._update()
-            raise
+        for i in range(self.RETRY_COUNT):
+            try:
+                response = self.__urlOpener.open(request, timeout = self._timeout)
+                return response
+            except urllib2.HTTPError, x:
+                if x.code == 401:
+                    self._update()
+                raise
+            except httplib.BadStatusLine, x:
+                if i == self.RETRY_COUNT - 1:
+                    raise
+                # Sometimes we've got unexcpected BadStatusLine with empty status line
+                # It looks like an httplib bug, we may ignore it and try again
+                FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d got unexpected HTTP status BadStatusLine %s" % (self.index, str(x)))
+                

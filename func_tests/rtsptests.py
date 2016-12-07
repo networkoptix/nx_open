@@ -341,10 +341,10 @@ Camera.isOnline = lambda self: self.status in ('Online', 'Recording')
 class SingleServerRtspTestBase(object):
     """ Provides:
         _fetchCameraList() called from __init__()
-        _checkRtspRequest() that checks reply for "200 OK', reporting to stdout and into the log
+        _checkRtspRequest() that checks reply for '200 OK', reporting to stdout and into the log
         _lock is used to avoid different streams' output intersection
         _mkRtspStreamHandler and _mkRtspArchiveHandler - to simplify StreamTcpBasic object creation
-    """
+     """
     _serverAddr = None
     _serverGUID = None
     _testCase = 0
