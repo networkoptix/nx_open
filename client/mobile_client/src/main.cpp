@@ -1,11 +1,10 @@
 #include <QtCore/QDir>
+#include <QtGui/QGuiApplication>
 #include <QtGui/QFont>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
-
-#include <qtsingleguiapplication.h>
 
 #include <time.h>
 
@@ -22,7 +21,6 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_uri_handler.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
-#include <mobile_client/mobile_client_ui_controller.h>
 
 #include <ui/camera_thumbnail_provider.h>
 #include <ui/window_utils.h>
@@ -42,8 +40,7 @@ using mobile_client::conf;
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <common/systemexcept.h>
 
-int runUi(QtSingleGuiApplication* application)
-{
+int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
@@ -159,20 +156,10 @@ int runUi(QtSingleGuiApplication* application)
             QDesktopServices::openUrl(initialIntentData);
     #endif
 
-    QObject::connect(application, &QtSingleGuiApplication::messageReceived,
-        [&context](const QString& message)
-        {
-            if (message == lit("startCamerasMode"))
-            {
-                context.uiController()->openResourcesScreen();
-                context.uiController()->connectToSystem(qnSettings->startupParameters().url);
-            }
-        });
-
     return application->exec();
 }
 
-int runApplication(QtSingleGuiApplication* application)
+int runApplication(QGuiApplication *application)
 {
     NX_ASSERT(nx::utils::TimerManager::instance());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
@@ -257,19 +244,12 @@ int main(int argc, char *argv[])
     #endif
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-    QtSingleGuiApplication application(argc, argv);
-
-    QnMobileClientStartupParameters startupParams(application);
-
-    if (application.isRunning())
-    {
-        if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
-            application.sendMessage(lit("startCamerasMode"));
-        return 0;
-    }
+    QGuiApplication application(argc, argv);
 
     conf.reload();
     initLog();
+
+    QnMobileClientStartupParameters startupParams(application);
 
     QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);
