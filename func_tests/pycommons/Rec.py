@@ -2,7 +2,7 @@
 # Artem V. Nikitin
 # Record - string-key dictionary replacer
 
-class Rec(object):
+class Rec:
 
     def __init__(self, init = {}, **kw):
         if isinstance(init, Rec): init = init.get()

@@ -7,21 +7,21 @@ import time, string, types, os
 # standard exception with unicode support
 class UException(Exception):
 
-    def __unicode__( self ):
+    def __unicode__(self):
         return self[0]
 
-    def __str__( self ):
+    def __str__(self):
         return `self[0]`
 
 # exception for 'normal' errors
 class UserError(UException): pass
 class TimeOut(UException): pass      # timeout on waiting something
 
-def userError( msg ):
+def userError(msg):
     raise UserError(msg)
 
 
-def hexStr( v, maxLen = None ):
+def hexStr(v, maxLen = None):
     s = ''
     for i in range(len(v)):
         if maxLen and len(s) + 5 > maxLen:
@@ -31,7 +31,7 @@ def hexStr( v, maxLen = None ):
         s += ' %02X' % ord(v[i])
     return s[2:]
 
-def hexify( v ):
+def hexify(v):
     s = ''
     for i in range(len(v)):
         s += '%02X' % ord(v[i])
@@ -49,7 +49,7 @@ def currentTime():
 _dayOfs = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
 # convert UTC time struct (year, mon, day, hour, min, sec) to unix seconds
-def mkgmtime( tm ):
+def mkgmtime(tm):
     year = tm[0] - 1970
     mon  = tm[1] - 1
     day  = tm[2] - 1
@@ -72,35 +72,35 @@ def getDayOfMonth(days,ofset):
             if i == 2: ofs = 0
             return (i,days-daysMonth[i-1]-ofs+1)
 
-def time2float( time ):
+def time2float(time):
     if time is None: return None
     sec, mcs = time
     return float(sec + mcs / 1000000)
 
-def secs2str( sec ):
+def secs2str(sec):
     if sec == 0: return '0'
     return time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(sec))
 
-def secs2localStr( sec ):
+def secs2localStr(sec):
     if sec == 0: return '0'
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(sec))
 
-def time2str( t ):
+def time2str(t):
     if t is None: return '0'
     sec, mcs = t
     assert (sec <> 0 or mcs <> 0), 'unknown time must be represented as None'
     return '%s.%06u' % (secs2str(sec), mcs)
 
-def time2localStr( t ):
+def time2localStr(t):
     if t is None: return '0'
     sec, mcs = t
     assert (sec <> 0 or mcs <> 0), 'unknown time must be represented as None'
     return '%s.%06u' % (secs2localStr(sec), mcs)
 
-def timeInt2str( (from_, to_) ):
+def timeInt2str((from_, to_)):
     return '[%s|%s]' % (time2str(from_), time2str(to_))
 
-def str2time( str ):
+def str2time(str):
     if str == '' or str == '0': return None
     l = string.split(str, '.')
     if len(l) != 2: raise Exception('Invalid time: "%s"' % str)
@@ -112,10 +112,10 @@ def str2time( str ):
         raise Exception('Invalid time: "%s" (%s)' % (str, x))
     return (sec, mcsec)
 
-def addr2str( (host, port) ):
+def addr2str((host, port)):
     return '%s:%d' % (host or '*', port)
 
-def str2addr( str ):
+def str2addr(str):
     l = string.split(str, ':')
     if len(l) != 2: raise Exception('Invalid address "%s", it must have form <host:port>' % str)
     host = l[0]
@@ -128,7 +128,7 @@ def str2addr( str ):
 
 
 # split string by spaces with respect to single and double quotes
-def qsplit( str ):
+def qsplit(str):
     s = string.rstrip(str)
     list = []
     while True:
@@ -152,7 +152,7 @@ def qsplit( str ):
             s = s[p + 1:]
 
 
-def bool2str( val, falseStr = 'false', trueStr = 'true' ):
+def bool2str(val, falseStr = 'false', trueStr = 'true'):
     if val: return trueStr
     else: return falseStr
 
@@ -164,27 +164,27 @@ def str2bool(val):
         return True
     raise Exception('Invalid boolean "%s"' % val)
 
-def withIndex( list ):
+def withIndex(list):
     result = []
     for i in range(len(list)):
         result.append((i, list[i]))
     return result
 
-def withLastTag( list ):
+def withLastTag(list):
     result = []
     for i in range(len(list)):
         lastTag = i == len(list) - 1
         result.append((lastTag, list[i]))
     return result
 
-def withFirstTag( list ):
+def withFirstTag(list):
     result = []
     for i in range(len(list)):
         firstTag = i == 0
         result.append((firstTag, list[i]))
     return result
 
-def withFirstLastTag( list ):
+def withFirstLastTag(list):
     result = []
     for i in range(len(list)):
         firstTag = i == 0
@@ -193,17 +193,17 @@ def withFirstLastTag( list ):
     return result
 
 
-def struct2str( r, maxLen = None, deep = False ):
+def struct2str(r, maxLen = None, deep = False):
     s = _struct2str(r, deep)
     if maxLen and len(s) > maxLen: s = '%s...' % s[:maxLen - 3]
     return s
 
-def _struct2str( r, deep = False ):
-    def toStr( r ):
+def _struct2str(r, deep = False):
+    def toStr(r):
         return _struct2str(r, deep)
-    def namedVal( (name, v) ):
+    def namedVal((name, v)):
         return '%s=%s' % (name, _struct2str(v, deep))
-    def dictVal( (name, v) ):
+    def dictVal((name, v)):
         return '%s: %s' % (name, _struct2str(v, deep))
     if deep:
         #following causes infinite loop sometimes
@@ -222,18 +222,18 @@ def _struct2str( r, deep = False ):
         return str(r)
 
 
-def methodNotImplemented( obj = None ):
+def methodNotImplemented(obj = None):
     raise Exception('(%s) Abstract method call: method is not implemented' % obj)
 
-def assertList( val ):
+def assertList(val):
     assert type(val) == type([]), str(val)
 
-def assertListOrNone( val ):
+def assertListOrNone(val):
     if val is None: return
     assert type(val) == type([]), str(val)
 
 # assert all list member are instances of 'cls'
-def assertListInst( l, cls ):
+def assertListInst(l, cls):
     assert type(l) is list
     for val in l:
         assert isinstance(val, cls), val
@@ -241,39 +241,39 @@ def assertListInst( l, cls ):
 assertIsListInstance = assertListInst
 
 # assert v is time value; tuple (sec, mcs)
-def assertIsTime( v ):
+def assertIsTime(v):
     msg = '%s is not a time' % str(v)
     assert type(v) is tuple, msg
     assert len(v) == 2, msg
     assert type(v[0]) in [int, long], msg
     assert type(v[1]) in [int, long], msg
 
-def assertIsTimeOrNone( v ):
+def assertIsTimeOrNone(v):
     if v is None: return
     assertIsTime(v)
 
-def assertIsString( v ):
+def assertIsString(v):
     assert type(v) is str
 
-def assertIsStringOrNone( v ):
+def assertIsStringOrNone(v):
     if v is None: return
     assertIsString(v)
 
-def assertIsInt( v ):
+def assertIsInt(v):
     assert type(v) is int, '"%s"/%s' % (str(v), type(v))
 
-def assertIsIntOrNone( v ):
+def assertIsIntOrNone(v):
     if v is None: return
     assertIsInt(v)
 
-def assertIsBool( v ):
+def assertIsBool(v):
     assert v in [False, True]
 
-def assertIsBoolOrNone( v ):
+def assertIsBoolOrNone(v):
     if v is None: return
     assertIsBool(v)
 
-def assertIsAddr( v ):
+def assertIsAddr(v):
     assert type(v) is tuple
     assert len(v) == 2
     assertIsString(v[0])
@@ -281,7 +281,7 @@ def assertIsAddr( v ):
 
 
 # rm -rf path
-def removeDirTree( path ):
+def removeDirTree(path):
     for name in os.listdir(path):
         p = os.path.join(path, name)
         if os.path.isdir(p):
@@ -292,19 +292,19 @@ def removeDirTree( path ):
 
 
 # sort a list in functional style
-def sort( list ):
+def sort(list):
     list = list[:]  # make a copy
     list.sort()
     return list
 
 # same as d.items() but in sorted keys order
-def sortedItems( d ):
-    def cvt( key ):
+def sortedItems(d):
+    def cvt(key):
         return (key, d[key])
     return map(cvt, sort(d.keys()))
 
 
-def withMutex( mutex, fn, *args, **kw ):
+def withMutex(mutex, fn, *args, **kw):
     mutex.acquire()
     try:
         return fn(*args, **kw)
@@ -312,8 +312,8 @@ def withMutex( mutex, fn, *args, **kw ):
         mutex.release()
 
 # method decorator
-def abstract( method ):
-    def f( self, *args, **kw ):
+def abstract(method):
+    def f(self, *args, **kw):
         raise Exception('Abstract method call; method "%s.%s" is not implemented' %
                         (self.__class__, method.__name__))
     return f
