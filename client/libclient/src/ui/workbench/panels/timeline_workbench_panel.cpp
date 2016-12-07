@@ -122,7 +122,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         };
 
     connect(display(), &QnWorkbenchDisplay::widgetChanged,
-        this, handleWidgetChanged, Qt::QueuedConnection);
+        this, handleWidgetChanged, Qt::QueuedConnection /*queue past setOpened(false)*/);
 
     m_showingProcessor->addTargetItem(m_showButton);
     m_showingProcessor->addTargetItem(m_showWidget);
