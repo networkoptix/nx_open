@@ -4055,11 +4055,12 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (data->users.size() == 1)
         user = &data->users[0];
 
-    // Admin user is required for global properties.
-    DB_LOAD(QnUserResource::kAdminGuid, data->users);
-
     if (user) // Do not load user roles if there is no current user.
         DB_LOAD(user->userRoleId, data->userRoles);
+
+    // Admin user is required for global properties.
+    if (userId != QnUserResource::kAdminGuid)
+        DB_LOAD(QnUserResource::kAdminGuid, data->users);
 
     DB_LOAD(QnUuid(), data->layouts);
     if (user) // Remove layouts belonging to other users.
