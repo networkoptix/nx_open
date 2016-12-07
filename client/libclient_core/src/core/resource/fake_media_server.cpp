@@ -46,7 +46,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     else
         removeFlags(Qn::read_only);
 
-    emit moduleInformationChanged(toSharedPointer());
+    emit moduleInformationChanged(::toSharedPointer(this));
 }
 
 QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
