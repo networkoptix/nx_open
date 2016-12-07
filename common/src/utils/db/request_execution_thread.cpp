@@ -107,20 +107,27 @@ DbRequestExecutionThread::DbRequestExecutionThread(
     m_state(ConnectionState::initializing),
     m_terminated(false),
     m_numberOfFailedRequestsInARow(0),
-    m_dbConnectionHolder(connectionOptions)
+    m_dbConnectionHolder(connectionOptions),
+    m_queueReaderId(queryExecutorQueue->generateReaderId())
 {
 }
 
 DbRequestExecutionThread::~DbRequestExecutionThread()
 {
     if (m_queryExecutionThread.joinable())
+    {
+        pleaseStop();
         m_queryExecutionThread.join();
+    }
     m_dbConnectionHolder.close();
+
+    queryExecutorQueue()->removeReaderFromTerminatedList(m_queueReaderId);
 }
 
 void DbRequestExecutionThread::pleaseStop()
 {
     m_terminated = true;
+    queryExecutorQueue()->addReaderToTerminatedList(m_queueReaderId);
 }
 
 void DbRequestExecutionThread::join()
@@ -168,7 +175,7 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
     while (!m_terminated && m_state == ConnectionState::opened)
     {
         boost::optional<std::unique_ptr<AbstractExecutor>> task = 
-            queryExecutorQueue()->pop(kTaskWaitTimeout);
+            queryExecutorQueue()->pop(kTaskWaitTimeout, m_queueReaderId);
         if (!task)
         {
             if (std::chrono::steady_clock::now() - previousActivityTime >= 

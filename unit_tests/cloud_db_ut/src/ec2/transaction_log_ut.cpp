@@ -507,10 +507,10 @@ TEST_F(TransactionLogSameTransaction, transaction_with_greater_sequence_replaces
 
 TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignored)
 {
-    //havingGeneratedTransactionLocally();
-    //havingReceivedOwnOldTransactionWithLesserSequence();
-    //assertIfTransactionHasBeenReplaced();
-    //assertThatTransactionAuthorIsLocalPeer();
+    havingGeneratedTransactionLocally();
+    havingReceivedOwnOldTransactionWithLesserSequence();
+    assertIfTransactionHasBeenReplaced();
+    assertThatTransactionAuthorIsLocalPeer();
 }
 
 TEST_F(TransactionLogSameTransaction, DISABLED_tran_rollback_clears_raw_data)

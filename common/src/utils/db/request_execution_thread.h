@@ -37,6 +37,9 @@ private:
 
     bool tuneConnection();
     bool tuneMySqlConnection();
+
+    DbConnectionHolder(const DbConnectionHolder&) = delete;
+    DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;
 };
 
 /**
@@ -50,7 +53,7 @@ public:
     DbRequestExecutionThread(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
-    virtual ~DbRequestExecutionThread();
+    virtual ~DbRequestExecutionThread() override;
 
     virtual void pleaseStop() override;
     virtual void join() override;
@@ -66,6 +69,7 @@ private:
     std::atomic<bool> m_terminated;
     int m_numberOfFailedRequestsInARow;
     DbConnectionHolder m_dbConnectionHolder;
+    const nx::utils::QueueReaderId m_queueReaderId;
 
     void queryExecutionThreadMain();
     void processTask(std::unique_ptr<AbstractExecutor> task);
