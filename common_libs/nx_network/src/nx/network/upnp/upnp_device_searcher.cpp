@@ -85,6 +85,8 @@ void DeviceSearcher::pleaseStop()
     m_socketList.clear();
 
     auto socket = std::move(m_receiveSocket);
+    m_receiveSocket.reset();
+
     if (socket)
         socket->pleaseStopSync();
 
@@ -140,14 +142,23 @@ void DeviceSearcher::unregisterHandler( SearchHandler* handler, const QString& d
         }
 
     // remove all registrations if deviceType is not specified
-    if( deviceType.isEmpty() )
-        for( auto specDev = m_handlers.begin(); specDev != m_handlers.end(); )
-            if( !specDev->first.isEmpty() &&
-                    specDev->second.erase( handler ) &&
-                    !specDev->second.size() )
+    if (deviceType.isEmpty())
+    {
+        for (auto specDev = m_handlers.begin(); specDev != m_handlers.end();)
+        {
+            if (!specDev->first.isEmpty()
+                && specDev->second.erase( handler )
+                && !specDev->second.size())
+            {
                 m_handlers.erase( specDev++ ); // remove deviceType from discovery
-            else                               // if no more subscribers left
+            }
+            else
+            {
+                // if no more subscribers left
                 ++specDev;
+            }
+        }
+    }
 }
 
 void DeviceSearcher::saveDiscoveredDevicesSnapshot()
@@ -198,8 +209,10 @@ void DeviceSearcher::onTimer( const quint64& /*timerID*/ )
 
     QnMutexLocker lk( &m_mutex );
     if( !m_terminated )
+    {
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
-            this, std::chrono::milliseconds(m_discoverTryTimeoutMS) );
+            this, std::chrono::milliseconds(m_discoverTryTimeoutMS));
+    }
 }
 
 void DeviceSearcher::onSomeBytesRead(
@@ -210,7 +223,6 @@ void DeviceSearcher::onSomeBytesRead(
 {
     if( errorCode )
     {
-        std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QnMutexLocker lk( &m_mutex );
             if (m_terminated)
@@ -225,18 +237,14 @@ void DeviceSearcher::onSomeBytesRead(
                 //removing socket from m_socketList
                 for (auto it = m_socketList.begin(); it != m_socketList.end(); ++it )
                 {
-                    if( it->second.sock.get() == sock )
+                    if (it->second.sock.get() == sock)
                     {
-                        udpSock = std::move(it->second.sock);
                         m_socketList.erase( it );
                         break;
                     }
                 }
             }
         }
-
-        if (udpSock)
-            udpSock->pleaseStopSync();
 
         return;
     }
@@ -333,13 +341,12 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
 
     m_receiveSocket->readSomeAsync(
         &m_receiveBuffer,
-        std::bind(
-            &DeviceSearcher::onSomeBytesRead,
-            this,
-            m_receiveSocket.get(),
-            std::placeholders::_1,
-            &m_receiveBuffer,
-            std::placeholders::_2 ) );
+        [this, sock = m_receiveSocket.get(), buf = &m_receiveBuffer](
+            SystemError::ErrorCode errorCode,
+            std::size_t bytesRead)
+        {
+            onSomeBytesRead(sock, errorCode, buf, bytesRead);
+        });
 
     m_needToUpdateReceiveSocket = false;
 
