@@ -2334,11 +2334,10 @@ void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QA
 
 bool QnActionManager::isMenuVisible() const
 {
-    for (auto menuObject : m_parametersByMenu.keys())
+    for (auto menu: m_parametersByMenu.keys())
     {
-        if (!menuObject)
-            continue;
-        return true;
+        if (menu && menu->isVisible())
+            return true;
     }
     return false;
 }
@@ -2381,8 +2380,9 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::IDType sou
     return false;
 }
 
-void QnActionManager::at_menu_destroyed(QObject *menu)
+void QnActionManager::at_menu_destroyed(QObject* menuObj)
 {
+    auto menu = static_cast<QMenu*>(menuObj);
     m_parametersByMenu.remove(menu);
     if (m_lastClickedMenu == menu)
         m_lastClickedMenu = NULL;
@@ -2399,10 +2399,11 @@ bool QnActionManager::eventFilter(QObject *watched, QEvent *event)
             return false;
     }
 
-    if (!qobject_cast<QMenu*>(watched))
+    auto menu = qobject_cast<QMenu*>(watched);
+    if (!menu)
         return false;
 
-    m_lastClickedMenu = watched;
+    m_lastClickedMenu = menu;
     return false;
 }
 

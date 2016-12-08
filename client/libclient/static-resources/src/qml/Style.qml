@@ -95,9 +95,9 @@ QtObject
         readonly property color mid: context.getPaletteColor("dark", 9);
         readonly property color midlight: context.getPaletteColor("dark", 12);
         readonly property color button: context.getPaletteColor("dark", 10);
-        readonly property color brand: context.getPaletteColor("brand", 4);
+        readonly property color brand: context.getPaletteColor("brand", 7);
 
-        readonly property color brandContrast: "white";
+        readonly property color brandContrast: context.getContrastColor("brand");
         readonly property color red_main: context.getPaletteColor("red", 4);
         readonly property color yellow_main: context.getPaletteColor("yellow", 0);
 

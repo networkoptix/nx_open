@@ -113,12 +113,16 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
     m_showWidget->setVisible(false);
     m_showWidget->setZValue(BackgroundItemZOrder);
-    connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
+
+    auto handleWidgetChanged =
         [this](Qn::ItemRole role)
         {
             if (role == Qn::ZoomedRole)
                 m_showWidget->setVisible(!isPinned());
-        });
+        };
+
+    connect(display(), &QnWorkbenchDisplay::widgetChanged,
+        this, handleWidgetChanged, Qt::QueuedConnection /*queue past setOpened(false)*/);
 
     m_showingProcessor->addTargetItem(m_showButton);
     m_showingProcessor->addTargetItem(m_showWidget);
@@ -393,7 +397,6 @@ void TimelineWorkbenchPanel::setVisible(bool visible, bool animate)
 
     m_visible = visible;
 
-    item->setEnabled(visible); /* So that it doesn't handle mouse events while disappearing. */
     updateOpacity(animate);
 
     if (m_autoHideTimer)

@@ -22,10 +22,16 @@
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtCore/QScopedPointer>
+
+#include <QtGui/QDesktopServices>
+
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtGui/QDesktopServices>
+
 #include <QtSingleApplication>
 
 #include <client/client_settings.h>
@@ -69,6 +75,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     const bool allowMultipleClientInstances = startupParams.allowMultipleClientInstances
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
+
+    if (startupParams.customUri.isValid())
+    {
+        QUrl url(QnAppInfo::defaultCloudPortalUrl());
+        url.setPath(lit("/api/utils/visitedKey"));
+
+        QJsonObject data{{lit("key"), startupParams.customUri.authenticator().encode()}};
+
+        QNetworkAccessManager manager;
+        manager.post(QNetworkRequest(url), QJsonDocument(data).toJson(QJsonDocument::Compact));
+    }
+
 
     if (!allowMultipleClientInstances)
     {

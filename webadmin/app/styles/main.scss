@@ -6,9 +6,9 @@ $icon-font-path: "../fonts/";
 @mixin icon{
   display: inline-block;
   background-size: 352px 224px;
-  background-image: url('../images/icons/wizard_sprite.png');
+  background-image: url('../images/icons/web_wizard_sprite.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('../images/icons/wizard_sprite@2x.png');
+    background-image: url('../images/icons/web_wizard_sprite@2x.png');
   }
 }
 
@@ -29,6 +29,11 @@ $icon-font-path: "../fonts/";
 }
 
 
+$radio-panels-hover-border: transparent;
+$radio-panels-hover-bg: $gray-lighter;
+
+$radio-panels-selected-bg: $gray-lighter;
+$radio-panels-selected-border: $gray-light;
 
 @import 'master';
 
@@ -556,5 +561,44 @@ h3 {
   td{
     text-overflow: ellipsis;
     overflow: hidden;
+  }
+}
+
+.panel-inline{
+  display:inline-block;
+  text-align: left;
+  margin: 30px 10px;
+
+  img {
+    vertical-align: bottom;
+    margin: 0 5px;
+  }
+
+  h3{
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  table>tbody>tr>td{
+    vertical-align: bottom;
+    height: 42px;
+  }
+
+}
+
+.grey-text{
+  color: #698796;
+}
+
+
+/* Kill visual effects for nx1 */
+.lite-client-mode{
+  * {
+    outline: none !important;
+    text-shadow:none !important;
+    box-shadow:none !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-timing-function: linear !important;
+    opacity: 1 !important;
   }
 }

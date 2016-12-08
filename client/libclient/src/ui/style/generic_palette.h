@@ -3,7 +3,34 @@
 #include <QtCore/QHash>
 #include <QtGui/QColor>
 
-typedef QList<QColor> QnColorList;
+
+class QnColorList : private QList<QColor>
+{
+    typedef QList<QColor> base_type;
+
+public:
+    using base_type::append;
+    using base_type::prepend;
+    using base_type::insert;
+    using base_type::size;
+    using base_type::begin;
+    using base_type::end;
+    using base_type::operator[];
+
+    QnColorList();
+
+    ~QnColorList() = default;
+
+    void setCoreColor(const QColor& color);
+    QColor coreColor() const;
+
+    void setContrastColor(const QColor& color);
+    QColor contrastColor() const;
+
+private:
+    QColor m_core;
+    QColor m_contrast;
+};
 
 class QnGenericPalette;
 

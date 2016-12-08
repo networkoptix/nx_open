@@ -187,6 +187,8 @@ void QnPtzManageDialog::reject()
 
 void QnPtzManageDialog::accept()
 {
+    ui->buttonBox->setFocus(); //< to force table editor to commit changes
+
     saveData();
 
     clear();
