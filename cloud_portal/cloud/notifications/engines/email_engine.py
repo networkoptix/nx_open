@@ -1,7 +1,8 @@
 import codecs
 import pystache
 from django.core.mail import EmailMultiAlternatives
-from email.mime.image import MIMEImage
+# from email.mime.image import MIMEImage  # python 3
+from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json
 
