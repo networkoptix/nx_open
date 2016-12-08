@@ -74,6 +74,7 @@ angular.module('cloudApp')
                             if(data.data.resultCode == 'notAuthorized'){
                                 account.logout();
                                 deferred.reject(data);
+                                return;
                             }
                             self.processing = false;
                             self.finished = true;
