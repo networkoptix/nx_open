@@ -724,7 +724,11 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
             if (column == Qn::NameColumn)
-                return m_displayName + (m_modified ? L'*' : QChar());
+            {
+                return m_modified
+                    ? m_displayName + L'*'
+                    : m_displayName;
+            }
             break;
 
         case Qt::ToolTipRole:
