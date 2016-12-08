@@ -256,26 +256,23 @@ else:
 NOTIFICATIONS_CONFIG = {
     'activate_account': {
         'engine': 'email',
-        'subject': '[CLOUD] Confirm your account'
+        'subject': 'Confirm your account'
     },
     'restore_password': {
         'engine': 'email',
-        'subject': '[CLOUD] Restore your password'
+        'subject': 'Restore your password'
     },
     'system_invite': {
         'engine': 'email',
-        'subject': '[CLOUD] Video system was shared with you'
+        'subject': 'Video system was shared with you'
     },
     'system_shared': {
         'engine': 'email',
-        'subject': '[CLOUD] Video system was shared with you'
+        'subject': 'Video system was shared with you'
     },
 }
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NOTIFICATIONS_TEMPLATES_LOCATION = os.path.join(BASE_DIR, "static", conf['customization'], "templates")
-NOTIFICATIONS_AUTO_SUBSCRIBE = None
+NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
-NOTIFICATIONS_CONFIG_DATA = {
-    'portal_url': conf['cloud_portal']['url']
-}
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_LOCATION = os.path.join(BASE_DIR, "static")

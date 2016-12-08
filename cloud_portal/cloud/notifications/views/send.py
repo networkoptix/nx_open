@@ -23,11 +23,15 @@ def send_notification(request):
             validation_error = True
             error_data['message'] = ['This field is required.']
 
+        if 'customization' not in request.data:
+            validation_error = True
+            error_data['customization'] = ['This field is required.']
+
         if validation_error:
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
 
-        api.send(request.data['user_email'], request.data['type'], request.data['message'])
+        api.send(request.data['user_email'], request.data['type'], request.data['message'], request.data['customization'])
     except ValidationError as error:
         raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error.detail)
     return api_success()
