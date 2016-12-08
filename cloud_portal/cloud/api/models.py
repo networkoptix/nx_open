@@ -14,6 +14,7 @@ class Account(models.Model):
     last_login = models.DateField(null=True, blank=True)
     subscribe = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']
