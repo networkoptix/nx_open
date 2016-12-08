@@ -52,10 +52,10 @@ protected:
         for (int i = 0; i < 2; ++i)
         {
             auto transaction = generateTransaction();
-            if (sequence)
-                transaction.persistentInfo.sequence = *sequence;
-            else
+            if (!sequence)
                 sequence = transaction.persistentInfo.sequence;
+            else
+                transaction.persistentInfo.sequence = *sequence;
             saveTransaction(transaction);
             m_lastAddedTransaction = transaction;
         }
