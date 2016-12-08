@@ -24,7 +24,7 @@ def visited_key(request):
         # Save cache value here
         require_params(request, ('key',))
         key = 'visited_key_' + request.data['key']
-        value = datetime.datetime.now()
+        value = datetime.datetime.now().strftime('%c')
 
         logger.debug('visited: ' + key + ': ' + value)
 
