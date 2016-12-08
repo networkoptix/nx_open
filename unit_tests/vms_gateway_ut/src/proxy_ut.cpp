@@ -175,13 +175,11 @@ TEST_F(VmsGatewayProxyTest, SslEnabled)
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
 
-#if 0 // TODO: #mux Uncomment when VMS-4764 is solved.
     expectSecurity(true);
     testProxyUrl(QUrl(lit("https://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
-#endif // 0
 
     expectSecurity(false);
     testProxyUrl(QUrl(lit("https://%1/http:%2%3")
@@ -258,19 +256,6 @@ TEST_F(VmsGatewayProxyTest, SslForbidden)
     expectSecurity(false);
 
     testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPathAndQuery)));
-
-#if 0 // TODO: #mux Uncomment when VMS-4764 is solved.
-    testProxyUrl(QUrl(lit("https://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPathAndQuery)),
-        nx_http::StatusCode::forbidden);
-#endif // 0
-
-    testProxyUrl(QUrl(lit("https://%1/http:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));

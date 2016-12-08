@@ -1265,6 +1265,15 @@ void SslEngine::useOrCreateCertificate(
     useCertificateAndPkey(certData);
 }
 
+void SslEngine::useRandomCertificate(const String& module)
+{
+    const auto sslCert = nx::network::SslEngine::makeCertificateAndKey(
+        module, "US", "Network Optix");
+
+    NX_CRITICAL(!sslCert.isEmpty());
+    NX_CRITICAL(nx::network::SslEngine::useCertificateAndPkey(sslCert));
+}
+
 class SslSocketPrivate
 {
 public:

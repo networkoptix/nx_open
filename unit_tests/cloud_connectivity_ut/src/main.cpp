@@ -10,13 +10,6 @@ int main(int argc, char **argv)
         argc, argv,
         [](const nx::utils::ArgumentParser&)
         {
-            const auto sslCert = nx::network::SslEngine::makeCertificateAndKey(
-                "cloud_connectivity_ut", "US", "Network Optix");
-
-            NX_CRITICAL(!sslCert.isEmpty());
-            nx::network::SslEngine::useCertificateAndPkey(sslCert);
-
-            nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-                SocketAddress::anyAddress);
+            nx::network::SslEngine::useRandomCertificate("cloud_connect_ut");
         });
 }
