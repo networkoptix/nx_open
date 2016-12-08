@@ -116,7 +116,7 @@ int runUi(QGuiApplication *application) {
     engine.rootContext()->setContextObject(&context);
 
     QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
-    QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
+    QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
@@ -146,7 +146,7 @@ int runUi(QGuiApplication *application) {
 
     prepareWindow();
     std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
-        mainWindow.data()));
+        mainWindow));
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     if (maxFfmpegResolution.isEmpty())
@@ -242,6 +242,9 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
     if (startupParameters.url.isValid())
         NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
+
+    if (startupParameters.autoLoginMode != AutoLoginMode::Undefined)
+        qnSettings->setAutoLoginMode(static_cast<int>(startupParameters.autoLoginMode));
 
     if (startupParameters.testMode)
     {

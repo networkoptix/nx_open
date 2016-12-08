@@ -21,10 +21,13 @@ int QnTestEmailSettingsHandler::executePost(const QString &path, const QnRequest
     fromApiToResource(apiData, settings);
     EmailManagerImpl emailManagerImpl;
 
+    SmtpOperationResult smtpResult = emailManagerImpl.testConnection(settings);
 
-    if (!emailManagerImpl.testConnection(settings)) {
-        reply.errorCode = -1;
-        reply.errorString = tr("Invalid email settings");
+    if (!smtpResult)
+    {
+        reply.errorCode = smtpResult.error;
+        reply.smtpReplyCode = smtpResult.lastCode;
+        reply.errorString = lit("Invalid email settings");
     }
 
     result.setReply(reply);

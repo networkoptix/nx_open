@@ -226,6 +226,8 @@ protected:
             ResolveHandler handler);
     };
 
+    virtual bool isMediatorAvailable() const;
+
     void tryFastDomainResolve(HaInfoIterator info);
 
     void dnsResolve(

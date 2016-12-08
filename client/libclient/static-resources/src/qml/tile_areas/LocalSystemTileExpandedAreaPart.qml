@@ -101,7 +101,10 @@ Column
             onCheckedChanged:
             {
                 if (!checked)
+                {
+                    passwordTextItem.text = "";
                     autoLoginCheckBoxItem.checked = false;
+                }
             }
         }
 

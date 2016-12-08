@@ -68,6 +68,13 @@ private:
 
     ItemState itemState(const QModelIndex& index) const;
 
+    ItemState itemStateForMediaResource(const QModelIndex& index) const;
+    ItemState itemStateForLayout(const QModelIndex& index) const;
+    ItemState itemStateForRecorder(const QModelIndex& index) const;
+    ItemState itemStateForLayoutItem(const QModelIndex& index) const;
+    ItemState itemStateForVideoWall(const QModelIndex& index) const;
+    ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
+
     void getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const;
 private:
     QPointer<QnWorkbench> m_workbench;

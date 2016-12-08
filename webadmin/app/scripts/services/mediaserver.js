@@ -1,12 +1,14 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
 
+        var mediaserver = {};
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
         var proxy = '';
+        // Support proxy mode
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');
             for (var i=0;i<params.length;i++) {
@@ -32,10 +34,10 @@ angular.module('webadminApp')
                 var ips = data.remoteAddresses;
                 var wrongNetwork = true;
                 for (var ip in ips) {
-                    if (ip == '127.0.0.1') { // Localhost
+                    if (ips[ip] == '127.0.0.1') { // Localhost
                         continue;
                     }
-                    if (ip.indexOf('169.254.') == 0) { // No DHCP address
+                    if (ips[ip].indexOf('169.254.') == 0) { // No DHCP address
                         continue;
                     }
                     wrongNetwork = false;
@@ -44,17 +46,15 @@ angular.module('webadminApp')
 
                 data.flags = {
                     noHDD: data.ecDbReadOnly,
-                    noNetwork: ips.length <= 1,
+                    noNetwork: !ips.length,
                     wrongNetwork: wrongNetwork,
                     hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
                     cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
                     canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0,
                     canSetupTime: data.serverFlags.indexOf(Config.timeCtrlFlag) >= 0
                 };
-                data.flags.newSystem = data.flags.cleanSystem &&
-                                        !data.flags.noHDD &&
-                                        !data.flags.noNetwork &&
-                                        !(data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.brokenSystem = data.flags.noHDD || data.flags.noNetwork || (data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.newSystem = data.flags.cleanSystem && !data.flags.brokenSystem;
                 return r;
             });
         }
@@ -82,8 +82,26 @@ angular.module('webadminApp')
                 return; // inline mode - do not do anything
             }
             if(error.status === 403 || error.status === 401) {
-                callLogin();
-                return;
+                // Try to get credentials from native client
+                return nativeClient.init().then(function(){
+                    return nativeClient.getCredentials().then(function(credentials) {
+                        var login = credentials.localLogin;
+                        var password = credentials.localPassword;
+                        if(!(login && password)) {
+                            return $q.reject();
+                        }
+                        return mediaserver.login(login, password).then(function(){
+                            setTimeout(function(){
+                                window.location.reload();
+                            },20);
+                            return true;
+                        });
+                    });
+                }).catch(function(error){
+                    $log.error(error);
+                    $log.log("fall back to login dialog");
+                    callLogin();
+                });
             }
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
@@ -132,6 +150,7 @@ angular.module('webadminApp')
         }
 
 
+        // Special hack to make our json recognizable by fusion on mediaserver
         function stringifyValues(object){
             if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
                 return object;
@@ -144,7 +163,7 @@ angular.module('webadminApp')
         }
 
 
-        return {
+        mediaserver = {
             checkCurrentPassword:function(password){
                 var login = $localStorage.login;
                 var realm = $localStorage.realm;
@@ -254,9 +273,7 @@ angular.module('webadminApp')
             },
             getUser:function(reload){
                 if(this.hasProxy()){ // Proxy means read-only
-                    var deferred = $q.defer();
-                    deferred.resolve(false);
-                    return deferred.promise;
+                    return $q.resolve(false);
                 }
 
                 return this.getCurrentUser(reload).then(function(result){
@@ -556,9 +573,15 @@ angular.module('webadminApp')
 
                 return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.flags.newSystem &&
-                        $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
+                    if($location.path()==='/advanced' ||  $location.path()==='/debug'){ // Do not redirect from advanced and debug pages
+                        return self.getUser();
+                    }
+                    if(r.data.reply.flags.newSystem){  // New system - redirect to setup
                         $location.path('/setup');
+                        return null;
+                    }
+                    if((r.data.reply.flags.brokenSystem)){ // No drives - redirect to settings and hide everything else
+                        $location.path('/settings/system');
                         return null;
                     }
                     return self.getUser();
@@ -594,4 +617,6 @@ angular.module('webadminApp')
                 });
             }
         };
+
+        return mediaserver;
     });

@@ -50,8 +50,6 @@ inline bool qFuzzyIsNull(const QVector4D &vector)
 #define QN_FLOAT_FUZZY_EQUALS_PRECISION 84
 #define QN_DOUBLE_FUZZY_EQUALS_PRECISION 4504
 
-// TODO: #Elric deprecate qFuzzyCompare
-
 inline bool qFuzzyEquals(float l, float r)
 {
     return qFuzzyCompare(l, r) || (qFuzzyIsNull(l) && qFuzzyIsNull(r));

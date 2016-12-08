@@ -118,20 +118,10 @@ private:
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const
     {
-        Qn::NodeType leftNodeType = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        Qn::NodeType rightNodeType = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-
-        if (leftNodeType != rightNodeType)
-        {
-            /* Check default behavior first. */
-            if (leftNodeType != Qn::ResourceNode && rightNodeType != Qn::ResourceNode)
-                return leftNodeType < rightNodeType;
-
-            qreal leftOrder = nodeOrder(left);
-            qreal rightOrder = nodeOrder(right);
-            if (!qFuzzyEquals(leftOrder, rightOrder))
-                return leftOrder < rightOrder;
-        }
+        qreal leftOrder = nodeOrder(left);
+        qreal rightOrder = nodeOrder(right);
+        if (!qFuzzyEquals(leftOrder, rightOrder))
+            return leftOrder < rightOrder;
 
         return resourceLessThan(left, right);
     }

@@ -7,14 +7,15 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/std/future.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
@@ -23,8 +24,35 @@
 
 #include "repeating_buffer_sender.h"
 
-
 namespace nx_http {
+namespace test {
+
+class SslAssertHandler:
+    public nx_http::AbstractHttpRequestHandler
+{
+public:
+    SslAssertHandler(bool expectSsl):
+        m_expectSsl(expectSsl)
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        EXPECT_EQ(m_expectSsl, connection->isSsl());
+        completionHandler(nx_http::RequestResult(
+            nx_http::StatusCode::ok,
+            std::make_unique<nx_http::BufferSource>(
+                nx_http::BufferType("text/plain"), nx_http::BufferType("ok"))));
+    }
+
+private:
+    const bool m_expectSsl;
+};
 
 class AsyncHttpClientTest:
     public ::testing::Test
@@ -33,6 +61,11 @@ public:
     AsyncHttpClientTest():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
+        m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
+            lit("/httpOnly"), []() { return std::make_unique<SslAssertHandler>(false); });
+
+        m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
+            lit("/httpsOnly"), []() { return std::make_unique<SslAssertHandler>(true); });
     }
 
     TestHttpServer* testHttpServer()
@@ -42,7 +75,32 @@ public:
 
 protected:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
+
+    void httpsTest(const QString& scheme, const QString& path)
+    {
+        const QUrl url(lit("%1://%2/%3")
+            .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
+
+        std::promise<void> promise;
+        NX_LOGX(lit("httpsTest: %1").arg(url.toString()), cl_logINFO);
+
+        const auto client = nx_http::AsyncHttpClient::create();
+        client->doGet(url, [&promise](AsyncHttpClientPtr ptr)
+        {
+             EXPECT_TRUE(ptr->hasRequestSuccesed());
+             promise.set_value();
+        });
+
+        promise.get_future().wait();
+    }
 };
+
+TEST_F(AsyncHttpClientTest, Https)
+{
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
+    httpsTest(lit("http"), lit("httpOnly"));
+    httpsTest(lit("https"), lit("httpsOnly"));
+}
 
 //TODO #ak introduce built-in http server to automate AsyncHttpClient tests
 
@@ -518,4 +576,5 @@ X-Nx-Result-Code: ok
     ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
 }
 
+} // namespace test
 } // namespace nx_http

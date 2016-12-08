@@ -92,7 +92,7 @@ Object
 
     Component.onCompleted:
     {
-        if (cameraOffline || cameraUnauthorized)
+        if (cameraOffline || cameraUnauthorized || resourceId == "")
             return
 
         mediaPlayer.playLive()

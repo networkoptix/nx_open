@@ -415,6 +415,11 @@ AddressResolver::RequestInfo::RequestInfo(
 {
 }
 
+bool AddressResolver::isMediatorAvailable() const
+{
+    return (bool) SocketGlobals::mediatorConnector().mediatorAddress();
+}
+
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 {
     const auto domain = info->first.toString();
@@ -500,8 +505,7 @@ void AddressResolver::mediatorResolve(
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress
-        && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
+    if (info->second.isLikelyCloudAddress && isMediatorAvailable())
     {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
         resolveResult = SystemError::noError;

@@ -640,7 +640,7 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
         targetHeight = maxHeight;
 
     QRectF geometry = item->geometry();
-    if (!qFuzzyCompare(geometry.height(), targetHeight))
+    if (!qFuzzyEquals(geometry.height(), targetHeight))
     {
         qreal targetTop = parentBottom - targetHeight;
         geometry.setHeight(targetHeight);

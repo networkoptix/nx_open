@@ -8,12 +8,23 @@ namespace ec2 {
 namespace database {
 namespace api {
 
-/** Get id from vms_resource table. Returns 0 if resource is not found. */
+/**
+ * @brief Get internal entry id from vms_resource table.
+ * @param in database Target database.
+ * @param in guid Unique id of the resource.
+ * @returns 0 if resource is not found, valid internal id otherwise.
+ */
 qint32 getResourceInternalId(
     const QSqlDatabase& database,
     const QnUuid& guid);
 
-/** Add or update resource. */
+/**
+ * @brief Add or update resource.
+ * @param in database Target database.
+ * @param in data Resource api data.
+ * @param out internalId Returns id of the inserted/updated entry.
+ * @returns True if operation was successful, false otherwise.
+ */
 bool insertOrReplaceResource(
     const QSqlDatabase& database,
     const ApiResourceData& data,

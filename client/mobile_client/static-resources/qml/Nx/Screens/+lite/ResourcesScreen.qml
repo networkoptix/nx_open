@@ -14,6 +14,7 @@ Page
 
     toolBar.visible: false
     warningText: qsTr("Server offline")
+    sideNavigationEnabled: false
 
     QtObject
     {
@@ -117,6 +118,32 @@ Page
         }
     }
 
+    Rectangle
+    {
+        id: connectionFailureDummy
+
+        anchors.fill: parent
+        color: ColorTheme.windowBackground
+        visible: false
+
+        Text
+        {
+            anchors.centerIn: parent
+            text: qsTr("Cannot connect to server")
+            font.pixelSize: 32
+            color: ColorTheme.base13
+        }
+
+        Text
+        {
+            anchors.centerIn: parent
+            anchors.verticalCenterOffset: parent.height / 4
+            text: qsTr("Press %1 to exit").arg("Esc")
+            font.pixelSize: 28
+            color: ColorTheme.base11
+        }
+    }
+
     Connections
     {
         target: connectionManager
@@ -124,17 +151,15 @@ Page
         onConnectionStateChanged:
         {
             if (connectionManager.connectionState === QnConnectionManager.Disconnected)
-            {
                 loadingDummy.opacity = 1
-            }
+            else
+                connectionFailureDummy.visible = false
         }
 
         onConnectionFailed:
         {
             var systemName = title ? title : getLastUsedSystemName()
-            Workflow.openSessionsScreenWithWarning(
-                connectionManager.connectionType == QnConnectionManager.LiteClientConnection
-                    ? "" : systemName)
+            connectionFailureDummy.visible = true
         }
 
         onInitialResourcesReceivedChanged:
