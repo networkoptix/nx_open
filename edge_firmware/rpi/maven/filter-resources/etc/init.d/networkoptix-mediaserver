@@ -42,7 +42,7 @@ process_core_dump() {
         REPORT=${BIN_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
 
         echo Generate crash report $REPORT...        BACKGROUND
-        echo "t apply all bt 25" | gdb $BIN_PATH $CORE 2&>1 >/tmp/$REPORT && \
+        echo "t apply all bt 25" | gdb $BIN_PATH $CORE 2>&1 >/tmp/$REPORT && \
             mv /tmp/$REPORT ~/$REPORT &
 
         ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null
@@ -92,7 +92,7 @@ stop() {
 }
 
 start_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+    WATCHDOG_PID="`ps -eO command | grep mediaserver| grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
     if [ "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is already running with pid $WATCHDOG_PID"
         return 0
