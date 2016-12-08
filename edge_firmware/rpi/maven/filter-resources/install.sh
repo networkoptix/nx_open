@@ -10,6 +10,7 @@ export DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber
 
 update () {
   cp $DISTRIB.tar.gz /tmp
+  rm -Rf /opt/networkoptix/mediaserver/lib
   tar xfv $DISTRIB.tar.gz -C /
   if [[ "${box}" == "bpi" ]]; then 
     /etc/init.d/nx1upgrade; 
