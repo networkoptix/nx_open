@@ -29,7 +29,7 @@ angular.module('cloudApp', [
     $routeProvider
         .when('/register/success', {
             title: L.pageTitles.registerSuccess,
-            templateUrl: 'static/views/regActions',
+            templateUrl: 'static/views/regActions.html',
             controller: 'RegisterCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
@@ -37,7 +37,7 @@ angular.module('cloudApp', [
         })
         .when('/register/successActivated', {
             title: L.pageTitles.registerSuccess,
-            templateUrl: 'static/views/regActions',
+            templateUrl: 'static/views/regActions.html',
             controller: 'RegisterCtrl',
             resolve: {
                 test: ['$route',function ($route) {
@@ -48,12 +48,12 @@ angular.module('cloudApp', [
         })
         .when('/register/:code', {
             title: L.pageTitles.register,
-            templateUrl: 'static/views/regActions',
+            templateUrl: 'static/views/regActions.html',
             controller: 'RegisterCtrl'
         })
         .when('/register', {
             title: L.pageTitles.register,
-            templateUrl: 'static/views/regActions',
+            templateUrl: 'static/views/regActions.html',
             controller: 'RegisterCtrl'
         })
         .when('/account/password', {
