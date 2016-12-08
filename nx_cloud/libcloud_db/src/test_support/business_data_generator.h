@@ -13,8 +13,16 @@ class BusinessDataGenerator
 {
 public:
     static std::string generateRandomEmailAddress();
+
     static api::AccountData generateRandomAccount();
+
     static data::SystemData generateRandomSystem(const api::AccountData& account);
+
+    static std::string generateRandomSystemId();
+
+    static api::SystemSharingEx generateRandomSharing(
+        const api::AccountData& account,
+        const std::string& systemId);
 };
 
 } // namespace test

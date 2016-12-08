@@ -6,57 +6,29 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <utils/common/guard.h>
 
 namespace nx {
 namespace db {
 
-DbRequestExecutionThread::DbRequestExecutionThread(
-    const ConnectionOptions& connectionOptions,
-    QueryExecutorQueue* const queryExecutorQueue)
-:
-    BaseRequestExecutor(connectionOptions, queryExecutorQueue),
-    m_state(ConnectionState::initializing),
-    m_terminated(false),
-    m_numberOfFailedRequestsInARow(0)
+DbConnectionHolder::DbConnectionHolder(const ConnectionOptions& connectionOptions):
+    m_connectionOptions(connectionOptions)
 {
 }
 
-DbRequestExecutionThread::~DbRequestExecutionThread()
+DbConnectionHolder::~DbConnectionHolder()
 {
-    if (m_queryExecutionThread.joinable())
-        m_queryExecutionThread.join();
-    m_dbConnection.close();
+    close();
 }
 
-void DbRequestExecutionThread::pleaseStop()
+const ConnectionOptions& DbConnectionHolder::connectionOptions() const
 {
-    m_terminated = true;
+    return m_connectionOptions;
 }
 
-void DbRequestExecutionThread::join()
-{
-    m_queryExecutionThread.join();
-}
-
-ConnectionState DbRequestExecutionThread::state() const
-{
-    return m_state;
-}
-
-void DbRequestExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    m_onClosedHandler = std::move(handler);
-}
-
-void DbRequestExecutionThread::start()
-{
-    m_queryExecutionThread = 
-        nx::utils::thread(std::bind(&DbRequestExecutionThread::queryExecutionThreadMain, this));
-}
-
-bool DbRequestExecutionThread::open()
+bool DbConnectionHolder::open()
 {
     // Using guid as a unique connection name.
     m_dbConnection = QSqlDatabase::addDatabase(
@@ -86,6 +58,124 @@ bool DbRequestExecutionThread::open()
     return true;
 }
 
+QSqlDatabase* DbConnectionHolder::dbConnection()
+{
+    return &m_dbConnection;
+}
+
+void DbConnectionHolder::close()
+{
+    m_dbConnection.close();
+}
+
+std::shared_ptr<nx::db::QueryContext> DbConnectionHolder::begin()
+{
+    return createNewTran();
+}
+
+bool DbConnectionHolder::tuneConnection()
+{
+    switch (connectionOptions().driverType)
+    {
+        case RdbmsDriverType::mysql:
+            return tuneMySqlConnection();
+        default:
+            return true;
+    }
+}
+
+bool DbConnectionHolder::tuneMySqlConnection()
+{
+    if (!connectionOptions().encoding.isEmpty())
+    {
+        QSqlQuery query(m_dbConnection);
+        query.prepare(lit("SET NAMES '%1'").arg(connectionOptions().encoding));
+        if (!query.exec())
+        {
+            NX_LOGX(lm("Failed to set connection character set to \"%1\". %2")
+                .arg(connectionOptions().encoding).arg(query.lastError().text()),
+                cl_logWARNING);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+std::shared_ptr<nx::db::QueryContext> DbConnectionHolder::createNewTran()
+{
+    auto deleter =
+        [](nx::db::QueryContext* queryContext)
+        {
+            if (queryContext->transaction()->isActive())
+                queryContext->transaction()->rollback();
+            delete queryContext->transaction();
+            delete queryContext;
+        };
+
+    auto transaction = std::make_unique<nx::db::Transaction>(dbConnection());
+    if (transaction->begin() != nx::db::DBResult::ok)
+        return nullptr;
+    return std::shared_ptr<nx::db::QueryContext>(
+        new nx::db::QueryContext(dbConnection(), transaction.release()),
+        deleter);
+}
+
+//-------------------------------------------------------------------------------------------------
+// DbRequestExecutionThread
+
+DbRequestExecutionThread::DbRequestExecutionThread(
+    const ConnectionOptions& connectionOptions,
+    QueryExecutorQueue* const queryExecutorQueue)
+:
+    BaseRequestExecutor(connectionOptions, queryExecutorQueue),
+    m_state(ConnectionState::initializing),
+    m_terminated(false),
+    m_numberOfFailedRequestsInARow(0),
+    m_dbConnectionHolder(connectionOptions),
+    m_queueReaderId(queryExecutorQueue->generateReaderId())
+{
+}
+
+DbRequestExecutionThread::~DbRequestExecutionThread()
+{
+    if (m_queryExecutionThread.joinable())
+    {
+        pleaseStop();
+        m_queryExecutionThread.join();
+    }
+    m_dbConnectionHolder.close();
+
+    queryExecutorQueue()->removeReaderFromTerminatedList(m_queueReaderId);
+}
+
+void DbRequestExecutionThread::pleaseStop()
+{
+    m_terminated = true;
+    queryExecutorQueue()->addReaderToTerminatedList(m_queueReaderId);
+}
+
+void DbRequestExecutionThread::join()
+{
+    m_queryExecutionThread.join();
+}
+
+ConnectionState DbRequestExecutionThread::state() const
+{
+    return m_state;
+}
+
+void DbRequestExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_onClosedHandler = std::move(handler);
+}
+
+void DbRequestExecutionThread::start()
+{
+    m_queryExecutionThread = 
+        nx::utils::thread(std::bind(&DbRequestExecutionThread::queryExecutionThreadMain, this));
+}
+
 void DbRequestExecutionThread::queryExecutionThreadMain()
 {
     constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
@@ -97,11 +187,12 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
                 onClosedHandler();
         });
 
-    if (!open())
+    if (!m_dbConnectionHolder.open())
     {
         m_state = ConnectionState::closed;
         return;
     }
+
     m_state = ConnectionState::opened;
 
     auto previousActivityTime = std::chrono::steady_clock::now();
@@ -109,7 +200,7 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
     while (!m_terminated && m_state == ConnectionState::opened)
     {
         boost::optional<std::unique_ptr<AbstractExecutor>> task = 
-            queryExecutorQueue()->pop(kTaskWaitTimeout);
+            queryExecutorQueue()->pop(kTaskWaitTimeout, m_queueReaderId);
         if (!task)
         {
             if (std::chrono::steady_clock::now() - previousActivityTime >= 
@@ -132,38 +223,9 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
     }
 }
 
-bool DbRequestExecutionThread::tuneConnection()
-{
-    switch (connectionOptions().driverType)
-    {
-        case RdbmsDriverType::mysql:
-            return tuneMySqlConnection();
-        default:
-            return true;
-    }
-}
-
-bool DbRequestExecutionThread::tuneMySqlConnection()
-{
-    if (!connectionOptions().encoding.isEmpty())
-    {
-        QSqlQuery query(m_dbConnection);
-        query.prepare(lit("SET NAMES '%1'").arg(connectionOptions().encoding));
-        if (!query.exec())
-        {
-            NX_LOGX(lm("Failed to set connection character set to \"%1\". %2")
-                .arg(connectionOptions().encoding).arg(query.lastError().text()),
-                cl_logWARNING);
-            return false;
-        }
-    }
-
-    return true;
-}
-
 void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
 {
-    const auto result = task->execute(&m_dbConnection);
+    const auto result = task->execute(m_dbConnectionHolder.dbConnection());
     switch (result)
     {
         case DBResult::ok:
@@ -174,13 +236,13 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
         default:
         {
             NX_LOGX(lit("DB query failed with error %1. Db text %2")
-                .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                .arg(QnLexical::serialized(result)).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
                 cl_logWARNING);
             ++m_numberOfFailedRequestsInARow;
             if (!isDbErrorRecoverable(result))
             {
                 NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .arg(QnLexical::serialized(result)).arg(m_dbConnection.lastError().text()),
+                    .arg(QnLexical::serialized(result)).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
                     cl_logWARNING);
                 closeConnection();
                 break;
@@ -199,7 +261,7 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
 
 void DbRequestExecutionThread::closeConnection()
 {
-    m_dbConnection.close();
+    m_dbConnectionHolder.close();
     m_state = ConnectionState::closed;
 }
 

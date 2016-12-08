@@ -6,6 +6,7 @@
 #include <nx/utils/time.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/id.h>
 
 namespace nx {
 namespace cdb {
@@ -36,7 +37,7 @@ data::SystemData BusinessDataGenerator::generateRandomSystem(const api::AccountD
 
     data::SystemData system;
 
-    system.id = QnUuid::createUuid().toSimpleByteArray().toStdString();
+    system.id = generateRandomSystemId();
     system.name = system.id;
     system.customization = QnAppInfo::customizationName().toStdString();
     //system.opaque = newSystem.opaque;
@@ -47,6 +48,29 @@ data::SystemData BusinessDataGenerator::generateRandomSystem(const api::AccountD
         duration_cast<seconds>(nx::utils::timeSinceEpoch() + hours(1)).count();
 
     return system;
+}
+
+std::string BusinessDataGenerator::generateRandomSystemId()
+{
+    return QnUuid::createUuid().toSimpleByteArray().toStdString();
+}
+
+api::SystemSharingEx BusinessDataGenerator::generateRandomSharing(
+    const api::AccountData& account,
+    const std::string& systemId)
+{
+    api::SystemSharingEx sharing;
+    sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+    sharing.accountEmail = account.email;
+    sharing.accountFullName = account.fullName;
+    sharing.accountId = account.id;
+    sharing.isEnabled = true;
+    sharing.lastLoginTime = std::chrono::system_clock::now();
+    sharing.systemId = systemId;
+    sharing.vmsUserId = guidFromArbitraryData(
+        sharing.accountEmail).toSimpleString().toStdString();
+
+    return sharing;
 }
 
 } // namespace test

@@ -33,8 +33,8 @@ public:
     virtual void stopWhileInAioThread() override;
 
     void readTransactions(
-        const ::ec2::QnTranState& from,
-        const ::ec2::QnTranState& to,
+        boost::optional<::ec2::QnTranState> from,
+        boost::optional<::ec2::QnTranState> to,
         int maxTransactionsToReturn,
         TransactionsReadHandler completionHandler);
 
