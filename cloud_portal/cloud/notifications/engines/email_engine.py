@@ -1,9 +1,13 @@
 import codecs
 import pystache
 from django.core.mail import EmailMultiAlternatives
-from email.MIMEImage import MIMEImage
-from notifications.config import notifications_config, notifications_module_config, TEMPLATES_LOCATION
+from email.mime.image import MIMEImage
+from django.conf import settings
 import json
+
+TEMPLATES_LOCATION = settings.NOTIFICATIONS_TEMPLATES_LOCATION
+notifications_module_config = settings.NOTIFICATIONS_CONFIG_DATA
+notifications_config = settings.NOTIFICATIONS_CONFIG
 
 
 def send(email, msg_type, message):

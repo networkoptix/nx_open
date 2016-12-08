@@ -1,10 +1,8 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
-from notifications.helpers.ipwhitelists import ip_allow_only
 from notifications import api
 from django.core.exceptions import ValidationError
-from cloud import settings
 
 
 @api_view(['POST'])
