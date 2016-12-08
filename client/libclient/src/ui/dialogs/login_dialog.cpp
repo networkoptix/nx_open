@@ -685,7 +685,35 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
 {
     auto addresses = qnModuleFinder->moduleAddresses(moduleInformation.id);
 
-    if (addresses.isEmpty())
+    auto isCloudAddress =
+        [](const HostAddress& address) -> bool
+        {
+            return nx::network::SocketGlobals::addressResolver()
+                .isCloudHostName(address.toString());
+        };
+
+    auto isLoopback =
+        [](const HostAddress& address) -> bool
+        {
+            return QHostAddress(address.toString()).isLoopback();
+        };
+
+    bool loopback = false;
+    SocketAddress address;
+
+    for (const auto& current: addresses)
+    {
+        if (isCloudAddress(current.address))
+            continue;
+
+        address = current;
+
+        loopback = isLoopback(current.address);
+        if (loopback)
+            break;
+    }
+
+    if (address.isNull())
     {
         at_moduleFinder_moduleLost(moduleInformation);
         return;
@@ -693,25 +721,15 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
 
     QnFoundSystemData data;
     data.info = moduleInformation;
-
-    /* prefer localhost */
-    SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(),
-        moduleInformation.port);
-    if (!addresses.contains(address))
-        address = *addresses.cbegin();
-
     data.url.setScheme(lit("http"));
     data.url.setHost(address.address.toString());
     data.url.setPort(address.port);
 
     if (m_foundSystems.contains(moduleInformation.id))
     {
-        QnFoundSystemData &oldData = m_foundSystems[moduleInformation.id];
-        if (!QHostAddress(address.address.toString()).isLoopback()
-                && addresses.contains(oldData.url.host()))
-        {
+        QnFoundSystemData& oldData = m_foundSystems[moduleInformation.id];
+        if (!loopback && addresses.contains(oldData.url.host()))
             data.url.setHost(oldData.url.host());
-        }
 
         if (oldData != data)
         {
