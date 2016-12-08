@@ -1,4 +1,5 @@
 #include "cloud_result_info.h"
+#include <utils/common/app_info.h>
 
 using namespace nx::cdb::api;
 
@@ -11,13 +12,13 @@ QnCloudResultInfo::operator QString() const
     return m_text;
 }
 
-//TODO: #placeholder #stub Fill with better human-readable strings
 QString QnCloudResultInfo::toString(ResultCode code)
 {
     switch (code)
     {
+        /* Public result codes: */
+
         case ResultCode::ok:
-        case ResultCode::partialContent:
             return tr("Successful.");
 
         case ResultCode::notAuthorized:
@@ -32,17 +33,36 @@ QString QnCloudResultInfo::toString(ResultCode code)
         case ResultCode::accountBlocked:
             return tr("This account is blocked.");
 
-        case ResultCode::notFound:
-            return tr("Not found.");
-
-        case ResultCode::alreadyExists:
-            return tr("Already exists.");
-
         case ResultCode::dbError:
-            return tr("Internal server error. Please contact support team.");
+            return tr("Internal %1 error. Please contact support team.").arg(QnAppInfo::cloudName());
 
         case ResultCode::networkError:
-            return tr("Network operation failed.");
+            return tr("Unexpected network error. Please check your Internet connection and try again.");
+
+        case ResultCode::badUsername:
+            return tr("Invalid login.");
+
+        case ResultCode::serviceUnavailable:
+            return tr("Sorry, %1 Service is temporary unavailable. We're doing our best to restore it. Please try again later.")
+                .arg(QnAppInfo::cloudName());
+
+        case ResultCode::credentialsRemovedPermanently:
+            return tr("Credentials are no longer valid.");
+
+        case ResultCode::retryLater:
+            return tr("Sorry, %1 Service couldn't process your request. Please try again in a few moments.")
+                .arg(QnAppInfo::cloudName());
+
+        /* Internal result codes: */
+
+        case ResultCode::partialContent:
+            return tr("Successful.");
+
+        case ResultCode::notFound:
+            return tr("Requested object is not found.");
+
+        case ResultCode::alreadyExists:
+            return tr("Object already exists.");
 
         case ResultCode::notImplemented:
             return tr("Requested feature is not implemented.");
@@ -50,26 +70,14 @@ QString QnCloudResultInfo::toString(ResultCode code)
         case ResultCode::unknownRealm:
             return tr("Unknown realm.");
 
-        case ResultCode::badUsername:
-            return tr("Bad username.");
-
         case ResultCode::badRequest:
             return tr("Bad request.");
 
         case ResultCode::invalidNonce:
             return tr("Invalid nonce.");
 
-        case ResultCode::serviceUnavailable:
-            return tr("Service is unavailable.");
-
-        case ResultCode::credentialsRemovedPermanently:
-            return tr("Credentials are no longer valid.");
-
         case ResultCode::invalidFormat:
             return tr("Invalid data received.");
-
-        case ResultCode::retryLater:
-            return tr("Please retry later.");
 
         case ResultCode::unknownError:
             return tr("Unknown error.");
