@@ -189,7 +189,7 @@ Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetTh
 {
     QnRequestParamList params;
     params.append({lit("startCamerasMode"), lit("true")});
-    return executeGet(lit("/api/startLiteClient"), QnRequestParamList(), callback, targetThread);
+    return executeGet(lit("/api/startLiteClient"), params, callback, targetThread);
 }
 
 Handle ServerConnection::getFreeSpaceForUpdateFiles(
