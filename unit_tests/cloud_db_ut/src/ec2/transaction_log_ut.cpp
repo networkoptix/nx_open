@@ -127,8 +127,8 @@ public:
         m_systemId(cdb::test::BusinessDataGenerator::generateRandomSystemId()),
         m_otherPeerId(QnUuid::createUuid()),
         m_otherPeerDbId(QnUuid::createUuid()),
-        m_dbConnectionHolder(dbConnectionOptions()),
-        m_otherPeerSequence(1)
+        m_otherPeerSequence(1),
+        m_dbConnectionHolder(dbConnectionOptions())
     {
         init();
     }
@@ -537,6 +537,10 @@ private:
                 case State::done:
                     setCompletedState(State::done);
                     return nx::db::DBResult::ok;
+
+                default:
+                    NX_GTEST_ASSERT_TRUE(false);
+                    break;
             }
         }
 
