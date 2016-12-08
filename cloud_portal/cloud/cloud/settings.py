@@ -251,3 +251,28 @@ if os.path.isfile(common_list_file):
         PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)
 else:
     print >> sys.stderr, "Warning: Can't read from {}".format(common_list_file)
+
+
+NOTIFICATIONS_CONFIG = {
+    'activate_account': {
+        'engine': 'email',
+        'subject': 'Confirm your account'
+    },
+    'restore_password': {
+        'engine': 'email',
+        'subject': 'Restore your password'
+    },
+    'system_invite': {
+        'engine': 'email',
+        'subject': 'Video system was shared with you'
+    },
+    'system_shared': {
+        'engine': 'email',
+        'subject': 'Video system was shared with you'
+    },
+}
+
+NOTIFICATIONS_AUTO_SUBSCRIBE = False
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_LOCATION = os.path.join(BASE_DIR, "static")
