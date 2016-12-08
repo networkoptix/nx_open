@@ -40,7 +40,6 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::OtherSystemsNode
         << Qn::WebPagesNode
         << Qn::ServersNode
-        << Qn::MyCloudNode
         << Qn::UserResourcesNode
         << Qn::RecorderNode
         << Qn::SystemNode
@@ -106,13 +105,10 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         break;
     case Qn::OtherSystemsNode:
         setNameInternal(tr("Other Systems"));
+        m_state = Invalid;
         break;
     case Qn::UsersNode:
         setNameInternal(tr("Users"));
-        break;
-    case Qn::MyCloudNode:
-        setNameInternal(QnAppInfo::cloudName());
-        m_state = Invalid;
         break;
     case Qn::WebPagesNode:
         setNameInternal(tr("Web Pages"));
@@ -452,6 +448,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::LocalResourcesNode:
         case Qn::SeparatorNode:
         case Qn::LocalSeparatorNode:
+        case Qn::OtherSystemsNode:
 
         /* These will be hidden or displayed together with their parent. */
         case Qn::VideoWallItemNode:
@@ -468,7 +465,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::RecorderNode:
         case Qn::SystemNode:
         case Qn::CloudSystemNode:
-        case Qn::MyCloudNode:
             return false;
 
         case Qn::CurrentSystemNode:
@@ -484,9 +480,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
     }
-
-    case Qn::OtherSystemsNode:
-        return !isAdmin || !QnGlobalSettings::instance()->isAutoDiscoveryEnabled();
 
     case Qn::UsersNode:
     case Qn::ServersNode:
@@ -510,6 +503,10 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Hide resource nodes without resource. */
         if (!m_resource)
             return true;
+
+        /* Other systems visibility governed by its parent node. */
+        if (m_resource->hasFlags(Qn::fake))
+            return false;
 
         /* Hide non-readable resources. */
         if (!accessController()->hasPermissions(m_resource, Qn::ReadPermission))
@@ -1095,9 +1092,6 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
         case Qn::ServersNode:
             return qnResIconCache->icon(QnResourceIconCache::Servers);
-
-        case Qn::OtherSystemsNode:
-            return qnResIconCache->icon(QnResourceIconCache::OtherSystems);
 
         case Qn::UsersNode:
         case Qn::RoleNode:
