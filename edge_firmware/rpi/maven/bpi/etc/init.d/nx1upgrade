@@ -37,7 +37,6 @@ touch /dev/cedar_dev
 chmod 777 /dev/disp
 chmod 777 /dev/cedar_dev
 usermod -aG video root
-rm -Rf /opt/networkoptix/mediaserver/lib
 
 mkdir -p $MNTDATAPART
 mount -t ext4 $DATAPART $MNTDATAPART
