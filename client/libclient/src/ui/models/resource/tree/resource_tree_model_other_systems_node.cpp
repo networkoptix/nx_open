@@ -31,8 +31,6 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
 {
     base_type::initialize();
 
-    qDebug() <<" node initialized";
-
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
         this, &QnResourceTreeModelOtherSystemsNode::handleSystemDiscovered);
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
@@ -128,8 +126,6 @@ void QnResourceTreeModelOtherSystemsNode::handleResourceRemoved(const QnResource
 void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
     const QnFakeMediaServerResourcePtr& server)
 {
-    qDebug() << "Updating fake server" << server->getName();
-
     bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     bool isAutoDiscoveryEnabled = qnGlobalSettings->isAutoDiscoveryEnabled();
 
@@ -137,13 +133,8 @@ void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
     {
         if (auto node = m_fakeServers.value(server))
         {
-            qDebug() << "hide server";
             removeNode(node);
             cleanupEmptyLocalNodes();
-        }
-        else
-        {
-            qDebug() << "node does not exist";
         }
         return;
     }
@@ -156,7 +147,6 @@ void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
         ? model()->rootNode(Qn::ServersNode)
         : ensureLocalSystemNode(info.systemName);
 
-    qDebug() << "reparent server to node" << parent->data(Qt::DisplayRole, 0);
     auto node = ensureFakeServerNode(server);
     const bool cleanupNeeded = (node->parent() && node->parent() != parent);
     node->setParent(parent);
@@ -208,8 +198,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModelOtherSystemsNode::ensureFakeServer
 
 void QnResourceTreeModelOtherSystemsNode::cleanupEmptyLocalNodes()
 {
-    return;
-
     NodeList nodesToRemove;
     for (auto node: m_localNodes)
     {
@@ -227,8 +215,13 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
     for (const auto& system : qnSystemsFinder->systems())
         handleSystemDiscovered(system);
 
-    for (const auto& server: qnResPool->getResources<QnFakeMediaServerResource>())
-        updateFakeServerNode(server);
+    for (const auto& resource: qnResPool->getAllIncompatibleResources())
+    {
+        const auto server = resource.dynamicCast<QnFakeMediaServerResource>();
+        NX_ASSERT(server);
+        if (server)
+            updateFakeServerNode(server);
+    }
 }
 
 void QnResourceTreeModelOtherSystemsNode::removeNode(const QnResourceTreeModelNodePtr& node)
@@ -264,4 +257,8 @@ void QnResourceTreeModelOtherSystemsNode::clean()
     for (auto node: m_localNodes)
         node->deinitialize();
     m_localNodes.clear();
+
+    for (auto node: m_fakeServers)
+        node->deinitialize();
+    m_fakeServers.clear();
 }
