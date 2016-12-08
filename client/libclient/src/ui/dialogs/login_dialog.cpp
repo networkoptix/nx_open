@@ -18,43 +18,42 @@
 
 #include <core/resource/resource.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/dialogs/connection_name_dialog.h>
-#include <ui/widgets/rendering_widget.h>
-#include <ui/style/skin.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <ui/workaround/gl_widget_factory.h>
-
 #include <network/module_finder.h>
 #include <network/networkoptixmodulerevealcommon.h>
 
+#include <nx/utils/raii_guard.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
+#include <rest/server/json_rest_result.h>
+#include <client_core/client_core_settings.h>
+
 #include <utils/applauncher_utils.h>
+#include <utils/common/app_info.h>
 #include <utils/common/url.h>
 #include <utils/common/util.h>
+#include <utils/connection_diagnostics_helper.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/filetypesupport.h>
 
-#include "connection_testing_dialog.h"
-#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-
+#include <ui/actions/action_manager.h>
+#include <ui/dialogs/connection_name_dialog.h>
+#include <ui/dialogs/connection_testing_dialog.h>
+#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-
-#include <utils/connection_diagnostics_helper.h>
-
-#include <utils/common/app_info.h>
 #include <ui/style/custom_style.h>
-#include <nx/utils/raii_guard.h>
-#include <nx/network/http/asynchttpclient.h>
-#include <rest/server/json_rest_result.h>
-#include <client_core/client_core_settings.h>
+#include <ui/style/skin.h>
+#include <ui/widgets/rendering_widget.h>
+#include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workbench/workbench_context.h>
 
 
 namespace {
+
 static const QnUuid kCustomConnectionLocalId;
 
 constexpr int kMinIntroWidth = 550;
@@ -124,7 +123,7 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
     return savedConnectionFound;
 }
 
-} // anonymous namespace
+} // namespace
 
 /************************************************************************/
 /* QnFoundSystemData                                                             */
@@ -244,7 +243,9 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
         at_moduleFinder_moduleChanged(moduleInformation);
 }
 
-QnLoginDialog::~QnLoginDialog() {}
+QnLoginDialog::~QnLoginDialog()
+{
+}
 
 void QnLoginDialog::updateFocus()
 {
