@@ -246,8 +246,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if (error == nxcip::NX_NO_ERROR)
         {
             QString mediaUrlStr(mediaUrlBuf);
-            if (!mediaUrlStr.isEmpty())
-                m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
+            m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
         }   
 
         return CameraDiagnostics::NoErrorResult();

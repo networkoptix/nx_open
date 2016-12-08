@@ -478,19 +478,25 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
 
 void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
 {
-    if (!storeUrlForRole(role))
+    if (!storeUrlForRole(role) || url.isEmpty())
         return;
 
-    if (updateProperty(Qn::CAMERA_STREAM_URLS,
-        [url, role]
-        (QString oldValue)
+    auto cachedUrl = m_cachedStreamUrls.find(role);
+    bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
+
+    if (cachedUrlExists && cachedUrl->second == url)
+        return;
+
+    auto urlUpdater = 
+        [url, role](QString oldValue)
         {
             const auto roleStr = QString::number(role);
             QJsonObject streamUrls = QJsonDocument::fromJson(oldValue.toUtf8()).object();
             streamUrls[roleStr] = url;
             return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
-        }
-    ))
+        };
+
+    if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
         saveParams();
 }
 
