@@ -47,7 +47,6 @@
 #include <nx/network/socket_common.h>
 #include "runtime_info_manager.h"
 #include <utils/common/app_info.h>
-#include <utils/common/delayed.h>
 
 #include <nx/utils/log/log.h>
 
@@ -89,7 +88,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound);
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost);
-    connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification, Qt::DirectConnection);
+    connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification);
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged);
 
     auto resourceManager = connection->getResourceNotificationManager();
@@ -622,25 +621,13 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetLicenses(fullData.licenses);
     resetTime();
 
-    //TODO: #gdm #vkutin #rvasilenko Get rid of this porn (refactor!)
-    // Currently QnCommonMessageProcessor processes almost all notifications not in its own thread
-    // but in the thread notification signals come from. Too keep message order we have to partially
-    // execute onGotInitialNotification in that thread, but the final part should be executed in
-    // QnCommonMessageProcessor's thread:
-    auto onGotInitialNotificationFinal =
-        [this, tt, guard = QPointer<QnCommonMessageProcessor>(this)]()
-        {
-            qDebug() << "resources loaded for" << tt.elapsed();
-            qnResourceAccessProvider->endUpdate();
-            qDebug() << "access ready" << tt.elapsed();
-            qnResourceAccessManager->endUpdate();
-            qDebug() << "permissions ready" << tt.elapsed();
+    qDebug() << "resources loaded for" << tt.elapsed();
+    qnResourceAccessProvider->endUpdate();
+    qDebug() << "access ready" << tt.elapsed();
+    qnResourceAccessManager->endUpdate();
+    qDebug() << "permissions ready" << tt.elapsed();
 
-            if (guard)
-                emit initialResourcesReceived();
-        };
-
-    executeDelayed(onGotInitialNotificationFinal, 0, thread());
+    emit initialResourcesReceived();
 }
 
 QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
