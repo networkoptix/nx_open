@@ -5,6 +5,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 
+#include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/request_execution_thread.h>
 
@@ -59,16 +60,13 @@ public:
         BasePersistentDataTest(DbInitializationType::delayed),
         m_peerId(QnUuid::createUuid())
     {
-        using namespace std::placeholders;
-
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
 
+        // TODO: #ak uncomment after fixing all tests of memory::TransactionDataObject
         ec2::dao::TransactionDataObjectFactory::setDataObjectType<
             ec2::dao::memory::TransactionDataObject>();
 
-        m_outgoingTransactionDispatcher.setOnNewTransaction(
-            std::bind(&TransactionLog::storeNewTransaction, this, _1, _2));
         initializeTransactionLog();
     }
 
@@ -91,51 +89,6 @@ public:
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
     }
 
-    void havingAddedBunchOfTransactionsConcurrently()
-    {
-        using namespace std::placeholders;
-
-        constexpr int transactionToAddCount = 100;
-
-        QnWaitCondition cond;
-        int transactionsToWait = 0;
-
-        QnMutexLocker lk(&m_mutex);
-
-        for (int i = 0; i < transactionToAddCount; ++i)
-        {
-            ++transactionsToWait;
-            m_transactionLog->startDbTransaction(
-                getSystem(0).id.c_str(),
-                std::bind(&TransactionLog::shareSystemToRandomUser, this, _1),
-                [this, &transactionsToWait, &cond](
-                    nx::db::QueryContext*, nx::db::DBResult dbResult)
-                {
-                    if (dbResult != nx::db::DBResult::cancelled)
-                    {
-                        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
-                    }
-
-                    QnMutexLocker lk(&m_mutex);
-                    --transactionsToWait;
-                    cond.wakeAll();
-                });
-        }
-
-        while (transactionsToWait > 0)
-            cond.wait(lk.mutex());
-    }
-
-    void expectingTransactionsWereSentInAscendingSequenceOrder()
-    {
-        int prevSequence = -1;
-        for (const auto& transaction: m_transactions)
-        {
-            ASSERT_GT(transaction->transactionHeader().persistentInfo.sequence, prevSequence);
-            prevSequence = transaction->transactionHeader().persistentInfo.sequence;
-        }
-    }
-
 protected:
     const std::unique_ptr<ec2::TransactionLog>& transactionLog()
     {
@@ -147,12 +100,14 @@ protected:
         return m_peerId;
     }
 
+    TestOutgoingTransactionDispatcher& outgoingTransactionDispatcher()
+    {
+        return m_outgoingTransactionDispatcher;
+    }
+
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     std::unique_ptr<ec2::TransactionLog> m_transactionLog;
-    QnMutex m_mutex;
-    QnMutex m_queryMutex;
-    std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_transactions;
     const QnUuid m_peerId;
 
     void initializeTransactionLog()
@@ -161,47 +116,6 @@ private:
             m_peerId,
             persistentDbManager()->queryExecutor().get(),
             &m_outgoingTransactionDispatcher);
-    }
-
-    nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
-    {
-        api::SystemSharingEx sharing;
-        sharing.systemId = getSystem(0).id;
-        const auto& accountToShareWith = 
-            accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size()-1));
-        sharing.accountId = accountToShareWith.id;
-        sharing.accountEmail = accountToShareWith.email;
-        sharing.accessRole = api::SystemAccessRole::advancedViewer;
-
-        // It does not matter for transaction log whether we save application data or not.
-        // TODO #ak But, it is still better to mockup data access object here.
-        //NX_GTEST_ASSERT_EQ(
-        //    nx::db::DBResult::ok,
-        //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
-
-        ::ec2::ApiUserData userData;
-        convert(sharing, &userData);
-        userData.isCloud = true;
-        userData.fullName = QString::fromStdString(accountToShareWith.fullName);
-        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::saveUser>(
-                queryContext,
-                sharing.systemId.c_str(),
-                std::move(userData));
-        NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
-
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(nx::utils::random::number<int>(0, 1000)));
-
-        return nx::db::DBResult::ok;
-    }
-
-    void storeNewTransaction(
-        const nx::String& /*systemId*/,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_transactions.push_back(std::move(transactionSerializer));
     }
 };
 
@@ -513,7 +427,7 @@ TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignore
     assertThatTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, DISABLED_tran_rollback_clears_raw_data)
+TEST_F(TransactionLogSameTransaction, /*DISABLED_*/tran_rollback_clears_raw_data)
 {
     havingGeneratedTransactionLocally();
     beginTran();
@@ -522,11 +436,343 @@ TEST_F(TransactionLogSameTransaction, DISABLED_tran_rollback_clears_raw_data)
     assertIfTransactionHasBeenReplaced();
 }
 
-TEST_F(TransactionLog, DISABLED_multiple_simultaneous_transactions)
+//-------------------------------------------------------------------------------------------------
+
+class TestTransactionController
+{
+public:
+    enum class State
+    {
+        init,
+        startedTransaction,
+        modifiedBusinessData,
+        generatedTransaction,
+        done,
+    };
+
+    TestTransactionController(
+        const std::unique_ptr<ec2::TransactionLog>& transactionLog,
+        const api::SystemData& system,
+        const api::AccountData& accountToShareWith)
+        :
+        m_transactionLog(transactionLog),
+        m_system(system),
+        m_accountToShareWith(accountToShareWith),
+        m_completedState(State::init),
+        m_desiredState(State::init)
+    {
+    }
+
+    ~TestTransactionController()
+    {
+        m_startedAsyncCallsCounter.wait();
+    }
+
+    void startDbTransaction()
+    {
+        using namespace std::placeholders;
+
+        m_completedState = State::startedTransaction;
+        m_desiredState = State::startedTransaction;
+        m_transactionLog->startDbTransaction(
+            m_system.id.c_str(),
+            std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
+            [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+                nx::db::QueryContext* queryContext,
+                nx::db::DBResult dbResult)
+            {
+                onDbTranCompleted(queryContext, dbResult);
+            });
+    }
+
+    void generateTransaction()
+    {
+        proceedToState(State::generatedTransaction);
+    }
+
+    void commit()
+    {
+        proceedToState(State::done);
+    }
+
+private:
+    const std::unique_ptr<ec2::TransactionLog>& m_transactionLog;
+    const api::SystemData m_system;
+    const api::AccountData m_accountToShareWith;
+    State m_completedState;
+    State m_desiredState;
+    api::SystemSharingEx m_sharing;
+    QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    QnCounter m_startedAsyncCallsCounter;
+
+    nx::db::DBResult doSomeDataModifications(nx::db::QueryContext* queryContext)
+    {
+        prepareData();
+
+        for (;;)
+        {
+            {
+                QnMutexLocker lock(&m_mutex);
+                while (m_completedState == m_desiredState)
+                    m_cond.wait(lock.mutex());
+
+                NX_ASSERT(m_completedState < m_desiredState);
+            }
+
+            State thingToDo = static_cast<State>(static_cast<int>(m_completedState) + 1);
+
+            switch (thingToDo)
+            {
+                case State::modifiedBusinessData:
+                    modifyBusinessData();
+                    setCompletedState(State::modifiedBusinessData);
+                    break;
+
+                case State::generatedTransaction:
+                    addTransactionToLog(queryContext);
+                    setCompletedState(State::generatedTransaction);
+                    break;
+
+                case State::done:
+                    setCompletedState(State::done);
+                    return nx::db::DBResult::ok;
+            }
+        }
+
+        return nx::db::DBResult::ok;
+    }
+
+    void setCompletedState(State completedState)
+    {
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_completedState = completedState;
+        }
+        m_cond.wakeAll();
+    }
+
+    void prepareData()
+    {
+        m_sharing.systemId = m_system.id;
+        m_sharing.accountId = m_accountToShareWith.id;
+        m_sharing.accountEmail = m_accountToShareWith.email;
+        m_sharing.accessRole = api::SystemAccessRole::advancedViewer;
+    }
+
+    void modifyBusinessData()
+    {
+        // It does not matter for transaction log whether we save application data or not.
+        // TODO #ak But, it is still better to mockup data access object here.
+        //NX_GTEST_ASSERT_EQ(
+        //    nx::db::DBResult::ok,
+        //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
+    }
+
+    void addTransactionToLog(nx::db::QueryContext* queryContext)
+    {
+        ::ec2::ApiUserData userData;
+        convert(m_sharing, &userData);
+        userData.isCloud = true;
+        userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
+        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::saveUser>(
+                queryContext,
+                m_sharing.systemId.c_str(),
+                std::move(userData));
+        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    }
+
+    void proceedToState(State targetState)
+    {
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_desiredState = targetState;
+        }
+        m_cond.wakeAll();
+
+        waitForReachingDesiredState();
+    }
+
+    void waitForReachingDesiredState()
+    {
+        QnMutexLocker lock(&m_mutex);
+        while (m_completedState < m_desiredState)
+            m_cond.wait(lock.mutex());
+    }
+
+    void onDbTranCompleted(
+        nx::db::QueryContext* /*queryContext*/,
+        nx::db::DBResult /*dbResult*/)
+    {
+    }
+
+    TestTransactionController(const TestTransactionController&) = delete;
+    TestTransactionController& operator=(const TestTransactionController&) = delete;
+};
+
+class TransactionLogOverlappingTransactions:
+    public TransactionLog
+{
+public:
+    TransactionLogOverlappingTransactions()
+    {
+        using namespace std::placeholders;
+
+        outgoingTransactionDispatcher().setOnNewTransaction(
+            std::bind(&TransactionLogOverlappingTransactions::storeNewTransaction, this, _1, _2));
+    }
+
+protected:
+    void havingAddedOverlappingTransactions()
+    {
+        constexpr std::size_t transactionCount = 5;
+
+        persistentDbManager()->queryExecutor()->reserveConnections(transactionCount);
+
+        auto dbTransactions = startDbTransactions(transactionCount);
+        for (std::size_t i = 0; i < dbTransactions.size(); ++i)
+            dbTransactions[i]->generateTransaction();
+
+        for (std::size_t i = dbTransactions.size(); i > 0; --i)
+            dbTransactions[i-1]->commit();
+    }
+
+    void havingAddedBunchOfTransactionsConcurrently()
+    {
+        using namespace std::placeholders;
+
+        constexpr int transactionToAddCount = 100;
+
+        QnWaitCondition cond;
+        int transactionsToWait = 0;
+
+        QnMutexLocker lk(&m_mutex);
+
+        for (int i = 0; i < transactionToAddCount; ++i)
+        {
+            ++transactionsToWait;
+            transactionLog()->startDbTransaction(
+                getSystem(0).id.c_str(),
+                std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1),
+                [this, &transactionsToWait, &cond](
+                    nx::db::QueryContext*, nx::db::DBResult dbResult)
+                {
+                    if (dbResult != nx::db::DBResult::cancelled)
+                    {
+                        ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+                    }
+
+                    QnMutexLocker lk(&m_mutex);
+                    --transactionsToWait;
+                    cond.wakeAll();
+                });
+        }
+
+        while (transactionsToWait > 0)
+            cond.wait(lk.mutex());
+    }
+
+    std::vector<std::unique_ptr<TestTransactionController>>
+        startDbTransactions(std::size_t tranCount)
+    {
+        std::vector<std::unique_ptr<TestTransactionController>> transactions;
+        transactions.resize(tranCount);
+        for (std::size_t i = 0; i < transactions.size(); ++i)
+            transactions[i] = startDbTransaction();
+        return transactions;
+    }
+
+    std::unique_ptr<TestTransactionController> startDbTransaction()
+    {
+        const auto& accountToShareWith =
+            accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
+
+        auto tranController = std::make_unique<TestTransactionController>(
+            transactionLog(),
+            getSystem(0),
+            accountToShareWith);
+        tranController->startDbTransaction();
+        return tranController;
+    }
+
+    void assertIfTransactionsWereNotSentInAscendingSequenceOrder()
+    {
+        int prevSequence = -1;
+        for (const auto& transaction: m_outgoingTransactions)
+        {
+            ASSERT_GT(transaction->transactionHeader().persistentInfo.sequence, prevSequence);
+            prevSequence = transaction->transactionHeader().persistentInfo.sequence;
+        }
+    }
+
+private:
+    QnMutex m_mutex;
+    std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_outgoingTransactions;
+
+    void storeNewTransaction(
+        const nx::String& /*systemId*/,
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_outgoingTransactions.push_back(std::move(transactionSerializer));
+    }
+
+    nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
+    {
+        api::SystemSharingEx sharing;
+        sharing.systemId = getSystem(0).id;
+        const auto& accountToShareWith =
+            accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
+        sharing.accountId = accountToShareWith.id;
+        sharing.accountEmail = accountToShareWith.email;
+        sharing.accessRole = api::SystemAccessRole::advancedViewer;
+
+        // It does not matter for transaction log whether we save application data or not.
+        // TODO #ak But, it is still better to mockup data access object here.
+        //NX_GTEST_ASSERT_EQ(
+        //    nx::db::DBResult::ok,
+        //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
+
+        ::ec2::ApiUserData userData;
+        convert(sharing, &userData);
+        userData.isCloud = true;
+        userData.fullName = QString::fromStdString(accountToShareWith.fullName);
+        auto dbResult = transactionLog()->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::saveUser>(
+                queryContext,
+                sharing.systemId.c_str(),
+                std::move(userData));
+        NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(nx::utils::random::number<int>(0, 1000)));
+
+        return nx::db::DBResult::ok;
+    }
+};
+
+TEST_F(TransactionLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
+{
+    givenRandomSystem();
+    havingAddedOverlappingTransactions();
+    assertIfTransactionsWereNotSentInAscendingSequenceOrder();
+}
+
+//TEST_F(TransactionLogOverlappingTransactions, overlapping_transactions_to_multiple_systems)
+
+//-------------------------------------------------------------------------------------------------
+
+class FtTransactionLogOverlappingTransactions:
+    public TransactionLogOverlappingTransactions
+{
+};
+
+TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactions)
 {
     givenRandomSystem();
     havingAddedBunchOfTransactionsConcurrently();
-    expectingTransactionsWereSentInAscendingSequenceOrder();
+    assertIfTransactionsWereNotSentInAscendingSequenceOrder();
 }
 
 } // namespace test
