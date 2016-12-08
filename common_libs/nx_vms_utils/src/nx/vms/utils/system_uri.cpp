@@ -202,10 +202,7 @@ public:
 
         if (!authenticator.user.isEmpty() && !authenticator.password.isEmpty())
         {
-            QString encodedAuth = QString(authenticator.user + ':' + authenticator.password)
-                .toUtf8()
-                .toBase64();
-            query.addQueryItem(kAuthKey, encodedAuth);
+            query.addQueryItem(kAuthKey, authenticator.encode());
         }
 
         if (referral.source != SystemUri::ReferralSource::None)
@@ -647,4 +644,9 @@ QUrl SystemUri::connectionUrl() const
 bool SystemUri::operator==(const SystemUri& other) const
 {
     return *d_ptr.data() == *other.d_ptr.data();
+}
+
+QString nx::vms::utils::SystemUri::Auth::encode() const
+{
+    return QString(user + ':' + password).toUtf8().toBase64();
 }

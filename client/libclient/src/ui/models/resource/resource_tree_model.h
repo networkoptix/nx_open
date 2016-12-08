@@ -59,6 +59,8 @@ public:
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 
     Scope scope() const;
+
+    QnResourceTreeModelNodePtr rootNode(Qn::NodeType nodeType) const;
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
@@ -69,7 +71,6 @@ private:
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
         const QnVirtualCameraResourcePtr& camera);
-    QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
@@ -78,9 +79,6 @@ private:
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
 
     Qn::NodeType rootNodeTypeForScope() const;
-
-    /* Remove group nodes that are not used anymore. */
-    void cleanupGroupNodes(Qn::NodeType nodeType);
 
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
@@ -112,8 +110,6 @@ private slots:
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
-    void at_fakeserver_information_changed(const QnResourcePtr &resource);
-
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_systemNameChanged();
 
@@ -136,9 +132,6 @@ private:
 
     /** Mapping for all nodes by resource (for quick update). */
     QHash<QnResourcePtr, NodeList> m_nodesByResource;
-
-    /** Mapping for system nodes, by system name. */
-    QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
 
     /** Full list of all created nodes. */
     QList<QnResourceTreeModelNodePtr> m_allNodes;
