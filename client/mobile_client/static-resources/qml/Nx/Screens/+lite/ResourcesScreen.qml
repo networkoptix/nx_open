@@ -151,6 +151,8 @@ Page
         {
             if (connectionManager.connectionState !== QnConnectionManager.Disconnected)
                 connectionFailureDummy.visible = false
+            if (connectionManager.connectionState === QnConnectionManager.Ready)
+                autoLoginEnabled = true
         }
 
         onConnectionFailed:
