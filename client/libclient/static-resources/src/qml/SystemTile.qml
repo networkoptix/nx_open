@@ -295,7 +295,7 @@ BaseTile
             var tile  = control.areaLoader.item;
             console.log("Connecting to local system<", control.systemName,
                 "host <", tile.selectedHost, "> with credentials: ",
-                tile.selectedUser, ":", tile.selectedPassword,
+                tile.selectedUser,
                 tile.savePassword, tile.autoLogin);
 
             context.connectToLocalSystem(
