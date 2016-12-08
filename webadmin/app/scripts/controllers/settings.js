@@ -149,7 +149,7 @@ angular.module('webadminApp')
                         errorToShow = L.settings.wrongPassword;
                 }
                 dialogs.alert( L.settings.error + errorToShow);
-            }else if (data.reply.restartNeeded) {
+            }else if (data.reply && data.reply.restartNeeded) {
                 dialogs.confirm(L.settings.restartNeeded).then(function() {
                     restartServer(true);
                 });

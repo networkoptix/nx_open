@@ -3,6 +3,7 @@
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
@@ -15,6 +16,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace test {
 
 /**
  * Accepts usual TCP connections
@@ -265,6 +267,13 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     TEST_F, CloudServerSocketTcpTest,
     [this](){ return makeServerTester(); },
     [this](){ return makeClientTester(); });
+
+TEST_F(CloudServerSocketTcpTest, SimpleSyncSsl)
+{
+    network::test::socketSimpleSync(
+        [&]() { return std::make_unique<SslServerSocket>(makeServerTester().release(), false); },
+        [&]() { return std::make_unique<SslSocket>(makeClientTester().release(), false); });
+}
 
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 {
@@ -588,6 +597,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     }
 }
 
+} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx

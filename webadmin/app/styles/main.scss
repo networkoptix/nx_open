@@ -6,9 +6,9 @@ $icon-font-path: "../fonts/";
 @mixin icon{
   display: inline-block;
   background-size: 352px 224px;
-  background-image: url('../images/icons/wizard_sprite.png');
+  background-image: url('../images/icons/web_wizard_sprite.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('../images/icons/wizard_sprite@2x.png');
+    background-image: url('../images/icons/web_wizard_sprite@2x.png');
   }
 }
 
@@ -29,6 +29,11 @@ $icon-font-path: "../fonts/";
 }
 
 
+$radio-panels-hover-border: transparent;
+$radio-panels-hover-bg: $gray-lighter;
+
+$radio-panels-selected-bg: $gray-lighter;
+$radio-panels-selected-border: $gray-light;
 
 @import 'master';
 
@@ -582,4 +587,18 @@ h3 {
 
 .grey-text{
   color: #698796;
+}
+
+
+/* Kill visual effects for nx1 */
+.lite-client-mode{
+  * {
+    outline: none !important;
+    text-shadow:none !important;
+    box-shadow:none !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-timing-function: linear !important;
+    opacity: 1 !important;
+  }
 }

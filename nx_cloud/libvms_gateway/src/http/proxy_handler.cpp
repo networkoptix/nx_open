@@ -39,14 +39,21 @@ void ProxyHandler::processRequest(
         return;
     }
 
-    if (!requestOptions.isSsl && m_settings.http().sslSupport)
-        requestOptions.isSsl = m_runTimeOptions.isSslEnforsed(requestOptions.target);
+    if (!m_settings.cloudConnect().sslAllowed)
+        requestOptions.isSsl = TargetWithOptions::Ssl::disabled;
+
+    if (requestOptions.isSsl == TargetWithOptions::Ssl::undefined
+        && m_settings.http().sslSupport
+        && m_runTimeOptions.isSslEnforsed(requestOptions.target))
+    {
+        requestOptions.isSsl = TargetWithOptions::Ssl::enabled;
+    }
 
     // TODO: #ak avoid request loop by using Via header.
-    if (requestOptions.isSsl && !m_settings.cloudConnect().sslAllowed)
-        requestOptions.isSsl = false;
 
-    m_targetPeerSocket = SocketFactory::createStreamSocket(requestOptions.isSsl);
+    m_targetPeerSocket = SocketFactory::createStreamSocket(
+        requestOptions.isSsl == TargetWithOptions::Ssl::enabled);
+
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
         !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
@@ -88,8 +95,7 @@ ProxyHandler::TargetWithOptions::TargetWithOptions(
     nx_http::StatusCode::Value status_, SocketAddress target_)
 :
     status(status_),
-    target(std::move(target_)),
-    isSsl(false)
+    target(std::move(target_))
 {
 }
 
@@ -123,8 +129,10 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
             requestOptions.target.port = m_settings.http().proxyTargetPort;
     }
 
-    requestOptions.isSsl |= connection.isSsl();
-    if (requestOptions.isSsl && !m_settings.http().sslSupport)
+    if (requestOptions.isSsl == TargetWithOptions::Ssl::undefined && connection.isSsl())
+        requestOptions.isSsl = TargetWithOptions::Ssl::enabled;
+
+    if (requestOptions.isSsl == TargetWithOptions::Ssl::enabled && !m_settings.http().sslSupport)
     {
         NX_LOGX(lm("SSL requestd but forbidden by settings %1")
             .str(connection.socket()->getForeignAddress()), cl_logDEBUG1);
@@ -185,8 +193,10 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
         const auto protocol = targetParts.front().toString();
         targetParts.pop_front();
 
-        if (protocol == "ssl" || protocol == "https")
-            requestOptions.isSsl = true;
+        if (protocol == lit("ssl") || protocol == lit("https"))
+            requestOptions.isSsl = TargetWithOptions::Ssl::enabled;
+        else if (protocol == lit("http"))
+            requestOptions.isSsl = TargetWithOptions::Ssl::disabled;
     }
 
     if (targetParts.size() > 1)

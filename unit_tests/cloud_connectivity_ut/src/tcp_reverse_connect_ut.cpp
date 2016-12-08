@@ -56,8 +56,8 @@ protected:
         std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
         network::test::socketSimpleSync(
-            [&](){ return std::move(serverSocket); },
-            [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
+            [&]() { return std::move(serverSocket); },
+            []() { return std::make_unique<CloudStreamSocket>(AF_INET); },
             SocketAddress(hostName));
     }
 
@@ -123,8 +123,8 @@ TEST_F(TcpReverseConnectTest, SimpleSyncSsl)
     std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
     network::test::socketSimpleSync(
-        [&](){ return std::make_unique<SslServerSocket>(serverSocket.release(), false); },
-        [](){ return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        [&]() { return std::make_unique<SslServerSocket>(serverSocket.release(), false); },
+        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
         SocketAddress(m_server->fullName()));
 }
 
