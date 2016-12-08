@@ -125,6 +125,7 @@ angular.module('cloudApp')
             });
 
             if($scope.data.activateCode){
+                setContext(null);
                 $scope.activate.run();
             }
 

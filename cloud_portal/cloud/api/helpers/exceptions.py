@@ -232,9 +232,16 @@ def validate_response(func):
             validate_error(response_data)
             raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
 
+        logic_errors = {
+            ErrorCodes.forbidden: APINotAuthorisedException,
+            ErrorCodes.not_authorized: APINotAuthorisedException
+        }
+
         # Check error_code status - raise APILogicException
         if 'resultCode' in response_data and response_data['resultCode'] != ErrorCodes.ok.value:
             validate_error(response_data)
+            if response_data['resultCode'] in logic_errors:
+                raise logic_errors[response_data['resultCode']](response_data['errorText'], error_code=response_data['resultCode'])
             raise APILogicException(response_data['errorText'], response_data['resultCode'])
 
         # everything is OK - return server's response
