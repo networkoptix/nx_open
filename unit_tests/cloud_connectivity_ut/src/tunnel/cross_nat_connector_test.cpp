@@ -81,11 +81,10 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
 
 void TunnelConnector::generalTest()
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const auto connectResult = doSimpleConnectTest(
-        std::chrono::seconds::zero(),   //no timeout
+        std::chrono::seconds::zero(), //< No timeout.
         MediaServerEmulator::ActionToTake::proceedWithConnection);
 
     ASSERT_EQ(SystemError::noError, connectResult.errorCode);
@@ -118,7 +117,7 @@ void TunnelConnector::cancellationTest()
             {
             });
 
-        //implying random delay
+        // Implying random delay.
         std::this_thread::sleep_for(std::chrono::microseconds(
             nx::utils::random::number(0, 0xFFFF) * 10));
         connector.pleaseStopSync();
@@ -180,12 +179,11 @@ class CrossNatConnector:
 
 TEST_F(CrossNatConnector, timeout)
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
 
-    //timing out mediator response by providing incorrect mediator address to connector
+    // Timing out mediator response by providing incorrect mediator address to connector.
     const auto connectResult = doSimpleConnectTest(
         connectTimeout,
         MediaServerEmulator::ActionToTake::ignoreIndication,
