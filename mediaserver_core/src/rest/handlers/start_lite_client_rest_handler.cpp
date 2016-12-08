@@ -85,6 +85,9 @@ int QnStartLiteClientRestHandler::executeGet(
     if (startCamerasMode)
         args.append(QStringList{"--auto-login", "enabled"});
 
+    if (startCamerasMode)
+        args.append(QStringList{"--auto-login", "enabled"});
+
     NX_LOG(lit("startLiteClient: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
 
     if (!QProcess::startDetached(fileName, args))
