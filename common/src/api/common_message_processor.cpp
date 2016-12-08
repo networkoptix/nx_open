@@ -611,9 +611,9 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     QnServerAdditionalAddressesDictionary::instance()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
+    resetResources(fullData);
     resetServerUserAttributesList(fullData.serversUserAttributesList);
     resetCameraUserAttributesList(fullData.cameraUserAttributesList);
-    resetResources(fullData);
     resetPropertyList(fullData.allProperties);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
