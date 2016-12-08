@@ -10,15 +10,15 @@ class OpteraStreamReaderResource: public QnPlOnvifResource
 {
 
 public:
-    virtual bool hasProperty(const QString &key) const;
-    virtual QString getProperty(const QString &key) const;
+    virtual bool hasProperty(const QString &key) const override;
+    virtual QString getProperty(const QString &key) const override;
 
     virtual bool setProperty(
         const QString &key,
         const QString &value,
-        PropertyOptions options = DEFAULT_OPTIONS);
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    virtual bool removeProperty(const QString& key);
+    virtual bool removeProperty(const QString& key) override;
 
 private:
     mutable QnMutex m_propertyMutex;
