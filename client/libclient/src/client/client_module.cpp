@@ -274,7 +274,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
-        .designateOwnPeerId("dc", common->moduleGUID());
+        .assignOwnPeerId("dc", common->moduleGUID());
 
     common->store(new QnGlobals());
     common->store(new QnSessionManager());

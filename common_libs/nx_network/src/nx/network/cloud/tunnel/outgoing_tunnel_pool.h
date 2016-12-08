@@ -47,11 +47,11 @@ public:
     String ownPeerId() const;
 
     /**
-     * Should be called somewhere in every module, so this id is useful for debug.
+     * Should be called somewhere in every module exactly once, so this id is useful for debug.
      * @param name Short module name, useful for debug.
      * @param uuid Unique instance id, e.g. Hardware id.
      */
-    void designateOwnPeerId(const String& name, const QnUuid& uuid);
+    void assignOwnPeerId(const String& name, const QnUuid& uuid);
 
 private:
     typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;

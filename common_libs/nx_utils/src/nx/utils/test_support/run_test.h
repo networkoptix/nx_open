@@ -33,6 +33,7 @@ inline int runTest(
     #ifdef NX_NETWORK_SOCKET_GLOBALS
         network::SocketGlobalsHolder sgGuard;
         network::SocketGlobals::applyArguments(args);
+        network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
     #endif
 
     if (extraInit)
