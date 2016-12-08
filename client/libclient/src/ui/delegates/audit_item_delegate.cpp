@@ -345,9 +345,9 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
 
     QnScopedPainterFontRollback fontRollback(painter, option.font);
     QnScopedPainterPenRollback penRollback(painter, option.palette.color(
-        option.state.testFlag(QStyle::State_Selected) ?
-        QPalette::HighlightedText :
-        QPalette::Text));
+        option.state.testFlag(QStyle::State_Selected)
+            ? QPalette::HighlightedText
+            : QPalette::Text));
 
     /* Paint alternate background: */
     if (index.data(Qn::AlternateColorRole).toInt() > 0)
