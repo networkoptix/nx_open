@@ -68,6 +68,6 @@ def read_template(name, location):
 
 def read_logo(location):
     if location not in logos_cache:
-        with open(logo_filename, 'rb') as fp:
+        with open(location, 'rb') as fp:
             logos_cache[location] = fp.read()
     return logos_cache[location]
