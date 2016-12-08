@@ -24,42 +24,6 @@ const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3346");
 
 const QLatin1String kDataDir("dataDir");
 
-//DB options
-const QLatin1String kDbDriverName("db/driverName");
-const QLatin1String kDefaultDbDriverName("QMYSQL");
-
-const QLatin1String kDbHostName("db/hostName");
-const QLatin1String kDefaultDbHostName("127.0.0.1");
-
-const QLatin1String kDbPort("db/port");
-const int kDefaultDbPort = 3306;
-
-const QLatin1String kDbName("db/name");
-const QLatin1String kDefaultDbName("nx_cloud");
-
-const QLatin1String kDbUserName("db/userName");
-const QLatin1String kDefaultDbUserName("root");
-
-const QLatin1String kDbPassword("db/password");
-const QLatin1String kDefaultDbPassword("");
-
-const QLatin1String kDbConnectOptions("db/connectOptions");
-const QLatin1String kDefaultDbConnectOptions("");
-
-const QLatin1String kDbEncoding("db/encoding");
-const QLatin1String kDefaultDbEncoding("utf8");
-
-const QLatin1String kDbMaxConnections("db/maxConnections");
-const QLatin1String kDefaultDbMaxConnections("1");
-
-const QLatin1String kDbInactivityTimeout("db/inactivityTimeout");
-const std::chrono::seconds kDefaultDbInactivityTimeout = std::chrono::minutes(10);
-
-const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
-    "db/maxPeriodQueryWaitsForAvailableConnection");
-const std::chrono::seconds kDefaultDbMaxPeriodQueryWaitsForAvailableConnection =
-std::chrono::minutes(1);
-
 const QLatin1String kChangeUser("changeUser");
 
 //notification settings
@@ -254,30 +218,7 @@ void Settings::loadConfiguration()
     m_vmsSynchronizationLogging.load(m_settings, QLatin1String("syncroLog"));
 
     //DB
-    m_dbConnectionOptions.driverType =
-        QnLexical::deserialized<nx::db::RdbmsDriverType>(
-            m_settings.value(kDbDriverName, kDefaultDbDriverName).toString(),
-            nx::db::RdbmsDriverType::unknown);
-    //< Ignoring error here since connection to DB will not be established anyway.
-    m_dbConnectionOptions.hostName = m_settings.value(kDbHostName, kDefaultDbHostName).toString();
-    m_dbConnectionOptions.port = m_settings.value(kDbPort, kDefaultDbPort).toInt();
-    m_dbConnectionOptions.dbName = m_settings.value(kDbName, kDefaultDbName).toString();
-    m_dbConnectionOptions.userName = m_settings.value(kDbUserName, kDefaultDbUserName).toString();
-    m_dbConnectionOptions.password = m_settings.value(kDbPassword, kDefaultDbPassword).toString();
-    m_dbConnectionOptions.connectOptions = m_settings.value(kDbConnectOptions, kDefaultDbConnectOptions).toString();
-    m_dbConnectionOptions.encoding = m_settings.value(kDbEncoding, kDefaultDbEncoding).toString();
-    m_dbConnectionOptions.maxConnectionCount = m_settings.value(kDbMaxConnections, kDefaultDbMaxConnections).toInt();
-    if (m_dbConnectionOptions.maxConnectionCount <= 0)
-        m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
-    m_dbConnectionOptions.inactivityTimeout = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            m_settings.value(kDbInactivityTimeout).toString(),
-            kDefaultDbInactivityTimeout));
-    m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            m_settings.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString(),
-            kDefaultDbMaxPeriodQueryWaitsForAvailableConnection));
-    
+    m_dbConnectionOptions.loadFromSettings(&m_settings);
 
     m_changeUser = m_settings.value(kChangeUser).toString();
 

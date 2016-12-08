@@ -31,6 +31,7 @@
 #include "mediaserver_api.h"
 #include "server/hole_punching_processor.h"
 #include "settings.h"
+#include "statistics/stats_manager.h"
 
 namespace nx {
 namespace hpm {
@@ -107,6 +108,8 @@ int MediatorProcess::exec()
         NX_LOGX( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );
     }
 
+    stats::StatsManager statsManager(settings);
+
     //STUN handlers
     nx::stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
@@ -120,7 +123,8 @@ int MediatorProcess::exec()
         settings,
         cloudDataProvider.get(),
         &stunMessageDispatcher,
-        &listeningPeerPool);
+        &listeningPeerPool,
+        &statsManager.collector());
 
     //accepting STUN requests by both tcp and udt
     MultiAddressServer<stun::SocketServer> tcpStunServer(

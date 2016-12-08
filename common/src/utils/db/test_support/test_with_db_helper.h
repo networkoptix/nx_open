@@ -5,12 +5,13 @@
 #include <utils/db/types.h>
 
 namespace nx {
-namespace cdb {
+namespace db {
+namespace test {
 
 class TestWithDbHelper
 {
 public:
-    TestWithDbHelper(QString tmpDir = QString());
+    TestWithDbHelper(QString moduleName, QString tmpDir);
     ~TestWithDbHelper();
 
     QString testDataDir() const;
@@ -32,5 +33,6 @@ private:
     static nx::db::ConnectionOptions sDbConnectionOptions;
 };
 
-} // namespace cdb
+} // namespace test
+} // namespace db
 } // namespace nx

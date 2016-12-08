@@ -1,0 +1,40 @@
+#include "collector.h"
+
+#include "dao/data_object_factory.h"
+
+namespace nx {
+namespace hpm {
+namespace stats {
+
+Collector::Collector(
+    const conf::Statistics& settings,
+    nx::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
+    :
+    m_settings(settings),
+    m_sqlQueryExecutor(sqlQueryExecutor),
+    m_dataObject(dao::DataObjectFactory::create())
+{
+}
+
+Collector::~Collector()
+{
+    m_startedAsyncCallsCounter.wait();
+}
+
+void Collector::saveConnectSessionStatistics(ConnectSession data)
+{
+    using namespace std::placeholders;
+
+    dao::ConnectionRecord record{std::move(data)};
+
+    m_sqlQueryExecutor->executeUpdate(
+        std::bind(&dao::AbstractDataObject::save, m_dataObject.get(), _1, std::move(record)),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            db::QueryContext* /*queryContext*/, db::DBResult /*dbResult*/)
+        {
+        });
+}
+
+} // namespace stats
+} // namespace hpm
+} // namespace nx

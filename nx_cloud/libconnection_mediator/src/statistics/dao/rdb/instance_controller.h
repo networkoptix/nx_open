@@ -1,22 +1,20 @@
 #pragma once
 
-#include <memory>
-
 #include <utils/db/db_instance_controller.h>
 
 namespace nx {
-namespace cdb {
+namespace hpm {
 namespace dao {
 namespace rdb {
 
-class DbInstanceController:
+class InstanceController:
     public nx::db::InstanceController
 {
 public:
-    DbInstanceController(const nx::db::ConnectionOptions& dbConnectionOptions);
+    InstanceController(const nx::db::ConnectionOptions& connectionOptions);
 };
 
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
+} // namespace hpm
 } // namespace nx
