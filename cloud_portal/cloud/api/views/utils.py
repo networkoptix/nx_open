@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from django.core.cache import cache
 from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, api_success, require_params, APIRequestException, ErrorCodes
-import datetime
+import datetime, logging
 from cloud import settings
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET', 'POST'])
@@ -23,7 +25,9 @@ def visited_key(request):
         require_params(request, ('key',))
         key = 'visited_key_' + request.data['key']
         value = datetime.datetime.now()
-        print (value)
+
+        logger.debug('visited: ' + key + ': ' + value)
+
         cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
     return Response({'visited': value})
 

@@ -203,7 +203,7 @@ angular.module('cloudApp')
             },
 
             visitedKey:function(key){
-                return $http.get(apiBase + '/utils/visitedKey/?key=' + key);
+                return $http.get(apiBase + '/utils/visitedKey/?key=' + encodeURIComponent(key));
             }
         }
 

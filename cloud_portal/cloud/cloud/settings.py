@@ -157,6 +157,11 @@ LOGGING = {
             'propagate': True,
             'handlers': ['console', 'mail_admins']
         },
+        'api.views.utils': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        },
         'api.helpers.exceptions': {
             'level': 'DEBUG',
             'propagate': True,
