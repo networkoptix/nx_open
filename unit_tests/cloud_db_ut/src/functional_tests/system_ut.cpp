@@ -10,6 +10,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
+#include <nx/utils/system_utils.h>
 #include <nx/utils/time.h>
 #include <nx/utils/test_support/utils.h>
 
@@ -20,7 +21,7 @@ namespace cdb {
 
 namespace {
 
-class System:
+class FtSystem:
     public CdbFunctionalTest
 {
 public:
@@ -131,7 +132,7 @@ private:
 
 }
 
-TEST_F(System, unbind)
+TEST_F(FtSystem, unbind)
 {
     api::AccountData account1;
     std::string account1Password;
@@ -313,12 +314,12 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 }
 
-TEST_F(System, get)
+TEST_F(FtSystem, get)
 {
     cdbFunctionalTestSystemGet(this);
 }
 
-TEST_F(System, activation)
+TEST_F(FtSystem, activation)
 {
     api::AccountData account1;
     std::string account1Password;
@@ -395,11 +396,11 @@ TEST_F(System, activation)
 constexpr static auto kSystemGoneForeverPeriod = std::chrono::seconds(5);
 constexpr static auto kDropExpiredSystemsPeriodSec = std::chrono::seconds(1);
 
-class SystemNotification:
-    public System
+class FtSystemNotification:
+    public FtSystem
 {
 public:
-    SystemNotification()
+    FtSystemNotification()
     {
         addArg("-systemManager/reportRemovedSystemPeriod");
         addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
@@ -410,7 +411,7 @@ public:
     }
 };
 
-TEST_F(SystemNotification, notification_of_system_removal)
+TEST_F(FtSystemNotification, notification_of_system_removal)
 {
     enum class TestOption
     {
@@ -483,7 +484,7 @@ TEST_F(SystemNotification, notification_of_system_removal)
     }
 }
 
-TEST_F(System, rename)
+TEST_F(FtSystem, rename)
 {
     const auto account1 = addActivatedAccount2();
     // Adding system1 to account1.
@@ -560,7 +561,7 @@ TEST_F(System, rename)
     ASSERT_EQ(actualSystemName, systemData.name);
 }
 
-TEST_F(System, persistent_sequence)
+TEST_F(FtSystem, persistent_sequence)
 {
     api::AccountData account1;
     std::string account1Password;
@@ -622,18 +623,25 @@ static void validateSystemsOrder(
     }
 }
 
-template<typename Container>
-void bringToTop(
-    Container& container,
-    typename Container::value_type value)
+class FtSystemSortingOrder:
+    public FtSystem
 {
-    const auto it = std::find(container.begin(), container.end(), value);
-    if (it != container.end())
-        container.erase(it);
-    container.push_front(std::move(value));
-}
+protected:
+    template<typename Container>
+    void bringToTop(
+        Container& container,
+        typename Container::value_type value)
+    {
+        const auto it = std::find(container.begin(), container.end(), value);
+        if (it != container.end())
+            container.erase(it);
+        container.push_front(std::move(value));
+    }
+};
 
-TEST_F(System, sorting_order_weight_expiration)
+//constexpr float nx::utils::kSystemAccessBurnPeriodFullDays = 5.0;
+
+TEST_F(FtSystemSortingOrder, weight_expiration)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
 
@@ -664,8 +672,9 @@ TEST_F(System, sorting_order_weight_expiration)
 
     ASSERT_GT(usageFrequency2, usageFrequency1);
 
-    // A week has passed. No access.
-    timeShift.applyRelativeShift(7 * std::chrono::hours(24));
+    timeShift.applyRelativeShift(
+        static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 0.25) *
+        std::chrono::hours(24));
 
     systems.clear();
     ASSERT_EQ(
@@ -675,8 +684,9 @@ TEST_F(System, sorting_order_weight_expiration)
 
     ASSERT_LT(usageFrequency3, usageFrequency2);
 
-    // Half year passed. Still no access.
-    timeShift.applyRelativeShift(6 * 30 * std::chrono::hours(24));
+    timeShift.applyRelativeShift(
+        static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 6) *
+        std::chrono::hours(24));
 
     systems.clear();
     ASSERT_EQ(
@@ -698,7 +708,7 @@ TEST_F(System, sorting_order_weight_expiration)
     ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
 
-TEST_F(System, sorting_order_multiple_systems)
+TEST_F(FtSystemSortingOrder, multiple_systems)
 {
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
@@ -725,7 +735,8 @@ TEST_F(System, sorting_order_multiple_systems)
         if (i == 1)
         {
             // Shifting time and testing for access history expiration.
-            timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
+            timeShift.applyAbsoluteShift(
+                static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 0.66) * std::chrono::hours(24));
 
             for (int j = 0; j < 2; ++j)
                 ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
@@ -754,7 +765,7 @@ TEST_F(System, sorting_order_multiple_systems)
     }
 }
 
-TEST_F(System, sorting_order_last_login_time)
+TEST_F(FtSystemSortingOrder, last_login_time)
 {
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
@@ -795,7 +806,7 @@ TEST_F(System, sorting_order_last_login_time)
     ASSERT_LT(lastLoginTime3, nx::utils::utcTime() + std::chrono::seconds(10));
 }
 
-TEST_F(System, sorting_order_new_system_is_on_top)
+TEST_F(FtSystemSortingOrder, new_system_is_on_top)
 {
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
@@ -829,7 +840,8 @@ TEST_F(System, sorting_order_new_system_is_on_top)
         nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
         if (bringNewSystemDown)
         {
-            timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
+            timeShift.applyAbsoluteShift(
+                static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 0.66) * std::chrono::hours(24));
             ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
 
             bringToTop(systemIdsInSortOrder, system1.id);
@@ -851,7 +863,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
     }
 }
 
-TEST_F(System, sorting_order_persistence_after_sharing_update)
+TEST_F(FtSystemSortingOrder, persistence_after_sharing_update)
 {
     const auto account1 = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account1);
@@ -887,7 +899,7 @@ TEST_F(System, sorting_order_persistence_after_sharing_update)
     }
 }
 
-TEST_F(System, sorting_order_unknown_system)
+TEST_F(FtSystemSortingOrder, unknown_system)
 {
     const auto account1 = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account1);
@@ -900,7 +912,7 @@ TEST_F(System, sorting_order_unknown_system)
         recordUserSessionStart(account1, "{"+system1.id+"}"));
 }
 
-TEST_F(System, update)
+TEST_F(FtSystem, update)
 {
     constexpr const char kOpaqueValue[] = 
         "SELECT * FROM account WHERE email like 'test@example.com'\r\n "
@@ -933,7 +945,7 @@ TEST_F(System, update)
     }
 }
 
-TEST_F(System, disabled_user_does_not_see_system)
+TEST_F(FtSystem, disabled_user_does_not_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
@@ -941,7 +953,7 @@ TEST_F(System, disabled_user_does_not_see_system)
     assertIfUserCanSeeSystem(user, system);
 }
 
-TEST_F(System, reenabled_user_can_see_system)
+TEST_F(FtSystem, reenabled_user_can_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
