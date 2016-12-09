@@ -10,13 +10,13 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
-#include <utils/db/types.h>
 
 #include <cdb/connection.h>
+#include <utils/db/test_support/test_with_db_helper.h>
+#include <utils/db/types.h>
 
 #include "cloud_db_process_public.h"
 #include "managers/email_manager.h"
-#include "test_with_db_helper.h"
 
 namespace nx {
 namespace cdb {
@@ -30,7 +30,7 @@ public:
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDBProcessPublic>,
-    public TestWithDbHelper
+    public db::test::TestWithDbHelper
 {
 public:
     //!Calls \a start

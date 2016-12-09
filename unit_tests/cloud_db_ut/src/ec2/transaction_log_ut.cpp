@@ -8,6 +8,7 @@
 #include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/request_execution_thread.h>
+#include <utils/db/test_support/test_with_db_helper.h>
 
 #include <ec2/dao/memory/transaction_data_object_in_memory.h>
 #include <ec2/data_conversion.h>
@@ -15,7 +16,6 @@
 #include <ec2/transaction_log.h>
 #include <nx_ec/ec_proto_version.h>
 #include <test_support/business_data_generator.h>
-#include <test_support/test_with_db_helper.h>
 
 #include "base_persistent_data_test.h"
 #include "data/account_data.h"

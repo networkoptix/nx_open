@@ -10,13 +10,12 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-class Statistics
-:
+class StatisticsApi:
     public MediatorFunctionalTest
 {
 };
 
-TEST_F(Statistics, listening_peer_list)
+TEST_F(StatisticsApi, listening_peer_list)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 

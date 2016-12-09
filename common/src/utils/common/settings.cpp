@@ -25,6 +25,12 @@ void QnSettings::parseArgs(int argc, const char* argv[])
     m_args.parse(argc, argv);
 }
 
+bool QnSettings::contains(const QString& key) const
+{
+    return static_cast<bool>(m_args.get(key))
+        || m_systemSettings.contains(key);
+}
+
 QVariant QnSettings::value(
     const QString& key,
     const QVariant& defaultValue) const
