@@ -101,6 +101,16 @@ Settings::Settings()
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
+
+    m_dbConnectionOptions.driverType = nx::db::RdbmsDriverType::mysql;
+    m_dbConnectionOptions.hostName = "127.0.0.1";
+    m_dbConnectionOptions.port = 3306;
+    m_dbConnectionOptions.dbName = "nx_cloud";
+    m_dbConnectionOptions.userName = "root";
+    m_dbConnectionOptions.encoding = "utf8";
+    m_dbConnectionOptions.maxConnectionCount = 1;
+    m_dbConnectionOptions.inactivityTimeout = std::chrono::minutes(10);
+    m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
 }
 
 bool Settings::showHelp() const

@@ -38,7 +38,7 @@ const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
 } // namespace
 
 ConnectionOptions::ConnectionOptions():
-    driverType(RdbmsDriverType::mysql),
+    driverType(RdbmsDriverType::sqlite),
     hostName(lit("127.0.0.1")),
     port(3306),
     encoding(lit("utf8")),
