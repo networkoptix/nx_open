@@ -19,12 +19,12 @@ public:
     const std::unique_ptr<AsyncSqlQueryExecutor>& queryExecutor();
 
 protected:
-    DBStructureUpdater& dbStructureUpdater();
+    DbStructureUpdater& dbStructureUpdater();
 
 private:
     const ConnectionOptions m_dbConnectionOptions;
     std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
-    DBStructureUpdater m_dbStructureUpdater;
+    DbStructureUpdater m_dbStructureUpdater;
 
     bool updateDbStructure();
     bool configureDb();
