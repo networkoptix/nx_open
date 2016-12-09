@@ -160,7 +160,9 @@ TEST_F(AddressResolver, HostNameResolve3)
 {
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     {
-        const auto ips = dnsResolver.resolveSync(QLatin1String("ya.ru"), AF_INET);
+        std::deque<HostAddress> ips;
+        const auto resultCode = dnsResolver.resolveSync(QLatin1String("ya.ru"), AF_INET, &ips);
+        ASSERT_EQ(SystemError::noError, resultCode);
         ASSERT_GE(ips.size(), 1);
         ASSERT_TRUE(ips.front().isIpAddress());
         ASSERT_TRUE((bool)ips.front().ipV4());
@@ -169,7 +171,9 @@ TEST_F(AddressResolver, HostNameResolve3)
     }
 
     {
-        const auto ips = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET);
+        std::deque<HostAddress> ips;
+        const auto resultCode = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET, &ips);
+        ASSERT_EQ(SystemError::hostNotFound, resultCode);
         ASSERT_EQ(0, ips.size());
         ASSERT_EQ(SystemError::hostNotFound, SystemError::getLastOSErrorCode());
     }
@@ -181,8 +185,15 @@ TEST_F(AddressResolver, HostNameResolve3)
         kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd"));
 
         dnsResolver.addEtcHost(kTestHost, kTestAddresses);
-        const auto ip4s = dnsResolver.resolveSync(kTestHost, AF_INET);
-        const auto ip6s = dnsResolver.resolveSync(kTestHost, AF_INET6);
+
+        std::deque<HostAddress> ip4s;
+        SystemError::ErrorCode resultCode = dnsResolver.resolveSync(kTestHost, AF_INET, &ip4s);
+        ASSERT_EQ(SystemError::noError, resultCode);
+
+        std::deque<HostAddress> ip6s;
+        resultCode = dnsResolver.resolveSync(kTestHost, AF_INET6, &ip6s);
+        ASSERT_EQ(SystemError::noError, resultCode);
+
         dnsResolver.removeEtcHost(kTestHost);
 
         ASSERT_EQ(1, ip4s.size());
@@ -251,7 +262,7 @@ public:
 
         m_resolver.dnsResolver().registerResolver(
             makeCustomResolver(std::bind(
-                &AddressResolverTrivialNameResolve::saveHostNameWithoutResolving, this, _1, _2)),
+                &AddressResolverTrivialNameResolve::saveHostNameWithoutResolving, this, _1, _2, _3)),
             m_resolver.dnsResolver().maxRegisteredResolverPriority() + 1);
     }
 
@@ -277,11 +288,11 @@ private:
     const QString m_hostNameToResolve;
     std::list<QString> m_resolvedHostNames;
 
-    std::deque<HostAddress> saveHostNameWithoutResolving(
-        const QString& hostName, int /*ipVersion*/)
+     SystemError::ErrorCode saveHostNameWithoutResolving(
+        const QString& hostName, int /*ipVersion*/, std::deque<HostAddress>* /*resolvedAddresses*/)
     {
         m_resolvedHostNames.push_back(hostName);
-        return std::deque<HostAddress>();
+        return SystemError::hostNotFound;
     }
 };
 
