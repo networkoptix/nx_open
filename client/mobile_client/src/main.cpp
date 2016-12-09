@@ -177,13 +177,18 @@ int runUi(QtSingleGuiApplication* application)
             QDesktopServices::openUrl(initialIntentData);
     #endif
 
-    QObject::connect(application, &QtSingleGuiApplication::messageReceived,
-        [&context](const QString& message)
+    QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
+        [&context, mainWindow](const QString& message)
         {
             if (message == lit("startCamerasMode"))
             {
                 context.uiController()->openResourcesScreen();
                 context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+                mainWindow->update();
+            }
+            else if (message == lit("refresh"))
+            {
+                mainWindow->update();
             }
         });
 
@@ -288,6 +293,8 @@ int main(int argc, char *argv[])
     {
         if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
             application.sendMessage(lit("startCamerasMode"));
+        else
+            application.sendMessage(lit("refresh"));
         return 0;
     }
 
