@@ -16,15 +16,14 @@ namespace Qn
         CurrentSystemNode,      /**< Root node, displaying current system name. */
         CurrentUserNode,        /**< Root node, displaying current user. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
-        MyCloudNode,            /**< Root node for available cloud systems. */
         ServersNode,            /**< Root node for servers for admin user. */
         UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
+        OtherSystemsNode,       /**< Root node for remote systems. */
         LocalResourcesNode,     /**< Root node for local resources. */
         LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
-        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
@@ -38,8 +37,8 @@ namespace Qn
         // Repeating nodes
         RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
@@ -47,8 +46,8 @@ namespace Qn
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
-        SystemNode,             /**< Node that represents systems but the current. */
         CloudSystemNode,        /**< Node that represents available cloud system. */
+        SystemNode,             /**< Node that represents systems but the current. */
 
         NodeTypeCount
     };

@@ -53,7 +53,7 @@ namespace ec2 {
 
 class SyncronizationEngine;
 
-} // namespace ec2 
+} // namespace ec2
 
 class InviteUserNotification;
 
@@ -132,7 +132,7 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
-    
+
     void recordUserSessionStart(
         const AuthorizationInfo& authzInfo,
         data::UserSessionDescriptor userSessionDescriptor,
@@ -342,7 +342,7 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand);
-    
+
     nx::db::DBResult generateSaveUserTransaction(
         nx::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
@@ -460,9 +460,6 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const data::AccountData& inviteeAccount);
-    static float calculateSystemUsageFrequency(
-        std::chrono::system_clock::time_point lastLoginTime,
-        float currentUsageFrequency);
 };
 
 } // namespace cdb

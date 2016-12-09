@@ -13,26 +13,43 @@
 #include "ui/graphics/opengl/gl_shortcuts.h"
 #include "opengl_renderer.h"
 
-QnRenderingWidget::QnRenderingWidget(const QGLFormat &format, QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f):
-    QnGLWidget(format, parent, shareWidget, f),
-    m_display(NULL),
-    m_renderer(NULL)
+namespace {
+
+constexpr qreal kDefaultAspectRatio = 16.0 / 9.0;
+
+QSize rendererSourceSize(const QnResourceWidgetRenderer* renderer)
 {
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    return renderer ? renderer->sourceSize() : QSize();
+}
+
+} // namespace
+
+
+QnRenderingWidget::QnRenderingWidget(
+    const QGLFormat& format,
+    QWidget* parent,
+    QGLWidget* shareWidget,
+    Qt::WindowFlags f)
+    :
+    QnGLWidget(format, parent, shareWidget, f),
+    m_display(nullptr),
+    m_renderer(nullptr)
+{
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this]() { update(); });
     timer->start(1000 / 60);
 }
 
 QnRenderingWidget::~QnRenderingWidget()
 {
-    if (m_display)
-    {
-        m_renderer->disconnect(this);
-        m_display->removeRenderer(m_renderer);
-        m_renderer->destroyAsync();
-        m_display->beforeDestroy();
-        m_display.clear();
-    }
+    if (!m_display)
+        return;
+
+    m_renderer->disconnect(this);
+    m_display->removeRenderer(m_renderer);
+    m_renderer->destroyAsync();
+    m_display->beforeDestroy();
+    m_display.clear();
 }
 
 QnMediaResourcePtr QnRenderingWidget::resource() const
@@ -40,13 +57,12 @@ QnMediaResourcePtr QnRenderingWidget::resource() const
     return m_resource;
 }
 
-void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource)
+void QnRenderingWidget::setResource(const QnMediaResourcePtr& resource)
 {
     if (resource == m_resource)
         return;
 
     invalidateDisplay();
-
     m_resource = resource;
 }
 
@@ -57,7 +73,7 @@ void QnRenderingWidget::stopPlayback()
 
     m_display->removeRenderer(m_renderer);
     m_renderer->destroyAsync();
-    m_renderer = NULL;
+    m_renderer = nullptr;
 
     m_display->beforeDestroy();
     m_display.clear();
@@ -81,28 +97,42 @@ int QnRenderingWidget::effectiveWidth() const
 
 QSize QnRenderingWidget::sizeHint() const
 {
-    if (!m_renderer)
+    QSize result = rendererSourceSize(m_renderer);
+    if (result.isEmpty())
         return QSize();
 
-    return m_renderer->sourceSize();
+    return result.expandedTo(minimumSizeHint());
 }
 
 QSize QnRenderingWidget::minimumSizeHint() const
 {
-    if (!m_renderer)
+    QSize result = rendererSourceSize(m_renderer);
+    if (result.isEmpty())
         return QSize();
-
-    QSize result = m_renderer->sourceSize();
-    if (!result.isValid())
-        return result;
 
     if (m_effectiveWidth > 0)
     {
-        return QnGeometry::bounded(result, QSizeF(m_effectiveWidth, m_effectiveWidth),
+        return QnGeometry::bounded(result,
+            QSizeF(m_effectiveWidth, m_effectiveWidth),
             Qt::KeepAspectRatio).toSize();
     }
 
     return result;
+}
+
+bool QnRenderingWidget::hasHeightForWidth() const
+{
+    return true;
+}
+
+int QnRenderingWidget::heightForWidth(int width) const
+{
+    QSize size = rendererSourceSize(m_renderer);
+    auto aspectRatio = size.isEmpty()
+        ? kDefaultAspectRatio
+        : QnGeometry::aspectRatio(size);
+
+    return qRound(width / aspectRatio);
 }
 
 void QnRenderingWidget::updateChannelScreenSize()
@@ -124,12 +154,12 @@ void QnRenderingWidget::updateChannelScreenSize()
 
 void QnRenderingWidget::invalidateDisplay()
 {
-    if (m_display)
-    {
-        m_renderer->disconnect(this);
-        m_display.reset();
-        m_renderer = NULL; /*< Owned by display */
-    }
+    if (!m_display)
+        return;
+
+    m_renderer->disconnect(this);
+    m_display.reset();
+    m_renderer = nullptr; /*< Owned by display */
 }
 
 void QnRenderingWidget::ensureDisplay()
@@ -138,7 +168,7 @@ void QnRenderingWidget::ensureDisplay()
         return;
 
     m_display.reset(new QnResourceDisplay(m_resource->toResourcePtr(), this));
-    m_renderer = new QnResourceWidgetRenderer(NULL, context());
+    m_renderer = new QnResourceWidgetRenderer(nullptr, context());
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QWidget::updateGeometry);
 
@@ -201,8 +231,7 @@ void QnRenderingWidget::paintGL()
             0,
             QRectF(0.0, 0.0, 1.0, 1.0),
             QnGeometry::expanded(QnGeometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
-            1.0
-        );
+            1.0);
     }
 }
 

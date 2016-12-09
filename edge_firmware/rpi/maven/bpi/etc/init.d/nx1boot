@@ -383,6 +383,7 @@ upgrade_sd() {
     
     LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
     if [ -z $LIBC_NEW ]; then
+        DEBIAN_FRONTEND=noninteractive
         cp /etc/apt/sources.list /etc/apt/sources.list_bk
         echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
         apt-get update

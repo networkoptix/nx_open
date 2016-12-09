@@ -224,6 +224,16 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
     ui->addressesView->header()->setSectionsMovable(false);
 
+    ui->addressesView->setIgnoreDefaultSpace(true);
+    connect(ui->addressesView, &QnTreeView::spacePressed, this,
+        [this](const QModelIndex& index)
+        {
+            auto checkIndex = index.sibling(index.row(), QnServerAddressesModel::InUseColumn);
+            auto checkState = static_cast<Qt::CheckState>(checkIndex.data(Qt::CheckStateRole).toInt());
+            auto newState = checkState == Qt::Checked ? Qt::Unchecked : Qt::Checked;
+            ui->addressesView->model()->setData(checkIndex, newState, Qt::CheckStateRole);
+        });
+
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->addressesView->setVerticalScrollBar(scrollBar->proxyScrollBar());

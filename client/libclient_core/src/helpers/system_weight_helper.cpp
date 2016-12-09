@@ -1,20 +1,13 @@
 #include "system_weight_helper.h"
 
+#include <nx/utils/system_utils.h>
 #include <client_core/client_core_settings.h>
 
 qreal helpers::calculateSystemWeight(qreal baseWeight, qint64 lastConnectedUtcMs)
 {
-    static const auto getDays =
-        [](qint64 utcMsSinceEpoch)
-        {
-            const qint64 kMsInDay = 60 * 60 * 24 * 1000;
-            return utcMsSinceEpoch / kMsInDay;
-        };
-
-    const auto currentTime = QDateTime::currentMSecsSinceEpoch();
-    const auto penalty = (getDays(currentTime) - getDays(lastConnectedUtcMs)) / 30.0;
-    return std::max<qreal>((1.0 - penalty) * baseWeight, 0);
-
+    const std::chrono::milliseconds ms(lastConnectedUtcMs);
+    const std::chrono::time_point<std::chrono::system_clock> timePoint(ms);
+    return nx::utils::calculateSystemUsageFrequency(timePoint, baseWeight);
 }
 
 void helpers::updateWeightData(const QnUuid& localId)

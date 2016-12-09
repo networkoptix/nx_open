@@ -5,6 +5,9 @@
 #include <core/resource/media_server_resource.h>
 #include <nx_ec/data/api_discovery_data.h>
 
+class QnFakeMediaServerResource;
+typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;
+
 /**
  * Used for DesktopClient purpose to put incompatible media servers to the resource tree.
  */
@@ -29,11 +32,10 @@ protected:
     virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
 
 signals:
-    void moduleInformationChanged(const QnResourcePtr &resource);
+    void moduleInformationChanged(const QnFakeMediaServerResourcePtr& resource);
 
 private:
     ec2::ApiDiscoveredServerData m_serverData;
     QAuthenticator m_authenticator;
 };
 
-typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;
