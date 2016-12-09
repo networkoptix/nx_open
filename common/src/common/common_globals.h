@@ -615,6 +615,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LC_Start,
 
         /**
+          * Camera with Free license can be recorded without license activation. It always available to use
+          */
+        LC_Free,
+
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,
