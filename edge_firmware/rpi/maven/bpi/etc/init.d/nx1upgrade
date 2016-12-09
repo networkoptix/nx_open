@@ -4,6 +4,23 @@
 
 ## This command will run each time after networkoptix-embedded-tools is installed
 
+set -x
+
+export NX1UPGRADELOG=/var/log/nx1upgrade.log
+# Close STDOUT file descriptor
+exec 1<&-
+# Close STDERR FD
+exec 2<&-
+
+# Open STDOUT as $NX1UPGRADELOG file for read and write.
+exec 1<>$NX1UPGRADELOG
+
+# Redirect STDERR to STDOUT
+exec 2>&1
+
+echo "Starting upgrade script ..."
+#avoid grabbing libstdc++ from mediaserver lib folder
+export LD_LIBRARY_PATH=
 export CUSTOMIZATION=${deb.customization.company.name}
 export DATAPART=/dev/mmcblk0p2
 export MNTDATAPART=/mnt/data
