@@ -197,7 +197,8 @@ angular.module('webadminApp')
                         url: module.remoteAddresses[0] + ':' + module.port,
                         systemName: module.systemName,
                         ip: module.remoteAddresses[0],
-                        name: module.name
+                        name: module.name,
+                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0
                     };
 
                     system.visibleName = system.systemName + ' (' + system.url + ' - ' + system.name + ')';
