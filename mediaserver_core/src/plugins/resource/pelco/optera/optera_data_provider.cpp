@@ -1,6 +1,7 @@
-#include "optera_data_provider.h"
-
 #ifdef ENABLE_ONVIF
+
+#include "optera_data_provider.h"
+#include "optera_stream_reader_resource.h"
 
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
@@ -38,7 +39,6 @@ QnAbstractMediaDataPtr QnOpteraDataProvider::getNextData()
 
 void QnOpteraDataProvider::closeStream()
 {
-    qDebug() << "Closing stream";
     m_dataSource.proxyCloseStream();
     m_dataSource.setUser(nullptr);
 }
@@ -119,8 +119,6 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
     QUrl url(m_onvifRes->getUrl());
     QUrl onvifUrl = url;
 
-    qDebug() << onvifUrl;
-
     QUrlQuery urlQuery(url);
     urlQuery.addQueryItem(
         lit("channel"),
@@ -128,7 +126,8 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
 
     url.setQuery(urlQuery);
 
-    QnPlOnvifResourcePtr subChannelResource(new QnPlOnvifResource());
+    QnPlOnvifResourcePtr subChannelResource(
+        new nx::plugins::pelco::OpteraStreamReaderResource());
 
     subChannelResource->setId(QnUuid::createUuid());
     subChannelResource->setTypeId(m_onvifRes->getTypeId());
