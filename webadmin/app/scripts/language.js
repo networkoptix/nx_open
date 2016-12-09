@@ -54,7 +54,7 @@ var L = {
         systemIsUnreacheble: 'System is unreachable or doesn\'t exist.',
         incorrectCurrentPassword: 'Incorrect current password',
         incorrectRemotePassword: 'Login or password are incorrect',
-        incompatibleVersion: 'Found system has incompatible version.',
+        incompatibleVersion: 'System is unreachable, doesn\'t exist or has incompatible version.',
         wrongUrl: 'Unable to connect to specified server.',
         safeMode: 'Can\'t merge systems. Remote system is in safe mode.',
         configError: 'Can\'t merge systems. Maybe one of the systems is in safe mode.',
