@@ -26,7 +26,7 @@ angular.module('webadminApp')
                 }
                 return true;
             });
-        };
+        }
 
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
@@ -249,7 +249,7 @@ angular.module('webadminApp')
             });
         }
 
-        function openCloudDialog(connect){
+        function openCloudDialog(){
             $modal.open({
                 templateUrl: 'views/dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
@@ -258,7 +258,7 @@ angular.module('webadminApp')
                 keyboard:false,
                 resolve:{
                     connect:function(){
-                        return connect;
+                        return true;
                     },
                     systemName:function(){
                         return $scope.settings.systemName;
@@ -270,9 +270,11 @@ angular.module('webadminApp')
                         return $scope.cloudSystemID;
                     }
                 }
-            }).result.finally(function(){
-                window.location.reload();
-            });
+            }).result.then(function(){
+                dialogs.alert(L.settings.connectedSuccess).then(function(){
+                    window.location.reload();
+                });
+            },errorHandler);
         }
 
         $scope.changePassword = function(){
@@ -291,12 +293,13 @@ angular.module('webadminApp')
                 });
         };
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
-            //Open Disconnect Dialog
 
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    window.location.reload();
+                    dialogs.alert(L.settings.disconnectedSuccess).then(function(){
+                        window.location.reload();
+                    });
                 }, function(error){
                     console.error(error);
                     dialogs.alert(L.settings.unexpectedError);
@@ -341,7 +344,7 @@ angular.module('webadminApp')
         };
 
         $scope.connectToCloud = function() { // Connect to Cloud
-            openCloudDialog(true); //Open Connect Dialog
+            openCloudDialog(); //Open Connect Dialog
         };
         mediaserver.networkSettings().then(function(r){
             $scope.networkSettings = r.data.reply;
