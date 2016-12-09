@@ -347,9 +347,7 @@ angular.module('webadminApp')
             $scope.networkSettings = r.data.reply;
         });
         $scope.saveNetworkSettings = function(){
-            mediaserver.networkSettings($scope.networkSettings).then(function(){
-                $scope.hardwareRestart(true);
-            }, errorHandler);
+            mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
 
         mediaserver.getTimeZones().then(function(reply){
