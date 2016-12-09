@@ -611,10 +611,10 @@ angular.module('webadminApp')
                 if(!dateTime || !timeZone) {
                     return wrapGet(proxy + '/web/api/gettime');
                 }
-                return wrapPost(proxy + '/web/api/setTime', {
+                return wrapPost(proxy + '/web/api/setTime', stringifyValues({
                     timeZoneId: timeZone,
                     dateTime: dateTime
-                });
+                }));
             }
         };
 

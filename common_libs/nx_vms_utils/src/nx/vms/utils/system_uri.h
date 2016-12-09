@@ -101,6 +101,8 @@ public:
     {
         QString user;
         QString password;
+
+        NX_VMS_UTILS_API QString encode() const;
     };
     Auth authenticator() const;
     void setAuthenticator(const Auth& value);

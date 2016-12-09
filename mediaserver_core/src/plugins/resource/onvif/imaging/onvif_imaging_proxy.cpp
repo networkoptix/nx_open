@@ -15,7 +15,7 @@
 
 #define SPC3(a, b, c) \
     SPC2(SPC2(a, b), c)
-    
+
 #define SPC4(a, b, c, d) \
     SPC2(SPC3(a, b, c), d)
 
@@ -44,8 +44,8 @@
 //
 QnOnvifImagingProxy::QnOnvifImagingProxy(const std::string& imagingUrl,
                                                  const QString& login,
-                                                 const QString& passwd, 
-                                                 const std::string& videoSrcToken, 
+                                                 const QString& passwd,
+                                                 const std::string& videoSrcToken,
                                                  int _timeDrift):
     m_rangesSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
     m_valsSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
@@ -96,7 +96,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
     auto registerEnumParameter = [this, &parameters](const QString &id, QnEnumOnvifImagingOperation::pathFunction path) {
         QnCameraAdvancedParameter param = parameters.getParameterById(id);
-        NX_ASSERT(param.isValid());
+      //  NX_ASSERT(param.isValid());
         if (!param.isValid())
             return;
         m_supportedOperations.insert(id, QnAbstractOnvifImagingOperationPtr(new QnEnumOnvifImagingOperation(m_values, param.getRange(), path)));
@@ -119,8 +119,8 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
     auto exposure = ranges->Exposure;
     if (exposure) {
         registerEnumParameter(
-            lit("ieMode"),                                    
-            [](ImagingSettingsResp* settings) -> int* 
+            lit("ieMode"),
+            [](ImagingSettingsResp* settings) -> int*
             {
                 if (auto expPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure))
                     return reinterpret_cast<int*>(&expPtr->Mode);
@@ -128,14 +128,14 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
             });
 
         registerEnumParameter(
-            lit("iePriority"),                                
+            lit("iePriority"),
             [](ImagingSettingsResp* settings) -> int*
             {
                 if (auto expPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure))
-                    return reinterpret_cast<int*>(&expPtr->Priority); 
+                    return reinterpret_cast<int*>(&expPtr->Priority);
                 return nullptr;
             });
-        
+
         registerFloatParameter(lit("ieMinETime"),   exposure->MinExposureTime,  [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MinExposureTime);});
         registerFloatParameter(lit("ieMaxETime"),   exposure->MaxExposureTime,  [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MaxExposureTime);});
         registerFloatParameter(lit("ieETime"),      exposure->ExposureTime,     [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, ExposureTime);});
@@ -148,7 +148,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
         registerFloatParameter(lit("ieMaxIris"),    exposure->MaxIris,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MaxIris);});
         registerFloatParameter(lit("ieIris"),       exposure->Iris,             [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, Iris);});
     }
-      
+
     auto focus = ranges->Focus;
     if (focus) {
         registerEnumParameter(
@@ -156,7 +156,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
             [](ImagingSettingsResp* settings) -> int*
             {
                 if (auto focusPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Focus))
-                    return reinterpret_cast<int*>(&focusPtr->AutoFocusMode); 
+                    return reinterpret_cast<int*>(&focusPtr->AutoFocusMode);
                 return nullptr;
             });
 
@@ -192,7 +192,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
     }
 
     if (!ranges->IrCutFilterModes.empty())
-        registerEnumParameter(lit("iIrCut"),                                    
+        registerEnumParameter(lit("iIrCut"),
             [](ImagingSettingsResp* settings) -> int*
             {
                 if (auto irPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings))
@@ -202,7 +202,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
     registerFloatParameter(lit("iBri"),             ranges->Brightness,         [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Brightness);});
     registerFloatParameter(lit("iCS"),              ranges->ColorSaturation,    [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, ColorSaturation);});
-    registerFloatParameter(lit("iCon"),             ranges->Contrast,           [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Contrast);});   
+    registerFloatParameter(lit("iCon"),             ranges->Contrast,           [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Contrast);});
     registerFloatParameter(lit("iSha"),             ranges->Sharpness,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Sharpness);});
 
 }
@@ -260,7 +260,7 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadRanges() {
 
     int soapRes = m_rangesSoapWrapper->getOptions(rangesRequest, *m_ranges);
     if (soapRes != SOAP_OK) {
-        qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging options." 
+        qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging options."
             << "Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
             << soapRes << ". " << m_rangesSoapWrapper->getLastError();
         return CameraDiagnostics::RequestFailedResult(lit("getOptions"), m_rangesSoapWrapper->getLastError());
@@ -274,7 +274,7 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamV
 
     int soapRes = m_valsSoapWrapper->getImagingSettings(valsRequest, *m_values);
     if (soapRes != SOAP_OK) {
-        qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging settings." 
+        qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging settings."
             << "Reason: SOAP to endpoint " << m_valsSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
             << soapRes << ". " << m_valsSoapWrapper->getLastError();
         return CameraDiagnostics::RequestFailedResult(lit("getImagingSettings"), m_valsSoapWrapper->getLastError());
@@ -301,7 +301,7 @@ bool QnOnvifImagingProxy::setValue(const QString &id, const QString &value) {
     QnAbstractOnvifImagingOperationPtr operation = m_supportedOperations[id];
     if (!operation->set(value))
         return false;
-    
+
     return makeSetRequest();
 }
 

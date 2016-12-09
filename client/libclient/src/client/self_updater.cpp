@@ -88,10 +88,13 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
 
     auto checkedCopy = [](const QString& src, const QString& dst)
         {
-            auto result = copy(src, dst);
+            auto result = copy(src, dst, OverwriteExisting);
             if (!result.isOk())
             {
-                NX_LOG(lit("SelfUpdater: Cannot copy %2. Code: %1").arg(result.code).arg(result.path),
+                NX_LOG(lit("SelfUpdater: Cannot copy %1 to %2. Code: %3")
+                    .arg(src)
+                    .arg(dst)
+                    .arg(result.code),
                     cl_logERROR);
                 return false;
             }
@@ -194,15 +197,39 @@ bool SelfUpdater::updateApplauncher()
 
     NX_LOGX(lit("Updating applauncher from %1").arg(applauncherVersion.toString()), cl_logINFO);
 
+    // Ensure applauncher will be started even if update failed.
+    auto runApplauncherGuard = QnRaiiGuard::createDestructible(
+        [this]()
+        {
+            if (!runMinilaucher())
+                NX_LOGX(lit("Could not run applauncher again!"),cl_logERROR);
+        });
+
+
+    static const int kKillApplauncherRetries = 10;
+    static const int kRetryMs = 100;
+    static const int kWaitProcessDeathMs = 100;
+
     /* Check if no applauncher instance is running. If there is, try to kill it. */
-    const auto killApplauncherResult = applauncher::quitApplauncher();
-    if (killApplauncherResult != ResultType::ok &&          /*< Successfully killed. */
-        killApplauncherResult != ResultType::connectError)  /*< Not running. */
+    auto killApplauncherResult = applauncher::quitApplauncher();
+    int retriesLeft = kKillApplauncherRetries;
+    while (retriesLeft > 0 && killApplauncherResult != ResultType::connectError) // Not running.
+    {
+        QThread::msleep(kRetryMs);
+        killApplauncherResult = applauncher::quitApplauncher();
+        --retriesLeft;
+    }
+
+    if (killApplauncherResult != ResultType::connectError)  // Applauncher is still running.
     {
         NX_LOGX(lit("Could not kill running applauncher instance. Error code %1")
             .arg(QString::fromUtf8(ResultType::toString(killApplauncherResult))), cl_logERROR);
         return false;
     }
+
+    // If we have tried at least one time, wait again.
+    if (retriesLeft != kKillApplauncherRetries)
+        QThread::msleep(kWaitProcessDeathMs);
 
     if (backupDir.exists())
     {
@@ -215,7 +242,7 @@ bool SelfUpdater::updateApplauncher()
         {
             NX_LOGX(lit("Could not backup applauncher to %1").arg(backupDir.absolutePath()),
                 cl_logERROR);
-            return false;
+            // Continue without backup
         }
     }
 
@@ -254,10 +281,6 @@ bool SelfUpdater::updateApplauncher()
         else
             guard.reset(); // Restore old applauncher.
     }
-
-    /* Run newest applauncher via our own minilauncher. */
-    if (!runMinilaucher())
-        return false;
 
     /* If we failed, return now. */
     if (!updateSuccess)

@@ -1,5 +1,4 @@
-#ifndef NX_NETWORK_SOCKET_GLOBAL_H
-#define NX_NETWORK_SOCKET_GLOBAL_H
+#pragma once
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
@@ -129,8 +128,7 @@ class SocketGlobalsHolder
     public Singleton<SocketGlobalsHolder>
 {
 public:
-    SocketGlobalsHolder()
-    :
+    SocketGlobalsHolder():
         m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>())
     {
     }
@@ -139,6 +137,7 @@ public:
     {
         m_socketGlobalsGuard.reset();
         m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>();
+        SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
     }
 
 private:
@@ -147,5 +146,3 @@ private:
 
 } // namespace network
 } // namespace nx
-
-#endif  //NX_NETWORK_SOCKET_GLOBAL_H

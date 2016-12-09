@@ -22,6 +22,12 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
         lit("Enable lite mode."));
     parser.addOption(liteModeOption);
 
+    const auto logLevelOption = QCommandLineOption(
+        lit("log-level"),
+        lit("Log level."),
+        lit("logLevel"));
+    parser.addOption(logLevelOption);
+
     const auto urlOption = QCommandLineOption(
         lit("url"),
         lit("URL to be used for server connection instead of asking login/password."),
@@ -61,6 +67,9 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
         basePath = parser.value(basePathOption);
 
     liteMode = parser.isSet(liteModeOption);
+
+    if (parser.isSet(logLevelOption))
+        logLevel = parser.value(logLevelOption);
 
     if (parser.isSet(urlOption))
         url = parser.value(urlOption);

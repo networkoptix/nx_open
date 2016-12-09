@@ -47,15 +47,15 @@ protected:
 
     void havingAddedMultipleTransactionsWithSameSequenceFromSamePeer()
     {
-        boost::optional<int> sequence;
+        int sequence = -1;
 
         for (int i = 0; i < 2; ++i)
         {
             auto transaction = generateTransaction();
-            if (sequence)
-                transaction.persistentInfo.sequence = *sequence;
-            else
+            if (sequence == -1)
                 sequence = transaction.persistentInfo.sequence;
+            else
+                transaction.persistentInfo.sequence = sequence;
             saveTransaction(transaction);
             m_lastAddedTransaction = transaction;
         }

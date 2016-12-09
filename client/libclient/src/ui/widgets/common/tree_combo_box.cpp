@@ -52,6 +52,8 @@ QnTreeComboBox::QnTreeComboBox(QWidget *parent):
 
     setView(m_treeView);
 
+    setSizeAdjustPolicy(AdjustToContents);
+
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(at_currentIndexChanged(int)));
 }
 
@@ -101,7 +103,22 @@ int QnTreeComboBox::getTreeWidth(const QModelIndex& parent, int nestedLevel) con
     return textWidth;
 }
 
-QSize QnTreeComboBox::minimumSizeHint() const {
+QSize QnTreeComboBox::minimumSizeHint() const
+{
+    switch (sizeAdjustPolicy())
+    {
+        case AdjustToContents:
+            break;
+
+        case AdjustToContentsOnFirstShow:
+            if (m_minimumSizeHint.isValid())
+                return m_minimumSizeHint;
+            break;
+
+        default:
+            return base_type::minimumSizeHint();
+    }
+
     int textWidth = getTreeWidth(QModelIndex(), 0);
 
     QStyleOptionComboBox opt;
@@ -111,7 +128,8 @@ QSize QnTreeComboBox::minimumSizeHint() const {
     textWidth = tmp.width();
 
     QSize sz = base_type::sizeHint();
-    return QSize(textWidth, sz.height()).expandedTo(QApplication::globalStrut());
+    m_minimumSizeHint = QSize(textWidth, sz.height()).expandedTo(QApplication::globalStrut());
+    return m_minimumSizeHint;
 }
 
 void QnTreeComboBox::wheelEvent(QWheelEvent *e) {

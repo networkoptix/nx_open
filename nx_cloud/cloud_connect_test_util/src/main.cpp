@@ -60,11 +60,16 @@ int main(int argc, const char* argv[])
 }
 
 //--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
+//
 //AK server:
 //--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
+//
+//AK home:
+//--http-client --url=http://admin:admin@40bb3c45-6d46-4cee-bdfc-47986af175d1/api/moduleInformation
+//
 //LA server:
 //--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
-//--http-client --url=http://admin:admin@52a2e39a-8e17-4977-96c9-94b465622848/api/gettime
+//--http-client --url=http://admin:admin@becf0a3f-d101-44af-bdc3-13b2296604f0/api/gettime
 //--connect --target=server1.c2cd3804-c66c-4ba4-900e-c27fd4d9180d --max-concurrent-connections=10
 //--listen --server-id=server1 --cloud-credentials=c2cd3804-c66c-4ba4-900e-c27fd4d9180d:02e780b8-2dc3-4389-9af3-8170de591835
 

@@ -56,10 +56,8 @@ private:
 
     void init()
     {
-        //starting mediator
         ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
-        //registering server in mediator
         m_system = mediator().addRandomSystem();
         m_server = mediator().addRandomServer(
             m_system, boost::none, hpm::ServerTweak::noBindEndpoint);

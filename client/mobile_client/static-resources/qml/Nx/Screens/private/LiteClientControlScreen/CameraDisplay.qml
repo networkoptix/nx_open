@@ -135,7 +135,7 @@ Item
 
         interval: initialLoadDelay
         repeat: true
-        running: connectionManager.connectionState == QnConnectionManager.Connected
+        running: connectionManager.connectionState === QnConnectionManager.Ready
 
         onTriggered:
         {

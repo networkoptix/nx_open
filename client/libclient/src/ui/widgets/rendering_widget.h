@@ -1,5 +1,4 @@
-#ifndef QN_RENDERING_WIDGET_H
-#define QN_RENDERING_WIDGET_H
+#pragma once
 
 #include <QtOpenGL/QGLWidget>
 
@@ -14,14 +13,17 @@ typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
  * Widget for displaying video from the given resource without constructing
  * the heavy graphics scene machinery.
  */
-class QnRenderingWidget: public QnGLWidget {
-    Q_OBJECT;
+class QnRenderingWidget: public QnGLWidget
+{
+    Q_OBJECT
+
 public:
-    QnRenderingWidget(const QGLFormat &format, QWidget *parent = 0, QGLWidget *shareWidget = NULL, Qt::WindowFlags f = 0);
+    explicit QnRenderingWidget(const QGLFormat& format, QWidget* parent = nullptr,
+        QGLWidget* shareWidget = nullptr, Qt::WindowFlags f = 0);
     virtual ~QnRenderingWidget();
 
     QnMediaResourcePtr resource() const;
-    void setResource(const QnMediaResourcePtr &resource);
+    void setResource(const QnMediaResourcePtr& resource);
 
     void stopPlayback();
 
@@ -30,6 +32,9 @@ public:
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;
+
+    virtual bool hasHeightForWidth() const override;
+    virtual int heightForWidth(int width) const override;
 
 protected:
     void updateChannelScreenSize();
@@ -45,10 +50,7 @@ protected:
 private:
     QnMediaResourcePtr m_resource;
     QnResourceDisplayPtr m_display;
-    QnResourceWidgetRenderer *m_renderer;
+    QnResourceWidgetRenderer* m_renderer;
     QSize m_channelScreenSize;
     int m_effectiveWidth = 0;
 };
-
-
-#endif // QN_RENDERING_WIDGET_H

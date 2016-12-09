@@ -26,7 +26,7 @@ namespace cdb {
 // CdbLauncher
 
 CdbLauncher::CdbLauncher(QString tmpDir):
-    TestWithDbHelper(tmpDir),
+    db::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {

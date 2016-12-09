@@ -10,8 +10,7 @@ Object
     property alias resourceId: resourceHelper.resourceId
 
     readonly property bool serverOffline:
-        connectionManager.connectionState == QnConnectionManager.Connecting
-        || connectionManager.connectionState == QnConnectionManager.Disconnected
+        connectionManager.connectionState === QnConnectionManager.Reconnecting
     readonly property bool cameraOffline:
         mediaPlayer.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
     readonly property bool cameraUnauthorized:
