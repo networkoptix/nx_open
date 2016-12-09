@@ -12,7 +12,27 @@
 ### END INIT INFO
 # VERSION: ${release.version}.${buildNumber}
 
+export NX1LOG=/var/log/nx1.log
+set -x
+
+# Close STDOUT file descriptor
+exec 1<&-
+# Close STDERR FD
+exec 2<&-
+
+# Open STDOUT as $NX1LOG file for read and write.
+exec 1<>$NX1LOG
+
+# Redirect STDERR to STDOUT
+exec 2>&1
+
+echo `date` "++++++++++++++++++++++ Starting Boot Process ++++++++++++++++++++++++"
+
+if [[ "${beta}" == "true" ]]; then 
+  BETA="-beta" 
+fi 
 export CUSTOMIZATION=${deb.customization.company.name}
+export DISTRIB=$CUSTOMIZATION-mediaserver-${box}-${release.version}.${buildNumber}$BETA
 
 export CHECKBOOTHDDPART=
 export CHECKDATAHDDPART=
@@ -24,6 +44,12 @@ fi
 
 if [[ ! -z $( cat /proc/cmdline | grep mmc ) ]]; then export BOOTDEVICE=mmc; else export BOOTDEVICE=ata; fi
 
+export BOOTHDDPART="$DISK"1
+export DATAHDDPART="$DISK"2
+export MAC=`ifconfig | grep eth0 | grep -v avahi | awk {'print $5'}`
+export MOUNTBOOT=
+export MOUNTDATA=
+export HDDNX1=
 export BOOTPART=/dev/mmcblk0p1
 export UBOOTENVPART=/dev/mmcblk0p3
 export DATAPART=/dev/mmcblk0p2
@@ -35,13 +61,6 @@ export MNTDATAHDDPART=/mnt/hdd/data
 export HDDBOOTFLUSHSCRIPT=hddbootflush.sh
 export HDDBOOTFLUSH=/etc/init.d/$HDDBOOTFLUSHSCRIPT
 export HDDBOOT_INDICATOR=$MNTUBOOTENVPART/hddboot
-export NX1LOG=/var/log/nx1.log
-export BOOTHDDPART="$DISK"1
-export DATAHDDPART="$DISK"2
-export MAC=`ifconfig | grep eth0 | grep -v avahi | awk {'print $5'}`
-export MOUNTBOOT=
-export MOUNTDATA=
-export HDDNX1=
 
 setup_hdd_environment() {
     if [ -f /tmp/hdd_native ]; then rm /tmp/hdd_native; fi
@@ -52,16 +71,13 @@ setup_hdd_environment() {
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
         HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
-        echo "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >> $NX1LOG
-        echo "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >> $NX1LOG
+        echo `date` "ACTUAL MAC:"$MAC""
+        echo `date` "HARD DRIVE IS BOUND TO MAC:"$HDDMAC""
         if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
         ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
         ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
         if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
-        echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG
+        echo `date` "ARCHIVE FOUND ON HDD:"$ARCHIVE""
         for p in $( lsof $MNTBOOTHDDPART | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $BOOTHDDPART
@@ -115,8 +131,7 @@ get_serial_number() {
     SERIAL_SHORT=${SERIAL%???????}
     SERIAL_CHECK=$(echo $SERIAL_SHORT | grep '14\|15')
     if [ -z $SERIAL_CHECK ]; then RESET=true; else RESET=false; fi    
-    echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
-    echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG
+    echo `date` "SERIAL NUMBER:"$SERIAL""
     rm /tmp/fw_printenv
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
@@ -134,8 +149,7 @@ hddboot_indicator_flush() {
 ethtweak () {
     ETH=`ifconfig | grep eth0 | awk {'print $1'}`
     if [ -z "$ETH" ]; then
-        echo "++++++++++++++ NETWORK INTERFACE ERROR. REBOOTING TO FIX ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ NETWORK INTERFACE ERROR. REBOOTING TO FIX ++++++++++++++" >> $NX1LOG
+        echo `date` "NETWORK INTERFACE ERROR. REBOOTING TO FIX"
         rm /etc/udev/rules.d/70-persistent-net.rules
         reboot
     fi
@@ -151,12 +165,10 @@ hddboot_indicator_create() {
 
 reboot_from_hdd () {
     if [ -z $DISK ]; then
-        echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
+        echo `date` "NO HDD FOUND"
         exit 1
     else
-        echo "++++++++++++++ REBOOTING FROM HDD... ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ REBOOTING FROM HDD... ++++++++++++++" >> $NX1LOG
+        echo `date` "REBOOTING FROM HDD..."
         hddboot_indicator_flush
         reboot
         exit 0
@@ -164,8 +176,7 @@ reboot_from_hdd () {
 }
 
 reboot_from_sd () {
-    echo "++++++++++++++ REBOOTING FROM SD CARD... ++++++++++++++" >&2 >/dev/kmsg
-    echo `date` "++++++++++++++ REBOOTING FROM SD CARD... ++++++++++++++" >> $NX1LOG
+    echo `date` "REBOOTING FROM SD CARD..."
     hddboot_indicator_create
     reboot
     sleep 1
@@ -174,8 +185,7 @@ reboot_from_sd () {
 
 system_restore () {
     if [ -z $DISK ]; then
-        echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
+        echo `date` "NO HDD FOUND"
         exit 0
     fi
 
@@ -187,8 +197,7 @@ system_restore () {
         if [ ! -f $MNTBOOTPART/restore ]; then touch $MNTBOOTPART/restore; fi
         umount $BOOTPART
         rm -Rf $MNTBOOTPART
-        echo "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >> $NX1LOG
+        echo `date` "REBOOTING TO SD CARD FOR RESTORE"
         reboot_from_sd
         exit 0
     fi
@@ -199,8 +208,7 @@ system_restore () {
         rm $MNTBOOTHDDPART/restored
         umount $BOOTHDDPART
         rm -Rf $MNTBOOTHDDPART
-        echo "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >> $NX1LOG
+        echo `date` "REBOOTING FOR RESTORE"
         touch /restore
         hddboot_indicator_create
         shutdown -rF now
@@ -220,8 +228,7 @@ system_restore () {
         sleep 2
         umount $DATAHDDPART
         if [ "$ARCHIVE" = "false" ]; then
-            echo "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >> $NX1LOG
+            echo `date` "FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE..."
             dd if=/dev/zero of=$DISK bs=512 count=1 conv=notrunc
             (echo 2; echo x; echo z; echo y; echo y) | gdisk $DISK
             #for v_partition in $(parted -s $DISK print|awk '/^ / {print $1}')
@@ -241,8 +248,7 @@ system_restore () {
             MOUNTDATA=`df -h | grep "$DATAHDDPART"`
             sleep 2
             if [ -z "$MOUNTDATA" ]; then
-                echo "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-                echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG
+                echo `date` "CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE "
                 touch /restore
                 hddboot_indicator_create
                 shutdown -rF now
@@ -252,19 +258,16 @@ system_restore () {
             sleep 2
             umount $DATAHDDPART
         else
-            echo "++++++++++++++ ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION... ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION... ++++++++++++++" >> $NX1LOG
+            echo `date` "ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION..."
         fi
-        echo "++++++++++++++ RESTORING SYSTEM PARTITION... ++++++++++++++"  >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ RESTORING SYSTEM PARTITION... ++++++++++++++" >> $NX1LOG
+        echo "RESTORING SYSTEM PARTITION..."
         mkfs.ext4 $BOOTHDDPART
         mkdir -p $MNTBOOTHDDPART
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
         MOUNTBOOT=`df -h | grep "$BOOTHDDPART"`
         sleep 2
         if [ -z "$MOUNTBOOT" ]; then
-            echo "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG
+            echo `date` "CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE "
             touch /restore
             hddboot_indicator_create
             shutdown -rF now
@@ -316,7 +319,7 @@ check_statistics_warning() {
 
 save_ipconfig() {
 # saves IP configuration and sets the flag to restore it after reboot (if reboot happened during restore process)
-    echo "++++++++++++++ SAVING IP CONFIG... ++++++++++++++" >&2 >/dev/kmsg
+    echo `date` "SAVING IP CONFIG..."
     if [ "$BOOTDEVICE" = "mmc" ]; then
         mkdir -p $MNTBOOTHDDPART
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
@@ -370,6 +373,7 @@ upgrade() {
 
 #only if boot from SD Card for the first time after upgrading 2.5 to 3.0
 upgrade_sd() {
+    tar xfv /root/$DISTRIB.tar.gz -C / --exclude "./etc/init.d/nx1*"
     touch /dev/cedar_dev
     chmod 777 /dev/disp
     chmod 777 /dev/cedar_dev
@@ -402,32 +406,27 @@ default_sequence () {
     if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi    
     stop_server
     setup_hdd_environment
-    echo "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >&2 >/dev/kmsg
-    echo `date` "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >> $NX1LOG
+    echo `date` "BOOTED FROM "$BOOTDEVICE""
     ethtweak
     tweak_charger
     check_statistics_warning
     if [ "$BOOTDEVICE" = "mmc" ]; then
         if [ -z $DISK ]; then
-            echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
+            echo `date` "NO HDD FOUND"
             hddboot_indicator_create
         else
             if [ "$HDDNX1" = "false" ]; then
-                echo "++++++++++++++ FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE... ++++++++++++++" >&2 >/dev/kmsg
-                echo `date` "++++++++++++++ FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE... ++++++++++++++" >> $NX1LOG
+                echo `date` "FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE..."
                 system_restore
             else
-                echo "++++++++++++++ NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME... ++++++++++++++" >&2 >/dev/kmsg
-                echo `date` "++++++++++++++ NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME... ++++++++++++++" >> $NX1LOG
+                echo `date` "NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME..."
                 hddboot_indicator_flush
             fi
         fi
         /etc/init.d/nx1led boot_sd
     fi
     if [ "$BOOTDEVICE" = "ata" ]; then
-        echo "++++++++++++++ MOUNTING DATA HDD PARTITION... ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ MOUNTING DATA HDD PARTITION... ++++++++++++++" >> $NX1LOG
+        echo `date` "MOUNTING DATA HDD PARTITION..."
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
         /etc/init.d/nx1led boot_hdd
     fi
