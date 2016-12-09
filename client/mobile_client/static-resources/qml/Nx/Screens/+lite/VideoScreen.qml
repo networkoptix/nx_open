@@ -29,6 +29,14 @@ PageBase
                 screenshot.source = ""
         }
 
+        mediaPlayer.onResourceIdChanged:
+        {
+            if (mediaPlayer.resourceId)
+                mediaPlayer.playLive()
+            else
+                mediaPlayer.stop()
+        }
+
         onOfflineChanged:
         {
             if (offline)
@@ -163,7 +171,7 @@ PageBase
         anchors.fill: parent
         onPreviousRequested: previousCameraRequested()
         onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel.count - 1
+        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
     }
 
     MouseArea
@@ -175,11 +183,9 @@ PageBase
     onNextCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
-        videoScreenController.mediaPlayer.play()
     }
     onPreviousCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
-        videoScreenController.mediaPlayer.play()
     }
 }
