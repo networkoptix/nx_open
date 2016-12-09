@@ -1,5 +1,7 @@
 #pragma once
 
+#include <deque>
+
 #include "../abstract_data_object.h"
 
 namespace nx {
@@ -14,12 +16,16 @@ class InMemoryDataObject:
 public:
     virtual nx::db::DBResult save(
         nx::db::QueryContext* /*queryContext*/,
-        ConnectionRecord connectionRecord) override;
+        ConnectSession connectionRecord) override;
 
-    const std::vector<ConnectionRecord>& records() const;
+    virtual nx::db::DBResult readAllRecords(
+        nx::db::QueryContext* /*queryContext*/,
+        std::deque<ConnectSession>* connectionRecords) override;
+
+    const std::deque<ConnectSession>& records() const;
 
 private:
-    std::vector<ConnectionRecord> m_records;
+    std::deque<ConnectSession> m_records;
 };
 
 } // namespace memory

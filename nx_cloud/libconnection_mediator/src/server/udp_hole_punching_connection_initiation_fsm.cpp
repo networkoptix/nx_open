@@ -65,7 +65,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
             request = std::move(request), connectResponseSender]()
         {
             m_sessionStatisticsInfo.originatingHostEndpoint = 
-                originatingPeerConnection->getSourceAddress();
+                originatingPeerConnection->getSourceAddress().toString().toUtf8();
             m_sessionStatisticsInfo.originatingHostName = request.originatingPeerId;
             m_sessionStatisticsInfo.destinationHostName = request.destinationHostName;
 
@@ -127,7 +127,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
         [this, connection, request = std::move(request),
             completionHandler = std::move(completionHandler)]() mutable
         {
-            m_sessionStatisticsInfo.destinationHostEndpoint = connection->getSourceAddress();
+            m_sessionStatisticsInfo.destinationHostEndpoint = 
+                connection->getSourceAddress().toString().toUtf8();
             
             if (m_state > State::waitingServerPeerUDPAddress)
             {

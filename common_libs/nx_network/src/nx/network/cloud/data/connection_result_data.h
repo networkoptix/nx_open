@@ -46,11 +46,12 @@ public:
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)
+
 }   //api
 }   //hpm
 }   //nx
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)
 void NX_NETWORK_API serialize(const nx::hpm::api::NatTraversalResultCode&, QString*);
 
 #endif  //NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H

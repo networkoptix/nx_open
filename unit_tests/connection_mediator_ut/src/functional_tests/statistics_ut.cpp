@@ -10,8 +10,7 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-class StatisticsApi
-:
+class StatisticsApi:
     public MediatorFunctionalTest
 {
 };

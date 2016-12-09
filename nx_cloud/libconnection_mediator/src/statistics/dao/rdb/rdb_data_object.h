@@ -14,7 +14,11 @@ class RdbDataObject:
 public:
     virtual nx::db::DBResult save(
         nx::db::QueryContext* /*queryContext*/,
-        ConnectionRecord connectionRecord) override;
+        ConnectSession connectionRecord) override;
+
+    virtual nx::db::DBResult readAllRecords(
+        nx::db::QueryContext* /*queryContext*/,
+        std::deque<ConnectSession>* connectionRecords) override;
 };
 
 } // namespace rdb

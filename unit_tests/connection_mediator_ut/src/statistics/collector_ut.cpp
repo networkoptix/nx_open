@@ -31,7 +31,7 @@ public:
 
     virtual nx::db::DBResult save(
         nx::db::QueryContext* queryContext,
-        dao::ConnectionRecord connectionRecord) override
+        stats::ConnectSession connectionRecord) override
     {
         if (m_saveMethodBlocker)
             m_saveMethodBlocker->get_future().wait();
@@ -46,7 +46,14 @@ public:
         return db::DBResult::ok;
     }
 
-    const std::vector<dao::ConnectionRecord>& records() const
+    virtual nx::db::DBResult readAllRecords(
+        nx::db::QueryContext* queryContext,
+        std::deque<stats::ConnectSession>* connectionRecords) override
+    {
+        return m_delegate.readAllRecords(queryContext, connectionRecords);
+    }
+
+    const std::deque<stats::ConnectSession>& records() const
     {
         return m_delegate.records();
     }

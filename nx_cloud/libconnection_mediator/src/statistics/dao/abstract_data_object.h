@@ -1,5 +1,7 @@
 #pragma once
 
+#include <deque>
+
 #include <utils/db/types.h>
 #include <utils/db/query_context.h>
 
@@ -10,11 +12,6 @@ namespace hpm {
 namespace stats {
 namespace dao {
 
-struct ConnectionRecord
-{
-    ConnectSession sessionStats;
-};
-
 class AbstractDataObject
 {
 public:
@@ -22,7 +19,11 @@ public:
 
     virtual nx::db::DBResult save(
         nx::db::QueryContext* /*queryContext*/,
-        ConnectionRecord connectionRecord) = 0;
+        ConnectSession connectionRecord) = 0;
+
+    virtual nx::db::DBResult readAllRecords(
+        nx::db::QueryContext* /*queryContext*/,
+        std::deque<ConnectSession>* connectionRecords) = 0;
 };
 
 } // namespace dao

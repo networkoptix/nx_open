@@ -101,6 +101,7 @@ Settings::Settings():
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
+    initializeWithDefaultValues();
 }
 
 bool Settings::showHelp() const
@@ -165,6 +166,12 @@ void Settings::fillSupportedCmdParameters()
 {
     m_commandLineParser.addParameter(
         &m_showHelp, "--help", NULL, "Show help message", false );
+}
+
+void Settings::initializeWithDefaultValues()
+{
+    m_dbConnectionOptions.driverType = db::RdbmsDriverType::sqlite;
+    m_dbConnectionOptions.dbName = "mediator_statistics.sqlite";
 }
 
 void Settings::loadConfiguration()

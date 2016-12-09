@@ -96,6 +96,7 @@ private:
     Statistics m_statistics;
 
     void fillSupportedCmdParameters();
+    void initializeWithDefaultValues();
     void loadConfiguration();
     void readEndpointList(
         const QString& str,

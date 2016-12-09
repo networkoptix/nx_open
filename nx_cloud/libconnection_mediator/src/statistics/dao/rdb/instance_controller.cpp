@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace hpm {
+namespace stats {
 namespace dao {
 namespace rdb {
 
@@ -15,5 +16,6 @@ InstanceController::InstanceController(const nx::db::ConnectionOptions& connecti
 
 } // namespace rdb
 } // namespace dao
+} // namespace stats
 } // namespace hpm
 } // namespace nx

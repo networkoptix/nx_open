@@ -19,7 +19,7 @@ public:
     const Collector& collector() const;
 
 private:
-    hpm::dao::rdb::InstanceController m_instanceController;
+    dao::rdb::InstanceController m_instanceController;
     std::unique_ptr<Collector> m_collector;
 };
 

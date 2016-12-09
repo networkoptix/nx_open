@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace hpm {
+namespace stats {
 namespace dao {
 namespace rdb {
 
@@ -16,5 +17,6 @@ public:
 
 } // namespace rdb
 } // namespace dao
+} // namespace stats
 } // namespace hpm
 } // namespace nx

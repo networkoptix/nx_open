@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/socket_common.h>
 
@@ -15,16 +16,22 @@ struct ConnectSession
     std::chrono::system_clock::time_point endTime;
     api::NatTraversalResultCode resultCode;
     nx::String sessionId;
-    SocketAddress originatingHostEndpoint;
+    nx::String originatingHostEndpoint;
     nx::String originatingHostName;
-    SocketAddress destinationHostEndpoint;
+    nx::String destinationHostEndpoint;
     nx::String destinationHostName;
 
-    ConnectSession():
-        resultCode(api::NatTraversalResultCode::ok)
-    {
-    }
+    ConnectSession();
+
+    bool operator==(const ConnectSession& rhs) const;
 };
+
+#define ConnectSession_Fields (startTime)(endTime)(resultCode)(sessionId) \
+    (originatingHostEndpoint)(originatingHostName)(destinationHostEndpoint)(destinationHostName)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (ConnectSession),
+    (sql_record))
 
 } // namespace stats
 } // namespace hpm
