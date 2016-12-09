@@ -5,6 +5,7 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace db {

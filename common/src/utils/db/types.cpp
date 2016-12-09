@@ -1,6 +1,7 @@
 #include "types.h"
 
 #include <chrono>
+#include <thread>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/timer_manager.h>
