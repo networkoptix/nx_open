@@ -27,5 +27,7 @@ fi
 LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
 /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE >>/opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client.log
 
-# Turning the screen blank after Lite Client terminates.
-echo "1" >/sys/class/graphics/fb0/blank
+if ! pgrep mobile_client > /dev/null; then
+    # Turning the screen blank after Lite Client terminates.
+    echo "1" >/sys/class/graphics/fb0/blank
+fi    
