@@ -33,10 +33,7 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
     for (auto src : QGuiApplication::screens())
         tmp.insert(src->geometry().left(), src);
 
-
     // Searching for appropriate screen
-
-
     const auto xSorted = tmp.values().toVector();
     const auto it = std::find_if(xSorted.begin(), xSorted.end(),
         [screen](const QScreen* value)
@@ -155,12 +152,12 @@ private:
 typedef QSharedPointer<MenuScreenCorrector> MenuScreenCorrectorPtr;
 typedef QHash<QMenu*, MenuScreenCorrectorPtr> MenuScreenCorrectorsHash;
 
-static MenuScreenCorrectorsHash knownCorrectors;
-
-void installMenuMouseEventCorrector(QMenu* menu)
+MenuScreenCorrectorPtr installMenuMouseEventCorrector(QMenu* menu)
 {
-    if (knownCorrectors.contains(menu))
-        return;
+    static MenuScreenCorrectorsHash knownCorrectors;
+    const auto itCorrector = knownCorrectors.find(menu);
+    if (itCorrector != knownCorrectors.end())
+        return *itCorrector;
 
     const auto corrector = MenuScreenCorrectorPtr(new MenuScreenCorrector(menu));
     knownCorrectors.insert(menu, corrector);
@@ -168,6 +165,7 @@ void installMenuMouseEventCorrector(QMenu* menu)
         [menu]() { knownCorrectors.remove(menu); });
 
     menu->installEventFilter(corrector.data());
+    return corrector;
 }
 
 QWindow* getParentWindow(QWidget* widget)
@@ -246,7 +244,10 @@ public:
         const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);
         const auto widget = dynamic_cast<QWidget*>(watched);
         const auto parentWindow = getParentWindow(widget);
-        if (!dynamic_cast<ProxyContextMenuEvent*>(event) && parentWindow)
+        const auto nativeEvent = (event->spontaneous()
+            && !dynamic_cast<ProxyContextMenuEvent*>(event));
+
+        if (nativeEvent && parentWindow)
         {
             const auto targetPos = screenRelatedToGlobal(
                 contextMenuEvent->globalPos(), parentWindow->screen());
@@ -274,10 +275,7 @@ QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
 {
     if (isWindowsEnvironment)
     {
-        if (!knownCorrectors.contains(menu))
-            installMenuMouseEventCorrector(menu);
-
-        const auto corrector = knownCorrectors.value(menu);
+        const auto corrector = installMenuMouseEventCorrector(menu);
         corrector->setTargetPosition(globalPoint);
     }
 
