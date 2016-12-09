@@ -7,54 +7,41 @@
 
 #include "utils/common/settings.h"
 
-// Using Qt plugin names here.
-
 namespace nx {
 namespace db {
 
 namespace {
 
-//DB options
 const QLatin1String kDbDriverName("db/driverName");
-const QLatin1String kDefaultDbDriverName("QMYSQL");
 
 const QLatin1String kDbHostName("db/hostName");
-const QLatin1String kDefaultDbHostName("127.0.0.1");
 
 const QLatin1String kDbPort("db/port");
-const int kDefaultDbPort = 3306;
 
 const QLatin1String kDbName("db/name");
-const QLatin1String kDefaultDbName("nx_cloud");
 
 const QLatin1String kDbUserName("db/userName");
-const QLatin1String kDefaultDbUserName("root");
 
 const QLatin1String kDbPassword("db/password");
-const QLatin1String kDefaultDbPassword("");
 
 const QLatin1String kDbConnectOptions("db/connectOptions");
-const QLatin1String kDefaultDbConnectOptions("");
 
 const QLatin1String kDbEncoding("db/encoding");
-const QLatin1String kDefaultDbEncoding("utf8");
 
 const QLatin1String kDbMaxConnections("db/maxConnections");
-const QLatin1String kDefaultDbMaxConnections("1");
 
 const QLatin1String kDbInactivityTimeout("db/inactivityTimeout");
-const std::chrono::seconds kDefaultDbInactivityTimeout = std::chrono::minutes(10);
 
 const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
     "db/maxPeriodQueryWaitsForAvailableConnection");
-const std::chrono::seconds kDefaultDbMaxPeriodQueryWaitsForAvailableConnection =
-    std::chrono::minutes(1);
 
 } // namespace
 
 ConnectionOptions::ConnectionOptions():
-    driverType(RdbmsDriverType::sqlite),
-    port(0),
+    driverType(RdbmsDriverType::mysql),
+    hostName(lit("127.0.0.1")),
+    port(3306),
+    encoding(lit("utf8")),
     maxConnectionCount(1),
     inactivityTimeout(std::chrono::minutes(10)),
     maxPeriodQueryWaitsForAvailableConnection(std::chrono::minutes(1)),
@@ -66,32 +53,65 @@ void ConnectionOptions::loadFromSettings(QnSettings* const settings)
 {
     using namespace std::chrono;
 
-    driverType = QnLexical::deserialized<nx::db::RdbmsDriverType>(
-        settings->value(kDbDriverName, kDefaultDbDriverName).toString(),
-        nx::db::RdbmsDriverType::unknown);
+    if (settings->contains(kDbDriverName))
+    {
+        driverType = QnLexical::deserialized<nx::db::RdbmsDriverType>(
+            settings->value(kDbDriverName).toString(),
+            nx::db::RdbmsDriverType::unknown);
+    }
 
-    //< Ignoring error here since connection to DB will not be established anyway.
-    hostName = settings->value(kDbHostName, kDefaultDbHostName).toString();
-    port = settings->value(kDbPort, kDefaultDbPort).toInt();
-    dbName = settings->value(kDbName, kDefaultDbName).toString();
-    userName = settings->value(kDbUserName, kDefaultDbUserName).toString();
-    password = settings->value(kDbPassword, kDefaultDbPassword).toString();
-    connectOptions = settings->value(kDbConnectOptions, kDefaultDbConnectOptions).toString();
-    encoding = settings->value(kDbEncoding, kDefaultDbEncoding).toString();
+    if (settings->contains(kDbHostName))
+        hostName = settings->value(kDbHostName).toString();
+    if (settings->contains(kDbPort))
+        port = settings->value(kDbPort).toInt();
+    if (settings->contains(kDbName))
+        dbName = settings->value(kDbName).toString();
+    if (settings->contains(kDbUserName))
+        userName = settings->value(kDbUserName).toString();
+    if (settings->contains(kDbPassword))
+        password = settings->value(kDbPassword).toString();
+    if (settings->contains(kDbConnectOptions))
+        connectOptions = settings->value(kDbConnectOptions).toString();
+    if (settings->contains(kDbEncoding))
+        encoding = settings->value(kDbEncoding).toString();
 
-    maxConnectionCount = settings->value(kDbMaxConnections, kDefaultDbMaxConnections).toInt();
-    if (maxConnectionCount <= 0)
-        maxConnectionCount = std::thread::hardware_concurrency();
+    if (settings->contains(kDbMaxConnections))
+    {
+        maxConnectionCount = settings->value(kDbMaxConnections).toInt();
+        if (maxConnectionCount <= 0)
+            maxConnectionCount = std::thread::hardware_concurrency();
+    }
 
-    inactivityTimeout = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings->value(kDbInactivityTimeout).toString(),
-            kDefaultDbInactivityTimeout));
+    if (settings->contains(kDbInactivityTimeout))
+    {
+        inactivityTimeout = duration_cast<seconds>(
+            nx::utils::parseTimerDuration(
+                settings->value(kDbInactivityTimeout).toString()));
+    }
 
-    maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings->value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString(),
-            kDefaultDbMaxPeriodQueryWaitsForAvailableConnection));
+    if (settings->contains(kDbMaxPeriodQueryWaitsForAvailableConnection))
+    {
+        maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
+            nx::utils::parseTimerDuration(
+                settings->value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString()));
+    }
+}
+
+bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
+{
+    return 
+        driverType == rhs.driverType &&
+        hostName == rhs.hostName &&
+        port == rhs.port &&
+        dbName == rhs.dbName &&
+        userName == rhs.userName &&
+        password == rhs.password &&
+        connectOptions == rhs.connectOptions &&
+        encoding == rhs.encoding &&
+        maxConnectionCount == rhs.maxConnectionCount &&
+        inactivityTimeout == rhs.inactivityTimeout &&
+        maxPeriodQueryWaitsForAvailableConnection == rhs.maxPeriodQueryWaitsForAvailableConnection &&
+        maxErrorsInARowBeforeClosingConnection == rhs.maxErrorsInARowBeforeClosingConnection;
 }
 
 } // namespace db

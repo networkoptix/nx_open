@@ -7,7 +7,7 @@ namespace db {
 namespace test {
 
 QString TestWithDbHelper::sTemporaryDirectoryPath;
-nx::db::ConnectionOptions TestWithDbHelper::sDbConnectionOptions;
+boost::optional<nx::db::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
 
 TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
     m_tmpDir(tmpDir)
@@ -23,7 +23,8 @@ TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
 
     m_dbConnectionOptions.driverType = RdbmsDriverType::sqlite;
 
-    m_dbConnectionOptions = sDbConnectionOptions;
+    if (sDbConnectionOptions)
+        m_dbConnectionOptions = *sDbConnectionOptions;
     m_dbConnectionOptions.maxConnectionCount = 7; // TODO: #ak Make tunable
 
     if (m_dbConnectionOptions.dbName.isEmpty())

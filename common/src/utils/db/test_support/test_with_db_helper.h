@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QString>
 
 #include <utils/db/types.h>
@@ -30,7 +32,7 @@ private:
     nx::db::ConnectionOptions m_dbConnectionOptions;
 
     static QString sTemporaryDirectoryPath;
-    static nx::db::ConnectionOptions sDbConnectionOptions;
+    static boost::optional<nx::db::ConnectionOptions> sDbConnectionOptions;
 };
 
 } // namespace test

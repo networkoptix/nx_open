@@ -50,7 +50,6 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     addArg("-http/addrToListenList"); addArg("127.0.0.1:0");
     addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-db/driverName"); addArg("QSQLITE");
 
     registerCloudDataProvider(&m_cloudDataProvider);
 }

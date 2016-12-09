@@ -45,7 +45,7 @@ const std::unique_ptr<AsyncSqlQueryExecutor>& InstanceController::queryExecutor(
     return m_queryExecutor;
 }
 
-DBStructureUpdater& InstanceController::dbStructureUpdater()
+DbStructureUpdater& InstanceController::dbStructureUpdater()
 {
     return m_dbStructureUpdater;
 }

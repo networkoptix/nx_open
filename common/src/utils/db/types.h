@@ -64,6 +64,8 @@ public:
     ConnectionOptions();
 
     void loadFromSettings(QnSettings* const settings);
+
+    bool operator==(const ConnectionOptions&) const;
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::DBResult)
