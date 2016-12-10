@@ -59,8 +59,8 @@ mkdir -p $MNTDATAPART
 mount -t ext4 $DATAPART $MNTDATAPART
 cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
 rm -Rf $MNTDATAPART/opt/$CUSTOMIZATION
-cp -f xfv /etc/init.d/nx1* $MNTDATAPART/etc/init.d
-cp -f xfv /tmp/$DISTRIB.tar.gz $MNTDATAPART/root
+cp -f /etc/init.d/nx1* $MNTDATAPART/etc/init.d
+cp -f /tmp/$DISTRIB.tar.gz $MNTDATAPART/root
 mkdir -p $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
 cp -f /root/tools/nx/ecs_static.sqlite $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
 CONF_FILE="$MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf"
