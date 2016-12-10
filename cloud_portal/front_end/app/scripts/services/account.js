@@ -69,10 +69,11 @@ angular.module('cloudApp')
                         self.setEmail(result.data.email);
                         $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface
                     }
+                    return result;
                 });
             },
             logout:function(doNotRedirect){
-                cloudApi.logout().then(function(){
+                cloudApi.logout().finally(function(){
                     $rootScope.session.$reset(); // Clear session
                     if(!doNotRedirect) {
                         $location.path(Config.redirectUnauthorised);
@@ -93,6 +94,13 @@ angular.module('cloudApp')
                         self.redirectAuthorised();
                     });
                 });
+            },
+            checkUnauthorized:function(data){
+                if(data && data.data && data.data.resultCode == 'notAuthorized'){
+                    this.logout();
+                    return false;
+                }
+                return true;
             }
         }
 
