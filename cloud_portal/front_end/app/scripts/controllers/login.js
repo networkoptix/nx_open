@@ -21,7 +21,7 @@ angular.module('cloudApp')
 
         $scope.login = process.init(function() {
             return account.login($scope.auth.email, $scope.auth.password, $scope.auth.remember);
-        }).then(function(){
+        },{ignoreUnauthorized: true}).then(function(){
             if(dialogSettings.params.redirect){
                 $location.path(Config.redirectAuthorised);
             }

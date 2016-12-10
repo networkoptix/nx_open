@@ -71,15 +71,17 @@ angular.module('cloudApp')
                         );
 
                         function handleError(data){
-                            if(data.data.resultCode == 'notAuthorized'){
-                                account.logout();
-                                deferred.reject(data);
-                                return;
-                            }
                             self.processing = false;
                             self.finished = true;
                             self.error = true;
                             self.errorData = data;
+
+                            if(!settings.ignoreUnauthorized && data.data.resultCode == 'notAuthorized'){
+                                account.logout();
+                                deferred.reject(data);
+                                return;
+                            }
+
                             var formatted = formatError(data.data || data, errorCodes);
                             if(formatted !== false){
                                 self.errorMessage = formatted;
