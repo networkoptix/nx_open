@@ -61,7 +61,7 @@ var DownloadsConfig = {
                     src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-mediaserver-2.5.0.11500-x64-release.deb'
                 },
                 {
-                    name: 'x85 - Server',
+                    name: 'x86 - Server',
                     src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-mediaserver-2.5.0.11500-x86-release.deb'
                 },
                 {

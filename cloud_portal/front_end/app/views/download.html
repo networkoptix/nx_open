@@ -34,7 +34,7 @@
                     <div ng-if="platform.installers.length>1">
                         <p><b>Other packages:</b></p>
                         <div class="row">
-                            <div class="col-lg-2 col-sm-3" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
+                            <div class="col-sm-3" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.src}}">
                                         {{link.name}}
@@ -43,7 +43,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-2 col-sm-3" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
+                            <div class="col-sm-3" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.src}}">
                                         {{link.name}}
