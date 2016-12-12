@@ -29,7 +29,6 @@ public:
 
         Layout,
         SharedLayout,
-        VideoWallLayout,    /**< Layout, accessible through videowall. */
         Layouts,
         SharedLayouts,
 
