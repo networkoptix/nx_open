@@ -13,9 +13,6 @@
 namespace nx {
 namespace db {
 
-//-------------------------------------------------------------------------------------------------
-// DbRequestExecutionThread
-
 DbRequestExecutionThread::DbRequestExecutionThread(
     const ConnectionOptions& connectionOptions,
     QueryExecutorQueue* const queryExecutorQueue)
