@@ -53,7 +53,7 @@ public:
     void setContents(QnIoModuleOverlayContents* newContents);
 
     void setIOModule(const QnVirtualCameraResourcePtr& newModule);
-    void setPorts(QnIOPortDataList& newPorts);
+    void setPorts(const QnIOPortDataList& newPorts);
 
     void resetControls();
 
@@ -75,8 +75,11 @@ QnIoModuleOverlayWidgetPrivate
 QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget):
     base_type(widget),
     q_ptr(widget),
-    connectionOpened(false),
+    contents(nullptr),
+    module(nullptr),
+    monitor(nullptr),
     colors(),
+    connectionOpened(false),
     userInputEnabled(false),
     timer(new QTimer(this))
 {
@@ -117,7 +120,7 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
     if (!module)
     {
         monitor.reset();
-        setPorts(QnIOPortDataList());
+        setPorts({});
         q->setEnabled(false);
         return;
     }
@@ -140,7 +143,7 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
     timer->start();
 }
 
-void QnIoModuleOverlayWidgetPrivate::setPorts(QnIOPortDataList& newPorts)
+void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
 {
     ports = newPorts;
 
