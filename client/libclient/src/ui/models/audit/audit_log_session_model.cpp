@@ -23,14 +23,28 @@ QVariant QnAuditLogMasterModel::data(const QModelIndex &index, int role) const
         }
         case Qt::ForegroundRole:
         {
-            const QnAuditRecord* record = rawData(index.row());
-            if (record->eventType == Qn::AR_UnauthorizedLogin && column != SelectRowColumn && column != TimestampColumn)
-                return m_colors.unsucessLoginAction;
-            if (column == UserActivityColumn)
-                return m_colors.chartColor;
-            return QVariant();
+            switch (column)
+            {
+                case UserActivityColumn:
+                    return m_colors.chartColor;
 
+                case SelectRowColumn:
+                case TimestampColumn:
+                    break;
+
+                default:
+                {
+                    const auto record = rawData(index.row());
+                    if (record->eventType == Qn::AR_UnauthorizedLogin)
+                        return m_colors.unsucessLoginAction;
+
+                    break;
+                }
+            }
+
+            return QVariant();
         }
+
         default:
             return base_type::data(index, role);
     }

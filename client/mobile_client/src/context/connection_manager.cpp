@@ -91,9 +91,7 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
             d->wasConnected = true;
             d->updateConnectionState();
         });
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
-        d, &QnConnectionManagerPrivate::updateConnectionState);
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
+    connect(qnClientMessageProcessor->connectionStatus(), &QnClientConnectionStatus::stateChanged,
         d, &QnConnectionManagerPrivate::updateConnectionState);
 
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);

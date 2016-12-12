@@ -175,19 +175,19 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
     switch (index.column())
     {
         case BytesColumn:
-            if (footer.recordedBytes <= 0)
+            if (footer.maxValues.recordedBytes <= 0)
                 return 0.0;
             result = value.recordedBytes / (qreal) footer.maxValues.recordedBytes;
             break;
 
         case DurationColumn:
-            if (footer.archiveDurationSecs <= 0)
-                return 0.0;
+            if (footer.maxValues.archiveDurationSecs <= 0)
+                 return 0.0;
             result = value.archiveDurationSecs / (qreal) footer.maxValues.archiveDurationSecs;
             break;
 
         case BitrateColumn:
-            if (footer.averageBitrate > 0)
+            if (footer.maxValues.averageBitrate <= 0)
                 return 0.0;
             result = value.averageBitrate / (qreal) footer.maxValues.averageBitrate;
             break;

@@ -8,7 +8,8 @@ angular.module('webadminApp')
             templateUrl: 'views/components/passwordInput.html',
             require: "ngModel",
             scope:{
-                ngModel:'='
+                ngModel: '=',
+                autoFocus: '@'
             },
             link:function(scope, element, attrs, ngModel){
                 scope.Config = Config;

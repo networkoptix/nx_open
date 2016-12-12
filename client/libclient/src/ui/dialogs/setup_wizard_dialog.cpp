@@ -8,6 +8,8 @@
 
 namespace
 {
+    static const QSize kSetupWizardSize(520, 456);
+
     QUrl constructUrl(const QUrl &baseUrl)
     {
         QUrl url(baseUrl);
@@ -19,7 +21,7 @@ namespace
         return url;
     }
 
-}
+} // namespace
 
 QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
     : base_type(parent, Qt::MSWindowsFixedSizeDialogHint)
@@ -40,7 +42,7 @@ QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
     });
 #endif
     layout->addWidget(d->webView);
-    setFixedSize(500, 400);
+    setFixedSize(kSetupWizardSize);
 }
 
 QnSetupWizardDialog::~QnSetupWizardDialog()
