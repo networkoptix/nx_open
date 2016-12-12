@@ -24,13 +24,13 @@
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
-                                <div class="col-md-6">
+                                <div class="col-xs-6">
                                     <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-xs-6">
                                     <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Change port</button>
                                 </div>
                             </div>
@@ -52,16 +52,13 @@
                             <h3>Change admin password</h3>
                             <p>If the system is local (not connected to the cloud) this will change the password for user "admin" and the recovery password on some servers.<br>
                                 Otherwise this will change the recovery password only.</p>
-                            <div class="form-group" ng-class="{'has-error':!rootPasswordForm.password.$valid}">
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" id="password" placeholder="Password" name="password"
-                                           ng-model="settings.rootPassword" required>
-                                </div>
+                            <div class="col-sm-6">
+                                <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
+                            </div>
 
-                                <div class="col-md-6">
-                                    <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                            ng-click="changePassword()">Change password</button>
-                                </div>
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>

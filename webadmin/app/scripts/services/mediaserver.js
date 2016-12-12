@@ -208,8 +208,6 @@ angular.module('webadminApp')
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
-                        $localStorage.$reset();
-
 
                         $log.log("Login2: nonce is " + nonce);
                         $log.log("Login2: auth is " + auth);
@@ -224,7 +222,8 @@ angular.module('webadminApp')
                                 $log.log("Login3: cookieLogin failed: " + data.data.error);
                                 return $q.reject(data.data);
                             }
-
+                            
+                            $localStorage.$reset();
                             $localStorage.login = login;
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
