@@ -98,7 +98,8 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
     LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
+    LicenseTypeInfo(Qn::LC_Free,            "free",          1),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              1)
 };
 } // anonymous namespace
 
@@ -186,6 +187,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall");
     case Qn::LC_IO:             return tr("I/O Module");
     case Qn::LC_Start:          return tr("Start");
+    case Qn::LC_Free:           return tr("Free");
     case Qn::LC_Invalid:        return tr("Invalid");
     default:
         break;
@@ -208,6 +210,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall Licenses");
     case Qn::LC_IO:             return tr("I/O Module Licenses");
     case Qn::LC_Start:          return tr("Start Licenses");
+    case Qn::LC_Free:           return tr("Free license");
     case Qn::LC_Invalid:        return tr("Invalid Licenses");
     default:
         break;
