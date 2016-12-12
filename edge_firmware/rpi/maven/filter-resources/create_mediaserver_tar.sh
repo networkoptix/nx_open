@@ -261,7 +261,7 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
+    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.19/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
