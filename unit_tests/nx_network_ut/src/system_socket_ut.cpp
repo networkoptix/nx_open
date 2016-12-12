@@ -55,6 +55,37 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
+static void waitForKeepAliveDisconnect(AbstractStreamSocket* socket)
+{
+    Buffer buffer(1024, Qt::Uninitialized);
+    ASSERT_TRUE(socket->setKeepAlive(KeepAliveOptions(10, 5, 3)));
+
+    NX_LOG(lm("waitForKeepAliveDisconnect recv"), cl_logINFO);
+    EXPECT_LT(socket->recv(buffer.data(), buffer.size()), 0);
+    EXPECT_EQ(SystemError::connectionAbort, SystemError::getLastOSErrorCode());
+    NX_LOG(lm("waitForKeepAliveDisconnect end"), cl_logINFO);
+}
+
+TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
+{
+    const auto server = std::make_unique<TCPServerSocket>(AF_INET);
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+    ASSERT_TRUE(server->listen(testClientCount()));
+    NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
+
+    std::unique_ptr<AbstractStreamSocket> client(server->accept());
+    ASSERT_TRUE(client);
+    waitForKeepAliveDisconnect(client.get());
+}
+
+TEST(TcpSocket, DISABLED_KeepAliveOptionsClient)
+{
+    const auto client = std::make_unique<TCPSocket>(AF_INET);
+    ASSERT_TRUE(client->connect(SocketAddress("")));
+    waitForKeepAliveDisconnect(client.get());
+}
+
 TEST(TcpSocket, ErrorHandling)
 {
     nx::network::test::socketErrorHandling(
