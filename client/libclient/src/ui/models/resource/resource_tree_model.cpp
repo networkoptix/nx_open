@@ -931,6 +931,9 @@ void QnResourceTreeModel::rebuildTree()
     for (auto nodeType : rootNodeTypes())
     {
         auto node = m_rootNodes[nodeType];
+        if (!node)
+            continue;
+
         updateNodeParent(node);
         node->update();
     }
