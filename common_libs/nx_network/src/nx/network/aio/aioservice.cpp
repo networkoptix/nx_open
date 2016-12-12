@@ -34,7 +34,6 @@ AIOService::AIOService( unsigned int threadCount )
 {
     if( !threadCount )
         threadCount = QThread::idealThreadCount();
-    //threadCount = 1;
 
     initializeAioThreadPool(&m_systemSocketAIO, threadCount);
 }

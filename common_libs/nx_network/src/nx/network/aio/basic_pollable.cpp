@@ -13,10 +13,12 @@ namespace nx {
 namespace network {
 namespace aio {
 
-BasicPollable::BasicPollable(aio::AbstractAioThread* aioThread)
+BasicPollable::BasicPollable(aio::AbstractAioThread* aioThread):
+    m_pollable(-1, std::make_unique<CommonSocketImpl>()),
+    m_aioService(SocketGlobals::aioService())
 {
     if (aioThread)
-        m_timer.bindToAioThread(aioThread);
+        m_aioService.bindSocketToAioThread(&m_pollable, aioThread);
 }
 
 void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -24,54 +26,53 @@ void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler
     post(
         [this, completionHandler = std::move(completionHandler)]
         {
-            m_timer.pleaseStopSync();
-            stopWhileInAioThread();
+            pleaseStopSync();
             completionHandler();
         });
 }
 
 void BasicPollable::pleaseStopSync(bool checkForLocks)
 {
-    if (m_timer.isInSelfAioThread())
+    if (isInSelfAioThread())
     {
-        m_timer.pleaseStopSync();
+        m_aioService.cancelPostedCalls(&m_pollable, true);
         stopWhileInAioThread();
     }
     else
     {
-        NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
+        NX_ASSERT(!m_aioService.isInAnyAioThread());
         QnStoppableAsync::pleaseStopSync(checkForLocks);
     }
 }
 
 aio::AbstractAioThread* BasicPollable::getAioThread() const
 {
-    return m_timer.getAioThread();
+    return m_aioService.getSocketAioThread(&m_pollable);
 }
 
 void BasicPollable::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_timer.bindToAioThread(aioThread);
+    m_aioService.bindSocketToAioThread(&m_pollable, aioThread);
 }
 
 void BasicPollable::post(nx::utils::MoveOnlyFunc<void()> func)
 {
-    m_timer.post(std::move(func));
+    m_aioService.post(&m_pollable, std::move(func));
 }
 
 void BasicPollable::dispatch(nx::utils::MoveOnlyFunc<void()> func)
 {
-    m_timer.dispatch(std::move(func));
-}
-
-Timer* BasicPollable::timer()
-{
-    return &m_timer;
+    m_aioService.dispatch(&m_pollable, std::move(func));
 }
 
 bool BasicPollable::isInSelfAioThread() const
 {
-    return m_timer.isInSelfAioThread();
+    return getAioThread() == m_aioService.getCurrentAioThread();
+}
+
+Pollable& BasicPollable::pollable()
+{
+    return m_pollable;
 }
 
 } // namespace aio

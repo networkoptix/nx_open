@@ -7,26 +7,26 @@
 
 #include "abstract_pollable.h"
 
-#include "timer.h"
+#include "pollable.h"
 
 namespace nx {
 namespace network {
 namespace aio {
 
+class AIOService;
+
 /**
- * This class implements \a AbstractPollable and simplifies async operation cancellation 
- *     by introducing \a BasicPollable::stopWhileInAioThread method.
+ * This class implements AbstractPollable and simplifies async operation cancellation 
+ * by introducing BasicPollable::stopWhileInAioThread method.
  *
  * TODO #ak conflicts with Pollable. Introduce proper names for Pollable, AbstractPollable, BasicPollable.
  * Successor to this class MUST support safe object deletion while in object's aio thread.
- * \a QnStoppableAsync::pleaseStop and \a BasicPollable::stopWhileInAioThread 
- *     are not called in this case. 
- * So, it is recommended that
- * - \a BasicPollable::stopWhileInAioThread implementation can be safely called multiple times
- * - \a BasicPollable::stopWhileInAioThread call is added to the destructor
+ * QnStoppableAsync::pleaseStop and BasicPollable::stopWhileInAioThread are not called in this case.
+ * So, it is recommended that:
+ * - BasicPollable::stopWhileInAioThread implementation can be safely called multiple times
+ * - BasicPollable::stopWhileInAioThread call is added to the destructor
  */
-class NX_NETWORK_API BasicPollable
-:
+class NX_NETWORK_API BasicPollable:
     public AbstractPollable
 {
 public:
@@ -50,13 +50,14 @@ public:
     bool isInSelfAioThread() const;
 
 protected:
-    Timer* timer();
-
     /** Cancel your asynchronous operations here. */
     virtual void stopWhileInAioThread() = 0;
 
+    Pollable& pollable();
+
 private:
-    Timer m_timer;
+    mutable Pollable m_pollable;
+    AIOService& m_aioService;
 };
 
 } // namespace aio
