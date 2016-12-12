@@ -109,9 +109,9 @@ public:
 QnIoModuleFormOverlayContentsPrivate::QnIoModuleFormOverlayContentsPrivate(QnIoModuleFormOverlayContents* main):
     base_type(main),
     q_ptr(main),
+    controlsLayout(new QGraphicsGridLayout()),
     indicatorOnPixmap(qnSkin->pixmap("legacy/io_indicator_on.png")),
-    indicatorOffPixmap(qnSkin->pixmap("legacy/io_indicator_off.png")),
-    controlsLayout(new QGraphicsGridLayout())
+    indicatorOffPixmap(qnSkin->pixmap("legacy/io_indicator_off.png"))
 {
     enum
     {
