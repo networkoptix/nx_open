@@ -384,8 +384,10 @@ upgrade_sd() {
 
     FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11)
     if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
-    
-    LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+  
+# Uncomment to enable libc/libstdc++ upgrade.
+#    LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+    LIBC_NEW = "do not upgrade"
     if [ -z $LIBC_NEW ]; then
         DEBIAN_FRONTEND=noninteractive
         cp /etc/apt/sources.list /etc/apt/sources.list_bk

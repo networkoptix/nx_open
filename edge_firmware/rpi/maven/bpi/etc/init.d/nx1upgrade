@@ -37,7 +37,9 @@ export DEBIAN_FRONTEND=noninteractive
 LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1)
 if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
 
-LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+# Uncomment to enable libc/libstdc++ upgrade.
+#LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+LIBC_NEW = "do not upgrade"
 if [ -z $LIBC_NEW ]; then
   cp /etc/apt/sources.list /etc/apt/sources.list_bk
   echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
