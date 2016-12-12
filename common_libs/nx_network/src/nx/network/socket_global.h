@@ -54,7 +54,7 @@ public:
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
-    static OutgoingTunnelPool& outgoingTunnelPool() { return s_instance->m_outgoingTunnelPool; }
+    static OutgoingTunnelPool& outgoingTunnelPool() { return *s_instance->m_outgoingTunnelPool; }
     static CloudSettings& cloudConnectSettings() { return s_instance->m_cloudConnectSettings; }
     static TcpReversePool& tcpReversePool() { return *s_instance->m_tcpReversePool; }
 
@@ -109,18 +109,20 @@ private:
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;
 
     aio::AIOService m_aioService;
-    aio::Timer m_debugConfigurationTimer;
+    std::unique_ptr<aio::Timer> m_debugConfigurationTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
 
     std::unique_ptr<cloud::MediatorAddressPublisher> m_addressPublisher;
-    cloud::OutgoingTunnelPool m_outgoingTunnelPool;
+    std::unique_ptr<cloud::OutgoingTunnelPool> m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
     std::unique_ptr<cloud::tcp::ReverseConnectionPool> m_tcpReversePool;
 
     QnMutex m_mutex;
     std::map<CustomInit, CustomDeinit> m_customInits;
+
+    void initializeCloudConnectivity();
 };
 
 class SocketGlobalsHolder

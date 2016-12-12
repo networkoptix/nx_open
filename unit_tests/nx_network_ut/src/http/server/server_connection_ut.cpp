@@ -16,8 +16,8 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
-
 
 namespace nx_http {
 

@@ -11,6 +11,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
@@ -72,6 +73,7 @@ private:
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
     bool m_done;
     nx::hpm::api::ConnectionParameters m_connectionParameters;
+    std::unique_ptr<aio::Timer> m_timer;
 
     void issueConnectRequestToMediator(
         std::chrono::milliseconds timeout,

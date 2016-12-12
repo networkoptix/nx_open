@@ -1,6 +1,7 @@
 
 #include "socket_global.h"
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
 const std::chrono::seconds kReloadDebugConfigurationInterval(10);
@@ -49,11 +50,12 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        m_debugConfigurationTimer.pleaseStop(barrier.fork());
+        if (m_debugConfigurationTimer)
+            m_debugConfigurationTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
         m_mediatorConnector->pleaseStop(barrier.fork());
-        m_outgoingTunnelPool.pleaseStop(barrier.fork());
+        m_outgoingTunnelPool->pleaseStop(barrier.fork());
         m_tcpReversePool->pleaseStop(barrier.fork());
     }
 
@@ -74,14 +76,8 @@ void SocketGlobals::init()
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals;
-
-        s_instance->m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>();
-        s_instance->m_addressPublisher = std::make_unique<cloud::MediatorAddressPublisher>(
-            s_instance->m_mediatorConnector->systemConnection());
-        s_instance->m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
-            s_instance->m_mediatorConnector->clientConnection());
-        s_instance->m_addressResolver = std::make_unique<cloud::AddressResolver>(
-            s_instance->m_mediatorConnector->clientConnection());
+        
+        s_instance->initializeCloudConnectivity();
 
         s_initState = InitState::done;
 
@@ -135,13 +131,26 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer.start(
+    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
+    m_debugConfigurationTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
         {
             m_debugConfiguration.reload(utils::FlagConfig::OutputType::silent);
             setDebugConfigurationTimer();
         });
+}
+
+void SocketGlobals::initializeCloudConnectivity()
+{
+    m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>();
+    m_addressPublisher = std::make_unique<cloud::MediatorAddressPublisher>(
+        m_mediatorConnector->systemConnection());
+    m_outgoingTunnelPool = std::make_unique<cloud::OutgoingTunnelPool>();
+    m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
+        m_mediatorConnector->clientConnection());
+    m_addressResolver = std::make_unique<cloud::AddressResolver>(
+        m_mediatorConnector->clientConnection());
 }
 
 QnMutex SocketGlobals::s_mutex;
