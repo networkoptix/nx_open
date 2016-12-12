@@ -1113,7 +1113,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 
         if( info )
             m_keepAlive = std::move( *info );
-    #elif defined( Q_OS_LINUX )
+    #else
         int isEnabled = info ? 1 : 0;
         if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE,
                         &isEnabled, sizeof(isEnabled) ) != 0 )
@@ -1122,22 +1122,23 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
         if( !info )
             return true;
 
-        if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE,
-                        &info->timeSec, sizeof(info->timeSec) ) < 0 )
-            return false;
+        #if defined( Q_OS_LINUX )
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE,
+                            &info->timeSec, sizeof(info->timeSec) ) < 0 )
+                return false;
 
-        if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL,
-                        &info->intervalSec, sizeof(info->intervalSec) ) < 0 )
-            return false;
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL,
+                            &info->intervalSec, sizeof(info->intervalSec) ) < 0 )
+                return false;
 
-        if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT,
-                        &info->probeCount, sizeof(info->probeCount) ) < 0 )
-            return false;
-    #else
-        int isEnabled = info ? 1 : 0;
-        if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE,
-                        &isEnabled, sizeof(isEnabled)) != 0 )
-            return false;
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT,
+                            &info->probeCount, sizeof(info->probeCount) ) < 0 )
+                return false;
+        #elif defined( Q_OS_MACX )
+            if( setsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE,
+                            &info->timeSec, sizeof(info->timeSec) ) < 0 )
+                return false;
+        #endif
     #endif
 
     return true;
