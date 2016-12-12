@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import NetworkOptix.Qml 1.0;
 
 import ".."
 
@@ -10,6 +11,7 @@ Item
     property real expandedOpacity: 0;
     property alias factorySystem: expandedArea.factorySystem;
 
+    property string localId;
     property string selectedHost: hostChooseItem.value;
     property string selectedUser: (control.impl.hasRecentConnections ?
         userChooseItem.value : expandedArea.loginTextField.text);
@@ -157,6 +159,15 @@ Item
         nextTabObject: control.prevTabObject;
 
         onConnectButtonClicked: { control.connectRequested(); }
+        Connections
+        {
+            target: expandedArea.savePasswordCheckbox;
+            onCheckedChanged:
+            {
+                if (!expandedArea.savePasswordCheckbox.checked)
+                    context.forgetPassword(control.localId, control.selectedUser);
+            }
+        }
     }
 
     property QtObject impl: QtObject
