@@ -55,6 +55,14 @@ protected:
     {
     }
 
+    ~StunClientServerTest()
+    {
+        if (client)
+            client->pleaseStopSync();
+        if (server)
+            server->pleaseStop();
+    }
+
     SystemError::ErrorCode sendTestRequestSync()
     {
         Message request(Header(MessageClass::request, MethodType::bindingMethod));
@@ -232,6 +240,12 @@ TEST_F(StunClientServerTest, AsyncClientUser)
 class StunClient:
     public StunClientServerTest
 {
+public:
+    ~StunClient()
+    {
+        m_stunClient.pleaseStopSync();
+    }
+
 protected:
     void givenClientConnectedToServer()
     {

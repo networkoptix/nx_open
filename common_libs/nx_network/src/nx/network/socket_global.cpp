@@ -54,13 +54,18 @@ SocketGlobals::~SocketGlobals()
             m_debugConfigurationTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
-        m_mediatorConnector->pleaseStop(barrier.fork());
+        //m_mediatorConnector->pleaseStop(barrier.fork());
         m_outgoingTunnelPool->pleaseStop(barrier.fork());
         m_tcpReversePool->pleaseStop(barrier.fork());
     }
 
     promise.get_future().wait();
-    m_mediatorConnector.reset();
+    //m_mediatorConnector.reset();
+    //auto mediatorConnectorGuard = makeScopedGuard(
+    //    [this]()
+    //    {
+    //        m_mediatorConnector->pleaseStopSync(false);
+    //    });
 
     for (const auto& init: m_customInits)
     {

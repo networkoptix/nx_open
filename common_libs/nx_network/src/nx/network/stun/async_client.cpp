@@ -13,28 +13,25 @@ AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_useSsl(false),
     m_state(State::disconnected),
-    m_timer(m_settings.reconnectPolicy)
+    m_timer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
+    bindToAioThread(getAioThread());
 }
 
 AsyncClient::~AsyncClient()
 {
-    std::unique_ptr< AbstractStreamSocket > connectingSocket;
-    std::unique_ptr< BaseConnectionType > baseConnection;
-    {
-        QnMutexLocker lock( &m_mutex );
-        connectingSocket = std::move( m_connectingSocket );
-		baseConnection = std::move( m_baseConnection );
-        m_state = State::terminated;
-    }
+    stopWhileInAioThread();
+}
 
-    if (baseConnection)
-        baseConnection->pleaseStopSync(false);
+void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
+{
+    network::aio::BasicPollable::bindToAioThread(aioThread);
 
-    if( connectingSocket )
-        connectingSocket->pleaseStopSync(false);
-
-    m_timer.pleaseStopSync(false);
+    m_timer->bindToAioThread(aioThread);
+    if (m_baseConnection)
+        m_baseConnection->bindToAioThread(aioThread);
+    if (m_connectingSocket)
+        m_connectingSocket->bindToAioThread(aioThread);
 }
 
 void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
@@ -123,7 +120,7 @@ void removeByClient(Container* container, void* client)
 void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler)
 {
     NX_ASSERT(client);
-    m_timer.dispatch(
+    m_timer->dispatch(
         [this, client, handler = std::move(handler)]()
         {
             QnMutexLocker lock(&m_mutex);
@@ -186,7 +183,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     if( !m_endpoint )
     {
         lock->unlock();
-        m_timer.post(std::bind(
+        m_timer->post(std::bind(
             &AsyncClient::onConnectionComplete, this, SystemError::notConnected));
         return;
     }
@@ -198,7 +195,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             m_connectingSocket = 
                 SocketFactory::createStreamSocket(
                     m_useSsl, nx::network::NatTraversalSupport::disabled );
-            m_connectingSocket->bindToAioThread(m_timer.getAioThread());
+            m_connectingSocket->bindToAioThread(getAioThread());
 
             auto onComplete = [ this ]( SystemError::ErrorCode code )
                 { onConnectionComplete( code ); };
@@ -254,7 +251,7 @@ void AsyncClient::closeConnectionImpl(
 
     if (m_state != State::terminated)
     {
-        m_timer.scheduleNextTry(
+        m_timer->scheduleNextTry(
             [this]
             {
                 NX_LOGX(lm("Try to restore mediator connection..."), cl_logDEBUG1);
@@ -317,12 +314,13 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
-    m_timer.reset();
+    m_timer->reset();
     NX_ASSERT(!m_baseConnection);
     NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logDEBUG1);
 
-    m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
-    m_baseConnection->setMessageHandler( 
+    m_baseConnection = std::make_unique<BaseConnectionType>(this, std::move(m_connectingSocket));
+    m_baseConnection->bindToAioThread(getAioThread());
+    m_baseConnection->setMessageHandler(
         [ this ]( Message message ){ processMessage( std::move(message) ); } );
 
     m_baseConnection->startReadingConnection();
@@ -394,6 +392,13 @@ void AsyncClient::processMessage(Message message)
                      cl_logERROR );
             return;
     }
+}
+
+void AsyncClient::stopWhileInAioThread()
+{
+    m_timer.reset();
+    m_baseConnection.reset();
+    m_connectingSocket.reset();
 }
 
 } // namespase stun
