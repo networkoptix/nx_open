@@ -559,8 +559,15 @@ bool UdtStreamSocket::connect(
     if (remoteAddress.address.isIpAddress())
         return connectToIp(remoteAddress, timeoutMs);
 
-    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
-        remoteAddress.address.toString(), AF_INET);
+    std::deque<HostAddress> ips;
+    const SystemError::ErrorCode resultCode =
+        SocketGlobals::addressResolver().dnsResolver().resolveSync(
+            remoteAddress.address.toString(), AF_INET, &ips);
+    if (resultCode != SystemError::noError)
+    {
+        SystemError::setLastErrorCode(resultCode);
+        return false;
+    }
 
     while (!ips.empty())
     {

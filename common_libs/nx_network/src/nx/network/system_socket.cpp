@@ -615,13 +615,20 @@ bool CommunicatingSocket<InterfaceToImplement>::connect(
     if (remoteAddress.address.isIpAddress())
         return connectToIp(remoteAddress, timeoutMs);
 
-    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
-        remoteAddress.address.toString(), this->m_ipVersion);
-
-    while (!ips.empty())
+    std::deque<HostAddress> resolvedAddresses;
+    const SystemError::ErrorCode resultCode = 
+        SocketGlobals::addressResolver().dnsResolver().resolveSync(
+            remoteAddress.address.toString(), this->m_ipVersion, &resolvedAddresses);
+    if (resultCode != SystemError::noError)
     {
-        auto ip = std::move(ips.front());
-        ips.pop_front();
+        SystemError::setLastErrorCode(resultCode);
+        return false;
+    }
+
+    while (!resolvedAddresses.empty())
+    {
+        auto ip = std::move(resolvedAddresses.front());
+        resolvedAddresses.pop_front();
         if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
             return true;
     }
@@ -1584,13 +1591,20 @@ bool UDPSocket::setDestAddr( const SocketAddress& endpoint )
     }
     else
     {
-        const auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
-            endpoint.address.toString(), m_ipVersion);
+        std::deque<HostAddress> resolvedAddresses;
+        const SystemError::ErrorCode resultCode = 
+            SocketGlobals::addressResolver().dnsResolver().resolveSync(
+                endpoint.address.toString(), m_ipVersion, &resolvedAddresses);
+        if (resultCode != SystemError::noError)
+        {
+            SystemError::setLastErrorCode(resultCode);
+            return false;
+        }
 
         // TODO: Here we select first address with hope it is correct one. This will never work
         // for NAT64, so we have to fix it somehow.
-        if (!ips.empty())
-            m_destAddr = SystemSocketAddress(SocketAddress(ips.front(), endpoint.port), m_ipVersion);
+        m_destAddr = SystemSocketAddress(
+            SocketAddress(resolvedAddresses.front(), endpoint.port), m_ipVersion);
     }
 
     return (bool) m_destAddr.ptr;
