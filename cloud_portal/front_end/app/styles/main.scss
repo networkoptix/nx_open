@@ -600,6 +600,7 @@ h1.process-success{
     .installer-name{
         margin-left:42px;
         display:block;
+        font-weight: normal;
     }
 }
 h2.version-number{
@@ -624,5 +625,17 @@ h2.version-number{
         position:absolute;
         color:$light8;
         right:17px;
+    }
+}
+
+
+@media (min-width: $screen-md-min) {
+    .flex-md{
+        display:flex;
+        align-items:stretch;
+    }
+
+    .border-left-md{
+      border-left:1px solid $common-border-color;
     }
 }

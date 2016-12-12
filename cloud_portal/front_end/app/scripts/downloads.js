@@ -22,28 +22,28 @@ var DownloadsConfig = {
 
             installers:[
                 {
-                    name: 'Windows x64 - Client & Server',
-                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x64.exe'
+                    name: 'Windows x64 - Client only',
+                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x64-client-only.msi'
                 },
                 {
-                    name: 'x64 - Client only',
-                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x64-client-only.msi'
+                    name: 'x64 - Client & Server',
+                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x64.exe'
                 },
                 {
                     name: 'x64 - Server only',
                     src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x64-server-only.msi'
                 },
                 {
-                    name: 'x86 - Client only',
-                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86-client-only.msi'
+                    name: 'x86 - Client & Server',
+                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86.exe'
                 },
                 {
                     name: 'x86 - Server only',
                     src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86-server-only.msi'
                 },
                 {
-                    name: 'x86 - Client & Server',
-                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86.exe'
+                    name: 'x86 - Client only',
+                    src: 'http://updates.networkoptix.com/default/11500/windows/networkoptix-nxwitness-2.5.0.11500-x86-client-only.msi'
                 }
             ]
         },
@@ -61,7 +61,7 @@ var DownloadsConfig = {
                     src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-mediaserver-2.5.0.11500-x64-release.deb'
                 },
                 {
-                    name: 'x85 - Server',
+                    name: 'x86 - Server',
                     src: 'http://updates.networkoptix.com/default/11500/linux/nxwitness-mediaserver-2.5.0.11500-x86-release.deb'
                 },
                 {

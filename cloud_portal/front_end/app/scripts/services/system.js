@@ -74,6 +74,10 @@ angular.module('cloudApp')
                     return $q.reject(error);
                 }
 
+                if(!result.data.length){
+                    return $q.reject({data:{resultCode: 'forbidden'}});
+                }
+
                 if(self.info){
                     $.extend(true, self.info, result.data[0]); // Update
                 }else{

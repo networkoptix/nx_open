@@ -56,18 +56,16 @@ def get_custom_config(customization):
 
 
 def read_template(name, location):
-    if location not in templates_cache:
-        filename = os.path.join(location, name + '.mustache')
-
+    filename = os.path.join(location, name + '.mustache')
+    if filename not in templates_cache:
         # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
         with codecs.open(filename, 'r', 'utf-8') as stream:
-            templates_cache[location] = stream.read()
+            templates_cache[filename] = stream.read()
+    return templates_cache[filename]
 
-    return templates_cache[location]
 
-
-def read_logo(location):
+def read_logo(filename):
     if location not in logos_cache:
-        with open(location, 'rb') as fp:
-            logos_cache[location] = fp.read()
-    return logos_cache[location]
+        with open(filename, 'rb') as fp:
+            logos_cache[filename] = fp.read()
+    return logos_cache[filename]

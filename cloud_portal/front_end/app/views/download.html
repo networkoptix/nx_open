@@ -1,5 +1,6 @@
 <h1>Download</h1>
 
+<div class="col-md-8">
 <uib-tabset>
     <uib-tab ng-repeat="platform in downloads.platforms"
              active="platform.active"
@@ -8,8 +9,8 @@
             <span class="tab-heading-hack">{{platform.name}}</span>
         </uib-tab-heading>
         <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="col-md-3  col-md-push-9 border-left">
+            <div class="panel-body flex-md">
+                <div class="col-md-4  col-md-push-8 border-left-md">
                     <p>
                         <b>Latest version</b>
                         <h2 class="version-number"><b>{{downloads.version}}</b></h2>
@@ -20,21 +21,22 @@
                     </p>
                 </div>
 
-                <div class="col-md-9 col-md-pull-3 ">
+                <div class="col-md-8 col-md-pull-4 ">
                     <div class="row">
-                        <a ng-href="{{platform.installers[0].src}}" class="btn btn-lg btn-default download-button">
-                            <span class="download-link pull-left"></span>
-                            <h2><b>Download VMS_NAME</b></h2>
-                            <span class="installer-name">{{platform.installers[0].name}}</span>
-                        </a>
-
-                        <p class="small" ng-if="platform.description" ng-bind-html="platform.description"></p>
+                        <div class="col-md-12">
+                            <a ng-href="{{platform.installers[0].src}}" class="btn btn-lg btn-default download-button">
+                                <span class="download-link pull-left"></span>
+                                <h2><b>Download VMS_NAME</b></h2>
+                                <span class="installer-name">{{platform.installers[0].name}}</span>
+                            </a>
+                            <p class="small" ng-if="platform.description" ng-bind-html="platform.description"></p>
+                        </div>
                     </div>
 
                     <div ng-if="platform.installers.length>1">
-                        <p><b>Other packages:</b></p>
+                        <h5><b>Other packages:</b></h5>
                         <div class="row">
-                            <div class="col-lg-2 col-sm-3" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
+                            <div class="col-sm-4 col-md-6 col-lg-4" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.src}}">
                                         {{link.name}}
@@ -43,7 +45,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-2 col-sm-3" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
+                            <div class="col-sm-4 col-md-6  col-lg-4" ng-repeat="link in platform.installers" ng-if="$index >= (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.src}}">
                                         {{link.name}}
@@ -58,9 +60,10 @@
     </uib-tab>
 </uib-tabset>
 
-
 <a ng-repeat="platform in downloads.mobile"
    class="mobile-link"
    ng-class="platform.os"
    ng-href="{{platform.src}}">
 </a>
+</div>
+
