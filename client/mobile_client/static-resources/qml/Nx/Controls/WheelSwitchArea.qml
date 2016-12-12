@@ -30,8 +30,8 @@ MouseArea
             {
                 --__currentRequests
                 previousRequested()
-                timer.start()
             }
+            timer.restart()
         }
         else
         {
@@ -46,10 +46,10 @@ MouseArea
 
             if (__currentRequests < maxConsequentRequests)
             {
-                timer.start()
                 ++__currentRequests
                 nextRequested()
             }
+            timer.restart()
         }
     }
 

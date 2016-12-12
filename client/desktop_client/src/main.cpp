@@ -27,6 +27,7 @@
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -78,13 +79,24 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
     if (startupParams.customUri.isValid())
     {
+        QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(application));
+        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
+            [manager](QNetworkReply* reply)
+            {
+                qDebug() << lit("Cloud Reply received: %1").arg(QLatin1String(reply->readAll()));
+                reply->deleteLater();
+                manager->deleteLater();
+            });
+
         QUrl url(QnAppInfo::defaultCloudPortalUrl());
         url.setPath(lit("/api/utils/visitedKey"));
+        qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
 
         QJsonObject data{{lit("key"), startupParams.customUri.authenticator().encode()}};
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
 
-        QNetworkAccessManager manager;
-        manager.post(QNetworkRequest(url), QJsonDocument(data).toJson(QJsonDocument::Compact));
+        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
     }
 
 
