@@ -25,7 +25,7 @@ public:
         using namespace std::placeholders;
 
         m_dnsResolver.registerResolver(
-            makeCustomResolver(std::bind(&DnsResolver::testResolve, this, _1, _2)),
+            makeCustomResolver(std::bind(&DnsResolver::testResolve, this, _1, _2, _3)),
             m_dnsResolver.maxRegisteredResolverPriority() + 1);
     }
 
@@ -79,7 +79,10 @@ private:
     std::list<nx::utils::test::ScopedTimeShift> m_shiftedTime;
     std::list<QString> m_pipelinedRequests;
 
-    std::deque<HostAddress> testResolve(const QString& hostName, int /*ipVersion*/)
+    SystemError::ErrorCode testResolve(
+        const QString& hostName,
+        int /*ipVersion*/,
+        std::deque<HostAddress>* resolvedAddress)
     {
         using namespace nx::utils::test;
 
@@ -94,7 +97,8 @@ private:
         if (!m_pipelinedRequests.empty())
             startNextPipelinedTask();
 
-        return std::deque<HostAddress>( {HostAddress::localhost} );
+        resolvedAddress->push_back({HostAddress::localhost});
+        return SystemError::noError;
     }
 
     void startNextPipelinedTask()

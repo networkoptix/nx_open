@@ -14,7 +14,10 @@ class NX_NETWORK_API PredefinedHostResolver:
     public AbstractResolver
 {
 public:
-    virtual std::deque<HostAddress> resolve(const QString& name, int ipVersion = 0) override;
+    virtual SystemError::ErrorCode resolve(
+        const QString& name,
+        int ipVersion,
+        std::deque<HostAddress>* resolvedAddresses) override;
 
     void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
     void removeEtcHost(const QString& name);

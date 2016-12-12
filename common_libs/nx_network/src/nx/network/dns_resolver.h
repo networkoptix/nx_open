@@ -42,7 +42,10 @@ public:
      * @note It is garanteed that reqID is set before completionHandler is called.
      */
     void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
-    std::deque<HostAddress> resolveSync(const QString& hostName, int ipVersion);
+    SystemError::ErrorCode resolveSync(
+        const QString& hostName,
+        int ipVersion,
+        std::deque<HostAddress>* resolvedAddresses);
 
     /**
      * @param waitForRunningHandlerCompletion if true, this method blocks until 
