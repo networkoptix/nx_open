@@ -34,8 +34,8 @@ public:
     QnVirtualCameraResourcePtr module;
     QnIOModuleMonitorPtr monitor;
     QnIoModuleColors colors;
-    bool connectionOpened;
-    bool userInputEnabled;
+    bool connectionOpened = false;
+    bool userInputEnabled = false;
 
     struct StateData
     {
@@ -46,7 +46,7 @@ public:
 
     QnIOPortDataList ports;
     QMap<QString, StateData> states;
-    QTimer* timer;
+    QTimer* const timer;
 
     QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
 
@@ -75,12 +75,6 @@ QnIoModuleOverlayWidgetPrivate
 QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget):
     base_type(widget),
     q_ptr(widget),
-    contents(nullptr),
-    module(nullptr),
-    monitor(nullptr),
-    colors(),
-    connectionOpened(false),
-    userInputEnabled(false),
     timer(new QTimer(this))
 {
     widget->setAutoFillBackground(true);
