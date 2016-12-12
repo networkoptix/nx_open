@@ -175,7 +175,6 @@ TEST_F(AddressResolver, HostNameResolve3)
         const auto resultCode = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET, &ips);
         ASSERT_EQ(SystemError::hostNotFound, resultCode);
         ASSERT_EQ(0, ips.size());
-        ASSERT_EQ(SystemError::hostNotFound, SystemError::getLastOSErrorCode());
     }
 
     {
