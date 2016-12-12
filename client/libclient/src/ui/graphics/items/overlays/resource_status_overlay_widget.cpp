@@ -97,7 +97,6 @@ void setupCaptionLabel(QLabel* label, bool isErrorStyle)
     label->setMinimumHeight(qMax(120, label->heightForWidth(label->width())));
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     label->setWordWrap(true);
-    label->setVisible(false);
 
     const auto color = isErrorStyle
         ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
@@ -207,7 +206,6 @@ void QnStatusOverlayWidget::setCaption(const QString& caption)
 void QnStatusOverlayWidget::setButtonText(const QString& text)
 {
     m_button->setText(text);
-    m_button->adjustSize();
     updateAreasSizes();
 }
 
@@ -234,7 +232,9 @@ void QnStatusOverlayWidget::setupPreloader()
 void QnStatusOverlayWidget::setupCentralControls()
 {
     m_centralAreaImage->setVisible(false);
+
     setupCaptionLabel(m_caption, m_errorStyle);
+    m_caption->setVisible(false);
 
     const auto container = new QWidget();
     setPaletteColor(container, QPalette::Window, Qt::transparent);
@@ -268,7 +268,17 @@ void QnStatusOverlayWidget::setupExtrasControls()
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
     layout->setContentsMargins(16, 0, 16, 16);
 
-    const auto buttonProxy = makeMaskedProxy(m_button, m_extrasHolder, false);
+    const auto buttonContainter = new QWidget();
+    buttonContainter->setAttribute(Qt::WA_TranslucentBackground, true);
+    buttonContainter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    const auto buttonLayout = new QHBoxLayout(buttonContainter);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(m_button);
+    buttonLayout->addStretch();
+
+    const auto buttonProxy = makeMaskedProxy(buttonContainter, m_extrasHolder, false);
     layout->addItem(buttonProxy);
     layout->setAlignment(buttonProxy, Qt::AlignHCenter);
 
