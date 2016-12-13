@@ -137,7 +137,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
             return MediaServerEmulator::ActionToTake::proceedWithConnection;
         });
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen().first);
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(

@@ -119,6 +119,7 @@ namespace attrs
         tcpReverseHttpReadTimeout,
         tcpReverseHttpMsgBodyTimeout,
         tunnelInactivityTimeout,
+        tcpConnectionKeepAlive,
 
         systemErrorCode = stun::attrs::userDefined + 0x500,
     };
@@ -127,9 +128,9 @@ namespace attrs
 
 
     /** Base class for string attributes */
-    struct NX_NETWORK_API StringAttribute : stun::attrs::Unknown
+    struct NX_NETWORK_API BaseStringAttribute : stun::attrs::Unknown
     {
-        StringAttribute( int userType, const String& value = String() );
+        BaseStringAttribute( int userType, const String& value = String() );
     };
 
     struct NX_NETWORK_API ResultCode: stun::attrs::IntAttribute
@@ -146,40 +147,47 @@ namespace attrs
         }
     };
 
-    struct NX_NETWORK_API SystemId : StringAttribute
+    template<AttributeType attributeType>
+    struct StringAttribute: BaseStringAttribute
+    {
+          static const AttributeType TYPE = attributeType;
+          StringAttribute( const String& value ) : BaseStringAttribute( TYPE, value ) {}
+    };
+
+    struct NX_NETWORK_API SystemId : BaseStringAttribute
     {
         static const AttributeType TYPE = systemId;
-        SystemId( const String& value ) : StringAttribute( TYPE, value ) {}
+        SystemId( const String& value ) : BaseStringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API ServerId : StringAttribute
+    struct NX_NETWORK_API ServerId : BaseStringAttribute
     {
         static const AttributeType TYPE = serverId;
-        ServerId( const String& value ) : StringAttribute( TYPE, value ) {}
+        ServerId( const String& value ) : BaseStringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API PeerId : StringAttribute
+    struct NX_NETWORK_API PeerId : BaseStringAttribute
     {
         static const AttributeType TYPE = peerId;
-        PeerId( const String& value ) : StringAttribute( TYPE, value ) {}
+        PeerId( const String& value ) : BaseStringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API ConnectionId : StringAttribute
+    struct NX_NETWORK_API ConnectionId : BaseStringAttribute
     {
         static const AttributeType TYPE = connectionId;
-        ConnectionId( const String& value ) : StringAttribute( TYPE, value ) {}
+        ConnectionId( const String& value ) : BaseStringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API HostName : StringAttribute
+    struct NX_NETWORK_API HostName : BaseStringAttribute
     {
         static const AttributeType TYPE = hostName;
-        HostName( const String& value ) : StringAttribute( TYPE, value ) {}
+        HostName( const String& value ) : BaseStringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API ConnectionMethods: StringAttribute
+    struct NX_NETWORK_API ConnectionMethods: BaseStringAttribute
     {
         static const AttributeType TYPE = connectionMethods;
-        ConnectionMethods(const String& value): StringAttribute(TYPE, value) {}
+        ConnectionMethods(const String& value): BaseStringAttribute(TYPE, value) {}
     };
 
     struct NX_NETWORK_API UdpHolePunchingResultCodeAttr: stun::attrs::IntAttribute
@@ -199,7 +207,7 @@ namespace attrs
 
 
     /** Base class for endpoint attributes */
-    struct NX_NETWORK_API EndpointList : StringAttribute
+    struct NX_NETWORK_API EndpointList : BaseStringAttribute
     {
         EndpointList( int type, const std::list< SocketAddress >& endpoints );
         std::list< SocketAddress > get() const;
@@ -234,7 +242,7 @@ namespace attrs
     };
 
     /** Base class for string list based attributes */
-    struct NX_NETWORK_API StringList : StringAttribute
+    struct NX_NETWORK_API StringList : BaseStringAttribute
     {
         StringList( int type, const std::vector< String >& strings );
         std::vector< String > get() const;

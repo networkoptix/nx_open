@@ -42,6 +42,11 @@ void AsyncClientUser::setOnReconnectedHandler(
         m_asyncGuard.sharedGuard().get());
 }
 
+void AsyncClientUser::setKeepAliveOptions(KeepAliveOptions options)
+{
+    m_client->setKeepAliveOptions(std::move(options));
+}
+
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     disconnectFromClient();

@@ -30,6 +30,7 @@ public:
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));
+    MOCK_METHOD1(setKeepAliveOptions, void(KeepAliveOptions));
 
     void sendRequest(Message request, RequestHandler handler, void*) override
     {

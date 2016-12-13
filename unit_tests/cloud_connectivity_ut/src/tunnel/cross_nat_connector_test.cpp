@@ -102,7 +102,7 @@ void TunnelConnector::cancellationTest()
     const auto system = mediator().addRandomSystem();
     const auto server = mediator().addRandomServer(system);
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen().first);
 
     const auto t1 = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - t1 < totalTestTime)
@@ -139,7 +139,7 @@ void TunnelConnector::doSimpleConnectTest(
             return actionOnConnectAckResponse;
         });
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen().first);
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(

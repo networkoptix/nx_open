@@ -59,7 +59,7 @@ public:
     SocketAddress endpoint() const;
 
     nx::hpm::api::ResultCode bind();
-    nx::hpm::api::ResultCode listen() const;
+    std::pair<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse> listen() const;
 
     /** Address of connection to mediator */
     SocketAddress mediatorConnectionLocalAddress() const;

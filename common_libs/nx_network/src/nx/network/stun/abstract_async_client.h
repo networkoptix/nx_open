@@ -89,6 +89,9 @@ public:
     /** Cancels all handlers, passed with @param client */
     virtual void cancelHandlers(
         void* client, utils::MoveOnlyFunc<void()> handler) = 0;
+
+    /** Configures connection keep alive options */
+    virtual void setKeepAliveOptions(KeepAliveOptions options) = 0;
 };
 
 } // namespase stun
