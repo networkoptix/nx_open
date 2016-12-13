@@ -11,7 +11,7 @@
 # NetworkOptix Lite Client
 
 RETVAL=0
-
+VTCONSOLE=$(fgconsole)
 SERVICE_NAME=lite-client
 CUSTOMIZATION=${deb.customization.company.name}
 PREFIX=/opt/$CUSTOMIZATION/lite_client/
@@ -56,6 +56,10 @@ start() {
        echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
        return 0
     fi
+    # changing active tty to 7 (should be always free)
+    if [ '$VTCONSOLE' != '7' ]; then chvt 7; fi
+    #disable console blinking
+    echo 0 > /sys/class/graphics/fbcon/cursor_blink
 
     # TODO: #boris: Properly wait for Mediaserver to be ready.
     echo "Sleeping for 20 seconds..."
@@ -96,6 +100,8 @@ stop() {
             /usr/bin/killall -9 $BIN_NAME 1>/dev/null 2>&1
         fi
     done
+    # changing active tty back to 1
+    if [ '$VTCONSOLE' != '1' ]; then chvt 1; fi    
     echo "OK"
 }
 
