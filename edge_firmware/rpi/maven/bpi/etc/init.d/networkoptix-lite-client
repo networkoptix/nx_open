@@ -41,7 +41,7 @@ process_core_dump() {
     if [ $? -eq 0 ]; then
         REPORT=${BIN_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
 
-        echo Generate crash report $REPORT...        BACKGROUND
+        echo "Generate crash report (in background) $REPORT..."
         echo "t apply all bt 25" | gdb $BIN_PATH $CORE 2&>1 >/tmp/$REPORT && \
             mv /tmp/$REPORT ~/$REPORT &
 
@@ -58,26 +58,27 @@ start() {
     fi
     # changing active tty to 7 (should be always free)
     if [ '$VTCONSOLE' != '7' ]; then chvt 7; fi
-    #disable console blinking
-    echo 0 > /sys/class/graphics/fbcon/cursor_blink
+
+    # Disable console cursor blinking.
+    echo "0" >/sys/class/graphics/fbcon/cursor_blink
 
     # TODO: #boris: Properly wait for Mediaserver to be ready.
     echo "Sleeping for 20 seconds..."
     sleep 20
 
-    echo -n "Starting $BIN_NAME..... "
+    echo -n "Starting $BIN_NAME via /api/startLiteClient: "
     # TODO: #boris: Decide whether to use curl here after fixing its crash.
     #curl http://127.0.0.1:$PORT/api/startLiteClient
-    wget http://127.0.0.1:$PORT/api/startLiteClient
+    wget -O /dev/null http://127.0.0.1:$PORT/api/startLiteClient
 
     # TODO: #boris: Properly wait for Lite Client to start.
-    echo "Sleeping for 10 seconds..."
+    echo -n "(sleeping for 10 seconds...) "
     sleep 10
 
     if [ `/bin/pidof $BIN_NAME` ]; then
         echo "OK"
     else
-        echo "FAILURE"
+        echo "FAILED"
     fi
 }
 
@@ -88,21 +89,21 @@ startquiet() {
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
 stop() {
-    echo -n "Stopping $BIN_NAME..... "
-    killall $1 $BIN_NAME 1>/dev/null 2>&1
+    echo -n "Stopping $BIN_NAME... "
+    killall $1 $BIN_NAME >/dev/null 2>&1
     local i=0
     while [ "`/bin/pidof $BIN_NAME`" ]
     do
         /bin/sleep 1
         let i++
         if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
-            echo -n "sending 9 signal...    "
-            /usr/bin/killall -9 $BIN_NAME 1>/dev/null 2>&1
+            echo -n "Sending 9 signal... "
+            /usr/bin/killall -9 $BIN_NAME >/dev/null 2>&1
         fi
     done
     # changing active tty back to 1
     if [ '$VTCONSOLE' != '1' ]; then chvt 1; fi    
-    echo "OK"
+    echo "DONE"
 }
 
 start_watchdog() {
@@ -111,7 +112,7 @@ start_watchdog() {
         echo "$CUSTOMIZATION-lite-client watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
-    bash -c "/etc/init.d/$CUSTOMIZATION-lite-client run_watchdog" 2>/dev/null 1>&2&
+    bash -c "/etc/init.d/$CUSTOMIZATION-lite-client run_watchdog" >/dev/null 2>&1 &
     echo "$SERVICE_NAME watchdog has been started"
 }
 
@@ -122,7 +123,7 @@ stop_watchdog() {
         return 0
     fi
 
-    echo -n "Stopping $CUSTOMIZATION-lite-client watchdog..... "
+    echo -n "Stopping $CUSTOMIZATION-lite-client watchdog... "
     kill $WATCHDOG_PID
     sleep 1
     echo "OK"

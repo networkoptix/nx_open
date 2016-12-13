@@ -19,7 +19,7 @@ BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 RUN_ARGS="-e --disable-crash-handler"
 
-export LD_LIBRARY_PATH=$PREFIX/lib:/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
+export LD_LIBRARY_PATH=$PREFIX/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins
 export SASL_PATH=$/opt/$CUSTOMIZATION/lib/sasl2
 
@@ -41,7 +41,7 @@ process_core_dump() {
     if [ $? -eq 0 ]; then
         REPORT=${BIN_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
 
-        echo Generate crash report $REPORT...        BACKGROUND
+        echo "Generate crash report (in background) $REPORT"
         echo "t apply all bt 25" | gdb $BIN_PATH $CORE 2>&1 >/tmp/$REPORT && \
             mv /tmp/$REPORT ~/$REPORT &
 
@@ -60,12 +60,16 @@ start() {
     process_core_dump
     hdparm -I /dev/sd? | grep Model > /tmp/hddlist
 
-    echo -n "Starting $BIN_NAME..... "
-    $BIN_PATH $RUN_ARGS 2>/dev/null 1>&2&
+    echo -n "Starting $BIN_NAME: "
+
+    # TODO: #boris: Implement log file rotation.
+    $BIN_PATH $RUN_ARGS >>/opt/networkoptix/mediaserver/var/log/mediaserver-out.log 2>&1 &
 
     if [ `/bin/pidof $BIN_NAME` ]
     then
         echo "OK"
+    else
+        echo "FAILED"
     fi
 }
 
@@ -108,7 +112,7 @@ stop_watchdog() {
         return 0
     fi
 
-    echo -n "Stopping $CUSTOMIZATION-mediaserver watchdog..... "
+    echo -n "Stopping $CUSTOMIZATION-mediaserver watchdog... "
     kill $WATCHDOG_PID
     sleep 1
     echo "OK"
