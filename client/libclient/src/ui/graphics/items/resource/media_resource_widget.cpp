@@ -336,14 +336,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     {
         m_ioLicenceStatusHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
-        m_ioModuleOverlayWidget->setCamera(m_camera);
+        m_ioModuleOverlayWidget->setIOModule(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        m_ioModuleOverlayWidget->setInputEnabled(accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
-        addOverlayWidget(m_ioModuleOverlayWidget
-            , detail::OverlayParams(Visible, true, true));
+        m_ioModuleOverlayWidget->setUserInputEnabled(accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
+        addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
-        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
-            , [this]() { updateIoModuleVisibility(true); });
+        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged,
+            this, [this]() { updateIoModuleVisibility(true); });
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);

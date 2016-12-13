@@ -347,7 +347,7 @@ QString QnEventLogModel::getResourceNameString(const QnUuid &id)
 QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
     switch (value) {
     case QnBusiness::EveryOne:
-        return tr("All Users");
+        return tr("Users");
     case QnBusiness::AdminOnly:
         return tr("Administrators Only");
     default:

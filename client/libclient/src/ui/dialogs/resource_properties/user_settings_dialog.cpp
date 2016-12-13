@@ -283,7 +283,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
 
 void QnUserSettingsDialog::forcedUpdate()
 {
-    loadDataToUi();
+    base_type::forcedUpdate();
     updatePermissions();
     updateButtonBox();
 }

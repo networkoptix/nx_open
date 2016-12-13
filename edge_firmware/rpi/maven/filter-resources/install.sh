@@ -1,5 +1,21 @@
 #!/bin/bash
 
+set -x
+
+export NX1UPGRADELOG=/var/log/nx1upgrade.log
+# Close STDOUT file descriptor
+exec 1<&-
+# Close STDERR FD
+exec 2<&-
+
+# Open STDOUT as $NX1UPGRADELOG file for read and write.
+exec 1<>$NX1UPGRADELOG
+
+# Redirect STDERR to STDOUT
+exec 2>&1
+
+echo "Starting upgrade ..."
+
 COMPANY_NAME=${deb.customization.company.name}
 BETA=
 
@@ -28,7 +44,7 @@ then
 else
   update 2>&1
 fi
-if [[ "${box}" == "bpi" ]]; then reboot; fi
+if [[ "${box}" == "bpi" ]]; then reboot && exit 0; fi
 /etc/init.d/$COMPANY_NAME-mediaserver start
 /etc/init.d/cron start
 
@@ -42,6 +58,7 @@ SERVER_PROCESS=`ps $PORT_PROCESS | grep $'/opt/'$COMPANY_NAME'/mediaserver'`
 # Note that $SERVER_PROCESS may contain spaces or \n in this case we need to convert it to empty string
 while [ -z "${SERVER_PROCESS// }" ]; do
   echo "Restarting "$COMPANY_NAME"-mediaserver" >> /opt/$COMPANY_NAME/mediaserver/var/log/update.log
+  /etc/init.d/$COMPANY_NAME-mediaserver stop
   kill -9 $PORT_PROCESS
   /etc/init.d/$COMPANY_NAME-mediaserver start
   sleep 3
