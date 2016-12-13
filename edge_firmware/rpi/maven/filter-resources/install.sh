@@ -27,10 +27,48 @@ export DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber
 update () {
   cp $DISTRIB.tar.gz /tmp
   rm -Rf /opt/networkoptix/mediaserver/lib
-  tar xfv $DISTRIB.tar.gz -C /
+  mkdir -p ./$DISTRIB
+  tar xfv $DISTRIB.tar.gz -C ./$DISTRIB
+  cp -Rf ./$DISTRIB/* /
   if [[ "${box}" == "bpi" ]]; then 
-    /etc/init.d/nx1upgrade; 
+    #avoid grabbing libstdc++ from mediaserver lib folder
+    export LD_LIBRARY_PATH=
+    export DATAPART=/dev/mmcblk0p2
+    export MNTDATAPART=/mnt/data
+    export BOOTPART=/dev/mmcblk0p1
+    export MNTBOOTPART=/mnt/boot
+
+    mkdir -p $MNTBOOTPART
+    mount -t vfat $BOOTPART $MNTBOOTPART
+    cp -f /root/tools/uboot/* $MNTBOOTPART
+    umount $BOOTPART
+    rm -Rf $MNTBOOTPART
+
+    LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1)
+    if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
+
+    FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11)
+    if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
+
+    touch /dev/cedar_dev
+    chmod 777 /dev/disp
+    chmod 777 /dev/cedar_dev
+    usermod -aG video root
+
+    mkdir -p $MNTDATAPART
+    mount -t ext4 $DATAPART $MNTDATAPART
+    cp -f /opt/$COMPANY_NAME/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
+    rm -Rf $MNTDATAPART/opt/$COMPANY_NAME
+    cp -Rf ./$DISTRIB/* $MNTDATAPART
+    mkdir -p $MNTDATAPART/opt/$COMPANY_NAME/mediaserver/var
+    cp -f /root/tools/nx/ecs_static.sqlite $MNTDATAPART/opt/$COMPANY_NAME/mediaserver/var
+    CONF_FILE="$MNTDATAPART/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf"
+    grep -q "statisticsReportAllowed=true" $CONF_FILE \
+        && echo "statisticsReportAllowed=true" >> $CONF_FILE
+    umount $DATAPART
     /etc/init.d/nx1boot upgrade
+    rm -Rf ./$DISTRIB
+    sync    
   fi
   # TODO: add errorlevel handling
   rm /tmp/$DISTRIB.tar.gz

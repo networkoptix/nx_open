@@ -384,21 +384,6 @@ upgrade_sd() {
 
     FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11)
     if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
-  
-# Uncomment to enable libc/libstdc++ upgrade.
-#    LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
-    LIBC_NEW="do not upgrade"
-    if [ -z $LIBC_NEW ]; then
-        DEBIAN_FRONTEND=noninteractive
-        cp /etc/apt/sources.list /etc/apt/sources.list_bk
-        echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
-        apt-get update
-        apt-get install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales -y -qq --force-yes
-        mv /etc/apt/sources.list_bk /etc/apt/sources.list
-        dpkg -i /opt/deb/curl/*.deb
-        reboot_from_sd
-        exit 0      
-    fi
 }    
 
 default_sequence () {
