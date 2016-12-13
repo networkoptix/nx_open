@@ -36,9 +36,10 @@ void Timer::start(
     m_handler = std::move(timerFunc);
     m_timeout = timeout;
     m_timerStartClock = std::chrono::steady_clock::now();
-    ++m_internalTimerId;
 
-    m_aioService.registerTimer(&pollable(), timeout, this);
+    QnMutexLocker lock(m_aioService.mutex());
+    ++m_internalTimerId;
+    m_aioService.registerTimerNonSafe(&lock, &pollable(), timeout, this);
 }
 
 std::chrono::nanoseconds Timer::timeToEvent() const
@@ -80,8 +81,10 @@ void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
 
     if (watcher.objectDestroyed())
         return;
+
+    QnMutexLocker lock(m_aioService.mutex());
     if (internalTimerId == m_internalTimerId)
-        m_aioService.removeFromWatch(&pollable(), EventType::etTimedOut, true);
+        m_aioService.removeFromWatchNonSafe(&lock, &pollable(), EventType::etTimedOut, true);
 }
 
 } // namespace aio
