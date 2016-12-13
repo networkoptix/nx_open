@@ -62,7 +62,12 @@ protected:
         m_callMadePromise.set_value(SocketGlobals::aioService().getCurrentAioThread());
     }
 
-    void havingPostedAsyncCall()
+    void givenPollableBoundTo(AbstractAioThread* aioThread)
+    {
+        pollable().bindToAioThread(aioThread);
+    }
+
+    void whenPostedAsyncCall()
     {
         pollable().post([this]() { recordAsyncCall(); });
     }
@@ -75,13 +80,13 @@ protected:
         ASSERT_EQ(pollable().getAioThread(), *m_callResult);
     }
 
-    void verifyThatAsyncCallHasBeenMadeWithinCurrentThread()
+    void assertThatAsyncCallHasBeenMadeWithinCurrentThread()
     {
-        verifyThatAsyncCallHasBeenMadeWithinThread(
+        thenAsyncCallShouldBeMadeWithinThread(
             SocketGlobals::aioService().getCurrentAioThread());
     }
 
-    void verifyThatAsyncCallHasBeenMadeWithinThread(AbstractAioThread* aioThread)
+    void thenAsyncCallShouldBeMadeWithinThread(AbstractAioThread* aioThread)
     {
         if (!m_callResult)
             m_callResult = m_callMadePromise.get_future().get();
@@ -89,12 +94,12 @@ protected:
         ASSERT_EQ(aioThread, *m_callResult);
     }
 
-    void havingRequestedStop()
+    void whenRequestedStop()
     {
         pollable().pleaseStopSync();
     }
 
-    void assertIfExpectedCleanupHasNotOccured()
+    void thenCleanupShouldOccur()
     {
         ASSERT_TRUE(pollable().isCleanupDone());
     }
@@ -107,7 +112,7 @@ private:
 
 TEST_F(BasicPollable, post)
 {
-    havingPostedAsyncCall();
+    whenPostedAsyncCall();
 
     assertIfAsyncCallHasNotBeenMade();
 }
@@ -127,17 +132,17 @@ TEST_F(BasicPollable, dispatch_within_aio_thread)
             pollable().dispatch([this]() { recordAsyncCall(); });
 
             assertIfAsyncCallHasNotBeenMade();
-            verifyThatAsyncCallHasBeenMadeWithinCurrentThread();
+            assertThatAsyncCallHasBeenMadeWithinCurrentThread();
         });
 }
 
 TEST_F(BasicPollable, bindToAioThread)
 {
     const auto randomAioThread = SocketGlobals::aioService().getRandomAioThread();
-    pollable().bindToAioThread(randomAioThread);
 
-    havingPostedAsyncCall();
-    verifyThatAsyncCallHasBeenMadeWithinThread(randomAioThread);
+    givenPollableBoundTo(randomAioThread);
+    whenPostedAsyncCall();
+    thenAsyncCallShouldBeMadeWithinThread(randomAioThread);
 }
 
 TEST_F(BasicPollable, getAioThread)
@@ -163,8 +168,8 @@ TEST_F(BasicPollable, isInSelfAioThread)
 
 TEST_F(BasicPollable, stopWhileInAioThread)
 {
-    havingRequestedStop();
-    assertIfExpectedCleanupHasNotOccured();
+    whenRequestedStop();
+    thenCleanupShouldOccur();
 }
 
 TEST_F(BasicPollable, pleaseStop)
