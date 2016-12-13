@@ -75,8 +75,9 @@ void helpers::forgetLocalConnectionPassword(const QnUuid& localId, const QString
     if (it->url.password().isEmpty() && it->password.isEmpty())
         return;
 
-    it->url.setPassword(QString());
-    it->password.setValue(QString());
+    auto& data = *it;
+    data.url.setPassword(QString());
+    data.password.setValue(QString());
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnClientCoreSettings->save();
 }
