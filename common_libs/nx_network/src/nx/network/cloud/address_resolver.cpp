@@ -14,7 +14,7 @@
 } while (0)
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
-static const auto kMediatorCacheTimeout = std::chrono::seconds(10);
+static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
 namespace nx {
 namespace network {
@@ -355,9 +355,6 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         m_dnsState = State::unresolved;
         m_dnsEntries.clear();
     }
-
-    if (!kResolveOnMediator)
-        return; // just a short cut
 
     if (m_mediatorState == State::resolved &&
         m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::steady_clock::now())
