@@ -1712,8 +1712,12 @@ void QnMediaResourceWidget::updateAspectRatio()
 {
     if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
     {
-        setAspectRatio(item()->dewarpingParams().panoFactor);
-        return;
+        const auto panoFactor = item()->dewarpingParams().panoFactor;
+        if (panoFactor > 1)
+        {
+            setAspectRatio(panoFactor);
+            return;
+        }
     }
 
     qreal baseAspectRatio = calculateVideoAspectRatio();
