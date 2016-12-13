@@ -79,7 +79,7 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
     waitForKeepAliveDisconnect(client.get());
 }
 
-TEST(TcpSocket, KeepAliveOptionsClient)
+TEST(TcpSocket, DISABLED_KeepAliveOptionsClient)
 {
     const auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->connect(SocketAddress("52.55.219.5:3345")));
