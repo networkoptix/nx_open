@@ -334,17 +334,17 @@ AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress)
 void AddressResolver::HostAddressInfo::setDnsEntries(
     std::vector<AddressEntry> entries)
 {
-    m_dnsState = State::resolved;
     m_dnsResolveTime = std::chrono::steady_clock::now();
     m_dnsEntries = std::move(entries);
+    m_dnsState = m_dnsEntries.empty() ? State::unresolved : State::resolved;
 }
 
 void AddressResolver::HostAddressInfo::setMediatorEntries(
-        std::vector<AddressEntry> entries)
+    std::vector<AddressEntry> entries)
 {
-    m_mediatorState = State::resolved;
     m_mediatorResolveTime = std::chrono::steady_clock::now();
     m_mediatorEntries = std::move(entries);
+    m_mediatorState = m_mediatorEntries.empty() ? State::unresolved : State::resolved;
 }
 
 void AddressResolver::HostAddressInfo::checkExpirations()
