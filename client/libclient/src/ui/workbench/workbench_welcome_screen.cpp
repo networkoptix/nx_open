@@ -408,7 +408,13 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
     const QString& userName)
 {
     const auto id = QnUuid::fromStringSafe(localSystemId);
-    helpers::forgetLocalConnectionPassword(id, userName);
+    if (id.isNull())
+        return;
+
+    const auto callback =
+        [id, userName]() { helpers::forgetLocalConnectionPassword(id, userName); };
+
+    executeDelayedParented(callback, 0, this);
 }
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
