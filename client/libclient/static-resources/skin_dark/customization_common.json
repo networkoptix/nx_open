@@ -529,10 +529,32 @@
         }}
     },
 
+    "QnIoModuleOverlayWidget": {
+        "palette": {
+            "default": {
+                "background": "dark6"
+            }
+        }
+    },
+
     "QnIoModuleFormOverlayContents": {
         "palette": {
             "default": {
                 "windowText": "dark13"
+            }
+        }
+    },
+
+    "QnIoModuleGridOverlayContents": {
+        "palette": {
+            "default": {
+                "windowText": "dark13",
+                "highlightedText": "green_l4",
+                "buttonText": "light4",
+                "dark": "dark8",
+                "button": "dark9",
+                "midlight": "dark10",
+                "shadow": "dark7"
             }
         }
     },
