@@ -6,7 +6,7 @@ import time, os, json, uuid
 
 from testbase import FuncTestCase
 from pycommons.ComparisonMixin import ComparisonMixin
-from pycommons.MockClient import DigestAuthClient as Client
+from pycommons.MockClient import ClientMixin, DigestAuthClient as Client
 from pycommons.Utils import bool2str, str2bool
 from pycommons.FuncTest import execVBoxCmd, MEDIA_SERVER_DIR, tlog
 from pycommons.Logger import LOGLEVEL
@@ -30,7 +30,7 @@ SYSTEM_SETTINGS_1 = {
    }
 }
 
-class MergeSystemTest(FuncTestCase, ComparisonMixin):
+class MergeSystemTest(FuncTestCase, ClientMixin):
     "Merge systems test"
 
     helpStr = 'Merge system test'
@@ -85,7 +85,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
         # Assign new system names
         if init:
-            for srv, info in self.servers.items():
+            for srv,info in self.servers.items():
                 settings = info.settings.copy()
                 settings['password'] = info.password
                 settings['systemName'] = info.sysName
@@ -93,23 +93,16 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
                   srv, "api/setupLocalSystem",
                   headers={'Content-Type': 'application/json'},
                   data=json.dumps(settings))
-                self.__checkResponseError(response, "api/setupLocalSystem")
+                self.checkResponseError(response, "api/setupLocalSystem")
                 # Check setupLocalSystem's settings
                 if info.settings.get("systemSettings"):
                     response = self.client.httpRequest(
                       srv, "api/systemSettings")
                     self.__checkSettings(response.data,
                                          info.settings.get("systemSettings"))
+                time.sleep(1.0)
 
         tlog(LOGLEVEL.INFO, "Prepare initial state done")
-
-    # Check API call error
-    def __checkResponseError(self, response, method):
-        self.assertEqual(response.status, 200, "'%s' status" % method)
-        if isinstance(response, Client.ServerResponseData):
-            self.assertFalse(type(response.data) is str, 'JSON response expected')
-            self.assertEqual(int(response.data.get('error', 0)), 0, "'%s' reply.error" % method)
-            self.assertEqual(response.data.get('errorString', ''), '', "'%s' reply.errorString" % method)
 
     # Change boolean global settings
     def __changeBoolSettings(self, srv, name):
@@ -120,7 +113,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
         kw = { name: bool2str(not val) }
         response = self.client.httpRequest(
           srv, "api/systemSettings", **kw)
-        self.__checkResponseError(response, 'api/systemSettings')
+        self.checkResponseError(response, 'api/systemSettings')
         response = self.client.httpRequest(
           srv, "api/systemSettings")
         self.assertEqual(response.data['reply']['settings'][name], bool2str(not val),
@@ -150,7 +143,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
         # api/getNonce doesn't require credentials
         # So, we can use any existing user for the request
         response = srvClient1.httpRequest(self.serverAddr1, "api/getNonce")
-        self.__checkResponseError(response, "api/getNonce")
+        self.checkResponseError(response, "api/getNonce")
         nonce = response.data["reply"]["nonce"]
         realm = response.data["reply"]["realm"]
         response = srvClient2.httpRequest(self.serverAddr2, "api/mergeSystems",
@@ -158,7 +151,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
            getKey=generateKey('GET', srvInfo1.user, srvInfo1.password, nonce, realm),
            postKey=generateKey('POST', srvInfo1.user, srvInfo1.password, nonce, realm),
            takeRemoteSettings=bool2str(takeRemoteSettings))
-        self.__checkResponseError(response, "api/mergeSystems")
+        self.checkResponseError(response, "api/mergeSystems")
         srvInfo2.change_credentials(srvInfo1)
         tlog(LOGLEVEL.INFO, "System merging done")
 
@@ -185,17 +178,6 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
                 return response1.data, response2.data
             time.sleep(1.0)
 
-    def __getServerGuid(self, srv):
-        srvInfo = self.servers[srv]
-        client = Client(srvInfo.user, srvInfo.password)
-        response = client.httpRequest(srv, 'ec2/getMediaServers')
-        for srvData in response.data:
-            if srv in srvData['networkAddresses']:
-                guid = srvData['id']
-                tlog(LOGLEVEL.INFO, "Get server '%s' guid '%s' done" % (srv, guid))
-                return guid
-        self.fail("Can't find '%s' in ec2/getMediaServers" % srv)
-
     def __setupCloud(self, srv, systemName):
         cloudClient = Client(CLOUD_USER_NAME, CLOUD_USER_PWD)
         srvInfo = self.servers[srv]
@@ -205,7 +187,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           'cdb/system/bind',
           name=systemName,
           customization=DEFAULT_CUSTOMIZATION)
-        self.__checkResponseError(result, "cdb/system/bind")
+        self.checkResponseError(result, "cdb/system/bind")
         settings = srvInfo.settings.copy()
         settings['systemName'] = systemName
         settings['cloudAuthKey'] = result.data['authKey']
@@ -216,7 +198,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           "api/setupCloudSystem",
           headers={'Content-Type': 'application/json'},
           data=json.dumps(settings))
-        self.__checkResponseError(response, "api/setupCloudSystem")
+        self.checkResponseError(response, "api/setupCloudSystem")
         srvInfo.user = CLOUD_USER_NAME
         srvInfo.password = CLOUD_USER_PWD
 
@@ -295,7 +277,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
 
     def testRestartOneServer(self):
         "Merge after restarting a server"
-        srv2Guid = self.__getServerGuid(self.serverAddr1)
+        srv2Guid = self.guids[1]
         srv2Box = self.hosts[1]
 
         # Stop Server2 and remove its database
@@ -308,7 +290,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           "ec2/removeResource",
           headers={'Content-Type': 'application/json'},
           data=json.dumps({'id': srv2Guid}))
-        self.__checkResponseError(response, 'ec2/removeResource')
+        self.checkResponseError(response, 'ec2/removeResource')
 
         # Start server 2 again and move it from initial to working state
         self._mediaserver_ctl(srv2Box, 'safe-start')
@@ -319,7 +301,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           systemName = self.sysName2,
           password = self.password,
           format = "json")
-        self.__checkResponseError(response, "api/setupLocalSystem")
+        self.checkResponseError(response, "api/setupLocalSystem")
 
         # Merge systems (takeRemoteSettings = false)
         self.__mergeSystems()
@@ -357,7 +339,7 @@ class MergeSystemTest(FuncTestCase, ComparisonMixin):
           self.serverAddr2,
           'api/detachFromCloud',
           password = newSrv2Pwd)
-        self.__checkResponseError(response, 'api/detachFromCloud')
+        self.checkResponseError(response, 'api/detachFromCloud')
         self.servers[self.serverAddr2].user = self.user
         self.servers[self.serverAddr2].password = newSrv2Pwd
 

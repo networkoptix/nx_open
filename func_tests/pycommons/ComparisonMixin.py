@@ -4,7 +4,7 @@
 
 from Rec import Rec
 from Utils import struct2str
-import types
+import types, operator
 
 class ComparisonMixin(object):
 
@@ -109,6 +109,11 @@ class ComparisonMixin(object):
                           (desc, self.__v2str(prItem), self.__v2str(item)))
             prIdx = idx
             prItem = item
+
+    def assertIsSorted(self, seq, desc = 'items', op = operator.le):
+        if not all(op(seq[i], seq[i+1]) for i in xrange(len(seq)-1)):
+            self.fail("%s' sequence is not sorted" % desc)
+        
 
     def isEqual(self, expect, got):
         try:

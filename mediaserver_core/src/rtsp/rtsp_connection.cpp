@@ -344,6 +344,13 @@ void QnRtspConnectionProcessor::parseRequest()
         processRangeHeader();
     else
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
+
+    if (d->startTime != 0)
+        d->peerHasAccess = qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
+
+    if (!d->peerHasAccess)
+        return;
+
     QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers).split('/')[0];
     if (!resolutionStr.isEmpty())
     {

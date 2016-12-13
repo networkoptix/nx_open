@@ -50,8 +50,7 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        if (m_debugConfigurationTimer)
-            m_debugConfigurationTimer->pleaseStop(barrier.fork());
+        m_debugConfigurationTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
         //m_mediatorConnector->pleaseStop(barrier.fork());

@@ -69,7 +69,7 @@ QnRecordingManager::~QnRecordingManager()
     QnMutexLocker lock(&m_resourceConnectionMutex);
     // We shouldn't receive any new recording orders if the destructor is called
     for (auto& camera: qnResPool->getResources<QnVirtualCameraResource>())
-        camera->disconnect(camera.data(), 0, this, 0);
+        camera->disconnect(camera.data(), nullptr, this, nullptr);
 
     stop();
 }
