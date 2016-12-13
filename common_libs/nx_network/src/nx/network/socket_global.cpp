@@ -38,8 +38,7 @@ bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
 }
 
 SocketGlobals::SocketGlobals():
-    m_log(QnLog::logs()),
-    m_debugConfigurationTimer(std::make_unique<aio::Timer>())
+    m_log(QnLog::logs())
 {
 }
 
@@ -131,6 +130,7 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
+    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
     m_debugConfigurationTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
