@@ -1,12 +1,8 @@
-/**********************************************************
-* Jun 30, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
-#include "abstract_pollable.h"
+#include <nx/utils/object_destruction_flag.h>
 
+#include "abstract_pollable.h"
 #include "pollable.h"
 
 namespace nx {
@@ -31,6 +27,7 @@ class NX_NETWORK_API BasicPollable:
 {
 public:
     BasicPollable(aio::AbstractAioThread* aioThread = nullptr);
+    virtual ~BasicPollable() override;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
@@ -58,6 +55,7 @@ protected:
 private:
     mutable Pollable m_pollable;
     AIOService& m_aioService;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 };
 
 } // namespace aio

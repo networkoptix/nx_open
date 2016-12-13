@@ -21,6 +21,12 @@ BasicPollable::BasicPollable(aio::AbstractAioThread* aioThread):
         m_aioService.bindSocketToAioThread(&m_pollable, aioThread);
 }
 
+BasicPollable::~BasicPollable()
+{
+    if (isInSelfAioThread())
+        m_aioService.cancelPostedCalls(&m_pollable, true);
+}
+
 void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     post(
@@ -36,7 +42,11 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
     if (isInSelfAioThread())
     {
         m_aioService.cancelPostedCalls(&m_pollable, true);
+
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
         stopWhileInAioThread();
+        if (!watcher.objectDestroyed())
+            m_aioService.cancelPostedCalls(&m_pollable, true);
     }
     else
     {
