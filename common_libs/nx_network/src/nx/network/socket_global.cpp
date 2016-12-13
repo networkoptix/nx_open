@@ -38,7 +38,8 @@ bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
 }
 
 SocketGlobals::SocketGlobals():
-    m_log(QnLog::logs())
+    m_log(QnLog::logs()),
+    m_debugConfigurationTimer(std::make_unique<aio::Timer>())
 {
 }
 
@@ -50,8 +51,7 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        if (m_debugConfigurationTimer)
-            m_debugConfigurationTimer->pleaseStop(barrier.fork());
+        m_debugConfigurationTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
         m_mediatorConnector->pleaseStop(barrier.fork());
@@ -131,7 +131,6 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
     m_debugConfigurationTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
