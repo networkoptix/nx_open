@@ -387,7 +387,7 @@ upgrade_sd() {
   
 # Uncomment to enable libc/libstdc++ upgrade.
 #    LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
-    LIBC_NEW = "do not upgrade"
+    LIBC_NEW="do not upgrade"
     if [ -z $LIBC_NEW ]; then
         DEBIAN_FRONTEND=noninteractive
         cp /etc/apt/sources.list /etc/apt/sources.list_bk
