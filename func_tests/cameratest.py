@@ -9,11 +9,10 @@ from pycommons.ComparisonMixin import ComparisonMixin
 from pycommons.TestCamera import TestCameraMixin
 from pycommons.Utils import secs2str
 from pycommons.Logger import log, LOGLEVEL
-from pycommons.StorageTestMixin import StorageTestMixin
 
 WAIT_CHUNK = 2*60
 
-class VirtualCameraTest(FuncTestCase, TestCameraMixin, StorageTestMixin):
+class VirtualCameraTest(FuncTestCase, TestCameraMixin):
     "Virtual camera test"
 
     helpStr = 'Virtual camera test'

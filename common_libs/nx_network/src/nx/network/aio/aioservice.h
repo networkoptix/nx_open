@@ -98,6 +98,12 @@ public:
         std::chrono::milliseconds timeoutMillis,
         AIOEventHandler<Pollable>* const eventHandler);
 
+    void registerTimerNonSafe(
+        QnMutexLockerBase* const locker,
+        Pollable* const sock,
+        std::chrono::milliseconds timeoutMillis,
+        AIOEventHandler<Pollable>* const eventHandler);
+
     //!Returns \a true, if socket is still listened for state changes
     bool isSocketBeingWatched(Pollable* sock) const;
 

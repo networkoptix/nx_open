@@ -3,6 +3,7 @@
 #include <client_core/client_core_settings.h>
 #include <client_core/local_connection_data.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -47,6 +48,12 @@ void QnRecentLocalSystemsFinder::updateSystems()
     {
         if (connection.localId.isNull())
             continue;
+
+        if (nx::network::SocketGlobals::addressResolver().
+            isCloudHostName(connection.url.toString()))
+        {
+            continue;
+        }
 
         const auto system = QnSystemDescription::createLocalSystem(
             connection.localId.toString(), connection.localId, connection.systemName);

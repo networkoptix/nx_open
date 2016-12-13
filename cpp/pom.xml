@@ -358,9 +358,6 @@
                     <value>bpi</value>
                 </property>
             </activation>
-            <build>
-                <directory>${arch}</directory>
-            </build>
             <properties>
                 <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
             </properties>
@@ -378,9 +375,6 @@
                     <value>rpi</value>
                 </property>
             </activation>
-            <build>
-                <directory>${arch}</directory>
-            </build>
             <properties>
                 <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
             </properties>
@@ -398,9 +392,6 @@
                     <value>isd</value>
                 </property>
             </activation>
-            <build>
-                <directory>${arch}</directory>
-            </build>
             <properties>
                 <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
             </properties>
@@ -418,9 +409,6 @@
                     <value>isd_s2</value>
                 </property>
             </activation>
-            <build>
-                <directory>${arch}</directory>
-            </build>
             <properties>
                 <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
             </properties>
@@ -438,9 +426,6 @@
                     <value>tx1</value>
                 </property>
             </activation>
-            <build>
-                <directory>${arch}</directory>
-            </build>
             <properties>
                 <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
             </properties>
