@@ -165,7 +165,6 @@ Item
             onClicked:
             {
                 var previosStateIsChecked = expandedArea.savePasswordCheckbox.checked;
-                console.log(previosStateIsChecked ? "remove" : "ignore")
                 if (previosStateIsChecked) //< It means next state after click or "space" is "unchecked"
                     context.forgetPassword(control.localId, control.selectedUser);
             }
