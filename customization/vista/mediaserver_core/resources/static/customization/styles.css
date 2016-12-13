@@ -61,3 +61,13 @@ fieldset[disabled] .btn-primary.active {
 
 #top.navbar-default .navbar-toggle .icon-bar {
     background-color: #98be2f; }
+
+
+
+a{
+    color:#A5CE39;
+}
+
+a:visited{
+    color:#98BF2F;
+}

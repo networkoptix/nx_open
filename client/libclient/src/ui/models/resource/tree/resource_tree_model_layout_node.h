@@ -25,7 +25,6 @@ protected:
 
 private:
     QnResourceAccessSubject getOwner() const;
-    QIcon iconBySubject(const QnResourceAccessSubject& subject) const;
 
     void handleResourceAdded(const QnResourcePtr& resource);
 

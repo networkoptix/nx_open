@@ -40,7 +40,7 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
 
-    void forcedUpdate();
+    virtual void forcedUpdate() override;
 
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
