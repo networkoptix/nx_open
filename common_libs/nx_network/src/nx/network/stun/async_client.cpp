@@ -135,6 +135,17 @@ void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handl
         });
 }
 
+void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
+{
+    m_timer.dispatch(
+        [this, options = std::move(options)]()
+        {
+            // NOTE: Dispatched action might happen after connection closure.
+            if (m_connectingSocket)
+                m_connectingSocket->setKeepAlive(options);
+        });
+}
+
 void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection)

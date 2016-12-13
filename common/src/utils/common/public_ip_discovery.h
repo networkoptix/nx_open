@@ -1,13 +1,13 @@
-#ifndef __PUBLIC_IP_DISCOVERY_H_
-#define __PUBLIC_IP_DISCOVERY_H_
+#pragma once
+
+#include <set>
 
 #include <QtNetwork/QHostAddress>
 
 #include <nx/network/http/async_http_client_reply.h>
+#include <nx/utils/thread/mutex.h>
 
-
-class QnPublicIPDiscovery
-:
+class QnPublicIPDiscovery:
     public QObject
 {
     Q_OBJECT
@@ -15,6 +15,8 @@ class QnPublicIPDiscovery
 public:
     /** If \a primaryUrls is empty, default urls are used */
     QnPublicIPDiscovery(QStringList primaryUrls = QStringList());
+    virtual ~QnPublicIPDiscovery() override;
+
     void waitForFinished();
     QHostAddress publicIP() const;
 
@@ -43,8 +45,8 @@ private:
     int m_replyInProgress;
     QStringList m_primaryUrls;
     QStringList m_secondaryUrls;
+    QnMutex m_mutex;
+    std::set<nx_http::AsyncHttpClientPtr> m_httpRequests;
 
     QString toString(Stage value) const;
 };
-
-#endif // __PUBLIC_IP_DISCOVERY_H_

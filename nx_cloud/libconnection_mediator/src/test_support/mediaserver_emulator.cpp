@@ -176,20 +176,22 @@ nx::hpm::api::ResultCode MediaServerEmulator::bind()
     return updateTcpAddresses({endpoint()});
 }
 
-nx::hpm::api::ResultCode MediaServerEmulator::listen() const
+std::pair<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>
+    MediaServerEmulator::listen() const
 {
     api::ListenRequest requestData;
     requestData.systemId = m_systemData.id;
     requestData.serverId = m_serverId;
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
-    std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
+    nx::hpm::api::ListenResponse response;
+    std::tie(resultCode, response) = makeSyncCall<decltype(resultCode), decltype(response)>(
         std::bind(
             &nx::hpm::api::MediatorServerTcpConnection::listen,
             m_serverClient.get(),
             std::move(requestData),
             std::placeholders::_1));
 
-    return resultCode;
+    return std::make_pair(resultCode, response);
 }
 
 SocketAddress MediaServerEmulator::mediatorConnectionLocalAddress() const

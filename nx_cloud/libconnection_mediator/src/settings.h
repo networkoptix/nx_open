@@ -39,11 +39,13 @@ struct CloudDB
 struct Stun
 {
     std::list<SocketAddress> addrToListenList;
+    boost::optional<KeepAliveOptions> keepAliveOptions;
 };
 
 struct Http
 {
     std::list<SocketAddress> addrToListenList;
+    boost::optional<KeepAliveOptions> keepAliveOptions;
 };
 
 struct Statistics

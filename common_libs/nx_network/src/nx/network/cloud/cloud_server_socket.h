@@ -91,7 +91,8 @@ protected:
 
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
-    void onListenRequestCompleted(nx::hpm::api::ResultCode resultCode);
+    void onListenRequestCompleted(
+        nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
     void acceptAsyncInternal(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode code,
@@ -114,6 +115,7 @@ protected:
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default
+    nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
 
 private:
     void stopWhileInAioThread();

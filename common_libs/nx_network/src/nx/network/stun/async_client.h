@@ -46,6 +46,7 @@ public:
     virtual SocketAddress remoteAddress() const override;
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
     virtual void cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler) override;
+    virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 
     void setOnConnectionClosedHandler(OnConnectionClosedHandler onConnectionClosedHandler);
     void connect(
