@@ -1,13 +1,13 @@
 
 .btn-primary {
     color: white;
-    background-color: #00aeef;
-    border-color: #009bd5; }
+    background-color: #a6ce39;
+    border-color: #98be2f; }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
     color: white;
-    background-color: #009bd5;
-    border-color: #0089bc; }
+    background-color: #98be2f;
+    border-color: #88aa2a; }
 
 .btn-primary.disabled,
 .btn-primary.disabled:hover,
@@ -24,6 +24,15 @@ fieldset[disabled] .btn-primary:hover,
 fieldset[disabled] .btn-primary:focus,
 fieldset[disabled] .btn-primary:active,
 fieldset[disabled] .btn-primary.active {
-    background-color: #00aeef;
-    border-color: #009bd5;
+    background-color: #a6ce39;
+    border-color: #98be2f;
     opacity: 0.65; }
+
+
+a{
+    color:#A5CE39;
+}
+
+a:visited{
+    color:#98BF2F;
+}
