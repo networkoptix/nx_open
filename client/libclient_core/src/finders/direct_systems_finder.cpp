@@ -3,6 +3,7 @@
 
 #include <network/module_finder.h>
 #include <network/system_helpers.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
 
 namespace {
@@ -11,6 +12,12 @@ bool isOldServer(const QnModuleInformation& info)
 {
     static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
     return (info.version < kMinVersionWithSystem);
+}
+
+bool isCloudAddress(const HostAddress& address)
+{
+    return nx::network::SocketGlobals::addressResolver()
+        .isCloudHostName(address.toString());
 }
 
 } // namespace
@@ -184,11 +191,27 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &moduleInformation
     , const SocketAddress &address)
 {
-    const auto systemIt = getSystemItByServer(moduleInformation.id);
+    auto systemIt = getSystemItByServer(moduleInformation.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    //NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
-    if (!serverIsInKnownSystem)
+    const bool isCloudHost = isCloudAddress(address.address);
+
+    if (isCloudHost)
+    {
+        // Do not allow servers with cloud host to be discovered
+        if (serverIsInKnownSystem)
+            removeServer(moduleInformation);
+
         return;
+    }
+    else if (!serverIsInKnownSystem)
+    {
+        // Primary address was changed from cloud to direct
+        addServer(moduleInformation);
+        systemIt = getSystemItByServer(moduleInformation.id);
+        if (systemIt == m_systems.end())
+            return;
+    }
+
 
     const auto systemDescription = systemIt.value();
     const auto url = address.toUrl(moduleInformation.sslAllowed ? lit("https") : QString());

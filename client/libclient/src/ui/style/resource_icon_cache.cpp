@@ -51,7 +51,6 @@ QString baseToString(QnResourceIconCache::Key base)
 
         QN_STRINGIFY(Layout);
         QN_STRINGIFY(SharedLayout);
-        QN_STRINGIFY(VideoWallLayout);
         QN_STRINGIFY(Layouts);
         QN_STRINGIFY(SharedLayouts);
 
@@ -114,7 +113,6 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(HealthMonitor,           loadIcon(lit("tree/health_monitor.png")));
     m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
     m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
-    m_cache.insert(VideoWallLayout,         loadIcon(lit("tree/layout_videowall.png")));
     m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
     m_cache.insert(SharedLayouts,           loadIcon(lit("tree/layouts_shared.png")));
     m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));

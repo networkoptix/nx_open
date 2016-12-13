@@ -143,8 +143,9 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
         return QString();
 
     QnLayoutResourcePtr resource = layout->resource();
-    return layout->name()
-        + (snapshotManager()->isModified(resource) ? L'*' : QChar());
+    return snapshotManager()->isModified(resource)
+        ? layout->name() + L'*'
+        : layout->name();
 }
 
 QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
