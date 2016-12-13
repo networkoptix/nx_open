@@ -529,16 +529,11 @@
         }}
     },
 
-    "QnIoModuleOverlayWidget": {
+    "QnIoModuleFormOverlayContents": {
         "palette": {
             "default": {
-                "window": "#222222d0",
-                "windowText": "#ffffff",
-                "buttonText": "#ffffff"
+                "windowText": "dark13"
             }
-        },
-        "colors": {
-            "idLabel": "#575757"
         }
     },
 

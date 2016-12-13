@@ -33,7 +33,6 @@ public:
 
     QnVirtualCameraResourcePtr module;
     QnIOModuleMonitorPtr monitor;
-    QnIoModuleColors colors;
     bool connectionOpened = false;
     bool userInputEnabled = false;
 
@@ -47,6 +46,7 @@ public:
     QnIOPortDataList ports;
     QMap<QString, StateData> states;
     QTimer* const timer;
+    QGraphicsLinearLayout* const layout;
 
     QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
 
@@ -75,20 +75,23 @@ QnIoModuleOverlayWidgetPrivate
 QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget):
     base_type(widget),
     q_ptr(widget),
-    timer(new QTimer(this))
+    timer(new QTimer(this)),
+    layout(new QGraphicsLinearLayout(Qt::Vertical, widget))
 {
     widget->setAutoFillBackground(true);
 
     connect(timer, &QTimer::timeout, this, &QnIoModuleOverlayWidgetPrivate::at_timerTimeout);
     timer->setInterval(kStateCheckIntervalMs);
 
-    setContents(new QnIoModuleFormOverlayContents(widget)); //< default
+    setContents(new QnIoModuleFormOverlayContents()); //< default
 }
 
 void QnIoModuleOverlayWidgetPrivate::setContents(QnIoModuleOverlayContents* newContents)
 {
-    NX_ASSERT(newContents && newContents->parent() == parent());
+    NX_ASSERT(newContents);
     contents.reset(newContents);
+
+    layout->addItem(newContents);
 
     connect(contents, &QnIoModuleOverlayContents::userClicked,
         this, &QnIoModuleOverlayWidgetPrivate::toggleState);
@@ -151,7 +154,7 @@ void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
     if (monitor && !connectionOpened)
         openConnection();
 
-    contents->portsChanged(ports);
+    contents->portsChanged(ports, userInputEnabled);
 
     for (const auto& item: states)
         contents->stateChanged(item.config, item.state);
@@ -302,22 +305,6 @@ void QnIoModuleOverlayWidget::setIOModule(const QnVirtualCameraResourcePtr& modu
     d->setIOModule(module);
 }
 
-const QnIoModuleColors& QnIoModuleOverlayWidget::colors() const
-{
-    Q_D(const QnIoModuleOverlayWidget);
-    return d->colors;
-}
-
-void QnIoModuleOverlayWidget::setColors(const QnIoModuleColors& colors)
-{
-    Q_D(QnIoModuleOverlayWidget);
-    if (d->colors == colors)
-        return;
-
-    d->colors = colors;
-    d->resetControls();
-}
-
 bool QnIoModuleOverlayWidget::userInputEnabled() const
 {
     Q_D(const QnIoModuleOverlayWidget);
@@ -338,28 +325,16 @@ void QnIoModuleOverlayWidget::setUserInputEnabled(bool value)
 QnIoModuleOverlayContents
 */
 
-QnIoModuleOverlayContents::QnIoModuleOverlayContents(QnIoModuleOverlayWidget* widget):
-    base_type(widget),
-    m_widget(widget)
+QnIoModuleOverlayContents::QnIoModuleOverlayContents():
+    base_type()
 {
-    NX_ASSERT(m_widget);
 }
 
 QnIoModuleOverlayContents::~QnIoModuleOverlayContents()
 {
 }
 
-QnIoModuleOverlayWidget* QnIoModuleOverlayContents::widget() const
+QnIoModuleOverlayWidget* QnIoModuleOverlayContents::overlayWidget() const
 {
-    return m_widget;
-}
-
-void QnIoModuleOverlayContents::setWidget(QnIoModuleOverlayWidget* widget)
-{
-    NX_ASSERT(widget);
-    if (!widget)
-        return;
-
-    m_widget = widget;
-    setParent(m_widget);
+    return qgraphicsitem_cast<QnIoModuleOverlayWidget*>(parentItem());
 }
