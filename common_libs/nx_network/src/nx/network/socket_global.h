@@ -1,5 +1,4 @@
-#ifndef NX_NETWORK_SOCKET_GLOBAL_H
-#define NX_NETWORK_SOCKET_GLOBAL_H
+#pragma once
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
@@ -55,7 +54,7 @@ public:
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
-    static OutgoingTunnelPool& outgoingTunnelPool() { return s_instance->m_outgoingTunnelPool; }
+    static OutgoingTunnelPool& outgoingTunnelPool() { return *s_instance->m_outgoingTunnelPool; }
     static CloudSettings& cloudConnectSettings() { return s_instance->m_cloudConnectSettings; }
     static TcpReversePool& tcpReversePool() { return *s_instance->m_tcpReversePool; }
 
@@ -110,18 +109,20 @@ private:
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;
 
     aio::AIOService m_aioService;
-    aio::Timer m_debugConfigurationTimer;
+    std::unique_ptr<aio::Timer> m_debugConfigurationTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
 
     std::unique_ptr<cloud::MediatorAddressPublisher> m_addressPublisher;
-    cloud::OutgoingTunnelPool m_outgoingTunnelPool;
+    std::unique_ptr<cloud::OutgoingTunnelPool> m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
     std::unique_ptr<cloud::tcp::ReverseConnectionPool> m_tcpReversePool;
 
     QnMutex m_mutex;
     std::map<CustomInit, CustomDeinit> m_customInits;
+
+    void initializeCloudConnectivity();
 };
 
 class SocketGlobalsHolder
@@ -129,8 +130,7 @@ class SocketGlobalsHolder
     public Singleton<SocketGlobalsHolder>
 {
 public:
-    SocketGlobalsHolder()
-    :
+    SocketGlobalsHolder():
         m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>())
     {
     }
@@ -139,6 +139,7 @@ public:
     {
         m_socketGlobalsGuard.reset();
         m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>();
+        SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
     }
 
 private:
@@ -147,5 +148,3 @@ private:
 
 } // namespace network
 } // namespace nx
-
-#endif  //NX_NETWORK_SOCKET_GLOBAL_H

@@ -105,6 +105,13 @@ bool AsyncSqlQueryExecutor::init()
     return true;
 }
 
+void AsyncSqlQueryExecutor::reserveConnections(int count)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (int i = 0; i < count; ++i)
+        openNewConnection(lock);
+}
+
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const
 {
     const auto effectiveDBConnectionCount = m_dbThreadPool.size();

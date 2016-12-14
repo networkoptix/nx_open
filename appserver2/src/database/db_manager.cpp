@@ -1447,6 +1447,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncLog = true;
         }
     }
+    else if (updateName == lit(":/updates/82_optera_trash_cleanup.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            cleanupDanglingDbObjects();
+            m_needClearLog = true;
+            m_needResyncLog = true;
+        }
+    }
 
     return true;
 }

@@ -14,7 +14,7 @@
 } while (0)
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
-static const auto kMediatorCacheTimeout = std::chrono::seconds(10);
+static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
 namespace nx {
 namespace network {
@@ -356,9 +356,6 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         m_dnsEntries.clear();
     }
 
-    if (!kResolveOnMediator)
-        return; // just a short cut
-
     if (m_mediatorState == State::resolved &&
         m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::steady_clock::now())
     {
@@ -413,6 +410,11 @@ AddressResolver::RequestInfo::RequestInfo(
     natTraversalSupport(natTraversalSupport),
     handler(std::move(handler))
 {
+}
+
+bool AddressResolver::isMediatorAvailable() const
+{
+    return (bool) SocketGlobals::mediatorConnector().mediatorAddress();
 }
 
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
@@ -500,8 +502,7 @@ void AddressResolver::mediatorResolve(
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress
-        && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
+    if (info->second.isLikelyCloudAddress && isMediatorAvailable())
     {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
         resolveResult = SystemError::noError;

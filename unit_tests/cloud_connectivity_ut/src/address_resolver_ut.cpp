@@ -121,6 +121,11 @@ public:
     }
 
 private:
+    virtual bool isMediatorAvailable() const override
+    {
+        return true;
+    }
+
     static std::map<QString, std::list<SocketAddress>> s_endpoints;
     static std::shared_ptr<stun::test::AsyncClientMock> s_stunClient;
 };

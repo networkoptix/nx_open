@@ -16,28 +16,29 @@
 #include <utils/common/stoppable.h>
 
 #include "listening_peer_pool.h"
-
+#include "statistics/connection_statistics_info.h"
 
 namespace nx {
 namespace hpm {
 
 namespace conf {
-    class Settings;
-}   // namespace conf
+
+class Settings;
+
+} // namespace conf
 
 /**
-    \note Object can be safely freed while in \a onFsmFinishedEventHandler handler.
-        Otherwise, one has to stop it with \a QnStoppableAsync::pleaseStop
-*/
-class UDPHolePunchingConnectionInitiationFsm
-:
+ * @note Object can be safely freed while in onFsmFinishedEventHandler handler.
+ *     Otherwise, one has to stop it with QnStoppableAsync::pleaseStop
+ */
+class UDPHolePunchingConnectionInitiationFsm:
     public QnStoppableAsync
 {
 public:
     /** 
-        \note \a onFsmFinishedEventHandler is allowed to free 
-            \a UDPHolePunchingConnectionInitiationFsm instance
-    */
+     * @note onFsmFinishedEventHandler is allowed to free
+     *     UDPHolePunchingConnectionInitiationFsm instance.
+     */
     UDPHolePunchingConnectionInitiationFsm(
         nx::String connectionID,
         const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
@@ -58,6 +59,8 @@ public:
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
+    stats::ConnectSession statisticsInfo() const;
+
 private:
     enum class State
     {
@@ -77,6 +80,7 @@ private:
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
     std::list<SocketAddress> m_directTcpAddresses;
+    stats::ConnectSession m_sessionStatisticsInfo;
     
     void onServerConnectionClosed();
     void done(api::ResultCode result);

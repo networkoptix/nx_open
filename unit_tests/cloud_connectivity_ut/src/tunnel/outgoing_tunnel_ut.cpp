@@ -119,8 +119,10 @@ public:
         m_singleShotConnection(singleShotConnection),
         m_canSucceedEvent(canSucceedEvent),
         m_connectTimeout(std::move(connectTimeout)),
-        m_tunnelConnectionInvokedPromise(nullptr)
+        m_tunnelConnectionInvokedPromise(nullptr),
+        m_timer(std::make_unique<aio::Timer>())
     {
+        m_timer->bindToAioThread(getAioThread());
         ++instanceCount;
     }
 
@@ -175,8 +177,15 @@ public:
         --instanceCount;
     }
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        AbstractCrossNatConnector::bindToAioThread(aioThread);
+        m_timer->bindToAioThread(getAioThread());
+    }
+
     virtual void stopWhileInAioThread() override
     {
+        m_timer.reset();
     }
 
     virtual void connect(
@@ -185,7 +194,7 @@ public:
     {
         if (m_connectTimeout)
         {
-            timer()->start(
+            m_timer->start(
                 *m_connectTimeout,
                 [this, handler = std::move(handler)]() mutable
                 {
@@ -197,10 +206,6 @@ public:
             connectInternal(std::move(handler));
         }
     }
-    //virtual const AddressEntry& targetPeerAddress() const override
-    //{
-    //    return m_targetPeerAddress;
-    //}
 
     void setConnectionInvokedPromise(
         nx::utils::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
@@ -216,6 +221,7 @@ private:
     nx::utils::promise<void>* const m_canSucceedEvent;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
     nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
+    std::unique_ptr<aio::Timer> m_timer;
 
     void connectInternal(
         ConnectCompletionHandler handler)

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <memory>
+
+#include <nx/network/aio/timer.h>
+
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/cloud/tunnel/abstract_outgoing_tunnel_connection.h>
 
@@ -18,7 +22,8 @@ public:
 
     ~OutgoingReverseTunnelConnection();
 
-    void stopWhileInAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
 
     void establishNewConnection(
         std::chrono::milliseconds timeout,
@@ -34,6 +39,7 @@ private:
     const std::shared_ptr<ReverseConnectionHolder> m_connectionHolder;
     utils::AsyncOperationGuard m_asyncGuard;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_closedHandler;
+    std::unique_ptr<aio::Timer> m_timer;
 };
 
 } // namespace tcp

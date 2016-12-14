@@ -64,7 +64,7 @@ QnMobileClientModule::QnMobileClientModule(
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().designateOwnPeerId("mc", common->moduleGUID());
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", common->moduleGUID());
 
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);

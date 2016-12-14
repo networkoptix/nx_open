@@ -12,7 +12,10 @@ class NX_NETWORK_API SystemResolver:
     public AbstractResolver
 {
 public:
-    virtual std::deque<HostAddress> resolve(const QString& hostName, int ipVersion) override;
+    virtual SystemError::ErrorCode resolve(
+        const QString& hostName,
+        int ipVersion,
+        std::deque<HostAddress>* resolvedAddresses) override;
 };
 
 } // namespace network

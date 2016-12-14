@@ -3,6 +3,7 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/network/system_socket.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include "core/resource_management/resource_pool.h"

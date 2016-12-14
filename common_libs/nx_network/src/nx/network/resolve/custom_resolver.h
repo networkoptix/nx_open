@@ -19,9 +19,12 @@ public:
     {
     }
 
-    virtual std::deque<HostAddress> resolve(const QString& hostName, int ipVersion) override
+    virtual SystemError::ErrorCode resolve(
+        const QString& hostName,
+        int ipVersion,
+        std::deque<HostAddress>* resolvedAddresses) override
     {
-        return m_func(hostName, ipVersion);
+        return m_func(hostName, ipVersion, resolvedAddresses);
     }
 
 private:

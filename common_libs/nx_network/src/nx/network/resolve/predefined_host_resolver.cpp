@@ -3,22 +3,24 @@
 namespace nx {
 namespace network {
 
-std::deque<HostAddress> PredefinedHostResolver::resolve(const QString& name, int ipVersion)
+SystemError::ErrorCode PredefinedHostResolver::resolve(
+    const QString& name,
+    int ipVersion,
+    std::deque<HostAddress>* resolvedAddresses)
 {
     QnMutexLocker lock(&m_mutex);
 
     const auto it = m_etcHosts.find(name);
     if (it == m_etcHosts.end())
-        return std::deque<HostAddress>();
+        return SystemError::hostNotFound;
 
-    std::deque<HostAddress> ipAddresses;
     for (const auto address : it->second)
     {
         if (ipVersion != AF_INET || address.ipV4())
-            ipAddresses.push_back(address);
+            resolvedAddresses->push_back(address);
     }
 
-    return ipAddresses;
+    return SystemError::noError;
 }
 
 void PredefinedHostResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)

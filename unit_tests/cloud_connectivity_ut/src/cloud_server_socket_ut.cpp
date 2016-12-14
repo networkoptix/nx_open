@@ -149,13 +149,21 @@ struct FakeTcpTunnelAcceptor
     size_t m_clientsLimit;
 };
 
-class CloudServerSocketTest
-:
+class CloudServerSocketTest:
     public ::testing::Test
 {
 public:
     CloudServerSocketTest()
     {
+        stun::AbstractAsyncClient::Settings stunClientSettings;
+        stunClientSettings.reconnectPolicy =
+            nx::network::RetryPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                std::chrono::milliseconds(0),
+                nx::network::RetryPolicy::kDefaultDelayMultiplier,
+                std::chrono::minutes(1));
+        nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
+
         SocketGlobalsHolder::instance()->reinitialize();
         init();
     }
@@ -166,15 +174,6 @@ protected:
 private:
     void init()
     {
-        stun::AbstractAsyncClient::Settings stunClientSettings;
-        stunClientSettings.reconnectPolicy =
-            nx::network::RetryPolicy(
-                nx::network::RetryPolicy::kInfiniteRetries,
-                std::chrono::milliseconds(0),
-                nx::network::RetryPolicy::kDefaultDelayMultiplier,
-                std::chrono::minutes(1));
-        SocketGlobals::mediatorConnector().reinitializeStunClient(stunClientSettings);
-
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
         auto system = m_mediator.addRandomSystem();
         auto server = m_mediator.addRandomServer(
@@ -192,24 +191,23 @@ private:
     }
 };
 
-struct CloudServerSocketTcpTester
-:
+class CloudServerSocketTcpTester:
     public CloudServerSocket
 {
-    CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder)
-    :
+public:
+    CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder):
         CloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection()),
         m_addressManager(addressBinder)
     {
     }
 
-    SocketAddress getLocalAddress() const override
+    virtual SocketAddress getLocalAddress() const override
     {
         return m_addressManager.key;
     }
 
-    bool listen(int queueLen) override
+    virtual bool listen(int queueLen) override
     {
         initTunnelPool(queueLen);
         moveToListeningState();
@@ -240,11 +238,11 @@ struct CloudServerSocketTcpTester
         return true;
     }
 
+private:
     network::test::AddressBinder::Manager m_addressManager;
 };
 
-class CloudServerSocketTcpTest
-:
+class CloudServerSocketTcpTest:
     public ::testing::Test
 {
 protected:

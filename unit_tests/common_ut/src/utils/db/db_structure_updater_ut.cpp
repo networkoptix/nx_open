@@ -87,13 +87,13 @@ private:
     CustomExecSqlScriptFunc m_customExecSqlScriptFunc;
 };
 
-class DBStructureUpdater:
+class DbStructureUpdater:
     public BaseDbTest
 {
     using BaseType = BaseDbTest;
 
 public:
-    DBStructureUpdater():
+    DbStructureUpdater():
         m_updateResult(false)
     {
         using namespace std::placeholders;
@@ -103,9 +103,9 @@ public:
         m_testAsyncSqlQueryExecutor = std::make_unique<TestAsyncSqlQueryExecutor>(
             asyncSqlQueryExecutor().get());
         m_testAsyncSqlQueryExecutor->setCustomExecSqlScriptFunc(
-            std::bind(&DBStructureUpdater::execSqlScript, this, _1, _2));
+            std::bind(&DbStructureUpdater::execSqlScript, this, _1, _2));
 
-        m_dbUpdater = std::make_unique<db::DBStructureUpdater>(m_testAsyncSqlQueryExecutor.get());
+        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(m_testAsyncSqlQueryExecutor.get());
     }
 
 protected:
@@ -175,7 +175,7 @@ protected:
 
 private:
     std::unique_ptr<TestAsyncSqlQueryExecutor> m_testAsyncSqlQueryExecutor;
-    std::unique_ptr<db::DBStructureUpdater> m_dbUpdater;
+    std::unique_ptr<nx::db::DbStructureUpdater> m_dbUpdater;
     std::list<QByteArray> m_executedScripts;
     std::multimap<QByteArray, RdbmsDriverType> m_registeredScripts;
     std::map<RdbmsDriverType, QByteArray> m_dbTypeToScript;
@@ -186,7 +186,7 @@ private:
         BaseType::initializeDatabase();
 
         // Creating initial structure.
-        nx::db::DBStructureUpdater updater(asyncSqlQueryExecutor().get());
+        nx::db::DbStructureUpdater updater(asyncSqlQueryExecutor().get());
         ASSERT_TRUE(updater.updateStructSync());
     }
 
@@ -203,7 +203,7 @@ private:
     }
 };
 
-TEST_F(DBStructureUpdater, different_sql_scripts_for_different_dbms)
+TEST_F(DbStructureUpdater, different_sql_scripts_for_different_dbms)
 {
     registerUpdateScriptFor(RdbmsDriverType::mysql);
     registerUpdateScriptFor(RdbmsDriverType::sqlite);
@@ -213,7 +213,7 @@ TEST_F(DBStructureUpdater, different_sql_scripts_for_different_dbms)
     assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType::mysql);
 }
 
-TEST_F(DBStructureUpdater, default_script_gets_called_if_no_dbms_specific_script_supplied)
+TEST_F(DbStructureUpdater, default_script_gets_called_if_no_dbms_specific_script_supplied)
 {
     registerUpdateScriptFor(RdbmsDriverType::mysql);
     registerDefaultUpdateScript();
@@ -223,7 +223,7 @@ TEST_F(DBStructureUpdater, default_script_gets_called_if_no_dbms_specific_script
     assertIfInvokedNotDefaultScript();
 }
 
-TEST_F(DBStructureUpdater, update_fails_if_no_suitable_script_found)
+TEST_F(DbStructureUpdater, update_fails_if_no_suitable_script_found)
 {
     registerUpdateScriptFor(RdbmsDriverType::mysql);
     registerUpdateScriptFor(RdbmsDriverType::sqlite);
@@ -233,7 +233,7 @@ TEST_F(DBStructureUpdater, update_fails_if_no_suitable_script_found)
     assertIfUpdateSucceeded();
 }
 
-TEST_F(DBStructureUpdater, proper_dialect_fix_is_applied)
+TEST_F(DbStructureUpdater, proper_dialect_fix_is_applied)
 {
     const char initialScript[] = "%bigint_primary_key_auto_increment%";
     const char sqliteAdaptedScript[] = "INTEGER PRIMARY KEY AUTOINCREMENT";

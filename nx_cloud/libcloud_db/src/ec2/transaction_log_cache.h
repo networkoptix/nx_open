@@ -74,9 +74,10 @@ public:
     const VmsDataState* state(TranId tranId) const;
     ::ec2::Timestamp generateTransactionTimestamp(TranId tranId);
     int generateTransactionSequence(const ::ec2::QnTranStateKey& tranStateKey);
+    void shiftTransactionSequence(const ::ec2::QnTranStateKey& tranStateKey, int delta);
 
     ::ec2::QnTranState committedTransactionState() const;
-    std::uint64_t committedTimstampSequence() const;
+    std::uint64_t committedTimestampSequence() const;
 
 private:
     struct TranContext

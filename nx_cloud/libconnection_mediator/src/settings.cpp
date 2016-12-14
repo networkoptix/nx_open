@@ -11,92 +11,103 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <nx/utils/timer_manager.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/data/connection_parameters.h>
+#include <nx/utils/timer_manager.h>
 
 #include <libconnection_mediator_app_info.h>
-#include <nx/network/cloud/data/connection_parameters.h>
 #include <utils/common/app_info.h>
 
+namespace {
 
-namespace
-{
-    //General settings
-    const QLatin1String kSystemUserToRunUnder("general/systemUserToRunUnder");
-    const QLatin1String kDefaultSystemUserToRunUnder("");
+//General settings
+const QLatin1String kSystemUserToRunUnder("general/systemUserToRunUnder");
+const QLatin1String kDefaultSystemUserToRunUnder("");
 
-    const QLatin1String kDataDir("general/dataDir");
-    const QLatin1String kDefaultDataDir("");
+const QLatin1String kDataDir("general/dataDir");
+const QLatin1String kDefaultDataDir("");
 
-    //CloudDB settings
-    const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
-    const QLatin1String kDefaultRunWithCloud("true");
+//CloudDB settings
+const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
+const QLatin1String kDefaultRunWithCloud("true");
 
-    const QLatin1String kCdbEndpoint("cloud_db/endpoint");
-    const QLatin1String kDefaultCdbEndpoint("");
+const QLatin1String kCdbEndpoint("cloud_db/endpoint");
+const QLatin1String kDefaultCdbEndpoint("");
 
-    const QLatin1String kCdbUser("cloud_db/user");
-    const QLatin1String kDefaultCdbUser("connection_mediator");
+const QLatin1String kCdbUser("cloud_db/user");
+const QLatin1String kDefaultCdbUser("connection_mediator");
 
-    const QLatin1String kCdbPassword("cloud_db/password");
-    const QLatin1String kDefaultCdbPassword("123456");
+const QLatin1String kCdbPassword("cloud_db/password");
+const QLatin1String kDefaultCdbPassword("123456");
 
-    const QLatin1String kCdbUpdateInterval("cloud_db/updateIntervalSec");
-    const std::chrono::seconds kDefaultCdbUpdateInterval(std::chrono::minutes(10));
+const QLatin1String kCdbUpdateInterval("cloud_db/updateIntervalSec");
+const std::chrono::seconds kDefaultCdbUpdateInterval(std::chrono::minutes(10));
 
-    //STUN
-    const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
-    const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
+//STUN
+const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
+const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 
-    //HTTP
-    const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
-    const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
+const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
+const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
-    const QString kModuleName = lit("connection_mediator");
+//HTTP
+const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
+const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
 
+const QLatin1String kHttpKeepAliveOptions("http/keepAliveOptions");
+const QLatin1String kDefaultHttpKeepAliveOptions("");
 
-    //CloudConnect
-    const QLatin1String kRendezvousConnectTimeout("cloudConnect/rendezvousConnectTimeout");
-    constexpr const std::chrono::seconds kDefaultRendezvousConnectTimeout =
-        nx::hpm::api::kRendezvousConnectTimeoutDefault;
+const QString kModuleName = lit("connection_mediator");
 
-    const QLatin1String kUdpTunnelKeepAliveInterval("cloudConnect/udpTunnelKeepAliveInterval");
-    constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
-        nx::hpm::api::kUdpTunnelKeepAliveIntervalDefault;
+//Statistics
+const QLatin1String kStatisticsEnabled("stats/enabled");
+const QLatin1String kDefaultStatisticsEnabled("true");
 
-    const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
-    constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
-        nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
+//CloudConnect
+const QLatin1String kRendezvousConnectTimeout("cloudConnect/rendezvousConnectTimeout");
+constexpr const std::chrono::seconds kDefaultRendezvousConnectTimeout =
+    nx::hpm::api::kRendezvousConnectTimeoutDefault;
 
-    const QLatin1String kTunnelInactivityTimeout("cloudConnect/tunnelInactivityTimeout");
-    constexpr const std::chrono::seconds kDefaultTunnelInactivityTimeout =
-        nx::hpm::api::kDefaultTunnelInactivityTimeout;
+const QLatin1String kUdpTunnelKeepAliveInterval("cloudConnect/udpTunnelKeepAliveInterval");
+constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
+    nx::hpm::api::kUdpTunnelKeepAliveIntervalDefault;
 
-    namespace tcp_reverse_retry_policy {
-    const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
-    const QLatin1String kInitialDelay("cloudConnect/tcpReverseRetryPolicy/initialDelay");
-    const QLatin1String kDelayMultiplier("cloudConnect/tcpReverseRetryPolicy/delayMultiplier");
-    const QLatin1String kMaxDelay("cloudConnect/tcpReverseRetryPolicy/maxDelay");
-    } // namespace tcp_reverse_retry_policy
+const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
+constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
+    nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 
-    namespace tcp_reverse_http_timeouts {
-    const QLatin1String kSend("cloudConnect/tcpReverseHttpTimeouts/send");
-    const QLatin1String kRead("cloudConnect/tcpReverseHttpTimeouts/read");
-    const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
-    } // namespace tcp_reverse_http_timeouts
-}
+const QLatin1String kTunnelInactivityTimeout("cloudConnect/tunnelInactivityTimeout");
+constexpr const std::chrono::seconds kDefaultTunnelInactivityTimeout =
+    nx::hpm::api::kDefaultTunnelInactivityTimeout;
 
+namespace tcp_reverse_retry_policy {
+
+const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
+const QLatin1String kInitialDelay("cloudConnect/tcpReverseRetryPolicy/initialDelay");
+const QLatin1String kDelayMultiplier("cloudConnect/tcpReverseRetryPolicy/delayMultiplier");
+const QLatin1String kMaxDelay("cloudConnect/tcpReverseRetryPolicy/maxDelay");
+
+} // namespace tcp_reverse_retry_policy
+
+namespace tcp_reverse_http_timeouts {
+
+const QLatin1String kSend("cloudConnect/tcpReverseHttpTimeouts/send");
+const QLatin1String kRead("cloudConnect/tcpReverseHttpTimeouts/read");
+const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
+
+} // namespace tcp_reverse_http_timeouts
+} // namespace 
 
 namespace nx {
 namespace hpm {
 namespace conf {
 
-Settings::Settings()
-:
+Settings::Settings():
     m_settings(QnLibConnectionMediatorAppInfo::applicationName(), kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
+    initializeWithDefaultValues();
 }
 
 bool Settings::showHelp() const
@@ -134,6 +145,16 @@ const QnLogSettings& Settings::logging() const
     return m_logging;
 }
 
+const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
+{
+    return m_dbConnectionOptions;
+}
+
+const Statistics& Settings::statistics() const
+{
+    return m_statistics;
+}
+
 void Settings::load(int argc, char **argv)
 {
     m_commandLineParser.parse(argc, argv, stderr);
@@ -151,6 +172,12 @@ void Settings::fillSupportedCmdParameters()
 {
     m_commandLineParser.addParameter(
         &m_showHelp, "--help", NULL, "Show help message", false );
+}
+
+void Settings::initializeWithDefaultValues()
+{
+    m_dbConnectionOptions.driverType = db::RdbmsDriverType::sqlite;
+    m_dbConnectionOptions.dbName = "mediator_statistics.sqlite";
 }
 
 void Settings::loadConfiguration()
@@ -180,9 +207,20 @@ void Settings::loadConfiguration()
         m_settings.value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
         &m_stun.addrToListenList);
 
+    m_stun.keepAliveOptions = KeepAliveOptions::fromString(
+        m_settings.value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
+
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
+
+    m_http.keepAliveOptions = KeepAliveOptions::fromString(
+        m_settings.value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
+
+    m_dbConnectionOptions.loadFromSettings(&m_settings);
+
+    //Statistics
+    m_statistics.enabled = m_settings.value(kStatisticsEnabled, kDefaultStatisticsEnabled).toBool();
 
     m_connectionParameters.rendezvousConnectTimeout =
         nx::utils::parseTimerDuration(
@@ -254,6 +292,6 @@ void Settings::readEndpointList(
         [](const QString& str) { return SocketAddress(str); });
 }
 
-}   //conf
-}   //hpm
-}   //nx
+} // namespace conf
+} // namespace hpm
+} // namespace nx

@@ -3,6 +3,7 @@
 #include <thread>
 
 #include <nx/network/cloud/tunnel/tcp/reverse_connector.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 

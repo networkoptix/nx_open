@@ -242,10 +242,11 @@ void SystemManager::unbindSystem(
 }
 
 namespace {
+
 /**
  * Returns true, if record contains every single resource present in filter.
  */
-bool applyFilter(
+static bool applyFilter(
     const stree::AbstractResourceReader& record,
     const stree::AbstractIteratableContainer& filter)
 {
@@ -259,12 +260,13 @@ bool applyFilter(
 
     return true;
 }
-}
+
+} // namespace
 
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     data::DataFilter filter,
-    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     //always providing only activated systems
     filter.resources().put(
@@ -357,6 +359,10 @@ void SystemManager::getSystems(
                 return system.accessRole == api::SystemAccessRole::none;
             });
         resultData.systems.erase(unallowedSystemsRangeStartIter, resultData.systems.end());
+
+        // If the only system found by filter has user disabled, then returning "forbidden".
+        if (resultData.systems.empty() && static_cast<bool>(systemId))
+            return completionHandler(api::ResultCode::forbidden, resultData);
     }
 
     //adding system health

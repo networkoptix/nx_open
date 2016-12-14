@@ -93,16 +93,22 @@ void DnsResolver::resolveAsync(
     m_cond.wakeAll();
 }
 
-std::deque<HostAddress> DnsResolver::resolveSync(const QString& hostName, int ipVersion)
+SystemError::ErrorCode DnsResolver::resolveSync(
+    const QString& hostName,
+    int ipVersion,
+    std::deque<HostAddress>* resolvedAddresses)
 {
     for (const auto& resolver: m_resolversByPriority)
     {
-        std::deque<HostAddress> ipAddresses = resolver.second->resolve(hostName, ipVersion);
-        if (!ipAddresses.empty())
-            return ipAddresses;
+        const auto resultCode = resolver.second->resolve(hostName, ipVersion, resolvedAddresses);
+        if (resultCode == SystemError::noError)
+        {
+            NX_ASSERT(!resolvedAddresses->empty());
+            return resultCode;
+        }
     }
 
-    return std::deque<HostAddress>();
+    return SystemError::hostNotFound;
 }
 
 void DnsResolver::cancel(RequestId requestId, bool waitForRunningHandlerCompletion)
@@ -178,15 +184,9 @@ void DnsResolver::run()
             SystemError::ErrorCode resultCode = SystemError::noError;
             std::deque<HostAddress> resolvedAddresses;
             if (isExpired(task))
-            {
                 resultCode = SystemError::timedOut;
-            }
             else
-            {
-                resolvedAddresses = resolveSync(task.hostAddress, task.ipVersion);
-                if (resolvedAddresses.empty())
-                    resultCode = SystemError::getLastOSErrorCode();
-            }
+                resultCode = resolveSync(task.hostAddress, task.ipVersion, &resolvedAddresses);
 
             if (task.requestId)
             {

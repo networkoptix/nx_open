@@ -745,8 +745,8 @@ QAbstractVideoSurface* Player::videoSurface(int channel) const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    // positionMs is real value from video frame. It coud containt 'coarse' timestamp
-	// a bit less then user requested position (inside of current GOP)
+    // positionMs is the actual value from a video frame. It could contain a "coarse" timestamp
+    // a bit less then the user requested position (inside of the current GOP).
     return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 

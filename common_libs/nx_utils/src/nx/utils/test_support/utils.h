@@ -23,3 +23,13 @@
             "in non-void method. Just ignore..."); \
     } \
 } while (0)
+
+#define NX_GTEST_ASSERT_TRUE(expected) do \
+{ \
+    NX_GTEST_ASSERT_EQ(true, expected); \
+} while (0)
+
+#define NX_GTEST_ASSERT_FALSE(expected) do \
+{ \
+    NX_GTEST_ASSERT_EQ(false, expected); \
+} while (0)

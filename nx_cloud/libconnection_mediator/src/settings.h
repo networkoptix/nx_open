@@ -1,66 +1,66 @@
-/**********************************************************
-* Dec 21, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CONNECTION_MEDIATOR_SETTING_H
-#define NX_CONNECTION_MEDIATOR_SETTING_H
+#pragma once
 
 #include <chrono>
 #include <list>
 #include <map>
 
+#include <nx/network/cloud/data/connection_parameters.h>
+#include <nx/network/socket_common.h>
+
 #include <utils/common/command_line_parser.h>
 #include <utils/common/settings.h>
 #include <utils/db/types.h>
 #include <utils/email/email.h>
-#include <nx/network/cloud/data/connection_parameters.h>
-#include <nx/network/socket_common.h>
-
 
 namespace nx {
 namespace hpm {
 namespace conf {
 
-class General
+struct General
 {
-public:
     QString systemUserToRunUnder;
     QString dataDir;
 };
 
-class CloudDB
+struct CloudDB
 {
-public:
     bool runWithCloud;
     QString endpoint;
     QString user;
     QString password;
     std::chrono::seconds updateInterval;
 
-    CloudDB()
-    :
+    CloudDB():
         runWithCloud(true)
     {
     }
 };
 
-class Stun
+struct Stun
 {
-public:
     std::list<SocketAddress> addrToListenList;
+    boost::optional<KeepAliveOptions> keepAliveOptions;
 };
 
-class Http
+struct Http
 {
-public:
     std::list<SocketAddress> addrToListenList;
+    boost::optional<KeepAliveOptions> keepAliveOptions;
 };
 
+struct Statistics
+{
+    bool enabled;
 
-/*!
-    \note Values specified via command-line have priority over conf file (or win32 registry) values
-*/
+    Statistics():
+        enabled(true)
+    {
+    }
+};
+
+/**
+ * @note Values specified via command-line have priority over conf file (or win32 registry) values.
+ */
 class Settings
 {
 public:
@@ -75,6 +75,8 @@ public:
     const Http& http() const;
     /** Properties for cloud connections */
     const api::ConnectionParameters& connectionParameters() const;
+    const nx::db::ConnectionOptions& dbConnectionOptions() const;
+    const Statistics& statistics() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
     void load(int argc, char **argv);
@@ -92,16 +94,17 @@ private:
     Stun m_stun;
     Http m_http;
     api::ConnectionParameters m_connectionParameters;
+    nx::db::ConnectionOptions m_dbConnectionOptions;
+    Statistics m_statistics;
 
     void fillSupportedCmdParameters();
+    void initializeWithDefaultValues();
     void loadConfiguration();
     void readEndpointList(
         const QString& str,
         std::list<SocketAddress>* const addrToListenList);
 };
 
-}   //conf
-}   //hpm
-}   //nx
-
-#endif  //NX_CONNECTION_MEDIATOR_SETTING_H
+} // namespace conf
+} // namespace hpm
+} // namespace nx

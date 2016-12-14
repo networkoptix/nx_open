@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <utils/common/systemerror.h>
+
 #include "../socket_common.h"
 
 namespace nx {
@@ -15,10 +17,12 @@ public:
     virtual ~AbstractResolver() = default;
 
     /**
-     * In case of failure, no address is returned and
-     * SystemError::getLastOsErrorCode() is set appropriately.
+     * @param resolvedAddresses Not empty in case if SystemError::noError is returned.
      */
-    virtual std::deque<HostAddress> resolve(const QString& hostName, int ipVersion) = 0;
+    virtual SystemError::ErrorCode resolve(
+        const QString& hostName,
+        int ipVersion,
+        std::deque<HostAddress>* resolvedAddresses) = 0;
 };
 
 } // namespace network

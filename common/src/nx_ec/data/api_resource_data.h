@@ -38,6 +38,8 @@ struct ApiResourceData: ApiIdData
     QString name;
     QString url;
     QnUuid typeId;
+
+    bool operator==(const ApiResourceData&) const;
 };
 #define ApiResourceData_Fields ApiIdData_Fields (parentId)(name)(url)(typeId)
 

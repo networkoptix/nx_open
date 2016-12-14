@@ -1,6 +1,7 @@
 #include "reverse_connection_holder.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -9,12 +10,26 @@ namespace tcp {
 
 ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
-    m_socketCount(0)
+    m_socketCount(0),
+    m_timer(std::make_unique<aio::Timer>())
 {
+    m_timer->bindToAioThread(aioThread);
+}
+
+ReverseConnectionHolder::~ReverseConnectionHolder()
+{
+    stopWhileInAioThread();
+}
+
+void ReverseConnectionHolder::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    aio::BasicPollable::bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
 }
 
 void ReverseConnectionHolder::stopWhileInAioThread()
 {
+    m_timer.reset();
 }
 
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
@@ -70,7 +85,7 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
 
                 if (m_handlers.empty() || expirationTime < m_handlers.begin()->first)
                 {
-                    timer()->start(
+                    m_timer->start(
                         timeLeft,
                         [this]()
                         {

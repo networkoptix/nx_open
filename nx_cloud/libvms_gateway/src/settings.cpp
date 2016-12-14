@@ -86,7 +86,7 @@ const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
 } // namespace tcp_reverse
 
 const QLatin1String kSslAllowed("cloudConnect/sslAllowed");
-const QLatin1String kDefaultSslAllowed("false");
+const QLatin1String kDefaultSslAllowed("true");
 
 } // namespace
 

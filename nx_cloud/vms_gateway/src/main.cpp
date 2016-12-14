@@ -11,6 +11,6 @@
 int main( int argc, char* argv[] )
 {
     nx::network::SocketGlobals::InitGuard sgGuard;
-    nx::network::SocketGlobals::outgoingTunnelPool().designateOwnPeerId("gw", QnUuid::createUuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("gw", QnUuid::createUuid());
     return libVmsGatewayMain( argc, argv );
 }

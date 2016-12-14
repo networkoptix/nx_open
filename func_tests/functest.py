@@ -34,6 +34,7 @@ from natcon_test import NatConnectionTest
 from dbtest import DBTest
 from proxytest import ServerProxyTest
 from mergetest import MergeSystemTest
+from cameratest import VirtualCameraTest
 from stresst import HTTPStressTest
 from pycommons.Logger import initLog, log, LOGLEVEL
 from pycommons.Config import config
@@ -1291,6 +1292,8 @@ def RunByAutotest():
             CallTest(DBTest)
         if not testMaster.args.skipmerge:
           CallTest(MergeSystemTest)
+        if not testMaster.args.skipcamera:
+          CallTest(VirtualCameraTest)
         CallTest(HTTPStressTest)
     #FIXME: acureate test result processing required!!!
     log(LOGLEVEL.INFO, "\nALL AUTOMATIC TEST ARE DONE\n")
@@ -1320,6 +1323,7 @@ BoxTestKeys = OrderedDict([
     ('--htstress', HTTPStressTest),
     ('--natcon', NatConnectionTest),
     ('--merge', MergeSystemTest),
+    ('--camera', VirtualCameraTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
@@ -1336,6 +1340,7 @@ def BoxTestsRun(name):
         if not CallTest(StreamingTest): ok = False
         if not CallTest(DBTest): ok = False
         if not CallTest(MergeSystemTest): ok = False
+        if not CallTest(VirtualCameraTest): ok = False
         if not CallTest(HTTPStressTest): ok = False
         return ok
     else:
@@ -1467,6 +1472,7 @@ def parseArgs():
     parser.add_argument('--skipstrm', action="store_true", help="Skip streaming tests")
     parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
     parser.add_argument('--skipmerge', action="store_true", help="Skip merge system test")
+    parser.add_argument('--skipcamera', action="store_true", help="Skip virtual camera test")
 #    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
     parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
 

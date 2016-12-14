@@ -49,15 +49,10 @@ void MaintenanceManager::getTransactionLog(
 {
     using namespace std::placeholders;
 
-    ::ec2::QnTranStateKey maxTranStateKey;
-    maxTranStateKey.peerID = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
-    ::ec2::QnTranState maxTranState;
-    maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
-
     m_syncronizationEngine->transactionLog().readTransactions(
         systemId.systemId.c_str(),
-        ::ec2::QnTranState(),
-        maxTranState,
+        boost::none,
+        boost::none,
         std::numeric_limits<int>::max(),
         std::bind(&MaintenanceManager::onTransactionLogRead, this, 
             m_startedAsyncCallsCounter.getScopedIncrement(),

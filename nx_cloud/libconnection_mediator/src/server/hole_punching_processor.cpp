@@ -2,11 +2,13 @@
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/time.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include "listening_peer_pool.h"
 #include "settings.h"
+#include "statistics/collector.h"
 
 namespace nx {
 namespace hpm {
@@ -22,11 +24,13 @@ HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
-    ListeningPeerPool* const listeningPeerPool)
+    ListeningPeerPool* listeningPeerPool,
+    stats::Collector* statisticsCollector)
 :
     RequestProcessor(cloudData),
     m_settings(settings),
-    m_listeningPeerPool(listeningPeerPool)
+    m_listeningPeerPool(listeningPeerPool),
+    m_statisticsCollector(statisticsCollector)
 {
     dispatcher->registerRequestProcessor(
         stun::cc::methods::connect,
@@ -180,6 +184,11 @@ void HolePunchingProcessor::connectionResult(
     NX_LOGX(lm("Connect result from %1, connection id %2, result: %3")
         .strs(connection->getSourceAddress(), request.connectSessionId,
             QnLexical::serialized(request.resultCode)), cl_logDEBUG2);
+
+    auto statisticsInfo = connectionIter->second->statisticsInfo();
+    statisticsInfo.resultCode = request.resultCode;
+    statisticsInfo.endTime = nx::utils::utcTime();
+    m_statisticsCollector->saveConnectSessionStatistics(std::move(statisticsInfo));
 
     connectionIter->second->onConnectionResultRequest(
         std::move(request),

@@ -360,12 +360,6 @@ public:
         nx::Buffer* buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& handler);
 
-    void waitForAllPendingIOFinish()
-    {
-        m_underlySocket->pleaseStopSync();
-        clear();
-    }
-
     void clear()
     {
         m_readQueue.clear();
@@ -1265,6 +1259,15 @@ void SslEngine::useOrCreateCertificate(
     useCertificateAndPkey(certData);
 }
 
+void SslEngine::useRandomCertificate(const String& module)
+{
+    const auto sslCert = nx::network::SslEngine::makeCertificateAndKey(
+        module, "US", "Network Optix");
+
+    NX_CRITICAL(!sslCert.isEmpty());
+    NX_CRITICAL(nx::network::SslEngine::useCertificateAndPkey(sslCert));
+}
+
 class SslSocketPrivate
 {
 public:
@@ -1516,9 +1519,6 @@ int SslSocket::bioFree(BIO* bio)
 SslSocket::~SslSocket()
 {
     Q_D(SslSocket);
-    if (d->ioMode == ASYNC && d->asyncSslHelper)
-            d->asyncSslHelper->waitForAllPendingIOFinish();
-
     delete d->wrappedSocket;
     delete d_ptr;
 }
