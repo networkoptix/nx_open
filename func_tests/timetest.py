@@ -18,7 +18,7 @@ from testbase import *
 
 GRACE = 1.0 # max time difference between responses to say that times are equal
 INET_GRACE = 3.0 # max time difference between a mediaserver time and the internet time
-DELTA_GRACE = 0.05 # max difference between two deltas (each between a mediaserver time and this script local time)
+DELTA_GRACE = 0.5 # max difference between two deltas (each between a mediaserver time and this script local time)
                    # used to check if the server time hasn't changed
 SERVER_SYNC_TIMEOUT = 10 # seconds
 MINOR_SLEEP = 1 # seconds
@@ -168,9 +168,9 @@ class TimeSyncTest(FuncTestCase):
         "Request server's time and its system time. Also return current local time at moment response was received."
 #        answer = self._server_request(boxnum, 'api/gettime',)
         answer = self._server_request(boxnum, 'ec2/getCurrentTime')
-        answer['boxtime'] = self.get_box_time(self.hosts[boxnum]) if ask_box_time else 0
         answer['time'] = int(answer['value']) / 1000.0
         answer['local'] = time.time()
+        answer['boxtime'] = self.get_box_time(self.hosts[boxnum]) if ask_box_time else 0
         log(LOGLEVEL.DEBUG + 9, "Server#%d ec2/getCurrentTime time: %s" %
             (boxnum, secs2str(answer['time'])))
         return answer
@@ -443,7 +443,7 @@ class TimeSyncTest(FuncTestCase):
     def ChangePrimarySystime(self):
         delta_before = self._serv_local_delta(self._primary)
         self.shift_box_time(self.hosts[self._primary], -12345)
-        time.sleep(SYSTEM_TIME_SYNC_SLEEP)
+        time.sleep(SYSTEM_TIME_SYNC_SLEEP * 10)
         delta_after = self._serv_local_delta(self._primary)
         self.assertAlmostEqual(delta_before, delta_after, delta=DELTA_GRACE,
             msg="Primary server's time changed (%s) after changing of it's system time" %
