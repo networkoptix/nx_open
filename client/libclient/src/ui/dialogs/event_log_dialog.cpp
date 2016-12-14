@@ -355,7 +355,12 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     if (m_lastMouseButton != Qt::LeftButton)
         return;
 
-    QnResourceList resources = m_model->resourcesForPlayback(idx);
+    QnResourceList resources = m_model->resourcesForPlayback(idx).filtered(
+        [this](const QnResourcePtr& resource)
+        {
+            return accessController()->hasPermissions(resource, Qn::ReadPermission);
+        });
+
     if (!resources.isEmpty())
     {
         qint64 pos = m_model->eventTimestamp(idx.row())/1000;
