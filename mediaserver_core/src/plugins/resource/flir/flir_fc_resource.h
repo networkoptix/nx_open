@@ -17,6 +17,13 @@ namespace flir {
 class FcResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
+
+    struct PortTimerEntry
+    {
+        QString portId;
+        bool state;
+    };
+
 public:
     FcResource();
     virtual ~FcResource();
@@ -28,6 +35,11 @@ public:
 
     virtual QnIOPortDataList getRelayOutputList() const override;
     virtual QnIOPortDataList getInputPortList() const override;
+
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeoutMS) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
@@ -41,6 +53,7 @@ private:
 
 private:
     nexus::WebSocketIoManager* m_ioManager;
+    std::map<quint64, PortTimerEntry> m_autoResetTimers;
 };
 
 } // namespace flir

@@ -23,16 +23,18 @@ using ErrorSignalType = void(QWebSocket::*)(QAbstractSocket::SocketError);
 const int kInvalidSessionId = -1;
 const std::size_t kMaxThgAreasNumber = 4;
 const std::size_t kMaxThgSpotsNumber = 8;
-const std::size_t kMaxAlarmsNumber = 10;
+const std::size_t kMaxThgAlarmsNumber = 10;
+const std::size_t kMaxMdAlarmsNumber = 4;
 
-const std::chrono::milliseconds kKeepAliveTimeout(5000);
+const std::chrono::milliseconds kKeepAliveTimeout(10000);
 const std::chrono::milliseconds kMinNotificationInterval(500);
 const std::chrono::milliseconds kMaxNotificationInterval(500);
-const std::chrono::milliseconds kSetOutputStateTimeout(5000);
+const std::chrono::milliseconds kSetOutputStateTimeout(10000);
 
 const QString kAlarmNameTemplate = lit("Alarm %1");
 const QString kDigitalInputNameTemplate = lit("Digital Input %1");
 const QString kDigitalOutputNameTemplate = lit("Digital Output %1");
+const QString kMdAreaNameTemplate = lit("Motion detection area %1");
 
 } // namespace
 
@@ -50,7 +52,8 @@ WebSocketIoManager::WebSocketIoManager(QnVirtualCameraResource* resource, quint1
     m_monitoringIsInProgress(false),
     m_controlProxy(nullptr),
     m_notificationProxy(nullptr),
-    m_nexusPort(nexusPort)
+    m_nexusPort(nexusPort),
+    m_sendControlTokenRequest(true)
 {
     QnMutexLocker lock(&m_mutex);
     initIoPortStatesUnsafe();
@@ -104,6 +107,13 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     QString path;
     QUrl url;
 
+    qDebug() << "================> SETTING OUTPUT STATE" << portId << isActive;
+    NX_LOGX(
+        lm("Setting output port state. Port: %1, isActive: %2")
+            .arg(portId)
+            .arg(isActive),
+        cl_logINFO); //< TODO: #dmishin change log level to debug1;
+
     {
         QnMutexLocker lock(&m_mutex);
         if (!m_monitoringIsInProgress)
@@ -112,17 +122,15 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
         if (m_initializationState < InitState::remoteControlObtained)
             return false;
 
-        const QString path =
-            lit("%1?session=%2&action=%3&Port=%4&Output=%5&State=%6")
+        url = lit("http://%1:%2/%3?session=%4&action=%5&Port=%6&Output=%7&State=%8")
+            .arg(m_resource->getHostAddress())
+            .arg(m_nexusPort)
             .arg(kCommandPrefix)
             .arg(m_nexusSessionId)
             .arg(kSetOutputPortStateCommand)
             .arg(getGpioModuleIdByPortId(portId))
             .arg(getPortNumberByPortId(portId))
             .arg(isActive ? 1 : 0);
-
-        url = m_resource->getUrl();
-        url.setPath(path);
     }
 
     nx_http::HttpClient httpClient;
@@ -130,8 +138,7 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     httpClient.setResponseReadTimeoutMs(kSetOutputStateTimeout.count());
     httpClient.setMessageBodyReadTimeoutMs(kSetOutputStateTimeout.count());
 
-    auto success = httpClient.doGet(url);
-    
+    auto success = httpClient.doGet(url);    
     if (!success)
         return false;
 
@@ -145,6 +152,11 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     nx_http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
+
+    qDebug() << "==================> RESPONSE MESSAGE BODY" << messageBody;
+    NX_LOGX(
+        lm("Set IO Port state response").arg(QString::fromUtf8(messageBody)),
+        cl_logINFO); //< TODO: #dmishin change log level to debug1;
 
     auto commandResponse = CommandResponse(QString::fromUtf8(messageBody));
     if (!commandResponse.isValid() || commandResponse.returnCode() != kNoError)
@@ -215,7 +227,7 @@ void WebSocketIoManager::terminate()
         TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 
-//============================================================================
+//------------------------------------------------------------------------------------
 
 void WebSocketIoManager::routeIOMonitoringInitializationUnsafe(InitState newState)
 {
@@ -514,12 +526,26 @@ void WebSocketIoManager::sendKeepAliveUnsafe()
     if (!m_monitoringIsInProgress)
         return;
 
-    auto keepAliveMessage = lit("%1?action=%2&%3=%4")
-        .arg(kCommandPrefix)
-        .arg(kServerWhoAmICommand)
-        .arg(kSessionParamName)
-        .arg(m_nexusSessionId);
+    QString keepAliveMessage;
 
+    if (m_sendControlTokenRequest)
+    {
+        keepAliveMessage = lit("%1?action=%2&%3=%4&Forced=1")
+            .arg(kCommandPrefix)
+            .arg(kRequestControlAsyncCommand)
+            .arg(kSessionParamName)
+            .arg(m_nexusSessionId);
+    }
+    else
+    {
+        keepAliveMessage = lit("%1?action=%2&%3=%4")
+            .arg(kCommandPrefix)
+            .arg(kServerWhoAmICommand)
+            .arg(kSessionParamName)
+            .arg(m_nexusSessionId);
+    }
+
+    m_sendControlTokenRequest = !m_sendControlTokenRequest;
     m_controlProxy->sendTextMessage(keepAliveMessage);
 
     auto sendKeepAliveWrapper =
@@ -629,7 +655,19 @@ void WebSocketIoManager::initIoPortStatesUnsafe()
         }
     }
 
-    for (std::size_t i = 0; i < kMaxAlarmsNumber; ++i)
+    for (std::size_t i = 0; i < kMaxMdAlarmsNumber; ++i)
+    {
+        auto alarmInput = QnIOPortData();
+
+        alarmInput.id = lit("%1:%2")
+            .arg(kMdAreaPrefix)
+            .arg(i);
+
+        alarmInput.inputName = kMdAreaNameTemplate.arg(i);
+        m_inputs.push_back(alarmInput);
+    }
+
+    for (std::size_t i = 0; i < kMaxThgAlarmsNumber; ++i)
     {
         auto alarmInput = QnIOPortData();
 

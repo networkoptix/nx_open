@@ -240,4 +240,55 @@ bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
     return true;
 }
 
+bool nx::plugins::flir::FcResource::setRelayOutputState(
+    const QString& outputId,
+    bool isActive,
+    unsigned int autoResetTimeoutMs)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (!m_ioManager)
+        return false;
+
+    if (!isActive)
+    {
+        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end(); ++it)
+        {
+            auto timerId = it->first;
+            auto portTimerEntry = it->second;
+            if (it->second.portId == outputId)
+            {
+                nx::utils::TimerManager::instance()->deleteTimer(timerId);
+                it = m_autoResetTimers.erase(it);
+                break;
+            }
+        }
+    }
+
+    if (isActive && autoResetTimeoutMs)
+    {
+        auto autoResetTimer = nx::utils::TimerManager::instance()->addTimer(
+            [this](quint64  timerId)
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (m_autoResetTimers.count(timerId))
+            {
+                auto timerEntry = m_autoResetTimers[timerId];
+                m_ioManager->setOutputPortState(
+                    timerEntry.portId,
+                    timerEntry.state);
+            }
+            m_autoResetTimers.erase(timerId);
+        },
+            std::chrono::milliseconds(autoResetTimeoutMs));
+
+        PortTimerEntry portTimerEntry;
+        portTimerEntry.portId = outputId;
+        portTimerEntry.state = !isActive;
+        m_autoResetTimers[autoResetTimer] = portTimerEntry;
+    }
+
+    return m_ioManager->setOutputPortState(outputId, isActive);
+}
+
 #endif // ENABLE_FLIR

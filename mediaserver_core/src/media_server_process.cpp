@@ -2482,8 +2482,7 @@ void MediaServerProcess::run()
 #endif
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
-    std::unique_ptr<nx::plugins::flir::IoExecutor> flirExecutor(
-        new nx::plugins::flir::IoExecutor());
+    auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
 
     if (cmdLineArguments.cleanupDb)
     {

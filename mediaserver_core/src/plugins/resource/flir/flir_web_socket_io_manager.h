@@ -129,6 +129,7 @@ private:
     QnIOPortDataList m_outputs;
 
     quint16 m_nexusPort;
+    bool m_sendControlTokenRequest;
 
     mutable QnMutex m_mutex;
 };

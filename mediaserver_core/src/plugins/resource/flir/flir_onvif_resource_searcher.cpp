@@ -8,9 +8,11 @@ const int kFlirDefaultOnvifPort = 8090;
 
 } // namespace
 
-using namespace nx::plugins;
+namespace nx {
+namespace plugins {
+namespace flir {
 
-QList<QnResourcePtr> flir::OnvifResourceSearcher::checkHostAddr(
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
     const QUrl& url,
     const QAuthenticator& auth,
     bool doMultichannelCheck)
@@ -22,15 +24,20 @@ QList<QnResourcePtr> flir::OnvifResourceSearcher::checkHostAddr(
     return ::OnvifResourceSearcher::checkHostAddr(urlCopy, auth, doMultichannelCheck);
 }
 
-QnResourceList flir::OnvifResourceSearcher::findResources()
+QnResourceList OnvifResourceSearcher::findResources()
 {
     return QnResourceList();
 }
 
-bool flir::OnvifResourceSearcher::isSequential() const
+bool OnvifResourceSearcher::isSequential() const
 {
     return true;
 }
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx
+
 
 #endif // defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
 

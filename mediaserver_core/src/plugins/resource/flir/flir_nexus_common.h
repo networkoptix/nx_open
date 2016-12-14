@@ -10,6 +10,7 @@ const quint16 kDefaultNexusPort = 8090;
 const QString kAlarmPrefix = lit("$ALARM");
 const QString kThgSpotPrefix = lit("$THGSPOT");
 const QString kThgAreaPrefix = lit("$THGAREA");
+const QString kMdAreaPrefix = lit("$MD");
 const QString kDigitalInputPrefix = lit("$DI");
 const QString kDigitalOutputPrefix = lit("$DO");
 
@@ -24,6 +25,7 @@ const QString kControlPrefix = lit("NexusWS.cgi");
 const QString kSubscriptionPrefix = lit("NexusWS_Status.cgi");
 const QString kServerWhoAmICommand = lit("SERVERWhoAmI");
 const QString kRequestControlCommand = lit("SERVERRemoteControlRequest");
+const QString kRequestControlAsyncCommand = lit("SERVERRemoteControlRequestAsync");
 const QString kReleaseControlCommand = lit("SERVERRemoteControlRelease");
 const QString kSetOutputPortStateCommand = lit("IOSENSOROutputStateSet");
 

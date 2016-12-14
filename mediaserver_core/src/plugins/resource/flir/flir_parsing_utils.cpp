@@ -4,6 +4,7 @@
 #include "flir_parsing_utils.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 using namespace nx::plugins::flir;
 
@@ -44,7 +45,14 @@ boost::optional<nexus::Notification> parseAlarmNotification(const QStringList& n
         prefix = nexus::kDigitalInputPrefix;
     else if (kDeviceType == nexus::kThgObjectDeviceType)
         prefix = nexus::kAlarmPrefix;
-
+    else if (kDeviceType == nexus::kMdDeviceType)
+    {
+        qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+        qDebug() << "!!!!!!!!!!! MOTION ALARM DETECTED!" << notificationParts.join(',');
+        qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+        NX_LOG(lm("FLIR ALARMS, MOTION ALARM DETECTED! %1").arg(notificationParts.join(',')), cl_logINFO);
+        prefix = nexus::kMdAreaPrefix;
+    }
 
     alarmEvent.alarmId = lit("%1:%2")
         .arg(prefix)
