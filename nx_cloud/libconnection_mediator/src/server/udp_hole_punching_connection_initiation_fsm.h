@@ -29,7 +29,7 @@ class Settings;
 
 /**
  * @note Object can be safely freed while in onFsmFinishedEventHandler handler.
- * Otherwise, one has to stop it with QnStoppableAsync::pleaseStop
+ *     Otherwise, one has to stop it with QnStoppableAsync::pleaseStop
  */
 class UDPHolePunchingConnectionInitiationFsm:
     public QnStoppableAsync
@@ -37,7 +37,7 @@ class UDPHolePunchingConnectionInitiationFsm:
 public:
     /** 
      * @note onFsmFinishedEventHandler is allowed to free
-     * UDPHolePunchingConnectionInitiationFsm instance.
+     *     UDPHolePunchingConnectionInitiationFsm instance.
      */
     UDPHolePunchingConnectionInitiationFsm(
         nx::String connectionID,
