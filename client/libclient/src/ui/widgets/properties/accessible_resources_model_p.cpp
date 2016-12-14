@@ -7,6 +7,8 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <core/resource/layout_resource.h>
+
 #include <nx/utils/string.h>
 
 #include <ui/models/resource/resource_list_model.h>
