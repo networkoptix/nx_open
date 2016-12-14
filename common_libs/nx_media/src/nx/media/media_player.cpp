@@ -264,6 +264,7 @@ void PlayerPrivate::doPeriodicTasks()
     Q_Q(Player);
     if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
     {
+        log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
         setMediaStatus(Player::MediaStatus::NoMedia);
         q->stop();
     }
@@ -869,6 +870,9 @@ void Player::setSource(const QUrl& url)
 
     if (d->resource && currentState == State::Playing)
         play();
+
+    d->log(lit("emit sourceChanged()"));
+    emit sourceChanged();
 
     d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }

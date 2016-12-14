@@ -3,6 +3,7 @@
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/debug_utils.h>
+#include <nx/utils/log/log.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
@@ -21,7 +22,7 @@ static const int kMaxMediaQueueLen = 90;
 // Max queue length for decoded video which is awaiting to be rendered.
 static const int kMaxDecodedVideoQueueSize = 2;
 
-/** 
+/**
  * Player will emit EOF if and only if it gets several empty packets in a row
  * Sometime single empty packet can be received in case of Multi server archive server1->server2 switching
  * or network issue/reconnect.
@@ -166,7 +167,7 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
     if (!checkSequence(videoFrame->opaque))
-        return true; //< no error. Just ignore old frame
+        return true; //< No error. Just ignore the old frame.
 
     quint32 videoChannel = videoFrame->channelNumber;
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
@@ -197,7 +198,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
 
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
-        return true; //< Frame is processed.
+        return true; //< The frame is processed.
 
     // First packet after a jump.
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
@@ -224,7 +225,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
-        qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
+        NX_LOG(lit("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
         // False result means we want to repeat this frame later, thus, returning true.
     }
     else
