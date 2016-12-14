@@ -21,8 +21,7 @@ using nx::hpm::MediaServerEmulator;
 
 constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
 
-class UdpTunnelConnector
-    :
+class UdpTunnelConnector:
     public cloud::test::TunnelConnector
 {
 public:

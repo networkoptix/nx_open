@@ -31,7 +31,9 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
 
     AsyncClient(Settings timeouts = kDefaultSettings);
-    ~AsyncClient() override;
+    virtual ~AsyncClient() override;
+
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     Q_DISABLE_COPY( AsyncClient );
 
@@ -71,6 +73,8 @@ private:
     void onConnectionComplete(SystemError::ErrorCode code);
     void processMessage(Message message );
 
+    virtual void stopWhileInAioThread() override;
+
 private:
     const Settings m_settings;
 
@@ -79,7 +83,7 @@ private:
     bool m_useSsl;
     State m_state;
 
-    nx::network::RetryTimer m_timer;
+    std::unique_ptr<nx::network::RetryTimer> m_timer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 

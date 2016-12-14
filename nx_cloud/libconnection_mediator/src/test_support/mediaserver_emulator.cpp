@@ -103,6 +103,7 @@ MediaServerEmulator::MediaServerEmulator(
         });
 
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
+    m_mediatorConnector->bindToAioThread(m_timer.getAioThread());
 
     m_mediatorConnector->mockupAddress(std::move(mediatorEndpoint));
 

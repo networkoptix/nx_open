@@ -37,7 +37,8 @@ void AsyncClientUser::setOnReconnectedHandler(
             if (auto lock = guard->lock())
                 return post(std::move(handler));
 
-            NX_LOGX(lm("Ignore reconnect handler"), cl_logDEBUG1);
+            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
+                .arg(this), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -74,8 +75,8 @@ void AsyncClientUser::sendRequest(
                         handler(code, std::move(message));
                     });
 
-            NX_LOGX(lm("Ignore response %1 handler")
-                .arg(message.header.transactionId.toHex()), cl_logDEBUG1);
+            NX_LOG(lm("AsyncClientUser(%1). Ignore response %2 handler")
+                .arg(this).arg(message.header.transactionId.toHex()), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -90,8 +91,8 @@ bool AsyncClientUser::setIndicationHandler(
             if (auto lock = guard->lock())
                 return post(std::bind(std::move(handler), std::move(message)));
 
-            NX_LOG(lm("Ignore indication %1 handler")
-                .arg(message.header.method), cl_logDEBUG1);
+            NX_LOG(lm("AsyncClientUser(%1). Ignore indication %2 handler")
+                .arg(this).arg(message.header.method), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -110,7 +111,7 @@ void AsyncClientUser::disconnectFromClient()
         });
 
     m_asyncGuard.reset();
-    NX_LOGX("Disconnected from client", cl_logDEBUG2);
+    NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
 }
 
 } // namespase stun

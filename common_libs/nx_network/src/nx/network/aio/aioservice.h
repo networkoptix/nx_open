@@ -91,7 +91,7 @@ public:
         Pollable* const sock,
         std::chrono::milliseconds timeoutMillis,
         AIOEventHandler<Pollable>* const eventHandler );
-
+    
     void registerTimerNonSafe(
         QnMutexLockerBase* const locker,
         Pollable* const sock,
