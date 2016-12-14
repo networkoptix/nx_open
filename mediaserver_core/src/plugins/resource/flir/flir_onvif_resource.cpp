@@ -2,15 +2,21 @@
 
 #ifdef ENABLE_ONVIF
 
-using namespace nx::plugins;
+namespace nx {
+namespace plugins {
+namespace flir {
 
-flir::OnvifResource::OnvifResource()
+OnvifResource::OnvifResource()
 {
 }
 
-CameraDiagnostics::Result flir::OnvifResource::initInternal()
+CameraDiagnostics::Result OnvifResource::initInternal()
 {
     return QnPlOnvifResource::initInternal();
 }
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx
 
 #endif // ENABLE_ONVIF
