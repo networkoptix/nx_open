@@ -74,6 +74,8 @@ private:
     static QnMutex m_createSocketMutex;
 };
 
+enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
+
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
@@ -118,7 +120,7 @@ private:
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
     void sendResponse(int code, const QByteArray& contentType);
-    bool isLiveMode() const;
+    Mode getStreamingMode() const;
 
     int numOfVideoChannels();
     int composeDescribe();

@@ -48,10 +48,11 @@ class BindOutput:
 # 'start' must be called from the main thread, so that signals for subprocess work.
 class Process:
 
-    def __init__( self, name, cmd, procMgr = None ):
+    def __init__( self, name, cmd, procMgr = None, env = None ):
         self.__name = name
         self.__cmd = cmd
         self.__procMgr = procMgr
+        self.__env = env
         if self.__procMgr:
             self.__procMgr.add(self)
 
@@ -64,7 +65,8 @@ class Process:
         self.__proc = subprocess.Popen(
           self.__cmd,
           stdout = subprocess.PIPE,
-          stderr = subprocess.PIPE)
+          stderr = subprocess.PIPE,
+          env = self.__env)
 
         self.out = BindOutput(self.__name, self.__proc.stdout, self._output, (), self._finished)
         self.err = BindOutput(self.__name, self.__proc.stderr, self._error)

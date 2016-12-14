@@ -67,7 +67,6 @@ static const QByteArray ENDL("\r\n");
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
-enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
 //static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
@@ -345,7 +344,7 @@ void QnRtspConnectionProcessor::parseRequest()
     else
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
 
-    if (!isLiveMode())
+    if (getStreamingMode() != Mode_Live)
         d->peerHasAccess = qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
 
     if (!d->peerHasAccess)
@@ -1189,10 +1188,16 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
 
 }
 
-bool QnRtspConnectionProcessor::isLiveMode() const
+Mode QnRtspConnectionProcessor::getStreamingMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return d->rtspScale >= 0 && d->startTime == DATETIME_NOW;
+
+    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
+        return Mode_ThumbNails;
+    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
+        return Mode_Live;
+
+    return Mode_Archive;
 }
 
 int QnRtspConnectionProcessor::composePlay()
@@ -1202,12 +1207,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
 
-    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
-        d->liveMode = Mode_ThumbNails;
-    else if (isLiveMode())
-        d->liveMode = Mode_Live;
-    else
-        d->liveMode = Mode_Archive;
+    d->liveMode = getStreamingMode();
 
     createDataProvider();
     checkQuality();
