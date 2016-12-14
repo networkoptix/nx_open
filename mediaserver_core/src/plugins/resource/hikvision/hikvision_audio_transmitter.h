@@ -16,7 +16,7 @@ public:
 
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
-    virtual void prepareHttpClient(nx_http::AsyncHttpClientPtr httpClient) override;
+    virtual void prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient) override;
     virtual bool isReadyForTransmission(
         nx_http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse) const override;

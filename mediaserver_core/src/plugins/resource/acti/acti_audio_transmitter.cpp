@@ -94,7 +94,7 @@ bool ActiAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     return true;
 }
 
-void ActiAudioTransmitter::prepareHttpClient(nx_http::AsyncHttpClientPtr httpClient)
+void ActiAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
 

@@ -51,7 +51,7 @@ bool HikvisionAudioTransmitter::sendData(const QnAbstractMediaDataPtr& data)
     return sendBuffer(m_socket.get(), data->data(), data->dataSize());
 }
 
-void HikvisionAudioTransmitter::prepareHttpClient(nx_http::AsyncHttpClientPtr httpClient)
+void HikvisionAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
 
@@ -116,7 +116,7 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
     if (format.sampleRate() != m_outputFormat.sampleRate() || 
         format.codec() != m_outputFormat.codec())
     {
-        m_outputFormat = format;
+        base_type::setOutputFormat(format);
         base_type::prepare();
     }
 

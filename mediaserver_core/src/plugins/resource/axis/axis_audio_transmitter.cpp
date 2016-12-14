@@ -38,7 +38,7 @@ bool QnAxisAudioTransmitter::sendData(
     return base_type::sendBuffer(m_socket.get(), data->data(), data->dataSize());
 }
 
-void QnAxisAudioTransmitter::prepareHttpClient(nx_http::AsyncHttpClientPtr httpClient)
+void QnAxisAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
     m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();

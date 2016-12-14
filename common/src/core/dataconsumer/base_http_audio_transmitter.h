@@ -27,7 +27,7 @@ public:
 
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) = 0;
-    virtual void prepareHttpClient(nx_http::AsyncHttpClientPtr httpClient) = 0;
+    virtual void prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient) = 0;
     virtual bool isReadyForTransmission(
         nx_http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse) const = 0;
