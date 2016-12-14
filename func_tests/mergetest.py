@@ -160,9 +160,13 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         start = time.time()
         srvInfo1 = self.servers[self.serverAddr1]
         srvInfo2 = self.servers[self.serverAddr2]
-        srvClient1 = Client(srvInfo1.user, srvInfo1.password)
-        srvClient2 = Client(srvInfo2.user, srvInfo2.password)
+        tlog(LOGLEVEL.INFO, "Use following credentials:")
+        for s, si in self.servers.items():
+            tlog(LOGLEVEL.INFO, "  %s: user: '%s', pwd: '%s'" %
+                 (s, si.user, si.password))
         while True:
+            srvClient1 = Client(srvInfo1.user, srvInfo1.password)
+            srvClient2 = Client(srvInfo2.user, srvInfo2.password)
             response1 = srvClient1.httpRequest(self.serverAddr1, "api/systemSettings")
             response2 = srvClient2.httpRequest(self.serverAddr2, "api/systemSettings")
             remain = self.mergeTimeout - (time.time() - start)

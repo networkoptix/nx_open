@@ -345,7 +345,7 @@ void QnRtspConnectionProcessor::parseRequest()
     else
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
 
-    if (d->startTime != 0)
+    if (!isLiveMode())
         d->peerHasAccess = qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
 
     if (!d->peerHasAccess)
@@ -1189,6 +1189,12 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
 
 }
 
+bool QnRtspConnectionProcessor::isLiveMode() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->rtspScale >= 0 && d->startTime == DATETIME_NOW;
+}
+
 int QnRtspConnectionProcessor::composePlay()
 {
 
@@ -1198,7 +1204,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
         d->liveMode = Mode_ThumbNails;
-    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
+    else if (isLiveMode())
         d->liveMode = Mode_Live;
     else
         d->liveMode = Mode_Archive;

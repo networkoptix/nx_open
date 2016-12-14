@@ -4,11 +4,13 @@
 
 #include <QtNetwork/QHostAddress>
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <nx/utils/thread/mutex.h>
 
 class QnPublicIPDiscovery:
-    public QObject
+    public QObject,
+    public nx::network::aio::BasicPollable
 {
     Q_OBJECT
 
@@ -16,6 +18,8 @@ public:
     /** If \a primaryUrls is empty, default urls are used */
     QnPublicIPDiscovery(QStringList primaryUrls = QStringList());
     virtual ~QnPublicIPDiscovery() override;
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     void waitForFinished();
     QHostAddress publicIP() const;
@@ -48,5 +52,7 @@ private:
     QnMutex m_mutex;
     std::set<nx_http::AsyncHttpClientPtr> m_httpRequests;
 
+    virtual void stopWhileInAioThread() override;
+    
     QString toString(Stage value) const;
 };

@@ -97,7 +97,7 @@ TEST(TcpSocket, socket_timer_is_single_shot)
 {
     constexpr auto kTimeout = std::chrono::milliseconds(10);
 
-    std::atomic<int> triggerCount = 0;
+    std::atomic<int> triggerCount(0);
 
     TCPSocket tcpSocket(AF_INET);
     tcpSocket.registerTimer(kTimeout, [&triggerCount]() { ++triggerCount; });

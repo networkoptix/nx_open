@@ -118,6 +118,7 @@ private:
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
     void sendResponse(int code, const QByteArray& contentType);
+    bool isLiveMode() const;
 
     int numOfVideoChannels();
     int composeDescribe();
