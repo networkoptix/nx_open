@@ -1,16 +1,9 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef STUN_MESSAGE_DATA_H
-#define STUN_MESSAGE_DATA_H
+#pragma once
 
 #include <nx/network/buffer.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/network/stun/cc/custom_stun.h>
-
 
 namespace nx {
 namespace hpm {
@@ -260,5 +253,3 @@ private:
 } // namespace api
 } // namespace hpm
 } // namespace nx
-
-#endif  //STUN_MESSAGE_DATA_H

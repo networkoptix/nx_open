@@ -1,15 +1,9 @@
-/**********************************************************
-* Jan 18, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
 #include "nx/network/cloud/cloud_connect_version.h"
-
 
 namespace nx {
 namespace hpm {
@@ -33,11 +27,10 @@ public:
     bool isPersistent;
 
     ConnectionRequestedEvent();
-
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

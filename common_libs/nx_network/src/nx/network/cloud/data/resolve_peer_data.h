@@ -9,7 +9,6 @@
 #include "connection_method.h"
 #include "stun_message_data.h"
 
-
 namespace nx {
 namespace hpm {
 namespace api {
@@ -24,9 +23,7 @@ public:
 
     nx::String hostName;
 
-    ResolvePeerRequest();
-    ResolvePeerRequest(nx::String _hostName);
-
+    ResolvePeerRequest(nx::String _hostName = {});
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
@@ -43,10 +40,6 @@ public:
     ConnectionMethods connectionMethods;
 
     ResolvePeerResponse();
-
-    /*!
-        \note after this method call object contents are undefined
-    */
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
