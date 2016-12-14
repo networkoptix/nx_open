@@ -58,13 +58,12 @@ start() {
     if [ -z "$PORT" ]; then PORT=7001; fi
     echo connecting to $CUSTOMIZATION server on port $PORT...    
     # changing active tty to 7 (should be always free)
-    if [ '$VTCONSOLE' != '7' ]; then chvt 7; fi
+    if [ "$VTCONSOLE" != "7" ]; then chvt 7; fi
 
     # Disable console cursor blinking.
     echo "0" >/sys/class/graphics/fbcon/cursor_blink
 
-    curl -s http://127.0.0.1:$PORT/static/version.txt | grep changeset | awk '{print $2}'
-    WEBADMIN_BUILD=$(curl -s http://127.0.0.1:$PORT/static/version.txt | grep changeset | awk '{print $2}')
+    WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt | grep changeset | awk '{print $2}'")
     if [ -z "$WEBADMIN_BUILD" ]; then 
         echo "Server is not running. Cannot run Lite Client"; 
         return 1
@@ -103,7 +102,7 @@ stop() {
         fi
     done
     # changing active tty back to 1
-    if [ '$VTCONSOLE' != '1' ]; then chvt 1; fi    
+    if [ "$VTCONSOLE" != "1" ]; then chvt 1; fi    
     echo "DONE"
 }
 
