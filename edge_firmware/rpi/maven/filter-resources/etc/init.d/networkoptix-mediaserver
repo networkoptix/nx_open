@@ -63,7 +63,8 @@ start() {
     echo -n "Starting $BIN_NAME: "
 
     # TODO: #boris: Implement log file rotation.
-    $BIN_PATH $RUN_ARGS >>/opt/networkoptix/mediaserver/var/log/mediaserver-out.log 2>&1 &
+    mkdir -p $PREFIX/var/log
+    $BIN_PATH $RUN_ARGS >>$PREFIX/var/log/mediaserver-out.log 2>&1 &
 
     if [ `/bin/pidof $BIN_NAME` ]
     then

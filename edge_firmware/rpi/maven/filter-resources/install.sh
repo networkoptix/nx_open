@@ -44,10 +44,10 @@ update () {
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
 
-    LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1)
+    LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1 | awk '{print $3}')
     if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
 
-    FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11)
+    FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11 | awk '{print $3}')
     if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
 
     touch /dev/cedar_dev
