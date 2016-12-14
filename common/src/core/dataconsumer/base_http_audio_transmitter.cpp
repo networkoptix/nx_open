@@ -114,15 +114,15 @@ bool BaseHttpAudioTransmitter::sendBuffer(AbstractStreamSocket* socket, const ch
 {
     size_t bytesSent = 0;
 
-    char* currentPos = const_cast<char*>(buffer);
+    const char* currentPos = buffer;
 
     while (bytesSent < size)
     {
         auto res = socket->send(currentPos, (unsigned int)(size - bytesSent));
-        if (res > 0)
-            bytesSent += res;
-        else
+        if (res <= 0)
             return false;
+        bytesSent += res;
+        currentPos += res;
     }
 
     return true;
