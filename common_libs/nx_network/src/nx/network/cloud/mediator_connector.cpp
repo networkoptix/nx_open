@@ -8,15 +8,22 @@
 #include "common/common_globals.h"
 
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
-static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes( 10 );
+static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 
 namespace nx {
 namespace hpm {
 namespace api {
 
+namespace {
+
+static stun::AbstractAsyncClient::Settings s_stunClientSettings
+    = stun::AbstractAsyncClient::kDefaultSettings;
+
+} // namespace
+
 MediatorConnector::MediatorConnector()
 :
-    m_stunClient(std::make_shared<stun::AsyncClient>()),
+    m_stunClient(std::make_shared<stun::AsyncClient>(s_stunClientSettings)),
     m_endpointFetcher(std::make_unique<nx::network::cloud::CloudModuleEndPointFetcher>(
         lit("hpm"),
         std::make_unique<nx::network::cloud::RandomEndpointSelector>())),
@@ -33,8 +40,8 @@ MediatorConnector::MediatorConnector()
 
 MediatorConnector::~MediatorConnector()
 {
+    NX_ASSERT((m_stunClient == nullptr) || m_stunClient.unique());
     pleaseStopSync(false);
-    //stopWhileInAioThread();
 }
 
 void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -44,13 +51,6 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     m_stunClient->bindToAioThread(aioThread);
     m_endpointFetcher->bindToAioThread(aioThread);
     m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
-}
-
-void MediatorConnector::reinitializeStunClient(
-    stun::AbstractAsyncClient::Settings stunClientSettings)
-{
-    m_stunClient = std::make_shared<stun::AsyncClient>(stunClientSettings);
-    m_stunClient->bindToAioThread(getAioThread());
 }
 
 void MediatorConnector::enable( bool waitComplete )
@@ -140,6 +140,12 @@ boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_mediatorAddress;
+}
+
+void MediatorConnector::setStunClientSettings(
+    stun::AbstractAsyncClient::Settings stunClientSettings)
+{
+    s_stunClientSettings = std::move(stunClientSettings);
 }
 
 static bool isReady(nx::utils::future<bool> const& f)

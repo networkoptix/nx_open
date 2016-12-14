@@ -120,7 +120,7 @@ void removeByClient(Container* container, void* client)
 void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler)
 {
     NX_ASSERT(client);
-    m_timer->dispatch(
+    dispatch(
         [this, client, handler = std::move(handler)]()
         {
             QnMutexLocker lock(&m_mutex);
@@ -137,7 +137,7 @@ void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handl
 
 void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
 {
-    m_timer.dispatch(
+    dispatch(
         [this, options = std::move(options)]()
         {
             // NOTE: Dispatched action might happen after connection closure.
@@ -194,8 +194,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     if( !m_endpoint )
     {
         lock->unlock();
-        m_timer->post(std::bind(
-            &AsyncClient::onConnectionComplete, this, SystemError::notConnected));
+        post(std::bind(&AsyncClient::onConnectionComplete, this, SystemError::notConnected));
         return;
     }
 
