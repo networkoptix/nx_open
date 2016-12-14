@@ -1,5 +1,7 @@
 #include "player_data_consumer.h"
 
+#include <algorithm>
+
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/debug_utils.h>
@@ -167,7 +169,10 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
     if (!checkSequence(videoFrame->opaque))
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): Ignoring old frame"), cl_logDEBUG2);
         return true; //< No error. Just ignore the old frame.
+    }
 
     quint32 videoChannel = videoFrame->channelNumber;
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
@@ -198,7 +203,10 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
 
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
         return true; //< The frame is processed.
+    }
 
     // First packet after a jump.
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
@@ -231,16 +239,27 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     else
     {
         if (decodedFrame)
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
             enqueueVideoFrame(std::move(decodedFrame));
+        }
+        else
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
+        }
     }
 
     return true;
 }
 
-bool PlayerDataConsumer::checkSequence(int sequence) const
+bool PlayerDataConsumer::checkSequence(int sequence)
 {
+    m_sequence = std::max(m_sequence, sequence);
     if (sequence && m_sequence && sequence != m_sequence)
+    {
+        //NX_LOG(lit("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
         return false;
+    }
     return true;
 }
 

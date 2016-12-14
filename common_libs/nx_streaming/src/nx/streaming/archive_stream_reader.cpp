@@ -12,6 +12,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <utils/media/frame_type_extractor.h>
+#include <nx/utils/log/log.h>
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
@@ -377,6 +378,8 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
+    //NX_LOG(lit("QnArchiveStreamReader::getNextData()"), cl_logDEBUG2);
+
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
 

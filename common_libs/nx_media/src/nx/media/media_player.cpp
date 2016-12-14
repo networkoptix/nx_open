@@ -55,7 +55,7 @@ static const int kTryLaterIntervalMs = 16;
 static const int kDefaultMaxTextureSize = 2048;
 
 // Player will go invalid state if no data during timeout
-static const int kGotDataTimeoutMs = 1000 * 10;
+static const int kGotDataTimeoutMs = 1000 * 15;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;
