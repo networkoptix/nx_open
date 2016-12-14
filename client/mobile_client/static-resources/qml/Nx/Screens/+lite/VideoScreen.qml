@@ -29,9 +29,9 @@ PageBase
                 screenshot.source = ""
         }
 
-        mediaPlayer.onResourceIdChanged:
+        mediaPlayer.onSourceChanged:
         {
-            if (mediaPlayer.resourceId)
+            if (mediaPlayer.source)
                 mediaPlayer.playLive()
             else
                 mediaPlayer.stop()
