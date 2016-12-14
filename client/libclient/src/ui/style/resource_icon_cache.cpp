@@ -237,7 +237,16 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = Unknown;
 
-    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    // Fake servers
+    if (flags.testFlag(Qn::fake))
+    {
+        auto server = resource.dynamicCast<QnMediaServerResource>();
+        NX_ASSERT(server);
+        status = helpers::serverBelongsToCurrentSystem(server->getModuleInformation())
+            ? Incompatible
+            : Online;
+    }
+    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;
@@ -266,14 +275,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
                 break;
 
             case Qn::Incompatible:
-                if (auto server = resource.dynamicCast<QnMediaServerResource>())
-                {
-                    if (!helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
-                    {
-                        status = Online;
-                        break;
-                    }
-                }
                 status = Incompatible;
                 break;
 
