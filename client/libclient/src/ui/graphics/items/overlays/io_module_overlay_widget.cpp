@@ -328,6 +328,8 @@ QnIoModuleOverlayContents
 QnIoModuleOverlayContents::QnIoModuleOverlayContents():
     base_type()
 {
+    setAcceptedMouseButtons(Qt::NoButton);
+    setAcceptHoverEvents(false);
 }
 
 QnIoModuleOverlayContents::~QnIoModuleOverlayContents()
