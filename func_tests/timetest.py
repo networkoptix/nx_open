@@ -11,6 +11,7 @@ import socket
 import struct
 import pprint
 import sys
+from pycommons.Utils import secs2str
 from pycommons.Logger import log, LOGLEVEL
 
 from testbase import *
@@ -166,10 +167,12 @@ class TimeSyncTest(FuncTestCase):
     def _request_gettime(self, boxnum, ask_box_time=True):
         "Request server's time and its system time. Also return current local time at moment response was received."
 #        answer = self._server_request(boxnum, 'api/gettime',)
-        answer = self._server_request(boxnum, 'ec2/getCurrentTime', nolog=True)
+        answer = self._server_request(boxnum, 'ec2/getCurrentTime')
+        answer['boxtime'] = self.get_box_time(self.hosts[boxnum]) if ask_box_time else 0
         answer['time'] = int(answer['value']) / 1000.0
         answer['local'] = time.time()
-        answer['boxtime'] = self.get_box_time(self.hosts[boxnum]) if ask_box_time else 0
+        log(LOGLEVEL.DEBUG + 9, "Server#%d ec2/getCurrentTime time: %s" %
+            (boxnum, secs2str(answer['time'])))
         return answer
 
     def _task_get_time(self, boxnum):
@@ -178,8 +181,9 @@ class TimeSyncTest(FuncTestCase):
 
     def _check_time_sync(self, sync_with_system=True):
         end_time = time.time() + SERVER_SYNC_TIMEOUT
-        reason = ''
         while time.time() < end_time:
+            reason = ''
+            time.sleep(0.2)
             for boxnum in xrange(self.num_serv):
                 self._worker.enqueue(self._task_get_time, (boxnum,))
             self._worker.joinQueue()
@@ -197,15 +201,15 @@ class TimeSyncTest(FuncTestCase):
                     type(self)._primary = td.index(min_td)
                     if not self.before_2_5:
                         self.assertTrue(self.times[self._primary]['isPrimaryTimeServer'],
-                            "Time was syncronized by server %s system time, but it's isPrimaryTimeServer flag is False" % self._primary)
+                            "Time was syncronized by server %s system time, " \
+                               "but it's isPrimaryTimeServer flag is False, timedeltas: '%s'" % (self._primary, td))
                     log(LOGLEVEL.INFO, "Synchronized by box %s" % self._primary)
                     return
                 else:
                     reason = "None of servers report time close enough to it's system time. Min delta = %.3f" % min_td
-            time.sleep(0.2)
         #self.debug_systime()
-        log(LOGLEVEL.ERROR, "0: ", self.times[0])
-        log(LOGLEVEL.ERROR, "1: ", self.times[1])
+        log(LOGLEVEL.ERROR, "0: %s" % self.times[0])
+        log(LOGLEVEL.ERROR, "1: %s" % self.times[1])
         self.fail(reason)
         #TODO: Add more details about servers' and their systems' time!
 
@@ -232,7 +236,8 @@ class TimeSyncTest(FuncTestCase):
 
     def get_box_time(self, box):
         resp = self._call_box(box, 'date', '+%s')
-        return int(resp.rstrip())
+        # Get last line of output to get rid of ssh output
+        return int(resp.splitlines()[-1].rstrip())
 
     def shift_box_time(self, box, delta):
         "Changes OS time on the box by the shift value"
