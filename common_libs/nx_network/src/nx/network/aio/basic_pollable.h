@@ -48,7 +48,7 @@ public:
 
 protected:
     /** Cancel your asynchronous operations here. */
-    virtual void stopWhileInAioThread() = 0;
+    virtual void stopWhileInAioThread();
 
     Pollable& pollable();
 

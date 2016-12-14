@@ -80,6 +80,10 @@ bool BasicPollable::isInSelfAioThread() const
     return getAioThread() == m_aioService.getCurrentAioThread();
 }
 
+void BasicPollable::stopWhileInAioThread()
+{
+}
+
 Pollable& BasicPollable::pollable()
 {
     return m_pollable;
