@@ -110,7 +110,13 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
     }
     else if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        handleLayoutAdded(layout);
+        connect(layout, &QnLayoutResource::parentIdChanged, this,
+            [this, layout]
+            {
+                updateAccessToLayout(layout);
+            });
+
+        updateAccessToLayout(layout);
     }
 }
 
@@ -138,7 +144,7 @@ void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& r
 void QnVideoWallItemAccessProvider::afterUpdate()
 {
     for (auto layout: qnResPool->getResources<QnLayoutResource>())
-        handleLayoutAdded(layout);
+        updateAccessToLayout(layout);
 
     base_type::afterUpdate();
 }
@@ -153,7 +159,7 @@ void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResour
     }
 }
 
-void QnVideoWallItemAccessProvider::handleLayoutAdded(const QnLayoutResourcePtr& layout)
+void QnVideoWallItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
 {
     /* Layouts and videowalls can be added independently. */
     auto parent = layout->getParentResource();
