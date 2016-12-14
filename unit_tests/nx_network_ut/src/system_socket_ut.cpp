@@ -93,6 +93,21 @@ TEST(TcpSocket, ErrorHandling)
         []() { return std::make_unique<TCPSocket>(AF_INET); });
 }
 
+TEST(TcpSocket, socket_timer_is_single_shot)
+{
+    constexpr auto kTimeout = std::chrono::milliseconds(10);
+
+    std::atomic<int> triggerCount = 0;
+
+    TCPSocket tcpSocket(AF_INET);
+    tcpSocket.registerTimer(kTimeout, [&triggerCount]() { ++triggerCount; });
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    tcpSocket.pleaseStopSync();
+
+    ASSERT_EQ(1, triggerCount.load());
+}
+
 TEST(TcpServerSocketIpv6, BindsToLocalAddress)
 {
     TCPServerSocket socket(AF_INET6);
