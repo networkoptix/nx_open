@@ -4,6 +4,23 @@
 
 ## This command will run each time after networkoptix-embedded-tools is installed
 
+set -x
+
+export NX1UPGRADELOG=/var/log/nx1upgrade.log
+# Close STDOUT file descriptor
+exec 1<&-
+# Close STDERR FD
+exec 2<&-
+
+# Open STDOUT as $NX1UPGRADELOG file for read and write.
+exec 1<>$NX1UPGRADELOG
+
+# Redirect STDERR to STDOUT
+exec 2>&1
+
+echo "Starting upgrade script ..."
+#avoid grabbing libstdc++ from mediaserver lib folder
+export LD_LIBRARY_PATH=
 export CUSTOMIZATION=${deb.customization.company.name}
 export DATAPART=/dev/mmcblk0p2
 export MNTDATAPART=/mnt/data
@@ -20,7 +37,9 @@ export DEBIAN_FRONTEND=noninteractive
 LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1)
 if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
 
-LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+# Uncomment to enable libc/libstdc++ upgrade.
+#LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+LIBC_NEW = "do not upgrade"
 if [ -z $LIBC_NEW ]; then
   cp /etc/apt/sources.list /etc/apt/sources.list_bk
   echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
@@ -37,13 +56,13 @@ touch /dev/cedar_dev
 chmod 777 /dev/disp
 chmod 777 /dev/cedar_dev
 usermod -aG video root
-rm -Rf /opt/networkoptix/mediaserver/lib
 
 mkdir -p $MNTDATAPART
 mount -t ext4 $DATAPART $MNTDATAPART
 cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
 rm -Rf $MNTDATAPART/opt/$CUSTOMIZATION
-tar xfv /tmp/$DISTRIB.tar.gz -C $MNTDATAPART
+cp -f /etc/init.d/nx1* $MNTDATAPART/etc/init.d
+cp -f /tmp/$DISTRIB.tar.gz $MNTDATAPART/root
 mkdir -p $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
 cp -f /root/tools/nx/ecs_static.sqlite $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
 CONF_FILE="$MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf"

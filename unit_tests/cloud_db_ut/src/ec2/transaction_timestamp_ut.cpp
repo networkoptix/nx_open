@@ -12,7 +12,7 @@ TEST(TransactionTimestamp, addNegative)
 
     ts += -1;
 
-    ASSERT_EQ(0, ts.sequence);
+    ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(9U, ts.ticks);
 }
 
@@ -24,7 +24,7 @@ TEST(TransactionTimestamp, addNegativeOverflow)
 
     ts += -3;
 
-    ASSERT_EQ(0, ts.sequence);
+    ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(std::numeric_limits<std::uint64_t>::max() - 1, ts.ticks);
 }
 
@@ -36,7 +36,7 @@ TEST(TransactionTimestamp, subtractPositive)
 
     ts -= 1;
 
-    ASSERT_EQ(0, ts.sequence);
+    ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(9U, ts.ticks);
 }
 
@@ -48,7 +48,7 @@ TEST(TransactionTimestamp, subtractPositiveOverflow)
 
     ts -= 3;
 
-    ASSERT_EQ(0, ts.sequence);
+    ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(std::numeric_limits<std::uint64_t>::max() - 1, ts.ticks);
 }
 

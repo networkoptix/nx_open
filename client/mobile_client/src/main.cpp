@@ -177,14 +177,21 @@ int runUi(QtSingleGuiApplication* application)
             QDesktopServices::openUrl(initialIntentData);
     #endif
 
-    QObject::connect(application, &QtSingleGuiApplication::messageReceived,
-        [&context](const QString& message)
+    QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
+        [&context, mainWindow](const QString& message)
         {
+            NX_LOG(lit("Processing application message BEGIN: %1").arg(message), cl_logDEBUG1);
             if (message == lit("startCamerasMode"))
             {
                 context.uiController()->openResourcesScreen();
                 context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+                mainWindow->update();
             }
+            else if (message == lit("refresh"))
+            {
+                mainWindow->update();
+            }
+            NX_LOG(lit("Processing application message END: %1").arg(message), cl_logDEBUG1);
         });
 
     return application->exec();
@@ -287,7 +294,17 @@ int main(int argc, char *argv[])
     if (application.isRunning())
     {
         if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
+        {
+            NX_LOG(lit("BEGIN Sending application message: startCamerasMode"), cl_logDEBUG1);
             application.sendMessage(lit("startCamerasMode"));
+            NX_LOG(lit("END Sending application message: startCamerasMode"), cl_logDEBUG1);
+        }
+        else
+        {
+            NX_LOG(lit("END Sending application message: refresh"), cl_logDEBUG1);
+            application.sendMessage(lit("refresh"));
+            NX_LOG(lit("BEGIN Sending application message: refresh"), cl_logDEBUG1);
+        }
         return 0;
     }
 

@@ -47,9 +47,15 @@ const std::chrono::seconds kDefaultCdbUpdateInterval(std::chrono::minutes(10));
 const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
 const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 
+const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
+const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
+
 //HTTP
 const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
 const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
+
+const QLatin1String kHttpKeepAliveOptions("http/keepAliveOptions");
+const QLatin1String kDefaultHttpKeepAliveOptions("");
 
 const QString kModuleName = lit("connection_mediator");
 
@@ -201,9 +207,15 @@ void Settings::loadConfiguration()
         m_settings.value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
         &m_stun.addrToListenList);
 
+    m_stun.keepAliveOptions = KeepAliveOptions::fromString(
+        m_settings.value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
+
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
+
+    m_http.keepAliveOptions = KeepAliveOptions::fromString(
+        m_settings.value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
 
     m_dbConnectionOptions.loadFromSettings(&m_settings);
 

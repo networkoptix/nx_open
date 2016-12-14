@@ -1029,7 +1029,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
             if (m_actionParams.userGroup == QnBusiness::AdminOnly)
                 return tr("Administrators Only");
             else
-                return tr("All Users");
+                return tr("Users");
         }
         case QnBusiness::BookmarkAction:
         case QnBusiness::CameraRecordingAction:

@@ -131,14 +131,21 @@ int MediatorProcess::exec()
         &stunMessageDispatcher,
         false,
         nx::network::NatTraversalSupport::disabled);
+
     if (!tcpStunServer.bind(settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to TCP addresses: %1")
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
         return 3;
     }
+
     m_stunEndpoints = tcpStunServer.endpoints();
-    
+    tcpStunServer.forEachListener(
+        [&settings](stun::SocketServer* server)
+        {
+            server->setConnectionKeepAliveOptions(settings.stun().keepAliveOptions);
+        });
+
     MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
     if (!udpStunServer.bind(m_stunEndpoints /*settings.stun().addrToListenList*/))
     {
@@ -150,7 +157,7 @@ int MediatorProcess::exec()
     std::unique_ptr<nx_http::MessageDispatcher> httpMessageDispatcher;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>
         multiAddressHttpServer;
-    
+
     launchHttpServerIfNeeded(
         settings,
         listeningPeerRegistrator,
@@ -181,7 +188,7 @@ int MediatorProcess::exec()
     }
 
     NX_LOGX(lit("STUN Server is listening on %1")
-        .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
+        .arg(containerString(settings.stun().addrToListenList)), cl_logALWAYS);
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
@@ -220,14 +227,21 @@ bool MediatorProcess::launchHttpServerIfNeeded(
             false,
             nx::network::NatTraversalSupport::disabled);
 
-    if (!(*multiAddressHttpServer)->bind(settings.http().addrToListenList))
+    auto& httpServer = *multiAddressHttpServer;
+    if (!httpServer->bind(settings.http().addrToListenList))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Failed to bind HTTP server to address ... . %1")
             .arg(SystemError::toString(osErrorCode)), cl_logERROR);
         return false;
     }
-    m_httpEndpoints = (*multiAddressHttpServer)->endpoints();
+
+    m_httpEndpoints = httpServer->endpoints();
+    httpServer->forEachListener(
+        [&settings](nx_http::HttpStreamSocketServer* server)
+        {
+            server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
+        });
 
     return true;
 }

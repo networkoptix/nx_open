@@ -21,19 +21,19 @@ bool InstanceController::initialize()
 {
     if (!m_queryExecutor->init())
     {
-        NX_LOG(lit("Failed to open connection to DB"), cl_logALWAYS);
+        NX_LOG(lit("Failed to open connection to DB"), cl_logERROR);
         return false;
     }
 
     if (!updateDbStructure())
     {
-        NX_LOG("Could not update DB to current vesion", cl_logALWAYS);
+        NX_LOG("Could not update DB to current vesion", cl_logERROR);
         return false;
     }
 
     if (!configureDb())
     {
-        NX_LOG("Failed to tune DB", cl_logALWAYS);
+        NX_LOG("Failed to tune DB", cl_logERROR);
         return false;
     }
 

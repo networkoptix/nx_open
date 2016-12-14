@@ -81,7 +81,7 @@ class BaseWorker(object):
 
     def _output(self, msg):
         if self._master.need_logexc():
-            sys.stdout.write(msg)
+            log(LOGLEVEL.DEBUG, msg)
         if logfile:
             print >>logfile, msg
 
@@ -115,8 +115,8 @@ class RequestWorker(BaseWorker):
             self._prep = [urllib2.Request(self._url)] # [self._session.prepare_request(requests.Request('GET', **kwargs))]
 
     def _req(self):
+        req = random.choice(self._prep)
         try:
-            req = random.choice(self._prep)
             #kwargs = {'verify': False} if req.url.startswith('https') else dict()
             #if logfile:
             #    print >>logfile, "URL: %s, HTTPS %s" % (req.url, 'ON' if 'verify' in kwargs else 'OFF')
@@ -127,10 +127,10 @@ class RequestWorker(BaseWorker):
                 return 'Code: %s' % res.getcode()
 #        except RequestException, e:
         except urllib2.URLError, e:
-            self._output("%s: %s\n" % (type(e).__name__, e.message))
+            self._output("'%s'exception: %s\n" % (req.get_full_url(), str(e)))
             return type(e).__name__
         except Exception, e:
-            self._output("Exception: %s\n" % (TB.format_exc(),))
+            self._output("'%s' exception: %s\n" % (req.get_full_url(), TB.format_exc()))
             return type(e).__name__
 
 

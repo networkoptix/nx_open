@@ -1,4 +1,3 @@
-
 #include "public_ip_discovery.h"
 
 #include <QtCore/QCoreApplication>
@@ -7,7 +6,6 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 
-
 namespace {
 
 const QString kDefaultPrimaryUrlsList(QLatin1String("http://www.mypublicip.com;http://checkip.eurodyndns.org"));
@@ -15,7 +13,7 @@ const QString kDefaultSecondaryUrlsList(QLatin1String("http://networkoptix.com/m
 const int kRequestTimeoutMs = 4 * 1000;
 const QLatin1String kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
-}
+} // namespace
 
 QnPublicIPDiscovery::QnPublicIPDiscovery(QStringList primaryUrls)
 :
@@ -40,6 +38,19 @@ QnPublicIPDiscovery::QnPublicIPDiscovery(QStringList primaryUrls)
         !m_primaryUrls.isEmpty(),
         Q_FUNC_INFO,
         "Server should have at least one public IP url");
+}
+
+QnPublicIPDiscovery::~QnPublicIPDiscovery()
+{
+    pleaseStopSync();
+}
+
+void QnPublicIPDiscovery::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    for (auto& httpRequest: m_httpRequests)
+        httpRequest->bindToAioThread(aioThread);
 }
 
 void QnPublicIPDiscovery::update()
@@ -123,13 +134,17 @@ void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpCli
 void QnPublicIPDiscovery::sendRequest(const QString &url)
 {
     nx_http::AsyncHttpClientPtr httpRequest = nx_http::AsyncHttpClient::create();
+    httpRequest->bindToAioThread(getAioThread());
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpRequests.insert(httpRequest);
+    }
 
     auto at_reply_finished =
-        [this, httpRequest](const nx_http::AsyncHttpClientPtr& httpClient) mutable
+        [this](const nx_http::AsyncHttpClientPtr& httpClient) mutable
         {
             handleReply(httpClient);
-            httpRequest->disconnect();
-            httpRequest.reset();
+            httpClient->disconnect();
             m_replyInProgress--;
             if (m_replyInProgress == 0)
                 nextStage();
@@ -140,17 +155,16 @@ void QnPublicIPDiscovery::sendRequest(const QString &url)
                 m_publicIP.clear();
                 emit found(m_publicIP);
             }
+
+            QnMutexLocker lock(&m_mutex);
+            m_httpRequests.erase(httpClient);
         };
 
     NX_LOG(lit("Sending request to %1").arg(url), cl_logDEBUG2);
     m_replyInProgress++;
 
     httpRequest->setResponseReadTimeoutMs(kRequestTimeoutMs);
-    connect(
-        httpRequest.get(), &nx_http::AsyncHttpClient::done,
-        this, at_reply_finished,
-        Qt::DirectConnection);
-    httpRequest->doGet(url);
+    httpRequest->doGet(url, at_reply_finished);
 }
 
 void QnPublicIPDiscovery::nextStage()
@@ -171,6 +185,11 @@ void QnPublicIPDiscovery::nextStage()
         m_stage = Stage::idle;
         NX_LOG(lit("Set stage to %1").arg(toString(m_stage)), cl_logDEBUG2);
     }
+}
+
+void QnPublicIPDiscovery::stopWhileInAioThread()
+{
+    m_httpRequests.clear();
 }
 
 QString QnPublicIPDiscovery::toString(Stage value) const

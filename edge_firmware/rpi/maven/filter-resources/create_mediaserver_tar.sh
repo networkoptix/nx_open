@@ -257,11 +257,13 @@ cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
-    mv -f $BUILD_DIR/etc/init.d/networkoptix-lite_client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite_client
+    mv -f $BUILD_DIR/etc/init.d/networkoptix-lite-client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite-client
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
+    # Uncomment to enable libc/libstdc++ upgrade.
+    #cp -f -P $PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
+    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.19/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d

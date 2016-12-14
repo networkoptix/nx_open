@@ -164,7 +164,7 @@ namespace nx_http
 
     bool AsyncHttpClient::failed() const
     {
-        return m_state == sFailed;
+        return m_state == sFailed || response() == nullptr;
     }
 
     SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const

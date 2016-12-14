@@ -20,10 +20,11 @@ inline int runTest(
 {
     nx::utils::FlagConfig::setOutputAllowed(false);
 
+    // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...)
+    ::testing::InitGoogleTest(&argc, (char**)argv);
+
     #ifdef USE_GMOCK
         ::testing::InitGoogleMock(&argc, (char**)argv);
-    #else
-        ::testing::InitGoogleTest(&argc, (char**)argv);
     #endif
 
     ArgumentParser args(argc, argv);

@@ -21,8 +21,7 @@ using nx::hpm::MediaServerEmulator;
 
 constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
 
-class UdpTunnelConnector
-    :
+class UdpTunnelConnector:
     public cloud::test::TunnelConnector
 {
 public:
@@ -137,7 +136,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
             return MediaServerEmulator::ActionToTake::proceedWithConnection;
         });
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen().first);
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(

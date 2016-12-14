@@ -62,7 +62,7 @@ static void waitForKeepAliveDisconnect(AbstractStreamSocket* socket)
 
     NX_LOG(lm("waitForKeepAliveDisconnect recv"), cl_logINFO);
     EXPECT_LT(socket->recv(buffer.data(), buffer.size()), 0);
-    EXPECT_EQ(SystemError::connectionAbort, SystemError::getLastOSErrorCode());
+    EXPECT_NE(SystemError::noError, SystemError::getLastOSErrorCode());
     NX_LOG(lm("waitForKeepAliveDisconnect end"), cl_logINFO);
 }
 
@@ -82,7 +82,7 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
 TEST(TcpSocket, DISABLED_KeepAliveOptionsClient)
 {
     const auto client = std::make_unique<TCPSocket>(AF_INET);
-    ASSERT_TRUE(client->connect(SocketAddress("")));
+    ASSERT_TRUE(client->connect(SocketAddress("52.55.219.5:3345")));
     waitForKeepAliveDisconnect(client.get());
 }
 
@@ -91,6 +91,21 @@ TEST(TcpSocket, ErrorHandling)
     nx::network::test::socketErrorHandling(
         []() { return std::make_unique<TCPServerSocket>(AF_INET); },
         []() { return std::make_unique<TCPSocket>(AF_INET); });
+}
+
+TEST(TcpSocket, socket_timer_is_single_shot)
+{
+    constexpr auto kTimeout = std::chrono::milliseconds(10);
+
+    std::atomic<int> triggerCount(0);
+
+    TCPSocket tcpSocket(AF_INET);
+    tcpSocket.registerTimer(kTimeout, [&triggerCount]() { ++triggerCount; });
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    tcpSocket.pleaseStopSync();
+
+    ASSERT_EQ(1, triggerCount.load());
 }
 
 TEST(TcpServerSocketIpv6, BindsToLocalAddress)

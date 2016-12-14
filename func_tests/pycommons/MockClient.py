@@ -5,6 +5,7 @@
 import urllib2, FuncTest, json, base64, httplib
 from Logger import LOGLEVEL
 from Config import config
+from ComparisonMixin import ComparisonMixin
 
 DEFAULT_TIMEOUT =  10.0
 DEFAULT_USER = 'admin'
@@ -90,7 +91,7 @@ class Client:
             FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
             return Client.ServerResponse(x.code, x.reason)
         except urllib2.URLError, x:
-            FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
+            FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET URL error '%s'" % (self.index, str(x)))
             return Client.ServerResponse(None, x.reason)
 
 class DigestAuthClient(Client):
@@ -126,4 +127,22 @@ class DigestAuthClient(Client):
                 # Sometimes we've got unexcpected BadStatusLine with empty status line
                 # It looks like an httplib bug, we may ignore it and try again
                 FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d got unexpected HTTP status BadStatusLine %s" % (self.index, str(x)))
+
+class ClientMixin(ComparisonMixin):
+
+    def setUp(self):
+        self.client = DigestAuthClient()
+
+    def tearDown(self):
+        pass
+
+    # Check API call error
+    def checkResponseError(self, response, method):
+        self.assertEqual(response.status, 200, "'%s' status" % method)
+        if isinstance(response, Client.ServerResponseData):
+            self.assertFalse(type(response.data) is str, 'JSON response expected')
+            if not isinstance(response.data, list):
+                self.assertEqual(int(response.data.get('error', 0)), 0, "'%s' reply.error" % method)
+                self.assertEqual(response.data.get('errorString', ''), '', "'%s' reply.errorString" % method)
+
                 

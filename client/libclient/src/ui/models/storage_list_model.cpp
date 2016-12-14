@@ -304,6 +304,9 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
         if (isStoragePoolInRebuild(storageData))
             return false;
 
+        if (index.column() == CheckBoxColumn && !storageData.isWritable)
+            return false;
+        
         return storageData.isOnline ||
             !storageIsActive(storageData);
     };

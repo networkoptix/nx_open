@@ -88,6 +88,7 @@ public:
 
     ~Statistics()
     {
+        m_queryExecutor.reset();
         stats::dao::DataObjectFactory::setFactoryFunc(nullptr);
     }
 
