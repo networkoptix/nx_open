@@ -870,6 +870,8 @@ void Player::setSource(const QUrl& url)
     if (d->resource && currentState == State::Playing)
         play();
 
+    emit sourceChanged();
+
     d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }
 
