@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef ENABLE_ONVIF
+#if defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
 
 #include <plugins/resource/onvif/onvif_resource.h>
 

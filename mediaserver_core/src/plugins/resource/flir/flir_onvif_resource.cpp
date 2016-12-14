@@ -1,6 +1,6 @@
 #include "flir_onvif_resource.h"
 
-#ifdef ENABLE_ONVIF
+#if defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
 
 namespace nx {
 namespace plugins {
