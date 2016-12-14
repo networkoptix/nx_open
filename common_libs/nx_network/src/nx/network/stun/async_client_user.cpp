@@ -37,7 +37,7 @@ void AsyncClientUser::setOnReconnectedHandler(
             if (auto lock = guard->lock())
                 return post(std::move(handler));
 
-            NX_LOGX(lm("Ignore reconnect handler"), cl_logDEBUG1);
+            NX_LOG(lm("AsyncClientUser. Ignoring reconnect handler"), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
