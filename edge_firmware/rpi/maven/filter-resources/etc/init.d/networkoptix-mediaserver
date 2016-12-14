@@ -58,7 +58,10 @@ start() {
     fi
 
     process_core_dump
-    hdparm -I /dev/sd? | grep Model > /tmp/hddlist
+    DISK=`fdisk -l | grep "Disk" | grep "dev/sd" | awk '{print substr ($2, 0, length($2))}'`
+    if [ ! -z $DISK ]; then
+        hdparm -I /dev/sd? | grep Model > /tmp/hddlist
+    fi    
 
     echo -n "Starting $BIN_NAME: "
 
@@ -66,13 +69,17 @@ start() {
     mkdir -p $PREFIX/var/log
     #$BIN_PATH $RUN_ARGS >>$PREFIX/var/log/mediaserver-out.log 2>&1 &
     $BIN_PATH $RUN_ARGS 2>&1 &
-
-    if [ `/bin/pidof $BIN_NAME` ]
-    then
-        echo "OK"
-    else
-        echo "FAILED"
-    fi
+    PORT=$(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
+    
+    for i in $(seq 10); do 
+        WEBADMIN_BUILD=$(LD_LIBRARY_PATH= && curl -s "http://127.0.0.1:$PORT/static/version.txt" | grep changeset | awk '{print $2}')
+        if [ ! -z "$WEBADMIN_BUILD" ]; then 
+            echo "Server started. Webadmin build is $WEBADMIN_BUILD" 
+            return 0
+        fi
+        sleep 1
+    done
+    if [ -z "$WEBADMIN_BUILD" ]; then echo "FAILED"; fi
 }
 
 startquiet() {

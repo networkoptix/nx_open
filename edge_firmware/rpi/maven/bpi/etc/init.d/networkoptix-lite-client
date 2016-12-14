@@ -54,7 +54,7 @@ start() {
        echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
        return 0
     fi
-    PORT=$(cat /opt/networkoptix/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
+    PORT=$(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
     if [ -z "$PORT" ]; then PORT=7001; fi
     echo connecting to $CUSTOMIZATION server on port $PORT...    
     # changing active tty to 7 (should be always free)
@@ -63,7 +63,7 @@ start() {
     # Disable console cursor blinking.
     echo "0" >/sys/class/graphics/fbcon/cursor_blink
 
-    WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt | grep changeset | awk '{print $2}'")
+    WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" | grep changeset | awk '{print $2}')
     if [ -z "$WEBADMIN_BUILD" ]; then 
         echo "Server is not running. Cannot run Lite Client"; 
         return 1
