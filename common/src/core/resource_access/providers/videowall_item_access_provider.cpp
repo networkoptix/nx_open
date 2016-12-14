@@ -90,7 +90,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
             {
                 auto videoWall = layout->getParentResource().dynamicCast<QnVideoWallResource>();
                 if (videoWall)
-                    providers << videoWall;
+                    providers << videoWall << layout;
                 break; /*< for item: getItems */
             }
         }

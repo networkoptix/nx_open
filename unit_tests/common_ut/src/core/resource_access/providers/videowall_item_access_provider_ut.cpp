@@ -237,8 +237,9 @@ TEST_F(QnVideoWallItemAccessProviderTest, accessProviders)
 
     QnResourceList providers;
     accessProvider()->accessibleVia(user, camera, &providers);
-    ASSERT_EQ(1, providers.size());
+    ASSERT_EQ(2, providers.size());
     ASSERT_TRUE(providers.contains(videoWall));
+    ASSERT_TRUE(providers.contains(layout));
 }
 
 TEST_F(QnVideoWallItemAccessProviderTest, checkByLayoutParentId)

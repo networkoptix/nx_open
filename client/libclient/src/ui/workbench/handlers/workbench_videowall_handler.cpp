@@ -19,6 +19,7 @@
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -57,6 +58,7 @@
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
+#include <ui/dialogs/messages/layouts_handler_messages.h>  //TODO: #GDM #VW refactor
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1388,7 +1390,6 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         }
     }
 
-    qnResPool->addResource(layout);
     return layout;
 }
 
@@ -1738,6 +1739,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
         {
             layoutResource = constructLayout(QnResourceList());
             layoutResource->setParentId(index.videowall()->getId());
+            qnResPool->addResource(layoutResource);
             resetLayout(QnVideoWallItemIndexList() << index, layoutResource);
         }
 
@@ -1920,6 +1922,50 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         targetLayout = constructLayout(targetResources);
         targetLayout->setParentId(videoWallId);
     }
+
+
+    /* User can occasionally remove own access to cameras by dropping something on videowall. */
+    if (dropAction == Action::SetAction
+        && currentLayout
+        && context()->user() //just in case
+        && !accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission))
+    {
+        QSet<QnUuid> oldResources = currentLayout->layoutResourceIds();
+        QSet<QnUuid> newResources = targetLayout->layoutResourceIds();
+
+        QnResourceList removedResources = qnResPool->getResources(oldResources - newResources);
+        QnResourceList inaccessible = removedResources.filtered(
+            [this, currentLayout, targetIndex](const QnResourcePtr& resource) -> bool
+            {
+                QnResourceList providers;
+                const auto accessSource = qnResourceAccessProvider->accessibleVia(
+                    context()->user(), resource, &providers);
+
+                // We need to get only resources which are accessible only by this layout
+                if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
+                    return false;
+
+                if (providers.size() > 2)
+                    return false;
+
+                NX_EXPECT(providers.contains(currentLayout));
+                NX_EXPECT(providers.contains(targetIndex.videowall()));
+
+                return true;
+            });
+
+        if (!inaccessible.isEmpty())
+        {
+            const auto okToContinue = QnLayoutsHandlerMessages::replaceVideoWallResources(
+                mainWindow(), inaccessible);
+            if (!okToContinue)
+                return;
+        }
+
+    }
+
+    if (!targetLayout->resourcePool())
+        qnResPool->addResource(targetLayout);
 
     switch (dropAction)
     {
