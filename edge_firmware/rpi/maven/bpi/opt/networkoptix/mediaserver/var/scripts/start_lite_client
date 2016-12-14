@@ -26,9 +26,8 @@ killall gpm
 
 # TODO: #boris: Implement log file rotation.
 CMD="LD_PRELOAD=\"/opt/$CUSTOMIZATION/lib/ldpreloadhook.so\" \
-    /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE 
-
-#    /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE \
+    /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE \
+    >>/dev/null 2>&1"
 #    >>/opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client-out.log 2>&1"
 
 echo "$(basename $0): Starting Lite Client with command:"

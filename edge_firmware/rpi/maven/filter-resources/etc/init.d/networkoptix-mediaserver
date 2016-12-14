@@ -19,7 +19,6 @@ BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 RUN_ARGS="-e --disable-crash-handler"
 
-export LD_LIBRARY_PATH=$PREFIX/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins
 export SASL_PATH=$/opt/$CUSTOMIZATION/lib/sasl2
 
@@ -72,14 +71,14 @@ start() {
     PORT=$(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
     
     for i in $(seq 10); do 
-        WEBADMIN_BUILD=$(LD_LIBRARY_PATH= && curl -s "http://127.0.0.1:$PORT/static/version.txt" | grep changeset | awk '{print $2}')
+        WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" | grep changeset | awk '{print $2}')
         if [ ! -z "$WEBADMIN_BUILD" ]; then 
             echo "Server started. Webadmin build is $WEBADMIN_BUILD" 
             return 0
         fi
         sleep 1
     done
-    if [ -z "$WEBADMIN_BUILD" ]; then echo "FAILED"; fi
+    echo "FAILED"
 }
 
 startquiet() {
