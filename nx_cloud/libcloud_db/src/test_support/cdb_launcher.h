@@ -151,6 +151,12 @@ public:
         const std::string& password,
         const std::string& systemId,
         std::vector<api::SystemSharingEx>* const sharings);
+    api::ResultCode getSystemSharing(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemId,
+        const std::string& userOfInterestEmail,
+        api::SystemSharingEx* sharing);
     api::ResultCode getAccessRoleList(
         const std::string& email,
         const std::string& password,
