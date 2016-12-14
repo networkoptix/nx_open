@@ -58,7 +58,7 @@ void HikvisionAudioTransmitter::prepareHttpClient(nx_http::AsyncHttpClientPtr ht
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
     httpClient->setDisablePrecalculatedAuthorization(false);
-    httpClient->setAllowPrecalculatedBasicAuth(true);
+    httpClient->setAuthType(nx_http::AsyncHttpClient::AuthType::authBasic);
 
     openChannelIfNeeded();
 }
