@@ -17,9 +17,12 @@ class TestCameraProc(Process):
     CAMERA_BIN=os.path.join(ServerEnvironment.getBinPath(), "testcamera")
    
     def __init__(self):
+        camera_env = os.environ.copy()
+        camera_env['LD_LIBRARY_PATH']=ServerEnvironment.getLDLibPath()
         sample_file=os.path.join(config.get("General", "vagrantFolder"), "sample.mkv")
-        command = [self.CAMERA_BIN, 'files="%s";count=1' % sample_file]
-        Process.__init__(self, 'TestCamera', command)
+        command = [
+            self.CAMERA_BIN, 'files="%s";count=1' % sample_file]
+        Process.__init__(self, 'TestCamera', command, env = camera_env)
 
 
 class TestCameraMixin(ClientMixin):

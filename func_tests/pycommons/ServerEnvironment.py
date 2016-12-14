@@ -27,6 +27,7 @@ class ServerEnvironment:
 
     SrvEnvCfg = "../build_variables/target/current_config.py"
     _srvBinPath = None
+    _ldPaths = []
 
     @classmethod
     def _findPath(cls, path, pattern):
@@ -44,11 +45,14 @@ class ServerEnvironment:
         return cls._srvBinPath
 
     @classmethod
+    def getLDLibPath(cls):
+        return ':'.join(cls._ldPaths)
+
+    @classmethod
     def initEnv(cls):
         env = dict()
         execfile(cls.SrvEnvCfg, env)
-        ld_paths = [env['QT_LIB'], env['LIB_PATH']]
-        os.environ['LD_LIBRARY_PATH'] = ':'.join(ld_paths)
+        cls._ldPaths = [env['QT_LIB'], env['LIB_PATH']]
         cls._srvBinPath = env['BIN_PATH']
 
 ServerEnvironment.initEnv()
