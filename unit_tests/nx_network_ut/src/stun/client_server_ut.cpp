@@ -18,12 +18,23 @@ namespace nx {
 namespace stun {
 namespace test {
 
-class TestServer: public SocketServer
+class TestServer:
+    public SocketServer
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher):
         SocketServer(&dispatcher, false)
     {
+    }
+
+    virtual ~TestServer() override
+    {
+        pleaseStop();
+        for (auto& connection: connections)
+        {
+            connection->pleaseStopSync();
+            connection.reset();
+        }
     }
 
     std::vector<std::shared_ptr<ServerConnection>> connections;

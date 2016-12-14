@@ -98,9 +98,8 @@ private:
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_socketDelegate;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
-    /** Used to tie this to aio thread.
-    //TODO #ak replace with aio thread timer */
-    std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
+    // TODO: #ak replace with aio::BasicPollable inheritance.
+    std::unique_ptr<aio::Timer> m_timer;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
 
     QnMutex m_mutex;

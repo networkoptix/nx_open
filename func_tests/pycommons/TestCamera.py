@@ -108,6 +108,11 @@ class TestCameraMixin(ClientMixin):
                 log(LOGLEVEL.INFO, "Camera appearance (wait cycle) done")
                 return
 
+    def restartCamera(self):
+        self.camera.stop()
+        time.sleep(5.0)
+        self.camera.start()
+
     def  switchCameraToServer(self, srv, srvGuid):
         self.assertTrue(self.cameraGuid)
         data = {}

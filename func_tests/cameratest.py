@@ -94,12 +94,14 @@ class VirtualCameraTest(FuncTestCase, TestCameraMixin):
 
         log(LOGLEVEL.INFO, "3. Switch camera to server#2.")
         self.switchCameraToServer(self.serverAddr1, serverGuid2)
+        self.restartCamera()
         self.__waitCameraHistory(
             [self.serverAddr1, self.serverAddr2],
             [serverGuid1, serverGuid2])
                 
         log(LOGLEVEL.INFO, "4. Switch camera to server#1.")
         self.switchCameraToServer(self.serverAddr1, serverGuid1)
+        self.restartCamera()
         self.__waitCameraHistory(
             [self.serverAddr1, self.serverAddr2],
             [serverGuid1, serverGuid2, serverGuid1])
