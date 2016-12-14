@@ -60,7 +60,7 @@ TEST(TcpReverseConnector, General)
 
             Buffer buffer(1024, Qt::Uninitialized);
             int size = 0;
-            while (!buffer.contains(kDelimiter + kDelimiter))
+            while (!buffer.left(size).contains(kDelimiter + kDelimiter))
             {
                 auto recv = client->recv(buffer.data() + size, buffer.size() - size);
                 ASSERT_GT(recv, 0);
