@@ -1,16 +1,11 @@
 #include "io_module_grid_overlay_contents.h"
-
-#include <array>
-#include <functional>
-
-#include <ui/processors/clickable.h>
-#include <utils/common/connective.h>
+#include "io_module_overlay_contents_p.h"
 
 
-class QnIoModuleGridOverlayContentsPrivate: public Connective<QObject>
+class QnIoModuleGridOverlayContentsPrivate: public QnIoModuleOverlayContentsPrivate
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QnIoModuleOverlayContentsPrivate;
 
     Q_DISABLE_COPY(QnIoModuleGridOverlayContentsPrivate)
     Q_DECLARE_PUBLIC(QnIoModuleGridOverlayContents)
@@ -20,135 +15,54 @@ class QnIoModuleGridOverlayContentsPrivate: public Connective<QObject>
 public:
     QnIoModuleGridOverlayContentsPrivate(QnIoModuleGridOverlayContents* main);
 
-    void portsChanged(const QnIOPortDataList& ports, bool userInputEnabled);
-    void stateChanged(const QnIOPortData& port, const QnIOStateData& state);
+protected:
+    virtual PortItem* createItem(const QString& id, bool isOutput);
 
 private:
-    class PortItem: public GraphicsWidget
+    /* Input port item implementation: */
+    class InputPortItem: public base_type::InputPortItem
     {
-        using base_type = GraphicsWidget;
+        using base_type = QnIoModuleOverlayContentsPrivate::InputPortItem;
 
     public:
-        PortItem(const QString& id, bool isOutput, QGraphicsItem* parent = nullptr);
-
-        QString id() const;
-        bool isOutput() const;
-
-        QString label() const;
-        void setLabel(const QString& label);
-
-        bool isOn() const;
-        void setOn(bool on);
-
-        qreal idWidth() const;
-
-        qreal minIdWidth() const;
-        void setMinIdWidth(qreal value);
-
-        qreal effectiveIdWidth() const;
+        using base_type::InputPortItem; //< forward constructors
 
     protected:
-        virtual void changeEvent(QEvent* event);
-
-        void paintId(QPainter* painter, const QRectF& rect, bool on);
-        void paintLabel(QPainter* painter, const QRectF& rect,
-            Qt::AlignmentFlag horizontalAlignment);
-
-    private:
-        void setupFonts();
-        void setTransparentForMouse(bool transparent);
-        void ensureElidedLabel(qreal width) const;
-
-    private:
-        const QString m_id;
-        const bool m_isOutput;
-        QString m_label;
-        bool m_on;
-        qreal m_minIdWidth;
-
-        QFont m_idFont;
-        QFont m_activeIdFont;
-        QFont m_labelFont;
-
-        /* Cached values: */
-        mutable qreal m_idWidth;
-        mutable qreal m_elidedLabelWidth;
-        mutable QString m_elidedLabel;
+        virtual void paint(QPainter* painter) override;
+        virtual void setupFonts(QFont& idFont, QFont& activeIdFont, QFont& labelFont) override;
     };
 
-    class InputPortItem: public PortItem
+    /* Output port item implementation: */
+    class OutputPortItem: public base_type::OutputPortItem
     {
-        using base_type = PortItem;
+        using base_type = QnIoModuleOverlayContentsPrivate::OutputPortItem;
 
     public:
-        InputPortItem(const QString& id, QGraphicsItem* parent = nullptr);
-        virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-    };
-
-    class OutputPortItem: public Clickable<PortItem>
-    {
-        using base_type = Clickable<PortItem>;
-
-    public:
-        /* We cannot use signal-slot mechanism in nested class. */
-        using ClickHandler = std::function<void(const QString&)>;
-
-        OutputPortItem(const QString& id, ClickHandler clickHandler, QGraphicsItem* parent = nullptr);
-        virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+        using base_type::OutputPortItem; //< forward constructors
 
     protected:
-        virtual void clickedNotify(QGraphicsSceneMouseEvent* event) override;
-
-    private:
-        ClickHandler m_clickHandler;
+        virtual QRectF activeRect() const override;
+        virtual void paint(QPainter* painter) override;
+        virtual void setupFonts(QFont& idFont, QFont& activeIdFont, QFont& labelFont) override;
     };
 
-    class Layout: public QGraphicsLayout
+    /* Layout implementation: */
+    class Layout: public base_type::Layout
     {
-        using base_type = QGraphicsLayout;
+        using base_type = QnIoModuleOverlayContentsPrivate::Layout;
 
     public:
-        Layout(QGraphicsLayoutItem* parent = nullptr);
-
-        void clear();
-        bool addItem(PortItem* item);
-        PortItem* itemById(const QString& id);
-
-        virtual int count() const override;
-        virtual QGraphicsLayoutItem* itemAt(int index) const override;
-        virtual void removeAt(int index) override;
+        using base_type::Layout; //< forward constructors
 
         virtual void setGeometry(const QRectF& rect) override;
-        virtual void invalidate() override;
 
     protected:
         virtual QSizeF sizeHint(Qt::SizeHint which,
             const QSizeF& constraint = QSizeF()) const override;
 
-    private:
-        using Position = QPoint;
-        struct ItemWithPosition
-        {
-            PortItem* item;
-            Position position;
-        };
-
-        using Items = QList<ItemWithPosition>;
-
-        ItemWithPosition& itemWithPosition(int index);
-        void ensureLayout();
-
-        using Location = QPair<Items&, int>;
-        Location locate(int index);
-
-        using ConstLocation = QPair<const Items&, int>;
-        ConstLocation locate(int index) const;
+        virtual void recalculateLayout() override;
 
     private:
-        Items m_inputItems;
-        Items m_outputItems;
-        QHash<QString, PortItem*> m_itemsById;
-
         enum Columns
         {
             kLeftColumn,
@@ -157,14 +71,6 @@ private:
             kColumnCount
         };
 
-        std::array<int, kColumnCount> m_rowCounts;
-        bool m_layoutDirty;
+        std::array<int, kColumnCount> m_rowCounts { 0, 0 };
     };
-
-private:
-    PortItem* createItem(const QnIOPortData& port);
-    QnIoModuleOverlayWidget* widget() const;
-
-private:
-    Layout* layout;
 };
