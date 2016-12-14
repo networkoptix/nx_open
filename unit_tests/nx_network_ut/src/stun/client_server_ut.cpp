@@ -21,8 +21,8 @@ namespace test {
 class TestServer: public SocketServer
 {
 public:
-    TestServer(const nx::stun::MessageDispatcher& dispatcher)
-        : SocketServer(&dispatcher, false)
+    TestServer(const nx::stun::MessageDispatcher& dispatcher):
+        SocketServer(&dispatcher, false)
     {
     }
 
@@ -30,7 +30,7 @@ public:
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
-            std::unique_ptr<AbstractStreamSocket> _socket) override
+        std::unique_ptr<AbstractStreamSocket> _socket) override
     {
         auto connection = SocketServer::createConnection(std::move(_socket));
         connections.push_back(connection);
