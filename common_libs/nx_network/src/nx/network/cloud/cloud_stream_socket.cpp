@@ -2,6 +2,7 @@
 
 #include <utils/common/systemerror.h>
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
 #include "tunnel/outgoing_tunnel.h"
@@ -14,14 +15,14 @@ namespace cloud {
 
 CloudStreamSocket::CloudStreamSocket(int ipVersion)
 :
-    m_aioThreadBinder(SocketFactory::createDatagramSocket()),
+    m_timer(std::make_unique<aio::Timer>()),
     m_connectPromisePtr(nullptr),
     m_terminated(false),
     m_ipVersion(ipVersion)
 {
     //TODO #ak user MUST be able to bind this object to any aio thread
     //getAioThread binds to an aio thread
-    m_socketAttributes.aioThread = m_aioThreadBinder->getAioThread();
+    m_socketAttributes.aioThread = m_timer->getAioThread();
 }
 
 CloudStreamSocket::~CloudStreamSocket()
@@ -141,7 +142,7 @@ bool CloudStreamSocket::connect(
         [this, &promise](SystemError::ErrorCode code)
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
-            m_aioThreadBinder->post(
+            m_timer->post(
                 [this, code]()
                 {
                     if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
@@ -210,13 +211,17 @@ void CloudStreamSocket::cancelIOAsync(
     {
         if (m_socketDelegate)
         {
-            NX_ASSERT(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
+            NX_ASSERT(m_timer->getAioThread() == m_socketDelegate->getAioThread());
         }
 
-        m_aioThreadBinder->cancelIOAsync(
-            eventType,
+        m_timer->post(
             [this, eventType, handler = move(handler)]() mutable
             {
+                if (eventType == aio::etNone)
+                    m_timer->pleaseStopSync();
+                else if (eventType == aio::etTimedOut)
+                    m_timer->cancelSync();
+
                 if (m_socketDelegate)
                     m_socketDelegate->cancelIOSync(eventType);
                 handler();
@@ -237,24 +242,31 @@ void CloudStreamSocket::cancelIOAsync(
 
 void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
 {
+    // TODO: #ak this method should just invoke cancelIOAsync.
+
     if (eventType == aio::etWrite || eventType == aio::etNone)
     {
         m_asyncConnectGuard->terminate(); // breaks outgoing connects
         nx::network::SocketGlobals::addressResolver().cancel(this);
     }
-    m_aioThreadBinder->cancelIOSync(eventType);
+
+    if (eventType == aio::etNone)
+        m_timer->pleaseStopSync();
+    else if (eventType == aio::etTimedOut)
+        m_timer->cancelSync();
+
     if (m_socketDelegate)
         m_socketDelegate->cancelIOSync(eventType);
 }
 
 void CloudStreamSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_aioThreadBinder->post(std::move(handler));
+    m_timer->post(std::move(handler));
 }
 
 void CloudStreamSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_aioThreadBinder->dispatch(std::move(handler));
+    m_timer->dispatch(std::move(handler));
 }
 
 void CloudStreamSocket::connectAsync(
@@ -273,7 +285,7 @@ void CloudStreamSocket::connectAsync(
 
             if (operationGuard->lock())
             {
-                m_aioThreadBinder->post(
+                m_timer->post(
                     [this, port, handler = std::move(handler),
                         code, dnsEntries = std::move(dnsEntries)]() mutable
                     {
@@ -302,7 +314,7 @@ void CloudStreamSocket::readSomeAsync(
     if (m_socketDelegate)
         m_socketDelegate->readSomeAsync(buf, std::move(handler));
     else
-        m_aioThreadBinder->post(std::bind(handler, SystemError::notConnected, 0));
+        m_timer->post(std::bind(handler, SystemError::notConnected, 0));
 }
 
 void CloudStreamSocket::sendAsync(
@@ -312,26 +324,26 @@ void CloudStreamSocket::sendAsync(
     if (m_socketDelegate)
         m_socketDelegate->sendAsync(buf, std::move(handler));
     else
-        m_aioThreadBinder->post(std::bind(handler, SystemError::notConnected, 0));
+        m_timer->post(std::bind(handler, SystemError::notConnected, 0));
 }
 
 void CloudStreamSocket::registerTimer(
-    std::chrono::milliseconds timeoutMs,
+    std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));
+    m_timer->start(timeout, std::move(handler));
 }
 
 aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
 {
-    return m_aioThreadBinder->getAioThread();
+    return m_timer->getAioThread();
 }
 
 void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     if (m_socketDelegate)
         m_socketDelegate->bindToAioThread(aioThread);
-    m_aioThreadBinder->bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
     m_socketAttributes.aioThread = aioThread;
 }
 
@@ -413,7 +425,7 @@ void CloudStreamSocket::connectToEntryAsync(
                         return; //operation has been cancelled
 
                     if (errorCode == SystemError::noError)
-                        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
+                        NX_ASSERT(cloudConnection->getAioThread() == m_timer->getAioThread());
                     else
                         NX_ASSERT(!cloudConnection);
 
@@ -474,7 +486,7 @@ void CloudStreamSocket::onCloudConnectDone(
 
     if (errorCode == SystemError::noError)
     {
-        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
+        NX_ASSERT(cloudConnection->getAioThread() == m_timer->getAioThread());
         m_socketDelegate = std::move(cloudConnection);
         setDelegate(m_socketDelegate.get());
     }
