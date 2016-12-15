@@ -546,6 +546,9 @@
                 "button": "dark11",
                 "midlight": "dark12",
                 "shadow": "dark5.setAlpha(77)"
+            },
+            "disabled": {
+                "button": "dark11.setAlpha(77)"
             }
         }
     },
@@ -560,6 +563,9 @@
                 "button": "dark9",
                 "midlight": "dark10",
                 "shadow": "dark5.setAlpha(77)"
+            },
+            "disabled": {
+                "button": "dark9.setAlpha(77)"
             }
         }
     },

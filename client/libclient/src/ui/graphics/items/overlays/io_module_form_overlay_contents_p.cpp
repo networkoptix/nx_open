@@ -147,6 +147,10 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::ensurePaths(const QRe
 
 void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* painter)
 {
+    auto palette = this->palette();
+    if (!isEnabled())
+        palette.setCurrentColorGroup(QPalette::Disabled);
+
     auto idRect = rect();
     paintId(painter, idRect, false);
 
@@ -156,14 +160,15 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     auto buttonRect = activeRect();
 
     ensurePaths(buttonRect);
-    painter->fillPath(m_buttonPath, palette().brush(colorRole));
+    painter->fillPath(m_buttonPath, palette.brush(colorRole));
 
     const QPainterPath& shadowPath = pressed ? m_topShadowPath : m_bottomShadowPath;
-    painter->fillPath(shadowPath, palette().shadow());
+    painter->fillPath(shadowPath, palette.shadow());
 
     auto labelRect = buttonRect.adjusted(kButtonMargin, 0.0, -kIndicatorWidth, 0.0);
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
+    //TODO: #vkutin #apats Icon for disabled state is required
     auto icon = qnSkin->icon(lit("io/button_indicator_off.png"), lit("io/button_indicator_on.png"));
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;

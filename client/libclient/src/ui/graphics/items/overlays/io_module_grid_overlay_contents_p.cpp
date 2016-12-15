@@ -94,12 +94,16 @@ QRectF QnIoModuleGridOverlayContentsPrivate::OutputPortItem::activeRect() const
 
 void QnIoModuleGridOverlayContentsPrivate::OutputPortItem::paint(QPainter* painter)
 {
+    auto palette = this->palette();
+    if (!isEnabled())
+        palette.setCurrentColorGroup(QPalette::Disabled);
+
     auto itemRect(rect().adjusted(0.0, 0.0, -1.0, -1.0));
     bool hovered = isHovered();
     bool pressed = hovered && scene() && scene()->mouseGrabberItem() == this;
 
     auto colorRole = pressed ? QPalette::Dark : (hovered ? QPalette::Midlight : QPalette::Button);
-    painter->fillRect(itemRect, palette().brush(colorRole));
+    painter->fillRect(itemRect, palette.brush(colorRole));
 
     if (pressed)
     {
@@ -109,14 +113,14 @@ void QnIoModuleGridOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
 
         auto topRect = itemRect;
         topRect.setHeight(kTopShadowWidth);
-        painter->fillRect(topRect, palette().shadow());
+        painter->fillRect(topRect, palette.shadow());
 
         auto sideRect = itemRect;
         sideRect.setTop(topRect.bottom());
         sideRect.setWidth(kSideShadowWidth);
-        painter->fillRect(sideRect, palette().shadow());
+        painter->fillRect(sideRect, palette.shadow());
         sideRect.moveRight(itemRect.right());
-        painter->fillRect(sideRect, palette().shadow());
+        painter->fillRect(sideRect, palette.shadow());
     }
 
     auto idRect = rect().adjusted(style::Metrics::kDefaultTopLevelMargin, 0.0, 0.0, 0.0);
