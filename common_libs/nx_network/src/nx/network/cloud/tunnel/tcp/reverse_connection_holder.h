@@ -9,10 +9,22 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
+class NX_NETWORK_API ReverseConnectionSource
+{
+public:
+    typedef utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> Handler;
+
+    virtual size_t socketCount() const = 0;
+    virtual void takeSocket(std::chrono::milliseconds timeout, Handler handler) = 0;
+};
+
 /**
  * Keeps all user NXRC connections and moniors if they close.
  */
-class NX_NETWORK_API ReverseConnectionHolder: 
+class NX_NETWORK_API ReverseConnectionHolder:
+    public ReverseConnectionSource,
     public aio::BasicPollable
 {
 public:
@@ -27,14 +39,11 @@ public:
     ReverseConnectionHolder& operator=(const ReverseConnectionHolder&) = delete;
     ReverseConnectionHolder& operator=(ReverseConnectionHolder&&) = delete;
 
+    /** @note Can only be called from bould AIO thread. */
     void saveSocket(std::unique_ptr<AbstractStreamSocket> socket);
-    size_t socketCount() const;
 
-    typedef utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket>)> Handler;
-
-    void takeSocket(std::chrono::milliseconds timeout, Handler handler);
+    virtual size_t socketCount() const override;
+    virtual void takeSocket(std::chrono::milliseconds timeout, Handler handler) override;
 
 private:
     void startCleanupTimer(std::chrono::milliseconds timeLeft);
