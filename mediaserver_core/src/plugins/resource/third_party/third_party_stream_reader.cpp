@@ -240,6 +240,15 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 initializeAudioContext( audioFormat );
         }
 
+        char mediaUrlBuf[nxcip::MAX_TEXT_LEN];
+        auto error = m_mediaEncoder2->getMediaUrl(mediaUrlBuf);
+
+        if (error == nxcip::NX_NO_ERROR)
+        {
+            QString mediaUrlStr(mediaUrlBuf);
+            m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
+        }   
+
         return CameraDiagnostics::NoErrorResult();
     }
     else
@@ -278,6 +287,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             m_builtinStreamReader.reset(new MJPEGStreamReader(
                 m_resource,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
+        }
+        else 
+        {
+            return CameraDiagnostics::UnknownErrorResult();
         }
         return m_builtinStreamReader->openStream();
     }

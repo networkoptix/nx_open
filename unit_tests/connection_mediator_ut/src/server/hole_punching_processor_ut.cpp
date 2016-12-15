@@ -65,7 +65,9 @@ TEST_F(HolePunchingProcessor, generic_tests)
                 return MediaServerEmulator::ActionToTake::ignoreIndication;
             });
 
-        ASSERT_EQ(api::ResultCode::ok, server1->listen());
+        const auto listenResult = server1->listen();
+        ASSERT_EQ(api::ResultCode::ok, listenResult.first);
+        ASSERT_EQ(KeepAliveOptions(10, 10, 3), listenResult.second.tcpConnectionKeepAlive);
 
         //requesting connect to the server
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
@@ -174,7 +176,7 @@ TEST_F(HolePunchingProcessor, server_failure)
             return actionToTake;
         });
 
-        ASSERT_EQ(api::ResultCode::ok, server1->listen());
+        ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
 
         //requesting connect to the server 
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
@@ -239,7 +241,7 @@ TEST_F(HolePunchingProcessor, destruction)
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
 
-    ASSERT_EQ(api::ResultCode::ok, server1->listen());
+    ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
 
     for (int i = 0; i < 100; ++i)
     {

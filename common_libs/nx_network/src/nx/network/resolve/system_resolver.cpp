@@ -44,15 +44,15 @@ static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
 
 } // namespace
 
-std::deque<HostAddress> SystemResolver::resolve(const QString& hostName, int ipVersion)
+SystemError::ErrorCode SystemResolver::resolve(
+    const QString& hostName,
+    int ipVersion,
+    std::deque<HostAddress>* resolvedAddresses)
 {
     auto resultCode = SystemError::noError;
     const auto guard = makeScopedGuard([&]() { SystemError::setLastErrorCode(resultCode); });
     if (hostName.isEmpty())
-    {
-        resultCode = SystemError::invalidData;
-        return std::deque<HostAddress>();
-    }
+        return SystemError::invalidData;
 
     addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -95,15 +95,15 @@ std::deque<HostAddress> SystemResolver::resolve(const QString& hostName, int ipV
 
         NX_LOGX(lm("Resolve of %1 on DNS failed with result %2")
             .str(hostName).str(SystemError::toString(resultCode)), cl_logDEBUG2);
-        return std::deque<HostAddress>();
+        return resultCode;
     }
 
     std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
-    const auto result = convertAddrInfo(addressInfo);
-    if (result.empty())
-        resultCode = SystemError::hostNotFound;
+    *resolvedAddresses = convertAddrInfo(addressInfo);
+    if (resolvedAddresses->empty())
+        return SystemError::hostNotFound;
 
-    return result;
+    return SystemError::noError;
 }
 
 } // namespace network

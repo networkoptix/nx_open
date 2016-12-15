@@ -328,40 +328,8 @@ void CloudServerSocket::registerOnMediator(
     NX_ASSERT(m_state == State::readyToListen);
     m_state = State::registeringOnMediator;
 
-    const auto cloudCredentials = m_mediatorConnection
-        ->credentialsProvider()->getSystemCredentials();
-
-    if (!cloudCredentials)
-    {
-        SystemError::setLastErrorCode(SystemError::invalidData);
-        m_state = State::readyToListen;
-        return handler(hpm::api::ResultCode::notAuthorized);
-    }
-
-    nx::hpm::api::ListenRequest listenRequestData;
-    listenRequestData.systemId = cloudCredentials->systemId;
-    listenRequestData.serverId = cloudCredentials->serverId;
-
-    m_mediatorConnection->listen(
-        std::move(listenRequestData),
-        [this, handler = std::move(handler)](hpm::api::ResultCode code)
-        {
-            m_mediatorConnection->setOnReconnectedHandler(
-                std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
-
-            if (code == hpm::api::ResultCode::ok)
-            {
-                m_state = State::listening;
-            }
-            else
-            {
-                //TODO #ak set appropriate error code
-                SystemError::setLastErrorCode(SystemError::invalidData);
-                m_state = State::readyToListen;
-            }
-
-            handler(code);
-        });
+    m_registrationHandler = std::move(handler);
+    issueRegistrationRequest();
 }
 
 hpm::api::ResultCode CloudServerSocket::registerOnMediatorSync()
@@ -423,8 +391,16 @@ void CloudServerSocket::startAcceptor(
 }
 
 void CloudServerSocket::onListenRequestCompleted(
-    nx::hpm::api::ResultCode resultCode)
+    nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response)
 {
+    const auto registrationHandlerGuard = makeScopedGuard(
+        [handler = std::move(m_registrationHandler), resultCode]()
+        {
+            if (handler)
+                handler(resultCode);
+        });
+
+    m_registrationHandler = nullptr;
     NX_ASSERT(m_state == State::registeringOnMediator);
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
@@ -432,6 +408,9 @@ void CloudServerSocket::onListenRequestCompleted(
 
         m_mediatorConnection->setOnReconnectedHandler(
             std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
+
+        if (response.tcpConnectionKeepAlive)
+            m_mediatorConnection->setKeepAliveOptions(*response.tcpConnectionKeepAlive);
 
         NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         auto acceptHandler = std::move(m_savedAcceptHandler);
@@ -500,7 +479,7 @@ void CloudServerSocket::issueRegistrationRequest()
         //specially for unit tests
         m_mediatorRegistrationRetryTimer.dispatch(std::bind(
             &CloudServerSocket::onListenRequestCompleted, this,
-            nx::hpm::api::ResultCode::notAuthorized));
+            nx::hpm::api::ResultCode::notAuthorized, hpm::api::ListenResponse()));
         return;
     }
 
@@ -509,11 +488,11 @@ void CloudServerSocket::issueRegistrationRequest()
     listenRequestData.serverId = cloudCredentials->serverId;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
-        [this](nx::hpm::api::ResultCode resultCode)
+        [this](nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response)
         {
             m_mediatorRegistrationRetryTimer.dispatch(std::bind(
                 &CloudServerSocket::onListenRequestCompleted, this,
-                resultCode));
+                resultCode, std::move(response)));
         });
 }
 

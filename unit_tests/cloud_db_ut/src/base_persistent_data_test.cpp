@@ -16,6 +16,7 @@ using SystemDataObject = cdb::dao::rdb::SystemDataObject;
 using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
 
 BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializationType):
+    db::test::TestWithDbHelper("cdb", QString()),
     m_systemDbController(m_settings)
 {
     if (dbInitializationType == DbInitializationType::immediate)

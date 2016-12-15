@@ -4,7 +4,7 @@
 #include <dao/rdb/account_data_object.h>
 #include <dao/rdb/system_data_object.h>
 #include <dao/rdb/system_sharing_data_object.h>
-#include <test_support/test_with_db_helper.h>
+#include <utils/db/test_support/test_with_db_helper.h>
 
 #include <libcloud_db/src/settings.h>
 
@@ -13,7 +13,7 @@ namespace cdb {
 namespace test {
 
 class BasePersistentDataTest:
-    public TestWithDbHelper
+    public db::test::TestWithDbHelper
 {
 public:
     enum class DbInitializationType

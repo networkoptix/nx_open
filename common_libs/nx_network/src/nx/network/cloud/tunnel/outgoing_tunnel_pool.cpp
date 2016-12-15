@@ -61,14 +61,16 @@ String OutgoingTunnelPool::ownPeerId() const
     QnMutexLocker lock(&m_mutex);
     if (!m_isOwnPeerIdDesignated)
     {
-        m_isOwnPeerIdDesignated = true; //< Peer Id is not supposed to be changed after first use.
-        NX_LOGX(lm("Random own peer Id: %1").arg(m_ownPeerId), cl_logINFO);
+        NX_ASSERT(false, "Own peer id is not supposed to be used until it's designated");
+
+        m_isOwnPeerIdDesignated = true; //< Peer id is not supposed to be changed after first use.
+        NX_LOGX(lm("Random own peer id: %1").arg(m_ownPeerId), cl_logINFO);
     }
 
     return m_ownPeerId;
 }
 
-void OutgoingTunnelPool::designateOwnPeerId(const String& name, const QnUuid& uuid)
+void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
 {
     const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
 
@@ -77,7 +79,7 @@ void OutgoingTunnelPool::designateOwnPeerId(const String& name, const QnUuid& uu
     m_isOwnPeerIdDesignated = true;
 
     m_ownPeerId = QString(id).toUtf8();
-    NX_LOGX(lm("Designated own peer Id: %1").arg(m_ownPeerId), cl_logINFO);
+    NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
 }
 
 const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(

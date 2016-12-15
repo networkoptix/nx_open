@@ -34,6 +34,8 @@ struct ApiIdData: ApiData
      */
     void fillId() { id = QnUuid::createUuid(); }
 
+    bool operator==(const ApiIdData& rhs) const;
+
     QnUuid id;
 };
 #define ApiIdData_Fields (id)

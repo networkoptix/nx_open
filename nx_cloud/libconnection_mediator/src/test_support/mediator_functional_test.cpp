@@ -32,8 +32,7 @@
 namespace nx {
 namespace hpm {
 
-MediatorFunctionalTest::MediatorFunctionalTest()
-:
+MediatorFunctionalTest::MediatorFunctionalTest():
     m_stunPort(0),
     m_httpPort(0)
 {

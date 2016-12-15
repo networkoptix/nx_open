@@ -84,6 +84,8 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient;
+    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+
     msClient.connect( address() );
     {
         stun::Message request( stun::Header( stun::MessageClass::request,

@@ -233,7 +233,11 @@ Control
                 id: player
 
                 resourceId: cameraItem.resourceId
-                Component.onCompleted: playLive()
+                Component.onCompleted:
+                {
+                    if (!paused)
+                        playLive()
+                }
                 videoQuality: QnPlayer.LowVideoQuality
             }
 

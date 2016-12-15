@@ -20,10 +20,11 @@ inline int runTest(
 {
     nx::utils::FlagConfig::setOutputAllowed(false);
 
+    // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...)
+    ::testing::InitGoogleTest(&argc, (char**)argv);
+
     #ifdef USE_GMOCK
         ::testing::InitGoogleMock(&argc, (char**)argv);
-    #else
-        ::testing::InitGoogleTest(&argc, (char**)argv);
     #endif
 
     ArgumentParser args(argc, argv);
@@ -33,6 +34,7 @@ inline int runTest(
     #ifdef NX_NETWORK_SOCKET_GLOBALS
         network::SocketGlobalsHolder sgGuard;
         network::SocketGlobals::applyArguments(args);
+        network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
     #endif
 
     if (extraInit)

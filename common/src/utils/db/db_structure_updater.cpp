@@ -59,35 +59,35 @@ INSERT INTO db_version_data (db_version) VALUES (0);
 } // namespace
 
 
-DBStructureUpdater::DBStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor):
+DbStructureUpdater::DbStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor):
     m_queryExecutor(queryExecutor),
     m_initialVersion(0)
 {
     m_updateScripts.emplace_back(QByteArray(kCreateDbVersionTable));
 }
 
-void DBStructureUpdater::setInitialVersion(unsigned int version)
+void DbStructureUpdater::setInitialVersion(unsigned int version)
 {
     m_initialVersion = version;
 }
 
-void DBStructureUpdater::addUpdateScript(QByteArray updateScript)
+void DbStructureUpdater::addUpdateScript(QByteArray updateScript)
 {
     m_updateScripts.emplace_back(std::move(updateScript));
 }
 
-void DBStructureUpdater::addUpdateScript(
+void DbStructureUpdater::addUpdateScript(
     std::map<RdbmsDriverType, QByteArray> scriptByDbType)
 {
     m_updateScripts.emplace_back(std::move(scriptByDbType));
 }
 
-void DBStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
+void DbStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
 {
     m_updateScripts.emplace_back(std::move(dbUpdateFunc));
 }
 
-void DBStructureUpdater::addFullSchemaScript(
+void DbStructureUpdater::addFullSchemaScript(
     unsigned int version,
     QByteArray createSchemaScript)
 {
@@ -95,14 +95,14 @@ void DBStructureUpdater::addFullSchemaScript(
     m_fullSchemaScriptByVersion.emplace(version, std::move(createSchemaScript));
 }
 
-bool DBStructureUpdater::updateStructSync()
+bool DbStructureUpdater::updateStructSync()
 {
     nx::utils::promise<DBResult> dbUpdatePromise;
     auto future = dbUpdatePromise.get_future();
 
     // Starting async operation.
     m_queryExecutor->executeUpdate(
-        std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
+        std::bind(&DbStructureUpdater::updateDbInternal, this, std::placeholders::_1),
         [&dbUpdatePromise](nx::db::QueryContext* /*connection*/, DBResult dbResult)
         {
             dbUpdatePromise.set_value(dbResult);
@@ -113,7 +113,7 @@ bool DBStructureUpdater::updateStructSync()
     return future.get() == DBResult::ok;
 }
 
-DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryContext)
+DBResult DbStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryContext)
 {
     DbSchemaState dbState = analyzeDbSchemaState(queryContext);
     if (dbState.version < m_initialVersion)
@@ -137,10 +137,10 @@ DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryC
     return updateDbVersion(queryContext, dbState);
 }
 
-DBStructureUpdater::DbSchemaState DBStructureUpdater::analyzeDbSchemaState(
+DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
     nx::db::QueryContext* const queryContext)
 {
-    DBStructureUpdater::DbSchemaState dbSchemaState{ m_initialVersion, false };
+    DbStructureUpdater::DbSchemaState dbSchemaState{ m_initialVersion, false };
 
     //reading current DB version
     QSqlQuery fetchDbVersionQuery(*queryContext->connection());
@@ -155,13 +155,13 @@ DBStructureUpdater::DbSchemaState DBStructureUpdater::analyzeDbSchemaState(
     return dbSchemaState;
 }
 
-DBResult DBStructureUpdater::createInitialSchema(
+DBResult DbStructureUpdater::createInitialSchema(
     nx::db::QueryContext* const queryContext,
     DbSchemaState* dbSchemaState)
 {
     if (!execSqlScript(queryContext, kCreateDbVersionTable, RdbmsDriverType::unknown))
     {
-        NX_LOG(lit("DBStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
+        NX_LOG(lit("DbStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
             .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
         return DBResult::ioError;
     }
@@ -175,7 +175,7 @@ DBResult DBStructureUpdater::createInitialSchema(
                 m_fullSchemaScriptByVersion.rbegin()->second,
                 RdbmsDriverType::unknown))
         {
-            NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2")
+            NX_LOG(lit("DbStructureUpdater. Failed to create schema of version %1: %2")
                 .arg(m_fullSchemaScriptByVersion.rbegin()->first)
                 .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
             return DBResult::ioError;
@@ -188,7 +188,7 @@ DBResult DBStructureUpdater::createInitialSchema(
     return DBResult::ok;
 }
 
-DBResult DBStructureUpdater::applyScriptsMissingInCurrentDb(
+DBResult DbStructureUpdater::applyScriptsMissingInCurrentDb(
     nx::db::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
@@ -202,12 +202,12 @@ DBResult DBStructureUpdater::applyScriptsMissingInCurrentDb(
     return DBResult::ok;
 }
 
-bool DBStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
+bool DbStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
 {
     return static_cast<size_t>(dbState->version) < (m_initialVersion + m_updateScripts.size());
 }
 
-DBResult DBStructureUpdater::applyNextUpdateScript(
+DBResult DbStructureUpdater::applyNextUpdateScript(
     nx::db::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
@@ -217,7 +217,7 @@ DBResult DBStructureUpdater::applyNextUpdateScript(
 
     if (!execDbUpdate(m_updateScripts[dbState->version - m_initialVersion], queryContext))
     {
-        NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2")
+        NX_LOG(lit("DbStructureUpdater. Failure updating to version %1: %2")
             .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
             cl_logWARNING);
         return DBResult::ioError;
@@ -228,7 +228,7 @@ DBResult DBStructureUpdater::applyNextUpdateScript(
     return DBResult::ok;
 }
 
-DBResult DBStructureUpdater::updateDbVersion(
+DBResult DbStructureUpdater::updateDbVersion(
     nx::db::QueryContext* const queryContext,
     const DbSchemaState& dbSchemaState)
 {
@@ -238,7 +238,7 @@ DBResult DBStructureUpdater::updateDbVersion(
     return updateDbVersionQuery.exec() ? DBResult::ok : DBResult::ioError;
 }
 
-bool DBStructureUpdater::execDbUpdate(
+bool DbStructureUpdater::execDbUpdate(
     const DbUpdate& dbUpdate,
     nx::db::QueryContext* const queryContext)
 {
@@ -260,7 +260,7 @@ bool DBStructureUpdater::execDbUpdate(
     return true;
 }
 
-bool DBStructureUpdater::execStructureUpdateTask(
+bool DbStructureUpdater::execStructureUpdateTask(
     const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
     nx::db::QueryContext* const queryContext)
 {
@@ -281,7 +281,7 @@ bool DBStructureUpdater::execStructureUpdateTask(
         selectedScriptIter->first);
 }
 
-std::map<RdbmsDriverType, QByteArray>::const_iterator DBStructureUpdater::selectSuitableScript(
+std::map<RdbmsDriverType, QByteArray>::const_iterator DbStructureUpdater::selectSuitableScript(
     const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
     RdbmsDriverType driverType) const
 {
@@ -294,7 +294,7 @@ std::map<RdbmsDriverType, QByteArray>::const_iterator DBStructureUpdater::select
     return properScriptIter;
 }
 
-bool DBStructureUpdater::execSqlScript(
+bool DbStructureUpdater::execSqlScript(
     nx::db::QueryContext* const queryContext,
     QByteArray sqlScript,
     RdbmsDriverType sqlScriptDialect)
@@ -308,7 +308,7 @@ bool DBStructureUpdater::execSqlScript(
     return m_queryExecutor->execSqlScriptSync(scriptText, queryContext) == DBResult::ok;
 }
 
-QByteArray DBStructureUpdater::fixSqlDialect(
+QByteArray DbStructureUpdater::fixSqlDialect(
     QByteArray initialScript, RdbmsDriverType targetDialect)
 {
     QByteArray script = initialScript;

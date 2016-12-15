@@ -38,7 +38,6 @@ def hexify(v):
     return s
 
 
-# obsoleted by kutil.time.get
 def currentTime():
     sec = time.time()
     mcs = int(sec * 1000000 % 1000000)

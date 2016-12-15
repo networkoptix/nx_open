@@ -2,6 +2,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 
 namespace nx {
 namespace network {
@@ -16,7 +17,10 @@ class NX_NETWORK_API ReverseConnectionHolder:
 {
 public:
     explicit ReverseConnectionHolder(aio::AbstractAioThread* aioThread);
-    void stopWhileInAioThread() override;
+    virtual ~ReverseConnectionHolder() override;
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
 
     ReverseConnectionHolder(const ReverseConnectionHolder&) = delete;
     ReverseConnectionHolder(ReverseConnectionHolder&&) = delete;
@@ -38,6 +42,7 @@ private:
     std::atomic<size_t> m_socketCount;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_sockets;
     std::multimap<std::chrono::steady_clock::time_point, Handler> m_handlers;
+    std::unique_ptr<aio::Timer> m_timer;
 };
 
 } // namespace tcp

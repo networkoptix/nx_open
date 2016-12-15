@@ -89,7 +89,7 @@ const char* toString(AttributeType val)
 }
 
 
-StringAttribute::StringAttribute( int userType, const String& value )
+BaseStringAttribute::BaseStringAttribute( int userType, const String& value )
     : stun::attrs::Unknown( userType, stringToBuffer( value ) )
 {
 }
@@ -104,7 +104,7 @@ static String endpointsToString( const std::list< SocketAddress >& endpoints )
 }
 
 EndpointList::EndpointList( int type, const std::list< SocketAddress >& endpoints )
-    : StringAttribute( type, endpointsToString( endpoints ) )
+    : BaseStringAttribute( type, endpointsToString( endpoints ) )
 {
 }
 
@@ -131,7 +131,7 @@ static String vectorToString( const std::vector< String >& vector )
 }
 
 StringList::StringList( int type, const std::vector< String >& strings )
-    : StringAttribute( type, vectorToString( strings ) )
+    : BaseStringAttribute( type, vectorToString( strings ) )
 {
 }
 

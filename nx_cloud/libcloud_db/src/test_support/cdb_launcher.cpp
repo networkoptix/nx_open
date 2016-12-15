@@ -26,7 +26,7 @@ namespace cdb {
 // CdbLauncher
 
 CdbLauncher::CdbLauncher(QString tmpDir):
-    TestWithDbHelper(tmpDir),
+    db::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
@@ -688,6 +688,31 @@ api::ResultCode CdbLauncher::getSystemSharings(
 
     *sharings = std::move(data.sharing);
     return resCode;
+}
+
+api::ResultCode CdbLauncher::getSystemSharing(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemId,
+    const std::string& userOfInterestEmail,
+    api::SystemSharingEx* sharing)
+{
+    std::vector<api::SystemSharingEx> sharings;
+    const auto resultCode = getSystemSharings(email, password, systemId, &sharings);
+    if (resultCode != api::ResultCode::ok)
+        return resultCode;
+    const auto it = std::find_if(
+        sharings.cbegin(), sharings.cend(),
+        [&userOfInterestEmail](const api::SystemSharingEx& value)
+        {
+            return value.accountEmail == userOfInterestEmail;
+        });
+
+    if (it == sharings.cend())
+        return api::ResultCode::notFound;
+
+    *sharing = *it;
+    return api::ResultCode::ok;
 }
 
 api::ResultCode CdbLauncher::getCdbNonce(

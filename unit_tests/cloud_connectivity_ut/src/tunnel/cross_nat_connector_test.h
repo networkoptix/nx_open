@@ -10,11 +10,9 @@
 namespace nx {
 namespace network {
 namespace cloud {
-
 namespace test {
 
-class TunnelConnector
-    :
+class TunnelConnector:
     public ::testing::Test
 {
 public:
@@ -60,7 +58,7 @@ private:
     nx::hpm::MediatorFunctionalTest m_mediator;
 };
 
-}   //namespace test
-}   //namespace cloud
-}   //namespace network
-}   //namespace nx
+} //namespace test
+} //namespace cloud
+} //namespace network
+} //namespace nx

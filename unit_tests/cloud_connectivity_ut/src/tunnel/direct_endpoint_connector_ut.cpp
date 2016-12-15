@@ -38,7 +38,6 @@ TEST_F(TcpTunnelConnector, general)
 
 TEST_F(TcpTunnelConnector, failModuleInformation)
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const auto connectResult = doSimpleConnectTest(
@@ -59,11 +58,10 @@ TEST_F(TcpTunnelConnector, cancellation)
     cancellationTest();
 }
 
-// Checking it does not connect to a server which does not provide 
-//  cloudSystemId in /api/moduleInformation response.
+// Checking it does not connect to a server which does not provide cloudSystemId in
+// /api/moduleInformation response.
 TEST_F(TcpTunnelConnector, connectedToWrongServer)
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const auto system1 = mediator().addRandomSystem();
@@ -80,7 +78,7 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
         {boost::none, false} };
 
     // Connecting to a specific server within a system, 
-    //  but connected to another server of that system.
+    // but connected to another server of that system.
 
     const auto peerId = QnUuid::createUuid();
     const TestData testPeerIdArray[] = {

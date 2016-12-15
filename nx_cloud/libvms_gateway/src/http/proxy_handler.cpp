@@ -225,10 +225,11 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
 void ProxyHandler::onConnected(
     const SocketAddress& targetAddress, SystemError::ErrorCode errorCode)
 {
-    static const auto isSsl = [](const std::unique_ptr<AbstractStreamSocket>& s)
-    {
-        return (bool) dynamic_cast<nx::network::SslSocket*>(s.get());
-    };
+    static const auto isSsl =
+        [](const std::unique_ptr<AbstractStreamSocket>& s)
+        {
+            return (bool) dynamic_cast<nx::network::SslSocket*>(s.get());
+        };
 
     if (errorCode != SystemError::noError)
     {

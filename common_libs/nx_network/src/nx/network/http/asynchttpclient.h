@@ -260,6 +260,8 @@ namespace nx_http
         */
         static AsyncHttpClientPtr create();
 
+        static QString endpointWithProtocol(const QUrl& url);
+
     signals:
         void tcpConnectionEstablished(nx_http::AsyncHttpClientPtr);
         //!Invoked after request has been sent
@@ -315,7 +317,7 @@ namespace nx_http
         AuthType m_authType;
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
-        SocketAddress m_remoteEndpoint;
+        QString m_remoteEndpointWithProtocol;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;

@@ -46,6 +46,8 @@ public:
     static void useOrCreateCertificate(
         const QString& filePath,
         const String& name, const String& country, const String& company);
+
+    static void useRandomCertificate(const String& module);
 };
 
 class NX_NETWORK_API SslSocket

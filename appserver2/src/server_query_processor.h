@@ -51,6 +51,36 @@ ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler
 {
     return ScopeHandlerGuard<Handler>(&errorCode, handler); 
 }
+
+struct AuditData
+{ 
+    ECConnectionAuditManager* auditManager;
+    QnAuthSession authSession;
+
+    AuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession) :
+        auditManager(auditManager),
+        authSession(authSession)
+    {}
+};
+
+template<class DataType>
+void triggerNotification(
+    const AuditData& auditData,
+    const QnTransaction<DataType>& tran)
+{
+    // Add audit record before notification to ensure removed resource is still alive.
+    if (auditData.auditManager)
+    {
+        auditData.auditManager->addAuditRecord(
+            tran.command,
+            tran.params,
+            auditData.authSession);
+    }
+
+    QnAppServerConnectionFactory::getConnection2() 
+        ->notificationManager()
+        ->triggerNotification(tran);
+}
 }
 
 class ServerQueryProcessor;
@@ -58,7 +88,7 @@ class ServerQueryProcessor;
 struct PostProcessTransactionFunction
 {
     template<class T>
-    void operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const;
+    void operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const;
 };
 
 class ServerQueryProcessor
@@ -285,26 +315,14 @@ public:
 
     void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
 
-    template<class DataType>
-    void triggerNotification(
-        const AbstractECConnectionPtr& connection,
-        const QnTransaction<DataType>& tran)
-    {
-        // Add audit record before notification to ensure removed resource is still alive.
-        if (m_auditManager)
-        {
-            m_auditManager->addAuditRecord(
-                tran.command,
-                tran.params,
-                m_authSession);
-        }
-
-        connection->notificationManager()->triggerNotification(tran);
-    }
-
 private:
     static PostProcessList& getStaticPostProcessList();
     static QnMutex& getStaticUpdateMutex();
+
+    aux::AuditData createAuditDataCopy()
+    {
+        return aux::AuditData(m_auditManager, m_authSession);
+    }
 
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
@@ -342,7 +360,7 @@ private:
             }
             else
             {
-                localPostProcessList.push(std::bind(PostProcessTransactionFunction(), this, tran));
+                localPostProcessList.push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
             }
 
             std::function<void()> postProcessAction;
@@ -579,7 +597,7 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), this, tran));
+        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
 
         return errorCode;
     }
@@ -696,10 +714,10 @@ private:
 };
 
 template<class T>
-void PostProcessTransactionFunction::operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const
+void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const
 {
     qnTransactionBus->sendTransaction(tran);
-    processor->triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
+    aux::triggerNotification(auditData, tran);
 }
 
 } // namespace detail
