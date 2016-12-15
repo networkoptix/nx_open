@@ -540,7 +540,12 @@
     "QnIoModuleFormOverlayContents": {
         "palette": {
             "default": {
-                "windowText": "dark13"
+                "windowText": "dark13",
+                "buttonText": "light4",
+                "dark": "dark10",
+                "button": "dark11",
+                "midlight": "dark12",
+                "shadow": "dark5.setAlpha(77)"
             }
         }
     },
