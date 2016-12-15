@@ -18,6 +18,7 @@ MediaServerHelper::MediaServerHelper(const MediaServerTestFuncTypeList& testList
     char* argv[] = { "", "-e" };
 
     m_platform.reset(new QnPlatformAbstraction());
+    MSSettings::roSettings()->clear();
     MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
     MSSettings::roSettings()->setValue(lit("dataDir"), *m_workDirResource.getDirName());
@@ -29,20 +30,34 @@ MediaServerHelper::MediaServerHelper(const MediaServerTestFuncTypeList& testList
 
     m_serverProcess.reset(new MediaServerProcess(argc, argv));
 
+
+    m_testsReadyFuture = m_testReadyPromise.get_future();
+
     QObject::connect(
         m_serverProcess.get(), 
         &MediaServerProcess::started, 
         [this]() 
         {
-            for (auto test : m_testList)
-                test();
-            m_serverProcess->stopSync();
+            m_thread = std::thread([this]()
+            {
+                for (auto test : m_testList)
+                    test();
+                m_serverProcess->stopSync();
+                m_testReadyPromise.set_value();
+            });
         });
+}
+
+MediaServerHelper::~MediaServerHelper()
+{
+    MSSettings::roSettings()->clear();
 }
 
 void MediaServerHelper::start()
 {
     m_serverProcess->run();
+    m_testsReadyFuture.wait();
+    m_thread.join();
 }
 
 }
