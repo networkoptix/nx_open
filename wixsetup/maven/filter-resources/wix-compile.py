@@ -39,9 +39,9 @@ nxtool_exe_name = '${finalName}-servertool.exe'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14', 'ClientVcrt12']
-server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14', 'ServerVcrt12', 'TraytoolVcrt12']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14', 'NxtoolVcrt12']
+client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14']
+server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14']
+nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14']
 
 client_exe_components = ['ArchCheck', 'ClientPackage']
 server_exe_components = ['ArchCheck', 'ServerPackage']
@@ -79,12 +79,6 @@ def get_candle_command(project, suffix, args, components):
     command.append(r'-dClientVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
     command.append(r'-dTraytoolVcrt14DstDir=${customization}TrayToolDir')
     command.append(r'-dNxtoolVcrt14DstDir=${customization}NxtoolDir')
-
-    command.append(r'-dVcrt12SrcDir=${VC12RedistPath}\bin')
-    command.append(r'-dServerVcrt12DstDir=${customization}MediaServerDir')
-    command.append(r'-dClientVcrt12DstDir=${customization}_${release.version}.${buildNumber}_Dir')
-    command.append(r'-dTraytoolVcrt12DstDir=${customization}TrayToolDir')
-    command.append(r'-dNxtoolVcrt12DstDir=${customization}NxtoolDir')
 
     if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')
