@@ -8,7 +8,7 @@
 # Short-Description: ${company.name} ${product.name} Media Server
 ### END INIT INFO
 
-# NetworkOptix Media Server
+# ${company.name} Media Server
 
 RETVAL=0
 
@@ -20,7 +20,7 @@ BIN_PATH=$PREFIX/bin/$BIN_NAME
 RUN_ARGS="-e --disable-crash-handler"
 
 export VMS_PLUGIN_DIR=$PREFIX/plugins
-export SASL_PATH=$/opt/$CUSTOMIZATION/lib/sasl2
+export SASL_PATH=$PREFIX/lib/sasl2
 
 ulimit -n 8192
 ulimit -c unlimited
