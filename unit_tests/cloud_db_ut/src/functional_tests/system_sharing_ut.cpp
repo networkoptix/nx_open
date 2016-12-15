@@ -1243,5 +1243,72 @@ TEST_F(SystemSharing, remove_sharing)
         getSystem(account2.email, account2.password, system1.id, &systemData));
 }
 
+class SystemSharingDisabledUser:
+    public SystemSharing
+{
+public:
+    SystemSharingDisabledUser():
+        m_previousResultCode(api::ResultCode::ok)
+    {
+        NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_ownerAccount = addActivatedAccount2();
+        m_system = addRandomSystemToAccount(m_ownerAccount);
+        m_userAccount = addActivatedAccount2();
+    }
+
+protected:
+    void givenUserDisabledInCloudSystem()
+    {
+        shareSystemEx(m_ownerAccount, m_system, m_userAccount, api::SystemAccessRole::cloudAdmin);
+        disableUser(m_ownerAccount, m_system, m_userAccount);
+    }
+
+    void whenUserRequestedThatSystemDetails()
+    {
+        api::SystemDataEx systemData;
+        m_previousResultCode = 
+            getSystem(m_userAccount.email, m_userAccount.password, m_system.id, &systemData);
+    }
+
+    void thenResponseCodeShouldBeForbidden()
+    {
+        ASSERT_EQ(api::ResultCode::forbidden, m_previousResultCode);
+    }
+
+    void whenUserRequestedSystemList()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(m_userAccount.email, m_userAccount.password, &m_allSystems));
+    }
+
+    void thenResponseShouldBeEmpty()
+    {
+        ASSERT_TRUE(m_allSystems.empty());
+    }
+
+private:
+    AccountWithPassword m_ownerAccount;
+    api::SystemData m_system;
+    AccountWithPassword m_userAccount;
+    api::ResultCode m_previousResultCode;
+    std::vector<api::SystemDataEx> m_allSystems;
+};
+
+TEST_F(SystemSharingDisabledUser, get_particular_system_returns_forbidden_error)
+{
+    givenUserDisabledInCloudSystem();
+    whenUserRequestedThatSystemDetails();
+    thenResponseCodeShouldBeForbidden();
+}
+
+TEST_F(SystemSharingDisabledUser, user_get_empty_list_if_he_is_disabled_in_the_only_system)
+{
+    givenUserDisabledInCloudSystem();
+    whenUserRequestedSystemList();
+    thenResponseShouldBeEmpty();
+}
+
 } // namespace cdb
 } // namespace nx

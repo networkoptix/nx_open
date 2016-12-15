@@ -10,9 +10,9 @@
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_requested_event_data.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 
 #include "settings.h"
-
 
 namespace nx {
 namespace hpm {
@@ -43,6 +43,9 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
         return;
     }
 
+    m_sessionStatisticsInfo.startTime = nx::utils::utcTime();
+    m_sessionStatisticsInfo.sessionId = connectionID;
+
     m_timer.bindToAioThread(serverConnectionStrongRef->socket()->getAioThread());
 }
 
@@ -61,6 +64,11 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
         [this, originatingPeerConnection,
             request = std::move(request), connectResponseSender]()
         {
+            m_sessionStatisticsInfo.originatingHostEndpoint = 
+                originatingPeerConnection->getSourceAddress().toString().toUtf8();
+            m_sessionStatisticsInfo.originatingHostName = request.originatingPeerId;
+            m_sessionStatisticsInfo.destinationHostName = request.destinationHostName;
+
             api::ConnectionRequestedEvent connectionRequestedEvent;
             connectionRequestedEvent.connectSessionId = std::move(request.connectSessionId);
             connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerId);
@@ -119,6 +127,9 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
         [this, connection, request = std::move(request),
             completionHandler = std::move(completionHandler)]() mutable
         {
+            m_sessionStatisticsInfo.destinationHostEndpoint = 
+                connection->getSourceAddress().toString().toUtf8();
+            
             if (m_state > State::waitingServerPeerUDPAddress)
             {
                 NX_LOGX(
@@ -183,6 +194,11 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionResultRequest(
                 this,
                 api::ResultCode::ok));
         });
+}
+
+stats::ConnectSession UDPHolePunchingConnectionInitiationFsm::statisticsInfo() const
+{
+    return m_sessionStatisticsInfo;
 }
 
 void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)

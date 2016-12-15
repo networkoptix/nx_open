@@ -36,8 +36,7 @@ enum Value
 };
 } // namespace ServerBehavior
 
-class MediatorFunctionalTest
-:
+class MediatorFunctionalTest:
     public utils::test::ModuleLauncher<MediatorProcessPublic>
 {
 public:

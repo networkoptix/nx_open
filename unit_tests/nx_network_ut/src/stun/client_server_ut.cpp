@@ -18,19 +18,30 @@ namespace nx {
 namespace stun {
 namespace test {
 
-class TestServer: public SocketServer
+class TestServer:
+    public SocketServer
 {
 public:
-    TestServer(const nx::stun::MessageDispatcher& dispatcher)
-        : SocketServer(&dispatcher, false)
+    TestServer(const nx::stun::MessageDispatcher& dispatcher):
+        SocketServer(&dispatcher, false)
     {
+    }
+
+    virtual ~TestServer() override
+    {
+        pleaseStop();
+        for (auto& connection: connections)
+        {
+            connection->pleaseStopSync();
+            connection.reset();
+        }
     }
 
     std::vector<std::shared_ptr<ServerConnection>> connections;
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
-            std::unique_ptr<AbstractStreamSocket> _socket) override
+        std::unique_ptr<AbstractStreamSocket> _socket) override
     {
         auto connection = SocketServer::createConnection(std::move(_socket));
         connections.push_back(connection);
@@ -53,6 +64,14 @@ protected:
     StunClientServerTest():
         client(std::make_shared<AsyncClient>(defaultSettings()))
     {
+    }
+
+    ~StunClientServerTest()
+    {
+        if (client)
+            client->pleaseStopSync();
+        if (server)
+            server->pleaseStop();
     }
 
     SystemError::ErrorCode sendTestRequestSync()
@@ -232,6 +251,12 @@ TEST_F(StunClientServerTest, AsyncClientUser)
 class StunClient:
     public StunClientServerTest
 {
+public:
+    ~StunClient()
+    {
+        m_stunClient.pleaseStopSync();
+    }
+
 protected:
     void givenClientConnectedToServer()
     {

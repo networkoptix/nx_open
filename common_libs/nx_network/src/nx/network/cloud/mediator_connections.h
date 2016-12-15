@@ -146,7 +146,9 @@ public:
     /** notifies mediator this server is willing to accept cloud connections */
     void listen(
         nx::hpm::api::ListenRequest listenParams,
-        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::ListenResponse)> completionHandler)
     {
         this->doAuthRequest(
             stun::cc::methods::listen,

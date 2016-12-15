@@ -88,6 +88,8 @@ public:
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
+    void reserveConnections(int count);
+
     /**
      * Executes data modification request that spawns some output data.
      * Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.

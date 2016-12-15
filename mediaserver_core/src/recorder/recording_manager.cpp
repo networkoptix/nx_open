@@ -66,6 +66,11 @@ QnRecordingManager::QnRecordingManager(): m_mutex(QnMutex::Recursive)
 
 QnRecordingManager::~QnRecordingManager()
 {
+    QnMutexLocker lock(&m_resourceConnectionMutex);
+    // We shouldn't receive any new recording orders if the destructor is called
+    for (auto& camera: qnResPool->getResources<QnVirtualCameraResource>())
+        camera->disconnect(camera.data(), nullptr, this, nullptr);
+
     stop();
 }
 
@@ -332,6 +337,9 @@ bool QnRecordingManager::startOrStopRecording(
 
 void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 {
+    if (QnResource::isStopping())
+        return;
+
     if (!cameraRes)
         return;
     if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
@@ -406,6 +414,10 @@ void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &re
 
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
+    QnMutexLocker lock(&m_resourceConnectionMutex);
+    if (QnResource::isStopping())
+        return;
+
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
     Q_ASSERT(!qnCameraPool->getVideoCamera(resource));
     if (qnCameraPool->getVideoCamera(resource))

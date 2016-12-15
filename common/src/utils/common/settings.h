@@ -33,6 +33,7 @@ public:
         QSettings::Scope scope = QSettings::SystemScope);
 
     void parseArgs(int argc, const char* argv[]);
+    bool contains(const QString& key) const;
     QVariant value(
         const QString& key,
         const QVariant& defaultValue = QVariant()) const;

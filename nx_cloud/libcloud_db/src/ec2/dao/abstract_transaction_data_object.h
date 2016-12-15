@@ -29,6 +29,12 @@ struct TransactionLogRecord
     std::unique_ptr<const TransactionSerializer> serializer;
 };
 
+/**
+ * Implementation MUST keep following unique indexes on data:
+ * - {system_id, peer_guid, db_guid, sequence}
+ * - {system_id, tran_hash}
+ * If unique indexes has been violated, transaction gets silently replaced.
+ */
 class AbstractTransactionDataObject
 {
 public:

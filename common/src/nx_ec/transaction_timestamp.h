@@ -63,8 +63,11 @@ public:
         return (sequence > 0) ? true : (ticks > right);
     }
 
-    Timestamp& operator-=(std::uint64_t right)
+    Timestamp& operator-=(std::int64_t right)
     {
+        if (right < 0)
+            return operator+=(-right);
+
         const auto ticksBak = ticks;
         ticks -= right;
         if (ticks > ticksBak)   //< Overflow?
@@ -72,8 +75,11 @@ public:
         return *this;
     }
 
-    Timestamp& operator+=(std::uint64_t right)
+    Timestamp& operator+=(std::int64_t right)
     {
+        if (right < 0)
+            return operator-=(-right);
+
         const auto ticksBak = ticks;
         ticks += right;
         if (ticks < ticksBak)   //< Overflow?

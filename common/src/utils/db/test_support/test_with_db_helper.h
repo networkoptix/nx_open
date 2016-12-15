@@ -1,16 +1,19 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QString>
 
 #include <utils/db/types.h>
 
 namespace nx {
-namespace cdb {
+namespace db {
+namespace test {
 
 class TestWithDbHelper
 {
 public:
-    TestWithDbHelper(QString tmpDir = QString());
+    TestWithDbHelper(QString moduleName, QString tmpDir);
     ~TestWithDbHelper();
 
     QString testDataDir() const;
@@ -29,8 +32,9 @@ private:
     nx::db::ConnectionOptions m_dbConnectionOptions;
 
     static QString sTemporaryDirectoryPath;
-    static nx::db::ConnectionOptions sDbConnectionOptions;
+    static boost::optional<nx::db::ConnectionOptions> sDbConnectionOptions;
 };
 
-} // namespace cdb
+} // namespace test
+} // namespace db
 } // namespace nx

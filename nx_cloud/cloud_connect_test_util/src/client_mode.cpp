@@ -222,6 +222,8 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cloud_connectivity_test_util", QnUuid::createUuid());
 
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 

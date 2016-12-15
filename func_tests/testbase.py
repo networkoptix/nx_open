@@ -578,7 +578,7 @@ class UnitTestRollback(object):
                 fail = "HTTP error code %s" % response.getcode()
                 response.close()
         if fail is not None:
-            print "Failed rollback transaction: %s, method %s, id=%s - FAILED: %s" % (url, methodName, resourceId, fail)
+            log(LOGLEVEL.ERROR, "Failed rollback transaction: %s, method %s, id=%s - FAILED: %s" % (url, methodName, resourceId, fail))
             return False
         return True
 

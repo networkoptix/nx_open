@@ -164,7 +164,7 @@ namespace nx_http
 
     bool AsyncHttpClient::failed() const
     {
-        return m_state == sFailed;
+        return m_state == sFailed || response() == nullptr;
     }
 
     SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
@@ -453,7 +453,7 @@ namespace nx_http
         if (errorCode == SystemError::noError)
         {
             //connect successful
-            m_remoteEndpoint = SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
+            m_remoteEndpointWithProtocol = endpointWithProtocol(m_url);
             serializeRequest();
             m_state = sSendingRequest;
             emit tcpConnectionEstablished(sharedThis);
@@ -605,13 +605,11 @@ namespace nx_http
         }
 
         m_url = url;
-        const SocketAddress remoteEndpoint(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT));
-
         canUseExistingConnection =
             m_socket &&
             !m_connectionClosed &&
             canUseExistingConnection &&
-            (m_remoteEndpoint == remoteEndpoint) &&
+            (m_remoteEndpointWithProtocol == endpointWithProtocol(url)) &&
             m_lastSysErrorCode == SystemError::noError;
 
         if (!canUseExistingConnection)
@@ -659,7 +657,7 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = SocketFactory::createStreamSocket(/*m_url.scheme() == lit("https")*/);
+        m_socket = SocketFactory::createStreamSocket(m_url.scheme() == lit("https"));
 
         NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_url).arg(m_socket->handle()), cl_logDEBUG2);
 
@@ -1091,6 +1089,14 @@ namespace nx_http
     AsyncHttpClientPtr AsyncHttpClient::create()
     {
         return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
+    }
+
+    QString AsyncHttpClient::endpointWithProtocol(const QUrl& url)
+    {
+        return lit("%1://%2:%3")
+            .arg(url.scheme())
+            .arg(url.host())
+            .arg(url.port(nx_http::DEFAULT_HTTP_PORT));
     }
 
     bool AsyncHttpClient::resendRequestWithAuthorization(

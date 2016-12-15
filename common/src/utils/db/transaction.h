@@ -21,6 +21,8 @@ public:
     DBResult commit();
     DBResult rollback();
 
+    bool isActive() const;
+
     void addOnSuccessfulCommitHandler(
         nx::utils::MoveOnlyFunc<void()> func);
 
