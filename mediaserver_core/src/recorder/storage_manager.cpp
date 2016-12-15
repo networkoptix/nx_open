@@ -407,102 +407,32 @@ public:
 
 class TestStorageThread: public QnLongRunnable
 {
-    struct StorageToData
-    {
-        QnStorageResourcePtr storage;
-        ec2::ApiStorageData data;
-        Qn::ResourceStatus status = Qn::Offline;
-    };
-
 public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
-        prepareTestData();
-        for (auto& storageToDataEntry : m_storageToData)
+        for (const auto& storage : m_owner->getStorages())
         {
             if (needToStop())
                 return;
 
-            storageToDataEntry.status = testStorage(storageToDataEntry);
-            switchOwnerStatusIfNeeded(storageToDataEntry);
+            Qn::ResourceStatus status = storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+            if (storage->getStatus() != status)
+                m_owner->changeStorageStatus(storage, status);
+
+            if (status == Qn::Online)
+            {
+                const auto space = QString::number(storage->getTotalSpace());
+                if (storage->setProperty(Qn::SPACE, space))
+                    propertyDictionary->saveParams(storage->getId());
+            }
         }
 
-        updatePersistentDataIfNeeded();
         m_owner->testStoragesDone();
     }
 
 private:
-    void prepareTestData()
-    {
-        const auto indexToStorageMap = m_owner->getStorages();
-        m_storageToData.clear();
-        for (auto it = indexToStorageMap.cbegin(); it != indexToStorageMap.cend(); ++it)
-        {
-            StorageToData newEntry;
-            newEntry.storage = *it;
-            ec2::fromResourceToApi(*it, newEntry.data);
-            m_storageToData.push_back(newEntry);
-        }
-    }
-
-    Qn::ResourceStatus testStorage(StorageToData& storageToDataEntry)
-    {
-        QnStorageResourcePtr& storage = storageToDataEntry.storage;
-        return storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
-    }
-
-    void switchOwnerStatusIfNeeded(const StorageToData& storageToDataEntry)
-    {
-        const QnStorageResourcePtr& storage = storageToDataEntry.storage;
-        Qn::ResourceStatus status = storageToDataEntry.status;
-
-        if (storage->getStatus() != status)
-            m_owner->changeStorageStatus(storage, status);
-    }
-
-    void updatePersistentDataIfNeeded()
-    {
-        ec2::ApiStorageDataList storageDataToUpdateList;
-        for (const auto& storageToDataEntry: m_storageToData)
-        {
-            syncTotalSpaceProperty(storageToDataEntry);
-            if (needToSaveStorageToDb(storageToDataEntry))
-            {
-                ec2::ApiStorageData storageData;
-                ec2::fromResourceToApi(storageToDataEntry.storage, storageData);
-                storageDataToUpdateList.push_back(storageData);
-            }
-        }
-
-        if (storageDataToUpdateList.empty())
-            return;
-
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(storageDataToUpdateList);
-    }
-
-    bool needToSaveStorageToDb(const StorageToData& storageToDataEntry)
-    {
-        return storageToDataEntry.storage->getSpaceLimit() != storageToDataEntry.data.spaceLimit;
-    }
-
-    void syncTotalSpaceProperty(const StorageToData& storageToDataEntry)
-    {
-        const QnStorageResourcePtr& storage = storageToDataEntry.storage;
-        Qn::ResourceStatus status = storageToDataEntry.status;
-
-        if (status == Qn::Online)
-        {
-            const auto space = QString::number(storage->getTotalSpace());
-            if (storage->setProperty(Qn::SPACE, space))
-                propertyDictionary->saveParams(storage->getId());
-        }
-    }
-
-private:
     QnStorageManager* m_owner;
-    std::vector<StorageToData> m_storageToData;
 };
 
 // -------------------- QnStorageManager --------------------

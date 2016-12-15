@@ -53,7 +53,7 @@ public:
 
     virtual QString getPath() const override;
 
-    qint64 getTotalSpaceWithoutInit();
+    qint64 calculateAndSetTotalSpaceWithoutInit();
 
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
