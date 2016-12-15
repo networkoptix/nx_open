@@ -207,7 +207,7 @@ void QnIoModuleFormOverlayContentsPrivate::Layout::setGeometry(const QRectF& rec
         return;
 
     /* Calculate column widths: */
-    std::array<qreal, kColumnCount> columnWidths{ 0.0, 0.0 };
+    std::array<qreal, kColumnCount> columnWidths = { 0.0, 0.0 };
 
     if (m_rowCounts[kRightColumn] == 0)
     {
@@ -263,7 +263,7 @@ void QnIoModuleFormOverlayContentsPrivate::Layout::setGeometry(const QRectF& rec
     }
 
     qreal rowStride = kItemHeight + kVerticalSpacing;
-    const std::array<qreal, kColumnCount> columnPositions { 0.0,
+    const std::array<qreal, kColumnCount> columnPositions = { 0.0,
         columnWidths[kLeftColumn] + kHorizontalSpacing };
 
     /* Calculate item geometries: */
