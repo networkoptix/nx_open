@@ -163,6 +163,8 @@ private:
     void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
 
+    boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
+
 
 private:
     class TriggerOutputTask
