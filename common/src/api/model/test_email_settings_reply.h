@@ -6,7 +6,7 @@
 
 struct QnTestEmailSettingsReply
 {
-    QnTestEmailSettingsReply(){}
+    QnTestEmailSettingsReply();
 
     SmtpError errorCode;
     SmtpReplyCode smtpReplyCode;

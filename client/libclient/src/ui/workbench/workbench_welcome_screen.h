@@ -118,6 +118,10 @@ public slots:
 
     void forceActiveFocus();
 
+    void forgetPassword(
+        const QString& localSystemId,
+        const QString& userName);
+
 public slots:
     QColor getContrastColor(const QString& group);
 

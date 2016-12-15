@@ -55,4 +55,6 @@ QnLocalConnectionData storeLocalSystemConnection(
     const QnUuid& localSystemId,
     const QUrl& url);
 
+void forgetLocalConnectionPassword(const QnUuid& localId, const QString& userName);
+
 }

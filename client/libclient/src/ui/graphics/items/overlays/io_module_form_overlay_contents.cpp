@@ -92,9 +92,7 @@ public:
 
     QnIoModuleFormOverlayContentsPrivate(QnIoModuleFormOverlayContents* main);
 
-    QnIoModuleOverlayWidget* widget() const;
-
-    void portsChanged(const QnIOPortDataList& ports);
+    void portsChanged(const QnIOPortDataList& ports, bool userInputEnabled);
     void stateChanged(const QnIOPortData& port, const QnIOStateData& state);
 
     PortControls createControls(const QnIOPortData& config);
@@ -113,13 +111,8 @@ QnIoModuleFormOverlayContentsPrivate::QnIoModuleFormOverlayContentsPrivate(QnIoM
     indicatorOnPixmap(qnSkin->pixmap("legacy/io_indicator_on.png")),
     indicatorOffPixmap(qnSkin->pixmap("legacy/io_indicator_off.png"))
 {
-    enum
-    {
-        kOuterMargin = 24,
-        kTopMargin = kOuterMargin * 2
-    };
-
-    controlsLayout->setContentsMargins(kOuterMargin, kTopMargin, kOuterMargin, kOuterMargin);
+    enum { kOuterMargin = 24 };
+    controlsLayout->setContentsMargins(kOuterMargin, kOuterMargin, kOuterMargin, kOuterMargin);
 
     static const std::array<Qt::AlignmentFlag, kColumnCount> kColumnAlignments
     {
@@ -146,13 +139,7 @@ QnIoModuleFormOverlayContentsPrivate::QnIoModuleFormOverlayContentsPrivate(QnIoM
     h->addItem(v);
     h->addStretch(kVeryBigStretch);
 
-    widget()->setLayout(h);
-}
-
-QnIoModuleOverlayWidget* QnIoModuleFormOverlayContentsPrivate::widget() const
-{
-    Q_Q(const QnIoModuleFormOverlayContents);
-    return q->widget();
+    main->setLayout(h);
 }
 
 QnIoModuleFormOverlayContentsPrivate::PortControls
@@ -188,11 +175,11 @@ GraphicsLabel* QnIoModuleFormOverlayContentsPrivate::createId(int row, int colum
     QFont font;
     font.setPixelSize(kPortFontPixelSize);
 
-    auto portIdLabel = new GraphicsLabel(widget());
+    Q_Q(QnIoModuleFormOverlayContents);
+    auto portIdLabel = new GraphicsLabel(q);
     portIdLabel->setFont(font);
     portIdLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     portIdLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-    setPaletteColor(portIdLabel, QPalette::WindowText, widget()->colors().idLabel);
 
     insertToLayout(portIdLabel, row, column);
     return portIdLabel;
@@ -200,7 +187,8 @@ GraphicsLabel* QnIoModuleFormOverlayContentsPrivate::createId(int row, int colum
 
 IndicatorWidget* QnIoModuleFormOverlayContentsPrivate::createIndicator(int row, int column)
 {
-    auto indicator = new IndicatorWidget(indicatorOnPixmap, indicatorOffPixmap, widget());
+    Q_Q(QnIoModuleFormOverlayContents);
+    auto indicator = new IndicatorWidget(indicatorOnPixmap, indicatorOffPixmap, q);
     insertToLayout(indicator, row, column);
     return indicator;
 }
@@ -210,10 +198,13 @@ GraphicsLabel* QnIoModuleFormOverlayContentsPrivate::createLabel(int row, int co
     QFont font;
     font.setPixelSize(kInputFontPixelSize);
 
-    auto descriptionLabel = new GraphicsLabel(widget());
+    Q_Q(QnIoModuleFormOverlayContents);
+    auto descriptionLabel = new GraphicsLabel(q);
     descriptionLabel->setFont(font);
     descriptionLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
     descriptionLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    setPaletteColor(descriptionLabel, QPalette::WindowText,
+        descriptionLabel->palette().color(QPalette::Text));
 
     insertToLayout(descriptionLabel, row, column);
     return descriptionLabel;
@@ -230,16 +221,16 @@ QPushButton* QnIoModuleFormOverlayContentsPrivate::createButton(int row, int col
     button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     button->setAutoDefault(false);
 
-    setPaletteColor(button, QPalette::Window, widget()->colors().buttonBackground);
+    Q_Q(QnIoModuleFormOverlayContents);
+    button->setBackgroundRole(QPalette::Button);
 
     connect(button, &QPushButton::clicked, this,
-        [this, port]()
+        [q, port]()
         {
-            Q_Q(QnIoModuleFormOverlayContents);
             q->userClicked(port);
         });
 
-    auto buttonProxy = new QnMaskedProxyWidget(widget());
+    auto buttonProxy = new QnMaskedProxyWidget(q);
     buttonProxy->setWidget(button);
 
     insertToLayout(buttonProxy, row, column);
@@ -251,7 +242,7 @@ void QnIoModuleFormOverlayContentsPrivate::insertToLayout(QGraphicsWidget* item,
     controlsLayout->addItem(item, row, column);
 }
 
-void QnIoModuleFormOverlayContentsPrivate::portsChanged(const QnIOPortDataList& ports)
+void QnIoModuleFormOverlayContentsPrivate::portsChanged(const QnIOPortDataList& ports, bool userInputEnabled)
 {
     /* Reset internal data: */
     inputsCount = outputsCount = 0;
@@ -285,7 +276,7 @@ void QnIoModuleFormOverlayContentsPrivate::portsChanged(const QnIOPortDataList& 
             const auto& metrics = controls.button->fontMetrics();
             int maxWidth = metrics.width(QString(kMaxPortNameLength, L'w'));
             controls.button->setText(metrics.elidedText(port.outputName, Qt::ElideRight, maxWidth));
-            controls.button->setEnabled(widget()->userInputEnabled());
+            controls.button->setEnabled(userInputEnabled);
         }
     }
 
@@ -303,8 +294,8 @@ void QnIoModuleFormOverlayContentsPrivate::stateChanged(const QnIOPortData& port
         controls.indicator->setOn(state.isActive);
 }
 
-QnIoModuleFormOverlayContents::QnIoModuleFormOverlayContents(QnIoModuleOverlayWidget* widget):
-    base_type(widget),
+QnIoModuleFormOverlayContents::QnIoModuleFormOverlayContents():
+    base_type(),
     d_ptr(new QnIoModuleFormOverlayContentsPrivate(this))
 {
 }
@@ -313,10 +304,10 @@ QnIoModuleFormOverlayContents::~QnIoModuleFormOverlayContents()
 {
 }
 
-void QnIoModuleFormOverlayContents::portsChanged(const QnIOPortDataList& ports)
+void QnIoModuleFormOverlayContents::portsChanged(const QnIOPortDataList& ports, bool userInputEnabled)
 {
     Q_D(QnIoModuleFormOverlayContents);
-    d->portsChanged(ports);
+    d->portsChanged(ports, userInputEnabled);
 }
 
 void QnIoModuleFormOverlayContents::stateChanged(const QnIOPortData& port, const QnIOStateData& state)

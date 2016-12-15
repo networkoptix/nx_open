@@ -79,11 +79,6 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(255, 52, 132);
 }
 
-QnIoModuleColors::QnIoModuleColors() {
-    idLabel = QColor(0x57, 0x57, 0x57);
-    buttonBackground = QColor("#1c1c1c");
-}
-
 QnScheduleGridColors::QnScheduleGridColors() :
     normalLabel(255, 255, 255),
     weekendLabel(255, 0, 0),

@@ -230,3 +230,19 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
 
     return result == QDialogButtonBox::Ok;
 }
+
+bool QnLayoutsHandlerMessages::replaceVideoWallResources(QWidget* parent,
+    const QnResourceList& inaccessible)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Update Screen..."));
+    messageBox.setText(tr("You will lose access to following resources:"));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
+    messageBox.setInformativeText(tr("You are going to delete some resources to which you have "
+        "access from videowall only. You won't see them in your resource list after it and won't "
+        "be able to add them to videowall again."));
+    messageBox.addCustomWidget(new QnResourceListView(inaccessible, true));
+    return messageBox.exec() == QDialogButtonBox::Ok;
+}
