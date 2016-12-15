@@ -82,9 +82,9 @@ void initializeQnLog(
     }
 
     const auto logInfo = lm("Logging level: %1, maxFileSize: %2, maxBackupCount: %3, fileName: %4")
-        .str(QnLog::logLevelToString(settings.level))
-        .str(nx::utils::bytesToString(settings.maxFileSize))
-        .strs(settings.maxBackupCount, fileName);
+        .strs(QnLog::logLevelToString(settings.level),
+            nx::utils::bytesToString(settings.maxFileSize),
+            settings.maxBackupCount, fileName);
 
     NX_LOG(id, lm(QByteArray(80, '=')), cl_logALWAYS);
     NX_LOG(id, lm("%1 started").arg(applicationName), cl_logALWAYS);

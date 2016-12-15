@@ -1,58 +1,27 @@
-/**********************************************************
-* Oct 5, 2015
-* akolesnikov
-***********************************************************/
-
 #include "log_message.h"
 
-#include <nx/utils/uuid.h>
-
+constexpr QChar QnLogMessage::kSpace;
 
 QnLogMessage::QnLogMessage()
 {
 }
 
-QnLogMessage::QnLogMessage(const char* str)
+QnLogMessage::QnLogMessage(const char* text)
 :
-    m_str(QString::fromLatin1(str))
+    m_str(QString::fromLatin1(text))
 {
 }
 
-QnLogMessage::QnLogMessage(const QString& str)
+QnLogMessage::QnLogMessage(const QString& text)
 :
-    m_str(str)
+    m_str(text)
 {
 }
 
-QnLogMessage::QnLogMessage(const QByteArray& ba)
+QnLogMessage::QnLogMessage(const QByteArray& text)
 :
-    m_str(QString::fromLatin1(ba))
+    m_str(QString::fromLatin1(text))
 {
-}
-
-QnLogMessage QnLogMessage::arg(const QString& a, int fieldWidth, QChar fillChar) const
-{
-    return m_str.arg(a, fieldWidth, fillChar);
-}
-
-QnLogMessage QnLogMessage::arg(char a, int fieldWidth, QChar fillChar) const
-{
-    return m_str.arg(QChar::fromLatin1(a), fieldWidth, fillChar);
-}
-
-QnLogMessage QnLogMessage::arg(const char* a, int fieldWidth, QChar fillChar) const
-{
-    return m_str.arg(QString::fromUtf8(a), fieldWidth, fillChar);
-}
-
-QnLogMessage QnLogMessage::arg(QChar a, int fieldWidth, QChar fillChar) const
-{
-    return m_str.arg(a, fieldWidth, fillChar);
-}
-
-QnLogMessage QnLogMessage::arg(double a, int fieldWidth, char format, int precision, QChar fillChar) const
-{
-    return m_str.arg(a, fieldWidth, format, precision, fillChar);
 }
 
 QnLogMessage QnLogMessage::arg(const QByteArray& a, int fieldWidth, QChar fillChar) const
@@ -70,23 +39,17 @@ QnLogMessage QnLogMessage::arg(const QnUuid& a, int fieldWidth, QChar fillChar) 
     return m_str.arg(a.toString(), fieldWidth, fillChar);
 }
 
-QnLogMessage QnLogMessage::arg(const void* a, int fieldWidth, QChar fillChar) const
-{
-    return m_str.arg(QString::fromLatin1("0x%1").arg(
-        reinterpret_cast<qulonglong>(a), fieldWidth - 2, 16, fillChar));
-}
-
-QnLogMessage QnLogMessage::arg(const std::chrono::milliseconds a, int fieldWidth, QChar fillChar) const
-{
-    return m_str.arg(QString::fromLatin1("%1ms").arg(a.count()), fieldWidth, fillChar);
-}
-
-QnLogMessage QnLogMessage::arg(const std::chrono::seconds a, int fieldWidth, QChar fillChar) const
+QnLogMessage QnLogMessage::arg(std::chrono::seconds a, int fieldWidth, QChar fillChar) const
 {
     return m_str.arg(QString::fromLatin1("%1s").arg(a.count()), fieldWidth, fillChar);
 }
 
-QnLogMessage QnLogMessage::arg(const std::chrono::microseconds a, int fieldWidth, QChar fillChar) const
+QnLogMessage QnLogMessage::arg(std::chrono::milliseconds a, int fieldWidth, QChar fillChar) const
+{
+    return m_str.arg(QString::fromLatin1("%1ms").arg(a.count()), fieldWidth, fillChar);
+}
+
+QnLogMessage QnLogMessage::arg(std::chrono::microseconds a, int fieldWidth, QChar fillChar) const
 {
     return m_str.arg(QString::fromLatin1("%1usec").arg(a.count()), fieldWidth, fillChar);
 }
