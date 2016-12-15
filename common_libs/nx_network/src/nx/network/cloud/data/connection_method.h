@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 14, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/utils/log/log_message.h>
@@ -35,6 +30,6 @@ namespace ConnectionMethod
 
 typedef int ConnectionMethods;
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

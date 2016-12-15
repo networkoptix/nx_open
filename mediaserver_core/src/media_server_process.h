@@ -32,9 +32,17 @@ struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
+struct BeforeRestoreDbData;
 namespace ec2 {
     class CrashReporter;
 }
+
+namespace aux {
+void saveStoragesInfoToBeforeRestoreData(
+    BeforeRestoreDbData* beforeRestoreDbData, 
+    const QnStorageResourceList& storages);
+}
+
 struct CloudManagerGroup;
 
 void restartServer(int restartTimeout);

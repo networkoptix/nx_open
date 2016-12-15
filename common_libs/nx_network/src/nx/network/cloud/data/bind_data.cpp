@@ -1,19 +1,10 @@
-
 #include "bind_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-BindRequest::BindRequest()
-:
-    BindRequest(std::list<SocketAddress>())
-{
-}
-
-BindRequest::BindRequest(std::list<SocketAddress> _publicEndpoints)
-:
+BindRequest::BindRequest(std::list<SocketAddress> _publicEndpoints):
     StunRequestData(kMethod),
     publicEndpoints(std::move(_publicEndpoints))
 {
@@ -31,6 +22,20 @@ bool BindRequest::parseAttributes(const nx::stun::Message& message)
         message, &publicEndpoints);
 }
 
-}   //api
-}   //hpm
-}   //nx
+BindResponse::BindResponse():
+    StunResponseData(kMethod)
+{
+}
+
+void BindResponse::serializeAttributes(nx::stun::Message* const /*message*/)
+{
+}
+
+bool BindResponse::parseAttributes(const nx::stun::Message& /*message*/)
+{
+    return true;
+}
+
+} // namespace api
+} // namespace hpm
+} // namespace nx

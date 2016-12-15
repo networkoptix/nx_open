@@ -369,8 +369,7 @@ void QnResource::setParentId(const QnUuid& parent)
         }
     }
 
-    if (!oldParentId.isNull())
-        emit parentIdChanged(toSharedPointer(this));
+    emit parentIdChanged(toSharedPointer(this));
 
     if (initializedChanged)
         emit this->initializedChanged(toSharedPointer(this));

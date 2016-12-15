@@ -37,6 +37,7 @@ public:
     void takeSocket(std::chrono::milliseconds timeout, Handler handler);
 
 private:
+    void startCleanupTimer(std::chrono::milliseconds timeLeft);
     void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
 
     std::atomic<size_t> m_socketCount;

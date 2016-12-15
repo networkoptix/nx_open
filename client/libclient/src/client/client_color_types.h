@@ -99,15 +99,6 @@ struct QnStatisticsColors {
 #define QnStatisticsColors_Fields (grid)(frame)(cpu)(ram)(hdds)(network)
 
 
-struct QnIoModuleColors {
-    QnIoModuleColors();
-
-    QColor idLabel;
-    QColor buttonBackground;
-};
-#define QnIoModuleColors_Fields (idLabel)(buttonBackground)
-
-
 struct QnScheduleGridColors {
 public:
     QnScheduleGridColors();
@@ -342,7 +333,7 @@ struct QnPasswordStrengthColors
     (QnHistogramColors)(QnResourceWidgetFrameColors) \
     (QnTwoWayAudioWidgetColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
-    (QnServerUpdatesColors)(QnIoModuleColors) \
+    (QnServerUpdatesColors) \
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
     (QnBookmarkColors) \

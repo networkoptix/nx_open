@@ -84,24 +84,30 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                     return handler(SystemError::timedOut, nullptr);
 
                 if (m_handlers.empty() || expirationTime < m_handlers.begin()->first)
-                {
-                    m_timer->start(
-                        timeLeft,
-                        [this]()
-                        {
-                            const auto now = std::chrono::steady_clock::now();
-                            for (auto it = m_handlers.begin(); it != m_handlers.end(); )
-                            {
-                                if (it->first > now)
-                                    return;
-
-                                it->second(SystemError::timedOut, nullptr);
-                                it = m_handlers.erase(it);
-                            }
-                        });
-                }
+                    startCleanupTimer(timeLeft);
 
                 m_handlers.emplace(expirationTime, std::move(handler));
+            }
+        });
+}
+
+void ReverseConnectionHolder::startCleanupTimer(std::chrono::milliseconds timeLeft)
+{
+    m_timer->start(
+        timeLeft,
+        [this]()
+        {
+            const auto now = std::chrono::steady_clock::now();
+            for (auto it = m_handlers.begin(); it != m_handlers.end(); )
+            {
+                const auto timeLeft = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    it->first - now);
+
+                if (timeLeft.count() > 0)
+                    return startCleanupTimer(timeLeft);
+
+                it->second(SystemError::timedOut, nullptr);
+                it = m_handlers.erase(it);
             }
         });
 }

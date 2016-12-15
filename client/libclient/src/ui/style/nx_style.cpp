@@ -3424,8 +3424,10 @@ QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option,
     {
         case SP_LineEditClearButton:
             return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
+        case SP_ArrowLeft:
         case SP_ArrowBack:
             return qnSkin->icon("standard_icons/sp_arrow_back.png");
+        case SP_ArrowRight:
         case SP_ArrowForward:
             return qnSkin->icon("standard_icons/sp_arrow_forward.png");
         case SP_FileDialogToParent:
