@@ -559,7 +559,7 @@
                 "dark": "dark8",
                 "button": "dark9",
                 "midlight": "dark10",
-                "shadow": "dark7"
+                "shadow": "dark5.setAlpha(77)"
             }
         }
     },

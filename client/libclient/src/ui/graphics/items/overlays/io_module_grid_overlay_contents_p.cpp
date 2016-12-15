@@ -112,6 +112,7 @@ void QnIoModuleGridOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
         painter->fillRect(topRect, palette().shadow());
 
         auto sideRect = itemRect;
+        sideRect.setTop(topRect.bottom());
         sideRect.setWidth(kSideShadowWidth);
         painter->fillRect(sideRect, palette().shadow());
         sideRect.moveRight(itemRect.right());
