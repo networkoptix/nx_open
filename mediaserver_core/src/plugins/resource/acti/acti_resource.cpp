@@ -351,7 +351,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setFirmware(report.value(kActiFirmawareVersionParamName));
     setMAC(QnMacAddress(report.value(kActiMacAddressParamName)));
 
-    m_platform = report.value(kActiMacAddressParamName)
+    m_platform = report.value(kActiPlatformParamName)
         .trimmed()
         .toUpper()
         .toLatin1();
