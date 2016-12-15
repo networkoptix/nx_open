@@ -79,6 +79,20 @@ TEST_F(AioTimer, destroying_in_timeout_handler)
     assertIfTimerHasNotShot();
 }
 
+TEST_F(AioTimer, cancel_timer_does_not_cancel_posted_calls)
+{
+    nx::utils::promise<void> postInvokedPromise;
+
+    m_timer->start(
+        std::chrono::seconds::zero(),
+        [this, &postInvokedPromise]()
+        {
+            m_timer->post([&postInvokedPromise]() { postInvokedPromise.set_value(); });
+            m_timer->cancelSync();
+        });
+    postInvokedPromise.get_future().wait();
+}
+
 class FtAioTimer:
     public AioTimer
 {
