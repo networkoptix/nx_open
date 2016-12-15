@@ -29,6 +29,11 @@ int QnTestEmailSettingsHandler::executePost(const QString &path, const QnRequest
         reply.smtpReplyCode = smtpResult.lastCode;
         reply.errorString = lit("Invalid email settings");
     }
+    else
+    {
+        reply.errorCode = SmtpError::Success;
+        reply.smtpReplyCode = SmtpReplyCode::AuthSuccessful;
+    }
 
     result.setReply(reply);
     return CODE_OK;

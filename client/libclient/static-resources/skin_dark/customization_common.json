@@ -532,13 +532,30 @@
     "QnIoModuleOverlayWidget": {
         "palette": {
             "default": {
-                "window": "#222222d0",
-                "windowText": "#ffffff",
-                "buttonText": "#ffffff"
+                "background": "dark6"
             }
-        },
-        "colors": {
-            "idLabel": "#575757"
+        }
+    },
+
+    "QnIoModuleFormOverlayContents": {
+        "palette": {
+            "default": {
+                "windowText": "dark13"
+            }
+        }
+    },
+
+    "QnIoModuleGridOverlayContents": {
+        "palette": {
+            "default": {
+                "windowText": "dark13",
+                "highlightedText": "green_l4",
+                "buttonText": "light4",
+                "dark": "dark8",
+                "button": "dark9",
+                "midlight": "dark10",
+                "shadow": "dark7"
+            }
         }
     },
 

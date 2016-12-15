@@ -31,7 +31,7 @@ protected:
 
 private:
     void handleVideoWallAdded(const QnVideoWallResourcePtr& videoWall);
-    void handleLayoutAdded(const QnLayoutResourcePtr& layout);
+    void updateAccessToLayout(const QnLayoutResourcePtr& layout);
     void handleItemAdded(const QnUuid& resourceId);
     void handleItemRemoved(const QnUuid& resourceId);
 

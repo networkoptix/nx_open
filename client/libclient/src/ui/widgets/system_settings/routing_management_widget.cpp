@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/string.h>
 
@@ -402,6 +403,26 @@ void QnRoutingManagementWidget::updateUi() {
     ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
+quint16 QnRoutingManagementWidget::getCurrentServerPort()
+{
+    const auto address = m_server->getPrimaryAddress();
+    const bool isUsualHost = !nx::network::SocketGlobals::addressResolver()
+        .isCloudHostName(address.address.toString());
+
+    if (isUsualHost && (address.port > 0))
+        return address.port;
+
+    const auto addresses = m_serverAddressesModel->addressList();
+    if (addresses.isEmpty())
+        return DEFAULT_APPSERVER_PORT;
+
+    const auto currentPort = addresses.first().port();
+    if (currentPort > 0)
+        return currentPort;
+
+    return DEFAULT_APPSERVER_PORT;
+}
+
 void QnRoutingManagementWidget::at_addButton_clicked() {
     if (!m_server)
         return;
@@ -418,8 +439,8 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
-    if (url.port() == -1)
-        url.setPort(m_server->getPort());
+    if (url.port() <= 0)
+        url.setPort(getCurrentServerPort());
 
     QUrl implicitUrl = url;
     implicitUrl.setPort(-1);

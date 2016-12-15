@@ -199,7 +199,7 @@ TEST_F(QnResourceAccessProviderTest, checkAccessProviders)
     QnResourceList expectedProviders;
 
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
-    expectedProviders << videoWall;
+    expectedProviders << videoWall << videoWallLayout;
     accessProvider()->accessibleVia(user, camera, &providers);
     ASSERT_EQ(expectedProviders, providers);
 

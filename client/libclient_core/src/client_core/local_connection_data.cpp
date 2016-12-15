@@ -44,10 +44,10 @@ QnLocalConnectionData helpers::storeLocalSystemConnection(
     auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     const auto itEnd = std::remove_if(recentConnections.begin(), recentConnections.end(),
         [localSystemId, userName = url.userName()](const QnLocalConnectionData& connection)
-    {
-        return (connection.localId == localSystemId)
-            && QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0;
-    });
+        {
+            return (connection.localId == localSystemId)
+                && (QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0);
+        });
 
     recentConnections.erase(itEnd, recentConnections.end());
 
@@ -58,3 +58,27 @@ QnLocalConnectionData helpers::storeLocalSystemConnection(
 
     return connectionData;
 }
+
+void helpers::forgetLocalConnectionPassword(const QnUuid& localId, const QString& userName)
+{
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    const auto it = std::find_if(recentConnections.begin(), recentConnections.end(),
+        [localId, userName](const QnLocalConnectionData& connection)
+        {
+            return ((connection.localId == localId)
+                && (QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0));
+        });
+
+    if (it == recentConnections.end())
+        return;
+
+    if (it->url.password().isEmpty() && it->password.isEmpty())
+        return;
+
+    auto& data = *it;
+    data.url.setPassword(QString());
+    data.password.setValue(QString());
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+    qnClientCoreSettings->save();
+}
+
