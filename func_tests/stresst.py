@@ -91,7 +91,6 @@ class BaseWorker(object):
     def run(self):
         while not self._master.stopping():
             self._report(self._req())
-            time.sl
 
 
 class RequestWorker(BaseWorker):
@@ -169,7 +168,7 @@ class InteruptingWorker(BaseWorker):
             #print "Retcode: %s" % (proc.returncode,)
             if proc.returncode != 0:
                 return "RC=%s" % (proc.returncode,)
-            return Nonels 
+            return None
         except Exception, e:
             self._output("Exception: %s\n" % (TB.format_exc(),))
             return type(e).__name__
@@ -269,7 +268,7 @@ class StressTestRunner(object):
         if not found:
             return False
         if fails[None] == 0 or fails[None] == self._tail[i][1][None]: # i.e. there was no more successes after i's
-           log(LOGLEVEL.ERROR,  "FAIL: No successes for the last %.1f seconds!" % (passed - self._tail[i][0],))
+            log(LOGLEVEL.ERROR,  "FAIL: No successes for the last %.1f seconds!" % (passed - self._tail[i][0]))
             self._hang = True
             return True
         return False
