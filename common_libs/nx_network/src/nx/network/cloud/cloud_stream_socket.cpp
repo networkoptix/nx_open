@@ -543,6 +543,7 @@ void CloudStreamSocket::stopWhileInAioThread()
     m_readIoBinder.reset();
     m_writeIoBinder.reset();
     m_socketDelegate.reset();
+    setDelegate(nullptr);
 }
 
 } // namespace cloud
