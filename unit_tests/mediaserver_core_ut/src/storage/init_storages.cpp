@@ -20,10 +20,6 @@
 
 TEST(InitStoragesTest, main)
 {
-    MSSettings::roSettings()->setValue(
-        nx_ms_conf::MIN_STORAGE_SPACE,
-        (qint64)std::numeric_limits<int64_t>::max());
-
     nx::ut::utils::MediaServerTestFuncTypeList testList;
     testList.push_back(
         []() 
@@ -32,6 +28,9 @@ TEST(InitStoragesTest, main)
             ASSERT_TRUE(storages.isEmpty());
         });
     nx::ut::utils::MediaServerHelper helper(testList);
+    MSSettings::roSettings()->setValue(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        (qint64)std::numeric_limits<int64_t>::max());
     helper.start();
 }
 
