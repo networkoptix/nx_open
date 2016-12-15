@@ -20,6 +20,10 @@
 
 TEST(InitStoragesTest, main)
 {
+    MSSettings::roSettings()->setValue(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        (qint64)std::numeric_limits<int64_t>::max());
+
     nx::ut::utils::MediaServerTestFuncTypeList testList;
     testList.push_back(
         []() 
