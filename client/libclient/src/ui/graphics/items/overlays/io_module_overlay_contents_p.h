@@ -1,10 +1,10 @@
 #include "io_module_overlay_widget.h"
 
-#include <array>
 #include <functional>
 
 #include <ui/processors/clickable.h>
 #include <utils/common/connective.h>
+
 
 class QnIoModuleOverlayContentsPrivate: public Connective<QObject>
 {

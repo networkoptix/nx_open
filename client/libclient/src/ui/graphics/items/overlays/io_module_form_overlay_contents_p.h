@@ -1,6 +1,8 @@
 #include "io_module_form_overlay_contents.h"
 #include "io_module_overlay_contents_p.h"
 
+#include <array>
+
 
 class QnIoModuleFormOverlayContentsPrivate: public QnIoModuleOverlayContentsPrivate
 {
