@@ -34,14 +34,13 @@ public:
 protected:
     template<typename RequestData, typename CompletionHandlerType>
     void doRequest(
-        nx::stun::cc::methods::Value method,
         RequestData requestData,
         CompletionHandlerType completionHandler)
     {
         nx::stun::Message request(
             nx::stun::Header(
                 stun::MessageClass::request,
-                method));
+                RequestData::kMethod));
         requestData.serialize(&request);
 
         sendRequestAndReceiveResponse(
@@ -55,6 +54,8 @@ protected:
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
+        static_assert(ResponseData::kMethod == ResponseData::kMethod,
+            "Request and response methods mismatch");
 
         const nx::stun::cc::methods::Value method =
             static_cast<nx::stun::cc::methods::Value>(request.header.method);

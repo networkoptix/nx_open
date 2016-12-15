@@ -173,12 +173,8 @@ public:
 
         if (m_keepAliveOptions)
         {
-            if (!socket->setKeepAlive(m_keepAliveOptions))
-            {
-                const auto error = SystemError::getLastOSErrorText();
-                NX_LOGX(lm("Unable to configure accepted socket: %1").arg(error), cl_logWARNING);
-                return;
-            }
+            const auto isKeepAliveSet = socket->setKeepAlive(m_keepAliveOptions);
+            NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
         }
 
         auto connection = createConnection(std::unique_ptr<AbstractStreamSocket>(socket));

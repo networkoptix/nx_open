@@ -28,12 +28,12 @@ public:
     /** Handler called just after broken tcp connection has been restored */
     void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
 
-    /** Configures connection keep alive options */
-    void setKeepAliveOptions(KeepAliveOptions options);
-
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
+
+    /** Return AbstractAsyncClient for configuration purposes */
+    AbstractAsyncClient* client() const;
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);

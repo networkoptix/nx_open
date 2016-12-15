@@ -142,7 +142,10 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
         {
             // NOTE: Dispatched action might happen after connection closure.
             if (m_connectingSocket)
-                m_connectingSocket->setKeepAlive(options);
+            {
+                const auto isKeepAliveSet = m_connectingSocket->setKeepAlive(std::move(options));
+                NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
+            }
         });
 }
 

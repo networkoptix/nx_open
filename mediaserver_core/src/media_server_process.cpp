@@ -456,6 +456,18 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("dbfile", QnDbStorageResource::instance, false);
 }
 
+void calculateSpaceLimitOrLoadFromConfig(const QnFileStorageResourcePtr& fileStorage)
+{
+    const BeforeRestoreDbData& beforeRestoreData = qnCommon->beforeRestoreDbData();
+    if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(fileStorage->getUrl()))
+    {
+        fileStorage->setSpaceLimit(beforeRestoreData.getSpaceLimitForStorage(fileStorage->getUrl()));
+        return;
+    }
+
+    fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
+}
+
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_LOG(lit("%1 Attempting to create storage %2")
@@ -478,8 +490,10 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
     {
-        const qint64 totalSpace = fileStorage->getTotalSpaceWithoutInit();
-        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < fileStorage->calcInitialSpaceLimit())
+        const qint64 totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
+        calculateSpaceLimitOrLoadFromConfig(fileStorage);
+
+        if (totalSpace < fileStorage->getSpaceLimit())
         {
             NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
                 .arg(Q_FUNC_INFO)
@@ -591,7 +605,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         qint64 totalSpace = -1;
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
         if (fileStorage)
-            totalSpace = fileStorage->getTotalSpaceWithoutInit();
+            totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
         else
         {
             storage->initOrUpdate();
@@ -1796,6 +1810,22 @@ bool MediaServerProcess::initTcpListener(
     return true;
 }
 
+void aux::saveStoragesInfoToBeforeRestoreData(
+    BeforeRestoreDbData* beforeRestoreDbData, 
+    const QnStorageResourceList& storages)
+{
+    QByteArray result;
+    for (const auto& storage : storages)
+    {
+        result.append(storage->getUrl().toLocal8Bit());
+        result.append(";");
+        result.append(QByteArray::number(storage->getSpaceLimit()));
+        result.append(";");
+    }
+
+    beforeRestoreDbData->storageInfo = result;
+}
+
 void MediaServerProcess::savePersistentDataBeforeDbRestore()
 {
     QnUserResourcePtr admin = qnResPool->getAdministrator();
@@ -1813,6 +1843,8 @@ void MediaServerProcess::savePersistentDataBeforeDbRestore()
     data.localSystemName = qnGlobalSettings->systemName().toLocal8Bit();
     if (m_mediaServer)
         data.serverName = m_mediaServer->getName().toLocal8Bit();
+
+    aux::saveStoragesInfoToBeforeRestoreData(&data, m_mediaServer->getStorages());
 
     data.saveToSettings(MSSettings::roSettings());
 }

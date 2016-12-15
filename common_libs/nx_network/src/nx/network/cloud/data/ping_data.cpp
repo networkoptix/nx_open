@@ -50,6 +50,6 @@ bool PingResponse::parseAttributes(const nx::stun::Message& message)
         message, &endpoints);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

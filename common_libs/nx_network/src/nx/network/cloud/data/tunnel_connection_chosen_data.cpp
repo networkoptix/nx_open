@@ -1,17 +1,10 @@
-/**********************************************************
-* Jun 14, 2016
-* akolesnikov
-***********************************************************/
-
 #include "tunnel_connection_chosen_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-TunnelConnectionChosenRequest::TunnelConnectionChosenRequest()
-:
+TunnelConnectionChosenRequest::TunnelConnectionChosenRequest():
     StunRequestData(kMethod)
 {
 }
@@ -25,9 +18,7 @@ bool TunnelConnectionChosenRequest::parseAttributes(const nx::stun::Message& /*m
     return true;
 }
 
-
-TunnelConnectionChosenResponse::TunnelConnectionChosenResponse()
-:
+TunnelConnectionChosenResponse::TunnelConnectionChosenResponse():
     StunResponseData(kMethod)
 {
 }
@@ -41,6 +32,6 @@ bool TunnelConnectionChosenResponse::parseAttributes(const nx::stun::Message& /*
     return true;
 }
 
-}   //namespace api
-}   //namespace hpm
-}   //namespace nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

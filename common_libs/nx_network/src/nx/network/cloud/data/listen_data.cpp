@@ -32,19 +32,18 @@ ListenResponse::ListenResponse():
 {
 }
 
-typedef stun::cc::attrs::StringAttribute<stun::cc::attrs::tcpConnectionKeepAlive>
-    TcpConnectionKeepAlive;
+typedef stun::cc::attrs::StringAttribute<stun::cc::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
 
 void ListenResponse::serializeAttributes(nx::stun::Message* const message)
 {
     if (tcpConnectionKeepAlive)
-        message->newAttribute<TcpConnectionKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
+        message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
 }
 
 bool ListenResponse::parseAttributes(const nx::stun::Message& message)
 {
     nx::String keepAliveOptions;
-    if (readStringAttributeValue<TcpConnectionKeepAlive>(message, &keepAliveOptions))
+    if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
     {
         tcpConnectionKeepAlive = KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
         return (bool)tcpConnectionKeepAlive; //< Empty means parsing has failed.

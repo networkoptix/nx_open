@@ -1,10 +1,4 @@
-/**********************************************************
-* Feb 11, 2016
-* akolesnikov
-***********************************************************/
-
 #include "udp_hole_punching_connection_initiation_data.h"
-
 
 namespace nx {
 namespace hpm {
@@ -12,8 +6,7 @@ namespace api {
 
 constexpr const stun::cc::methods::Value UdpHolePunchingSynRequest::kMethod;
 
-UdpHolePunchingSynRequest::UdpHolePunchingSynRequest()
-:
+UdpHolePunchingSynRequest::UdpHolePunchingSynRequest():
     StunRequestData(kMethod)
 {
 }
@@ -30,8 +23,7 @@ bool UdpHolePunchingSynRequest::parseAttributes(const nx::stun::Message& /*messa
 
 constexpr const stun::cc::methods::Value UdpHolePunchingSynResponse::kMethod;
 
-UdpHolePunchingSynResponse::UdpHolePunchingSynResponse()
-:
+UdpHolePunchingSynResponse::UdpHolePunchingSynResponse():
     StunResponseData(kMethod)
 {
 }
@@ -48,6 +40,6 @@ bool UdpHolePunchingSynResponse::parseAttributes(const nx::stun::Message& messag
         &connectSessionId);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx
