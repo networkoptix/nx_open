@@ -520,9 +520,6 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
 bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
 {
-    if (!applauncher::checkOnline())
-        return false;
-
     /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())
         return false;
