@@ -71,6 +71,6 @@ private:
             kColumnCount
         };
 
-        std::array<int, kColumnCount> m_rowCounts { 0 };
+        std::array<int, kColumnCount> m_rowCounts { 0, 0 };
     };
 };

@@ -87,7 +87,7 @@ private:
             kColumnCount
         };
 
-        std::array<int, kColumnCount> m_rowCounts { 0 };
-        std::array<qreal, kColumnCount> m_widthHints { 0.0 };
+        std::array<int, kColumnCount> m_rowCounts { 0, 0 };
+        std::array<qreal, kColumnCount> m_widthHints { 0.0, 0.0 };
     };
 };
