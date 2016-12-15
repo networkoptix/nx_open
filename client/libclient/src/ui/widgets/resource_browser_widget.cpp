@@ -1009,6 +1009,14 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
         return;
     }
 
+    if (nodeType == Qn::VideoWallItemNode)
+    {
+        auto item = qnResPool->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+        menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
+            QnVideoWallItemIndexList() << item);
+        return;
+    }
+
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     /* Do not open users or fake servers. */
     if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
