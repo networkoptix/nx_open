@@ -33,9 +33,9 @@ CdbLauncher::CdbLauncher(QString tmpDir):
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
-    addArg("-log/level"); addArg("DEBUG2");
+    addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(testDataDir().toLatin1().constData());
-    addArg("-syncroLog/level"); addArg("DEBUG2");
+    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
 
     const auto dbConnectionOptionsToUse = dbConnectionOptions();
 

@@ -11,12 +11,13 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <libvms_gateway_app_info.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/timer_manager.h>
+
 #include <utils/common/app_info.h>
 
+#include "libvms_gateway_app_info.h"
 
 namespace {
 
@@ -116,7 +117,10 @@ CloudConnect::CloudConnect()
 
 Settings::Settings()
 :
-    m_settings(QnLibVmsGatewayAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        QnLibVmsGatewayAppInfo::applicationName(),
+        kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
@@ -132,7 +136,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const QnLogSettings& Settings::logging() const
+const nx::utils::log::QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }

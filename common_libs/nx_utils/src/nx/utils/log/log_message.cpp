@@ -34,6 +34,16 @@ QnLogMessage QnLogMessage::arg(const std::string& a, int fieldWidth, wchar_t fil
     return m_str.arg(QString::fromStdString(a), fieldWidth, fillChar);
 }
 
+QnLogMessage QnLogMessage::arg(const char* str, int fieldWidth, wchar_t fillChar) const
+{
+    return m_str.arg(QString::fromUtf8(str), fieldWidth, fillChar);
+}
+
+QnLogMessage QnLogMessage::arg(const wchar_t* str, int fieldWidth, wchar_t fillChar) const
+{
+    return m_str.arg(QString::fromWCharArray(str), fieldWidth, fillChar);
+}
+
 QnLogMessage QnLogMessage::arg(const QnUuid& a, int fieldWidth, wchar_t fillChar) const
 {
     return m_str.arg(a.toString(), fieldWidth, fillChar);

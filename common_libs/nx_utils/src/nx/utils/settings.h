@@ -4,9 +4,9 @@
 
 #include <QtCore/QSettings>
 
-#include <nx/utils/argument_parser.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/string.h>
+#include "argument_parser.h"
+#include "log/log.h"
+#include "string.h"
 
 /**
  * Able to take settings from QSettings class (win32 registry or linux ini file) or from
@@ -24,10 +24,11 @@
  *
  * arguments: --section/item=value
  */
-class QnSettings
+class NX_UTILS_API QnSettings
 {
 public:
     QnSettings(
+        const QString& organizationName,
         const QString& applicationName,
         const QString& moduleName,
         QSettings::Scope scope = QSettings::SystemScope);
@@ -48,28 +49,3 @@ private:
     QSettings m_systemSettings;
     nx::utils::ArgumentParser m_args;
 };
-
-class QnLogSettings
-{
-public:
-    #ifdef _DEBUG
-        static constexpr QnLogLevel kDefaultLogLevel = cl_logDEBUG1;
-    #else
-        static constexpr QnLogLevel kDefaultLogLevel = cl_logINFO;
-    #endif
-
-    QnLogLevel level = kDefaultLogLevel;
-    QString directory = QString(); //< dataDir/log
-    quint32 maxFileSize = nx::utils::stringToBytesConst("10M");
-    quint8 maxBackupCount = 5;
-
-    /** Rewrites values from settings if specified */
-    void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
-};
-
-void initializeQnLog(
-    const QnLogSettings& settings,
-    const QString& dataDir,
-    const QString& applicationName,
-    const QString& baseName = QLatin1String("log_file"),
-    int id = QnLog::MAIN_LOG_ID);
