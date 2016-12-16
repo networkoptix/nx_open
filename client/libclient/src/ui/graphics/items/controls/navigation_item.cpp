@@ -604,7 +604,6 @@ void QnNavigationItem::at_liveButton_clicked()
         navigator()->setLive(true);
         action(QnActions::PlayPauseAction)->setChecked(true);
         m_liveButton->setChecked(true);
-    action(QnActions::PlayPauseAction)->setChecked(true);
 
         /* Move time scrollbar so that maximum is visible. */
         m_timeSlider->finishAnimations();
