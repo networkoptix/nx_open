@@ -144,7 +144,7 @@ void RandomlyFailingHttpConnection::processMessage(nx_http::Message /*request*/)
         std::bind(&RandomlyFailingHttpConnection::onResponseSent, this, _1));
 }
 
-void RandomlyFailingHttpConnection::onResponseSent(SystemError::ErrorCode sysErrorCode)
+void RandomlyFailingHttpConnection::onResponseSent(SystemError::ErrorCode /*sysErrorCode*/)
 {
     //closeConnection(sysErrorCode);
 }
