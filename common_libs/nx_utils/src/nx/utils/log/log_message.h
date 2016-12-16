@@ -24,6 +24,8 @@ public:
 
     QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
     QnLogMessage arg(const std::string& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(const char* str, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(const wchar_t* str, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
     QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
 
     QnLogMessage arg(std::chrono::seconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
