@@ -15,6 +15,7 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 80px;
+  min-width: 360px;
 }
 footer {
   position: absolute;
@@ -553,10 +554,8 @@ h1.process-success{
     display:inline-block;
     width:32px;
     height:32px;
-    position: relative;
     background-repeat: no-repeat;
     background-size: 32px 32px;
-    margin-right:10px;
 
     background-image: url('/static/images/download.png') !important;
 
@@ -592,15 +591,14 @@ h1.process-success{
 }
 
 .download-button{
-    text-align:left !important;
     margin-bottom:8px;
-    h2{
-        margin-left:42px;
-    }
+    margin-top:0;
     .installer-name{
-        margin-left:42px;
         display:block;
         font-weight: normal;
+    }
+    .media-body{
+        width:auto;
     }
 }
 h2.version-number{
