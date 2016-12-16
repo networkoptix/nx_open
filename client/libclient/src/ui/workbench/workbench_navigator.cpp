@@ -648,7 +648,9 @@ void QnWorkbenchNavigator::setSpeed(qreal speed)
     {
         reader->setSpeed(speed);
 
-        if (!qFuzzyIsNull(speed - 1.0))
+        setPlaying(!qFuzzyIsNull(speed));
+
+        if (speed <= 0.0)
             setLive(false);
 
         updateSpeed();
