@@ -13,15 +13,15 @@
                 <li class="vertical-bar"></li>
                 <li class="auth-hidden" ng-class="{active:isActive('/content/about')}"><a href="/content/about">About</a></li>
                 <li class="auth-visible" ng-class="{active:isActive('/systems')}"><a href="/systems">Systems</a></li>
-
-
+                <li role="separator" class="nav-divider"></li>
             </ul>
+
             <ul class="nav navbar-nav navbar-right auth-hidden">
                 <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
-                                                 ng-click="login();$event.preventDefault();">Log in</a></span></li>
-                <li><span class="btn-wrapper"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
+                                                 ng-click="login();$event.preventDefault();">Log in</a></span><span
+                        class="btn-wrapper"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
             </ul>
-            <ul class="nav navbar-nav navbar-right auth-visible">
+            <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
                 <li class="vertical-bar"></li>
                 <li uib-dropdown>
                     <a uib-dropdown-toggle href="">{{account.email}} <span class="caret"></span></a>
@@ -31,8 +31,13 @@
                         <li><a href="" ng-click="logout()">Log out</a></li>
                     </ul>
                 </li>
-
                 <li class="vertical-bar"></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right hidden-expanded auth-visible ">
+                <li><a>{{account.email}}</a></li>
+                <li><a href="/account/">Account Settings</a></li>
+                <li><a href="/account/password/">Change Password</a></li>
+                <li><a href="" ng-click="logout()">Log out</a></li>
             </ul>
         </div>
     </div>
