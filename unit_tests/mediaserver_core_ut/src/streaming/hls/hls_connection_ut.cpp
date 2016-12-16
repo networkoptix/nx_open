@@ -162,8 +162,8 @@ TEST(HLSMimeTypes, main)
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u8")), lit("application/vnd.apple.mpegurl"));
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U8")), lit("application/vnd.apple.mpegurl"));
 
-    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("ts")), lit("audio/mpegurl"));
-    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("TS")), lit("audio/mpegurl"));
+    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u")), lit("audio/mpegurl"));
+    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U")), lit("audio/mpegurl"));
 }
 
 } // namespace test
