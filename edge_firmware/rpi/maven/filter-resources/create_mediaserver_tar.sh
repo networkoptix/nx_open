@@ -231,8 +231,8 @@ mkdir -p $VOX_TARGET_DIR
 cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
-    mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
-    mv -f $BUILD_DIR/etc/init.d/networkoptix-lite-client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite-client
+    if [ -f "$BUILD_DIR/etc/init.d/networkoptix-mediaserver" ]; then mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver; fi
+    if [ -f "$BUILD_DIR/etc/init.d/networkoptix-lite-client" ]; then mv -f $BUILD_DIR/etc/init.d/networkoptix-lite-client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite-client; fi
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
