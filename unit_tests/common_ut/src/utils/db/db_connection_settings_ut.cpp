@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
+#include <nx/utils/settings.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/common/settings.h>
 #include <utils/db/types.h>
 
 namespace nx {
@@ -36,7 +36,7 @@ protected:
 
     void havingLoadedOptionsFromSettings()
     {
-        QnSettings settings("app", "mod");
+        QnSettings settings("company_name", "app", "mod");
         settings.parseArgs(argc, args);
         m_optionsUnderTest.loadFromSettings(&settings);
     }
