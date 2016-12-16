@@ -75,8 +75,15 @@ class VirtualCameraTest(FuncTestCase, TestCameraMixin):
                         time.sleep(5.0)
         self.compare(responses[0].data, responses[1].data)
         log(LOGLEVEL.INFO, "Camera history (wait cycle) done")
-        
 
+    def __waitCameraHistoryWithRestart(self, servers, expGuids):
+        try:
+            self.__waitCameraHistory(servers, expGuids)
+            return
+        except self.failureException:
+            self.restartCamera()
+        self.__waitCameraHistory(servers, expGuids)
+        
     def testCameraHistory(self):
         "Switch camera between two servers and check history"
         log(LOGLEVEL.INFO, "1. Prepare test environment.")
@@ -85,24 +92,23 @@ class VirtualCameraTest(FuncTestCase, TestCameraMixin):
         serverGuid2 = "{%s}" % self.guids[1]
         # Wait camera appearance
         self.waitCamera([self.serverAddr1, self.serverAddr2])
+        
         log(LOGLEVEL.INFO, "2. Switch camera to server#1 and start recording.")
         self.switchCameraToServer(self.serverAddr1, serverGuid1)
         self.startCameraRecording(self.serverAddr1, serverGuid1)
-        self.__waitCameraHistory(
+        self.__waitCameraHistoryWithRestart(
             [self.serverAddr1, self.serverAddr2],
             [serverGuid1])
 
         log(LOGLEVEL.INFO, "3. Switch camera to server#2.")
         self.switchCameraToServer(self.serverAddr1, serverGuid2)
-        self.restartCamera()
-        self.__waitCameraHistory(
+        self.__waitCameraHistoryWithRestart(
             [self.serverAddr1, self.serverAddr2],
             [serverGuid1, serverGuid2])
                 
         log(LOGLEVEL.INFO, "4. Switch camera to server#1.")
         self.switchCameraToServer(self.serverAddr1, serverGuid1)
-        self.restartCamera()
-        self.__waitCameraHistory(
+        self.__waitCameraHistoryWithRestart(
             [self.serverAddr1, self.serverAddr2],
             [serverGuid1, serverGuid2, serverGuid1])
 
