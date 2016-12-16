@@ -45,6 +45,16 @@ process_core_dump() {
 }
 
 start() {
+# Hack to properly restart client and server if server is crashed
+    SERVER_PID="`pidof mediaserver`"
+    if [ -z "$SERVER_PID" ]
+    then
+       echo "Server is not running running. Killing Lite Client" >> /tmp/lite.log
+       killall -9 mobile_client
+       /etc/init.d/$CUSTOMIZATION-mediaserver start
+       return 0
+    fi
+
     SERVICE_PID="`/bin/pidof $BIN_NAME`"
     if [ ! -z "$SERVICE_PID" ]
     then
