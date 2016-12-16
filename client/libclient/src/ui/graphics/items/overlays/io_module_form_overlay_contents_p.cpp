@@ -1,5 +1,7 @@
 #include "io_module_form_overlay_contents_p.h"
 
+#include <array>
+
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -59,6 +61,85 @@ static QSizeF withContentsMargins(const QGraphicsLayout* layout, const QSizeF& s
 }
 
 } // namespace
+
+/*
+QnIoModuleFormOverlayContentsPrivate private nested class declarations
+*/
+
+/* Input port item implementation: */
+class QnIoModuleFormOverlayContentsPrivate::InputPortItem:
+    public QnIoModuleFormOverlayContentsPrivate::base_type::InputPortItem
+{
+    using base_type = QnIoModuleOverlayContentsPrivate::InputPortItem;
+
+public:
+    using base_type::InputPortItem; //< forward constructors
+
+protected:
+    virtual void paint(QPainter* painter) override;
+    virtual void setupFonts(QFont& idFont, QFont& activeIdFont, QFont& labelFont) override;
+
+    virtual QSizeF sizeHint(Qt::SizeHint which,
+        const QSizeF& constraint = QSizeF()) const override;
+};
+
+/* Output port item implementation: */
+class QnIoModuleFormOverlayContentsPrivate::OutputPortItem:
+    public QnIoModuleFormOverlayContentsPrivate::base_type::OutputPortItem
+{
+    using base_type = QnIoModuleOverlayContentsPrivate::OutputPortItem;
+
+public:
+    using base_type::OutputPortItem; //< forward constructors
+
+protected:
+    virtual QRectF activeRect() const override;
+    virtual void paint(QPainter* painter) override;
+    virtual void setupFonts(QFont& idFont, QFont& activeIdFont, QFont& labelFont) override;
+
+    virtual QSizeF sizeHint(Qt::SizeHint which,
+        const QSizeF& constraint = QSizeF()) const override;
+
+private:
+    void ensurePaths(const QRectF& buttonRect);
+
+private:
+    /* Cached paint information: */
+    QRectF m_lastButtonRect;
+    QPainterPath m_buttonPath;
+    QPainterPath m_topShadowPath;
+    QPainterPath m_bottomShadowPath;
+};
+
+/* Layout implementation: */
+class QnIoModuleFormOverlayContentsPrivate::Layout:
+    public QnIoModuleFormOverlayContentsPrivate::base_type::Layout
+{
+    using base_type = QnIoModuleOverlayContentsPrivate::Layout;
+
+public:
+    using base_type::Layout; //< forward constructors
+
+    virtual void setGeometry(const QRectF& rect) override;
+
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint which,
+        const QSizeF& constraint = QSizeF()) const override;
+
+    virtual void recalculateLayout() override;
+
+private:
+    enum Columns
+    {
+        kLeftColumn,
+        kRightColumn,
+
+        kColumnCount
+    };
+
+    std::array<int, kColumnCount> m_rowCounts { { 0, 0 } };
+    std::array<qreal, kColumnCount> m_widthHints { { 0.0, 0.0 } };
+};
 
 /*
 QnIoModuleFormOverlayContentsPrivate::InputPortItem

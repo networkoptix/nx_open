@@ -1,5 +1,7 @@
 #include "io_module_grid_overlay_contents_p.h"
 
+#include <array>
+
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 
@@ -43,6 +45,67 @@ static void setupFonts(
 }
 
 } // namespace
+
+/*
+QnIoModuleGridOverlayContentsPrivate private nested class declarations
+*/
+
+class QnIoModuleGridOverlayContentsPrivate::InputPortItem:
+    public QnIoModuleGridOverlayContentsPrivate::base_type::InputPortItem
+{
+    using base_type = QnIoModuleOverlayContentsPrivate::InputPortItem;
+
+public:
+    using base_type::InputPortItem; //< forward constructors
+
+protected:
+    virtual void paint(QPainter* painter) override;
+    virtual void setupFonts(QFont& idFont, QFont& activeIdFont, QFont& labelFont) override;
+};
+
+/* Output port item implementation: */
+class QnIoModuleGridOverlayContentsPrivate::OutputPortItem:
+    public QnIoModuleGridOverlayContentsPrivate::base_type::OutputPortItem
+{
+    using base_type = QnIoModuleOverlayContentsPrivate::OutputPortItem;
+
+public:
+    using base_type::OutputPortItem; //< forward constructors
+
+protected:
+    virtual QRectF activeRect() const override;
+    virtual void paint(QPainter* painter) override;
+    virtual void setupFonts(QFont& idFont, QFont& activeIdFont, QFont& labelFont) override;
+};
+
+/* Layout implementation: */
+class QnIoModuleGridOverlayContentsPrivate::Layout:
+    public QnIoModuleGridOverlayContentsPrivate::base_type::Layout
+{
+    using base_type = QnIoModuleOverlayContentsPrivate::Layout;
+
+public:
+    using base_type::Layout; //< forward constructors
+
+    virtual void setGeometry(const QRectF& rect) override;
+
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint which,
+        const QSizeF& constraint = QSizeF()) const override;
+
+    virtual void recalculateLayout() override;
+
+private:
+    enum Columns
+    {
+        kLeftColumn,
+        kRightColumn,
+
+        kColumnCount
+    };
+
+    std::array<int, kColumnCount> m_rowCounts{ { 0, 0 } };
+};
 
 /*
 QnIoModuleGridOverlayContentsPrivate::InputPortItem
