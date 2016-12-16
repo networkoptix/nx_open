@@ -7,6 +7,15 @@ QnAppInfo::QnAppInfo(QObject* parent):
 {
 }
 
+QString QnAppInfo::organizationNameForSettings()
+{
+#ifdef _WIN32
+    return organizationName();
+#else
+    return linuxOrganizationName();
+#endif
+}
+
 bool QnAppInfo::isArm()
 {
     return applicationArch() == lit("arm");

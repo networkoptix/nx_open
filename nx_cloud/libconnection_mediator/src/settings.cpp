@@ -15,8 +15,9 @@
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/utils/timer_manager.h>
 
-#include <libconnection_mediator_app_info.h>
 #include <utils/common/app_info.h>
+
+#include "libconnection_mediator_app_info.h"
 
 namespace {
 
@@ -103,7 +104,10 @@ namespace hpm {
 namespace conf {
 
 Settings::Settings():
-    m_settings(QnLibConnectionMediatorAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        QnLibConnectionMediatorAppInfo::applicationName(),
+        kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
@@ -140,7 +144,7 @@ const api::ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const QnLogSettings& Settings::logging() const
+const nx::utils::log::QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }
