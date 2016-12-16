@@ -147,5 +147,24 @@ TEST_F(QnHttpLiveStreamingProcessorHttp10Response, unknown_length_resource)
     expectEndOfFileSignalledByConnectionClosure();
 }
 
+TEST(HLSMimeTypes, main)
+{
+    class HlsServerTest : public nx_hls::QnHttpLiveStreamingProcessor
+    {
+    public:
+        using nx_hls::QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor;
+        const char *mimeTypeByExtension(const QString& extension) const
+        {
+            return nx_hls::QnHttpLiveStreamingProcessor::mimeTypeByExtension(extension);
+        }
+    } hlsServerTest(QSharedPointer<AbstractStreamSocket>(), nullptr);
+
+    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u8")), lit("application/vnd.apple.mpegurl"));
+    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U8")), lit("application/vnd.apple.mpegurl"));
+
+    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("ts")), lit("audio/mpegurl"));
+    ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("TS")), lit("audio/mpegurl"));
+}
+
 } // namespace test
 } // namespace nx_hls
