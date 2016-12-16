@@ -369,10 +369,14 @@ td{
   padding-left: 8px;
 }
 
+
+.buttons-panel {
+    padding-bottom: 15px;
+}
 @media (min-width: $screen-sm-min) {
-  .pull-right-sm {
-    padding: 15px 0;
+  .buttons-panel {
     float: right;
+    padding-top: 15px;
   }
 }
 
