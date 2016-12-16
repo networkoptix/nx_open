@@ -15,26 +15,26 @@
 class NX_UTILS_API QnLogMessage
 {
 public:
-    static constexpr QChar kSpace = QLatin1Char(' ');
+    static constexpr wchar_t kSpace = u' ';
 
     QnLogMessage();
     QnLogMessage(const char* text);
     QnLogMessage(const QString& text);
     QnLogMessage(const QByteArray& text);
 
-    QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, QChar fillChar = kSpace) const;
-    QnLogMessage arg(const std::string& a, int fieldWidth = 0, QChar fillChar = kSpace) const;
-    QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, QChar fillChar = kSpace) const;
+    QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(const std::string& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
 
-    QnLogMessage arg(std::chrono::seconds a, int fieldWidth = 0, QChar fillChar = kSpace) const;
-    QnLogMessage arg(std::chrono::milliseconds a, int fieldWidth = 0, QChar fillChar = kSpace) const;
-    QnLogMessage arg(std::chrono::microseconds a, int fieldWidth = 0, QChar fillChar = kSpace) const;
+    QnLogMessage arg(std::chrono::seconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(std::chrono::milliseconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(std::chrono::microseconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
 
     template<typename T>
-    QnLogMessage arg(T* a,int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const
+    QnLogMessage arg(T* a,int fieldWidth = 0, wchar_t fillChar = kSpace) const
     {
         return m_str.arg(QString::fromLatin1("0x%1").arg(
-            reinterpret_cast<qulonglong>(a), fieldWidth - 2, 16, fillChar));
+            reinterpret_cast<qulonglong>(a), fieldWidth - 2, 16, QChar(fillChar)));
     }
 
     template<typename T, typename ... Args>
