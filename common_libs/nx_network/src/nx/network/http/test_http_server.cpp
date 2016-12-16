@@ -8,7 +8,7 @@
 #include <QtCore/QFile>
 
 #include <nx/network/http/buffer_source.h>
-
+#include <nx/utils/random.h>
 
 TestHttpServer::TestHttpServer()
 {
@@ -98,4 +98,79 @@ bool TestHttpServer::registerFileProvider(
         httpPath,
         std::move(fileContents),
         mimeType);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class RandomlyFailingHttpConnection
+
+RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
+    StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+    std::unique_ptr<AbstractCommunicatingSocket> sock)
+    :
+    BaseType(socketServer, std::move(sock)),
+    m_requestsToAnswer(nx::utils::random::number<int>(0, 3))
+{
+}
+
+RandomlyFailingHttpConnection::~RandomlyFailingHttpConnection()
+{
+}
+
+void RandomlyFailingHttpConnection::setResponseBuffer(const QByteArray& buf)
+{
+    m_responseBuffer = buf;
+}
+
+void RandomlyFailingHttpConnection::processMessage(nx_http::Message /*request*/)
+{
+    using namespace std::placeholders;
+
+    QByteArray dataToSend;
+    if (m_requestsToAnswer > 0)
+    {
+        dataToSend = m_responseBuffer;
+        --m_requestsToAnswer;
+    }
+    else
+    {
+        const auto bytesToSend = nx::utils::random::number<int>(0, m_responseBuffer.size());
+        if (bytesToSend == 0)
+            return closeConnection(SystemError::noError);
+        dataToSend = m_responseBuffer.left(bytesToSend);
+    }
+
+    sendData(
+        dataToSend,
+        std::bind(&RandomlyFailingHttpConnection::onResponseSent, this, _1));
+}
+
+void RandomlyFailingHttpConnection::onResponseSent(SystemError::ErrorCode sysErrorCode)
+{
+    //closeConnection(sysErrorCode);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class RandomlyFailingHttpServer
+
+RandomlyFailingHttpServer::RandomlyFailingHttpServer(
+    bool sslRequired,
+    nx::network::NatTraversalSupport natTraversalSupport)
+    :
+    BaseType(sslRequired, natTraversalSupport)
+{
+}
+
+void RandomlyFailingHttpServer::setResponseBuffer(const QByteArray& buf)
+{
+    m_responseBuffer = buf;
+}
+
+std::shared_ptr<RandomlyFailingHttpConnection> RandomlyFailingHttpServer::createConnection(
+    std::unique_ptr<AbstractStreamSocket> _socket)
+{
+    auto result = std::make_shared<RandomlyFailingHttpConnection>(
+        this,
+        std::move(_socket));
+    result->setResponseBuffer(m_responseBuffer);
+    return result;
 }
