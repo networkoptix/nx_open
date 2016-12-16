@@ -593,6 +593,7 @@ void QnNavigationItem::at_liveButton_clicked()
     /* Reset speed. It MUST be done before setLive(true) is called. */
     navigator()->setSpeed(1.0);
     navigator()->setLive(true);
+    action(QnActions::PlayPauseAction)->setChecked(true);
 
     /* Move time scrollbar so that maximum is visible. */
     m_timeSlider->finishAnimations();
