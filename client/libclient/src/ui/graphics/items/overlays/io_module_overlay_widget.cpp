@@ -8,8 +8,7 @@
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/camera_output_business_action.h>
-#include <nx/fusion/serialization/lexical.h>
-#include <nx/fusion/serialization/lexical_enum.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -115,7 +114,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
             QnIoModuleOverlayWidget::Style::Default);
     }
 
-    bool needToCreateNewContents = style != overlayStyle || contents == nullptr;
+    bool needToCreateNewContents = style != overlayStyle || !contents;
     if (!needToCreateNewContents)
         return;
 

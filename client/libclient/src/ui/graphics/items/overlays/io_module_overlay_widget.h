@@ -2,7 +2,7 @@
 
 #include <api/model/api_ioport_data.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 

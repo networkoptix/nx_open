@@ -2,7 +2,7 @@
 #include "ui_ioport_settings_widget.h"
 
 #include <core/resource/param.h>
-#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/model_functions.h>
 #include <ui/delegates/ioport_item_delegate.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/help/help_topic_accessor.h>
