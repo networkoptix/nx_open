@@ -14,7 +14,6 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 
-
 class NX_NETWORK_API TestHttpServer
 {
 public:
@@ -62,6 +61,51 @@ public:
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
+};
+
+//-------------------------------------------------------------------------------------------------
+// class RandomlyFailingHttpConnection
+
+class NX_NETWORK_API RandomlyFailingHttpConnection:
+    public nx_http::BaseConnection<RandomlyFailingHttpConnection>,
+    public std::enable_shared_from_this<RandomlyFailingHttpConnection>
+{
+public:
+    using BaseType = nx_http::BaseConnection<RandomlyFailingHttpConnection>;
+
+    RandomlyFailingHttpConnection(
+        StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+        std::unique_ptr<AbstractCommunicatingSocket> sock);
+    virtual ~RandomlyFailingHttpConnection();
+
+    void setResponseBuffer(const QByteArray& buf);
+
+    void processMessage(nx_http::Message request);
+
+private:
+    QByteArray m_responseBuffer;
+    int m_requestsToAnswer;
+
+    void onResponseSent(SystemError::ErrorCode sysErrorCode);
+};
+
+class NX_NETWORK_API RandomlyFailingHttpServer:
+    public StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
+{
+    using BaseType = StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
+
+public:
+    RandomlyFailingHttpServer(
+        bool sslRequired,
+        nx::network::NatTraversalSupport natTraversalSupport);
+
+    void setResponseBuffer(const QByteArray& buf);
+
+private:
+    QByteArray m_responseBuffer;
+
+    virtual std::shared_ptr<RandomlyFailingHttpConnection> createConnection(
+        std::unique_ptr<AbstractStreamSocket> _socket) override;
 };
 
 #endif  //TEST_HTTP_SERVER_H

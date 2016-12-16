@@ -56,6 +56,10 @@ namespace nx_hls
     static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * 7;
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
+
+    const char *const kApplicationMpegUrlMimeType = "application/vnd.apple.mpegurl";
+    const char *const kAudioMpegUrlMimeType = "audio/mpegurl";
+
     //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
@@ -411,6 +415,14 @@ namespace nx_hls
         }
     }
 
+    const char* QnHttpLiveStreamingProcessor::mimeTypeByExtension(const QString& extension) const
+    {
+        if (extension.toLower() == lit("m3u8"))
+            return kApplicationMpegUrlMimeType;
+        
+        return kAudioMpegUrlMimeType;
+    }
+
     typedef std::multimap<QString, QString> RequestParamsType;
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
@@ -505,10 +517,7 @@ namespace nx_hls
             return static_cast<nx_http::StatusCode::Value>(response->statusLine.statusCode);
 
         response->messageBody = serializedPlaylist;
-        if (requestFileExtension == lit("m3u8"))
-            response->headers.emplace("Content-Type", "application/vnd.apple.mpegurl");
-        else
-            response->headers.emplace("Content-Type", "audio/mpegurl");
+        response->headers.emplace("Content-Type", mimeTypeByExtension(requestFileExtension));
         response->headers.insert(make_pair("Content-Length", QByteArray::number(response->messageBody.size())));
 
         return nx_http::StatusCode::ok;

@@ -9,6 +9,7 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
+class ReverseConnectionSource;
 class ReverseConnectionHolder;
 
 /**
@@ -33,7 +34,7 @@ public:
     bool start(HostAddress publicIp, uint16_t port, bool waitForRegistration = false);
     uint16_t port() const;
 
-    std::shared_ptr<ReverseConnectionHolder> getConnectionHolder(const String& hostName);
+    std::shared_ptr<ReverseConnectionSource> getConnectionSource(const String& hostName);
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     // TODO: make is configurable for each client? can it be usefull?

@@ -8,7 +8,7 @@ import errno, json, random, re, select, signal, socket, sys, time, traceback
 import base64
 from hashlib import md5
 import pprint
-import urllib2
+import urllib2, httplib
 import threading
 from collections import namedtuple
 from itertools import imap
@@ -779,7 +779,7 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
             else:
                 if data is None or data == '':
                     with self._lock:
-                        log("--------------------------------------------")
+                        self._perfLog.write("--------------------------------------------\n")
                         if data is None:
                             log(LOGLEVEL.INFO, "URL %s: no archive data response for %s seconds" % (
                                 tcp_rtsp._url, self._tcpTimeout))
@@ -1138,12 +1138,25 @@ class RtspStreamTest(RtspPerf):
 #-----------------------------------------------------------
 class SingleServerHlsTest(SingleServerRtspPerf):
     _logNameTpl = "%s_%s.hls.log"
+    BAD_STATUS_RETRY = 3
+
+    # From httplib.py:
+    #   Presumably, the server closed the connection before
+    #   sending a valid response.
+    # It looks like an httplib issue, we may ignore it and try again.
+    def _safe_request(self, request):
+        for i in xrange(self.BAD_STATUS_RETRY):
+            try:
+                return urllib2.urlopen(request, timeout=self._httpTimeout)
+            except httplib.BadStatusLine, x:
+                if i == self.BAD_STATUS_RETRY - 1:
+                    raise
 
     def _hlsRequest(self, url):
         err = ""
         try:
-            response = urllib2.urlopen(urllib2.Request(url, headers={'x-server-guid': self._serverGUID}),
-                timeout=self._httpTimeout)
+            response = self._safe_request(
+                urllib2.Request(url, headers={'x-server-guid': self._serverGUID}))
         except Exception as e:
             err = "ERROR: url %s request raised exception (%s) %s" % (url, type(e).__name__, e)
         else:

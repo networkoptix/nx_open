@@ -49,6 +49,7 @@ namespace nx_hls
 
     protected:
         virtual void run() override;
+        const char* mimeTypeByExtension(const QString& extension) const;
 
     private:
         enum State
