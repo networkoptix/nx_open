@@ -2,6 +2,45 @@
 
 #include <QtQuick/private/qquicktextinput_p_p.h>
 #include <QtQuick/private/qquickclipnode_p.h>
+#include <QtLabsTemplates/private/qquickmenu_p.h>
+#include <QtLabsTemplates/private/qquickmenuitem_p.h>
+
+namespace {
+
+template<typename Type>
+Type* createComponent(QObject* textInput, const QString& description, const QString& text)
+{
+    QQmlComponent component(qmlEngine(textInput));
+    component.setData(text.toLatin1(), QUrl(description));
+    return qobject_cast<Type*>(component.create());
+};
+
+void addMenuItem(
+    QObject* textInput,
+    QQuickMenu* menu,
+    const QString& text,
+    bool enabled,
+    const std::function<void()> callback)
+{
+    const auto menuItem = createComponent<QQuickMenuItem>(
+        textInput, lit("menu_item"), lit("import Nx.Controls 1.0; MenuItem {}"));
+    if (!menuItem)
+        return;
+
+    QObject::connect(menuItem, &QQuickMenuItem::triggered, textInput,
+        [menu, callback]()
+    {
+        callback();
+        menu->close();
+    });
+
+    menuItem->setText(text);
+    menuItem->setEnabled(enabled);
+    menu->addItem(menuItem);
+    menu->setHeight(menuItem->height() * menu->children().count());
+};
+
+} // namespace
 
 class QnQuickTextInputPrivate : public QQuickTextInputPrivate
 {
@@ -77,7 +116,7 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     Q_D(QnQuickTextInput);
 
     auto updateInputMethod = [d](){ d->updateInputMethod(); };
-
+    setAcceptedMouseButtons(Qt::AllButtons);
     connect(this, &QnQuickTextInput::visibleChanged, updateInputMethod);
     connect(this, &QnQuickTextInput::enabledChanged, updateInputMethod);
 }
@@ -165,6 +204,8 @@ QSGNode* QnQuickTextInput::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdateP
     return clipNode;
 }
 
+#include <QtWidgets/QMenu>
+
 void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
     Q_D(QnQuickTextInput);
@@ -175,6 +216,9 @@ void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& 
 void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
+
+    if (event->button() == Qt::RightButton)
+        showMenu(event->pos());
 
     base_type::mousePressEvent(event);
 
@@ -234,4 +278,52 @@ void QnQuickTextInput::mouseReleaseEvent(QMouseEvent* event)
         emit clicked();
 
     base_type::mouseReleaseEvent(event);
+}
+
+void QnQuickTextInput::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+    selectAll();
+}
+
+void QnQuickTextInput::showMenu(const QPoint& position)
+{
+    auto menu = createComponent<QQuickMenu>(this, lit("context_menu"), lit("import Nx.Controls 1.0; Menu {}"));
+    if (!menu)
+        return;
+
+    const auto currentText = text();
+    const auto currentSelectedText = selectedText();
+
+    addMenuItem(this, menu, lit("Cut"), !currentSelectedText.isEmpty(),
+        [this, selStart = selectionStart(), selEnd = selectionEnd()]()
+        {
+            select(selStart, selEnd);
+            cut();
+        });
+
+    addMenuItem(this, menu, lit("Copy"), !currentSelectedText.isEmpty(),
+        [this, selStart = selectionStart(), selEnd = selectionEnd()]()
+        {
+            select(selStart, selEnd);
+            copy();
+        });
+
+    addMenuItem(this, menu, lit("Paste"), true,
+        [this, selStart = selectionStart(), selEnd = selectionEnd()]()
+        {
+            remove(selStart, selEnd);
+            paste();
+        });
+
+    addMenuItem(this, menu, lit("Select All"), currentSelectedText != currentText,
+        [this]() { selectAll(); });
+
+    connect(menu, &QQuickMenu::aboutToHide, this,
+        [menu]() { menu->deleteLater(); });
+
+    menu->setX(position.x());
+    menu->setY(position.y());
+    menu->setParentItem(this);
+    menu->open();
 }
