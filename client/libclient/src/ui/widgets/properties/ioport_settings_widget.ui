@@ -45,6 +45,13 @@
      </attribute>
     </widget>
    </item>
+   <item>
+    <widget class="QCheckBox" name="enableTileInterfaceCheckBox">
+     <property name="text">
+      <string>Enable tile interface</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

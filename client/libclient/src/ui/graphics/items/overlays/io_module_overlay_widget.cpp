@@ -1,5 +1,6 @@
 #include "io_module_overlay_widget.h"
 #include "io_module_form_overlay_contents.h"
+#include "io_module_grid_overlay_contents.h"
 
 #include <api/app_server_connection.h>
 #include <core/resource/camera_resource.h>
@@ -7,6 +8,8 @@
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/camera_output_business_action.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -47,6 +50,7 @@ public:
     QMap<QString, StateData> states;
     QTimer* const timer;
     QGraphicsLinearLayout* const layout;
+    QnIoModuleOverlayWidget::Style overlayStyle;
 
     QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
 
@@ -55,7 +59,8 @@ public:
     void setIOModule(const QnVirtualCameraResourcePtr& newModule);
     void setPorts(const QnIOPortDataList& newPorts);
 
-    void resetControls();
+    void updateContents();
+    void updateOverlayStyle();
 
     void openConnection();
     void toggleState(const QString& port);
@@ -76,14 +81,15 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     base_type(widget),
     q_ptr(widget),
     timer(new QTimer(this)),
-    layout(new QGraphicsLinearLayout(Qt::Vertical, widget))
+    layout(new QGraphicsLinearLayout(Qt::Vertical, widget)),
+    overlayStyle(QnIoModuleOverlayWidget::Style::Default)
 {
     widget->setAutoFillBackground(true);
 
     connect(timer, &QTimer::timeout, this, &QnIoModuleOverlayWidgetPrivate::at_timerTimeout);
     timer->setInterval(kStateCheckIntervalMs);
 
-    setContents(new QnIoModuleFormOverlayContents()); //< default
+    updateOverlayStyle();
 }
 
 void QnIoModuleOverlayWidgetPrivate::setContents(QnIoModuleOverlayContents* newContents)
@@ -95,6 +101,37 @@ void QnIoModuleOverlayWidgetPrivate::setContents(QnIoModuleOverlayContents* newC
 
     connect(contents, &QnIoModuleOverlayContents::userClicked,
         this, &QnIoModuleOverlayWidgetPrivate::toggleState);
+
+    updateContents();
+}
+
+void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
+{
+    auto style = overlayStyle;
+    if (module)
+    {
+        style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
+            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
+            QnIoModuleOverlayWidget::Style::Default);
+    }
+
+    bool needToCreateNewContents = style != overlayStyle || contents == nullptr;
+    if (!needToCreateNewContents)
+        return;
+
+    overlayStyle = style;
+
+    switch (overlayStyle)
+    {
+        case QnIoModuleOverlayWidget::Style::Tile:
+            setContents(new QnIoModuleGridOverlayContents());
+            break;
+
+        case QnIoModuleOverlayWidget::Style::Form:
+        default:
+            setContents(new QnIoModuleFormOverlayContents());
+            break;
+    }
 }
 
 void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePtr& newModule)
@@ -136,6 +173,8 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
     connect(module, &QnResource::statusChanged,
         this, &QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged);
 
+    updateOverlayStyle();
+
     setPorts(module->getIOPorts());
     timer->start();
 }
@@ -160,12 +199,13 @@ void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
         contents->stateChanged(item.config, item.state);
 }
 
-void QnIoModuleOverlayWidgetPrivate::resetControls()
+void QnIoModuleOverlayWidgetPrivate::updateContents()
 {
     /* This is a "hard-reset" of widgets displaying I/O ports
      * It is called when colors or user input enabled state is changed
      * This normally should not happen often when I/O module overlay is open */
-    setPorts(module->getIOPorts());
+    if (module)
+        setPorts(module->getIOPorts());
 }
 
 void QnIoModuleOverlayWidgetPrivate::openConnection()
@@ -182,10 +222,17 @@ void QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged(const QnResourcePtr&
 
 void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePtr& resource, const QString& key)
 {
-    if (resource != module || key != Qn::IO_SETTINGS_PARAM_NAME)
+    if (resource != module)
         return;
 
-    setPorts(module->getIOPorts());
+    if (key == Qn::IO_SETTINGS_PARAM_NAME)
+    {
+        setPorts(module->getIOPorts());
+    }
+    else if (key == Qn::IO_OVERLAY_STYLE_PARAM_NAME)
+    {
+        updateOverlayStyle();
+    }
 }
 
 void QnIoModuleOverlayWidgetPrivate::at_connectionOpened()
@@ -305,6 +352,12 @@ void QnIoModuleOverlayWidget::setIOModule(const QnVirtualCameraResourcePtr& modu
     d->setIOModule(module);
 }
 
+QnIoModuleOverlayWidget::Style QnIoModuleOverlayWidget::overlayStyle() const
+{
+    Q_D(const QnIoModuleOverlayWidget);
+    return d->overlayStyle;
+}
+
 bool QnIoModuleOverlayWidget::userInputEnabled() const
 {
     Q_D(const QnIoModuleOverlayWidget);
@@ -318,7 +371,7 @@ void QnIoModuleOverlayWidget::setUserInputEnabled(bool value)
         return;
 
     d->userInputEnabled = value;
-    d->resetControls();
+    d->updateContents();
 }
 
 /*
@@ -340,3 +393,8 @@ QnIoModuleOverlayWidget* QnIoModuleOverlayContents::overlayWidget() const
 {
     return qgraphicsitem_cast<QnIoModuleOverlayWidget*>(parentItem());
 }
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnIoModuleOverlayWidget, Style,
+    (QnIoModuleOverlayWidget::Style::Form, "Form")
+    (QnIoModuleOverlayWidget::Style::Tile, "Tile")
+)
