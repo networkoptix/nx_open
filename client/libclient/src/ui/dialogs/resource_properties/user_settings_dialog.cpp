@@ -169,7 +169,7 @@ void QnUserSettingsDialog::updatePermissions()
                 return kHtmlRowTemplate1.arg(tr("All")).arg(name);
             }
 
-            if (counts.second < 0)
+            if (filter == QnResourceAccessFilter::LayoutsFilter || counts.second < 0)
                 return kHtmlRowTemplate1.arg(counts.first).arg(name);
 
             return kHtmlRowTemplate2.arg(counts.first).arg(counts.second).arg(name);
