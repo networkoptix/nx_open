@@ -27,7 +27,8 @@ CloudStreamSocket::CloudStreamSocket(int ipVersion):
 
 CloudStreamSocket::~CloudStreamSocket()
 {
-    stopWhileInAioThread();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
