@@ -205,8 +205,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::OpenAuditLogAction), SIGNAL(triggered()), this, SLOT(at_openAuditLogAction_triggered()));
     connect(action(QnActions::CameraListAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
     connect(action(QnActions::CameraListByServerAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
-    connect(action(QnActions::WebClientAction), SIGNAL(triggered()), this, SLOT(at_webClientAction_triggered()));
-    connect(action(QnActions::WebClientActionSubMenu), SIGNAL(triggered()), this, SLOT(at_webClientAction_triggered()));
+
+    connect(action(QnActions::WebClientAction), &QAction::triggered, this,
+        &QnWorkbenchActionHandler::at_webClientAction_triggered);
+
     connect(action(QnActions::SystemAdministrationAction), SIGNAL(triggered()), this, SLOT(at_systemAdministrationAction_triggered()));
     connect(action(QnActions::SystemUpdateAction), SIGNAL(triggered()), this, SLOT(at_systemUpdateAction_triggered()));
     connect(action(QnActions::UserManagementAction), SIGNAL(triggered()), this, SLOT(at_userManagementAction_triggered()));
@@ -1046,32 +1048,29 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-
-    QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    const auto server = qnCommon->currentServer();
     if (!server)
-        /* If target server is not provided, open the server we are currently connected to. */
-        server = qnCommon->currentServer();
+        return;
 
     // TODO: #akolesnikov #3.1 VMS-2806
-    #ifdef WEB_CLIENT_SUPPORTS_PROXY
-        openInBrowser(server, lit("/static/index.html"));
-    #else
-        QUrl url(server->getApiUrl());
-        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-            return;
+#ifdef WEB_CLIENT_SUPPORTS_PROXY
+    openInBrowser(server, lit("/static/index.html"));
+#else
+    QUrl url(server->getApiUrl());
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
 
-        url.setUserName(QString());
-        url.setPassword(QString());
-        url.setScheme(lit("http"));
-        url.setPath(lit("/static/index.html"));
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setScheme(lit("http"));
+    url.setPath(lit("/static/index.html"));
 
-        url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-            return;
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
 
-        QDesktopServices::openUrl(url);
-    #endif
+    QDesktopServices::openUrl(url);
+#endif
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {

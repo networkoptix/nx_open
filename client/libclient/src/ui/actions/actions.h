@@ -355,13 +355,6 @@ enum IDType
     WebClientAction,
 
     /**
-     * Opens web client in the default browser. Placed in submenu
-     * TODO: #ynikitenkov Add ability to add action both in submenu and context menu,
-     * now it is not available
-     */
-    WebClientActionSubMenu,
-
-    /**
      * Opens business events editing dialog.
      */
     BusinessEventsAction,

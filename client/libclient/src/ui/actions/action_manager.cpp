@@ -765,7 +765,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory().
-        flags(Qn::Main | Qn::Scene).
+        flags(Qn::Main | Qn::Tree | Qn::Scene).
         mode(QnActionTypes::DesktopMode).
         text(tr("Open..."));
 
@@ -787,11 +787,15 @@ QnActionManager::QnActionManager(QObject *parent):
         factory().separator().
             flags(Qn::Main);
 
-        factory(QnActions::WebClientActionSubMenu).
-            flags(Qn::Main).
+        factory(QnActions::WebClientAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
             text(tr("Web Client...")).
+            pulledText(tr("Open Web Client...")).
             autoRepeat(false).
-            requiredGlobalPermission(Qn::GlobalAdminPermission);
+            condition(new QnConjunctionActionCondition(
+                new QnLoggedInCondition(this),
+                new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
+                this));
 
     } factory.endSubMenu();
 
@@ -933,13 +937,6 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
-
-    factory(QnActions::WebClientAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
-        text(tr("Open Web Client...")).
-        autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
 
