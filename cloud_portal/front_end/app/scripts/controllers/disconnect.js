@@ -22,6 +22,7 @@ angular.module('cloudApp')
         $scope.disconnecting = process.init(function(){
             return cloudApi.disconnect(systemId, $scope.model.password);
         },{
+            ignoreUnauthorized: true,
             errorCodes:{
                 notAuthorized: L.errorCodes.passwordMismatch
             },

@@ -58,7 +58,6 @@ angular.module('cloudApp')
                     url += linkSettings.action;
                 }
                 url += '?' + $.param(getParams);
-                console.log("generated link", url);
                 return url;
 
             },
@@ -93,18 +92,7 @@ angular.module('cloudApp')
                     // ugly thing!
                     // see CLOUD-716 for more information
 
-                    /*
-                    var result = $q.defer();
-                    window.protocolCheck(link, function () {
-                        result.reject(L.errorCodes.noClientDetected);
-                    },function(){
-                        result.resolve();
-                    });
-                    return result;
-                    */
-
-                    window.location.assign(link);
-                    // window.open(link);
+                    window.protocolCheck(link);
 
                     return $timeout(function(){
                         return account.checkVisitedKey(authKey).then(function(visited){
