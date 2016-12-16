@@ -62,7 +62,7 @@ private:
     QPoint m_dragMovePos;
 
     /* Flag that an element is edited right now. Workaround for Qt bug: state() is not always Editing. */
-    bool m_editorOpen;
+    bool m_editorOpenWorkaround;
 
     bool m_ignoreDefaultSpace;
 };

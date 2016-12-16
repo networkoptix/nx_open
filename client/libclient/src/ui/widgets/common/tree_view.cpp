@@ -10,7 +10,7 @@
 
 QnTreeView::QnTreeView(QWidget *parent):
     base_type(parent),
-    m_editorOpen(false),
+    m_editorOpenWorkaround(false),
     m_ignoreDefaultSpace(false)
 {}
 
@@ -24,7 +24,7 @@ int QnTreeView::rowHeight(const QModelIndex &index) const {
 
 void QnTreeView::wheelEvent(QWheelEvent* event)
 {
-    if (m_editorOpen)
+    if (m_editorOpenWorkaround && state() == EditingState)
         return;
 
     base_type::wheelEvent(event);
@@ -34,7 +34,7 @@ void QnTreeView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
-        bool canActivate = !m_editorOpen && (state() != EditingState || hasFocus());
+        bool canActivate = !m_editorOpenWorkaround && (state() != EditingState || hasFocus());
         if (canActivate)
         {
             event->ignore();
@@ -93,13 +93,13 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
 
 void QnTreeView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) {
     base_type::closeEditor(editor, hint);
-    m_editorOpen = false;
+    m_editorOpenWorkaround = false;
 }
 
 bool QnTreeView::edit(const QModelIndex &index, EditTrigger trigger, QEvent *event) {
     bool startEdit = base_type::edit(index, trigger, event);
     if (startEdit)
-        m_editorOpen = true;
+        m_editorOpenWorkaround = true;
     return startEdit;
 }
 
