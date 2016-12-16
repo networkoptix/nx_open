@@ -190,7 +190,8 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
         case IdColumn:
             break;
         case TypeColumn:
-            flags |= Qt::ItemIsEditable;
+            if (value.supportedPortTypes != value.portType)
+                flags |= Qt::ItemIsEditable;
             break;
         case DefaultStateColumn:
         case NameColumn:
@@ -242,33 +243,38 @@ QnIOPortDataList QnIOPortsViewModel::modelData() const
     return m_data;
 }
 
-QString QnIOPortsViewModel::portTypeToString(Qn::IOPortType portType) const {
-    switch (portType) {
-    case Qn::PT_Unknown:
-        return tr("Unknown", "IO Port Type");
-    case Qn::PT_Disabled:
-        return tr("Disabled", "IO Port Type");
-    case Qn::PT_Input:
-        return tr("Input", "IO Port Type");
-    case Qn::PT_Output:
-        return tr("Output", "IO Port Type");
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-        break;
-    }
-    return tr("Invalid", "IO Port Type");
+QString QnIOPortsViewModel::portTypeToString(Qn::IOPortType portType)
+{
+    switch (portType)
+    {
+        case Qn::PT_Unknown:
+            return tr("Unknown", "IO Port Type");
 
+        case Qn::PT_Disabled:
+            return tr("Disabled", "IO Port Type");
+
+        case Qn::PT_Input:
+            return tr("Input", "IO Port Type");
+
+        case Qn::PT_Output:
+            return tr("Output", "IO Port Type");
+    }
+
+    NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+    return tr("Invalid", "IO Port Type");
 }
 
-QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state) const {
-    switch (state) {
-    case Qn::IO_OpenCircuit:
-        return tr("Open Circuit", "IO Port State");
-    case Qn::IO_GroundedCircuit:
-        return tr("Grounded circuit", "IO Port State");
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-        break;
+QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state)
+{
+    switch (state)
+    {
+        case Qn::IO_OpenCircuit:
+            return tr("Open circuit", "IO Port State");
+
+        case Qn::IO_GroundedCircuit:
+            return tr("Grounded circuit", "IO Port State");
     }
+
+    NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
     return tr("Invalid state", "IO Port State");
 }
