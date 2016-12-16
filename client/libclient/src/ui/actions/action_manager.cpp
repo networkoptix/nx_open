@@ -1644,6 +1644,15 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
             this));
 
+    factory(QnActions::WebAdminAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Web Page...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
+            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+            this));
+
     factory(QnActions::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).

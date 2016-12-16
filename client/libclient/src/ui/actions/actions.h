@@ -355,6 +355,11 @@ enum IDType
     WebClientAction,
 
     /**
+     * Opens web admin for given server in the default browser.
+    */
+    WebAdminAction,
+
+    /**
      * Opens business events editing dialog.
      */
     BusinessEventsAction,

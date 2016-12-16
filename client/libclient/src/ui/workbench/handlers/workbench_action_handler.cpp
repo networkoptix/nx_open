@@ -208,6 +208,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
 
     connect(action(QnActions::WebClientAction), &QAction::triggered, this,
         &QnWorkbenchActionHandler::at_webClientAction_triggered);
+    connect(action(QnActions::WebAdminAction), &QAction::triggered, this,
+        &QnWorkbenchActionHandler::at_webAdminAction_triggered);
 
     connect(action(QnActions::SystemAdministrationAction), SIGNAL(triggered()), this, SLOT(at_systemAdministrationAction_triggered()));
     connect(action(QnActions::SystemUpdateAction), SIGNAL(triggered()), this, SLOT(at_systemUpdateAction_triggered()));
@@ -1048,28 +1050,34 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered()
 {
+    static const auto kPath = lit("/static/index.html");
+    static const auto kFragment = lit("/view");
+
     const auto server = qnCommon->currentServer();
     if (!server)
         return;
 
-    // TODO: #akolesnikov #3.1 VMS-2806
 #ifdef WEB_CLIENT_SUPPORTS_PROXY
-    openInBrowser(server, lit("/static/index.html"));
+    openInBrowser(server, kPath, kFragment);
 #else
-    QUrl url(server->getApiUrl());
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+    openInBrowserDirectly(server, kPath, kFragment);
+#endif
+}
+
+void QnWorkbenchActionHandler::at_webAdminAction_triggered()
+{
+    static const auto kPath = lit("/static/index.html");
+    static const auto kFragment = lit("/server");
+
+    const auto server = menu()->currentParameters(sender()).resource()
+        .dynamicCast<QnMediaServerResource>();
+    if (!server)
         return;
 
-    url.setUserName(QString());
-    url.setPassword(QString());
-    url.setScheme(lit("http"));
-    url.setPath(lit("/static/index.html"));
-
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-        return;
-
-    QDesktopServices::openUrl(url);
+#ifdef WEB_CLIENT_SUPPORTS_PROXY
+    openInBrowser(server, kPath, kFragment);
+#else
+    openInBrowserDirectly(server, kPath, kFragment);
 #endif
 }
 
@@ -1234,7 +1242,8 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
     cameraListDialog()->setServer(server);
 }
 
-void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
+void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource = parameters.resource();
@@ -2223,14 +2232,39 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
 }
 
-void QnWorkbenchActionHandler::openInBrowser(
-    const QnMediaServerResourcePtr& server,
-    const QString& webPage)
+void QnWorkbenchActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server,
+    const QString& path, const QString& fragment)
+{
+    // TODO: #akolesnikov #3.1 VMS-2806 deprecate this method, always use openInBrowser()
+
+    QUrl url(server->getApiUrl());
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
+
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setScheme(lit("http"));
+    url.setPath(path);
+    url.setFragment(fragment);
+
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
+
+    QDesktopServices::openUrl(url);
+}
+
+void QnWorkbenchActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
+    const QString& path, const QString& fragment)
 {
     if (!server || !context()->user())
         return;
 
-    QUrl serverUrl(server->getApiUrl().toString() + webPage);
+    QUrl serverUrl(server->getApiUrl().toString());
+    serverUrl.setPath(path);
+    serverUrl.setFragment(fragment);
+
     QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
