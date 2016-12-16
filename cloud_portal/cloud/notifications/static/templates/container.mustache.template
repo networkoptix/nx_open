@@ -45,15 +45,15 @@
         </tr>
 
         <tr>
-            <td></td>
+            <td class="side-spacer"></td>
             <td class="content" bgcolor="white" width="800">
                 {{>body}}
             </td>
-            <td></td>
+            <td class="side-spacer"></td>
         </tr>
 
         <tr>
-            <td></td>
+            <td class="side-spacer"></td>
             <td class="footer">
                 <table border="0" cellspacing="0" cellpadding="0">
                     <tbody>
@@ -81,7 +81,7 @@
                     </tbody>
                 </table>
             </td>
-            <td></td>
+            <td class="side-spacer"></td>
         </tr>
         </tbody>
     </table>
