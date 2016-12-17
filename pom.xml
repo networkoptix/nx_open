@@ -536,6 +536,7 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
+                <qt.version>5.6.1-1</qt.version>
             </properties>
 
         </profile>

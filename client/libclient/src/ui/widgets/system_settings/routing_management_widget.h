@@ -41,6 +41,8 @@ private:
     void updateFromModel();
     void updateUi();
 
+    quint16 getCurrentServerPort();
+
 private slots:
     void at_addButton_clicked();
     void at_removeButton_clicked();

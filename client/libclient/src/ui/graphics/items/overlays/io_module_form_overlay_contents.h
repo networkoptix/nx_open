@@ -9,11 +9,11 @@ class QnIoModuleFormOverlayContents: public QnIoModuleOverlayContents
     using base_type = QnIoModuleOverlayContents;
 
 public:
-    QnIoModuleFormOverlayContents(QnIoModuleOverlayWidget* widget);
+    QnIoModuleFormOverlayContents();
     virtual ~QnIoModuleFormOverlayContents();
 
 protected:
-    virtual void portsChanged(const QnIOPortDataList& ports) override;
+    virtual void portsChanged(const QnIOPortDataList& ports, bool userInputEnabled) override;
     virtual void stateChanged(const QnIOPortData& port, const QnIOStateData& state) override;
 
 private:

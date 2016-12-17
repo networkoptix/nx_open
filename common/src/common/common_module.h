@@ -22,6 +22,9 @@ struct BeforeRestoreDbData
     void loadFromSettings(const QSettings* settings);
     bool isEmpty() const;
 
+    bool hasInfoForStorage(const QString& url) const;
+    qint64 getSpaceLimitForStorage(const QString& url) const;
+
     static void clearSettings(QSettings* settings);
 
     QByteArray digest;
@@ -31,6 +34,7 @@ struct BeforeRestoreDbData
     QByteArray localSystemId;
     QByteArray localSystemName;
     QByteArray serverName;
+    QByteArray storageInfo;
 };
 
 

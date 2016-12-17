@@ -29,7 +29,7 @@ bool createDesktopFile(
     result += lit("Name=%1\n").arg(applicationName);
     result += lit("Comment=%1\n").arg(description);
     result += lit("Icon=vmsclient-%1.png\n").arg(customization);
-    result += lit("Exec=%1 %u\n").arg(applicationBinaryPath);
+    result += lit("Exec=\"%1\" %u\n").arg(applicationBinaryPath);
     result += lit("StartupNotify=%1\n").arg(lit("true"));
     result += lit("Terminal=%1\n").arg(lit("false"));
 

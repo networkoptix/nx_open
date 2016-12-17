@@ -118,7 +118,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
                 std::bind(
-                    &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                    &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
                     &udpClient,
                     std::move(connectionResult),
                     std::placeholders::_1));
@@ -130,7 +130,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
                 std::bind(
-                    &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                    &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
                     &udpClient,
                     std::move(connectionResult),
                     std::placeholders::_1));
@@ -223,7 +223,7 @@ TEST_F(HolePunchingProcessor, server_failure)
             std::tie(resultCode) =
                 makeSyncCall<api::ResultCode>(
                     std::bind(
-                        &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                        &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
                         &udpClient,
                         std::move(connectionResult),
                         std::placeholders::_1));

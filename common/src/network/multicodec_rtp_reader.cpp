@@ -244,7 +244,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
 
-        if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO) 
+        if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO)
         {
             if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
             {
@@ -466,8 +466,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     m_RtpSession.setTransport(getRtpTransport());
-    if (m_RtpSession.getTransport() != QnRtspClient::TRANSPORT_UDP)
-        m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
 
 
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
@@ -483,6 +481,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl);
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
+
+    if (m_RtpSession.getTransport() != QnRtspClient::TRANSPORT_UDP)
+        m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
     if (camera)
@@ -518,7 +519,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         QnRtspClient::TrackType trackType = trackInfo[i]->trackType;
         videoExist |= trackType == QnRtspClient::TT_VIDEO;
         audioExist |= trackType == QnRtspClient::TT_AUDIO;
-        if (trackType == QnRtspClient::TT_VIDEO || trackType == QnRtspClient::TT_AUDIO) 
+        if (trackType == QnRtspClient::TT_VIDEO || trackType == QnRtspClient::TT_AUDIO)
         {
             m_tracks[i].parser = createParser(trackInfo[i]->codecName.toUpper());
             if (m_tracks[i].parser) {
@@ -643,11 +644,11 @@ void QnMulticodecRtpReader::calcStreamUrl()
         {
             m_currentStreamUrl = m_request;
         }
-        else 
+        else
         {
-            QTextStream(&m_currentStreamUrl) 
-                << "rtsp://" 
-                << nres->getHostAddress() << ":" 
+            QTextStream(&m_currentStreamUrl)
+                << "rtsp://"
+                << nres->getHostAddress() << ":"
                 << nres->mediaPort();
 
             if (!m_request.startsWith(QLatin1Char('/')))

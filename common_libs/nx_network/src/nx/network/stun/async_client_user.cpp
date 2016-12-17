@@ -43,11 +43,6 @@ void AsyncClientUser::setOnReconnectedHandler(
         m_asyncGuard.sharedGuard().get());
 }
 
-void AsyncClientUser::setKeepAliveOptions(KeepAliveOptions options)
-{
-    m_client->setKeepAliveOptions(std::move(options));
-}
-
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     disconnectFromClient();
@@ -58,6 +53,11 @@ void AsyncClientUser::pleaseStopSync(bool checkForLocks)
 {
     disconnectFromClient();
     network::aio::Timer::pleaseStopSync(checkForLocks);
+}
+
+AbstractAsyncClient* AsyncClientUser::client() const
+{
+    return m_client.get();
 }
 
 void AsyncClientUser::sendRequest(

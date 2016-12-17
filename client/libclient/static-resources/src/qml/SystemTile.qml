@@ -207,6 +207,7 @@ BaseTile
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
                 currentAreaItem.factorySystem = Qt.binding( function() { return control.factorySystem; });
+                currentAreaItem.localId = Qt.binding( function() { return control.localId; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {

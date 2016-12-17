@@ -1,16 +1,15 @@
-
 #pragma once
 
 #include "stun_message_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-/** [connection_mediator, 4.3.1] */
-class NX_NETWORK_API PingRequest
-:
+/**
+ * [connection_mediator, 4.3.1]
+ */
+class NX_NETWORK_API PingRequest:
     public StunRequestData
 {
 public:
@@ -26,8 +25,7 @@ public:
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-class NX_NETWORK_API PingResponse
-:
+class NX_NETWORK_API PingResponse:
     public StunResponseData
 {
 public:
@@ -42,6 +40,6 @@ public:
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx
