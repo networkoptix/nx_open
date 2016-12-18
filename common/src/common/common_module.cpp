@@ -53,6 +53,7 @@ namespace
     static const QString kLocalSystemId = lit("localSystemId");
     static const QString kLocalSystemName = lit("localSystemName");
     static const QString kServerName= lit("serverName");
+    static const QString kStorageInfo = lit("storageInfo");
 }
 
 void BeforeRestoreDbData::saveToSettings(QSettings* settings)
@@ -64,6 +65,7 @@ void BeforeRestoreDbData::saveToSettings(QSettings* settings)
     settings->setValue(kLocalSystemId, localSystemId);
     settings->setValue(kLocalSystemName, localSystemName);
     settings->setValue(kServerName, serverName);
+    settings->setValue(kStorageInfo, storageInfo);
 }
 
 void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
@@ -75,6 +77,7 @@ void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
     localSystemId = settings->value(kLocalSystemId).toByteArray();
     localSystemName = settings->value(kLocalSystemName).toByteArray();
     serverName = settings->value(kServerName).toByteArray();
+    storageInfo = settings->value(kStorageInfo).toByteArray();
 }
 
 void BeforeRestoreDbData::clearSettings(QSettings* settings)
@@ -86,11 +89,29 @@ void BeforeRestoreDbData::clearSettings(QSettings* settings)
     settings->remove(kLocalSystemId);
     settings->remove(kLocalSystemName);
     settings->remove(kServerName);
+    settings->remove(kStorageInfo);
 }
 
 bool BeforeRestoreDbData::isEmpty() const
 {
     return digest.isEmpty() && hash.isEmpty();
+}
+
+bool BeforeRestoreDbData::hasInfoForStorage(const QString& url) const
+{
+    return storageInfo.contains(url.toLocal8Bit());
+}
+
+qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
+{
+    int urlPos = storageInfo.indexOf(url);
+    if (urlPos == -1)
+        return -1;
+
+    int spaceLimitStringBeginPos = urlPos + url.size() + 1;
+    int spaceLimitStringEndPos = storageInfo.indexOf(";", spaceLimitStringBeginPos);
+
+    return storageInfo.mid(spaceLimitStringBeginPos, spaceLimitStringEndPos - spaceLimitStringBeginPos).toLongLong();
 }
 
 // ------------------- QnCommonModule --------------------

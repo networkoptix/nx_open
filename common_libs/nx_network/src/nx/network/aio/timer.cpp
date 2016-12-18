@@ -52,12 +52,26 @@ std::chrono::nanoseconds Timer::timeToEvent() const
 
 void Timer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    pleaseStop(std::move(completionHandler));
+    post(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
 }
 
 void Timer::cancelSync()
 {
-    pleaseStopSync();
+    if (isInSelfAioThread())
+    {
+        stopWhileInAioThread();
+    }
+    else
+    {
+        nx::utils::promise<void> cancelledPromise;
+        cancelAsync([&cancelledPromise]() { cancelledPromise.set_value(); });
+        cancelledPromise.get_future().wait();
+    }
 }
 
 void Timer::stopWhileInAioThread()

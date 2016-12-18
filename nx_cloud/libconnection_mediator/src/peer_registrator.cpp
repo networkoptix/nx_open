@@ -67,7 +67,7 @@ PeerRegistrator::PeerRegistrator(
             stun::cc::methods::clientBind,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
-                processRequestWithNoOutput(
+                processRequestWithOutput(
                     &PeerRegistrator::clientBind,
                     this,
                     std::move(connection),
@@ -190,6 +190,7 @@ void PeerRegistrator::listen(
     api::ListenResponse response;
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
     completionHandler(api::ResultCode::ok, std::move(response));
+
     for (auto& indication: clientBindIndications)
         connection->sendMessage(std::move(indication));
 }
@@ -265,14 +266,14 @@ void PeerRegistrator::clientBind(
     const ConnectionStrongRef& connection,
     api::ClientBindRequest requestData,
     stun::Message /*requestMessage*/,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler)
 {
     const auto reject = [&](api::ResultCode code)
     {
         NX_LOGX(lm("Reject client bind (requested from %1): %2")
             .strs(connection->getSourceAddress(), code), cl_logDEBUG2);
 
-        completionHandler(code);
+        completionHandler(code, {});
     };
 
     // Only local peers are alowed while auth is not avaliable for clients:
@@ -311,7 +312,10 @@ void PeerRegistrator::clientBind(
             m_boundClients.erase(it);
         });
 
-    completionHandler(api::ResultCode::ok);
+    api::ClientBindResponse response;
+    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    completionHandler(api::ResultCode::ok, std::move(response));
+
     for (const auto& connectionRef: listeningPeerConnections)
         if (const auto connection = connectionRef.lock())
             connection->sendMessage(indication);

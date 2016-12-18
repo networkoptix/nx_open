@@ -410,7 +410,7 @@ void CloudServerSocket::onListenRequestCompleted(
             std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
         if (response.tcpConnectionKeepAlive)
-            m_mediatorConnection->setKeepAliveOptions(*response.tcpConnectionKeepAlive);
+            m_mediatorConnection->client()->setKeepAliveOptions(*response.tcpConnectionKeepAlive);
 
         NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         auto acceptHandler = std::move(m_savedAcceptHandler);
