@@ -773,14 +773,29 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
     return Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters) {
-    if (parameters.hasArgument(Qn::NodeTypeRole)) {
+QnTreeNodeTypeCondition::QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent):
+    QnActionCondition(parent),
+    m_nodeTypes({nodeType})
+{
+}
+
+QnTreeNodeTypeCondition::QnTreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes, QObject *parent):
+    QnActionCondition(parent),
+    m_nodeTypes(nodeTypes.toSet())
+{
+}
+
+Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters)
+{
+    if (parameters.hasArgument(Qn::NodeTypeRole))
+    {
         Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
-        return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
+        return m_nodeTypes.contains(nodeType) 
+            ? Qn::EnabledAction 
+            : Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
 }
-
 
 Qn::ActionVisibility QnNewUserLayoutActionCondition::check(const QnActionParameters &parameters)
 {

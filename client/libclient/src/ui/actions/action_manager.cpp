@@ -794,7 +794,7 @@ QnActionManager::QnActionManager(QObject *parent):
             autoRepeat(false).
             condition(new QnConjunctionActionCondition(
                 new QnLoggedInCondition(this),
-                new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
+                new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this),
                 this));
 
     } factory.endSubMenu();
@@ -938,7 +938,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
+        condition(new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this));
 
     factory(QnActions::SystemUpdateAction).
         flags(Qn::NoTarget).
@@ -1018,7 +1018,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
         condition(new QnConjunctionActionCondition(
-            new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
+            new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this),
             new QnForbiddenInSafeModeCondition(this),
             new QnRequiresOwnerCondition(this),
             this)
