@@ -102,13 +102,9 @@ wstring toNativeSeparator(const wstring& path)
     return value;
 }
 
-int createDirectory(const wstring& path)
+bool createDirectory(const wstring& path)
 {
-    wchar_t* buffer = new wchar_t[path.length() + 16];
-    wsprintf(buffer, L"mkdir \"%s\"", toNativeSeparator(path).c_str());
-    int result = _wsystem(buffer);
-    delete [] buffer;
-    return result;
+    return CreateDirectory(path.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
 }
 
 void checkDir(set<wstring>& checkedDirs, const wstring& dir)
