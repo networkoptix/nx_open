@@ -234,8 +234,6 @@ void QnLicenseManagerWidget::updateLicenses()
     m_model->updateLicenses(m_licenses);
 
     /* Update info label. */
-    bool useRedLabel = false;
-
     if (!m_licenses.isEmpty())
     {
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
@@ -259,11 +257,13 @@ void QnLicenseManagerWidget::updateLicenses()
         {
             if (!helper->isValid())
             {
-                useRedLabel = true;
                 for (Qn::LicenseType lt: helper->licenseTypes())
                 {
                     if (helper->usedLicenses(lt) > 0)
-                        messages << tr("At least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    {
+                        messages << setWarningStyleHtml(tr("At least %n %2 are required", "",
+                            helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                    }
                 }
             }
             else
@@ -271,33 +271,29 @@ void QnLicenseManagerWidget::updateLicenses()
                 for (Qn::LicenseType lt: helper->licenseTypes())
                 {
                     if (helper->usedLicenses(lt) > 0)
-                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    {
+                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt))
+                            .arg(QnLicense::longDisplayName(lt));
+                    }
                 }
             }
         }
-        ui->infoLabel->setText(messages.join(L'\n'));
+        ui->infoLabel->setText(messages.join(lit("<br/>")));
     }
     else
     {
         if (qnLicensePool->currentHardwareId().isEmpty())
         {
             ui->infoLabel->setText(tr("Obtaining licenses from server..."));
-            useRedLabel = false;
         }
         else
         {
             QString text = (QnAppInfo::freeLicenseCount() > 0)
                 ? tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.")
                 : tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
-            ui->infoLabel->setText(text);
-            useRedLabel = true;
+            ui->infoLabel->setText(setWarningStyleHtml(text));
         }
     }
-
-    QPalette palette = this->palette();
-    if (useRedLabel)
-        setWarningStyle(&palette);
-    ui->infoLabel->setPalette(palette);
 
     updateButtons();
 }

@@ -1076,6 +1076,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
+    /* Invalid items may lead to very strange behavior bugs. */
+    if (item->uuid().isNull())
+    {
+        qnDeleteLater(item);
+        return false;
+    }
+
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if (!resource)
     {

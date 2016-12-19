@@ -253,9 +253,9 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
         this, [this]() { updateFilter(false); });
-    connect(ui->filterLineEdit, &QLineEdit::textChanged,
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
         this, [this]() { updateFilter(false); });
-    connect(ui->filterLineEdit, &QLineEdit::editingFinished,
+    connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
         this, [this]() { updateFilter(true); });
 
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
@@ -903,7 +903,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
     ui->searchTreeWidget->setModel(nullptr);
-    ui->filterLineEdit->setText(QString());
+    ui->filterLineEdit->lineEdit()->setText(QString());
     killSearchTimer();
 }
 
@@ -918,7 +918,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
-    ui->filterLineEdit->setText(layoutFilter(layout));
+    ui->filterLineEdit->lineEdit()->setText(layoutFilter(layout));
 
     /* Bold state has changed. */
     currentTreeWidget()->update();
@@ -1006,6 +1006,14 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
     {
         menu()->trigger(QnActions::ConnectToCloudSystemAction, QnActionParameters()
             .withArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()));
+        return;
+    }
+
+    if (nodeType == Qn::VideoWallItemNode)
+    {
+        auto item = qnResPool->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+        menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
+            QnVideoWallItemIndexList() << item);
         return;
     }
 

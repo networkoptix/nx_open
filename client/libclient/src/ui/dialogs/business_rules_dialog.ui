@@ -47,22 +47,7 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="searchLayout">
-       <item>
-        <widget class="QLineEdit" name="filterLineEdit">
-         <property name="placeholderText">
-          <string notr="true">&lt; filter by camera... &gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="clearFilterButton">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QnSearchLineEdit" name="filterLineEdit" native="true"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="topLayout">
@@ -168,6 +153,12 @@
    <class>QnTableView</class>
    <extends>QTableView</extends>
    <header location="global">ui/widgets/common/table_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnSearchLineEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnBusinessRuleWidget</class>

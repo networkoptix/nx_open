@@ -1,8 +1,11 @@
 #include "player_data_consumer.h"
 
+#include <algorithm>
+
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/debug_utils.h>
+#include <nx/utils/log/log.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
@@ -21,7 +24,7 @@ static const int kMaxMediaQueueLen = 90;
 // Max queue length for decoded video which is awaiting to be rendered.
 static const int kMaxDecodedVideoQueueSize = 2;
 
-/** 
+/**
  * Player will emit EOF if and only if it gets several empty packets in a row
  * Sometime single empty packet can be received in case of Multi server archive server1->server2 switching
  * or network issue/reconnect.
@@ -166,7 +169,10 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
     if (!checkSequence(videoFrame->opaque))
-        return true; //< no error. Just ignore old frame
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): Ignoring old frame"), cl_logDEBUG2);
+        return true; //< No error. Just ignore the old frame.
+    }
 
     quint32 videoChannel = videoFrame->channelNumber;
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
@@ -197,7 +203,10 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
 
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
-        return true; //< Frame is processed.
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
+        return true; //< The frame is processed.
+    }
 
     // First packet after a jump.
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
@@ -224,22 +233,33 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
-        qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
+        NX_LOG(lit("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
         // False result means we want to repeat this frame later, thus, returning true.
     }
     else
     {
         if (decodedFrame)
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
             enqueueVideoFrame(std::move(decodedFrame));
+        }
+        else
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
+        }
     }
 
     return true;
 }
 
-bool PlayerDataConsumer::checkSequence(int sequence) const
+bool PlayerDataConsumer::checkSequence(int sequence)
 {
+    m_sequence = std::max(m_sequence, sequence);
     if (sequence && m_sequence && sequence != m_sequence)
+    {
+        //NX_LOG(lit("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
         return false;
+    }
     return true;
 }
 

@@ -60,7 +60,8 @@ QString QnClientInstallation::libraryPath() const {
     return m_libPath.isEmpty() ? QString() : m_rootPath + "/" + m_libPath;
 }
 
-bool QnClientInstallation::verify() const {
+bool QnClientInstallation::verify() const
+{
     NX_LOG(QString::fromLatin1("Entered VerifyInstallation"), cl_logDEBUG1);
 
     QMap<QString, qint64> fileSizeByEntry;
@@ -76,15 +77,8 @@ bool QnClientInstallation::verify() const {
         file.close();
     }
 
-    if (fileSizeByEntry.isEmpty())
-        return false;
-
-    for (auto it = fileSizeByEntry.begin(); it != fileSizeByEntry.end(); ++it) {
-        if (QFile(rootDir.absoluteFilePath(it.key())).size() != it.value())
-            return false;
-    }
-
-    return true;
+    /* File is written after the successful end of the downloading, so it's presence is a marker.*/
+    return !fileSizeByEntry.isEmpty();
 }
 
 QString targetBinaryPath(QString binaryPath)

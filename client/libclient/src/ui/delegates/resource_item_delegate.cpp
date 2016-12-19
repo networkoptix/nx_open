@@ -33,7 +33,8 @@
 
 namespace {
 
-const int kSeparatorItemHeight = 16;
+constexpr int kSeparatorItemHeight = 16;
+constexpr int kExtraTextMargin = 5;
 
 } // namespace
 
@@ -224,7 +225,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             /* If name was empty, actualRect will be invalid: */
             int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
-            textRect.setLeft(startPos + textPadding * 2);
+            textRect.setLeft(startPos + kExtraTextMargin);
             QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width());
 
             painter->setFont(option.font);
@@ -628,7 +629,8 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     baseName = index.data(Qt::DisplayRole).toString();
     extInfo = QString();
 
-    static const QString kCustomExtInfoTemplate = lit(" - %1");
+    static const QString kCustomExtInfoTemplate = //< "- %1" with en-dash
+        QString::fromWCharArray(L"\x2013 %1");
 
     /* Two-component text from resource information: */
     auto infoLevel = m_customInfoLevel;
