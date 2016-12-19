@@ -43,8 +43,12 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    void showMenu(const QPoint& position);
+    void showMenu();
 
 private:
     Q_DECLARE_PRIVATE(QnQuickTextInput)
+
+private:
+    QPoint m_contextMenuPos;
+    QTimer* m_contextMenuTimer;
 };
