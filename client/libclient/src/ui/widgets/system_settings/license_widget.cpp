@@ -102,7 +102,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     connect(ui->copyHwidButton, &QPushButton::clicked, this, [this]
     {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QnMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
+        QnMessageBox::information(this, tr("Success"), tr("Hardware ID has been copied to clipboard."));
     });
 
     connect(ui->pasteKeyButton, &QPushButton::clicked, this, [this]

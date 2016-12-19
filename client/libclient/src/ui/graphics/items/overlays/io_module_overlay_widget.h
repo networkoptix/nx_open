@@ -1,8 +1,8 @@
 #pragma once
 
 #include <api/model/api_ioport_data.h>
-#include <client/client_color_types.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
@@ -22,6 +22,16 @@ public:
     virtual ~QnIoModuleOverlayWidget();
 
     void setIOModule(const QnVirtualCameraResourcePtr& module);
+
+    enum class Style
+    {
+        Form,
+        Tile,
+        Default = Form
+    };
+
+    /** Overlay style set in accordance with resource settings: */
+    Style overlayStyle() const;
 
     /** Whether user is allowed to toggle output ports: */
     bool userInputEnabled() const;
@@ -52,3 +62,5 @@ public:
 signals:
     void userClicked(const QString& port);
 };
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnIoModuleOverlayWidget::Style), (lexical))

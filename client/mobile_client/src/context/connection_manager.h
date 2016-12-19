@@ -78,6 +78,7 @@ signals:
 public slots:
     void connectToServer(const QUrl &url);
     void connectToServer(const QUrl &url, const QString& userName, const QString& password);
+    void connectByUserInput(const QString& address, const QString& userName, const QString& password);
     void disconnectFromServer();
 
 private:

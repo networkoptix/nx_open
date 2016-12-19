@@ -590,17 +590,25 @@ void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void QnNavigationItem::at_liveButton_clicked()
 {
-    /* Reset speed. It MUST be done before setLive(true) is called. */
-    navigator()->setSpeed(1.0);
-    navigator()->setLive(true);
+    /* Experimental mode: ability to uncheck "LIVE" button (= set on pause): */
+    if (navigator()->isLive())
+    {
+        /* Set on pause: */
+        action(QnActions::PlayPauseAction)->setChecked(false);
+        m_liveButton->setChecked(false);
+    }
+    else
+    {
+        /* Reset speed. It MUST be done before setLive(true) is called. */
+        navigator()->setSpeed(1.0);
+        navigator()->setLive(true);
+        action(QnActions::PlayPauseAction)->setChecked(true);
+        m_liveButton->setChecked(true);
 
-    /* Move time scrollbar so that maximum is visible. */
-    m_timeSlider->finishAnimations();
-    m_timeScrollBar->setValue(m_timeScrollBar->maximum());
-
-    /* Reset button's checked state. */
-    if (!m_liveButton->isChecked())
-        m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
+        /* Move time scrollbar so that maximum is visible. */
+        m_timeSlider->finishAnimations();
+        m_timeScrollBar->setValue(m_timeScrollBar->maximum());
+    }
 }
 
 void QnNavigationItem::at_syncButton_clicked()

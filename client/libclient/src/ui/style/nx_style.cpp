@@ -1744,8 +1744,9 @@ void QnNxStyle::drawControl(
         {
             if (auto comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option))
             {
-                QStyleOptionComboBox opt = *comboBox;
-                opt.rect.setLeft(opt.rect.left() + 6);
+                static constexpr int kComboBoxMarginAdjustment = 7; //< to align with other controls
+                QStyleOptionComboBox opt(*comboBox);
+                opt.rect.setLeft(opt.rect.left() + kComboBoxMarginAdjustment);
                 base_type::drawControl(element, &opt, painter, widget);
                 return;
             }

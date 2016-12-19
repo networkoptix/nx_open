@@ -169,7 +169,7 @@ void QnUserSettingsDialog::updatePermissions()
                 return kHtmlRowTemplate1.arg(tr("All")).arg(name);
             }
 
-            if (counts.second < 0)
+            if (filter == QnResourceAccessFilter::LayoutsFilter || counts.second < 0)
                 return kHtmlRowTemplate1.arg(counts.first).arg(name);
 
             return kHtmlRowTemplate2.arg(counts.first).arg(counts.second).arg(name);
@@ -210,14 +210,18 @@ void QnUserSettingsDialog::updatePermissions()
     if (isPageVisible(ProfilePage))
     {
         Qn::UserRole role = m_user->userRole();
-        QString permissionsText = QnUserRolesManager::userRoleDescription(role);
-        QnResourceAccessSubject subject(m_user);
+        QString permissionsText;
 
         if (role == Qn::UserRole::CustomUserRole || role == Qn::UserRole::CustomPermissions)
         {
-            permissionsText += kHtmlTableTemplate.arg(
+            QnResourceAccessSubject subject(m_user);
+            permissionsText = kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, false)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, false)));
+        }
+        else
+        {
+            permissionsText = QnUserRolesManager::userRoleDescription(role);
         }
 
         m_profilePage->updatePermissionsLabel(permissionsText);
@@ -225,7 +229,7 @@ void QnUserSettingsDialog::updatePermissions()
     else
     {
         Qn::UserRole roleType = m_settingsPage->selectedRole();
-        QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
+        QString permissionsText;
 
         if (roleType == Qn::UserRole::CustomUserRole)
         {
@@ -233,7 +237,7 @@ void QnUserSettingsDialog::updatePermissions()
             QnUuid roleId = m_settingsPage->selectedUserRoleId();
             QnResourceAccessSubject subject(qnUserRolesManager->userRole(roleId));
 
-            permissionsText += kHtmlTableTemplate.arg(
+            permissionsText = kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, true)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, true)));
         }
@@ -245,9 +249,13 @@ void QnUserSettingsDialog::updatePermissions()
                 return descriptionHtml(widget->filter(), widget->isAll(), widget->selected());
             };
 
-            permissionsText += kHtmlTableTemplate.arg(
+            permissionsText = kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
+        }
+        else
+        {
+            permissionsText = QnUserRolesManager::userRoleDescription(roleType);
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);

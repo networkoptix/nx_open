@@ -556,12 +556,13 @@ public:
 class QnTreeNodeTypeCondition: public QnActionCondition
 {
 public:
-    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent): QnActionCondition(parent), m_nodeType(nodeType) {}
+    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent);
+    QnTreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes, QObject *parent);
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
 private:
-    Qn::NodeType m_nodeType;
+    QSet<Qn::NodeType> m_nodeTypes;
 };
 
 class QnResourceStatusActionCondition: public QnActionCondition
