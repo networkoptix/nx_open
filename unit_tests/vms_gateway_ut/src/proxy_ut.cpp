@@ -319,6 +319,23 @@ TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
 
+TEST_F(VmsGatewayProxyTest, ModRewrite)
+{
+    addArg("-http/sslSupport", "true");
+    addArg("-cloudConnect/sslAllowed", "true");
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    testProxyUrl(QUrl(lit("http://%1/gateway/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().address.toString())
+        .arg(testPathAndQuery)));
+
+    testProxyUrl(QUrl(lit("https://%1/gateway/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+}
+
 }   // namespace test
 }   // namespace gateway
 }   // namespace cloud
