@@ -29,22 +29,16 @@ void addMenuItem(
 
     QObject::connect(menuItem, &QQuickMenuItem::triggered, textInput,
         [menu, callback]()
-    {
-        callback();
-        menu->close();
-    });
+        {
+            callback();
+            menu->close();
+        });
 
     menuItem->setText(text);
     menuItem->setEnabled(enabled);
     menu->addItem(menuItem);
     menu->setHeight(menuItem->height() * menu->children().count());
 };
-
-template<typename PointType>
-QPoint toPoint(const PointType& point)
-{
-    return QPoint(point.x(), point.y());
-}
 
 } // namespace
 
