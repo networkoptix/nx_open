@@ -147,7 +147,7 @@ int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int
     return 0;
 }
 
-bool startProcessAsync(wchar_t* commandline, const wstring& dstDir)
+BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
 {
     STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION lpProcessInfo;
