@@ -212,10 +212,8 @@ void VmsGatewayProcess::registerApiHandlers(
     const conf::RunTimeOptions& runTimeOptions,
     nx_http::MessageDispatcher* const msgDispatcher)
 {
-    msgDispatcher->registerRequestProcessor<ProxyHandler>(
-        nx_http::kAnyPath,
-        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
-        {
+    msgDispatcher->setDefaultProcessor<ProxyHandler>(
+        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler> {
             return std::make_unique<ProxyHandler>(settings, runTimeOptions);
         });
 
@@ -231,8 +229,6 @@ void VmsGatewayProcess::registerApiHandlers(
             },
             nx_http::StringType("CONNECT"));
     }
-
-    msgDispatcher->addModRewriteRule(lit("/gateway/"), lit("/"));
 }
 
 void VmsGatewayProcess::publicAddressFetched(

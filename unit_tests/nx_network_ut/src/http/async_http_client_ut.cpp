@@ -83,35 +83,14 @@ protected:
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         std::promise<void> promise;
-        NX_LOGX(lm("httpsTest: %1").str(url), cl_logINFO);
+        NX_LOGX(lit("httpsTest: %1").arg(url.toString()), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
-        client->doGet(url,
-            [&promise](AsyncHttpClientPtr ptr)
-            {
-                 EXPECT_TRUE(ptr->hasRequestSuccesed());
-                 promise.set_value();
-            });
-
-        promise.get_future().wait();
-    }
-
-    void testResult(const QString& path, const nx_http::BufferType& expectedResult)
-    {
-        const QUrl url(lit("http://%1%2")
-            .arg(m_testHttpServer->serverAddress().toString()).arg(path));
-
-        std::promise<void> promise;
-        NX_LOGX(lm("testResult: %1").str(url), cl_logINFO);
-
-        const auto client = nx_http::AsyncHttpClient::create();
-        client->doGet(url,
-            [&promise, &expectedResult](AsyncHttpClientPtr ptr)
-            {
-                 EXPECT_TRUE(ptr->hasRequestSuccesed());
-                 EXPECT_EQ(expectedResult, ptr->fetchMessageBodyBuffer());
-                 promise.set_value();
-            });
+        client->doGet(url, [&promise](AsyncHttpClientPtr ptr)
+        {
+             EXPECT_TRUE(ptr->hasRequestSuccesed());
+             promise.set_value();
+        });
 
         promise.get_future().wait();
     }
@@ -122,41 +101,6 @@ TEST_F(AsyncHttpClientTest, Https)
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
     httpsTest(lit("http"), lit("httpOnly"));
     httpsTest(lit("https"), lit("httpsOnly"));
-}
-
-// TODO: #mux Better create HttpServer test and move it there.
-TEST_F(AsyncHttpClientTest, ServerModRewrite)
-{
-    m_testHttpServer->registerStaticProcessor(
-        nx_http::kAnyPath, "root", "text/plain");
-    m_testHttpServer->registerStaticProcessor(
-        lit("/somePath1/longerPath"), "someData1", "text/plain");
-    m_testHttpServer->registerStaticProcessor(
-        lit("/somePath2/longerPath"), "someData2", "text/plain");
-    ASSERT_TRUE(m_testHttpServer->bindAndListen());
-
-    testResult(lit("/"), "root");
-    testResult(lit("/somePath1/longerPath"), "someData1");
-    testResult(lit("/somePath2/longerPath"), "someData2");
-    testResult(lit("/somePath3/longerPath"), "root");
-    testResult(lit("/suffix/somePath1/longerPath"), "root");
-
-    m_testHttpServer->addModRewriteRule(lit("/somePath2/longerPath"), lit("/"));
-    m_testHttpServer->addModRewriteRule(lit("/somePath3/"), lit("/somePath1/"));
-
-    testResult(lit("/"), "root");
-    testResult(lit("/somePath1/longerPath"), "someData1");
-    testResult(lit("/somePath2/longerPath"), "root");
-    testResult(lit("/somePath3/longerPath"), "someData1");
-    testResult(lit("/suffix/somePath1/longerPath"), "root");
-
-    m_testHttpServer->addModRewriteRule(lit("/suffix/"), lit("/"));
-
-    testResult(lit("/"), "root");
-    testResult(lit("/somePath1/longerPath"), "someData1");
-    testResult(lit("/somePath2/longerPath"), "root");
-    testResult(lit("/somePath3/longerPath"), "someData1");
-    testResult(lit("/suffix/somePath1/longerPath"), "someData1");
 }
 
 //TODO #ak introduce built-in http server to automate AsyncHttpClient tests

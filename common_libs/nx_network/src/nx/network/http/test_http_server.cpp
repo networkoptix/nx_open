@@ -71,11 +71,6 @@ void TestHttpServer::setPersistentConnectionEnabled(bool value)
     m_httpServer->setPersistentConnectionEnabled(value);
 }
 
-void TestHttpServer::addModRewriteRule(QString oldPrefix, QString newPrefix)
-{
-    m_httpMessageDispatcher.addModRewriteRule(std::move(oldPrefix), std::move(newPrefix));
-}
-
 bool TestHttpServer::registerStaticProcessor(
     const QString& path,
     QByteArray msgBody,

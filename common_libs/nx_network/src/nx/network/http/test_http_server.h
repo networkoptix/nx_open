@@ -49,7 +49,6 @@ public:
         const QString& path,
         QByteArray msgBody,
         const nx_http::StringType& mimeType);
-
     bool registerFileProvider(
         const QString& httpPath,
         const QString& filePath,
@@ -57,7 +56,6 @@ public:
 
     // used for test purpose
     void setPersistentConnectionEnabled(bool value);
-    void addModRewriteRule(QString oldPrefix, QString newPrefix);
 
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
 
