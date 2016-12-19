@@ -12,6 +12,9 @@ DEP_CFLAGS = -MD -MP -MQ $@
 LIB_CFLAGS = -fPIC
 LIB_LDFLAGS = -shared -Wl,-soname,$(TARGET)
 
+# Allows ProxyDecoder to use its own ffmpeg located in "lib/ffmpeg".
+LIB_LDFLAGS += -Wl,-rpath,'$$ORIGIN/ffmpeg'
+
 OBJ = $(addsuffix .o,$(basename $(SRC)))
 DEP = $(addsuffix .d,$(basename $(SRC)))
 
