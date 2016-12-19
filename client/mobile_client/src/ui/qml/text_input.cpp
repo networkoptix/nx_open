@@ -206,9 +206,7 @@ void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
     m_contextMenuPos = event->pos();
     m_selectionStart = selectionStart();
     m_selectionEnd = selectionEnd();
-    if (event->button() == Qt::RightButton)
-        emitLongPress();
-    else
+    if (event->button() == Qt::LeftButton)
         m_contextMenuTimer->start();
 
     base_type::mousePressEvent(event);
