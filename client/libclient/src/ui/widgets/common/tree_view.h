@@ -30,6 +30,7 @@ public:
     bool ignoreDefaultSpace() const;
     void setIgnoreDefaultSpace(bool value);
 
+    virtual QRect visualRect(const QModelIndex &index) const override;
 signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the

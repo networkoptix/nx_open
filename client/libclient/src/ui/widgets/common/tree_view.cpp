@@ -123,3 +123,10 @@ void QnTreeView::setIgnoreDefaultSpace(bool value)
 {
     m_ignoreDefaultSpace = value;
 }
+
+QRect QnTreeView::visualRect(const QModelIndex &index) const
+{
+    QRect result = base_type::visualRect(index);
+    result.setLeft(0);
+    return result;
+}
