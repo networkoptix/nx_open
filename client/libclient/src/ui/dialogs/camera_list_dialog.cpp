@@ -19,9 +19,11 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/widgets/common/item_view_auto_hider.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
+
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
@@ -31,6 +33,12 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     m_pendingWindowTitleUpdate(false)
 {
     ui->setupUi(this);
+
+    QnSnappedScrollBar* verticalScrollBar = new QnSnappedScrollBar(Qt::Vertical, this);
+    ui->camerasView->setVerticalScrollBar(verticalScrollBar->proxyScrollBar());
+    QnSnappedScrollBar* horizontalScrollBar = new QnSnappedScrollBar(Qt::Horizontal, this);
+    horizontalScrollBar->setUseItemViewPaddingWhenVisible(true);
+    ui->camerasView->setHorizontalScrollBar(horizontalScrollBar->proxyScrollBar());
 
     m_resourceSearch->setSourceModel(m_model);
     updateCriterion();
@@ -130,6 +138,7 @@ void QnCameraListDialog::updateWindowTitle() {
     setWindowTitle(title);
 
     ui->camerasView->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    resize({ sizeHint().width(), height() });
 }
 
 void QnCameraListDialog::updateCriterion() {
