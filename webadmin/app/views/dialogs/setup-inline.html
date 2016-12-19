@@ -224,8 +224,7 @@
         </div>
 
         <div class="form-group"
-             ng-if="(!forms.localForm.localLogin.$touched && !forms.localForm.passwordInput.password.$touched && !forms.localForm.localPasswordConfirmation.$touched) ||
-                    forms.localForm.$valid && (settings.localPasswordConfirmation == settings.localPassword)">
+             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) && !forms.localForm.passwordInput.$dirty">
             <div class="help-block">
                 Password must contain different types of characters and have at least 8 symbols
             </div>
@@ -239,18 +238,16 @@
 
         <div class="form-group has-error"
              ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
-                    forms.localForm.passwordInput.password.$touched && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.passwordInput.$valid && forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
+                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
             <div class="help-block">
                 All fields are required
             </div>
         </div>
 
         <div class="form-group has-error"
-             ng-if= "forms.localForm.passwordInput.$valid &&
-                     forms.localForm.localPasswordConfirmation.$valid &&
-                     forms.localForm.localPasswordConfirmation.$touched &&
-                     settings.localPasswordConfirmation != settings.localPassword">
+             ng-if= "forms.localForm.$valid &&
+                     (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
                 Passwords do not match
             </div>

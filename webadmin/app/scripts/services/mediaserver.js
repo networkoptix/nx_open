@@ -271,10 +271,7 @@ angular.module('webadminApp')
                 return proxy !=='';
             },
             getUser:function(reload){
-                if(this.hasProxy()){ // Proxy means read-only
-                    return $q.resolve(false);
-                }
-
+                var self = this;
                 return this.getCurrentUser(reload).then(function(result){
                     /*jshint bitwise: false*/
                     var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
@@ -284,6 +281,10 @@ angular.module('webadminApp')
 
                     var isOwner = result.data.reply.isAdmin ;
 
+                    if(self.hasProxy()){
+                        isAdmin = false;
+                        isOwner = false;
+                    }
                     return {
                         isAdmin:isAdmin,
                         isOwner:isOwner,
