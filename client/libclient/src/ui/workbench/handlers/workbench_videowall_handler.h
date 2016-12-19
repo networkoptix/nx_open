@@ -88,6 +88,9 @@ private:
     /** Returns id of the running client that is currently controlling provided layout. */
     QnUuid getLayoutController(const QnUuid &layoutId);
 
+    /** Check if user will not lose access to resources if remove them from layout. */
+    bool canRemoveResourcesFromLayout(const QnResourceList& resources) const;
+
 private slots:
     void at_newVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
