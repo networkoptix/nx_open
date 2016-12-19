@@ -75,6 +75,14 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
         case SystemUri::ClientCommand::ConnectToSystem:
             if (m_uiController)
             {
+                m_uiController->disconnectFromSystem();
+
+                if (!uri.authenticator().user.isEmpty() && !uri.authenticator().password.isEmpty())
+                {
+                    qnCloudStatusWatcher->setCredentials(QnCredentials(
+                        uri.authenticator().user, uri.authenticator().password));
+                }
+
                 const auto url = uri.connectionUrl();
                 if (url.isValid())
                     m_uiController->connectToSystem(url);
