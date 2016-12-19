@@ -249,11 +249,18 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
 
-    m_contextMenuPos = QPoint();
-    m_contextMenuTimer->stop();
-
     if (qAbs(int(event->localPos().x() - d->pressPos.x())) > QGuiApplication::styleHints()->startDragDistance())
         d->dragStarted = true;
+
+    if (d->dragStarted)
+    {
+        m_contextMenuPos = QPoint();
+        m_contextMenuTimer->stop();
+    }
+    else
+    {
+        m_contextMenuPos = event->pos();
+    }
 
     if (!d->scrollByMouse)
     {
