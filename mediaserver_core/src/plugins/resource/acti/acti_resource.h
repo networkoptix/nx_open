@@ -28,8 +28,10 @@ class QnActiResource
 {
     Q_OBJECT
 
-    typedef QMap<QString, QString> ActiSystemInfo;
 public:
+
+    typedef QMap<QString, QString> ActiSystemInfo;
+
     static const QString MANUFACTURE;
     static const QString CAMERA_PARAMETER_GROUP_ENCODER;
     static const QString CAMERA_PARAMETER_GROUP_SYSTEM;
