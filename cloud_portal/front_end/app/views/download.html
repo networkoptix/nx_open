@@ -24,10 +24,14 @@
                 <div class="col-md-8 col-md-pull-4 ">
                     <div class="row">
                         <div class="col-md-12">
-                            <a ng-href="{{platform.installers[0].src}}" class="btn btn-lg btn-default download-button">
-                                <span class="download-link pull-left"></span>
-                                <h2><b>Download VMS_NAME</b></h2>
-                                <span class="installer-name">{{platform.installers[0].name}}</span>
+                            <a class="media btn btn-lg btn-default download-button" ng-href="{{platform.installers[0].src}}" >
+                                  <div class="media-left">
+                                        <span class="download-link"></span>
+                                  </div>
+                                  <div class="media-body text-left">
+                                        <h2><b>Download VMS_NAME</b></h2>
+                                        <span class="installer-name">{{platform.installers[0].name}}</span>
+                                  </div>
                             </a>
                             <p class="small" ng-if="platform.description" ng-bind-html="platform.description"></p>
                         </div>
