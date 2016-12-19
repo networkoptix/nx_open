@@ -118,6 +118,11 @@ void QnQuickTextInputPrivate::updateInputMethod()
 
 QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     base_type(*(new QnQuickTextInputPrivate), parent),
+    m_contextMenuPos(),
+    m_selectionStart(-1),
+    m_selectionEnd(-1),
+    m_canCutCopy(false),
+    m_canSelectAll(false),
     m_contextMenuTimer(new QTimer(this))
 {
     Q_D(QnQuickTextInput);
@@ -228,7 +233,7 @@ void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
 
-    m_contextMenuPos = event->pos();
+    storeContextMenuParameters(event->pos());
     if (event->button() == Qt::RightButton)
         showMenu();
     else
@@ -244,7 +249,9 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
 
-    m_contextMenuPos = event->pos();
+    m_contextMenuPos = QPoint();
+    m_contextMenuTimer->stop();
+
     if (qAbs(int(event->localPos().x() - d->pressPos.x())) > QGuiApplication::styleHints()->startDragDistance())
         d->dragStarted = true;
 
@@ -304,6 +311,16 @@ void QnQuickTextInput::mouseDoubleClickEvent(QMouseEvent *event)
     selectAll();
 }
 
+void QnQuickTextInput::storeContextMenuParameters(const QPoint& pos)
+{
+    const auto currentSelected = selectedText();
+    m_canCutCopy = !currentSelected.isEmpty();
+    m_canSelectAll = (text() != currentSelected);
+    m_selectionStart = selectionStart();
+    m_selectionEnd = selectionEnd();
+    m_contextMenuPos = pos;
+}
+
 void QnQuickTextInput::showMenu()
 {
     if (m_contextMenuPos.isNull())
@@ -314,35 +331,29 @@ void QnQuickTextInput::showMenu()
     if (!menu)
         return;
 
-    const auto currentSelected = selectedText();
-    const bool canCutCopy = !currentSelected.isEmpty();
-    const bool canSelectAll = (text() != currentSelected);
-    const int selStart = selectionStart();
-    const int selEnd = selectionEnd();
-
-    addMenuItem(this, menu, lit("Cut"), canCutCopy,
-        [this, selStart, selEnd]()
+    addMenuItem(this, menu, lit("Cut"), m_canCutCopy,
+        [this]()
         {
-            select(selStart, selEnd);
+            select(m_selectionStart, m_selectionEnd);
             cut();
         });
 
-    addMenuItem(this, menu, lit("Copy"), canCutCopy,
-        [this, selStart, selEnd]()
+    addMenuItem(this, menu, lit("Copy"), m_canCutCopy,
+        [this]()
         {
-            select(selStart, selEnd);
+            select(m_selectionStart, m_selectionEnd);
             copy();
         });
 
     static constexpr bool kAlwaysAllowPasteOperation = true;
     addMenuItem(this, menu, lit("Paste"), kAlwaysAllowPasteOperation,
-        [this, selStart, selEnd]()
+        [this]()
         {
-            remove(selStart, selEnd);
+            remove(m_selectionStart, m_selectionEnd);
             paste();
         });
 
-    addMenuItem(this, menu, lit("Select All"), canSelectAll,
+    addMenuItem(this, menu, lit("Select All"), m_canSelectAll,
         [this]() { selectAll(); });
 
     connect(menu, &QQuickMenu::aboutToHide, this,
@@ -353,32 +364,3 @@ void QnQuickTextInput::showMenu()
     menu->setParentItem(this);
     menu->open();
 }
-/*
-void QnQuickTextInput::touchEvent(QTouchEvent *event)
-{
-const auto updateContextMenuPos =
-[this, event]()
-{
-const auto points = event->touchPoints();
-m_contextMenuPos = (points.isEmpty()
-? QPoint()
-: toPoint(event->touchPoints().first().pos()));
-};
-
-switch (event->type())
-{
-case QEvent::TouchUpdate:
-updateContextMenuPos();
-break;
-case QEvent::TouchBegin:
-updateContextMenuPos();
-m_contextMenuTimer->start();
-break;
-case QEvent::TouchCancel:
-case QEvent::TouchEnd:
-m_contextMenuPos = QPoint();
-m_contextMenuTimer->stop();
-break;
-}
-}
-*/

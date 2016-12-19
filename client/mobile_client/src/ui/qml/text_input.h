@@ -44,11 +44,16 @@ protected:
 
 private:
     void showMenu();
+    void storeContextMenuParameters(const QPoint& pos);
 
 private:
     Q_DECLARE_PRIVATE(QnQuickTextInput)
 
 private:
     QPoint m_contextMenuPos;
+    int m_selectionStart;
+    int m_selectionEnd;
+    bool m_canCutCopy;
+    bool m_canSelectAll;
     QTimer* m_contextMenuTimer;
 };
