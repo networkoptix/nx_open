@@ -24,6 +24,8 @@ killall gpm
 #    AUTO_LOGIN_MODE="--auto-login=disabled"
 #fi
 
+cd "/opt/$CUSTOMIZATION/lite_client/bin"
+
 # TODO: #boris: Implement log file rotation.
 CMD="LD_PRELOAD=\"/opt/$CUSTOMIZATION/lib/ldpreloadhook.so\" \
     /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE \
