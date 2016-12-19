@@ -34,6 +34,7 @@ signals:
     void backgroundChanged();
     void placeholderTextChanged();
     void clicked();
+    void longPress(const QPoint& pos);
 
 protected:
     virtual void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
@@ -43,8 +44,7 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    void showMenu();
-    void storeContextMenuParameters(const QPoint& pos);
+    void emitLongPress();
 
 private:
     Q_DECLARE_PRIVATE(QnQuickTextInput)
@@ -53,7 +53,6 @@ private:
     QPoint m_contextMenuPos;
     int m_selectionStart;
     int m_selectionEnd;
-    bool m_canCutCopy;
-    bool m_canSelectAll;
+    int m_cursorPosition;
     QTimer* m_contextMenuTimer;
 };

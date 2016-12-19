@@ -33,7 +33,7 @@ MenuItem
 
     label: Text
     {
-        opacity: (control.enabled ? 1.0 : 0.3);
+        opacity: (control.enabled ? 1.0 : 0.3)
         text: control.text
         x: control.width - width - control.rightPadding
         y: control.topPadding

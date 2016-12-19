@@ -252,4 +252,51 @@ QnTextInput
         y: positionListener.scenePos.y + localY
         parent: control.activeFocus ? Window.contentItem : control
     }
+
+    Connections
+    {
+        target: control
+        onLongPress:
+        {
+            contextMenu.x = pos.x;
+            contextMenu.y = pos.y;
+            contextMenu.open();
+        }
+    }
+
+    Menu
+    {
+        id: contextMenu
+
+        height: 4 * item.height //< TODO: figure out why height is not calculated correctly
+
+        MenuItem
+        {
+            id: item;
+            text: qsTr("Cut")
+            enabled: control.selectedText.length
+            onTriggered: { control.cut(); }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Copy")
+            enabled: control.selectedText.length
+            onTriggered: { control.copy(); }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Paste")
+            enabled: control.canPaste
+            onTriggered: { control.paste(); }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Select All")
+            enabled: (control.selectedText != control.text)
+            onTriggered: { control.selectAll(); }
+        }
+    }
 }
