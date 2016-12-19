@@ -6,7 +6,9 @@ QnTableView::QnTableView(QWidget* parent):
     base_type(parent),
     m_tracker(new QnItemViewHoverTracker(this))
 {
-
+    /* Make the defaults consistent with QTreeView: */
+    horizontalHeader()->setHighlightSections(false);
+    verticalHeader()->setHighlightSections(false);
 }
 
 QnTableView::~QnTableView()

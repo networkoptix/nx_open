@@ -27,7 +27,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     m_generalPage(new QnServerSettingsWidget(this)),
     m_statisticsPage(new QnStorageAnalyticsWidget(this)),
     m_storagesPage(new QnStorageConfigWidget(this)),
-    m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
+    m_webPageButton(new QPushButton(action(QnActions::WebAdminAction)->text(), this))
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
@@ -36,10 +36,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
 
-    connect(m_webPageButton, &QPushButton::clicked, this, [this]()
-    {
-        menu()->trigger(QnActions::WebClientAction, m_server);
-    });
+    connect(m_webPageButton, &QPushButton::clicked, this,
+        [this]
+        {
+            menu()->trigger(QnActions::WebAdminAction, m_server);
+        });
 
     //TODO: #GDM #access connect to resource pool to check if server was deleted
 

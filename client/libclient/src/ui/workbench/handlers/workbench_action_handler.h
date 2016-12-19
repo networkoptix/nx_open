@@ -151,7 +151,10 @@ protected:
     void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
+
+    void at_webAdminAction_triggered();
     void at_webClientAction_triggered();
+
     void at_systemAdministrationAction_triggered();
     void at_systemUpdateAction_triggered();
     void at_userManagementAction_triggered();
@@ -232,7 +235,10 @@ private:
 
     bool confirmResourcesDelete(const QnResourceList& resources);
 
-    void openInBrowser(const QnMediaServerResourcePtr& server, const QString& path);
+    void openInBrowserDirectly(const QnMediaServerResourcePtr& server,
+        const QString& path, const QString& fragment = QString());
+    void openInBrowser(const QnMediaServerResourcePtr& server,
+        const QString& path, const QString& fragment = QString());
     void at_nonceReceived(QnAsyncHttpClientReply* client);
 
 private:

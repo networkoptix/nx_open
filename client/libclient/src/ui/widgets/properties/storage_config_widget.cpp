@@ -765,25 +765,40 @@ void QnStorageConfigWidget::cancelBackup()
 bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     int selectedCamerasCount, QString* info)
 {
-    auto error = [info](const QString& error) -> bool
-    {
-        if (info)
-            *info = error;
-        return false;
-    };
+    auto error = 
+        [info](const QString& error) -> bool
+        {
+            if (info)
+                *info = error;
+            return false;
+        };
 
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (m_model->storages().size() < 2)
+    QnStorageModelInfoList validStorages;
+    for (const auto& storage: m_model->storages())
+    {
+        if (!storage.isWritable)
+            continue;
+        validStorages << storage;
+    }
+
+
+    //TODO: #GDM what if there is only one storage - and it is backup?
+    //TODO: #GDM what if there are no storages at all?
+
+    if (validStorages.size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
 
-    const auto isCorrectStorage = [](const QnStorageModelInfo& storage)
-    {
-        return storage.isWritable && storage.isUsed && storage.isBackup;
-    };
+    const auto isEnabledBackupStorage = 
+        [](const QnStorageModelInfo& storage)
+        {
+            return storage.isUsed && storage.isBackup;
+        };
 
-    if (!any_of(m_model->storages(), isCorrectStorage))
+    //TODO: #GDM what if storage is not used, so we should just enable it?
+    if (!any_of(validStorages, isEnabledBackupStorage))
         return error(tr("Change \"Main\" to \"Backup\" for some of the storage above to enable backup."));
 
     if (hasChanges())

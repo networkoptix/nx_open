@@ -32,7 +32,7 @@ QnBaseResourceAccessProvider::~QnBaseResourceAccessProvider()
 bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    NX_EXPECT(!isUpdating());
+    //NX_EXPECT(!isUpdating()); //we can get here while reconnecting
 
     if (!acceptable(subject, resource))
         return false;
@@ -55,7 +55,7 @@ QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibl
     const QnResourcePtr& resource,
     QnResourceList* providers) const
 {
-    NX_EXPECT(!isUpdating());
+    //NX_EXPECT(!isUpdating()); //we can get here while reconnecting
 
     if (!hasAccess(subject, resource))
         return Source::none;

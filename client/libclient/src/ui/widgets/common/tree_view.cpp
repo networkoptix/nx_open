@@ -10,7 +10,6 @@
 
 QnTreeView::QnTreeView(QWidget *parent):
     base_type(parent),
-    m_editorOpen(false),
     m_ignoreDefaultSpace(false)
 {}
 
@@ -22,19 +21,21 @@ int QnTreeView::rowHeight(const QModelIndex &index) const {
     return base_type::rowHeight(index);
 }
 
-void QnTreeView::wheelEvent(QWheelEvent* event)
+void QnTreeView::scrollContentsBy(int dx, int dy)
 {
-    if (m_editorOpen)
-        return;
+    base_type::scrollContentsBy(dx, dy);
 
-    base_type::wheelEvent(event);
+    /* Workaround for editor staying open when a scroll by wheel
+     * (from either view itself or it's scrollbar) is performed: */
+    if (state() == EditingState)
+        currentChanged(currentIndex(), currentIndex());
 }
 
 void QnTreeView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
-        bool canActivate = !m_editorOpen && (state() != EditingState || hasFocus());
+        bool canActivate = state() != EditingState;
         if (canActivate)
         {
             event->ignore();
@@ -45,7 +46,7 @@ void QnTreeView::keyPressEvent(QKeyEvent *event)
 
     if (event->key() == Qt::Key_Space)
     {
-        if (state() != EditingState || hasFocus())
+        if (state() != EditingState)
         {
             event->ignore();
             if (currentIndex().isValid())
@@ -91,18 +92,6 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
     base_type::timerEvent(event);
 }
 
-void QnTreeView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) {
-    base_type::closeEditor(editor, hint);
-    m_editorOpen = false;
-}
-
-bool QnTreeView::edit(const QModelIndex &index, EditTrigger trigger, QEvent *event) {
-    bool startEdit = base_type::edit(index, trigger, event);
-    if (startEdit)
-        m_editorOpen = true;
-    return startEdit;
-}
-
 QSize QnTreeView::viewportSizeHint() const
 {
     /*
@@ -122,4 +111,11 @@ bool QnTreeView::ignoreDefaultSpace() const
 void QnTreeView::setIgnoreDefaultSpace(bool value)
 {
     m_ignoreDefaultSpace = value;
+}
+
+QRect QnTreeView::visualRect(const QModelIndex &index) const
+{
+    QRect result = base_type::visualRect(index);
+    result.setLeft(0);
+    return result;
 }

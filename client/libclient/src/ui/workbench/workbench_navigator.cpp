@@ -547,7 +547,7 @@ bool QnWorkbenchNavigator::setLive(bool live)
     }
     else
     {
-        m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: #Elric need to save position here.
+        m_timeSlider->setValue(m_timeSlider->maximum() - 1, false);
     }
     return true;
 }
@@ -649,6 +649,9 @@ void QnWorkbenchNavigator::setSpeed(qreal speed)
         reader->setSpeed(speed);
 
         setPlaying(!qFuzzyIsNull(speed));
+
+        if (speed <= 0.0)
+            setLive(false);
 
         updateSpeed();
     }

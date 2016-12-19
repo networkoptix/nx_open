@@ -56,7 +56,6 @@ private slots:
     void at_newRuleButton_clicked();
     void at_deleteButton_clicked();
     void at_resetDefaultsButton_clicked();
-    void at_clearFilterButton_clicked();
 
     void at_beforeModelChanged();
     void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);

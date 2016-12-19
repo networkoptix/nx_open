@@ -117,27 +117,16 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->updateButton->setEnabled(false);
 
     connect(ui->cancelButton, &QPushButton::clicked, this,
-        [this]()
+        &QnServerUpdatesWidget::cancelUpdate);
+
+    connect(ui->updateButton, &QPushButton::clicked, this,
+        [this]
         {
-
-            if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-            {
-                ui->cancelButton->setEnabled(false);
-                m_updateTool->cancelUpdate();
-                ui->cancelButton->setEnabled(true);
-            }
+            if (m_localFileName.isEmpty())
+                m_updateTool->startUpdate(m_targetVersion);
+            else
+                m_updateTool->startUpdate(m_localFileName);
         });
-
-    connect(ui->updateButton, &QPushButton::clicked, this, [this]()
-    {
-        if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-            return;
-
-        if (m_localFileName.isEmpty())
-            m_updateTool->startUpdate(m_targetVersion);
-        else
-            m_updateTool->startUpdate(m_localFileName);
-    });
 
     connect(ui->refreshButton, &QPushButton::clicked, this, &QnServerUpdatesWidget::refresh);
 
@@ -317,10 +306,13 @@ void QnServerUpdatesWidget::initDownloadActions()
 
 bool QnServerUpdatesWidget::cancelUpdate()
  {
-    if (m_updateTool->isUpdating())
-        return m_updateTool->cancelUpdate();
-
-    return true;
+    if (!m_updateTool->isUpdating())
+        return true;
+   
+    ui->cancelButton->setEnabled(false);
+    const bool result = m_updateTool->cancelUpdate();
+    ui->cancelButton->setEnabled(true);
+    return result;
 }
 
 bool QnServerUpdatesWidget::canCancelUpdate() const
@@ -354,10 +346,29 @@ void QnServerUpdatesWidget::applyChanges()
 
 void QnServerUpdatesWidget::discardChanges()
 {
-    if (!canCancelUpdate())
-        QnMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
+    if (!m_updateTool->isUpdating())
+        return;
+
+    if (canCancelUpdate())
+    {
+        QnMessageBox messageBox(this);
+        messageBox.setIcon(QnMessageBox::Icon::Warning);
+        messageBox.setWindowTitle(tr("Cancel update?"));
+        messageBox.setText(tr("Cancel update?"));
+        messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        messageBox.setDefaultButton(QDialogButtonBox::No);
+        if (messageBox.exec() == QDialogButtonBox::Yes)
+            cancelUpdate();
+    }
     else
-        cancelUpdate();
+    {
+        QnMessageBox::critical(
+            this, 
+            tr("Error"),
+            tr("Cannot cancel update at this state.") 
+            + L'\n'
+            + tr("Please wait until update is finished"));
+    }
 }
 
 bool QnServerUpdatesWidget::hasChanges() const
@@ -520,9 +531,6 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
 bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
 {
-    if (!applauncher::checkOnline())
-        return false;
-
     /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())
         return false;
@@ -544,9 +552,6 @@ bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
 
 void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
-
     if (!beginChecking())
         return;
 

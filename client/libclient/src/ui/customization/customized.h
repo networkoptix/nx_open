@@ -27,7 +27,7 @@ class Customized;
  * Base class for objects that are to be passed through customization subsystem
  * after construction. Note that this can be done automatically for <tt>QApplication</tt>
  * and <tt>QWidget</tt>s from <tt>QStyle</tt> implementation.
- * 
+ *
  * Not really useful for anything, but can be <tt>dynamic_cast</tt>ed to.
  */
 class CustomizedBase {
@@ -41,13 +41,13 @@ private:
 
 
 /**
- * Convenience base class for objects that need to be processed through 
- * customization subsystem. 
+ * Convenience base class for objects that need to be processed through
+ * customization subsystem.
  */
 template<class Base, bool baseIsCustomized = boost::is_base_of<CustomizedBase, Base>::value>
 class Customized: public Base, public CustomizedBase {
 public:
-    QN_FORWARD_CONSTRUCTOR(Customized, Base, { QCoreApplication::postEvent(this, new QEvent(QnEvent::Customize)); });
+    QN_FORWARD_CONSTRUCTOR(Customized, Base, { QCoreApplication::postEvent(this, new QEvent(QnEvent::Customize), Qt::HighEventPriority); });
 
 protected:
     virtual bool event(QEvent *event) override {

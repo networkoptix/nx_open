@@ -78,13 +78,16 @@ void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled)
     }
 }
 
-QStandardItem* newConnectionItem(const QString& text, const QUrl& url)
+QStandardItem* newConnectionItem(const QString& text, const QUrl& url, bool isValid = true)
 {
     if (url.isEmpty())
         return nullptr;
 
     auto result = new QStandardItem(text);
     result->setData(url, Qn::UrlRole);
+    if (!isValid)
+        result->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
+
     return result;
 }
 
@@ -122,6 +125,18 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
     const bool savedConnectionFound = (itCustom != custom.end());
     return savedConnectionFound;
 }
+
+struct AutoFoundSystemViewModel
+{
+    QString title;
+    QUrl url;
+    bool isValid = true;
+
+    bool operator<(const AutoFoundSystemViewModel& other) const
+    {
+        return QString::compare(title, other.title, Qt::CaseInsensitive) < 0;
+    }
+};
 
 } // namespace
 
@@ -415,10 +430,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     std::sort(customConnections.begin(), customConnections.end(),
         [](const QnConnectionData& left, const QnConnectionData& right)
         {
-            if (left.isCustom() == right.isCustom())
-                return (left.name < right.name);
-
-            return left.isCustom();
+            return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
         });
 
     for (const auto& connection : customConnections)
@@ -436,50 +448,55 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
+        return;
     }
-    else
+
+    QList<AutoFoundSystemViewModel> viewModels;
+    viewModels.reserve(m_foundSystems.size());
+
+    for (const QnFoundSystemData& data : m_foundSystems)
     {
-        for (const QnFoundSystemData& data: m_foundSystems)
+        auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
+
+        /* Do not show servers with incompatible customization or cloud host */
+        if (!qnRuntime->isDevMode()
+            && (compatibilityCode == Qn::IncompatibleInternalConnectionResult
+                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult))
         {
-            QUrl url = data.url;
-
-            auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
-
-            /* Do not show servers with incompatible customization or cloud host */
-            if (!qnRuntime->isDevMode()
-                && (compatibilityCode == Qn::IncompatibleInternalConnectionResult
-                    || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult))
-            {
-                    continue;
-            }
-
-            bool isCompatible = (compatibilityCode == Qn::SuccessConnectionResult);
-
-            QString title;
-            if (!data.info.systemName.isEmpty())
-            {
-                title = lit("%3 - (%1:%2)")
-                    .arg(url.host()).arg(url.port()).arg(data.info.systemName);
-            }
-            else
-            {
-                title = lit("%1:%2").arg(url.host()).arg(url.port());
-            }
-
-            if (!isCompatible)
-            {
-                title += lit(" (v%1)")
-                    .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
-            }
-
-            QStandardItem* item = new QStandardItem(title);
-            item->setData(url, Qn::UrlRole);
-
-            if (!isCompatible)
-                item->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
-            m_autoFoundItem->appendRow(item);
+            continue;
         }
+
+        AutoFoundSystemViewModel vm;
+        vm.url = data.url;
+        vm.isValid = (compatibilityCode == Qn::SuccessConnectionResult);
+
+        if (!data.info.systemName.isEmpty())
+        {
+            vm.title = lit("%3 - (%1:%2)")
+                .arg(vm.url.host()).arg(vm.url.port()).arg(data.info.systemName);
+        }
+        else
+        {
+            vm.title = lit("%1:%2").arg(vm.url.host()).arg(vm.url.port());
+        }
+
+        if (!vm.isValid)
+        {
+            vm.title += lit(" (v%1)")
+                .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
+        }
+
+        viewModels.push_back(vm);
     }
+
+    std::sort(viewModels.begin(), viewModels.end());
+    for (const auto& vm: viewModels)
+    {
+        auto item = ::newConnectionItem(vm.title, vm.url, vm.isValid);
+        m_autoFoundItem->appendRow(item);
+    }
+
+
 }
 
 void QnLoginDialog::updateAcceptibility()
