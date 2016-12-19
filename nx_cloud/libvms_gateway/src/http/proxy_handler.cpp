@@ -85,10 +85,8 @@ void ProxyHandler::closeConnection(
         cl_logDEBUG1);
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
-    NX_ASSERT(m_requestCompletionHandler);
-
-    auto handler = std::move(m_requestCompletionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable);
+    if (auto handler = std::move(m_requestCompletionHandler))
+        handler(nx_http::StatusCode::serviceUnavailable);
 }
 
 ProxyHandler::TargetWithOptions::TargetWithOptions(
