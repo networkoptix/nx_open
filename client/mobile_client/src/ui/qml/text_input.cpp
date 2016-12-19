@@ -132,7 +132,7 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     connect(this, &QnQuickTextInput::visibleChanged, updateInputMethod);
     connect(this, &QnQuickTextInput::enabledChanged, updateInputMethod);
 
-    static constexpr int kContextMenuTouchDuration = 1000;
+    static constexpr int kContextMenuTouchDuration = 600;
     m_contextMenuTimer->setInterval(kContextMenuTouchDuration);
     m_contextMenuTimer->setSingleShot(true);
     connect(m_contextMenuTimer, &QTimer::timeout, this,
