@@ -10,7 +10,6 @@
 
 QnTreeView::QnTreeView(QWidget *parent):
     base_type(parent),
-    m_editorOpenWorkaround(false),
     m_ignoreDefaultSpace(false)
 {}
 
@@ -22,19 +21,21 @@ int QnTreeView::rowHeight(const QModelIndex &index) const {
     return base_type::rowHeight(index);
 }
 
-void QnTreeView::wheelEvent(QWheelEvent* event)
+void QnTreeView::scrollContentsBy(int dx, int dy)
 {
-    if (m_editorOpenWorkaround && state() == EditingState)
-        return;
+    base_type::scrollContentsBy(dx, dy);
 
-    base_type::wheelEvent(event);
+    /* Workaround for editor staying open when a scroll by wheel
+     * (from either view itself or it's scrollbar) is performed: */
+    if (state() == EditingState)
+        currentChanged(currentIndex(), currentIndex());
 }
 
 void QnTreeView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
-        bool canActivate = !m_editorOpenWorkaround && (state() != EditingState || hasFocus());
+        bool canActivate = state() != EditingState;
         if (canActivate)
         {
             event->ignore();
@@ -45,7 +46,7 @@ void QnTreeView::keyPressEvent(QKeyEvent *event)
 
     if (event->key() == Qt::Key_Space)
     {
-        if (state() != EditingState || hasFocus())
+        if (state() != EditingState)
         {
             event->ignore();
             if (currentIndex().isValid())
@@ -89,18 +90,6 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
     }
 
     base_type::timerEvent(event);
-}
-
-void QnTreeView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) {
-    base_type::closeEditor(editor, hint);
-    m_editorOpenWorkaround = false;
-}
-
-bool QnTreeView::edit(const QModelIndex &index, EditTrigger trigger, QEvent *event) {
-    bool startEdit = base_type::edit(index, trigger, event);
-    if (startEdit)
-        m_editorOpenWorkaround = true;
-    return startEdit;
 }
 
 QSize QnTreeView::viewportSizeHint() const
