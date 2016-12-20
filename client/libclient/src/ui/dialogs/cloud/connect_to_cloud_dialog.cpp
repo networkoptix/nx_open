@@ -104,7 +104,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->indicatorButton->setText(okButton->text()); // Title from OS theme
     d->indicatorButton->setIcon(okButton->icon()); // Icon from OS theme
     d->indicatorButton->setDefault(true);
-    d->indicatorButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(d->indicatorButton);
     ui->buttonBox->removeButton(okButton.data());
     ui->buttonBox->addButton(d->indicatorButton, QDialogButtonBox::AcceptRole);
 

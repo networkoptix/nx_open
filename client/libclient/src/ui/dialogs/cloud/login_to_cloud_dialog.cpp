@@ -10,7 +10,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/input_field.h>
 
@@ -103,7 +102,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     d->updateUi();
     d->lockUi(false);
 
-    ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(ui->loginButton);
 
     setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 }
