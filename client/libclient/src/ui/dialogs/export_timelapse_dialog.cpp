@@ -27,6 +27,18 @@ const qint64 kDefaultLengthMs = 5 * 60 * 1000;
 /* Default value for slider steps number. */
 const int kSliderSteps = 20;
 
+constexpr qint64 kMsInSec = 1000;
+constexpr qint64 kMsInMin = kMsInSec * 60;
+constexpr qint64 kMsInHour = kMsInMin * 60;
+constexpr qint64 kMsInDay = kMsInHour * 24;
+
+constexpr int kLevelCount = 4;
+
+constexpr std::array<qint64, kLevelCount> kUnits = {kMsInSec, kMsInMin, kMsInHour, kMsInDay};
+
+// After this value units will be changed to bigger one
+constexpr std::array<int, kLevelCount - 1> kMaxValuePerUnit = {120, 120, 720};
+
 void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* model)
 {
     QStandardItem* item = new QStandardItem(text);
@@ -173,20 +185,15 @@ void QnExportTimelapseDialog::initControls()
 
     m_filteredUnitsModel->clear();
 
-    static const qint64 msInSec = 1000;
-    static const qint64 msInMin = 1000 * 60;
-    static const qint64 msInHour = 1000 * 60 * 60;
-    static const qint64 msInDay = 1000 * 60 * 60 * 24;
-
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
-    if (maxExpectedLengthMs >= msInSec)
-        addModelItem(tr("sec"), msInSec, m_filteredUnitsModel);
-    if (maxExpectedLengthMs >= msInMin)
-        addModelItem(tr("min"), msInMin, m_filteredUnitsModel);
-    if (maxExpectedLengthMs >= msInHour)
-        addModelItem(tr("hrs"), msInHour, m_filteredUnitsModel);
-    if (maxExpectedLengthMs >= msInDay)
-        addModelItem(tr("days"), msInDay, m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= kMsInSec)
+        addModelItem(tr("sec"), kMsInSec, m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= kMsInMin)
+        addModelItem(tr("min"), kMsInMin, m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= kMsInHour)
+        addModelItem(tr("hrs"), kMsInHour, m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= kMsInDay)
+        addModelItem(tr("days"), kMsInDay, m_filteredUnitsModel);
 
     m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     ui->speedSpinBox->setRange(kMinimalSpeed, m_maxSpeed);
@@ -217,6 +224,15 @@ void QnExportTimelapseDialog::setExpectedLengthMsInternal(qint64 value)
 
     int index = ui->resultLengthUnitsComboBox->currentIndex();
     qreal valueInUnits = value * 1.0 / expectedLengthMeasureUnit(index);
+
+    while (index >= 0
+        && index < m_filteredUnitsModel->rowCount() - 1
+        && valueInUnits >= kMaxValuePerUnit[index])
+    {
+        ++index;
+        valueInUnits = value * 1.0 / expectedLengthMeasureUnit(index);
+    }
+
     while (valueInUnits < 1.0 && index > 0)
     {
         --index;
