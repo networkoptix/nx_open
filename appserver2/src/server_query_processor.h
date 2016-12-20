@@ -360,6 +360,11 @@ private:
             }
             else
             {
+                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+                {
+                    errorCode = ErrorCode::forbidden;
+                    return;
+                }
                 localPostProcessList.push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
             }
 

@@ -52,25 +52,6 @@ static void down_mix_to_stereo(T *data, int channels, int len)
     }
 }
 
-// =======================================================================
-int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
-{
-    if (ctx->channels <= 2)
-        return size;
-
-    if (ctx->sample_fmt == AV_SAMPLE_FMT_U8 || ctx->sample_fmt == AV_SAMPLE_FMT_U8P)
-        down_mix_to_stereo<qint8>((qint8*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S16 || ctx->sample_fmt == AV_SAMPLE_FMT_S16P)
-        down_mix_to_stereo<qint16>((qint16*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 || ctx->sample_fmt == AV_SAMPLE_FMT_S32P || ctx->sample_fmt == AV_SAMPLE_FMT_FLT)
-        down_mix_to_stereo<qint32>((qint32*)data, ctx->channels, size);
-    else
-        NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
-
-    return size / ctx->channels * 2;
-}
-
-
 QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFormat format)
 {
     if (format.channelCount() > 2)

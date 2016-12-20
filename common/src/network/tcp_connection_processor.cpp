@@ -215,7 +215,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -264,7 +264,14 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
 
-    QnMutexLocker lock( &d->sockMutex );
+    return response;
+}
+
+void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+{
+    Q_D(QnTCPConnectionProcessor);
+    auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary, displayDebug);
+    QnMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());
 }
 

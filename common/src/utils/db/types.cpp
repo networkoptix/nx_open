@@ -5,8 +5,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/timer_manager.h>
-
-#include "utils/common/settings.h"
+#include <nx/utils/settings.h>
 
 namespace nx {
 namespace db {

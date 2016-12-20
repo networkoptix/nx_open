@@ -887,6 +887,8 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
     else
     {
         qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
+        if (baseSpaceLimit > maxSpaceLimit) //< User explicitely set large spaceLimit, let's hope he knows what he's doing.
+            return baseSpaceLimit;
         return qMin(maxSpaceLimit, qMax(m_cachedTotalSpace / kMaxSpaceLimitRatio, baseSpaceLimit));
     }
 

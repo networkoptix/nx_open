@@ -5,7 +5,6 @@
 
 #include "cdb_request_path.h"
 
-
 namespace nx {
 namespace cdb {
 
@@ -34,11 +33,14 @@ const char* kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
 
 const char* kPingPath = "/cdb/ping";
 
-const char* kEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
-const char* kPushEc2TransactionPath = "/ec2/forward_events/";
+const char* kEstablishEc2TransactionConnectionDeprecatedPath = "/ec2/events/ConnectingStage1";
+const char* kPushEc2TransactionDeprecatedPath = "/ec2/forward_events/";
+
+const char* kEstablishEc2TransactionConnectionPath = "/cdb/ec2/events/ConnectingStage1";
+const char* kPushEc2TransactionPath = "/cdb/ec2/forward_events/";
 
 const char* kMaintenanceGetVmsConnections = "/cdb/maintenance/getVmsConnections";
 const char* kMaintenanceGetTransactionLog = "/cdb/maintenance/getTransactionLog";
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
