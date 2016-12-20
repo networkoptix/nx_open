@@ -462,9 +462,9 @@ TEST_F(AbstractStorageResourceTest, LoadBalancingAlgorithmTest)
     qnNormalStorageMan->addStorage(storage2);
     qnNormalStorageMan->addStorage(storage3);
 
-    storage1->setStatus(Qn::Online, true);
-    storage2->setStatus(Qn::Online, true);
-    storage3->setStatus(Qn::Online, true);
+    storage1->setStatus(Qn::Online);
+    storage2->setStatus(Qn::Online);
+    storage3->setStatus(Qn::Online);
 
     storage1->setWritedCoeff(0.3);
     storage1->setWritedCoeff(0.3);
