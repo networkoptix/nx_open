@@ -227,7 +227,7 @@ angular.module('webadminApp')
                 'INCOMPATIBLE':'fail',
                 'SAFE_MODE':'fail',
                 'CONFIGURATION_ERROR':'fail',
-
+                'UNCONFIGURED_SYSTEM':'fail',
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
                 'BOTH_SYSTEM_BOUND_TO_CLOUD':'fail',
                 'DIFFERENT_CLOUD_HOST':'fail'
@@ -249,6 +249,7 @@ angular.module('webadminApp')
                 // Merge fail:
                 'SAFE_MODE': L.join.safeMode,
                 'CONFIGURATION_ERROR': L.join.configError,
+                'UNCONFIGURED_SYSTEM':L.join.newSystemError,
 
 
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
