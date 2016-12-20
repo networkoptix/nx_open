@@ -93,13 +93,7 @@ static const int kMessagesDelayMs = 5000;
 bool isConnectionToCloud(const QUrl& url)
 {
     const bool isCloudHost = nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
-    const bool isCloudUser = (qnCloudStatusWatcher->credentials().user == url.userName());
-
-    /**
-     * Connection to the new system is always through the non-cloud host.
-     * So, we have to check if cloud user is used.
-     */
-    return (isCloudUser || isCloudHost);
+    return isCloudHost;
 }
 
 bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
