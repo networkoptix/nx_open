@@ -8,6 +8,8 @@ LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
 LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
 MOBILE_CLIENT_INI="/tmp/mobile_client.ini"
 
+export LD_LIBRARY_PATH="/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg"
+
 export LESS_TERMCAP_ue=
 export vcs_info_msg_1_=
 export PAGER="less"

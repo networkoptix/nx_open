@@ -10,7 +10,7 @@
 
 CUSTOMIZATION=${deb.customization.company.name}
 
-# TODO: Restore to "/opt/$CUSTOMIZATION/lib", and create lib symlink for rpath.
+# TODO: Restore to "/opt/$CUSTOMIZATION/lib".
 LIBS_PATH="/opt/$CUSTOMIZATION/mediaserver/lib"
 
 SERVICE_NAME="mediaserver"
