@@ -126,7 +126,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 
 void QnExportTimelapseDialog::setSpeed(qint64 absoluteValue)
 {
-    Q_ASSERT_X(!m_updating, Q_FUNC_INFO, "Function belongs to outer interface, must not be called internally.");
+    NX_ASSERT(!m_updating, Q_FUNC_INFO, "Function belongs to outer interface, must not be called internally.");
     if (m_updating)
         return;
 
@@ -210,7 +210,7 @@ void QnExportTimelapseDialog::initControls()
 
 void QnExportTimelapseDialog::setExpectedLengthMsInternal(qint64 value)
 {
-    Q_ASSERT_X(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
+    NX_ASSERT(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
 
     int speed = m_sourcePeriodLengthMs / value;
     updateFrameStepInternal(speed);
@@ -230,7 +230,7 @@ void QnExportTimelapseDialog::setExpectedLengthMsInternal(qint64 value)
 
 void QnExportTimelapseDialog::updateFrameStepInternal(int speed)
 {
-    Q_ASSERT_X(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
+    NX_ASSERT(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
 
     m_expectedLengthMs = speed;
     m_frameStepMs = 1000ll * speed / kResultFps;
@@ -239,7 +239,7 @@ void QnExportTimelapseDialog::updateFrameStepInternal(int speed)
 
 void QnExportTimelapseDialog::updateExpectedLengthRangeInternal(int index)
 {
-    Q_ASSERT_X(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
+    NX_ASSERT(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
 
     qint64 unit = expectedLengthMeasureUnit(index);
 
@@ -324,7 +324,7 @@ qint64 QnExportTimelapseDialog::expectedLengthMeasureUnit(int index) const
     if (index < 0)
         index = std::max(ui->resultLengthUnitsComboBox->currentIndex(), 0);
 
-    Q_ASSERT_X(m_filteredUnitsModel->rowCount() > index, Q_FUNC_INFO, "Make sure model is valid");
+    NX_ASSERT(m_filteredUnitsModel->rowCount() > index, Q_FUNC_INFO, "Make sure model is valid");
     if (index >= m_filteredUnitsModel->rowCount())
         return 1;
 
