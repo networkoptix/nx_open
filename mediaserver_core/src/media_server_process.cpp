@@ -677,7 +677,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr, bool isNewServerInstance)
 {
     QnMediaServerResourcePtr savedServer;
-    serverPtr->setStatus(Qn::Online, true);
+    serverPtr->setStatus(Qn::Online, Qn::StatusChangeReason::CreateInitialData);
 
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
     if (rez != ec2::ErrorCode::ok)
@@ -1148,6 +1148,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
         qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+        qnCameraHistoryPool->setHistoryCheckDelay(1000);
     }
 
     {
@@ -1504,10 +1505,13 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/debugEvent", new QnDebugEventsRestHandler());
 #endif
 
+    int maxConnections = MSSettings::roSettings()->value("maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
+    NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
+
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
         rtspPort,
-        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        maxConnections,
         MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool() );
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;

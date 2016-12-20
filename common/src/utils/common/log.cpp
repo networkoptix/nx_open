@@ -44,7 +44,7 @@ public:
 		m_file.close();
 	}
 
-    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) 
+    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel)
     {
         m_baseName = baseName;
         m_maxFileSize = maxFileSize;
@@ -56,12 +56,12 @@ public:
         return !m_file.fail();
     }
 
-    void setLogLevel(QnLogLevel logLevel) 
+    void setLogLevel(QnLogLevel logLevel)
     {
         m_logLevel = logLevel;
     }
 
-    QnLogLevel logLevel() const 
+    QnLogLevel logLevel() const
     {
         return m_logLevel;
     }
@@ -82,7 +82,7 @@ public:
 #else
             QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << "\r\n";
+            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
 
         {
             QnMutexLocker mutx( &m_mutex );
@@ -150,18 +150,33 @@ private:
 
     void openFileImpl()
     {
-        #ifdef Q_OS_WIN
-            m_file.open(currFileName().toStdWString(), std::ios_base::app | std::ios_base::out);
-        #else
-            m_file.open(currFileName().toStdString(), std::ios_base::app | std::ios_base::out);
-        #endif
+        if (m_file.is_open())
+            return;
+
+#ifdef Q_OS_WIN
+        m_file.open(currFileName().toStdWString(), std::ios_base::in | std::ios_base::out);
+#else
+        m_file.open(currFileName().toStdString(), std::ios_base::in | std::ios_base::out);
+#endif
+
+        if (!m_file.fail())
+        {
+            // File exists, prepare to append.
+            m_file.seekp(std::ios_base::streamoff(0), std::ios_base::end);
+            return;
+        }
+
+#ifdef Q_OS_WIN
+        m_file.open(currFileName().toStdWString(), std::ios_base::out);
+#else
+        m_file.open(currFileName().toStdString(), std::ios_base::out);
+#endif
 
         if (m_file.fail())
             return;
 
-        // Ensure 1st char is UTF8 BOM
-        if (m_file.tellp() == std::fstream::pos_type(0))
-            m_file.write("\xEF\xBB\xBF", 3);
+        // Ensure 1st char is UTF8 BOM.
+        m_file.write("\xEF\xBB\xBF", 3);
     }
 
     QString currFileName() const

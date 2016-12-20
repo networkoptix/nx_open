@@ -139,6 +139,9 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
+    if (data.id.isNull())
+        return;
+
     QUrl url(data.url);
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(data.id);
@@ -435,7 +438,7 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
     qnStatusDictionary->clear();
     for(const QnUuid& id: keys) {
         if (QnResourcePtr resource = qnResPool->getResourceById(id))
-            emit resource->statusChanged(resource);
+            emit resource->statusChanged(resource, Qn::StatusChangeReason::Default);
     }
 
     for(const ec2::ApiResourceStatusData& statusData: params)

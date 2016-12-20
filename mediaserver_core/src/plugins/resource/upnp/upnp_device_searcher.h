@@ -156,6 +156,7 @@ private:
     //Receive socket listens for multicast packets on all interfaces
     std::unique_ptr<AbstractDatagramSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
+    bool m_needToUpdateReceiveSocket;
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
