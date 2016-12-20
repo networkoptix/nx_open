@@ -837,7 +837,7 @@ void socketIsInValidStateAfterCancellation(const ClientSocketMaker& clientMaker)
         [](SystemError::ErrorCode /*sysErrorCode*/) {});
 
     socket->pleaseStopSync();
-    ASSERT_TRUE(socket->setRecvBufferSize(128 * 1024));
+    socket->setRecvBufferSize(128 * 1024);
 }
 
 template<typename ServerSocketMaker>
