@@ -1,21 +1,26 @@
 #!/bin/bash
 
+CUSTOMIZATION=${deb.customization.company.name}
+BIN_NAME="mobile_client"
+BIN_PATH="/opt/$CUSTOMIZATION/lite_client/bin/$BIN_NAME"
+LIBS_PATH="/opt/$CUSTOMIZATION/lib"
+LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
+LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
+MOBILE_CLIENT_INI="/tmp/mobile_client.ini"
+
 export LESS_TERMCAP_ue=
 export vcs_info_msg_1_=
-export PAGER=less
+export PAGER="less"
 export LESS_TERMCAP_us=
 export VDPAU_OSD=1
 export vcs_info_msg_0_=
-export LANG=en_US.UTF-8
+export LANG="en_US.UTF-8"
 export SHLVL=3
 export LESS_TERMCAP_so=
-export DISPLAY=:0
-export VDPAU_DRIVER=sunxi
-export COLORTERM=yes
+export DISPLAY=":0"
+export VDPAU_DRIVER="sunxi"
+export COLORTERM="yes"
 export LESS_TERMCAP_se=
-export CUSTOMIZATION=${deb.customization.company.name}
-export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
-BIN_NAME=mobile_client
 
 killall gpm
 
@@ -26,15 +31,22 @@ killall gpm
 
 cd "/opt/$CUSTOMIZATION/lite_client/bin"
 
-# TODO: #boris: Implement log file rotation.
-CMD="LD_PRELOAD=\"/opt/$CUSTOMIZATION/lib/ldpreloadhook.so\" \
-    /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $* $AUTO_LOGIN_MODE \
-    >>/dev/null 2>&1"
-#    >>/opt/$CUSTOMIZATION/mediaserver/var/log/mobile_client-out.log 2>&1"
+if [ -f "$LOG_OUTPUT_FLAG" ]; then
+    REDIRECT_OUTPUT="$LOGS_PATH/mobile_client-out.log"
+    
+    # Turn on NX_LOG for mobile_client via .ini-file, if it does not exist.
+    if [ ! -f "$MOBILE_CLIENT_INI" ]; then
+        echo "enableLog=true" >>"$MOBILE_CLIENT_INI"
+        echo "logFile=$LOGS_PATH/mobile_client" >>"$MOBILE_CLIENT_INI"
+    fi
+else
+    REDIRECT_OUTPUT="/dev/null"
+fi
 
-echo "$(basename $0): Starting Lite Client with command:"
-echo "$CMD"
-eval "$CMD"
+echo "$(basename $0): Starting Lite Client, outputting to $REDIRECT_OUTPUT, with command:"
+set -x
+LD_PRELOAD="$LIBS_PATH/ldpreloadhook.so" "$BIN_PATH" "$@" "$AUTO_LOGIN_MODE" >>$REDIRECT_OUTPUT 2>&1
+{ set +x; } 2>/dev/null
 
 if ! pgrep mobile_client >/dev/null; then
     echo "Turning the screen blank because Lite Client is terminated"
