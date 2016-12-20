@@ -15,9 +15,9 @@ namespace media {
 
 using AudioFilter = std::function<QnCodecAudioFormat(QnByteArray&, QnCodecAudioFormat)>;
 
-QnAudioFormat getCompatibleFormat(QnAudioFormat format, QList<AudioFilter>* filters)
+QnAudioFormat getCompatibleFormat(QnAudioFormat format, QList<AudioFilter>* outFilters)
 {
-    filters->clear();
+    outFilters->clear();
 
     if (nx::audio::Sound::isFormatSupported(format))
         return format;
@@ -27,28 +27,28 @@ QnAudioFormat getCompatibleFormat(QnAudioFormat format, QList<AudioFilter>* filt
         format.setSampleType(QnAudioFormat::SignedInt);
         if (nx::audio::Sound::isFormatSupported(format))
         {
-            filters->push_back(QnAudioProcessor::float2int32);
+            outFilters->push_back(QnAudioProcessor::float2int32);
             return format;
         }
         format.setSampleSize(16);
-        filters->push_back(QnAudioProcessor::float2int16);
+        outFilters->push_back(QnAudioProcessor::float2int16);
         if (nx::audio::Sound::isFormatSupported(format))
             return format;
     }
     else if (format.sampleSize() == 32)
     {
         format.setSampleSize(16);
-        filters->push_back(QnAudioProcessor::int32Toint16);
+        outFilters->push_back(QnAudioProcessor::int32Toint16);
         if (nx::audio::Sound::isFormatSupported(format))
             return format;
     }
 
     format.setChannelCount(qMin(format.channelCount(), 2));
-    filters->push_back(QnAudioProcessor::downmix);
+    outFilters->push_back(QnAudioProcessor::downmix);
     if (nx::audio::Sound::isFormatSupported(format))
         return format;
 
-    filters->clear();
+    outFilters->clear();
     return QnAudioFormat(); //< conversion rule not found
 }
 
