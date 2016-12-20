@@ -166,7 +166,7 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
 TEST_F(VmsGatewayProxyTest, SslEnabled)
 {
     addArg("-http/sslSupport", "true");
-    addArg("-cloudConnect/sslAllowed", "true");
+    addArg("-cloudConnect/preferedSslMode", "undefined");
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     expectSecurity(false);
@@ -206,10 +206,35 @@ TEST_F(VmsGatewayProxyTest, SslEnabled)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslNotAllowed)
+TEST_F(VmsGatewayProxyTest, SslEnforced)
 {
     addArg("-http/sslSupport", "true");
-    addArg("-cloudConnect/sslAllowed", "false");
+    addArg("-cloudConnect/preferedSslMode", "enabled");
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("https://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("http://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+}
+
+TEST_F(VmsGatewayProxyTest, SslRestricted)
+{
+    addArg("-http/sslSupport", "true");
+    addArg("-cloudConnect/preferedSslMode", "disabled");
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     expectSecurity(false);
@@ -236,13 +261,13 @@ TEST_F(VmsGatewayProxyTest, SslNotAllowed)
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
 
-    expectSecurity(false);
+    expectSecurity(true);
     testProxyUrl(QUrl(lit("http://%1/ssl:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
 
-    expectSecurity(false);
+    expectSecurity(true);
     testProxyUrl(QUrl(lit("http://%1/https:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
@@ -252,6 +277,7 @@ TEST_F(VmsGatewayProxyTest, SslNotAllowed)
 TEST_F(VmsGatewayProxyTest, SslForbidden)
 {
     addArg("-http/sslSupport", "false");
+    addArg("-cloudConnect/preferedSslMode", "undefined");
     ASSERT_TRUE(startAndWaitUntilStarted());
     expectSecurity(false);
 

@@ -14,7 +14,7 @@ class RunTimeOptions
 {
 public:
     void enforceSsl(const SocketAddress& address, bool enabled = true);
-    bool isSslEnforsed(const SocketAddress& address) const;
+    bool isSslEnforced(const SocketAddress& address) const;
 
 private:
     mutable QnMutex m_mutex;
