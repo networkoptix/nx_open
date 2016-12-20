@@ -98,17 +98,18 @@ private:
 class QnRtspIoDevice
 {
 public:
-    explicit RTPIODevice(RTPSession* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
-    virtual ~RTPIODevice();
+    explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
+    virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
-    const RtspStatistic& getStatistic() { return m_statistic;}
-    void setStatistic(const RtspStatistic& value) { m_statistic = value; }
+    const QnRtspStatistic& getStatistic() { return m_statistic; }
+    void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
     AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    void shutdown();
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
-    
+
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
     void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};

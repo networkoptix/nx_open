@@ -241,7 +241,7 @@ public:
         const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
 protected:
-    virtual QnAbstractReplyProcessor* newReplyProcessor(int object) override;
+    virtual QnAbstractReplyProcessor* newReplyProcessor(int object, const QString& serverId) override;
     virtual bool isReady() const override;
 
     int sendAsyncGetRequestLogged(

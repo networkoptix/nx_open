@@ -48,6 +48,7 @@ public:
         nx_http::StringType messageBody);
     const Response* response() const;
     SystemError::ErrorCode lastSysErrorCode() const;
+    bool isValid() const;
     bool eof() const;
     /**
         Blocks, if internal message body buffer is empty
@@ -82,6 +83,7 @@ private:
     QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
     bool m_done;
+    bool m_error;
     bool m_terminated;
     nx_http::BufferType m_msgBodyBuffer;
     std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
@@ -93,6 +95,7 @@ private:
     boost::optional<QString> m_userAgent;
     boost::optional<QString> m_userName;
     boost::optional<QString> m_userPassword;
+    std::size_t m_maxInternalBufferSize;
     boost::optional<SocketAddress> m_proxyEndpoint;
 
     void instanciateHttpClient();

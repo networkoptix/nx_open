@@ -70,9 +70,9 @@ namespace
 
 // --------------------- QnRtspIoDevice --------------------------
 
-RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
+QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort, quint16 rtcpPort):
     m_owner(owner),
-    m_tcpMode(false),
+    m_tcpMode(useTCP),
     m_mediaSocket(0),
     m_rtcpSocket(0),
     m_mediaPort(mediaPort),
@@ -82,7 +82,6 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_reportTimerStarted(false),
     m_forceRtcpReports(false)
 {
-    m_tcpMode = useTCP;
     if (!m_tcpMode)
     {
         m_mediaSocket = SocketFactory::createDatagramSocket().release();
@@ -147,7 +146,7 @@ void QnRtspIoDevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
-    
+
     bool rtcpReportAlreadySent = false;
     while( m_rtcpSocket->hasData() )
     {
@@ -191,8 +190,8 @@ void QnRtspIoDevice::processRtcpData()
                 auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
                 if (!m_rtcpSocket->setDestAddr(remoteEndpoint))
                 {
-                    qWarning() 
-                        << "RTPIODevice::processRtcpData(): setDestAddr() failed: " 
+                    qWarning()
+                        << "RTPIODevice::processRtcpData(): setDestAddr() failed: "
                         << SystemError::getLastOSErrorText();
                 }
                 m_rtcpSocket->send(sendBuffer, outBufSize);
@@ -1207,7 +1206,7 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
     return sendRequestInternal(std::move(request));
 }
 
-void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
+void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
 {
     nx_http::StringType rangeVal;
     if (startPos != qint64(AV_NOPTS_VALUE))
@@ -1226,7 +1225,7 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
             else
                 rangeVal += "clock";
         }
-        
+
     }
     else
     {
@@ -1796,7 +1795,7 @@ QAuthenticator QnRtspClient::getAuth() const
     return m_auth;
 }
 
-QUrl RTPSession::getUrl() const
+QUrl QnRtspClient::getUrl() const
 {
     return m_url;
 }

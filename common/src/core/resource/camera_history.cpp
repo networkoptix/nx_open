@@ -464,7 +464,7 @@ bool QnCameraHistoryPool::isValidHistoryDetails(
     const QnUuid& cameraId,
     const ec2::ApiCameraHistoryItemDataList& historyDetails) const
 {
-    QnVirtualCameraResourcePtr camera = toCamera(cameraId);
+    QnSecurityCamResourcePtr camera = toCamera(cameraId);
     if (!camera || camera->getStatus() != Qn::Recording)
         return true; //< nothing to check if no camera or not int recording state
 
@@ -500,7 +500,7 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
     m_historyValidCameras.insert(cameraId);
 
     lock.unlock();
-    if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+    if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
         emit cameraHistoryChanged(camera);
     return true;
 }

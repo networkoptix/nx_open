@@ -172,7 +172,10 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(resource->getId(), Qn::Online);
+        // it's own server. change status to online
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto manager = connection->getResourceManager(Qn::kSystemAccess);
+        manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
     }
     else {

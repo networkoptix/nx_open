@@ -342,7 +342,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
             bool gotData = false;
             while (!gotData)
             {
-                quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
+                quint8* rtpBuffer = QnRtspClient::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
                 int readed = track.ioDevice->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
                 if (readed < 1)
                     break;
@@ -478,7 +478,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     m_RtpSession.setTransport(getRtpTransport());
-    if (m_RtpSession.getTransport() != RTPSession::TRANSPORT_UDP)
+    if (m_RtpSession.getTransport() != QnRtspClient::TRANSPORT_UDP)
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
 
 
@@ -497,7 +497,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         return result;
 
     if (m_RtpSession.getTransport() != QnRtspClient::TRANSPORT_UDP)
-        m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
+        m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
     if (camera)
@@ -540,7 +540,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
                 m_tracks[i].parser->setSDPInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
                 m_tracks[i].ioDevice = trackInfo[i]->ioDevice;
-                
+
                 auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
                 if (secResource)
                 {
@@ -560,7 +560,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                 else
                     m_tracks[i].parser->setLogicalChannelNum(m_numberOfVideoChannels);
 
-                if (m_RtpSession.getTransport() == RTPSession::TRANSPORT_UDP)
+                if (m_RtpSession.getTransport() == QnRtspClient::TRANSPORT_UDP)
                 {
                     m_tracks[i].ioDevice->getMediaSocket()->setRecvBufferSize(SOCKET_READ_BUFFER_SIZE);
                     m_tracks[i].ioDevice->getMediaSocket()->setNonBlockingMode(true);

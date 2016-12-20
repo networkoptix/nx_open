@@ -28,51 +28,49 @@ QString urlPath;
 
 typedef QnMultiserverRequestContext<QnChunksRequestData> QnChunksRequestContext;
 
-void loadRemoteDataAsync(
-    void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr &server, QnChunksRequestContext* ctx)
-    QnChunksRequestContext* ctx)
+QString toString(const QnSecurityCamResourceList& cameras)
 {
-        QString result;
-        for (const auto& camera: cameras)
-        {
-            if (!result.isEmpty())
-                result += L',';
-            result += camera->getUniqueId();
-        }
-        return result;
-    }
-    auto requestCompletionFunc =
-        MultiServerPeriodDataList& outputData,
-        const QnMediaServerResourcePtr &server,
-        QnChunksRequestContext* ctx,
-        int requestNum,
-        const QElapsedTimer& timer)
+    QString result;
+    for (const auto& camera : cameras)
     {
+        if (!result.isEmpty())
+            result += L',';
+        result += camera->getUniqueId();
+    }
+    return result;
+}
 
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+void loadRemoteDataAsync(
+    MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr& server,
+    QnChunksRequestContext* ctx,
+    int requestNum, const QElapsedTimer& timer)
+{
+    auto requestCompletionFunc =
+        [ctx, &outputData, server, requestNum, timer](
+            SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+    {
+        MultiServerPeriodDataList remoteData;
+        bool success = false;
+        if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
         {
-            MultiServerPeriodDataList remoteData;
-            bool success = false;
-            if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+            remoteData = QnCompressedTime::deserialized(
+                msgBody, MultiServerPeriodDataList(), &success);
+        }
+
+        qDebug() << "In progress request QnMultiserverChunksRestHandler::loadRemoteDataAsync #"
+            << requestNum << ". Got response from server" << server->getId()
+            << "osErrorCode=" << osErrorCode << "statusCode=" << statusCode
+            << "cameras=" << toString(ctx->request().resList)
+            << "timeout=" << timer.elapsed();
+
+        ctx->executeGuarded([ctx, success, &remoteData, &outputData]()
             {
-                remoteData = QnCompressedTime::deserialized(
-                    msgBody, MultiServerPeriodDataList(), &success);
-            }
+                if (success && !remoteData.empty())
+                    outputData.push_back(std::move(remoteData.front()));
 
-            qDebug() << "In progress request QnMultiserverChunksRestHandler::loadRemoteDataAsync #"
-                << requestNum << ". Got response from server" << server->getId()
-                << "osErrorCode=" << osErrorCode << "statusCode=" << statusCode
-                << "cameras=" << toString(ctx->request().resList)
-                << "timeout=" << timer.elapsed();
-
-            ctx->executeGuarded([ctx, success, &remoteData, &outputData]()
-                {
-                    if (success && !remoteData.empty())
-                        outputData.push_back(std::move(remoteData.front()));
-
-                    ctx->requestProcessed();
-                });
-        };
+                ctx->requestProcessed();
+            });
+    };
 
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(L'/' + urlPath + L'/');

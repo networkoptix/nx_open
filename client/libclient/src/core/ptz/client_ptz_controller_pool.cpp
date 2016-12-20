@@ -11,8 +11,8 @@ namespace {
 bool cameraSupportsPtz(const QnVirtualCameraResourcePtr& camera)
 {
     return camera
-        && camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
-        && !camera->hasPtzCapabilities(Qn::VirtualPtzCapability);
+        && camera->hasAnyOfPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !camera->hasAnyOfPtzCapabilities(Qn::VirtualPtzCapability);
 }
 
 } // namespace
@@ -64,8 +64,12 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
     return controller;
 }
 
-void QnClientPtzControllerPool::cacheCameraPresets(const QnVirtualCameraResourcePtr &camera)
+void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
 {
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
     if (!cameraSupportsPtz(camera))
         return;
 

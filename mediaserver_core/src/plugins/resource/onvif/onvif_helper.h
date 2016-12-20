@@ -9,7 +9,7 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 #include <QtCore/QPair>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 //first - login, second - password
 typedef std::list<std::pair<const char*, const char*> > PasswordList;

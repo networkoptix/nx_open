@@ -115,7 +115,7 @@ public:
     void setUrl(const QUrl &url);
 
 protected:
-    virtual QnAbstractReplyProcessor *newReplyProcessor(int object) = 0;
+    virtual QnAbstractReplyProcessor *newReplyProcessor(int object, const QString& serverId) = 0;
 
     QnLexicalSerializer *serializer() const;
     void setSerializer(QnLexicalSerializer *serializer);

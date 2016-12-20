@@ -364,9 +364,9 @@ QnMediaServerConnection::~QnMediaServerConnection()
     return;
 }
 
-QnAbstractReplyProcessor* QnMediaServerConnection::newReplyProcessor(int object)
+QnAbstractReplyProcessor* QnMediaServerConnection::newReplyProcessor(int object, const QString& serverId)
 {
-    return new QnMediaServerReplyProcessor(object);
+    return new QnMediaServerReplyProcessor(object, serverId);
 }
 
 bool QnMediaServerConnection::isReady() const

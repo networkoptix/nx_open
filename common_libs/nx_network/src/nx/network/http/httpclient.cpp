@@ -7,8 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/future.h>
-#include <utils/common/log.h>
-
+#include <nx/utils/log/log.h>
 
 namespace {
     const std::size_t kDefaultMaxInternalBufferSize = 200 * 1024 *1024; //< 200MB should be enough
@@ -75,10 +74,11 @@ const Response* HttpClient::response() const
     return m_asyncHttpClient->response();
 }
 
+bool HttpClient::isValid() const
 {
-        return !m_error;
+    QnMutexLocker lock(&m_mutex);
+    return !m_error;
 }
-
 
 bool HttpClient::eof() const
 {
@@ -164,6 +164,7 @@ void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     m_proxyEndpoint = proxyEndpoint;
 }
 
+const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
 {
     return m_asyncHttpClient->socket();
 }
@@ -270,7 +271,7 @@ void HttpClient::onResponseReceived()
                 cl_logWARNING);
             m_done = true;
             m_error = true;
-            m_asyncHttpClient->terminate();
+            m_asyncHttpClient->pleaseStopSync();
         }
     m_cond.wakeAll();
 }
@@ -289,7 +290,7 @@ void HttpClient::onSomeMessageBodyAvailable()
                 cl_logWARNING);
             m_done = true;
             m_error = true;
-            m_asyncHttpClient->terminate();
+            m_asyncHttpClient->pleaseStopSync();
         }
     m_cond.wakeAll();
 }
