@@ -51,8 +51,7 @@ private:
 };
 
 
-class Appserver2ProcessPublic
-    :
+class Appserver2ProcessPublic:
     public QnStoppable
 {
 public:

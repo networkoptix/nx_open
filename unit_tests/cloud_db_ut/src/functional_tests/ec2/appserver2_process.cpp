@@ -43,8 +43,7 @@ namespace conf {
 class Settings
 {
 public:
-    Settings()
-    :
+    Settings():
         m_settings(QnAppInfo::organizationNameForSettings(), "Nx Appserver2", "appserver2"),
         m_showHelp(false)
     {
@@ -78,8 +77,7 @@ private:
 }   // namespace conf
 
 
-class QnSimpleHttpConnectionListener
-    :
+class QnSimpleHttpConnectionListener:
     public QnHttpConnectionListener
 {
 public:
