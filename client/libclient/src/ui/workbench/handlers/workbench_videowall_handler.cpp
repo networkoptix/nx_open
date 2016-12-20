@@ -1934,10 +1934,10 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     /* User can occasionally remove own access to cameras by dropping something on videowall. */
     if (dropAction == Action::SetAction && currentLayout)
     {
-        QSet<QnUuid> oldResources = currentLayout->layoutResourceIds();
-        QSet<QnUuid> newResources = targetLayout->layoutResourceIds();
+        const auto oldResources = currentLayout->layoutResourceIds();
+        const auto newResources = targetLayout->layoutResourceIds();
 
-        QnResourceList removedResources = qnResPool->getResources(oldResources - newResources);
+        const auto removedResources = qnResPool->getResources(oldResources - newResources);
         if (!confirmRemoveResourcesFromLayout(removedResources))
             return;
     }
@@ -3067,6 +3067,7 @@ bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
             if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
                 return false;
 
+            // Check if providers list contains only this layout and videowall
             if (providers.size() > 2)
                 return false;
 
@@ -3075,7 +3076,7 @@ bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
 
     if (inaccessible.isEmpty())
         return true;
-    
+
     return QnLayoutsHandlerMessages::replaceVideoWallResources(mainWindow(), inaccessible);
 }
 
