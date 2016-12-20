@@ -37,7 +37,7 @@ void ReverseConnectionHolder::stopWhileInAioThread()
 
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
-    NX_CRITICAL(isInSelfAioThread());
+    NX_ASSERT(isInSelfAioThread());
     if (!m_handlers.empty())
     {
         NX_LOGX(lm("Use new socket(%1), %2 sockets left")

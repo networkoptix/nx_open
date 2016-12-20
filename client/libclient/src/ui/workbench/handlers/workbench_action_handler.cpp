@@ -205,8 +205,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::OpenAuditLogAction), SIGNAL(triggered()), this, SLOT(at_openAuditLogAction_triggered()));
     connect(action(QnActions::CameraListAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
     connect(action(QnActions::CameraListByServerAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
-    connect(action(QnActions::WebClientAction), SIGNAL(triggered()), this, SLOT(at_webClientAction_triggered()));
-    connect(action(QnActions::WebClientActionSubMenu), SIGNAL(triggered()), this, SLOT(at_webClientAction_triggered()));
+
+    connect(action(QnActions::WebClientAction), &QAction::triggered, this,
+        &QnWorkbenchActionHandler::at_webClientAction_triggered);
+    connect(action(QnActions::WebAdminAction), &QAction::triggered, this,
+        &QnWorkbenchActionHandler::at_webAdminAction_triggered);
+
     connect(action(QnActions::SystemAdministrationAction), SIGNAL(triggered()), this, SLOT(at_systemAdministrationAction_triggered()));
     connect(action(QnActions::SystemUpdateAction), SIGNAL(triggered()), this, SLOT(at_systemUpdateAction_triggered()));
     connect(action(QnActions::UserManagementAction), SIGNAL(triggered()), this, SLOT(at_userManagementAction_triggered()));
@@ -752,6 +756,15 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (status != 0)
     {
+        const auto title = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Cannot move devices"),
+                tr("Cannot move cameras"),
+                tr("Cannot move I/O modules")
+            ),
+            modifiedResources
+        );
+
         const auto question = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
@@ -765,7 +778,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             QnMessageBox::Warning,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Cannot move cameras"),
+            title,
             QDialogButtonBox::Ok,
             mainWindow());
         messageBox.setDefaultButton(QDialogButtonBox::Ok);
@@ -791,6 +804,15 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (!errorResources.empty())
     {
+        const auto title = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Cannot move devices"),
+                tr("Cannot move cameras"),
+                tr("Cannot move I/O modules")
+            ),
+            errorResources
+        );
+
         const auto question = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
@@ -804,12 +826,12 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             QnMessageBox::Warning,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Cannot move cameras"),
+            title,
             QDialogButtonBox::Yes | QDialogButtonBox::No,
             mainWindow());
         messageBox.setDefaultButton(QDialogButtonBox::Yes);
         messageBox.setInformativeText(question);
-        messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
+        messageBox.addCustomWidget(new QnResourceListView(errorResources));
         auto result = messageBox.exec();
 
         /* If user is sure, return invalid cameras back to list. */
@@ -818,15 +840,17 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     }
 
     const QnUuid serverId = server->getId();
-    qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera)
-    {
-        camera->setPreferredServerId(serverId);
-    });
+    qnResourcesChangesManager->saveCameras(modifiedResources,
+        [serverId](const QnVirtualCameraResourcePtr &camera)
+        {
+            camera->setPreferredServerId(serverId);
+        });
 
-    qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera)
-    {
-        camera->setParentId(serverId);
-    });
+    qnResourcesChangesManager->saveCamerasCore(modifiedResources,
+        [serverId](const QnVirtualCameraResourcePtr &camera)
+        {
+            camera->setParentId(serverId);
+        });
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
@@ -1026,32 +1050,35 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    static const auto kPath = lit("/static/index.html");
+    static const auto kFragment = lit("/view");
 
-    QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    const auto server = qnCommon->currentServer();
     if (!server)
-        /* If target server is not provided, open the server we are currently connected to. */
-        server = qnCommon->currentServer();
+        return;
 
-    // TODO: #akolesnikov #3.1 VMS-2806
-    #ifdef WEB_CLIENT_SUPPORTS_PROXY
-        openInBrowser(server, lit("/static/index.html"));
-    #else
-        QUrl url(server->getApiUrl());
-        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-            return;
+#ifdef WEB_CLIENT_SUPPORTS_PROXY
+    openInBrowser(server, kPath, kFragment);
+#else
+    openInBrowserDirectly(server, kPath, kFragment);
+#endif
+}
 
-        url.setUserName(QString());
-        url.setPassword(QString());
-        url.setScheme(lit("http"));
-        url.setPath(lit("/static/index.html"));
+void QnWorkbenchActionHandler::at_webAdminAction_triggered()
+{
+    static const auto kPath = lit("/static/index.html");
+    static const auto kFragment = lit("/server");
 
-        url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-            return;
+    const auto server = menu()->currentParameters(sender()).resource()
+        .dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
 
-        QDesktopServices::openUrl(url);
-    #endif
+#ifdef WEB_CLIENT_SUPPORTS_PROXY
+    openInBrowser(server, kPath, kFragment);
+#else
+    openInBrowserDirectly(server, kPath, kFragment);
+#endif
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1215,7 +1242,8 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
     cameraListDialog()->setServer(server);
 }
 
-void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
+void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource = parameters.resource();
@@ -2204,14 +2232,39 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
 }
 
-void QnWorkbenchActionHandler::openInBrowser(
-    const QnMediaServerResourcePtr& server,
-    const QString& webPage)
+void QnWorkbenchActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server,
+    const QString& path, const QString& fragment)
+{
+    // TODO: #akolesnikov #3.1 VMS-2806 deprecate this method, always use openInBrowser()
+
+    QUrl url(server->getApiUrl());
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
+
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setScheme(lit("http"));
+    url.setPath(path);
+    url.setFragment(fragment);
+
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
+
+    QDesktopServices::openUrl(url);
+}
+
+void QnWorkbenchActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
+    const QString& path, const QString& fragment)
 {
     if (!server || !context()->user())
         return;
 
-    QUrl serverUrl(server->getApiUrl().toString() + webPage);
+    QUrl serverUrl(server->getApiUrl().toString());
+    serverUrl.setPath(path);
+    serverUrl.setFragment(fragment);
+
     QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 

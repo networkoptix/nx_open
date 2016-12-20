@@ -208,7 +208,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
     sortModel->sort(kSortColumn);
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
+
+    enum { kUpdateFilterDelayMs = 200 };
+    ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
     ui->tableView->setModel(sortModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -257,10 +260,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->eventLogButton, &QPushButton::clicked,
         context()->action(QnActions::OpenBusinessLogAction), &QAction::trigger);
 
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
         &QnBusinessRulesDialog::updateFilter);
-    connect(ui->clearFilterButton, &QToolButton::clicked, this,
-        &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
     updateFilter();
     updateControlButtons();
@@ -291,7 +292,7 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog() {
 }
 
 void QnBusinessRulesDialog::setFilter(const QString &filter) {
-    ui->filterLineEdit->setText(filter);
+    ui->filterLineEdit->lineEdit()->setText(filter);
 }
 
 void QnBusinessRulesDialog::accept()
@@ -399,10 +400,6 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 
     QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
-}
-
-void QnBusinessRulesDialog::at_clearFilterButton_clicked() {
-    ui->filterLineEdit->clear();
 }
 
 void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok) {
@@ -553,17 +550,15 @@ void QnBusinessRulesDialog::updateFilter() {
         ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
         return;
     }
-
-    ui->clearFilterButton->setVisible(!filter.isEmpty());
 }
 
 void QnBusinessRulesDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    ui->filterLineEdit->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("filter by devices..."),
-        tr("filter by cameras...")
+    ui->filterLineEdit->lineEdit()->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Filter by devices..."),
+        tr("Filter by cameras...")
     ));
 }
 

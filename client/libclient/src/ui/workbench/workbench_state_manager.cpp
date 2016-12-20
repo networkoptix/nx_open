@@ -47,9 +47,10 @@ bool QnWorkbenchStateManager::tryClose(bool force)
         qnStatisticsManager->saveCurrentStatistics();
     }
 
-    for (auto d: m_delegates)
+    /* Order should be backward, so more recently opened dialogs will ask first. */
+    for (int i = m_delegates.size() - 1; i >=0; --i)
     {
-        if (!d->tryClose(force))
+        if (!m_delegates[i]->tryClose(force))
             return false;
     }
 

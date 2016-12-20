@@ -765,7 +765,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory().
-        flags(Qn::Main | Qn::Scene).
+        flags(Qn::Main | Qn::Tree | Qn::Scene).
         mode(QnActionTypes::DesktopMode).
         text(tr("Open..."));
 
@@ -787,11 +787,15 @@ QnActionManager::QnActionManager(QObject *parent):
         factory().separator().
             flags(Qn::Main);
 
-        factory(QnActions::WebClientActionSubMenu).
-            flags(Qn::Main).
+        factory(QnActions::WebClientAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
             text(tr("Web Client...")).
+            pulledText(tr("Open Web Client...")).
             autoRepeat(false).
-            requiredGlobalPermission(Qn::GlobalAdminPermission);
+            condition(new QnConjunctionActionCondition(
+                new QnLoggedInCondition(this),
+                new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this),
+                this));
 
     } factory.endSubMenu();
 
@@ -934,14 +938,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
-
-    factory(QnActions::WebClientAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
-        text(tr("Open Web Client...")).
-        autoRepeat(false).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
+        condition(new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this));
 
     factory(QnActions::SystemUpdateAction).
         flags(Qn::NoTarget).
@@ -1021,7 +1018,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
         condition(new QnConjunctionActionCondition(
-            new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
+            new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this),
             new QnForbiddenInSafeModeCondition(this),
             new QnRequiresOwnerCondition(this),
             this)
@@ -1642,6 +1639,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Diagnostics...")).
         requiredGlobalPermission(Qn::GlobalViewLogsPermission).
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
+            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+            this));
+
+    factory(QnActions::WebAdminAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Web Page...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
             new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

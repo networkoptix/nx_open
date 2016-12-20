@@ -55,7 +55,7 @@ static const int kTryLaterIntervalMs = 16;
 static const int kDefaultMaxTextureSize = 2048;
 
 // Player will go invalid state if no data during timeout
-static const int kGotDataTimeoutMs = 1000 * 10;
+static const int kGotDataTimeoutMs = 1000 * 15;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;
@@ -262,10 +262,23 @@ void PlayerPrivate::setState(Player::State state)
 void PlayerPrivate::doPeriodicTasks()
 {
     Q_Q(Player);
-    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+
+    if (state == Player::State::Playing)
     {
-        setMediaStatus(Player::MediaStatus::NoMedia);
-        q->stop();
+        if (dataConsumer &&
+            dataConsumer->audioOutput() &&
+            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        {
+            gotDataTimer.restart();
+            return;
+        }
+
+        if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
+        {
+            log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+        }
     }
 }
 
@@ -870,6 +883,7 @@ void Player::setSource(const QUrl& url)
     if (d->resource && currentState == State::Playing)
         play();
 
+    d->log(lit("emit sourceChanged()"));
     emit sourceChanged();
 
     d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));

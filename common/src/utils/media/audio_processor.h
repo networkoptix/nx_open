@@ -9,8 +9,6 @@
 class QnAudioProcessor
 {
 public:
-    static int downmix(quint8* data, int size, AVCodecContext* ctx);
-
     static QnCodecAudioFormat downmix(QnByteArray& audio, QnCodecAudioFormat format);
     static QnCodecAudioFormat float2int16(QnByteArray& audio, QnCodecAudioFormat format);
     static QnCodecAudioFormat float2int32(QnByteArray& audio, QnCodecAudioFormat format);

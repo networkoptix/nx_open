@@ -231,7 +231,6 @@ void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
             if (connection->client == clientPtr)
             {
                 requestId = connection->handle;
-                connection->handle = 0;
                 break;
             }
         }
@@ -241,6 +240,20 @@ void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
         emit done(requestId, clientPtr);
 
     QnMutexLocker lock(&m_mutex);
+    // free connection
+    if (requestId > 0)
+    {
+        for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
+        {
+            HttpConnection* connection = itr->second.get();
+            if (connection->handle == requestId)
+            {
+                connection->handle = 0;
+                break;
+            }
+        }
+    }
+
     sendNextRequestUnsafe();
     cleanupDisconnectedUnsafe();
 }

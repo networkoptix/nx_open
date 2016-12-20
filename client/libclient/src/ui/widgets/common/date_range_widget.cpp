@@ -12,23 +12,29 @@
 
 namespace {
 
-static const int kMillisecondsInSeconds = 1000;
-static const int kMillisecondsInDay = 60 * 60 * 24 * 1000;
+constexpr int kMillisecondsInSeconds = 1000;
+constexpr int kMillisecondsInDay = 60 * 60 * 24 * 1000;
+constexpr int kDefaultDaysOffset = -7;
 
 
 QDate defaultStartDate()
 {
-    return QDate::currentDate().addDays(-7);
+    return QDate::currentDate().addDays(kDefaultDaysOffset);
 }
 
 qint64 getStartOfTheDayMs(qint64 timeMs)
 {
-    return timeMs - (timeMs % kMillisecondsInDay);
+    QDateTime value(QDateTime::fromMSecsSinceEpoch(timeMs));
+    value.setTime(QTime(0, 0));
+    return value.toMSecsSinceEpoch();
 }
 
 qint64 getEndOfTheDayMs(qint64 timeMs)
 {
-    return getStartOfTheDayMs(timeMs) + kMillisecondsInDay;
+    QDateTime value(QDateTime::fromMSecsSinceEpoch(timeMs));
+    value.setTime(QTime(0, 0));
+    value.addDays(1);
+    return value.toMSecsSinceEpoch();
 }
 
 QDate minAllowedDate()

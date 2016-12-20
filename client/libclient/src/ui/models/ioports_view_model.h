@@ -22,7 +22,6 @@ public:
         ColumnCount
     };
 
-
     explicit QnIOPortsViewModel(QObject *parent = 0);
     virtual ~QnIOPortsViewModel();
 
@@ -36,13 +35,15 @@ public:
     void clear();
     void setModelData(const QnIOPortDataList& data);
     QnIOPortDataList modelData() const;
+
+    static QString portTypeToString(Qn::IOPortType portType);
+    static QString stateToString(Qn::IODefaultState state);
+
 private:
     QString textData(const QModelIndex &index) const;
     QVariant editData(const QModelIndex &index) const;
     bool isDisabledData(const QModelIndex &index) const;
 
-    QString portTypeToString(Qn::IOPortType portType) const;
-    QString stateToString(Qn::IODefaultState state) const;
 private:
     QnIOPortDataList m_data;
 };

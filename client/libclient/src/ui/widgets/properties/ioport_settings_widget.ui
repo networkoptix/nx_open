@@ -14,6 +14,9 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
    <item>
     <widget class="QTableView" name="tableView">
      <property name="editTriggers">
@@ -43,6 +46,13 @@
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="enableTileInterfaceCheckBox">
+     <property name="text">
+      <string>Enable tile interface</string>
+     </property>
     </widget>
    </item>
   </layout>

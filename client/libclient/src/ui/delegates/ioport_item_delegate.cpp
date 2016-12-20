@@ -38,6 +38,14 @@ void QnIOPortItemDelegate::initStyleOption(QStyleOptionViewItem *option, const Q
     }
 }
 
+void QnIOPortItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    if (index.column() == QnIOPortsViewModel::NameColumn)
+        base_type::updateEditorGeometry(editor, option, index);
+    else
+        editor->setGeometry(option.rect);
+}
+
 QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex &index) const
 {
     Q_UNUSED(option)
@@ -49,19 +57,19 @@ QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
         case QnIOPortsViewModel::TypeColumn:
         {
             QComboBox* comboBox = new QComboBox(parent);
-            if (ioPort.supportedPortTypes & Qn::PT_Disabled)
-                comboBox->addItem(tr("Disabled"), Qn::PT_Disabled);
-            if (ioPort.supportedPortTypes & Qn::PT_Input)
-                comboBox->addItem(tr("Input"), Qn::PT_Input);
-            if (ioPort.supportedPortTypes & Qn::PT_Output)
-                comboBox->addItem(tr("Output"), Qn::PT_Output);
+            if (ioPort.supportedPortTypes.testFlag(Qn::PT_Disabled))
+                comboBox->addItem(QnIOPortsViewModel::portTypeToString(Qn::PT_Disabled), Qn::PT_Disabled);
+            if (ioPort.supportedPortTypes.testFlag(Qn::PT_Input))
+                comboBox->addItem(QnIOPortsViewModel::portTypeToString(Qn::PT_Input), Qn::PT_Input);
+            if (ioPort.supportedPortTypes.testFlag(Qn::PT_Output))
+                comboBox->addItem(QnIOPortsViewModel::portTypeToString(Qn::PT_Output), Qn::PT_Output);
             return comboBox;
         }
         case QnIOPortsViewModel::DefaultStateColumn:
         {
             QComboBox* comboBox = new QComboBox(parent);
-            comboBox->addItem(tr("Open circuit"), Qn::IO_OpenCircuit);
-            comboBox->addItem(tr("Grounded circuit"), Qn::IO_GroundedCircuit);
+            comboBox->addItem(QnIOPortsViewModel::stateToString(Qn::IO_OpenCircuit), Qn::IO_OpenCircuit);
+            comboBox->addItem(QnIOPortsViewModel::stateToString(Qn::IO_GroundedCircuit), Qn::IO_GroundedCircuit);
             return comboBox;
         }
         case QnIOPortsViewModel::NameColumn:

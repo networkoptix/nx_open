@@ -185,6 +185,20 @@ void QnConnectionManager::connectToServer(
     connectToServer(urlWithAuth);
 }
 
+void QnConnectionManager::connectByUserInput(
+    const QString& address,
+    const QString& userName,
+    const QString& password)
+{
+    QUrl url = QUrl::fromUserInput(address);
+    if (url.port() <= 0)
+        url.setPort(DEFAULT_APPSERVER_PORT);
+
+    url.setUserName(userName);
+    url.setPassword(password);
+    connectToServer(url);
+}
+
 void QnConnectionManager::disconnectFromServer()
 {
     Q_D(QnConnectionManager);
