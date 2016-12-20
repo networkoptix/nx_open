@@ -33,23 +33,18 @@ var Config = {
             style: 'label-default'
         },
         notActivated: {
-            label: L.systemStatuses.notActivated,
             style: 'label-danger'
         },
         activated: {
-            label: L.systemStatuses.activated,
             style: 'label-info'
         },
         online: {
-            label: L.systemStatuses.online,
             style: 'label-success'
         },
         offline: {
-            label: L.systemStatuses.offline,
             style: 'label-default'
         },
         unavailable: {
-            label: L.systemStatuses.unavailable,
             style: 'label-default'
         }
     },
@@ -108,14 +103,9 @@ var Config = {
 
     passwordRequirements: {
         minLength: 8,
-        minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
-        requiredMessage: L.passwordRequirements.requiredMessage,
         minClassesCount: 2,
-        strongClassesCount: 3,
-        weakMessage: L.passwordRequirements.weakMessage,
-        strongMessage: L.passwordRequirements.strongMessage,
-        commonMessage: L.passwordRequirements.commonMessage
+        strongClassesCount: 3
     }
 };
