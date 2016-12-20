@@ -65,12 +65,6 @@ ApplicationWindow
             }
         }
 
-        if (liteMode)
-        {
-            Workflow.openLiteClientWelcomeScreen()
-            return
-        }
-
         // TODO: #dklychkov Check if need it in #3.1 and uncomment.
         // if (cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
         // {
