@@ -110,9 +110,9 @@ private:
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     // TODO: #ak replace with aio::BasicPollable inheritance.
     aio::BasicPollable m_aioThreadBinder;
-    std::unique_ptr<aio::Timer> m_timer;
-    std::unique_ptr<aio::Timer> m_readIoBinder;
-    std::unique_ptr<aio::Timer> m_writeIoBinder;
+    aio::Timer m_timer;
+    aio::BasicPollable m_readIoBinder;
+    aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
 
     QnMutex m_mutex;

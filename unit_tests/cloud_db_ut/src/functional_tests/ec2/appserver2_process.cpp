@@ -12,6 +12,7 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/settings.h>
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
@@ -24,7 +25,6 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
-#include <utils/common/settings.h>
 
 #include "ec2_connection_processor.h"
 
@@ -45,7 +45,7 @@ class Settings
 public:
     Settings()
     :
-        m_settings("Nx Appserver2", "appserver2"),
+        m_settings(QnAppInfo::organizationNameForSettings(), "Nx Appserver2", "appserver2"),
         m_showHelp(false)
     {
     }

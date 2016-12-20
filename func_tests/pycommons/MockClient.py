@@ -122,10 +122,12 @@ class DigestAuthClient(Client):
                     self._update()
                 raise
             except httplib.BadStatusLine, x:
+                # From httplib.py:
+                #   Presumably, the server closed the connection before
+                #   sending a valid response.
+                # It looks like an httplib issue, we may ignore it and try again.
                 if i == self.RETRY_COUNT - 1:
                     raise
-                # Sometimes we've got unexcpected BadStatusLine with empty status line
-                # It looks like an httplib bug, we may ignore it and try again
                 FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d got unexpected HTTP status BadStatusLine %s" % (self.index, str(x)))
 
 class ClientMixin(ComparisonMixin):

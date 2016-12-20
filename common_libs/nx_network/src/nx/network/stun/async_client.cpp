@@ -140,11 +140,24 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            // NOTE: Dispatched action might happen after connection closure.
-            if (m_connectingSocket)
+            if (m_baseConnection)
             {
-                const auto isKeepAliveSet = m_connectingSocket->setKeepAlive(std::move(options));
-                NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
+                if (const auto socket = dynamic_cast<AbstractStreamSocket*>(
+                    m_baseConnection->socket().get()))
+                {
+                    NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
+                    const auto isKeepAliveSet = socket->setKeepAlive(std::move(options));
+                    NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
+                }
+                else
+                {
+                    NX_LOGX(lm("Trying to set keep alive for non-stream socket"), cl_logWARNING);
+                }
+            }
+            else
+            {
+                NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
+                    cl_logDEBUG1);
             }
         });
 }

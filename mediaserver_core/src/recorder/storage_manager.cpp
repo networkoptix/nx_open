@@ -1010,8 +1010,8 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         };
 
         std::pair<QString, QString> keyValue;
-        if (!parseLine(line, keyValue, lineNumber++))
-            continue;
+        if (!parseLine(line, keyValue, lineNumber++) && line.size() > 0)
+            return;
 
         if (keyValue.first.contains(kArchiveCameraNameKey))
             newCamera.coreData.name = keyValue.second;
@@ -2180,6 +2180,9 @@ void QnStorageManager::writeCameraInfoFiles()
         {
             for (auto cameraIt = m_devFileCatalog[i].cbegin(); cameraIt != m_devFileCatalog[i].cend(); ++cameraIt)
             {
+                if (QnResource::isStopping())
+                    return;
+
                 QString cameraUniqueId = cameraIt.key();
                 auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
                 if (!camResource)

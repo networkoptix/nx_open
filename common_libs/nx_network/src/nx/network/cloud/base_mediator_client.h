@@ -54,11 +54,9 @@ protected:
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
-        static_assert(ResponseData::kMethod == ResponseData::kMethod,
-            "Request and response methods mismatch");
-
         const nx::stun::cc::methods::Value method =
             static_cast<nx::stun::cc::methods::Value>(request.header.method);
+        NX_ASSERT(method == ResponseData::kMethod, "Request and response methods mismatch");
 
         this->sendRequest(
             std::move(request),

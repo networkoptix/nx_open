@@ -59,8 +59,8 @@ uint16_t ReverseConnectionPool::port() const
     return m_acceptor.address().port;
 }
 
-std::shared_ptr<ReverseConnectionHolder>
-    ReverseConnectionPool::getConnectionHolder(const String& hostName)
+std::shared_ptr<ReverseConnectionSource>
+    ReverseConnectionPool::getConnectionSource(const String& hostName)
 {
     QnMutexLocker lk(&m_mutex);
     const auto suffix = getHostSuffix(hostName);

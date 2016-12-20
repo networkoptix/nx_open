@@ -262,11 +262,23 @@ void PlayerPrivate::setState(Player::State state)
 void PlayerPrivate::doPeriodicTasks()
 {
     Q_Q(Player);
-    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+
+    if (state == Player::State::Playing)
     {
-        log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
-        setMediaStatus(Player::MediaStatus::NoMedia);
-        q->stop();
+        if (dataConsumer &&
+            dataConsumer->audioOutput() &&
+            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        {
+            gotDataTimer.restart();
+            return;
+        }
+
+        if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
+        {
+            log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+        }
     }
 }
 
