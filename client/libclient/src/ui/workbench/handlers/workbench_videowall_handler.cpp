@@ -1515,7 +1515,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
         if (const auto layout = qnResPool->getResourceById<QnLayoutResource>(existingItem.layout))
         {
             auto removedResources = qnResPool->getResources(layout->layoutResourceIds());
-            if (!canRemoveResourcesFromLayout(removedResources))
+            if (!confirmRemoveResourcesFromLayout(removedResources))
                 break;
         }
 
@@ -1938,7 +1938,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         QSet<QnUuid> newResources = targetLayout->layoutResourceIds();
 
         QnResourceList removedResources = qnResPool->getResources(oldResources - newResources);
-        if (!canRemoveResourcesFromLayout(removedResources))
+        if (!confirmRemoveResourcesFromLayout(removedResources))
             return;
     }
 
@@ -3045,7 +3045,7 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
     return QnUuid();
 }
 
-bool QnWorkbenchVideoWallHandler::canRemoveResourcesFromLayout(
+bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
     const QnResourceList& resources) const
 {
     //just in case
