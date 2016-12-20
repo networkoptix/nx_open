@@ -265,7 +265,9 @@ void PlayerPrivate::doPeriodicTasks()
 
     if (state == Player::State::Playing)
     {
-        if (dataConsumer && dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        if (dataConsumer &&
+            dataConsumer->audioOutput() &&
+            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
         {
             gotDataTimer.restart();
             return;
