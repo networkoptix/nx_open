@@ -34,17 +34,16 @@ signals:
     void backgroundChanged();
     void placeholderTextChanged();
     void clicked();
-    void longPress(const QPoint& pos);
+    void pressAndHold(const QPoint& pos);
 
 protected:
     virtual void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
-    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    void emitLongPress();
+    void emitPressAndHold();
 
 private:
     Q_DECLARE_PRIVATE(QnQuickTextInput)
@@ -54,5 +53,5 @@ private:
     int m_selectionStart;
     int m_selectionEnd;
     int m_cursorPosition;
-    QTimer* m_contextMenuTimer;
+    QTimer* m_pressAndHoldTimer;
 };

@@ -79,7 +79,7 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     m_selectionStart(-1),
     m_selectionEnd(-1),
     m_cursorPosition(-1),
-    m_contextMenuTimer(new QTimer(this))
+    m_pressAndHoldTimer(new QTimer(this))
 {
     Q_D(QnQuickTextInput);
 
@@ -88,10 +88,9 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     connect(this, &QnQuickTextInput::visibleChanged, updateInputMethod);
     connect(this, &QnQuickTextInput::enabledChanged, updateInputMethod);
 
-    static constexpr int kContextMenuTouchDuration = 600;
-    m_contextMenuTimer->setInterval(kContextMenuTouchDuration);
-    m_contextMenuTimer->setSingleShot(true);
-    connect(m_contextMenuTimer, &QTimer::timeout, this, &QnQuickTextInput::emitLongPress);
+    m_pressAndHoldTimer->setInterval(QGuiApplication::styleHints()->mousePressAndHoldInterval());
+    m_pressAndHoldTimer->setSingleShot(true);
+    connect(m_pressAndHoldTimer, &QTimer::timeout, this, &QnQuickTextInput::emitPressAndHold);
     setPersistentSelection(true);
 }
 
@@ -185,7 +184,7 @@ void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& 
     d->resizeBackground();
 }
 
-void QnQuickTextInput::emitLongPress()
+void QnQuickTextInput::emitPressAndHold()
 {
     if (m_contextMenuPos.isNull())
         return;
@@ -195,7 +194,7 @@ void QnQuickTextInput::emitLongPress()
         select(m_selectionStart, m_selectionEnd);
     else
         setCursorPosition(m_cursorPosition);
-    emit longPress(m_contextMenuPos);
+    emit pressAndHold(m_contextMenuPos);
 };
 
 
@@ -207,7 +206,7 @@ void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
     m_selectionStart = selectionStart();
     m_selectionEnd = selectionEnd();
     if (event->button() == Qt::LeftButton)
-        m_contextMenuTimer->start();
+        m_pressAndHoldTimer->start();
 
     base_type::mousePressEvent(event);
     m_cursorPosition = cursorPosition();
@@ -226,7 +225,7 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
     if (d->dragStarted)
     {
         m_contextMenuPos = QPoint();
-        m_contextMenuTimer->stop();
+        m_pressAndHoldTimer->stop();
     }
     else
     {
@@ -278,13 +277,7 @@ void QnQuickTextInput::mouseReleaseEvent(QMouseEvent* event)
         emit clicked();
 
     m_contextMenuPos = QPoint();
-    m_contextMenuTimer->stop();
+    m_pressAndHoldTimer->stop();
 
     base_type::mouseReleaseEvent(event);
-}
-
-void QnQuickTextInput::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event);
-    selectAll();
 }

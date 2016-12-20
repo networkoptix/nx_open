@@ -253,50 +253,50 @@ QnTextInput
         parent: control.activeFocus ? Window.contentItem : control
     }
 
-    Connections
+    onPressAndHold:
     {
-        target: control
-        onLongPress:
-        {
-            contextMenu.x = pos.x;
-            contextMenu.y = pos.y;
-            contextMenu.open();
-        }
+        contextMenu.x = pos.x
+        contextMenu.y = pos.y
+        contextMenu.open()
     }
 
     Menu
     {
         id: contextMenu
 
-        height: 4 * item.height //< TODO: figure out why height is not calculated correctly
-
+        /**
+         * TODO: figure out why height is not calculated correctly
+         * TODO: figure out why invisible MenuItem does not disapper from
+         * menu and draws blank space instead
+         */
+        height: 4 * cutItem.height
         MenuItem
         {
-            id: item;
+            id: cutItem
             text: qsTr("Cut")
             enabled: control.selectedText.length
-            onTriggered: { control.cut(); }
+            onTriggered: { control.cut() }
         }
 
         MenuItem
         {
             text: qsTr("Copy")
             enabled: control.selectedText.length
-            onTriggered: { control.copy(); }
+            onTriggered: { control.copy() }
         }
 
         MenuItem
         {
             text: qsTr("Paste")
             enabled: control.canPaste
-            onTriggered: { control.paste(); }
+            onTriggered: { control.paste() }
         }
 
         MenuItem
         {
             text: qsTr("Select All")
             enabled: (control.selectedText != control.text)
-            onTriggered: { control.selectAll(); }
+            onTriggered: { control.selectAll() }
         }
     }
 }
