@@ -56,6 +56,7 @@ var L = {
         incorrectRemotePassword: 'Login or password are incorrect',
         incompatibleVersion: 'System is unreachable, doesn\'t exist or has incompatible version.',
         wrongUrl: 'Unable to connect to specified server.',
+        newSystemError: 'Can\'t merge systems. Remote system is not configured yet',
         safeMode: 'Can\'t merge systems. Remote system is in safe mode.',
         configError: 'Can\'t merge systems. Maybe one of the systems is in safe mode.',
         cloudError: 'Can\'t merge systems. Dependent system is connected to cloud. You need to disconnect it first.',
