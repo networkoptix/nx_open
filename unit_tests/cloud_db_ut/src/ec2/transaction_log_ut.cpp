@@ -20,36 +20,12 @@
 #include "base_persistent_data_test.h"
 #include "data/account_data.h"
 #include "data/system_data.h"
+#include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
 namespace test {
-
-class TestOutgoingTransactionDispatcher:
-    public AbstractOutgoingTransactionDispatcher
-{
-public:
-    typedef nx::utils::MoveOnlyFunc<
-        void(const nx::String&, std::shared_ptr<const SerializableAbstractTransaction>)
-    > OnNewTransactionHandler;
-
-    virtual void dispatchTransaction(
-        const nx::String& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override
-    {
-        if (m_onNewTransactionHandler)
-            m_onNewTransactionHandler(systemId, std::move(transactionSerializer));
-    }
-
-    void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler)
-    {
-        m_onNewTransactionHandler = std::move(onNewTransactionHandler);
-    }
-
-private:
-    OnNewTransactionHandler m_onNewTransactionHandler;
-};
 
 class TransactionLog:
     public cdb::test::BasePersistentDataTest,
@@ -623,10 +599,6 @@ public:
     TransactionLogOverlappingTransactions():
         TransactionLog(dao::DataObjectType::ram)
     {
-        using namespace std::placeholders;
-
-        outgoingTransactionDispatcher().setOnNewTransaction(
-            std::bind(&TransactionLogOverlappingTransactions::storeNewTransaction, this, _1, _2));
     }
 
 protected:
@@ -704,25 +676,11 @@ protected:
 
     void assertIfTransactionsWereNotSentInAscendingSequenceOrder()
     {
-        int prevSequence = -1;
-        for (const auto& transaction: m_outgoingTransactions)
-        {
-            ASSERT_GT(transaction->transactionHeader().persistentInfo.sequence, prevSequence);
-            prevSequence = transaction->transactionHeader().persistentInfo.sequence;
-        }
+        outgoingTransactionDispatcher().assertIfTransactionsWereNotSentInAscendingSequenceOrder();
     }
 
 private:
     QnMutex m_mutex;
-    std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_outgoingTransactions;
-
-    void storeNewTransaction(
-        const nx::String& /*systemId*/,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_outgoingTransactions.push_back(std::move(transactionSerializer));
-    }
 
     nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
     {
@@ -774,7 +732,7 @@ class FtTransactionLogOverlappingTransactions:
 {
 };
 
-TEST_F(FtTransactionLogOverlappingTransactions, DISABLED_multiple_simultaneous_transactions)
+TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactions)
 {
     givenRandomSystem();
     whenAddedBunchOfTransactionsConcurrently();
