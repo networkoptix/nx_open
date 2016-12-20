@@ -5,7 +5,7 @@ angular.module('cloudApp')
     .directive('passwordInput', ['cloudApi',function (cloudApi) {
         return {
             restrict: 'E',
-            templateUrl: 'static/views/components/password-input.html',
+            templateUrl: Config.viewsDir + 'components/password-input.html',
             require: 'ngModel',
             scope:{
                 ngModel:'=',

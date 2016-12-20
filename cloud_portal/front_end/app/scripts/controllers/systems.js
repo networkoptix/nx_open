@@ -9,7 +9,6 @@ angular.module('cloudApp')
             $scope.gettingSystems.run();
         });
 
-        $scope.Config = Config;
         $scope.showSearch = false;
 
         function sortSystems(systems){

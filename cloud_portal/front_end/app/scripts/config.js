@@ -1,6 +1,8 @@
 'use strict';
 
 var Config = {
+    viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
     realm: 'VMS',

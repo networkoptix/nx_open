@@ -4,7 +4,6 @@ angular.module('cloudApp')
     .controller('LoginCtrl', ['$scope', 'cloudApi', 'process', '$location', '$routeParams', 'account',
         'dialogs', function ($scope, cloudApi, process, $location, $routeParams, account, dialogs) {
 
-        $scope.Config = Config;
         var dialogSettings = dialogs.getSettings($scope);
 
         $scope.auth = {

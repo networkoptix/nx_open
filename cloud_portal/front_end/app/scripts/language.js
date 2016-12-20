@@ -1,6 +1,7 @@
 'use strict';
 
 var L = {
+    language: 'en',
     productName: 'PRODUCT_NAME',
     clientProtocol: 'CLIENT_PROTOCOL:',
 

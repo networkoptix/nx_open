@@ -2,9 +2,9 @@
 
 
 angular.module('cloudApp').run(['$http','$templateCache', function($http,$templateCache) {
-        $http.get('static/views/dialogs/login.html', {cache: $templateCache});
-        $http.get('static/views/dialogs/share.html', {cache: $templateCache});
-        $http.get('static/views/components/dialog.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'dialogs/login.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'dialogs/share.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'components/dialog.html', {cache: $templateCache});
     }])
     .factory('dialogs', ['$http', '$uibModal', '$q', '$location', 'ngToast', function ($http, $uibModal, $q, $location, ngToast) {
 
@@ -21,7 +21,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             modalInstance = $uibModal.open({
                 size: settings.size || 'sm',
                 controller: 'DialogCtrl',
-                templateUrl: 'static/views/components/dialog.html',
+                templateUrl: Config.viewsDir + 'components/dialog.html',
                 animation: !isInline(),
                 keyboard:settings.cancellable,
                 backdrop:settings.cancellable?true:'static',
@@ -111,7 +111,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             login:function(keepPage){
                 return openDialog({
                     title: L.dialogs.loginTitle,
-                    template: 'static/views/dialogs/login.html',
+                    template: Config.viewsDir + 'dialogs/login.html',
                     url: 'login',
                     hasFooter: false,
                     cancellable: !keepPage,
@@ -128,7 +128,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 }
                 return openDialog({
                     title:title,
-                    template: 'static/views/dialogs/share.html',
+                    template: Config.viewsDir + 'dialogs/share.html',
                     url: url,
                     hasFooter: false,
                     cancellable:true,
@@ -145,7 +145,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
                 return openDialog({
                     title:title,
-                    template: 'static/views/dialogs/disconnect.html',
+                    template: Config.viewsDir + 'dialogs/disconnect.html',
                     hasFooter: false,
                     cancellable:true,
                     params: {
@@ -158,7 +158,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
                 return openDialog({
                     title:title,
-                    template: 'static/views/dialogs/rename.html',
+                    template: Config.viewsDir + 'dialogs/rename.html',
                     hasFooter: false,
                     cancellable:true,
                     params: {

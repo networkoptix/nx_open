@@ -4,8 +4,6 @@ angular.module('cloudApp')
     .controller('RenameCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account',
     function ($scope, cloudApi, process, dialogs, $q, account) {
 
-        $scope.Config = Config;
-        $scope.L = L;
         $scope.buttonText = L.sharing.renameConfirmButton;
 
         var dialogSettings = dialogs.getSettings($scope);
