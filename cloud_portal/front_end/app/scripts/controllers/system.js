@@ -39,7 +39,7 @@ angular.module('cloudApp')
                 return $scope.system.update();
             },Config.updateInterval);
 
-            $scope.$on("$destroy", function( event ) {
+            $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemUpdate);
             } );
         }

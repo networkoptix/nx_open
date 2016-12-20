@@ -49,10 +49,10 @@ angular.module('cloudApp')
             }
 
             // Check session context
-            if( checkContext("activateSuccess",  $routeParams.activationSuccess) ||
-                checkContext("reactivatingSuccess",$routeParams.reactivatingSuccess) ||
-                checkContext("restoringSuccess", $routeParams.restoringSuccess) ||
-                checkContext("changeSuccess",    $routeParams.changeSuccess)){
+            if( checkContext('activateSuccess',  $routeParams.activationSuccess) ||
+                checkContext('reactivatingSuccess',$routeParams.reactivatingSuccess) ||
+                checkContext('restoringSuccess', $routeParams.restoringSuccess) ||
+                checkContext('changeSuccess',    $routeParams.changeSuccess)){
                 setContext(null);
             }
 
@@ -66,8 +66,8 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:'Couldn\'t save new password:'
             }).then(function(){
-                setContext("changeSuccess");
-                $location.path("/restore_password/success", false); // Change url, do not reload
+                setContext('changeSuccess');
+                $location.path('/restore_password/success', false); // Change url, do not reload
             });
 
             $scope.directChange = function(){
@@ -85,8 +85,8 @@ angular.module('cloudApp')
             }).then(function(){
                 $scope.restoring = false;
                 $scope.restoringSuccess = true;
-                setContext("restoringSuccess");
-                $location.path("/restore_password/sent", false); // Change url, do not reload
+                setContext('restoringSuccess');
+                $location.path('/restore_password/sent', false); // Change url, do not reload
             });
 
             $scope.openClient = function(){
@@ -102,9 +102,9 @@ angular.module('cloudApp')
                 },
                 errorPrefix:'Couldn\'t activate your account:'
             }).then(function(){
-                setContext("activateSuccess");
+                setContext('activateSuccess');
                 $scope.activationSuccess = true;
-                $location.path("/activate/success", false); // Change url, do not reload
+                $location.path('/activate/success', false); // Change url, do not reload
             });
 
 
@@ -118,8 +118,8 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:'Couldn\'t send confirmation email:'
             }).then(function(){
-                setContext("reactivatingSuccess");
-                $location.path("/activate/send", false); // Change url, do not reload
+                setContext('reactivatingSuccess');
+                $location.path('/activate/send', false); // Change url, do not reload
                 $scope.reactivating = false;
                 $scope.reactivatingSuccess = true;
             });

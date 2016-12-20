@@ -50,27 +50,27 @@ var L = {
             label: 'Disabled',
             description: 'User is disabled and cannot log in to the system.'
         },
-        'Owner': {
+        Owner: {
             label: 'Owner',
             description: 'Unrestricted access including the ability to share and connect/disconnect system from cloud.'
         },
-        'Viewer': {
+        Viewer: {
             label: 'Viewer',
             description: 'Can view live video and browse the archive.'
         },
-        'Live Viewer': {
+        "Live Viewer": {
             label: 'Live Viewer',
             description: 'Can only view live video.'
         },
-        'Advanced Viewer': {
+        "Advanced Viewer": {
             label: 'Advanced Viewer',
             description: 'Can view live video, browse the archive, configure cameras, control PTZ etc.'
         },
-        'Administrator':{
+        Administrator:{
             label: 'Administrator',
             description: 'Unrestricted access including the ability to share.'
         },
-        'Custom':{
+        Custom:{
             label: 'Custom',
             description: 'Use the desktop client application to set up custom permissions.'
         },

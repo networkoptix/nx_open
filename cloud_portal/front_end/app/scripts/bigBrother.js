@@ -1,9 +1,9 @@
 'use strict';
 
 var activatedEye = false;
-document.addEventListener("mousemove", function (event) {
-    var $bb = $(".big-brother");
-    var $pupil = $(".big-brother>.eye .pupil");
+document.addEventListener('mousemove', function (event) {
+    var $bb = $('.big-brother');
+    var $pupil = $('.big-brother>.eye .pupil');
     var maxLength = 150;
     var activationLegth = 60;
 
@@ -38,8 +38,8 @@ document.addEventListener("mousemove", function (event) {
     var proportionLengthX = pupilFloatX/Math.max(maxLength,length);
     var proportionLengthY = pupilFloatY/Math.max(maxLength,length);
     var pupilPosition = {
-        top:  pupilBasePosition + proportionLengthY * direction.top + "px",
-        left: pupilBasePosition + proportionLengthX * direction.left + "px"
+        top:  pupilBasePosition + proportionLengthY * direction.top + 'px',
+        left: pupilBasePosition + proportionLengthX * direction.left + 'px'
     };
     $pupil.css(pupilPosition);
 });

@@ -33,7 +33,7 @@ angular.module('cloudApp')
                 });
             },Config.updateInterval);
 
-            $scope.$on("$destroy", function( event ) {
+            $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemsUpdate);
             } );
         }

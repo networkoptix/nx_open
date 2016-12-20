@@ -6,7 +6,7 @@ angular.module('cloudApp')
         return {
             restrict: 'E',
             templateUrl: 'static/views/components/password-input.html',
-            require: "ngModel",
+            require: 'ngModel',
             scope:{
                 ngModel:'=',
                 name:'=',

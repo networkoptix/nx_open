@@ -30,7 +30,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
 
                 function setFocusToInvalid(form){
                     $timeout(function() {
-                        $("[name='" + form.$name + "']").find('.ng-invalid:visible:first').focus();
+                        $('[name="' + form.$name + '"]').find('.ng-invalid:visible:first').focus();
                     });
                 }
 

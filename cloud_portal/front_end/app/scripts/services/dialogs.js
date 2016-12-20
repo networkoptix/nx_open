@@ -56,14 +56,14 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
 
             function escapeRegExp(str) {
-                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             }
             function clearPath(){
-                return $location.$$path.replace(new RegExp("/" + escapeRegExp(url) + '$'),'');
+                return $location.$$path.replace(new RegExp('/' + escapeRegExp(url) + '$'),'');
             }
 
             if(url) {
-                $location.path(clearPath() + "/" + url, false);
+                $location.path(clearPath() + '/' + url, false);
 
                 modalInstance.result.finally(function () {
                     $location.path(clearPath(), false);
@@ -172,7 +172,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 return this.confirm(L.downloads.noClientDetectedMessage,
                     L.downloads.noClientDetectedTitle, L.downloads.action)
                     .then(function(){
-                        $location.path("/download");
+                        $location.path('/download');
                     });
                 // return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
             },
@@ -206,7 +206,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 return $scope.settings || $scope.$parent && this.getSettings($scope.$parent) || null;
             }
         };
-    }]).controller("DialogCtrl",['$scope', '$uibModalInstance','settings', function($scope, $uibModalInstance,settings){
+    }]).controller('DialogCtrl',['$scope', '$uibModalInstance','settings', function($scope, $uibModalInstance,settings){
         $scope.settings = settings;
 
         $scope.close = function(){
