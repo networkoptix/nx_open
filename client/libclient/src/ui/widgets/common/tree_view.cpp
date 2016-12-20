@@ -12,8 +12,8 @@
 QnTreeView::QnTreeView(QWidget *parent):
     base_type(parent),
     m_ignoreDefaultSpace(false),
-    m_inDragDropEvent(false),
-    m_dropOnBranchesAllowed(true)
+    m_dropOnBranchesAllowed(true),
+    m_inDragDropEvent(false)
 {
     setDragDropOverwriteMode(true);
 }
