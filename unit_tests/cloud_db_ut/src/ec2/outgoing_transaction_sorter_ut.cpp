@@ -3,6 +3,7 @@
 #include <deque>
 
 #include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <ec2/outgoing_transaction_sorter.h>
 
