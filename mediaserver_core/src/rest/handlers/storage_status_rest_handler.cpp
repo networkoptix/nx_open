@@ -17,45 +17,59 @@
 #include "media_server/settings.h"
 
 
-int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+namespace aux {
+QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
 {
     QnStorageStatusReply reply;
-    QString storageUrl;
+    reply.status = storage->initOrUpdate();
+    reply.storage.url  = storage->getUrl();
+    reply.storage = QnStorageSpaceData(storage, false);
 
-    if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return nx_http::StatusCode::invalidParameter;
+    QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+    if (fileStorage)
+        reply.storage.reservedSpace = fileStorage->calcInitialSpaceLimit();
+    else
+        reply.storage.reservedSpace = QnStorageResource::kNasStorageLimit;
 
+#if defined (Q_OS_WIN)
+    if (!reply.storage.isExternal) 
+    {
+        /* Do not allow to create several local storages on one hard drive. */
+        reply.storage.isWritable = false;
+        reply.storage.isUsedForWriting = false;
+    }
+#endif
+
+    return reply;
+}
+
+QnStorageResourcePtr createAndInitStorage(const QString& storageUrl)
+{
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
     if (!storage)
         storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
 
     if (!storage)
-    {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
 
-        if (!storage)
-            return nx_http::StatusCode::invalidParameter;
-        else
-        {
-            storage->setUrl(storageUrl);
-            reply.status = storage->initOrUpdate();
-        }
-    }
-
-    reply.storage.url  = storageUrl;
-
     if (storage)
-    {
-        reply.storage = QnStorageSpaceData(storage, false);
-#ifdef WIN32
-        if (!reply.storage.isExternal) {
-            /* Do not allow to create several local storages on one hard drive. */
-            reply.storage.isWritable = false;
-            reply.storage.isUsedForWriting = false;
-        }
-#endif
-    }
+        storage->setUrl(storageUrl);
 
-    result.setReply(reply);
+    return storage;
+}
+}
+
+int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+{
+    QString storageUrl;
+
+    if(!requireParameter(params, lit("path"), result, &storageUrl))
+        return nx_http::StatusCode::invalidParameter;
+
+    auto storage = aux::createAndInitStorage(storageUrl);
+    if (!storage)
+        return nx_http::StatusCode::invalidParameter;
+
+    result.setReply(aux::createReply(storage));
     return nx_http::StatusCode::ok;
 }
