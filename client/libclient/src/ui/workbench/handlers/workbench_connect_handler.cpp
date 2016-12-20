@@ -437,7 +437,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     switch (status)
     {
         case Qn::SuccessConnectionResult:
-            if (helpers::isNewSystem(connectionInfo))
+            if (helpers::isNewSystem(connectionInfo) && !connectionInfo.ecDbReadOnly)
             {
                 disconnectFromServer(true);
                 auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
