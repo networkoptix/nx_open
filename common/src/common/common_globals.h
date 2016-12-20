@@ -369,6 +369,14 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RI_FullInfo        /**< All info */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
+	
+	    enum class StatusChangeReason
+    {
+        Default,
+        CreateInitialData,
+        GotFromRemotePeer
+    };
+
 
     enum BitratePerGopType {
         BPG_None,
@@ -881,6 +889,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 

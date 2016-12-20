@@ -5,8 +5,11 @@
 #include <api/helpers/chunks_request_data.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 
 namespace {
+
+static const int kHistoryCacheTimeoutMs = 1000 * 60 * 10;
 
 struct TimePeriodEx: public QnTimePeriod
 {
@@ -37,6 +40,31 @@ TimePeriodEx findMinStartTimePeriod(
         }
     }
     return result;
+}
+
+struct LoadDataContext
+{
+    LoadDataContext()
+    {
+        timer.invalidate();
+    }
+
+    QnMutex mutex;
+    QElapsedTimer timer;
+};
+
+LoadDataContext* getContext(const QnUuid& id)
+{
+    static QnMutex access;
+    QnMutexLocker lock(&access);
+
+    static std::map<QnUuid, std::unique_ptr<LoadDataContext>> loadDataContext;
+
+    auto itr = loadDataContext.find(id);
+    if (itr == loadDataContext.end())
+        itr = loadDataContext.emplace(id, std::unique_ptr<LoadDataContext>(new LoadDataContext)).first;
+
+    return itr->second.get();
 }
 
 } // namespace
@@ -74,20 +102,63 @@ int QnCameraHistoryRestHandler::executeGet(
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
+    static std::atomic<int> staticRequestNum;
+
+    QElapsedTimer timer;
+    timer.restart();
+    int requestNum = ++staticRequestNum;
+    qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "started";
+
     ec2::ApiCameraHistoryDataList outputData;
     for (const auto& camera: request.resList)
     {
-        QnChunksRequestData updatedRequest = request;
-        updatedRequest.resList.clear();
-        updatedRequest.resList.push_back(camera);
-        MultiServerPeriodDataList chunks =
-            QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
         ec2::ApiCameraHistoryData outputRecord;
         outputRecord.cameraId = camera->getId();
-        outputRecord.items = buildHistoryData(chunks);
+
+        bool isValid = false;
+
+        LoadDataContext* context = getContext(outputRecord.cameraId);
+        QnMutexLocker lock(&context->mutex);
+
+        if (context->timer.isValid() && !context->timer.hasExpired(kHistoryCacheTimeoutMs))
+            outputRecord.items = qnCameraHistoryPool->getHistoryDetails(outputRecord.cameraId, &isValid);
+        if (!isValid)
+        {
+            QnChunksRequestData updatedRequest = request;
+            updatedRequest.startTimeMs = 0;
+            updatedRequest.endTimeMs = DATETIME_NOW;
+            updatedRequest.resList.clear();
+            updatedRequest.resList.push_back(camera);
+            MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
+            outputRecord.items = buildHistoryData(chunks);
+            if (qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
+                context->timer.restart();
+
+            qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "cache miss. exec time=" << timer.elapsed();
+        }
+
+        // filter time range
+        auto comparator = [](
+            const ec2::ApiCameraHistoryItemData& data, qint64 value) -> bool
+        {
+            return data.timestampMs < value;
+        };
+
+        auto& items = outputRecord.items;
+        if (!items.empty())
+        {
+            auto itrMinTime = std::lower_bound(items.begin(), items.end(), request.startTimeMs, comparator);
+            items.erase(items.begin(), itrMinTime);
+
+            auto itrMaxTime = std::lower_bound(items.begin(), items.end(), request.endTimeMs, comparator);
+            items.erase(itrMaxTime, items.end());
+        }
+
         outputData.push_back(std::move(outputRecord));
     }
 
     QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format);
+
+    qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "finished. exec time=" << timer.elapsed();
     return nx_http::StatusCode::ok;
 }

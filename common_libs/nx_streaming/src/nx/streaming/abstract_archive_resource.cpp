@@ -48,8 +48,8 @@ Qn::ResourceStatus QnAbstractArchiveResource::getStatus() const
     return m_localStatus;
 }
 
-void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
-    Q_UNUSED(silenceMode)
+    Q_UNUSED(reason)
     m_localStatus = newStatus;
 }

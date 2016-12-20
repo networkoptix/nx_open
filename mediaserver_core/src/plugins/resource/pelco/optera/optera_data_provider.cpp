@@ -39,7 +39,6 @@ QnAbstractMediaDataPtr QnOpteraDataProvider::getNextData()
 
 void QnOpteraDataProvider::closeStream()
 {
-    qDebug() << "Closing stream";
     m_dataSource.proxyCloseStream();
     m_dataSource.setUser(nullptr);
 }
@@ -119,8 +118,6 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
 {
     QUrl url(m_onvifRes->getUrl());
     QUrl onvifUrl = url;
-
-    qDebug() << onvifUrl;
 
     QUrlQuery urlQuery(url);
     urlQuery.addQueryItem(
