@@ -177,6 +177,7 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     m_asyncHttpClient->dispatch(
         [this, &sock, &socketTakenPromise]()
     {
+        sock = std::move(m_asyncHttpClient->takeSocket());
         socketTakenPromise.set_value();
     });
     socketTakenPromise.get_future().wait();
