@@ -25,6 +25,7 @@
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QInputDialog>
 #include <private/qfont_p.h>
+#include <private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
@@ -38,6 +39,7 @@
 #include <utils/common/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
+
 
 using namespace style;
 
@@ -985,6 +987,16 @@ void QnNxStyle::drawPrimitive(
             else
                 drawFunction(option);
 
+            return;
+        }
+
+        case PE_IndicatorItemViewItemDrop:
+        {
+            if (!option->rect.isValid())
+                return;
+
+            QnScopedPainterPenRollback penRollback(painter, option->palette.color(QPalette::Link));
+            painter->drawRect(option->rect.adjusted(0, 0, -1, -1));
             return;
         }
 
@@ -3676,6 +3688,29 @@ void QnNxStyle::polish(QWidget *widget)
             /* Set margins for drop-down list container: */
             topLevel->setContentsMargins(0, 2, 0, 2);
             popupToCustomizeShadow = topLevel;
+        }
+        else
+        {
+            /* Fix for Qt 5.6 bug: item views don't reset their dropIndicatorRect: */
+            connect(view, &QAbstractItemView::pressed, this,
+                [view]()
+                {
+                    class QnAbstractItemViewCorrector: public QAbstractItemView
+                    {
+                        Q_DECLARE_PRIVATE(QAbstractItemView);
+
+                    public:
+                        void correctDropIndicatorRect()
+                        {
+                            Q_D(QAbstractItemView);
+                            if (state() != DraggingState)
+                                d->dropIndicatorRect = QRect();
+                        }
+                    };
+
+                    static_cast<QnAbstractItemViewCorrector*>(view)->
+                        correctDropIndicatorRect();
+                });
         }
     }
 
