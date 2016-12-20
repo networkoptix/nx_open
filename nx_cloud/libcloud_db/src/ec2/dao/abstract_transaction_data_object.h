@@ -82,6 +82,8 @@ public:
     static void setDataObjectType(DataObjectType dataObjectType);
 
     static void setFactoryFunc(FactoryFunc func);
+
+    static void resetToDefaultFactory();
 };
 
 } // namespace dao

@@ -44,6 +44,11 @@ public:
         initializeTransactionLog();
     }
 
+    ~TransactionLog()
+    {
+        ec2::dao::TransactionDataObjectFactory::resetToDefaultFactory();
+    }
+
     void givenRandomSystem()
     {
         using namespace std::placeholders;

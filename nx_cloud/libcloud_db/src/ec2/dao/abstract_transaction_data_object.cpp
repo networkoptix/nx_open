@@ -43,6 +43,11 @@ void TransactionDataObjectFactory::setFactoryFunc(
     factoryFunc = std::move(func);
 }
 
+void TransactionDataObjectFactory::resetToDefaultFactory()
+{
+    factoryFunc = nullptr;
+}
+
 } // namespace dao
 } // namespace ec2
 } // namespace cdb
