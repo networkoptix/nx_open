@@ -8,17 +8,18 @@
 #include <client/client_globals.h>
 #include <ui/help/help_topic_accessor.h>
 
+
 QnTreeView::QnTreeView(QWidget *parent):
     base_type(parent),
-    m_ignoreDefaultSpace(false)
-{}
-
-QnTreeView::~QnTreeView() {
-    return;
+    m_ignoreDefaultSpace(false),
+    m_dropOnBranchesAllowed(true),
+    m_inDragDropEvent(false)
+{
+    setDragDropOverwriteMode(true);
 }
 
-int QnTreeView::rowHeight(const QModelIndex &index) const {
-    return base_type::rowHeight(index);
+QnTreeView::~QnTreeView()
+{
 }
 
 void QnTreeView::scrollContentsBy(int dx, int dy)
@@ -31,7 +32,7 @@ void QnTreeView::scrollContentsBy(int dx, int dy)
         currentChanged(currentIndex(), currentIndex());
 }
 
-void QnTreeView::keyPressEvent(QKeyEvent *event)
+void QnTreeView::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
@@ -61,26 +62,38 @@ void QnTreeView::keyPressEvent(QKeyEvent *event)
     base_type::keyPressEvent(event);
 }
 
-void QnTreeView::dragMoveEvent(QDragMoveEvent *event) {
-    if (autoExpandDelay() >= 0) {
+void QnTreeView::dragMoveEvent(QDragMoveEvent* event)
+{
+    if (autoExpandDelay() >= 0)
+    {
         m_dragMovePos = event->pos();
         m_openTimer.start(autoExpandDelay(), this);
     }
 
     /* Important! Skip QTreeView's implementation. */
+    QScopedValueRollback<bool> guard(m_inDragDropEvent, true);
     QAbstractItemView::dragMoveEvent(event);
 }
 
-void QnTreeView::dragLeaveEvent(QDragLeaveEvent *event) {
+void QnTreeView::dragLeaveEvent(QDragLeaveEvent* event)
+{
     m_openTimer.stop();
-
     base_type::dragLeaveEvent(event);
 }
 
-void QnTreeView::timerEvent(QTimerEvent *event) {
-    if (event->timerId() == m_openTimer.timerId()) {
+void QnTreeView::dropEvent(QDropEvent* event)
+{
+    QScopedValueRollback<bool> guard(m_inDragDropEvent, true);
+    base_type::dropEvent(event);
+}
+
+void QnTreeView::timerEvent(QTimerEvent* event)
+{
+    if (event->timerId() == m_openTimer.timerId())
+    {
         QPoint pos = m_dragMovePos;
-        if (state() == QAbstractItemView::DraggingState && viewport()->rect().contains(pos)) {
+        if (state() == QAbstractItemView::DraggingState && viewport()->rect().contains(pos))
+        {
             /* Open the node that the mouse is hovered over.
              * Don't close it if it's already opened as the default implementation does. */
             QModelIndex index = indexAt(pos);
@@ -113,9 +126,24 @@ void QnTreeView::setIgnoreDefaultSpace(bool value)
     m_ignoreDefaultSpace = value;
 }
 
-QRect QnTreeView::visualRect(const QModelIndex &index) const
+bool QnTreeView::dropOnBranchesAllowed() const
+{
+    return m_dropOnBranchesAllowed;
+}
+
+void QnTreeView::setDropOnBranchesAllowed(bool value)
+{
+    m_dropOnBranchesAllowed = value;
+}
+
+QRect QnTreeView::visualRect(const QModelIndex& index) const
 {
     QRect result = base_type::visualRect(index);
-    result.setLeft(0);
+    if (!m_inDragDropEvent)
+        return result;
+
+    if (m_dropOnBranchesAllowed && index.column() == treePosition())
+        result.setLeft(columnViewportPosition(index.column()));
+
     return result;
 }
