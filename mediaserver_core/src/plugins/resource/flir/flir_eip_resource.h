@@ -26,6 +26,12 @@ public:
     QnFlirEIPResource();
     ~QnFlirEIPResource();
 
+    struct PortTimerEntry
+    {
+        QString portId;
+        bool state;
+    };
+
     enum class ParamsRequestMode{
         GetMode, SetMode
     };
@@ -82,6 +88,7 @@ private:
     std::shared_ptr<EIPAsyncClient> m_eipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_outputEipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_alarmsEipAsyncClient;
+    std::map<quint64, PortTimerEntry> m_autoResetTimers;
 
 private:
     MessageRouterRequest buildEIPGetRequest(const QnCameraAdvancedParameter& param) const;
