@@ -319,7 +319,6 @@ module.exports = function (grunt) {
                         '<%= yeoman.dist %>/static/styles/{,*/}*.css',
 
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                        '!<%= yeoman.dist %>/scripts/{,*/}language.js',
                         '!<%= yeoman.dist %>/scripts/{,*/}downloads.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
                         //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
@@ -446,9 +445,9 @@ module.exports = function (grunt) {
                             '*.html',
                             'apple-app-site-association',
                             'scripts/{,*/}*.json',
-                            'scripts/language.js',
                             'scripts/downloads.js',
                             'views/{,*/}*.html',
+                            'views/{,*/}*.json',
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',

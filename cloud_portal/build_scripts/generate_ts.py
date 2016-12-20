@@ -15,20 +15,35 @@ def unique_list(iter_list):
 
 
 def process_js_file(file_name):
+    strings = []
+
+    def iterate(d):
+        if not d:
+            return
+        if isinstance(d, dict):
+            for k, v in d.iteritems():
+                iterate(v)
+        elif isinstance(d, (list, tuple)):
+            for v in d:
+                iterate(v)
+        else:
+            strings.append(str(d))
+
     with open(file_name, 'r') as file_descriptor:
-        data = file_descriptor.read()
-        strings = re.findall("(?<=').+?(?<!\\\\)(?=')", data)
-        strings += re.findall("(?<=\").+?(?<!\\\\)(?=\")", data)
-        strings = [x for x in strings if x not in ignore_strings]
+        data = json.load(file_descriptor)
 
-        if not strings:
-            return None
+    iterate(data)
 
-        return {
-            'filename': file_name,
-            'inline': [],
-            'attributes': strings
-        }
+    strings = [x for x in strings if x not in ignore_strings]
+
+    if not strings:
+        return None
+
+    return {
+        'filename': file_name,
+        'inline': [],
+        'attributes': strings
+    }
 
 
 def process_json_file(file_name):
@@ -170,7 +185,7 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('static/scripts', 'language.js', mode='js')
+js_strings = extract_strings('static/views', '.json', mode='js')
 js_strings1 = extract_strings('static/', 'apple-app-site-association', mode='js')
 html_strings = extract_strings('static/views', '.html')  # , dir_exclude='static'
 html_strings1 = extract_strings('static/', '503.html')  # , dir_exclude='static'
