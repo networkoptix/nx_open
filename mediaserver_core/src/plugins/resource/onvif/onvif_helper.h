@@ -20,6 +20,8 @@ class PasswordHelper:
     public QObject,
     public Singleton<PasswordHelper>
 {
+    Q_OBJECT
+
     //QHash<Manufacturer, Passwords>
     typedef QHash<QString, PasswordList> ManufacturerPasswords;
 
