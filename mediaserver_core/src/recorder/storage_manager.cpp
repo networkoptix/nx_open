@@ -2180,6 +2180,9 @@ void QnStorageManager::writeCameraInfoFiles()
         {
             for (auto cameraIt = m_devFileCatalog[i].cbegin(); cameraIt != m_devFileCatalog[i].cend(); ++cameraIt)
             {
+                if (QnResource::isStopping())
+                    return;
+
                 QString cameraUniqueId = cameraIt.key();
                 auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
                 if (!camResource)

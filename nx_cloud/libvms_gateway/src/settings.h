@@ -57,26 +57,30 @@ public:
     Http();
 };
 
+enum class SslMode
+{
+    undefined,
+    enabled,
+    disabled,
+};
+
+struct TcpReverseOptions
+{
+    uint16_t port = 0;
+    size_t poolSize = 0;
+    boost::optional<KeepAliveOptions> keepAlive;
+};
+
 class CloudConnect
 {
 public:
-    struct TcpReverseOptions
-    {
-        uint16_t port;
-        size_t poolSize;
-        boost::optional<KeepAliveOptions> keepAlive;
-    };
-
-    bool replaceHostAddressWithPublicAddress;
-    bool allowIpTarget;
+    bool replaceHostAddressWithPublicAddress = false;
+    bool allowIpTarget = false;
     QString fetchPublicIpUrl;
     QString publicIpAddress;
     TcpReverseOptions tcpReverse;
-    bool sslAllowed;
-
-    CloudConnect();
+    SslMode preferedSslMode = SslMode::undefined;
 };
-
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
