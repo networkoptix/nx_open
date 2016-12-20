@@ -313,7 +313,7 @@ QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
     QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
 
     server->setId(QnUuid::createUuid());
-    server->setStatus(serverData.status, true);
+    server->setStatus(serverData.status);
     server->setOriginalGuid(serverData.id);
     server->setFakeServerModuleInformation(serverData);
     return server;

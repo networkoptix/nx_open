@@ -122,9 +122,9 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 #endif
 
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
+        connect(resource.data(), &QnResource::statusChanged,      this, &QnResourcePool::statusChanged,     Qt::QueuedConnection);
+        connect(resource.data(), &QnResource::statusChanged,      this, &QnResourcePool::resourceChanged,   Qt::QueuedConnection);
+        connect(resource.data(), &QnResource::resourceChanged,    this, &QnResourcePool::resourceChanged,   Qt::QueuedConnection);
 
         if (!resource->hasFlags(Qn::foreigner))
         {

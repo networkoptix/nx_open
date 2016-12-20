@@ -90,7 +90,7 @@ public:
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
-    enum class StartResult 
+    enum class StartResult
     {
         ommited,    //< request doesn't start because of data is up to date, callback wont called.
         started,    //< async IO started success. callback will called.
@@ -117,6 +117,18 @@ public:
      * \returns                     True if no error.
      */
     bool updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera);
+
+    ec2::ApiCameraHistoryItemDataList getHistoryDetails(const QnUuid& cameraId, bool* isValid);
+
+    /**
+     * \brief                       Set camera history details if provided server list in historyDetails still actual.
+     *                              Otherwise don't change data and returns false.
+     */
+    bool testAndSetHistoryDetails(
+        const QnUuid& cameraId,
+        const ec2::ApiCameraHistoryItemDataList& historyDetails);
+
+    void setHistoryCheckDelay(int value);
 signals:
     /**
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
@@ -149,10 +161,16 @@ private:
 
 private:
     void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
-    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr &camera
-        , bool filterOnlineServers = false) const;
+    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr &camera,
+        bool filterOnlineServers = false) const;
+    QnMediaServerResourceList getCameraFootageDataUnsafe(
+        const QnUuid &cameraId,
+        bool filterOnlineServers = false) const;
+    bool isValidHistoryDetails(
+        const QnUuid& cameraId,
+        const ec2::ApiCameraHistoryItemDataList& historyDetails) const;
 private:
-
+    int m_historyCheckDelay;
     mutable QnMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 

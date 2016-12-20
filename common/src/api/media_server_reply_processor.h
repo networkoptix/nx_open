@@ -1,6 +1,8 @@
 #ifndef QN_MEDIA_SERVER_REPLY_PROCESSOR_H
 #define QN_MEDIA_SERVER_REPLY_PROCESSOR_H
 
+#include <QtCore/QElapsedTimer>
+
 #include "abstract_reply_processor.h"
 
 #include <core/ptz/ptz_fwd.h>
@@ -32,7 +34,7 @@ class QnMediaServerReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
 public:
-    QnMediaServerReplyProcessor(int object): QnAbstractReplyProcessor(object) {}
+    QnMediaServerReplyProcessor(int object, const QString& serverId);
 
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
@@ -73,6 +75,8 @@ signals:
 
 private:
     friend class QnAbstractReplyProcessor;
+    QString m_serverId; // for debug purposes
+    QElapsedTimer timer;
 };
 
 

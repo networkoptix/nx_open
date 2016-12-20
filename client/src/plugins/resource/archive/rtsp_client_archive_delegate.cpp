@@ -855,10 +855,15 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
 
 
-    if (server) {
-        QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
-        if (proxy.type() != QNetworkProxy::NoProxy)
-            session->setProxyAddr(proxy.hostName(), proxy.port());
+    if (server)
+    {
+        auto factory = QnNetworkProxyFactory::instance();
+        if (factory) // Lower possibility of AV on exit. See VMS-4737 #gdm
+        {
+            QNetworkProxy proxy = factory->proxyToResource(server);
+            if (proxy.type() != QNetworkProxy::NoProxy)
+                session->setProxyAddr(proxy.hostName(), proxy.port());
+        }
         session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 

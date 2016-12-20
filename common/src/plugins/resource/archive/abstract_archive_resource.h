@@ -21,7 +21,7 @@ public:
 
     //!Implementation of QnResource::setStatus
     virtual Qn::ResourceStatus getStatus() const override;
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override;
 
     //!Implementation of QnMediaResource::toResource
     virtual const QnResource* toResource() const override;

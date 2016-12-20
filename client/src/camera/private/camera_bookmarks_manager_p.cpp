@@ -17,11 +17,8 @@
 #include <utils/common/scoped_timer.h>
 
 namespace {
-    /** Live queries should be updated once in a time even if data is actual. */
-    const int updateLiveBookmarksTimeoutMs = 10000;
-
     /** Each query can be updated no more often than once in that period. */
-    const int minimimumRequestTimeoutMs = 3000;
+    const int minimimumRequestTimeoutMs = 10000;
 
     /** Timer precision to update all queries. */
     const int queriesCheckTimoutMs = 1000;
@@ -29,7 +26,8 @@ namespace {
     /** Reserved value for invalid requests. */
     const int invalidRequestId = 0;
 
-    const int pendingDiscardTimeout = updateLiveBookmarksTimeoutMs;
+    /** Cache of bookmarks we have just added or removed. */
+    const int pendingDiscardTimeout = 30000;
 }
 
 namespace {
@@ -121,6 +119,7 @@ QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnUuid &bookmark
 QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
     : base_type(parent)
     , q_ptr(parent)
+    , m_operationsTimer(new QTimer(this))
     , m_requests()
 {
     /*
@@ -135,16 +134,35 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
      * update chunks on history change and bookmarks adding/deleting, then forcefully re-request required periods
      */
 
-    QTimer* timer = new QTimer(this);
-    timer->setInterval(queriesCheckTimoutMs);
-    timer->setSingleShot(false);
-    connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
-    connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
-    timer->start();
+    m_operationsTimer->setInterval(queriesCheckTimoutMs);
+    m_operationsTimer->setSingleShot(false);
+    connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
+    connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 {}
+
+bool QnCameraBookmarksManagerPrivate::isEnabled() const
+{
+    return m_operationsTimer->isActive();
+}
+
+void QnCameraBookmarksManagerPrivate::setEnabled(bool value)
+{
+    if (isEnabled() == value)
+        return;
+
+    if (value)
+    {
+        m_operationsTimer->start();
+        checkQueriesUpdate();
+    }
+    else
+    {
+        m_operationsTimer->stop();
+    }
+}
 
 int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
                                                         , const QnCameraBookmarkSearchFilter &filter
@@ -189,6 +207,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
         return;
     }
 
+    setEnabled(true); // Forcefully enable on modifying operation
     int handle = server->apiConnection()->addBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, bookmark.guid, callback);
 
@@ -201,13 +220,16 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmar
     if (!bookmark.isValid())
         return;
 
+    setEnabled(true); // Forcefully enable on modifying operation
     int handle = qnCommon->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);
 }
 
-void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
+void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback)
+{
+    setEnabled(true); // Forcefully enable on modifying operation
     int handle =  qnCommon->currentServer()->apiConnection()->deleteBookmarkAsync(bookmarkId, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, bookmarkId, callback);
 
@@ -261,10 +283,8 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
     case QueryInfo::QueryState::Queued:
         return !info.requestTimer.isValid() || info.requestTimer.hasExpired(minimimumRequestTimeoutMs) || !query->isValid();
     case QueryInfo::QueryState::Requested:
-        return false;
     case QueryInfo::QueryState::Actual:
         return false;
-        //(query->filter().endTimeMs > qnSyncTime->currentMSecsSinceEpoch()) && info.requestTimer.hasExpired(updateLiveBookmarksTimeoutMs);
     default:
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;

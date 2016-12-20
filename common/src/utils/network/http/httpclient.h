@@ -50,6 +50,7 @@ namespace nx_http
             nx_http::StringType messageBody );
         const Response* response() const;
         SystemError::ErrorCode lastSysErrorCode() const;
+        bool isValid() const;
         //!
         bool eof() const;
         //!
@@ -75,6 +76,7 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+        void setMaxInternalBufferSize(std::size_t bufferSize);
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
@@ -83,6 +85,7 @@ namespace nx_http
         QnWaitCondition m_cond;
         mutable QnMutex m_mutex;
         bool m_done;
+        bool m_error;
         bool m_terminated;
         nx_http::BufferType m_msgBodyBuffer;
         std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
@@ -94,6 +97,7 @@ namespace nx_http
         boost::optional<QString> m_userAgent;
         boost::optional<QString> m_userName;
         boost::optional<QString> m_userPassword;
+        std::size_t m_maxInternalBufferSize;
 
         void instanciateHttpClient();
         template<typename AsyncClientFunc>

@@ -16,6 +16,7 @@ QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseCon
          * we don't know that. Should probably be fixed by adding a signal to
          * PTZ controller. */ // TODO: #Elric
         connect(resource(), &QnResource::statusChanged, this, &QnCachingPtzController::initialize);
+        connect(resource(), &QnResource::parentIdChanged, this, &QnCachingPtzController::initialize);
     }
 }
 
@@ -303,11 +304,15 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         emit changed(changedFields);
 }
 
-bool QnCachingPtzController::initialize() {
+bool QnCachingPtzController::initialize()
+{
     /* Note that this field is accessed from this object's thread only,
      * so there is no need to lock. */
     if(m_initialized)
         return true;
+
+    if (resource()->hasFlags(Qn::foreigner))
+        return false;
 
     QnPtzData data;
     return getData(Qn::AllPtzFields, &data);

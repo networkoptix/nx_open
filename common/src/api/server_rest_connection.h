@@ -112,6 +112,8 @@ namespace rest
         Handle sendRequest(const Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
 
         QnMediaServerResourcePtr getServerWithInternetAccess() const;
+
+        void trace(int handle, const QString& message) const;
     private:
         QnUuid m_serverId;
         QMap<Handle, nx_http::AsyncHttpClientPtr> m_runningRequests;

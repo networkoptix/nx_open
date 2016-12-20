@@ -86,7 +86,7 @@ public:
         QnCameraAdvancedParamValueList result;
         if (success)
             success = m_resource->getParamsPhysical(m_ids, result);
-        
+
         emit m_resource->asyncParamsGetDone(m_resource, result);
         return success;
     }
@@ -162,7 +162,7 @@ typedef std::shared_ptr<QnResourceSetParamsCommand> QnResourceSetParamsCommandPt
 // -------------------------------------------------------------------------- //
 // QnResource
 // -------------------------------------------------------------------------- //
-QnResource::QnResource(): 
+QnResource::QnResource():
     QObject(),
     m_mutex(QnMutex::Recursive),
     m_initMutex(QnMutex::Recursive),
@@ -205,14 +205,14 @@ QnResource::~QnResource()
     disconnectAllConsumers();
 }
 
-QnResourcePool *QnResource::resourcePool() const 
+QnResourcePool *QnResource::resourcePool() const
 {
     QnMutexLocker mutexLocker( &m_mutex );
 
     return m_resourcePool;
 }
 
-void QnResource::setResourcePool(QnResourcePool *resourcePool) 
+void QnResource::setResourcePool(QnResourcePool *resourcePool)
 {
     QnMutexLocker mutexLocker( &m_mutex );
 
@@ -239,7 +239,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
@@ -254,7 +254,7 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 
     if (m_flags != other->m_flags) {
-        m_flags = other->m_flags;    
+        m_flags = other->m_flags;
         modifiedFields << "flagsChanged";
     }
 
@@ -280,7 +280,8 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 }
 
-void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
+void QnResource::update(const QnResourcePtr& other)
+{
     /*
     Q_ASSERT_X(other->metaObject()->className() == this->metaObject()->className(),
         Q_FUNC_INFO,
@@ -297,17 +298,15 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
         QnMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
         if(m1 > m2)
             std::swap(m1, m2);  //to maintain mutex lock order
-        QnMutexLocker mutexLocker1( m1 ); 
-        QnMutexLocker mutexLocker2( m2 ); 
+        QnMutexLocker mutexLocker1( m1 );
+        QnMutexLocker mutexLocker2( m2 );
         updateInner(other, modifiedFields);
     }
 
-    silenceMode |= other->hasFlags(Qn::foreigner);
-    //setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
     {
-        QnMutexLocker lk( &m_mutex ); 
+        QnMutexLocker lk( &m_mutex );
         if( !m_id.isNull() && !m_locallySavedProperties.empty() )
         {
             std::map<QString, LocalPropertyValue> locallySavedProperties;
@@ -360,7 +359,7 @@ void QnResource::setParentId(const QnUuid& parent)
             initializedChanged = true;
         }
     }
-    
+
     if (!oldParentId.isNull())
         emit parentIdChanged(toSharedPointer(this));
 
@@ -462,7 +461,7 @@ QnResourcePtr QnResource::getParentResource() const
 
 bool QnResource::hasParam(const QString &name) const
 {
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
     if (!resType)
         return false;
     return resType->hasParam(name);
@@ -474,7 +473,7 @@ bool QnResource::getParamPhysical(const QString &id, QString &value) {
     return false;
 }
 
-bool QnResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) 
+bool QnResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
 {
     bool success = true;
     for(const QString &id: idList) {
@@ -574,13 +573,13 @@ Qn::ResourceStatus QnResource::getStatus() const
     return qnStatusDictionary->value(getId());
 }
 
-void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus)
+void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
-    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized) 
+    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
     {
         if(m_initialized) {
             m_initialized = false;
@@ -591,10 +590,10 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
         init();
 
-    emit statusChanged(toSharedPointer(this));
+    emit statusChanged(toSharedPointer(this), reason);
 }
 
-void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (newStatus == Qn::NotDefined)
         return;
@@ -609,8 +608,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     if (oldStatus == newStatus)
         return;
     qnStatusDictionary->setValue(id, newStatus);
-    if (!silenceMode)
-        doStatusChanged(oldStatus, newStatus);
+    doStatusChanged(oldStatus, newStatus, reason);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const
@@ -794,7 +792,7 @@ QnAbstractPtzController *QnResource::createPtzController() {
     }
     if((capabilities & Qn::DevicePositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
     {
-        auto message = 
+        auto message =
             lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
                 .arg(getName())
                 .arg(getUrl());
@@ -802,7 +800,7 @@ QnAbstractPtzController *QnResource::createPtzController() {
         qDebug() << message;
         NX_LOG(message.toLatin1(), cl_logERROR);
     }
-    
+
     return result;
 }
 
@@ -836,7 +834,7 @@ QString QnResource::getProperty(const QString &key) const {
 
     if (value.isNull()) {
         // find default value in resourceType
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
         if (resType)
             return resType->defaultValue(key);
     }
@@ -961,7 +959,7 @@ bool QnResource::init()
         m_prevInitializationResult = initResult;
     }
     m_initializationAttemptCount.fetchAndAddOrdered(1);
-    
+
     bool changed = m_initialized;
     if(m_initialized) {
         initializationDone();
@@ -1034,7 +1032,7 @@ void QnResource::initAsync(bool optional)
     QnMutexLocker lock( &m_initAsyncMutex );
 
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
-        return; 
+        return;
 
     if (m_appStopping)
         return;

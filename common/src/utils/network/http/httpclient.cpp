@@ -6,6 +6,12 @@
 #include "httpclient.h"
 
 #include <utils/thread/mutex.h>
+#include <utils/common/log.h>
+
+
+namespace {
+    const std::size_t kDefaultMaxInternalBufferSize = 200 * 1024 *1024; //< 200MB should be enough
+}
 
 
 namespace nx_http
@@ -14,7 +20,9 @@ namespace nx_http
     HttpClient::HttpClient()
     :
         m_done( false ),
-        m_terminated( false )
+        m_error(false),
+        m_terminated( false ),
+        m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
     {
         instanciateHttpClient();
     }
@@ -60,11 +68,17 @@ namespace nx_http
         return m_asyncHttpClient->response();
     }
 
+    bool HttpClient::isValid() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return !m_error;
+    }
+
     //!
     bool HttpClient::eof() const
     {
         QnMutexLocker lk( &m_mutex );
-        return m_done && m_msgBodyBuffer.isEmpty();
+        return (m_done && m_msgBodyBuffer.isEmpty()) || m_error;
     }
 
     //!
@@ -74,9 +88,13 @@ namespace nx_http
     BufferType HttpClient::fetchMessageBodyBuffer()
     {
         QnMutexLocker lk( &m_mutex );
-        while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done) )
+        while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done && !m_error) )
             m_cond.wait( lk.mutex() );
+
         nx_http::BufferType result;
+        if (m_error)
+            return result;
+
         result.swap( m_msgBodyBuffer );
         return result;
     }
@@ -136,6 +154,11 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
+    void HttpClient::setMaxInternalBufferSize(std::size_t bufferSize)
+    {
+        m_maxInternalBufferSize = bufferSize;
+    }
+
     void HttpClient::instanciateHttpClient()
     {
         m_asyncHttpClient = nx_http::AsyncHttpClient::create();
@@ -149,7 +172,7 @@ namespace nx_http
     {
         QnMutexLocker lk(&m_mutex);
 
-        if (!m_done)
+        if (!m_done || m_error)
         {
             lk.unlock();
 
@@ -185,6 +208,7 @@ namespace nx_http
         }
 
         m_done = false;
+        m_error = false;
         func(m_asyncHttpClient.get());
 
         m_msgBodyBuffer.clear();
@@ -199,6 +223,18 @@ namespace nx_http
         QnMutexLocker lk( &m_mutex );
         //message body buffer can be non-empty
         m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
+        if (m_msgBodyBuffer.size() > m_maxInternalBufferSize)
+        {
+            NX_LOG(
+                lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
+                    .arg(m_maxInternalBufferSize)
+                    .arg(m_msgBodyBuffer.size())
+                    .arg(url().toString()),
+                cl_logWARNING);
+            m_done = true;
+            m_error = true;
+            m_asyncHttpClient->terminate();
+        }
         m_cond.wakeAll();
     }
 
@@ -206,6 +242,18 @@ namespace nx_http
     {
         QnMutexLocker lk( &m_mutex );
         m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
+        if (m_msgBodyBuffer.size() > m_maxInternalBufferSize)
+        {
+            NX_LOG(
+                lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
+                    .arg(m_maxInternalBufferSize)
+                    .arg(m_msgBodyBuffer.size())
+                    .arg(url().toString()),
+                cl_logWARNING);
+            m_done = true;
+            m_error = true;
+            m_asyncHttpClient->terminate();
+        }
         m_cond.wakeAll();
     }
 

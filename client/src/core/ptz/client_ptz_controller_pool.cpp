@@ -3,7 +3,19 @@
 #include <core/ptz/remote_ptz_controller.h>
 #include <core/ptz/caching_ptz_controller.h>
 #include <core/resource/camera_resource.h>
+
 #include <core/resource_management/resource_pool.h>
+
+namespace {
+
+bool cameraSupportsPtz(const QnVirtualCameraResourcePtr& camera)
+{
+    return camera
+        && camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !camera->hasPtzCapabilities(Qn::VirtualPtzCapability);
+}
+
+} // namespace
 
 QnClientPtzControllerPool::QnClientPtzControllerPool(QObject *parent /*= NULL*/)
     : base_type(parent)
@@ -18,7 +30,18 @@ QnClientPtzControllerPool::QnClientPtzControllerPool(QObject *parent /*= NULL*/)
 void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) {
     base_type::registerResource(resource);
 
-    cacheCameraPresets(resource.dynamicCast<QnVirtualCameraResource>());
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    connect(camera, &QnVirtualCameraResource::ptzCapabilitiesChanged, this,
+        [this, camera]
+        {
+            updateController(camera);
+            cacheCameraPresets(camera);
+        });
+
+    cacheCameraPresets(camera);
 }
 
 void QnClientPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
@@ -27,7 +50,7 @@ void QnClientPtzControllerPool::unregisterResource(const QnResourcePtr &resource
 
 QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourcePtr &resource) const {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    if (!cameraSupportsPtz(camera))
         return QnPtzControllerPtr();
 
     QnPtzControllerPtr controller;
@@ -38,7 +61,10 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
 
 void QnClientPtzControllerPool::cacheCameraPresets(const QnVirtualCameraResourcePtr &camera)
 {
-    if (!camera || camera->getStatus() != Qn::Online)
+    if (!cameraSupportsPtz(camera))
+        return;
+
+    if (camera->getStatus() != Qn::Online)
         return;
 
     auto controller = this->controller(camera);

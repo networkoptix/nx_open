@@ -352,6 +352,13 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
+    enum class StatusChangeReason
+    {
+        Default,
+        CreateInitialData,
+        GotFromRemotePeer
+    };
+
     enum BitratePerGopType {
         BPG_None,
         BPG_Predefined,
@@ -838,6 +845,7 @@ public:
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 
