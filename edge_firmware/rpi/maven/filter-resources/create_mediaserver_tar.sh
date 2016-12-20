@@ -179,6 +179,12 @@ if [[ "${box}" == "bpi" ]]; then
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   fi
 
+  #creating symlink for rpath needed by mobile_client binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/lib"
+
+  #creating symlink for rpath needed by Qt plugins
+  ln -s "../../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib"
+
   #copying directories needed by lite client
   DIRS_TO_COPY=( \
   egldeviceintegrations \
@@ -202,8 +208,6 @@ if [[ "${box}" == "bpi" ]]; then
   cp -Rfv $USR_DIR $BUILD_DIR/usr
   
   #additional platform specific files
-  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
-  cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
   cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
