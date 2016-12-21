@@ -6,7 +6,7 @@ from os.path import join
 
 
 # 1. read ts into xml
-xml_files = ('cloud_portal.ts', 'templates.ts')
+xml_files = ('cloud_portal.ts', 'cloud_templates.ts')
 root_directory = ''
 
 # Read branding info

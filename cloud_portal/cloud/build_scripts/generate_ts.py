@@ -175,4 +175,4 @@ html_strings1 = extract_strings('../../front_end/dist/', '.html')  # , dir_exclu
 format_ts(js_strings + js_strings1 + html_strings + html_strings1, "cloud_portal.ts")
 
 template_strings = extract_strings('../notifications/static/templates', '.mustache')
-format_ts(template_strings, "templates.ts")
+format_ts(template_strings, "cloud_templates.ts")
