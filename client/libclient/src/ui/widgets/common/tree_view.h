@@ -25,6 +25,7 @@ public:
     bool ignoreDefaultSpace() const;
     void setIgnoreDefaultSpace(bool value);
 
+    /** Fix to allow drop something in the space left of the node icon. Default: true. */
     bool dropOnBranchesAllowed() const;
     void setDropOnBranchesAllowed(bool value);
 
