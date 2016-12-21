@@ -26,11 +26,11 @@ server_msi_strip_folder = 'bin/strip'
 client_msi_strip_folder = 'bin/strip'
 wix_pdb = 'wixsetup.wixpdb'
 
-server_msi_name = '${final.artifact.name}-server-only.msi'
-server_exe_name = '${final.artifact.name}-server-only.exe'
+server_msi_name = '${final.artifact.name}-server.msi'
+server_exe_name = '${final.artifact.name}-server.exe'
 
-client_msi_name = '${final.artifact.name}-client-only.msi'
-client_exe_name = '${final.artifact.name}-client-only.exe'
+client_msi_name = '${final.artifact.name}-client.msi'
+client_exe_name = '${final.artifact.name}-client.exe'
 
 full_exe_name = '${final.artifact.name}-bundle.exe'
 
