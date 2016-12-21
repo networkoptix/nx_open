@@ -1,8 +1,11 @@
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <memory>
 
+#include <nx/network/aio/async_call.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "serialization/serializable_transaction.h"
@@ -28,6 +31,8 @@ public:
         VmsTransactionLogCache* vmsTransactionLogCache,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
+    ~OutgoingTransactionSorter();
+
     /**
      * This optional method can be called prior to adding transaction to ensure 
      * that transactionSequence is used in sort order calculations even before 
@@ -44,6 +49,10 @@ public:
     void rollback(VmsTransactionLogCache::TranId cacheTranId);
     void commit(VmsTransactionLogCache::TranId cacheTranId);
 
+protected:
+    std::size_t transactionsCommitted() const;
+    std::size_t transactionsDelivered() const;
+
 private:
     struct TranContext
     {
@@ -58,15 +67,20 @@ private:
     std::map<VmsTransactionLogCache::TranId, TranContext> m_transactions;
     std::map<TransactionSequence, VmsTransactionLogCache::TranId> m_transactionsBySequence;
     QnMutex m_mutex;
+    std::size_t m_transactionsCommitted;
+    std::size_t m_transactionsDelivered;
+    std::unique_ptr<nx::network::aio::AsyncCall> m_asyncCall;
 
     void dispatchTransactions();
 
     std::vector<VmsTransactionLogCache::TranId> findTransactionsToSend(
-        const QnMutexLockerBase& lock);
+        const QnMutexLockerBase& /*lock*/);
 
     void dispatchTransactions(
-        QnMutexLockerBase* lock,
+        const QnMutexLockerBase& /*lock*/,
         VmsTransactionLogCache::TranId tranId);
+    void deliverTransactions(
+        std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions);
 
     void registerTransactionSequence(
         const QnMutexLockerBase& /*lock*/,

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <list>
 #include <memory>
+#include <utility>
 
 #include <nx/utils/move_only_func.h>
 
@@ -25,6 +27,8 @@ public:
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
     void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler);
+    void setDelayBeforeSavingTransaction(
+        std::chrono::milliseconds min, std::chrono::milliseconds max);
 
     void clear();
 
@@ -47,6 +51,7 @@ private:
     OnNewTransactionHandler m_onNewTransactionHandler;
     QnMutex m_mutex;
     std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_outgoingTransactions;
+    std::pair<std::chrono::milliseconds, std::chrono::milliseconds> m_delayBeforeSavingTransaction;
 };
 
 } // namespace test

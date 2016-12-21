@@ -3,6 +3,7 @@
 #include <set>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "outgoing_transaction_dispatcher.h"
 
@@ -14,11 +15,20 @@ OutgoingTransactionSorter::OutgoingTransactionSorter(
     const nx::String& systemId,
     VmsTransactionLogCache* vmsTransactionLogCache,
     AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
-    :
+:
     m_systemId(systemId),
     m_vmsTransactionLogCache(vmsTransactionLogCache),
-    m_outgoingTransactionDispatcher(outgoingTransactionDispatcher)
+    m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
+    m_transactionsCommitted(0),
+    m_transactionsDelivered(0),
+    m_asyncCall(std::make_unique<nx::network::aio::AsyncCall>())
 {
+}
+
+OutgoingTransactionSorter::~OutgoingTransactionSorter()
+{
+    // Freeing m_asyncCall first of all to be sure call is not running in a separate thread.
+    m_asyncCall.reset();
 }
 
 void OutgoingTransactionSorter::registerTransactionSequence(
@@ -83,19 +93,28 @@ void OutgoingTransactionSorter::commit(VmsTransactionLogCache::TranId cacheTranI
     dispatchTransactions();
 }
 
+std::size_t OutgoingTransactionSorter::transactionsCommitted() const
+{
+    return m_transactionsCommitted;
+}
+
+std::size_t OutgoingTransactionSorter::transactionsDelivered() const
+{
+    return m_transactionsDelivered;
+}
+
 void OutgoingTransactionSorter::dispatchTransactions()
 {
     QnMutexLocker lock(&m_mutex);
 
     for (;;)
     {
-        std::vector<VmsTransactionLogCache::TranId> tranToCommitIds = 
-            findTransactionsToSend(lock);
+        std::vector<VmsTransactionLogCache::TranId> tranToCommitIds = findTransactionsToSend(lock);
         if (tranToCommitIds.empty())
             return;
 
         for(const auto& tranId: tranToCommitIds)
-            dispatchTransactions(&lock, tranId);
+            dispatchTransactions(lock, tranId);
     }
 }
 
@@ -134,7 +153,7 @@ std::vector<VmsTransactionLogCache::TranId> OutgoingTransactionSorter::findTrans
 }
 
 void OutgoingTransactionSorter::dispatchTransactions(
-    QnMutexLockerBase* lock,
+    const QnMutexLockerBase& /*lock*/,
     VmsTransactionLogCache::TranId tranId)
 {
     TranContext tranContext;
@@ -148,11 +167,32 @@ void OutgoingTransactionSorter::dispatchTransactions(
     for (const auto& transaction: tranContext.transactions)
         m_transactionsBySequence.erase(transaction->transactionHeader().persistentInfo.sequence);
 
-    QnMutexUnlocker unlock(lock);
-
     m_vmsTransactionLogCache->commit(tranId);
-    for (auto& transaction: tranContext.transactions)
-        m_outgoingTransactionDispatcher->dispatchTransaction(m_systemId, std::move(transaction));
+
+    deliverTransactions(std::move(tranContext.transactions));
+}
+
+void OutgoingTransactionSorter::deliverTransactions(
+    std::vector<std::unique_ptr<const SerializableAbstractTransaction>> transactions)
+{
+    // We MUST ensure transactions are delivered to m_outgoingTransactionDispatcher in a correct order.
+    // If we just release mutex here, order will be undefined.
+    // Delivering with mutex locked is not good either.
+
+    m_transactionsCommitted += transactions.size();
+
+    m_asyncCall->post(
+        [this, transactions = std::move(transactions)]() mutable
+        {
+            for (auto& transaction: transactions)
+            {
+                m_outgoingTransactionDispatcher->dispatchTransaction(
+                    m_systemId,
+                    std::move(transaction));
+            }
+
+            m_transactionsDelivered += transactions.size();
+        });
 }
 
 void OutgoingTransactionSorter::registerTransactionSequence(

@@ -14,6 +14,29 @@ namespace cdb {
 namespace ec2 {
 namespace test {
 
+class TestOutgoingTransactionSorter:
+    public ec2::OutgoingTransactionSorter
+{
+public:
+    TestOutgoingTransactionSorter(
+        const nx::String& systemId,
+        VmsTransactionLogCache* vmsTransactionLogCache,
+        AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
+    :
+        ec2::OutgoingTransactionSorter(
+            systemId,
+            vmsTransactionLogCache,
+            outgoingTransactionDispatcher)
+    {
+    }
+
+    void waitUntilEveryCommittedTransactionHasBeenDelivered()
+    {
+        while (transactionsCommitted() > transactionsDelivered())
+            std::this_thread::yield();
+    }
+};
+
 class TestTransaction:
     public SerializableAbstractTransaction
 {
@@ -102,14 +125,21 @@ public:
             QnUuid::createUuid().toSimpleByteArray(),
             &m_transactionCache,
             &m_testOutgoingTransactionDispatcher),
-        m_prevSequence(0)
+        m_prevSequence(0),
+        m_transactionCountRange(5, 50)
     {
+    }
+
+    void setTransactionCountRange(std::size_t min, std::size_t max)
+    {
+        m_transactionCountRange = {min, max};
     }
 
 protected:
     void givenMultipleStartedTransactions()
     {
-        m_tranIds.resize(nx::utils::random::number<std::size_t>(5, 50));
+        m_tranIds.resize(nx::utils::random::number<std::size_t>(
+            m_transactionCountRange.first, m_transactionCountRange.second));
         for (auto& tranId: m_tranIds)
         {
             tranId = m_transactionCache.beginTran();
@@ -122,6 +152,8 @@ protected:
         for (const auto& tranId: m_tranIds)
             commit(tranId);
         m_tranIds.clear();
+
+        m_transactionSorter.waitUntilEveryCommittedTransactionHasBeenDelivered();
     }
 
     void whenRolledBackAllTransactions()
@@ -136,6 +168,8 @@ protected:
         for (auto rIt = m_tranIds.rbegin(); rIt != m_tranIds.rend(); ++rIt)
             commit(*rIt);
         m_tranIds.clear();
+
+        m_transactionSorter.waitUntilEveryCommittedTransactionHasBeenDelivered();
     }
 
     void whenRolledBackFirstTransaction()
@@ -156,6 +190,8 @@ protected:
                 m_transactionSorter.rollback(m_tranIds[tranIndex]);
             m_tranIds.erase(m_tranIds.begin()+tranIndex);
         }
+
+        m_transactionSorter.waitUntilEveryCommittedTransactionHasBeenDelivered();
     }
 
     void thenTransactionsShouldBeSentInIncreasingSequenceOrder()
@@ -181,14 +217,30 @@ protected:
         }
     }
 
-private:
-    TestOutgoingTransactionDispatcher m_testOutgoingTransactionDispatcher;
-    VmsTransactionLogCache m_transactionCache;
-    ec2::OutgoingTransactionSorter m_transactionSorter;
-    std::atomic<int> m_prevSequence;
+    void commit(VmsTransactionLogCache::TranId tranId)
+    {
+        m_transactionSorter.commit(tranId);
+
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& transaction: m_transactionsGenerated)
+        {
+            if (transaction->tranId() == tranId)
+                m_transactionsCommitted.push_back(transaction);
+        }
+    }
+
+protected:
     std::deque<VmsTransactionLogCache::TranId> m_tranIds;
+    TestOutgoingTransactionDispatcher m_testOutgoingTransactionDispatcher;
+
+private:
+    VmsTransactionLogCache m_transactionCache;
+    TestOutgoingTransactionSorter m_transactionSorter;
+    std::atomic<int> m_prevSequence;
     std::vector<std::shared_ptr<TestTransaction>> m_transactionsGenerated;
     std::vector<std::shared_ptr<TestTransaction>> m_transactionsCommitted;
+    std::pair<std::size_t, std::size_t> m_transactionCountRange;
+    QnMutex m_mutex;
 
     void addTransaction(VmsTransactionLogCache::TranId tranId)
     {
@@ -199,16 +251,6 @@ private:
             std::make_unique<TransactionSharedWrapper>(transaction));
 
         m_transactionsGenerated.push_back(transaction);
-    }
-
-    void commit(VmsTransactionLogCache::TranId tranId)
-    {
-        m_transactionSorter.commit(tranId);
-        for (const auto& transaction: m_transactionsGenerated)
-        {
-            if (transaction->tranId() == tranId)
-                m_transactionsCommitted.push_back(transaction);
-        }
     }
 };
 
@@ -248,6 +290,70 @@ TEST_F(OutgoingTransactionSorter, correct_send_order_after_random_commit_rollbac
 {
     givenMultipleStartedTransactions();
     whenRandomlyFinishedTransactions();
+    thenTransactionsShouldBeSentInIncreasingSequenceOrder();
+}
+
+class FtOutgoingTransactionSorter:
+    public OutgoingTransactionSorter
+{
+    constexpr static int threadCount = 10;
+    constexpr static int transactionPerThreadCount = 100;
+    constexpr static int totalTransactionCount = threadCount * transactionPerThreadCount;
+
+public:
+    FtOutgoingTransactionSorter()
+    {
+        setTransactionCountRange(totalTransactionCount, totalTransactionCount);
+
+        m_testOutgoingTransactionDispatcher.setDelayBeforeSavingTransaction(
+            std::chrono::milliseconds(0), std::chrono::milliseconds(10));
+    }
+
+protected:
+    void whenCommittedTransactionsConcurrently()
+    {
+        m_threads.resize(threadCount);
+        for (auto& thread: m_threads)
+        {
+            std::vector<VmsTransactionLogCache::TranId> transactionsForThread = 
+                selectRandomTransactions(transactionPerThreadCount);
+            thread = std::thread(
+                std::bind(&FtOutgoingTransactionSorter::testThreadMain, this,
+                    std::move(transactionsForThread)));
+        }
+
+        for (auto& thread: m_threads)
+            thread.join();
+    }
+
+private:
+    std::vector<std::thread> m_threads;
+
+    std::vector<VmsTransactionLogCache::TranId> selectRandomTransactions(int maxTranCount)
+    {
+        std::vector<VmsTransactionLogCache::TranId> result;
+        result.reserve(maxTranCount);
+        for (int i = 0; (i < maxTranCount) && (!m_tranIds.empty()); ++i)
+        {
+            const auto index = nx::utils::random::number<std::size_t>(0, m_tranIds.size()-1);
+            result.push_back(m_tranIds[index]);
+            m_tranIds.erase(m_tranIds.begin() + index);
+        }
+
+        return result;
+    }
+
+    void testThreadMain(std::vector<VmsTransactionLogCache::TranId> tranIds)
+    {
+        for (const auto& tranId: tranIds)
+            commit(tranId);
+    }
+};
+
+TEST_F(FtOutgoingTransactionSorter, concurrent_transactions)
+{
+    givenMultipleStartedTransactions();
+    whenCommittedTransactionsConcurrently();
     thenTransactionsShouldBeSentInIncreasingSequenceOrder();
 }
 
