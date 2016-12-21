@@ -22,12 +22,8 @@ ICONTARGET=$USRTARGET/share/icons
 LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
 
-FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
+FINALNAME=${final.artifact.name}
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
