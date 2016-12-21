@@ -232,9 +232,12 @@ void initLog(const QString& logLevel)
 
     if (conf.enableLog)
     {
-        const auto logFileBaseName = QnAppInfo::isAndroid()
-            ? lit("-")
-            : QLatin1String(conf.tempPath()) + lit("mobile_client");
+        const auto logFileBaseName = 
+            conf.logFile && conf.logFile[0]
+                ? QLatin1String(conf.logFile)
+                : QnAppInfo::isAndroid()
+                    ? lit("-")
+                    : QLatin1String(conf.tempPath()) + lit("mobile_client");
 
         QnLog::instance(QnLog::MAIN_LOG_ID)->create(
             logFileBaseName,
@@ -281,9 +284,6 @@ int main(int argc, char *argv[])
     #if defined(Q_OS_WIN)
         AllowSetForegroundWindow(ASFW_ANY);
         win32_exception::installGlobalUnhandledExceptionHandler();
-    #endif
-    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-        linux_exception::installCrashSignalHandler();
     #endif
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);

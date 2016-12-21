@@ -8,149 +8,122 @@
 # Short-Description: ${company.name} ${product.name} Lite Client
 ### END INIT INFO
 
-# NetworkOptix Lite Client
-
-RETVAL=0
+CUSTOMIZATION=${deb.customization.company.name}
 VTCONSOLE=$(fgconsole)
 SERVICE_NAME=lite-client
-CUSTOMIZATION=${deb.customization.company.name}
-PREFIX=/opt/$CUSTOMIZATION/lite_client/
-BIN_NAME=mobile_client
-BIN_PATH=$PREFIX/bin/$BIN_NAME
-PORT=$(cat /opt/networkoptix/mediaserver/etc/mediaserver.conf |grep port= | awk -F "=" '{print $2}')
-if [ -z "$PORT" ]; then PORT=7001; fi
-echo connecting to $CUSTOMIZATION server on port $PORT...
-
-export LD_LIBRARY_PATH=$PREFIX/lib:/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
+PREFIX="/opt/$CUSTOMIZATION/lite_client"
+BIN_NAME="mobile_client"
+BIN_PATH="$PREFIX/bin/$BIN_NAME"
 
 ulimit -n 8192
 ulimit -c unlimited
 
-process_core_dump() {
-    if [ ! $(which gdb) ]; then
-        return 0 # no gdb on the host
-    fi
-    if [ $(pidof gdb) ]; then
-        return 0 # gdb is alrady engaged
-    fi
-
-    CORE_ORIG=$(dirname $BIN_PATH)/core
-    TIME=$(date +"%s")
-    CORE=$CORE_ORIG.$TIME
-    mv $CORE_ORIG $CORE 2>/dev/null
-    if [ $? -eq 0 ]; then
-        REPORT=${BIN_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
-
-        echo Generate crash report $REPORT...        BACKGROUND
-        echo "t apply all bt 25" | gdb $BIN_PATH $CORE 2&>1 >/tmp/$REPORT && \
-            mv /tmp/$REPORT ~/$REPORT &
-
-        ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null
-    fi
-}
-
-start() {
-# Hack to properly restart client and server if server is crashed
-    SERVER_PID="`pidof mediaserver`"
-    if [ -z "$SERVER_PID" ]
-    then
-       echo "Server is not running running. Killing Lite Client" >> /tmp/lite.log
-       killall -9 mobile_client
-       /etc/init.d/$CUSTOMIZATION-mediaserver start
-       return 0
+start() 
+{
+    SERVICE_PID=$(pidof "$BIN_NAME")
+    if [ ! -z "$SERVICE_PID" ]; then
+        echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
+        return 0
     fi
 
-    SERVICE_PID="`/bin/pidof $BIN_NAME`"
-    if [ ! -z "$SERVICE_PID" ]
-    then
-       echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
-       return 0
+    PORT=$(cat "/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf" |grep port= |awk -F "=" '{print $2}')
+    if [ -z "$PORT" ]; then
+        PORT=7001
     fi
-    # changing active tty to 7 (should be always free)
-    if [ '$VTCONSOLE' != '7' ]; then chvt 7; fi
-    #disable console blinking
-    echo 0 > /sys/class/graphics/fbcon/cursor_blink
+    echo "Connecting to $CUSTOMIZATION server on port $PORT..."
 
-    # TODO: #boris: Properly wait for Mediaserver to be ready.
-    echo "Sleeping for 20 seconds..."
-    sleep 20
+    # Changing active tty to 7 (should be always free).
+    if [ "$VTCONSOLE" != "7" ]; then
+        chvt 7
+    fi
 
-    echo -n "Starting $BIN_NAME..... "
-    # TODO: #boris: Decide whether to use curl here after fixing its crash.
-    #curl http://127.0.0.1:$PORT/api/startLiteClient
-    wget http://127.0.0.1:$PORT/api/startLiteClient
+    # Disable console cursor blinking.
+    echo "1" >/sys/class/graphics/fbcon/cursor_blink
 
-    # TODO: #boris: Properly wait for Lite Client to start.
-    echo "Sleeping for 10 seconds..."
-    sleep 10
-
-    if [ `/bin/pidof $BIN_NAME` ]; then
+    WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" |grep changeset |awk '{print $2}')
+    if [ -z "$WEBADMIN_BUILD" ]; then 
+        echo "Server is not running. Cannot run Lite Client"
+        return 1
+    else
+        echo "Server is running. Webadmin changeset is $WEBADMIN_BUILD"
+        echo -n "Starting $BIN_NAME via /api/startLiteClient: "
+        curl -s "http://127.0.0.1:$PORT/api/startLiteClient"
+    fi
+    
+    sleep 5
+    
+    if [ $(pidof "$BIN_NAME") ]; then
         echo "OK"
     else
-        echo "FAILURE"
+        echo "FAILED"
     fi
 }
 
-startquiet() {
+startquiet() 
+{
     start
 }
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
-stop() {
-    echo -n "Stopping $BIN_NAME..... "
-    killall $1 $BIN_NAME 1>/dev/null 2>&1
+stop() 
+{
+    echo -n "Stopping $BIN_NAME... "
+    killall "$1" "$BIN_NAME" >/dev/null 2>&1
     local i=0
-    while [ "`/bin/pidof $BIN_NAME`" ]
-    do
-        /bin/sleep 1
+    while [ $(pidof "$BIN_NAME") ]; do
+        sleep 1
         let i++
         if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
-            echo -n "sending 9 signal...    "
-            /usr/bin/killall -9 $BIN_NAME 1>/dev/null 2>&1
+            echo -n "Sending 9 signal... "
+            killall -9 "$BIN_NAME" >/dev/null 2>&1
         fi
     done
-    # changing active tty back to 1
-    if [ '$VTCONSOLE' != '1' ]; then chvt 1; fi    
-    echo "OK"
+
+    # Changing active tty back to 1.
+    if [ "$VTCONSOLE" != "1" ]; then 
+        chvt 1
+    fi
+
+    echo "DONE"
 }
 
-start_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep lite-client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+start_watchdog()
+{
+    WATCHDOG_PID=$(ps -eO command | grep lite-client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1)
     if [ "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-lite-client watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
-    bash -c "/etc/init.d/$CUSTOMIZATION-lite-client run_watchdog" 2>/dev/null 1>&2&
+    bash -c "/etc/init.d/$CUSTOMIZATION-lite-client run_watchdog" >/dev/null 2>&1 &
     echo "$SERVICE_NAME watchdog has been started"
 }
 
-stop_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+stop_watchdog()
+{
+    WATCHDOG_PID=$(ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1)
     if [ ! "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-lite-client watchdog is not running"
         return 0
     fi
 
-    echo -n "Stopping $CUSTOMIZATION-lite-client watchdog..... "
-    kill $WATCHDOG_PID
+    echo -n "Stopping $CUSTOMIZATION-lite-client watchdog... "
+    kill "$WATCHDOG_PID"
     sleep 1
     echo "OK"
 }
 
-run_watchdog() {
-    while true
-    do
+run_watchdog()
+{
+    while true; do
         start
-        # TODO: #boris After other todos are fixed, restore the period of 20.
-        sleep 60
+        sleep 20
     done
 }
 
+#--------------------------------------------------------------------------------------------------
+# main
 
-#
-#   Main script
-#
 case "$1" in
     start)
         start
@@ -162,11 +135,11 @@ case "$1" in
         ;;
 
     start_console)
-        $BIN_PATH $RUN_ARGS
+        "$BIN_PATH" $RUN_ARGS
         ;;
 
     start_gdb)
-        gdbserver 0.0.0.0:12345 $BIN_PATH $RUN_ARGS
+        gdbserver 0.0.0.0:12345 "$BIN_PATH" $RUN_ARGS
         ;;
 
     stop)
@@ -180,9 +153,8 @@ case "$1" in
         ;;
 
     status)
-        SERVICE_PID="`/bin/pidof $BIN_NAME`"
-        if [ ! -z $SERVICE_PID ]
-        then
+        SERVICE_PID=$(pidof "$BIN_NAME")
+        if [ ! -z "$SERVICE_PID" ]; then
             echo "$SERVICE_NAME is running with pid $SERVICE_PID"
             exit 0
         else
@@ -192,8 +164,7 @@ case "$1" in
         ;;
 
     server_status)
-        if [ `/bin/pidof $BIN_NAME` ]
-        then
+        if [ $(pidof "$BIN_NAME") ]; then
             echo "1"
         fi
         ;;
@@ -201,9 +172,8 @@ case "$1" in
     restart|reload|force-reload)
         stop_watchdog
         stop
-        while [ `/bin/pidof $BIN_NAME` ]
-        do
-            /bin/sleep 1
+        while [ $(pidof "$BIN_NAME") ]; do
+            sleep 1
         done
         start
         start_watchdog
@@ -226,4 +196,3 @@ case "$1" in
         exit 1
 esac
 
-exit $RETVAL
