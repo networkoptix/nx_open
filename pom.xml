@@ -227,8 +227,9 @@
 
         <projectType>generic</projectType>
 
-        <final.artifact.name>${installer.name}-${release.version}.${buildNumber}-${platform}${cloud.instance}${release.configuration}${beta.status}</final.artifact.name>
+        <final.artifact.name>${installer.name}-${release.version}.${buildNumber}-${platform}${arch.suffix}${cloud.instance}${release.configuration}${beta.status}</final.artifact.name>
         <cloud.instance>-${cloud.group}</cloud.instance>
+        <arch.suffix>-${arch}</arch.suffix>
         <release.configuration>-${build.configuration}</release.configuration>
         <beta.status>-beta</beta.status>         
     </properties>
@@ -764,6 +765,7 @@
                 </property>
             </activation>
             <properties>
+                <arch.suffix />                
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
@@ -1082,6 +1084,9 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
             </modules>
+            <properties>
+                <arch.suffix />            
+            </properties>    
         </profile>
         <profile>
             <id>mobile-android</id>
