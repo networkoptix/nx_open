@@ -6,7 +6,8 @@
 
 var L = {};
 $.ajax({
-  url: 'static/views/language.json', //Config.viewsDir +
+// url: 'static/views/language.json', 
+  url: 'api/utils/language',
   async: true,
   dataType: 'json',
   success: function (response) {

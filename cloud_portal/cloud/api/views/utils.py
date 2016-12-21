@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, api_success, require_params, APIRequestException, ErrorCodes
 import datetime, logging
 from cloud import settings
+from django.shortcuts import redirect
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +32,51 @@ def visited_key(request):
         cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
     return Response({'visited': value})
 
+
+@api_view(['GET', 'POST'])
+@permission_classes((AllowAny, ))
+def language(request):
+    def unify_language(lang):
+        # Here we get language from client and select one of supported languages based on that lang
+        # If we cant - return default language
+        return lang
+
+    if request.method == 'GET':  # Get language for current user
+        # 1. Try session value
+        lang = request.session.get('language', False)
+
+        # 2. Try cookie value
+        if not lang:
+            if 'language' in request.COOKIES:
+                lang = request.COOKIES['language']
+
+        # 3. Try account value
+        if not lang and request.user.is_authenticated():
+            lang = request.user.language
+
+        # 4. Try ACCEPT_LANGUAGE header
+        if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
+            lang = request.META['HTTP_ACCEPT_LANGUAGE']
+
+        lang = unify_language(lang)
+
+        language_file = '/static/views/language.json'
+        return redirect(language_file)
+        # Return: redirect to language.json file for selected language
+        pass
+    elif request.method == 'POST':
+        require_params(request, ('language',))
+        lang = request.data['language']
+
+        # Save session value
+        request.session['language'] = lang
+
+        # Save account value
+        if request.user.is_authenticated():
+            request.user.language = lang
+            request.user.save()
+
+        response = Response({'language': lang})
+        # Save cookie
+        response.set_cookie('language', lang, 60 * 60 * 24 * 7)  # Cookie for one week
+        return response
