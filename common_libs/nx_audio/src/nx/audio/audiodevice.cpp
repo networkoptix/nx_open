@@ -49,7 +49,7 @@ int AudioDevice::internalBufferInSamples(ALCdevice* device)
      * As it is invalid pointer, we can't use it accessing ALCdevice_struct' fields.
      * From the other side we can continue to use it as opaque handle for OpenAL functions.
      *
-     *  Problem is known:
+     * Problem is known:
      * https://github.com/hajimehoshi/ebiten/issues/195
      * https://groups.google.com/forum/#!topic/golang-bugs/nARJpJCYum4
      *
