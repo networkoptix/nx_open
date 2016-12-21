@@ -16,7 +16,7 @@ protected:
     virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const override;
 
 private:
-    void cacheCameraPresets(const QnResourcePtr& resource);
+    void cacheCameraPresets(const QnResourcePtr &resource);
 };
 
 #endif // QN_CLIENT_PTZ_CONTROLLER_POOL_H

@@ -56,6 +56,9 @@ namespace
     const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
     const int kTakeCameraOwnershipWithoutLockDefault = false;
 
+    const QString kMaxRtpRetryCount(lit("maxRtpRetryCount"));
+    const int kMaxRtpRetryCountDefault(6);
+	
     const int kAuditTrailPeriodDaysDefault = 183;
 }
 
@@ -289,6 +292,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_maxRecorderQueueSizePackets = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRecorderQueueSizePacketsName,
         kMaxRecorderQueueSizePacketsDefault,
+        this);
+
+    m_maxRtpRetryCount = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRtpRetryCount,
+        kMaxRtpRetryCountDefault,
         this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
@@ -794,6 +802,16 @@ bool QnGlobalSettings::arecontRtspEnabled() const
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
     m_arecontRtspEnabledAdaptor->setValue(newVal);
+}
+
+int QnGlobalSettings::maxRtpRetryCount() const
+{
+    return m_maxRtpRetryCount->value();
+}
+
+void QnGlobalSettings::setMaxRtpRetryCount(int newVal)
+{
+    m_maxRtpRetryCount->setValue(newVal);
 }
 
 int QnGlobalSettings::maxRecorderQueueSizeBytes() const

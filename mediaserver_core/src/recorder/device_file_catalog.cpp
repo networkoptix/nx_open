@@ -1003,28 +1003,28 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     if (itr == m_chunks.end())
         return result;
 
-    size_t firstIndex = itr - m_chunks.begin();
-    result.push_back(QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs));
+    result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
 
-    for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
+    ++itr;
+    for (; itr != m_chunks.end() && itr->startTimeMs < endTime; ++itr)
     {
         QnTimePeriod& last = result.last();
         qint64 lastEndTime = last.startTimeMs + last.durationMs;
-        if (lastEndTime > m_chunks[i].startTimeMs) {
+        if (lastEndTime > itr->startTimeMs) {
             // overlapped periods
-            if (m_chunks[i].durationMs == -1)
+            if (itr->durationMs == -1)
                 last.durationMs = -1;
             else
-                last.durationMs = qMax(last.durationMs, m_chunks[i].endTimeMs() - last.startTimeMs);
+                last.durationMs = qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
         }
-        else if (qAbs(lastEndTime - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
-            last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
+        else if (qAbs(lastEndTime - itr->startTimeMs) <= detailLevel && itr->durationMs != -1)
+            last.durationMs = itr->startTimeMs - last.startTimeMs + itr->durationMs;
         else {
             if (last.durationMs < detailLevel && result.size() > 1 && !keepSmalChunks)
                 result.pop_back();
             if (result.size() >= limit)
                 break;
-            result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
+            result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
         }
     }
     //if (!result.isEmpty())
