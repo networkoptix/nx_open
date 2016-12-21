@@ -23,7 +23,7 @@ LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
-FINALNAME=${final.artifact.name}
+FINALNAME=${final.artifact.name}-client
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME

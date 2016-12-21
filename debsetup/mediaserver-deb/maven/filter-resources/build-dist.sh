@@ -18,7 +18,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
 
-FINALNAME=${final.artifact.name}
+FINALNAME=${final.artifact.name}-server
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
