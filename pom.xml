@@ -765,7 +765,7 @@
                 </property>
             </activation>
             <properties>
-                <arch.suffix>${box}</arch.suffix>
+                <arch.suffix>-${box}</arch.suffix>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
