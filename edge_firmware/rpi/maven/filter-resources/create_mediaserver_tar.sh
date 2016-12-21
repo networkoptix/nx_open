@@ -142,6 +142,9 @@ do
   fi
 done
 
+#creating symlink for rpath needed by mediaserver binary
+ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
+
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
@@ -210,10 +213,10 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   #copying debs and uboot
   cp -Rfv $DEBS_DIR $BUILD_DIR/opt
   cp -Rfv $UBOOT_DIR $BUILD_DIR/root
-  
+
   #copying additional binaries
   cp -Rfv $USR_DIR $BUILD_DIR/usr
-  
+
   #additional platform specific files
   cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
