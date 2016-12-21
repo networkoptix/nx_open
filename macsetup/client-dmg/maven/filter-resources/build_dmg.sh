@@ -5,7 +5,7 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${final.artifact.name}-client-only.dmg"
+DMG_FILE="${final.artifact.name}.dmg"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
 
