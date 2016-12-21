@@ -67,6 +67,9 @@ ios {
     QMAKE_XCODE_CODE_SIGN_IDENTITY = "${ios.sign.identity}"
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
     XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=${mobile_client_entitlements}
+    eval (${mac.skip.sign} = true) {
+        XCODEBUILD_FLAGS += CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    }
 }
 
 SOURCES += ${project.build.directory}/mobile_client_app_info_impl.cpp
