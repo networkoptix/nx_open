@@ -276,10 +276,12 @@ void CrossNatConnector::onConnectorFinished(
     m_connectors.clear();   // Cancelling other connectors.
     if (connection)
     {
-        m_connection = std::make_unique<OutgoingTunnelConnectionWatcher>(
+        auto tunnelWatcher = std::make_unique<OutgoingTunnelConnectionWatcher>(
             std::move(m_connectionParameters),
             std::move(connection));
-        m_connection->bindToAioThread(getAioThread());
+        tunnelWatcher->bindToAioThread(getAioThread());
+        tunnelWatcher->start();
+        m_connection = std::move(tunnelWatcher);
     }
     holePunchingDone(resultCode, sysErrorCode);
 }
