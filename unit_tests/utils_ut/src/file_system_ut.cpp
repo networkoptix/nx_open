@@ -19,20 +19,21 @@ class CopyTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        QDir(kTestDirectoryName).removeRecursively();
+        QDir rootDir(QDir::temp().absoluteFilePath(kTestDirectoryName));
 
-        ASSERT_TRUE(QDir().mkdir(kTestDirectoryName));
+        rootDir.removeRecursively();
+        ASSERT_TRUE(QDir().mkdir(rootDir.absolutePath()));
 
-        const QDir rootDir(kTestDirectoryName);
-        ASSERT_TRUE(QDir(kTestDirectoryName).mkdir(kSourceDirectoryName));
+        ASSERT_TRUE(rootDir.mkdir(kSourceDirectoryName));
         sourceDir = rootDir.absoluteFilePath(kSourceDirectoryName);
-        ASSERT_TRUE(QDir(kTestDirectoryName).mkdir(kTargetDirectoryName));
+        ASSERT_TRUE(rootDir.mkdir(kTargetDirectoryName));
         targetDir = rootDir.absoluteFilePath(kTargetDirectoryName);
     }
 
     virtual void TearDown() override
     {
-        ASSERT_TRUE(QDir(kTestDirectoryName).removeRecursively());
+        QDir rootDir(QDir::temp().absoluteFilePath(kTestDirectoryName));
+        ASSERT_TRUE(rootDir.removeRecursively());
     }
 
     enum class Location
