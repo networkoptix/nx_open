@@ -45,7 +45,7 @@ template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper
 :
     public GSoapAsyncCallWrapperBase,
-    public QnStoppable,
+    public QnStoppableAsync,
     public QnJoinable
 {
 public:
@@ -72,8 +72,9 @@ public:
 
     ~GSoapAsyncCallWrapper()
     {
-        pleaseStop();
-        join();
+        nx::utils::promise<void> promise;
+        pleaseStop([&promise](){promise.set_value();});
+        promise.get_future().wait();
 
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
@@ -81,7 +82,7 @@ public:
         soap_end(m_syncWrapper->getProxy()->soap);
         m_syncWrapper.reset();
 
-        //if we are here, it is garanteed that 
+        //if we are here, it is guaranteed that 
             //- completion handler is down the stack
             //- or no completion handler is running and it will never be launched
 
@@ -89,16 +90,41 @@ public:
             *m_terminatedFlagPtr = true;
     }
 
-    virtual void pleaseStop() override
+    
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
+        std::shared_ptr<AbstractStreamSocket> socket;
+        {
+            QnMutexLocker lk(&m_mutex);
+            auto socket = std::move(m_socket);
+            if (socket)
+                m_stoppingSockets.insert(socket);
+        }
+
+        if (socket)
+        {
+            socket->pleaseStop(
+                [handler = std::move(completionHandler), socket, this]()
+                {
+                    {
+                        QnMutexLocker lk(&m_mutex);
+                        m_stoppingSockets.erase(socket);
+                    }
+                    handler();
+                });
+        }
+        else
+        {
+            completionHandler();
+        }
     }
 
     /*!
-        It is garanteed that after return of this method \a resultHandler is not running and will not be called
+        It is guaranteed that after return of this method \a resultHandler is not running and will not be called
     */
     virtual void join() override
     {
-        std::unique_ptr<AbstractStreamSocket> socket;
+        std::shared_ptr<AbstractStreamSocket> socket;
         {
             QnMutexLocker lk( &m_mutex );
             socket = std::move(m_socket);
@@ -324,7 +350,8 @@ private:
     QByteArray m_serializedRequest;
     QByteArray m_responseBuffer;
     int m_responseDataPos;
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::shared_ptr<AbstractStreamSocket> m_socket;
+    std::set<std::shared_ptr<AbstractStreamSocket>> m_stoppingSockets;
     std::function<void(int)> m_extCompletionHandler;
     std::function<void(int)> m_resultHandler;
     bool* m_terminatedFlagPtr;

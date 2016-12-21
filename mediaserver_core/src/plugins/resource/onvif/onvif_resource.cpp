@@ -292,6 +292,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
     }
 
     stopInputPortMonitoringAsync();
+    waitWhileInputMonitoringIsStopping();
 
     QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();
@@ -1845,6 +1846,13 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
     }
 }
 
+void QnPlOnvifResource::waitWhileInputMonitoringIsStopping()
+{
+    QnMutexLocker lock(&m_ioPortMutex);
+    while (!m_stoppingMessagePullers.empty())
+        m_stopIoWaitCondition.wait(&m_mutex);
+}
+
 bool QnPlOnvifResource::trustMaxFPS()
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
@@ -3129,8 +3137,18 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
 
     if( asyncPullMessagesCallWrapper )
     {
-        asyncPullMessagesCallWrapper->pleaseStop();
-        asyncPullMessagesCallWrapper->join();
+        asyncPullMessagesCallWrapper->pleaseStop(
+            [asyncPullMessagesCallWrapper, this]()
+            {
+                QnMutexLocker lk(&m_ioPortMutex);
+                m_stoppingMessagePullers.erase(asyncPullMessagesCallWrapper);
+                m_stopIoWaitCondition.wakeAll();
+            });
+
+        {
+            QnMutexLocker lk(&m_ioPortMutex);
+            m_stoppingMessagePullers.insert(asyncPullMessagesCallWrapper);
+        }
     }
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())

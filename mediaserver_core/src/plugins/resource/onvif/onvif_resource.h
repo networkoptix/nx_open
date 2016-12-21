@@ -6,6 +6,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <set>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
@@ -331,6 +332,8 @@ private:
     bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 
+    void waitWhileInputMonitoringIsStopping();
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
@@ -550,6 +553,8 @@ private:
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
 	mutable QnOnvifServiceUrls m_serviceUrls;
+    std::set<QSharedPointer<GSoapAsyncPullMessagesCallWrapper>> m_stoppingMessagePullers;
+    QnWaitCondition m_stopIoWaitCondition;
 
 protected:
     QnCameraAdvancedParams m_advancedParameters;
