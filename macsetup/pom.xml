@@ -16,7 +16,6 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/..</root.dir>
-        <final.artifact.name>${installer.name}-client</final.artifact.name>
     </properties>
 
     <build>
