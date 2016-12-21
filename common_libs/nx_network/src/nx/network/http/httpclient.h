@@ -19,13 +19,13 @@
 
 namespace nx_http {
 
-/** Sync http client.
-    This is  a synchronous wrapper on top of \a AsyncHttpClient.
-    \note This class is not thread-safe
-    \warning Message body is read ascynhronously to some internal buffer
-*/
-class NX_NETWORK_API HttpClient
-    :
+/**
+ * Synchronous http client.
+ * This is a synchronous wrapper on top of AsyncHttpClient.
+ * @note This class is not thread-safe.
+ * @warning Message body is read ascynhronously to some internal buffer.
+ */
+class NX_NETWORK_API HttpClient:
     public QObject,
     public QnStoppable
 {
@@ -109,4 +109,4 @@ private:
     void onReconnected();
 };
 
-}   //namespace nx_http
+} // namespace nx_http
