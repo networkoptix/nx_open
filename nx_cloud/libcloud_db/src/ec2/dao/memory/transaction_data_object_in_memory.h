@@ -7,6 +7,8 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
+#include <nx/utils/thread/mutex.h>
+
 #include <utils/db/types.h>
 #include <utils/db/query_context.h>
 
@@ -78,6 +80,7 @@ private:
     constexpr static const int kIndexBySourceAndSequence = 0;
     constexpr static const int kIndexByHash = 1;
 
+    QnMutex m_mutex;
     TransactionDictionary m_transactions;
 };
 

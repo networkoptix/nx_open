@@ -20,54 +20,33 @@
 #include "base_persistent_data_test.h"
 #include "data/account_data.h"
 #include "data/system_data.h"
+#include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
 namespace test {
 
-class TestOutgoingTransactionDispatcher:
-    public AbstractOutgoingTransactionDispatcher
-{
-public:
-    typedef nx::utils::MoveOnlyFunc<
-        void(const nx::String&, std::shared_ptr<const SerializableAbstractTransaction>)
-    > OnNewTransactionHandler;
-
-    virtual void dispatchTransaction(
-        const nx::String& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override
-    {
-        if (m_onNewTransactionHandler)
-            m_onNewTransactionHandler(systemId, std::move(transactionSerializer));
-    }
-
-    void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler)
-    {
-        m_onNewTransactionHandler = std::move(onNewTransactionHandler);
-    }
-
-private:
-    OnNewTransactionHandler m_onNewTransactionHandler;
-};
-
 class TransactionLog:
     public cdb::test::BasePersistentDataTest,
     public ::testing::Test
 {
 public:
-    TransactionLog():
+    TransactionLog(dao::DataObjectType dataObjectType):
         BasePersistentDataTest(DbInitializationType::delayed),
         m_peerId(QnUuid::createUuid())
     {
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
 
-        // TODO: #ak uncomment after fixing all tests of memory::TransactionDataObject
-        //ec2::dao::TransactionDataObjectFactory::setDataObjectType<
-        //    ec2::dao::memory::TransactionDataObject>();
+        ec2::dao::TransactionDataObjectFactory::setDataObjectType(dataObjectType);
 
         initializeTransactionLog();
+    }
+
+    ~TransactionLog()
+    {
+        ec2::dao::TransactionDataObjectFactory::resetToDefaultFactory();
     }
 
     void givenRandomSystem()
@@ -124,6 +103,7 @@ class TransactionLogSameTransaction:
 {
 public:
     TransactionLogSameTransaction():
+        TransactionLog(dao::DataObjectType::rdbms),
         m_systemId(cdb::test::BusinessDataGenerator::generateRandomSystemId()),
         m_otherPeerId(QnUuid::createUuid()),
         m_otherPeerDbId(QnUuid::createUuid()),
@@ -155,7 +135,7 @@ protected:
         m_activeQuery.reset();
     }
 
-    void havingGeneratedTransactionLocally()
+    void whenGeneratedTransactionLocally()
     {
         auto queryContext = getQueryContext();
         auto transaction = transactionLog()->prepareLocalTransaction<::ec2::ApiCommand::saveUser>(
@@ -180,7 +160,7 @@ protected:
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
 
-    void havingReceivedTransactionFromOtherPeerWithGreaterTimestamp()
+    void whenReceivedTransactionFromOtherPeerWithGreaterTimestamp()
     {
         addTransactionFromOtherPeerWithTimestampDiff(1);
     }
@@ -203,7 +183,7 @@ protected:
         ASSERT_EQ(m_otherPeerId, finalTransaction.peerID);
     }
 
-    void havingReceivedTransactionFromOtherPeerWithLesserTimestamp()
+    void whenReceivedTransactionFromOtherPeerWithLesserTimestamp()
     {
         addTransactionFromOtherPeerWithTimestampDiff(-1);
     }
@@ -214,12 +194,12 @@ protected:
         ASSERT_EQ(*m_initialTransaction, finalTransaction);
     }
 
-    void havingAddedTransactionLocallyWithGreaterSequence()
+    void whenAddedTransactionLocallyWithGreaterSequence()
     {
-        havingGeneratedTransactionLocally();
+        whenGeneratedTransactionLocally();
     }
 
-    void havingReceivedOwnOldTransactionWithLesserSequence()
+    void whenReceivedOwnOldTransactionWithLesserSequence()
     {
         auto queryContext = getQueryContext();
         auto transaction = transactionLog()->prepareLocalTransaction<::ec2::ApiCommand::saveUser>(
@@ -383,13 +363,13 @@ private:
 
 TEST_F(TransactionLogSameTransaction, newly_generated_transaction_is_there)
 {
-    havingGeneratedTransactionLocally();
+    whenGeneratedTransactionLocally();
     assertIfTransactionIsNotPresent();
 }
 
 TEST_F(TransactionLogSameTransaction, transaction_from_remote_peer_has_been_added)
 {
-    havingReceivedTransactionFromOtherPeerWithGreaterTimestamp();
+    whenReceivedTransactionFromOtherPeerWithGreaterTimestamp();
     assertIfTransactionIsNotPresent();
 }
 
@@ -397,41 +377,41 @@ TEST_F(
     TransactionLogSameTransaction,
     transaction_from_other_peer_with_greater_timestamp_replaces_existing_one)
 {
-    havingGeneratedTransactionLocally();
-    havingReceivedTransactionFromOtherPeerWithGreaterTimestamp();
+    whenGeneratedTransactionLocally();
+    whenReceivedTransactionFromOtherPeerWithGreaterTimestamp();
     assertIfTransactionHasNotBeenReplaced();
     assertThatTransactionAuthorIsOtherPeer();
 }
 
 TEST_F(TransactionLogSameTransaction, transaction_with_lesser_timestamp_is_ignored)
 {
-    havingGeneratedTransactionLocally();
-    havingReceivedTransactionFromOtherPeerWithLesserTimestamp();
+    whenGeneratedTransactionLocally();
+    whenReceivedTransactionFromOtherPeerWithLesserTimestamp();
     assertIfTransactionHasBeenReplaced();
     assertThatTransactionAuthorIsLocalPeer();
 }
 
 TEST_F(TransactionLogSameTransaction, transaction_with_greater_sequence_replaces_existing)
 {
-    havingGeneratedTransactionLocally();
-    havingAddedTransactionLocallyWithGreaterSequence();
+    whenGeneratedTransactionLocally();
+    whenAddedTransactionLocallyWithGreaterSequence();
     assertIfTransactionHasNotBeenReplaced();
     assertThatTransactionAuthorIsLocalPeer();
 }
 
 TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignored)
 {
-    havingGeneratedTransactionLocally();
-    havingReceivedOwnOldTransactionWithLesserSequence();
+    whenGeneratedTransactionLocally();
+    whenReceivedOwnOldTransactionWithLesserSequence();
     assertIfTransactionHasBeenReplaced();
     assertThatTransactionAuthorIsLocalPeer();
 }
 
 TEST_F(TransactionLogSameTransaction, /*DISABLED_*/tran_rollback_clears_raw_data)
 {
-    havingGeneratedTransactionLocally();
+    whenGeneratedTransactionLocally();
     beginTran();
-    havingAddedTransactionLocallyWithGreaterSequence();
+    whenAddedTransactionLocallyWithGreaterSequence();
     rollbackTran();
     assertIfTransactionHasBeenReplaced();
 }
@@ -562,6 +542,8 @@ private:
         m_sharing.accountId = m_accountToShareWith.id;
         m_sharing.accountEmail = m_accountToShareWith.email;
         m_sharing.accessRole = api::SystemAccessRole::advancedViewer;
+        m_sharing.vmsUserId = 
+            guidFromArbitraryData(m_sharing.accountEmail).toSimpleString().toStdString();
     }
 
     void modifyBusinessData()
@@ -619,16 +601,13 @@ class TransactionLogOverlappingTransactions:
     public TransactionLog
 {
 public:
-    TransactionLogOverlappingTransactions()
+    TransactionLogOverlappingTransactions():
+        TransactionLog(dao::DataObjectType::ram)
     {
-        using namespace std::placeholders;
-
-        outgoingTransactionDispatcher().setOnNewTransaction(
-            std::bind(&TransactionLogOverlappingTransactions::storeNewTransaction, this, _1, _2));
     }
 
 protected:
-    void havingAddedOverlappingTransactions()
+    void whenAddedOverlappingTransactions()
     {
         constexpr std::size_t transactionCount = 5;
 
@@ -642,7 +621,7 @@ protected:
             dbTransactions[i-1]->commit();
     }
 
-    void havingAddedBunchOfTransactionsConcurrently()
+    void whenAddedBunchOfTransactionsConcurrently()
     {
         using namespace std::placeholders;
 
@@ -702,25 +681,11 @@ protected:
 
     void assertIfTransactionsWereNotSentInAscendingSequenceOrder()
     {
-        int prevSequence = -1;
-        for (const auto& transaction: m_outgoingTransactions)
-        {
-            ASSERT_GT(transaction->transactionHeader().persistentInfo.sequence, prevSequence);
-            prevSequence = transaction->transactionHeader().persistentInfo.sequence;
-        }
+        outgoingTransactionDispatcher().assertIfTransactionsWereNotSentInAscendingSequenceOrder();
     }
 
 private:
     QnMutex m_mutex;
-    std::list<std::shared_ptr<const SerializableAbstractTransaction>> m_outgoingTransactions;
-
-    void storeNewTransaction(
-        const nx::String& /*systemId*/,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_outgoingTransactions.push_back(std::move(transactionSerializer));
-    }
 
     nx::db::DBResult shareSystemToRandomUser(nx::db::QueryContext* queryContext)
     {
@@ -756,10 +721,10 @@ private:
     }
 };
 
-TEST_F(TransactionLogOverlappingTransactions, DISABLED_overlapping_transactions_sent_in_a_correct_order)
+TEST_F(TransactionLogOverlappingTransactions, overlapping_transactions_sent_in_a_correct_order)
 {
     givenRandomSystem();
-    havingAddedOverlappingTransactions();
+    whenAddedOverlappingTransactions();
     assertIfTransactionsWereNotSentInAscendingSequenceOrder();
 }
 
@@ -772,10 +737,10 @@ class FtTransactionLogOverlappingTransactions:
 {
 };
 
-TEST_F(FtTransactionLogOverlappingTransactions, DISABLED_multiple_simultaneous_transactions)
+TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactions)
 {
     givenRandomSystem();
-    havingAddedBunchOfTransactionsConcurrently();
+    whenAddedBunchOfTransactionsConcurrently();
     assertIfTransactionsWereNotSentInAscendingSequenceOrder();
 }
 

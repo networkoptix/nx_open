@@ -55,6 +55,9 @@ nx::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
         {std::move(sourcePeerKey), transactionData.header.persistentInfo.sequence},
         transactionData.hash,
         transactionData.ubjsonSerializedTransaction};
+
+    QnMutexLocker lk(&m_mutex);
+    
     auto insertionPair = m_transactions.insert(transaction);
     if (!insertionPair.second)
         m_transactions.replace(insertionPair.first, std::move(transaction));
@@ -79,6 +82,8 @@ nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     std::int64_t maxSequence,
     std::vector<dao::TransactionLogRecord>* const transactions)
 {
+    QnMutexLocker lk(&m_mutex);
+
     const TransactionKey from{systemId, peerId, dbInstanceId, minSequence};
     const TransactionKey to{systemId, peerId, dbInstanceId, maxSequence};
     const auto& indexBySourceAndSequence = m_transactions.get<kIndexBySourceAndSequence>();

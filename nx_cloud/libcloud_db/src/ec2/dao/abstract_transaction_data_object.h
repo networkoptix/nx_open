@@ -60,6 +60,12 @@ public:
         std::vector<dao::TransactionLogRecord>* const transactions) = 0;
 };
 
+enum class DataObjectType
+{
+    rdbms,
+    ram
+};
+
 class TransactionDataObjectFactory
 {
 public:
@@ -73,7 +79,11 @@ public:
         setFactoryFunc([](){ return std::make_unique<CustomDataObjectType>(); });
     }
 
+    static void setDataObjectType(DataObjectType dataObjectType);
+
     static void setFactoryFunc(FactoryFunc func);
+
+    static void resetToDefaultFactory();
 };
 
 } // namespace dao
