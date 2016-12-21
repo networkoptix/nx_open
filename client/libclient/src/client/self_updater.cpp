@@ -202,7 +202,7 @@ bool SelfUpdater::updateApplauncher()
         [this]()
         {
             if (!runMinilaucher())
-                NX_LOGX(lit("Could not run applauncher again!"),cl_logERROR);
+                NX_LOGX(lit("Could not run applauncher again!"), cl_logERROR);
         });
 
 
