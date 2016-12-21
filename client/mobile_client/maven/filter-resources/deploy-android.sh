@@ -19,17 +19,10 @@ if [[ "${build.configuration}" == "release" ]]; then
         SIGN=
         SOURCE_APK=apk/bin/QtApp-release-unsigned.apk
     fi
-
-    if [[ "${beta}" == "true" ]]; then
-        APK_SUFFIX="beta"
-    else
-        APK_SUFFIX="release"
-    fi
 else
     SOURCE_APK=apk/bin/QtApp-debug.apk
-    APK_SUFFIX="debug"
 fi
-TARGET_APK=revamped-${installer.name}-${project.version.name}.${project.version.code}-$APK_SUFFIX.apk
+TARGET_APK=${final.artifact.name}.apk
 
 rm -rf $BUILD_TARGET
 
