@@ -26,16 +26,16 @@ server_msi_strip_folder = 'bin/strip'
 client_msi_strip_folder = 'bin/strip'
 wix_pdb = 'wixsetup.wixpdb'
 
-server_msi_name = '${finalName}-server-only.msi'
-server_exe_name = '${finalName}-server-only.exe'
+server_msi_name = '${final.artifact.name}-server.msi'
+server_exe_name = '${final.artifact.name}-server.exe'
 
-client_msi_name = '${finalName}-client-only.msi'
-client_exe_name = '${finalName}-client-only.exe'
+client_msi_name = '${final.artifact.name}-client.msi'
+client_exe_name = '${final.artifact.name}-client.exe'
 
-full_exe_name = '${finalName}.exe'
+full_exe_name = '${final.artifact.name}-bundle.exe'
 
-nxtool_msi_name = '${finalName}-servertool.msi'
-nxtool_exe_name = '${finalName}-servertool.exe'
+nxtool_msi_name = '${final.artifact.name}-servertool.msi'
+nxtool_exe_name = '${final.artifact.name}-servertool.exe'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtensionExt']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
