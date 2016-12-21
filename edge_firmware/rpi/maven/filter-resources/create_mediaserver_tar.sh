@@ -204,3 +204,4 @@ mv ./* ../
 cd ..
 rm -Rf zip
 rm -Rf $TEMP_DIR
+rm -Rf $DEBUG_DIR
