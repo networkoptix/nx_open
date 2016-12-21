@@ -310,3 +310,4 @@ cd ..
 rm -Rf zip
 rm -Rf $BUILD_DIR
 rm -Rf $TEMP_DIR
+rm -Rf $DEBUG_DIR
