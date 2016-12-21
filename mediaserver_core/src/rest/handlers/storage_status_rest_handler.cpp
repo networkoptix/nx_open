@@ -29,7 +29,7 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
     if (fileStorage)
         reply.storage.reservedSpace = fileStorage->calcInitialSpaceLimit();
     else
-        reply.storage.reservedSpace = QnStorageResource::kNasStorageLimit;
+        reply.storage.reservedSpace = QnStorageResource::kThirdPartyStorageLimit;
 
 #if defined (Q_OS_WIN)
     if (!reply.storage.isExternal) 
@@ -43,7 +43,7 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
     return reply;
 }
 
-QnStorageResourcePtr createAndInitStorage(const QString& storageUrl)
+QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl)
 {
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
     if (!storage)
@@ -66,7 +66,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     if(!requireParameter(params, lit("path"), result, &storageUrl))
         return nx_http::StatusCode::invalidParameter;
 
-    auto storage = aux::createAndInitStorage(storageUrl);
+    auto storage = aux::getOrCreateStorage(storageUrl);
     if (!storage)
         return nx_http::StatusCode::invalidParameter;
 
