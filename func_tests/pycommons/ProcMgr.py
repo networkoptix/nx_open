@@ -55,6 +55,8 @@ class Process:
         self.__env = env
         if self.__procMgr:
             self.__procMgr.add(self)
+        self.__out = None
+        self.__err = None
 
     @property
     def name( self ):
@@ -68,13 +70,13 @@ class Process:
           stderr = subprocess.PIPE,
           env = self.__env)
 
-        self.out = BindOutput(self.__name, self.__proc.stdout, self._output, (), self._finished)
-        self.err = BindOutput(self.__name, self.__proc.stderr, self._error)
+        self.__out = BindOutput(self.__name, self.__proc.stdout, self._output, (), self._finished)
+        self.__err = BindOutput(self.__name, self.__proc.stderr, self._error)
 
     # will block until process finishes
     def _close( self ):
-        self.out.close()
-        self.err.close()
+        if self.__out: self.__out.close()
+        if self.__err: self.__err.close()
 
     def _output( self, line ):
         log(5, '%s' % line)
