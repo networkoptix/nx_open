@@ -315,7 +315,6 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
-            <ComponentGroupRef Id="ClientVcrt12ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>

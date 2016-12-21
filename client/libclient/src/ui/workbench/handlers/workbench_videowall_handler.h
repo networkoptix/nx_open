@@ -89,7 +89,7 @@ private:
     QnUuid getLayoutController(const QnUuid &layoutId);
 
     /** Check if user will not lose access to resources if remove them from layout. */
-    bool canRemoveResourcesFromLayout(const QnResourceList& resources) const;
+    bool confirmRemoveResourcesFromLayout(const QnResourceList& resources) const;
 
 private slots:
     void at_newVideoWallAction_triggered();

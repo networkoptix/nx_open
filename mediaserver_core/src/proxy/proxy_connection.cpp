@@ -274,7 +274,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 	{
         QUrl url = d->request.requestLine.url;
         QString host = url.host();
-        QString urlPath = url.path();
+        QString urlPath = QString('/') + QnTcpListener::normalizedPath(url.path());
 
         // todo: this code is deprecated and isn't compatible with WEB client
         // It never used for WEB client purpose

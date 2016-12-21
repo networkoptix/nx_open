@@ -7,7 +7,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "settings.h"
 #include "run_time_options.h"
 
 namespace nx {
@@ -39,20 +38,17 @@ void ProxyHandler::processRequest(
         return;
     }
 
-    if (!m_settings.cloudConnect().sslAllowed)
-        requestOptions.isSsl = TargetWithOptions::Ssl::disabled;
-
-    if (requestOptions.isSsl == TargetWithOptions::Ssl::undefined
+    if (requestOptions.sslMode == conf::SslMode::undefined
         && m_settings.http().sslSupport
-        && m_runTimeOptions.isSslEnforsed(requestOptions.target))
+        && m_runTimeOptions.isSslEnforced(requestOptions.target))
     {
-        requestOptions.isSsl = TargetWithOptions::Ssl::enabled;
+        requestOptions.sslMode = conf::SslMode::enabled;
     }
 
     // TODO: #ak avoid request loop by using Via header.
 
     m_targetPeerSocket = SocketFactory::createStreamSocket(
-        requestOptions.isSsl == TargetWithOptions::Ssl::enabled);
+        requestOptions.sslMode == conf::SslMode::enabled);
 
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
@@ -85,10 +81,8 @@ void ProxyHandler::closeConnection(
         cl_logDEBUG1);
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
-    NX_ASSERT(m_requestCompletionHandler);
-
-    auto handler = std::move(m_requestCompletionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable);
+    if (auto handler = std::move(m_requestCompletionHandler))
+        handler(nx_http::StatusCode::serviceUnavailable);
 }
 
 ProxyHandler::TargetWithOptions::TargetWithOptions(
@@ -129,10 +123,13 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
             requestOptions.target.port = m_settings.http().proxyTargetPort;
     }
 
-    if (requestOptions.isSsl == TargetWithOptions::Ssl::undefined && connection.isSsl())
-        requestOptions.isSsl = TargetWithOptions::Ssl::enabled;
+    if (requestOptions.sslMode == conf::SslMode::undefined)
+        requestOptions.sslMode = m_settings.cloudConnect().preferedSslMode;
 
-    if (requestOptions.isSsl == TargetWithOptions::Ssl::enabled && !m_settings.http().sslSupport)
+    if (requestOptions.sslMode == conf::SslMode::undefined && connection.isSsl())
+        requestOptions.sslMode = conf::SslMode::enabled;
+
+    if (requestOptions.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
         NX_LOGX(lm("SSL requestd but forbidden by settings %1")
             .str(connection.socket()->getForeignAddress()), cl_logDEBUG1);
@@ -194,9 +191,9 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
         targetParts.pop_front();
 
         if (protocol == lit("ssl") || protocol == lit("https"))
-            requestOptions.isSsl = TargetWithOptions::Ssl::enabled;
+            requestOptions.sslMode = conf::SslMode::enabled;
         else if (protocol == lit("http"))
-            requestOptions.isSsl = TargetWithOptions::Ssl::disabled;
+            requestOptions.sslMode = conf::SslMode::disabled;
     }
 
     if (targetParts.size() > 1)

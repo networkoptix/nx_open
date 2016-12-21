@@ -73,6 +73,7 @@ protected:
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     //void clearBuffer();
 
+    QByteArray createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug = false);
     void sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), const QByteArray& multipartBoundary = QByteArray(), bool displayDebug = false);
     QString codeToMessage(int code);
 

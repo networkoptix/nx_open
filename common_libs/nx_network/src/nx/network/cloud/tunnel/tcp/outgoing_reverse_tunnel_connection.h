@@ -18,7 +18,7 @@ class OutgoingReverseTunnelConnection:
 public:
     OutgoingReverseTunnelConnection(
         aio::AbstractAioThread* aioThread,
-        std::shared_ptr<ReverseConnectionHolder> connectionHolder);
+        std::shared_ptr<ReverseConnectionSource> connectionHolder);
 
     ~OutgoingReverseTunnelConnection();
 
@@ -36,7 +36,7 @@ public:
 private:
     void updateCloseTimer();
 
-    const std::shared_ptr<ReverseConnectionHolder> m_connectionHolder;
+    const std::shared_ptr<ReverseConnectionSource> m_connectionHolder;
     utils::AsyncOperationGuard m_asyncGuard;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_closedHandler;
     std::unique_ptr<aio::Timer> m_timer;

@@ -415,6 +415,12 @@ void CloudDBProcess::registerApiHandlers(
 
     //---------------------------------------------------------------------------------------------
     // ec2::ConnectionManager
+    // TODO: #ak remove after 3.0 release.
+    registerHttpHandler(
+        kEstablishEc2TransactionConnectionDeprecatedPath,
+        &ec2::ConnectionManager::createTransactionConnection,
+        ec2ConnectionManager);
+
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
         &ec2::ConnectionManager::createTransactionConnection,

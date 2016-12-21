@@ -1515,7 +1515,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
         if (const auto layout = qnResPool->getResourceById<QnLayoutResource>(existingItem.layout))
         {
             auto removedResources = qnResPool->getResources(layout->layoutResourceIds());
-            if (!canRemoveResourcesFromLayout(removedResources))
+            if (!confirmRemoveResourcesFromLayout(removedResources))
                 break;
         }
 
@@ -1934,11 +1934,11 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     /* User can occasionally remove own access to cameras by dropping something on videowall. */
     if (dropAction == Action::SetAction && currentLayout)
     {
-        QSet<QnUuid> oldResources = currentLayout->layoutResourceIds();
-        QSet<QnUuid> newResources = targetLayout->layoutResourceIds();
+        const auto oldResources = currentLayout->layoutResourceIds();
+        const auto newResources = targetLayout->layoutResourceIds();
 
-        QnResourceList removedResources = qnResPool->getResources(oldResources - newResources);
-        if (!canRemoveResourcesFromLayout(removedResources))
+        const auto removedResources = qnResPool->getResources(oldResources - newResources);
+        if (!confirmRemoveResourcesFromLayout(removedResources))
             return;
     }
 
@@ -3045,7 +3045,7 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
     return QnUuid();
 }
 
-bool QnWorkbenchVideoWallHandler::canRemoveResourcesFromLayout(
+bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
     const QnResourceList& resources) const
 {
     //just in case
@@ -3067,6 +3067,7 @@ bool QnWorkbenchVideoWallHandler::canRemoveResourcesFromLayout(
             if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
                 return false;
 
+            // Check if providers list contains only this layout and videowall
             if (providers.size() > 2)
                 return false;
 
@@ -3075,7 +3076,7 @@ bool QnWorkbenchVideoWallHandler::canRemoveResourcesFromLayout(
 
     if (inaccessible.isEmpty())
         return true;
-    
+
     return QnLayoutsHandlerMessages::replaceVideoWallResources(mainWindow(), inaccessible);
 }
 

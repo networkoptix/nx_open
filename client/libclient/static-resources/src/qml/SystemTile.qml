@@ -14,6 +14,7 @@ BaseTile
     property bool factorySystem: false;
     property bool isCompatibleInternal: false;
     property bool safeMode: false;
+    property bool isFactoryTile: impl.isFactoryTile;
 
     property string wrongVersion;
     property string compatibleVersion;
@@ -121,9 +122,7 @@ BaseTile
         {
             case control.impl.kFactorySystemTileType:
                 var factorySystemHost = areaLoader.item.host;
-                console.log("Show wizard for system <", systemName,
-                    ">, host <", factorySystemHost, ">");
-                context.setupFactorySystem(factorySystemHost);
+                control.impl.connectToLocalSystem();
                 break;
 
             case control.impl.kCloudSystemTileType:
@@ -290,19 +289,41 @@ BaseTile
 
         function connectToLocalSystem()
         {
-            if (isFactoryTile || isCloudTile)
+            if (isCloudTile)
                 return;
 
             var tile  = control.areaLoader.item;
-            console.log("Connecting to local system<", control.systemName,
-                "host <", tile.selectedHost, "> with credentials: ",
-                tile.selectedUser,
-                tile.savePassword, tile.autoLogin);
+            if (isFactoryTile)
+            {
+                var factorySystemHost = areaLoader.item.host;
+                console.log("Trying tp setup factory system <", control.systemName,
+                    ">, host <", factorySystemHost, ">");
 
-            context.connectToLocalSystem(
-                control.systemId, tile.selectedHost,
-                tile.selectedUser, tile.selectedPassword,
-                tile.savePassword, tile.autoLogin);
+                /**
+                  * Discussed with R. Vasilenko - we can rely on admin/admin
+                  * credentials for factory (new) systems. Otherwise it is error
+                  * situation  on server side
+                  */
+                var kFactorySystemUser = "admin";
+                var kFactorySystemPassword = "admin";
+                context.connectToLocalSystem(
+                    control.systemId, factorySystemHost,
+                    kFactorySystemUser, kFactorySystemPassword,
+                    false, false);
+            }
+            else
+            {
+                console.log("Connecting to local system <", control.systemName,
+                    ">, host <", tile.selectedHost, ">, user <", tile.selectedUser, ">");
+
+                context.connectToLocalSystem(
+                    control.systemId, tile.selectedHost,
+                    tile.selectedUser, tile.selectedPassword,
+                    tile.savePassword, tile.autoLogin);
+            }
+
+
+
         }
     }
 }

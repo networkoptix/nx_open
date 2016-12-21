@@ -46,7 +46,7 @@ private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
      bool m_updating;
 
-     qint64 m_expectedLengthMs;
+     qint64 m_speed;
      qint64 m_sourcePeriodLengthMs;
      qint64 m_frameStepMs;
      int m_maxSpeed;

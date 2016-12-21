@@ -827,6 +827,19 @@ void socketConnectCancelAsync(
     }
 }
 
+template<typename ClientSocketMaker>
+void socketIsInValidStateAfterCancellation(const ClientSocketMaker& clientMaker)
+{
+    auto socket = clientMaker();
+    ASSERT_TRUE(socket->setNonBlockingMode(true));
+    socket->connectAsync(
+        SocketAddress(HostAddress::localhost, 12345),
+        [](SystemError::ErrorCode /*sysErrorCode*/) {});
+
+    socket->pleaseStopSync();
+    socket->setRecvBufferSize(128 * 1024);
+}
+
 template<typename ServerSocketMaker>
 void socketAcceptTimeoutSync(
     const ServerSocketMaker& serverMaker,
@@ -967,6 +980,8 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketConnectCancelAsync(mkClient, StopType::cancelIo); } \
     Type(Name, ConnectPleaseStopAsync) \
         { nx::network::test::socketConnectCancelAsync(mkClient, StopType::pleaseStop); } \
+    Type(Name, SocketIsInValidStateAfterCancellation) \
+        { nx::network::test::socketIsInValidStateAfterCancellation(mkClient); } \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleAcceptMixed) \

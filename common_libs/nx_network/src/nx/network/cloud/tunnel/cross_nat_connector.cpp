@@ -104,7 +104,7 @@ void CrossNatConnector::connect(
         [this, timeout, handler = std::move(handler)]() mutable
         {
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
-            if (auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(hostName))
+            if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
                 NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
                 return handler(

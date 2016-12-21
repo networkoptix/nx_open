@@ -71,12 +71,7 @@ update () {
 
 /etc/init.d/cron stop
 /etc/init.d/$COMPANY_NAME-mediaserver stop
-if [ "$1" != "" ]
-then
-  update >> $1 2>&1
-else
-  update 2>&1
-fi
+update
 if [[ "${box}" == "bpi" ]]; then reboot && exit 0; fi
 /etc/init.d/$COMPANY_NAME-mediaserver start
 /etc/init.d/cron start
