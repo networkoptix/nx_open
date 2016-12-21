@@ -1,7 +1,7 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-export DISTRIB=${final.artifact.name}-$BOX_NAME-server
+export DISTRIB=${final.artifact.name}-server
 
 update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop

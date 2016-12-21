@@ -15,9 +15,8 @@ exec 1<>$NX1UPGRADELOG
 exec 2>&1
 
 echo "Starting upgrade ..."
-BOX_NAME=${box}
 COMPANY_NAME=${deb.customization.company.name}
-export DISTRIB=${final.artifact.name}-$BOX_NAME-server
+export DISTRIB=${final.artifact.name}-server
 
 update () {
   cp $DISTRIB.tar.gz /tmp
