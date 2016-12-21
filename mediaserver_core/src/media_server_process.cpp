@@ -537,6 +537,37 @@ static int freeGB(QString drive)
 }
 #endif
 
+aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
+    m_mediaFolderName(mediaFolderName)
+{}
+
+QString aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
+{
+    if (!url.endsWith(m_mediaFolderName))
+        return url;
+    
+    int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
+    NX_ASSERT(indexBeforeMediaFolderName > 0);
+    if (indexBeforeMediaFolderName <= 0)
+        return url;
+
+    return url.mid(0, indexBeforeMediaFolderName);
+}
+
+QnStorageResourceList aux::UnmountedStoragesFilter::getUnmountedStorages(
+        const QnStorageResourceList& allStorages,
+        const QStringList& paths)
+{
+    QnStorageResourceList result;
+    for (const auto& storage: allStorages)
+    {
+        if (!paths.contains(getStorageUrlWithoutMediaFolder(storage->getUrl())))
+            result.append(storage);
+    }
+
+    return result;
+}
+
 static QStringList listRecordFolders()
 {
     QStringList folderPaths;
@@ -768,6 +799,13 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         }
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+
+        aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
+        auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
+                m_mediaServer->getStorages(), 
+                listRecordFolders());
+
+        storagesToRemove.append(unMountedStorages);
 
         NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
         for (const auto& storage: storagesToRemove)
