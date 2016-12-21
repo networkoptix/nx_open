@@ -21,12 +21,7 @@ MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
+PACKAGE_NAME=${final.artifact.name}-$BOX_NAME-server.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
 BUILD_DIR="`mktemp -d`"
