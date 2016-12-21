@@ -142,9 +142,6 @@ do
   fi
 done
 
-#creating symlink for rpath needed by mediaserver binary
-ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
-
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
@@ -188,6 +185,8 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   fi
+  #creating symlink for rpath needed by mediaserver binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
 
   #creating symlink for rpath needed by mobile_client binary
   ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/lib"
