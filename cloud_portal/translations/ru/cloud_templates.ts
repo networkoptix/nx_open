@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>templates/activate_account.mustache</name>
+    <name>activate_account.mustache</name>
     <message>
-      <location filename="templates/activate_account.mustache"/>
+      <location filename="activate_account.mustache"/>
       <source>notification</source>
       <translation> </translation>
     </message>
@@ -49,9 +49,9 @@
     </message>
   </context>
   <context>
-    <name>templates/restore_password.mustache</name>
+    <name>restore_password.mustache</name>
     <message>
-      <location filename="templates/restore_password.mustache"/>
+      <location filename="restore_password.mustache"/>
       <source>notification</source>
       <translation> </translation>
     </message>
@@ -102,9 +102,9 @@
     </message>
   </context>
   <context>
-    <name>templates/system_invite.mustache</name>
+    <name>system_invite.mustache</name>
     <message>
-      <location filename="templates/system_invite.mustache"/>
+      <location filename="system_invite.mustache"/>
       <source>notification</source>
       <translation> </translation>
     </message>
@@ -160,9 +160,9 @@
     </message>
   </context>
   <context>
-    <name>templates/system_shared.mustache</name>
+    <name>system_shared.mustache</name>
     <message>
-      <location filename="templates/system_shared.mustache"/>
+      <location filename="system_shared.mustache"/>
       <source>notification</source>
       <translation> </translation>
     </message>
@@ -203,9 +203,9 @@
     </message>
   </context>
   <context>
-    <name>templates/unknown.mustache</name>
+    <name>unknown.mustache</name>
     <message>
-      <location filename="templates/unknown.mustache"/>
+      <location filename="unknown.mustache"/>
       <source>notification</source>
       <translation> </translation>
     </message>

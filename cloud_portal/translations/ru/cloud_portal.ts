@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>static/scripts/language.js</name>
+    <name>scripts/language.js</name>
     <message>
-      <location filename="static/scripts/language.js"/>
+      <location filename="scripts/language.js"/>
       <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -514,9 +514,9 @@
     </message>
   </context>
   <context>
-    <name>static/apple-app-site-association</name>
+    <name>apple-app-site-association</name>
     <message>
-      <location filename="static/apple-app-site-association"/>
+      <location filename="apple-app-site-association"/>
       <source>applinks</source>
       <translation> </translation>
     </message>
@@ -562,9 +562,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/404.html</name>
+    <name>views/404.html</name>
     <message>
-      <location filename="static/views/404.html"/>
+      <location filename="views/404.html"/>
       <source>Page not found</source>
       <translation>Нема</translation>
     </message>
@@ -575,14 +575,14 @@
     </message>
     <message>
       <location/>
-      <source>/static/images/404@2x.png 2x&quot; set-title</source>
+      <source>/images/404@2x.png 2x&quot; set-title</source>
       <translation> </translation>
     </message>
   </context>
   <context>
-    <name>static/views/account.html</name>
+    <name>views/account.html</name>
     <message>
-      <location filename="static/views/account.html"/>
+      <location filename="views/account.html"/>
       <source>Аккаунт</source>
       <translation> </translation>
     </message>
@@ -648,9 +648,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/activeActions.html</name>
+    <name>views/activeActions.html</name>
     <message>
-      <location filename="static/views/activeActions.html"/>
+      <location filename="views/activeActions.html"/>
       <source>Your account has been successfully activated.</source>
       <translation> </translation>
     </message>
@@ -741,9 +741,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/debug.html</name>
+    <name>views/debug.html</name>
     <message>
-      <location filename="static/views/debug.html"/>
+      <location filename="views/debug.html"/>
       <source>Debug native links</source>
       <translation> </translation>
     </message>
@@ -894,9 +894,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/download.html</name>
+    <name>views/download.html</name>
     <message>
-      <location filename="static/views/download.html"/>
+      <location filename="views/download.html"/>
       <source>Download</source>
       <translation>Скачать </translation>
     </message>
@@ -917,9 +917,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/regActions.html</name>
+    <name>views/regActions.html</name>
     <message>
-      <location filename="static/views/regActions.html"/>
+      <location filename="views/regActions.html"/>
       <source>The account was successfully registered. We've sent a confirmation message to your email address.</source>
       <translation> </translation>
     </message>
@@ -1010,15 +1010,15 @@
     </message>
   </context>
   <context>
-    <name>static/views/startPage.html</name>
+    <name>views/startPage.html</name>
   </context>
   <context>
-    <name>static/views/static.html</name>
+    <name>views/static.html</name>
   </context>
   <context>
-    <name>static/views/system.html</name>
+    <name>views/system.html</name>
     <message>
-      <location filename="static/views/system.html"/>
+      <location filename="views/system.html"/>
       <source>You do not have access to the system information.</source>
       <translation> </translation>
     </message>
@@ -1029,9 +1029,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/systems.html</name>
+    <name>views/systems.html</name>
     <message>
-      <location filename="static/views/systems.html"/>
+      <location filename="views/systems.html"/>
       <source>Systems</source>
       <translation> </translation>
     </message>
@@ -1052,9 +1052,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/dialog.html</name>
+    <name>views/components/dialog.html</name>
     <message>
-      <location filename="static/views/components/dialog.html"/>
+      <location filename="views/components/dialog.html"/>
       <source>&amp;times;</source>
       <translation> </translation>
     </message>
@@ -1075,9 +1075,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/footer.html</name>
+    <name>views/components/footer.html</name>
     <message>
-      <location filename="static/views/components/footer.html"/>
+      <location filename="views/components/footer.html"/>
       <source>About</source>
       <translation> </translation>
     </message>
@@ -1133,9 +1133,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/header.html</name>
+    <name>views/components/header.html</name>
     <message>
-      <location filename="static/views/components/header.html"/>
+      <location filename="views/components/header.html"/>
       <source>About</source>
       <translation> </translation>
     </message>
@@ -1201,9 +1201,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/open-client-button.html</name>
+    <name>views/components/open-client-button.html</name>
     <message>
-      <location filename="static/views/components/open-client-button.html"/>
+      <location filename="views/components/open-client-button.html"/>
       <source>default</source>
       <translation> </translation>
     </message>
@@ -1224,9 +1224,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/password-input.html</name>
+    <name>views/components/password-input.html</name>
     <message>
-      <location filename="static/views/components/password-input.html"/>
+      <location filename="views/components/password-input.html"/>
       <source>good</source>
       <translation> </translation>
     </message>
@@ -1273,12 +1273,12 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/process-button.html</name>
+    <name>views/components/process-button.html</name>
   </context>
   <context>
-    <name>static/views/components/system-card.html</name>
+    <name>views/components/system-card.html</name>
     <message>
-      <location filename="static/views/components/system-card.html"/>
+      <location filename="views/components/system-card.html"/>
       <source>Your system</source>
       <translation> </translation>
     </message>
@@ -1314,9 +1314,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/system-header.html</name>
+    <name>views/components/system-header.html</name>
     <message>
-      <location filename="static/views/components/system-header.html"/>
+      <location filename="views/components/system-header.html"/>
       <source>Share</source>
       <translation> </translation>
     </message>
@@ -1332,9 +1332,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/components/system-users.html</name>
+    <name>views/components/system-users.html</name>
     <message>
-      <location filename="static/views/components/system-users.html"/>
+      <location filename="views/components/system-users.html"/>
       <source>Users</source>
       <translation> </translation>
     </message>
@@ -1380,9 +1380,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/dialogs/disconnect.html</name>
+    <name>views/dialogs/disconnect.html</name>
     <message>
-      <location filename="static/views/dialogs/disconnect.html"/>
+      <location filename="views/dialogs/disconnect.html"/>
       <source>System will be unavailable through the cloud. The only possible way to connect to the system will be addressing it directly(host address and port). If you don't have local administator account, you will have to create it the first time when you connect to the system.</source>
       <translation> </translation>
     </message>
@@ -1418,9 +1418,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/dialogs/login.html</name>
+    <name>views/dialogs/login.html</name>
     <message>
-      <location filename="static/views/dialogs/login.html"/>
+      <location filename="views/dialogs/login.html"/>
       <source>Email address</source>
       <translation> </translation>
     </message>
@@ -1456,9 +1456,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/dialogs/rename.html</name>
+    <name>views/dialogs/rename.html</name>
     <message>
-      <location filename="static/views/dialogs/rename.html"/>
+      <location filename="views/dialogs/rename.html"/>
       <source>System name is required....</source>
       <translation> </translation>
     </message>
@@ -1479,9 +1479,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/dialogs/share.html</name>
+    <name>views/dialogs/share.html</name>
     <message>
-      <location filename="static/views/dialogs/share.html"/>
+      <location filename="views/dialogs/share.html"/>
       <source>User</source>
       <translation> </translation>
     </message>
@@ -1512,12 +1512,12 @@
     </message>
   </context>
   <context>
-    <name>static/views/static/about.html</name>
+    <name>views/about.html</name>
   </context>
   <context>
-    <name>static/views/static/eula.html</name>
+    <name>views/eula.html</name>
     <message>
-      <location filename="static/views/static/eula.html"/>
+      <location filename="views/eula.html"/>
       <source>Terms and conditions</source>
       <translation> </translation>
     </message>
@@ -1593,9 +1593,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/static/help.html</name>
+    <name>views/help.html</name>
     <message>
-      <location filename="static/views/static/help.html"/>
+      <location filename="views/help.html"/>
       <source>How to use</source>
       <translation> </translation>
     </message>
@@ -1636,9 +1636,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/static/landing.html</name>
+    <name>views/landing.html</name>
     <message>
-      <location filename="static/views/static/landing.html"/>
+      <location filename="views/landing.html"/>
       <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -1689,9 +1689,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/static/no-systems.html</name>
+    <name>views/no-systems.html</name>
     <message>
-      <location filename="static/views/static/no-systems.html"/>
+      <location filename="views/no-systems.html"/>
       <source>You have no systems connected to PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -1712,9 +1712,9 @@
     </message>
   </context>
   <context>
-    <name>static/views/static/register-intro.html</name>
+    <name>views/register-intro.html</name>
     <message>
-      <location filename="static/views/static/register-intro.html"/>
+      <location filename="views/register-intro.html"/>
       <source>Welcome to</source>
       <translation> </translation>
     </message>
@@ -1755,9 +1755,9 @@
     </message>
   </context>
   <context>
-    <name>static/503.html</name>
+    <name>503.html</name>
     <message>
-      <location filename="static/503.html"/>
+      <location filename="503.html"/>
       <source>PRODUCT_NAME is under maintenance</source>
       <translation> </translation>
     </message>
@@ -1807,7 +1807,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
     </message>
     <message>
       <location/>
-      <source>/static/images/favicon.ico</source>
+      <source>/images/favicon.ico</source>
       <translation> </translation>
     </message>
     <message>
@@ -1837,12 +1837,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
     </message>
     <message>
       <location/>
-      <source>static/styles/f01c59fd.503.css</source>
+      <source>styles/f01c59fd.503.css</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/static/images/503@2x.png 2x</source>
+      <source>/images/503@2x.png 2x</source>
       <translation> </translation>
     </message>
     <message>
