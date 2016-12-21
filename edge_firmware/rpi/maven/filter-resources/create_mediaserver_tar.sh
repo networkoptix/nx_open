@@ -186,6 +186,12 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   fi
 
+  #creating symlink for rpath needed by mobile_client binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/lib"
+
+  #creating symlink for rpath needed by Qt plugins
+  ln -s "../../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib"
+
   #copying directories needed by lite client
   DIRS_TO_COPY=( \
   egldeviceintegrations \
@@ -209,7 +215,6 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   cp -Rfv $USR_DIR $BUILD_DIR/usr
   
   #additional platform specific files
-  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
   cp -Rf ${qt.dir}/translations $BUILD_DIR/$PREFIX_DIR/lite_client/bin

@@ -1506,12 +1506,19 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
 
     QSet<QnVideoWallResourcePtr> videoWalls;
 
-    for (const QnVideoWallItemIndex &index: items)
+    for (const QnVideoWallItemIndex& index: items)
     {
         if (!index.isValid())
             continue;
 
         QnVideoWallItem existingItem = index.item();
+        if (const auto layout = qnResPool->getResourceById<QnLayoutResource>(existingItem.layout))
+        {
+            auto removedResources = qnResPool->getResources(layout->layoutResourceIds());
+            if (!confirmRemoveResourcesFromLayout(removedResources))
+                break;
+        }
+
         existingItem.layout = QnUuid();
         index.videowall()->items()->updateItem(existingItem);
         videoWalls << index.videowall();
@@ -1925,43 +1932,14 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 
 
     /* User can occasionally remove own access to cameras by dropping something on videowall. */
-    if (dropAction == Action::SetAction
-        && currentLayout
-        && context()->user() //just in case
-        && !accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission))
+    if (dropAction == Action::SetAction && currentLayout)
     {
-        QSet<QnUuid> oldResources = currentLayout->layoutResourceIds();
-        QSet<QnUuid> newResources = targetLayout->layoutResourceIds();
+        const auto oldResources = currentLayout->layoutResourceIds();
+        const auto newResources = targetLayout->layoutResourceIds();
 
-        QnResourceList removedResources = qnResPool->getResources(oldResources - newResources);
-        QnResourceList inaccessible = removedResources.filtered(
-            [this, currentLayout, targetIndex](const QnResourcePtr& resource) -> bool
-            {
-                QnResourceList providers;
-                const auto accessSource = qnResourceAccessProvider->accessibleVia(
-                    context()->user(), resource, &providers);
-
-                // We need to get only resources which are accessible only by this layout
-                if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
-                    return false;
-
-                if (providers.size() > 2)
-                    return false;
-
-                NX_EXPECT(providers.contains(currentLayout));
-                NX_EXPECT(providers.contains(targetIndex.videowall()));
-
-                return true;
-            });
-
-        if (!inaccessible.isEmpty())
-        {
-            const auto okToContinue = QnLayoutsHandlerMessages::replaceVideoWallResources(
-                mainWindow(), inaccessible);
-            if (!okToContinue)
-                return;
-        }
-
+        const auto removedResources = qnResPool->getResources(oldResources - newResources);
+        if (!confirmRemoveResourcesFromLayout(removedResources))
+            return;
     }
 
     if (!targetLayout->resourcePool())
@@ -3065,6 +3043,41 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
         return info.uuid;
     }
     return QnUuid();
+}
+
+bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
+    const QnResourceList& resources) const
+{
+    //just in case
+    if (!context()->user())
+        return true;
+
+    //quick check
+    if (accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission))
+        return true;
+
+    QnResourceList inaccessible = resources.filtered(
+        [this](const QnResourcePtr& resource) -> bool
+        {
+            QnResourceList providers;
+            const auto accessSource = qnResourceAccessProvider->accessibleVia(
+                context()->user(), resource, &providers);
+
+            // We need to get only resources which are accessible only by this layout
+            if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
+                return false;
+
+            // Check if providers list contains only this layout and videowall
+            if (providers.size() > 2)
+                return false;
+
+            return true;
+        });
+
+    if (inaccessible.isEmpty())
+        return true;
+
+    return QnLayoutsHandlerMessages::replaceVideoWallResources(mainWindow(), inaccessible);
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWallResourcePtr& videowall, const QnLayoutResourcePtr &layout)
