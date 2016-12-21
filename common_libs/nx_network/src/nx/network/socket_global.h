@@ -135,11 +135,13 @@ public:
     {
     }
 
-    void reinitialize()
+    void reinitialize(bool initializePeerId = true)
     {
         m_socketGlobalsGuard.reset();
         m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>();
-        SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
+
+        if (initializePeerId)
+            SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
     }
 
 private:

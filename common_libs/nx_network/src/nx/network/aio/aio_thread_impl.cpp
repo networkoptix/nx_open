@@ -119,7 +119,7 @@ void AIOThreadImpl::processPollSetModificationQueue(TaskType taskFilter)
                 NX_ASSERT(task.postHandler);
                 NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
                 postedCalls.push_back(std::move(task));
-                //this task differs from every else in a way that it is not processed here, 
+                //this task differs from every else in a way that it is not processed here,
                     //just moved to another container. TODO #ak is it really needed to move to another container?
                 it = pollSetModificationQueue.erase(it);
                 continue;
@@ -299,9 +299,9 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
                 ? aio::etRead
                 : aio::etWrite);
 
-        //TODO #ak in case of error pollSet reports etError once, 
+        //TODO #ak in case of error pollSet reports etError once,
         //but two handlers may be registered for socket.
-        //So, we must notify both (if they differ, probably). 
+        //So, we must notify both (if they differ, probably).
         //Currently, leaving as-is since any socket installs single handler for both events
 
         //TODO #ak notify second handler (if any) and if it not removed by first handler
@@ -328,7 +328,7 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
         if (handlingData->timeout > 0)
             handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;
         --handlingData->beingProcessed;
-        //NOTE element, this iterator points to, could be removed in eventTriggered call, 
+        //NOTE element, this iterator points to, could be removed in eventTriggered call,
         //but it is still safe to increment this iterator
         ++it;
     }
