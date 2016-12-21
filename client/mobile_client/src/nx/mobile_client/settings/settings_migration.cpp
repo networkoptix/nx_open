@@ -74,22 +74,44 @@ static void migrateFrom26To30()
         return;
 
     auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    auto weights = qnClientCoreSettings->localSystemWeightsData();
+
+    const auto dateTime = QDateTime::currentMSecsSinceEpoch();
 
     for (const QVariant& sessionVariant: sessions)
     {
         const auto session = QnLoginSession::fromVariant(sessionVariant.toMap());
 
-        auto it = boost::find_if(recentConnections,
-            [&session](const QnLocalConnectionData& data) { return data.localId == session.id; });
+        {
+            auto it = boost::find_if(recentConnections,
+                [&session](const QnLocalConnectionData& data)
+                {
+                    return data.localId == session.id
+                            && data.url.userName().compare(
+                                session.url.userName(), Qt::CaseInsensitive) == 0;
+                });
 
-        if (it != recentConnections.end())
-            continue;
+            if (it != recentConnections.end())
+                continue;
+        }
 
         const QnLocalConnectionData connectionData(session.systemName, session.id, session.url);
         recentConnections.append(connectionData);
+
+        {
+            auto it = boost::find_if(weights,
+                [session](const QnWeightData& data) { return data.localId == session.id; });
+
+            if (it == weights.end())
+                weights.append(QnWeightData{session.id, 1.0, dateTime, true});
+        }
     }
 
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+    qnClientCoreSettings->setLocalSystemWeightsData(weights);
+    qnClientCoreSettings->save();
+    qnSettings->setSavedSessions(QVariantList());
+    qnSettings->save();
 }
 
 void migrateSettings()
