@@ -91,6 +91,12 @@ class Process:
         if self.__proc.poll() is None:
             log(13, 'sending signal %d to %s (%d)' % (sig, self.__name, self.__proc.pid))
             os.kill(self.__proc.pid, sig)
+            finishTime = time.time() + 5.0
+            while self.__proc.poll() is None and time.time() < finishTime:
+                time.sleep(0.5)
+            if self.__proc.poll() is None:
+                log(13, 'sending signal %d to %s (%d)' % (signal.KILL, self.__name, self.__proc.pid))
+                os.kill(self.__proc.pid, signal.KILL)
         else:
             log(13, 'not sending signal %d to %s - already stopped' % (sig, self.__name))
 

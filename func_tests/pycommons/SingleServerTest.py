@@ -107,14 +107,16 @@ class MediaServerBaseTest(FuncTest.FuncTestCaseBase, ComparisonMixin):
                 return
             time.sleep(1.0)
 
-    # Override the method in your dirrived test class,
+    # Override the method in your derived test class,
     # if want to make specific server preparation
-    def prepareEnv(self, server):
+    @classmethod
+    def prepareEnv(cls, server):
         server.prepare()
 
-    # Override the method in your dirrived test class,
+    # Override the method in your derived test class,
     # if need to change server config
-    def writeConfig(self, server):
+    @classmethod
+    def writeConfig(cls, server):
         server.writeConfig()
 
 class MediaServerInstanceTest(MediaServerBaseTest):
@@ -132,10 +134,10 @@ class MediaServerInstanceTest(MediaServerBaseTest):
         super(MediaServerBaseTest, cls).globalInit(config)
         cdesc = cls.__name__
         cls.server = MediaServerProcess(FuncTest.makeTestInfo(), cdesc)
+        cls.prepareEnv(cls.server)
+        cls.writeConfig(cls.server)
+        cls.server.start()
 
     def setUp(self):
         FuncTest.tlog(10, "Start '%s' process" % self.server.name)
-        self.prepareEnv(self.server)
-        self.writeConfig(self.server)
-        self.server.start()
         self.checkConnect(self.server.address)
