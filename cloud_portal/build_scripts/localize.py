@@ -6,10 +6,10 @@ from os.path import join
 
 import errno
 import yaml
+import shutil
+import codecs
 
 # 1. read ts into xml
-xml_files = (('static', 'cloud_portal.ts'), ('templates', 'cloud_templates.ts'))
-
 # Read branding info
 
 branding_messages = {}
@@ -49,47 +49,52 @@ def save_content(filename, content):
         # proceed with branding
         active_content = process_branding(content)
 
-        # save old file
-        with open(filename, "w") as file_descriptor:
-            print "save: " + filename
-            file_descriptor.write(active_content)
+        with codecs.open(filename, "w", "utf-8") as file:
+            file.write(u'\ufeff')
+            file.close()
 
 
-def process_files(lang):
-    for xml_file in xml_files:
-        root_directory = xml_file[0]
-        tree = eTree.parse(xml_file[1])
-        root = tree.getroot()
+def process_files(lang, root_directory, xml_filename):
+    # 1. Copy all sources to target dir
 
-        # 2. go file by file
-        active_filename = ''
-        target_filename = ''
-        active_content = ''
-        for context in root.iter('context'):
-            for message in context.iter('message'):
-                location = message.find('location')
-                if location is not None and location.get('filename'):
-                    filename = location.get('filename')
-                    save_content(target_filename, active_content)
-                    active_filename = os.path.join(root_directory, filename)
-                    target_filename = os.path.join(root_directory, lang, filename)
+    xml_filename = os.path.join("../../..", "translations", lang, xml_filename)
+    tree = eTree.parse(xml_filename)
 
+    root = tree.getroot()
+
+    # 2. go file by file
+    active_filename = ''
+    target_filename = ''
+    active_content = ''
+    for context in root.iter('context'):
+        for message in context.iter('message'):
+            location = message.find('location')
+            if location is not None and location.get('filename'):
+                filename = location.get('filename')
+                save_content(target_filename, active_content)
+                active_filename = os.path.join(root_directory, filename)
+                target_filename = os.path.join(root_directory, "lang_" + lang, filename)
+
+                try:
                     with open(active_filename, 'r') as file_descriptor:
                         active_content = file_descriptor.read()
+                except IOError as a:
+                    print(a)
+                    continue
 
-                source = message.find('source').text
+            source = message.find('source').text
 
-                translation = message.find('translation').text
+            translation = message.find('translation').text
 
-                if translation and translation.strip():
-                    # 3. replace string in file
-                    if ' ' not in source:
-                        print("! replacing single word:", source, active_filename)
-                        active_content = re.sub('(?<=\W)' + re.escape(source) + '(?=\W)', translation, active_content)
-                    else:
-                        print("replacing:", active_filename, source, translation)
-                        active_content = active_content.replace(source, translation)
-        save_content(target_filename, active_content)
+            if translation and translation.strip():
+                # 3. replace string in file
+                if ' ' not in source:
+                    print("! replacing single word:", source, active_filename)
+                    active_content = re.sub('(?<=\W)' + re.escape(source) + '(?=\W)', translation, active_content)
+                else:
+                    print("replacing:", active_filename, source, translation)
+                    active_content = active_content.replace(source, translation)
+    save_content(target_filename, active_content)
 
 
 read_branding()
@@ -104,4 +109,11 @@ if 'languages' not in config:
 languages = config['languages']
 # Localize this language
 for lang in languages:
-    process_files(lang)
+    # copy static/views to target dir
+    lang_dir = os.path.join('static', 'lang_' + lang)
+    if os.path.isdir(lang_dir):
+        shutil.rmtree(lang_dir)
+    shutil.copytree(os.path.join('static', 'views'), lang_dir)
+
+    process_files(lang, 'static', 'cloud_portal.ts')
+    process_files(lang, 'templates', 'cloud_templates.ts')
