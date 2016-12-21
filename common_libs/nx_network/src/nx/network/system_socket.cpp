@@ -1410,18 +1410,20 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
     if (!acceptedSocket)
         return nullptr;
-#ifdef _WIN32
-    if (!nonBlockingMode)
-        return acceptedSocket;
 
-    //moving socket to blocking mode by default to be consistent with msdn
-        //(https://msdn.microsoft.com/en-us/library/windows/desktop/ms738573(v=vs.85).aspx)
-    if (!acceptedSocket->setNonBlockingMode(false))
-    {
-        delete acceptedSocket;
-        return nullptr;
-    }
-#endif
+    #if defined(Q_OS_WIN) || defined(Q_OS_MACX)
+        if (!nonBlockingMode)
+            return acceptedSocket;
+
+        // Make all platforms behave like Linux, so all new sockets are in blocking mode
+        // regardless of their origin.
+        if (!acceptedSocket->setNonBlockingMode(false))
+        {
+            delete acceptedSocket;
+            return nullptr;
+        }
+    #endif
+
     return acceptedSocket;
 }
 

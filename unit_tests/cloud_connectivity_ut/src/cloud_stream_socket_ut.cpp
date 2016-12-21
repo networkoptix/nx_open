@@ -309,25 +309,24 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
     for (int i = 0; i < kTestRuns; ++i)
     {
-        auto sock = std::make_unique<CloudStreamSocket>(AF_INET);
-
+        auto socket = SocketFactory::createStreamSocket();
         enum class SocketState {init, connected, closed};
         std::atomic<SocketState> socketState(SocketState::init);
 
         nx::utils::thread sendThread(
-            [&sock, targetAddress = tcpServer.addressBeingListened(), &socketState]
+            [&socket, targetAddress = tcpServer.addressBeingListened(), &socketState]
             {
                 char testBuffer[16*1024];
 
-                if (!sock->isConnected())
+                if (!socket->isConnected())
                 {
-                    ASSERT_TRUE(sock->connect(targetAddress, 3000));
+                    ASSERT_TRUE(socket->connect(targetAddress, 3000));
                     socketState = SocketState::connected;
                 }
 
-                while (!sock->isClosed() && sock->isConnected())
+                while (!socket->isClosed() && socket->isConnected())
                 {
-                    int bytesSent = sock->send(testBuffer, sizeof(testBuffer));
+                    int bytesSent = socket->send(testBuffer, sizeof(testBuffer));
                     if (bytesSent == -1)
                         continue;
                 }
@@ -335,7 +334,7 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
         //read thread
         nx::utils::thread recvThread(
-            [&sock, &socketState]
+            [&socket, &socketState]
             {
                 char readBuffer[16 * 1024];
                 for (;;)
@@ -346,10 +345,10 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
                         continue;
                     }
 
-                    if (!sock->isConnected() || sock->isClosed())
+                    if (!socket->isConnected() || socket->isClosed())
                         break;
 
-                    int bytesReceived = sock->recv(readBuffer, sizeof(readBuffer));
+                    int bytesReceived = socket->recv(readBuffer, sizeof(readBuffer));
                     if (bytesReceived == -1)
                         continue;
                 }
@@ -359,14 +358,14 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
         //cancelling
         if (i & 1)
-            sock->close();
+            socket->close();
         else
-            sock->shutdown();
+            socket->shutdown();
 
         recvThread.join();
         sendThread.join();
 
-        sock.reset();
+        socket.reset();
     }
 
     tcpServer.pleaseStopSync();
