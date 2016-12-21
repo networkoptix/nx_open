@@ -369,7 +369,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RI_FullInfo        /**< All info */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
-	
+
 	    enum class StatusChangeReason
     {
         Default,
@@ -557,6 +557,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_OldMobileClient = 3,
         PT_MobileClient = 4,
         PT_CloudServer = 5,
+        PT_OldServer = 6, //< 2.6 or below
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
