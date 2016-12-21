@@ -14,7 +14,7 @@ def unique_list(iter_list):
     return [e for i, e in enumerate(iter_list) if iter_list.index(e) == i]
 
 
-def process_js_file(file_name):
+def process_js_file(root_dir, file_name):
     strings = []
 
     def iterate(d):
@@ -29,7 +29,7 @@ def process_js_file(file_name):
         else:
             strings.append(str(d))
 
-    with open(file_name, 'r') as file_descriptor:
+    with open(os.path.join(root_dir, file_name), 'r') as file_descriptor:
         data = json.load(file_descriptor)
 
     iterate(data)
@@ -46,8 +46,8 @@ def process_js_file(file_name):
     }
 
 
-def process_json_file(file_name):
-    with open(file_name, 'r') as file_descriptor:
+def process_js_file_old(root_dir, file_name):
+    with open(os.path.join(root_dir, file_name)) as file_descriptor:
         data = file_descriptor.read()
 
         json.load(data)
@@ -65,8 +65,8 @@ def process_json_file(file_name):
         }
 
 
-def process_html_file(file_name):
-    with open(file_name, 'r') as file_descriptor:
+def process_html_file(root_dir, file_name):
+    with open(os.path.join(root_dir, file_name), 'r') as file_descriptor:
         data = file_descriptor.read()
         inline = process_inline_text(data)
         attributes = process_attributes(data)
@@ -157,9 +157,9 @@ def generate_ts(data):
     return parsed.toprettyxml(indent="  ", encoding='UTF-8')
 
 
-def extract_strings(file_root_dir, file_filter, dir_exclude=None, mode='html', recursive=True):
+def extract_strings(root_dir, file_dir, file_filter, dir_exclude=None, mode='html', recursive=True):
     all_strings = []
-    for root, dirs, files in os.walk(file_root_dir):
+    for root, dirs, files in os.walk(os.path.join(root_dir, file_dir)):
         if dir_exclude and root.endswith(dir_exclude):
             continue
 
@@ -171,9 +171,9 @@ def extract_strings(file_root_dir, file_filter, dir_exclude=None, mode='html', r
         for filename in files:
             if filename.endswith(file_filter):
                 if mode == 'js':
-                    result = process_js_file(os.path.join(root, filename))
+                    result = process_js_file(root_dir, os.path.relpath(os.path.join(root, filename), root_dir))
                 else:
-                    result = process_html_file(os.path.join(root, filename))
+                    result = process_html_file(root_dir, os.path.relpath(os.path.join(root, filename), root_dir))
                 if result:
                     all_strings.append(result)
     return all_strings
@@ -185,13 +185,13 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('static/views', '.json', mode='js')
-js_strings1 = extract_strings('static/', 'apple-app-site-association', mode='js')
-html_strings = extract_strings('static/views', '.html')  # , dir_exclude='static'
-html_strings1 = extract_strings('static/', '503.html')  # , dir_exclude='static'
+js_strings = extract_strings('static', 'views', '.json', mode='js')
+js_strings1 = extract_strings('static', '', 'apple-app-site-association', mode='js')
+html_strings = extract_strings('static', 'views', '.html')  # , dir_exclude='static'
+html_strings1 = extract_strings('static', '', '503.html')  # , dir_exclude='static'
 # html_strings1 = extract_strings('localization/static/', '.html', recursive=False)  # , dir_exclude='static'
 
 format_ts(js_strings + js_strings1 + html_strings + html_strings1, "cloud_portal.ts")
 
-template_strings = extract_strings('templates', '.mustache')
+template_strings = extract_strings('templates', '', '.mustache')
 format_ts(template_strings, "cloud_templates.ts")
