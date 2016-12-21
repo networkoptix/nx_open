@@ -5,12 +5,12 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${finalName}.dmg"
+DMG_FILE="${final.artifact.name}-client-only.dmg"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
 
 AS_SRC=app-store
-PKG_FILE="${finalName}.pkg"
+PKG_FILE="${final.artifact.name}.pkg"
 
 QT_DIR="${qt.dir}"
 QT_VERSION="${qt.version}"

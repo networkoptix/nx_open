@@ -133,9 +133,7 @@
         <box>none</box>
         <modification/>
         <beta>true</beta>
-        <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-cloud_${cloud.group}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile/>
@@ -203,8 +201,8 @@
         <toolchain.version>none</toolchain.version>       
 
         <additional.defines/>
-        <customization.defines/>
-
+        <customization.defines/>    
+        
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
@@ -228,11 +226,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <projectType>generic</projectType>
+
+        <final.artifact.name>${installer.name}-${release.version}.${buildNumber}-${platform}${cloud.instance}${release.configuration}${beta.status}</final.artifact.name>
+        <cloud.instance>-${cloud.group}</cloud.instance>
+        <release.configuration>-${build.configuration}</release.configuration>
+        <beta.status>-beta</beta.status>         
     </properties>
 
     <build>
         <defaultGoal>package</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${final.artifact.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1033,11 +1036,35 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-cloud_${cloud.group}</finalName>
+                <beta_status />
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>
         </profile>
+        <profile>
+            <id>build-release</id>
+            <activation>
+                <property>
+                    <name>build.configuration</name>
+                    <value>release</value>
+                </property>
+            </activation>
+            <properties>
+                <release.configuration />
+            </properties>
+        </profile>
+        <profile>
+            <id>cloud-production</id>
+            <activation>
+                <property>
+                    <name>cloud.host</name>
+                    <value>prod</value>
+                </property>
+            </activation>
+            <properties>
+                <cloud.instance />
+            </properties>
+        </profile>         
 
         <!-- Mobile client profiles -->
         <profile>
