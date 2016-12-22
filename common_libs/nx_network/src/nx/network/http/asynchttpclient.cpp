@@ -35,6 +35,8 @@ namespace nx_http
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
+    
+    constexpr int kMaxNumberOfRedirects = 5;
 
     AsyncHttpClient::Timeouts::Timeouts(
         std::chrono::milliseconds send,
@@ -55,8 +57,7 @@ namespace nx_http
             && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
     }
 
-    AsyncHttpClient::AsyncHttpClient()
-        :
+    AsyncHttpClient::AsyncHttpClient():
         m_state(sInit),
         m_connectionClosed(false),
         m_requestBytesSent(0),
@@ -75,7 +76,8 @@ namespace nx_http
         m_lastSysErrorCode(SystemError::noError),
         m_requestSequence(0),
         m_forcedEof(false),
-        m_precalculatedAuthorizationDisabled(false)
+        m_precalculatedAuthorizationDisabled(false),
+        m_numberOfRedirectsTried(0)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -590,6 +592,7 @@ namespace nx_http
         ++m_requestSequence;
         m_authorizationTried = false;
         m_ha1RecalcTried = false;
+        m_numberOfRedirectsTried = 0;
         m_request = nx_http::Request();
     }
 
@@ -653,7 +656,9 @@ namespace nx_http
         const SocketAddress remoteAddress =
             m_proxyEndpoint
             ? m_proxyEndpoint.get()
-            : SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
+            : SocketAddress(
+                m_url.host(),
+                m_url.port(nx_http::defaultPortForScheme(m_url.scheme().toLatin1())));
 
         m_state = sInit;
 
@@ -850,32 +855,8 @@ namespace nx_http
             arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.message().response->statusLine.statusCode).
             arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2);
 
-        const Response* response = m_httpStreamReader.message().response;
-        if (response->statusLine.statusCode == StatusCode::unauthorized)
-        {
-            //TODO #ak following block should be moved somewhere
-            if (!m_ha1RecalcTried &&
-                response->headers.find(Qn::REALM_HEADER_NAME) != response->headers.cend())
-            {
-                m_authorizationTried = false;
-                m_ha1RecalcTried = true;
-            }
-
-            if (!m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()))
-            {
-                //trying authorization
-                if (resendRequestWithAuthorization(*response))
-                    return;
-            }
-        }
-        else if (response->statusLine.statusCode == StatusCode::proxyAuthenticationRequired)
-        {
-            if (!m_proxyAuthorizationTried && (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
-            {
-                if (resendRequestWithAuthorization(*response, true))
-                    return;
-            }
-        }
+        if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
+            return;
 
         const bool messageHasMessageBody =
             (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
@@ -938,11 +919,81 @@ namespace nx_http
         }
 
         //message body has been received with request
-        NX_ASSERT(m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError);
+        NX_ASSERT(
+            m_httpStreamReader.state() == HttpStreamReader::messageDone ||
+            m_httpStreamReader.state() == HttpStreamReader::parseError);
 
         m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
         emit done(sharedThis);
     }
+
+    bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
+    {
+        switch (response.statusLine.statusCode)
+        {
+            case StatusCode::unauthorized:
+            {
+                if (!m_ha1RecalcTried &&
+                    response.headers.find(Qn::REALM_HEADER_NAME) != response.headers.cend())
+                {
+                    m_authorizationTried = false;
+                    m_ha1RecalcTried = true;
+                }
+
+                if (!m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()))
+                {
+                    //trying authorization
+                    if (resendRequestWithAuthorization(response))
+                        return true;
+                }
+
+                break;
+            }
+            
+            case StatusCode::proxyAuthenticationRequired:
+            {
+                if (!m_proxyAuthorizationTried &&
+                    (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
+                {
+                    if (resendRequestWithAuthorization(response, true))
+                        return true;
+                }
+                break;
+            }
+            
+            case StatusCode::movedPermanently:
+                return sendRequestToNewLocation(response);
+
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
+    {
+        if (m_numberOfRedirectsTried >= kMaxNumberOfRedirects)
+            return false;
+        ++m_numberOfRedirectsTried;
+
+        // For now, using first Location if many have been provided in response.
+        const auto locationIter = response.headers.find("Location");
+        if (locationIter == response.headers.end())
+            return false;
+
+        m_authorizationTried = false;
+        m_ha1RecalcTried = false;
+
+        initiateHttpMessageDelivery(QUrl(QLatin1String(locationIter->second)));
+        return true;
+    }
+
+    //QUrl AsyncHttpClient::buildUrlFromLocation(
+    //    const QUrl& currentUrl,
+    //    const nx::String redirectedLocation)
+    //{
+    //}
 
     void AsyncHttpClient::processResponseMessageBodyBytes(
         std::shared_ptr<AsyncHttpClient> sharedThis,
@@ -1096,7 +1147,7 @@ namespace nx_http
         return lit("%1://%2:%3")
             .arg(url.scheme())
             .arg(url.host())
-            .arg(url.port(nx_http::DEFAULT_HTTP_PORT));
+            .arg(url.port(nx_http::defaultPortForScheme(url.scheme().toLatin1())));
     }
 
     bool AsyncHttpClient::resendRequestWithAuthorization(

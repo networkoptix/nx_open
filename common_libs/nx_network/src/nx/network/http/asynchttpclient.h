@@ -325,6 +325,7 @@ namespace nx_http
         //TODO #ak remove this member
         nx::network::aio::Timer m_aioThreadBinder;
         bool m_precalculatedAuthorizationDisabled;
+        int m_numberOfRedirectsTried;
 
         AsyncHttpClient();
 
@@ -345,6 +346,9 @@ namespace nx_http
         void processResponseHeadersBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             bool* const continueReceiving);
+        bool repeatRequestIfNeeded(const Response& response);
+        bool sendRequestToNewLocation(const Response& response);
+        QUrl buildUrlFromLocation(const QUrl& currentUrl, const nx::String redirectedLocation);
         void processResponseMessageBodyBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             std::size_t bytesRead,
