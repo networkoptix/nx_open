@@ -759,7 +759,7 @@ void QnStorageConfigWidget::cancelBackup()
 bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     int selectedCamerasCount, QString* info)
 {
-    auto error = 
+    auto error =
         [info](const QString& error) -> bool
         {
             if (info)
@@ -785,7 +785,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (validStorages.size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
 
-    const auto isEnabledBackupStorage = 
+    const auto isEnabledBackupStorage =
         [](const QnStorageModelInfo& storage)
         {
             return storage.isUsed && storage.isBackup;
@@ -934,7 +934,8 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
             else
             {
                 ui->realtimeBackupStatusLabel->setText(tr("Realtime backup is set up."));
-                ui->realtimeIconLabel->setPixmap(qnSkin->pixmap(lit("archive_backup/backup_ready.png")));
+                ui->realtimeIconLabel->setPixmap(qnSkin->pixmap(lit("archive_backup/backup_ready.png"),
+                    QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
             }
 
             ui->backupPages->setCurrentWidget(ui->backupRealtimePage);
