@@ -348,7 +348,6 @@ namespace nx_http
             bool* const continueReceiving);
         bool repeatRequestIfNeeded(const Response& response);
         bool sendRequestToNewLocation(const Response& response);
-        QUrl buildUrlFromLocation(const QUrl& currentUrl, const nx::String redirectedLocation);
         void processResponseMessageBodyBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             std::size_t bytesRead,

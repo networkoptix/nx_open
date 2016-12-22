@@ -989,12 +989,6 @@ namespace nx_http
         return true;
     }
 
-    //QUrl AsyncHttpClient::buildUrlFromLocation(
-    //    const QUrl& currentUrl,
-    //    const nx::String redirectedLocation)
-    //{
-    //}
-
     void AsyncHttpClient::processResponseMessageBodyBytes(
         std::shared_ptr<AsyncHttpClient> sharedThis,
         std::size_t bytesRead,
