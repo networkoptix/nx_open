@@ -12,8 +12,6 @@ class CloudDBProcessPublic
     public QnStoppable
 {
 public:
-    static constexpr size_t kMaxStartRetryCount = 1;
-
     CloudDBProcessPublic(int argc, char **argv);
     virtual ~CloudDBProcessPublic();
 

@@ -24,6 +24,8 @@
 #include <utils/common/delete_later.h>
 #include <nx/utils/log/log.h>
 
+// Uncomment to enable malloc statistics debug output
+//#define MALLOC_STATISTICS
 
 // -------------------------------------------------------------------------- //
 // QnStubMonitor
@@ -275,15 +277,15 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
 		logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
 
-#ifdef __linux__
-        const size_t memStatBufSize = 64*1024;
-        std::vector<char> memStatBuf;
-        memStatBuf.resize(memStatBufSize);
-        FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
-        malloc_info(0, memStatStr);
-        fclose(memStatStr);
-        NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
-#endif
+        #if defined(__linux__) && defined(MALLOC_STATISTICS)
+            const size_t memStatBufSize = 64*1024;
+            std::vector<char> memStatBuf;
+            memStatBuf.resize(memStatBufSize);
+            FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
+            malloc_info(0, memStatStr);
+            fclose(memStatStr);
+            NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
+        #endif
     }
 
     return d->totalHddLoad;
