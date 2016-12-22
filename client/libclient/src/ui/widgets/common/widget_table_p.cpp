@@ -1,0 +1,606 @@
+#include "widget_table_p.h"
+#include "widget_table_delegate.h"
+
+#include <QtCore/QVarLengthArray>
+#include <private/qabstractitemmodel_p.h>
+
+#include <utils/common/event_processors.h>
+
+
+/*
+QnWidgetTablePrivate::HeaderInterface
+A private class - an empty tree view - showing only header
+and delegating column size computations to our widget table
+*/
+
+class QnWidgetTablePrivate::HeaderInterface: public QTreeView
+{
+    using base_type = QTreeView;
+
+public:
+    HeaderInterface(QnWidgetTablePrivate* impl, QWidget* parent): base_type(parent), m_impl(impl)
+    {
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
+
+    virtual int sizeHintForColumn(int column) const override
+    {
+        return m_impl->sizeHintForColumn(column);
+    }
+
+    virtual void updateGeometries() override
+    {
+        base_type::updateGeometries();
+        resize(width(), viewportMargins().top());
+        m_impl->updateViewportMargins();
+        m_impl->doLayout();
+    }
+
+private:
+    QnWidgetTablePrivate* const m_impl;
+};
+
+/*
+QnWidgetTablePrivate
+*/
+
+QnWidgetTablePrivate::QnWidgetTablePrivate(QnWidgetTable* table):
+    base_type(),
+    q_ptr(table),
+    m_model(QAbstractItemModelPrivate::staticEmptyModel()),
+    m_defaultDelegate(new QnWidgetTableDelegate(this)),
+    m_container(new QWidget(table)),
+    m_layoutTimer(new QTimer(this)),
+    m_headerInterface(new HeaderInterface(this, table)),
+    m_columnCount(0),
+    m_minimumRowHeight(0),
+    m_headerPadding(table->style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing)),
+    m_rowSpacing(m_headerPadding),
+    m_pendingLayout(false)
+{
+    table->setWidget(m_container);
+    table->setWidgetResizable(true);
+
+    m_headerInterface->ensurePolished();
+    m_headerInterface->setFrameShape(QFrame::NoFrame);
+    m_headerInterface->setContentsMargins(0, 0, 0, 0);
+    m_headerInterface->setPalette(table->palette());
+
+    installEventHandler(m_container, { QEvent::Resize, QEvent::Move }, this,
+        [this]()
+        {
+            /* Horizontal position and size are handled here: */
+            const auto containerGeom = m_container->geometry();
+            m_headerInterface->setGeometry(containerGeom.left(), 0,
+                containerGeom.width(), m_headerInterface->height());
+        });
+
+    setHeader(new QHeaderView(Qt::Horizontal));
+
+    m_layoutTimer->setSingleShot(true);
+    connect(m_layoutTimer, &QTimer::timeout, this, &QnWidgetTablePrivate::doLayout);
+}
+
+void QnWidgetTablePrivate::setModel(QAbstractItemModel* model, const QModelIndex& rootIndex)
+{
+    if (!model)
+        model = QAbstractItemModelPrivate::staticEmptyModel();
+
+    if (model == m_model)
+        return;
+
+    if (m_model != QAbstractItemModelPrivate::staticEmptyModel())
+        m_model->disconnect(this);
+
+    m_model = model;
+    header()->setModel(model);
+
+    if (m_model != QAbstractItemModelPrivate::staticEmptyModel())
+    {
+        connect(m_model, &QAbstractItemModel::modelReset,
+            this, &QnWidgetTablePrivate::reset);
+
+        //TODO: #vkutin optimize this to avoid recreation of all widgets
+        connect(m_model, &QAbstractItemModel::layoutChanged,
+            this, &QnWidgetTablePrivate::reset);
+
+        connect(m_model, &QAbstractItemModel::rowsInserted,
+            this, &QnWidgetTablePrivate::rowsInserted);
+        connect(m_model, &QAbstractItemModel::rowsRemoved,
+            this, &QnWidgetTablePrivate::rowsRemoved);
+        connect(m_model, &QAbstractItemModel::rowsMoved,
+            this, &QnWidgetTablePrivate::rowsMoved);
+
+        connect(m_model, &QAbstractItemModel::columnsInserted,
+            this, &QnWidgetTablePrivate::columnsInserted);
+        connect(m_model, &QAbstractItemModel::columnsRemoved,
+            this, &QnWidgetTablePrivate::columnsRemoved);
+        connect(m_model, &QAbstractItemModel::columnsMoved,
+            this, &QnWidgetTablePrivate::columnsMoved);
+
+        connect(m_model, &QAbstractItemModel::dataChanged,
+            this, &QnWidgetTablePrivate::dataChanged);
+    }
+
+    setRootIndex(rootIndex, true);
+
+    updateSorting(header()->sortIndicatorSection(), header()->sortIndicatorOrder());
+}
+
+void QnWidgetTablePrivate::setRootIndex(const QModelIndex& rootIndex, bool forceReset)
+{
+    QModelIndex newRootIndex(rootIndex);
+    if (newRootIndex.isValid() && newRootIndex.model() != m_model)
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "rootIndex should not be from another model");
+        newRootIndex = QModelIndex();
+    }
+
+    if (newRootIndex != m_rootIndex && !forceReset)
+        return;
+
+    m_rootIndex = newRootIndex;
+    reset();
+}
+
+QHeaderView* QnWidgetTablePrivate::header() const
+{
+    return m_headerInterface->header();
+}
+
+void QnWidgetTablePrivate::setHeader(QHeaderView* newHeader)
+{
+    if (!newHeader || newHeader->orientation() != Qt::Horizontal)
+        return;
+
+    if (header() == newHeader)
+        return;
+
+    if (header())
+        header()->disconnect(this);
+
+    m_headerInterface->setHeader(newHeader);
+    newHeader->setModel(m_model);
+
+    connect(newHeader, &QHeaderView::sectionResized, this, &QnWidgetTablePrivate::invalidateLayout);
+    connect(newHeader, &QHeaderView::sectionMoved,   this, &QnWidgetTablePrivate::invalidateLayout);
+
+    connect(newHeader, &QHeaderView::sortIndicatorChanged, this, &QnWidgetTablePrivate::updateSorting);
+    updateSorting(newHeader->sortIndicatorSection(), newHeader->sortIndicatorOrder());
+}
+
+void QnWidgetTablePrivate::updateViewportMargins()
+{
+    Q_Q(QnWidgetTable);
+    const int margin = (headerVisible() ? m_headerInterface->height() + m_headerPadding : 0);
+    q->setViewportMargins(0, margin, 0, 0);
+}
+
+void QnWidgetTablePrivate::setHeaderPadding(int padding)
+{
+    if (m_headerPadding == padding)
+        return;
+
+    m_headerPadding = padding;
+    updateViewportMargins();
+}
+
+bool QnWidgetTablePrivate::headerVisible() const
+{
+    return !m_headerInterface->isHidden();
+}
+
+void QnWidgetTablePrivate::setHeaderVisible(bool visible)
+{
+    if (visible == headerVisible())
+        return;
+
+    m_headerInterface->setVisible(visible);
+    updateViewportMargins();
+}
+
+bool QnWidgetTablePrivate::sortingEnabled() const
+{
+    return header()->isSortIndicatorShown() && header()->sectionsClickable();
+}
+
+void QnWidgetTablePrivate::setSortingEnabled(bool enable)
+{
+    if (sortingEnabled() == enable)
+        return;
+
+    const auto header = this->header();
+
+    header->setSortIndicatorShown(enable);
+    header->setSectionsClickable(enable);
+
+    updateSorting(header->sortIndicatorSection(), header->sortIndicatorOrder());
+}
+
+void QnWidgetTablePrivate::setRowSpacing(int spacing)
+{
+    if (m_rowSpacing == spacing)
+        return;
+
+    m_rowSpacing = spacing;
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::setMinimumRowHeight(int height)
+{
+    if (m_minimumRowHeight == height)
+        return;
+
+    m_minimumRowHeight = height;
+    invalidateLayout();
+}
+
+QnWidgetTableDelegate* QnWidgetTablePrivate::commonDelegate() const
+{
+    return (m_userDelegate ? m_userDelegate : m_defaultDelegate);
+}
+
+QnWidgetTableDelegate* QnWidgetTablePrivate::columnDelegate(int column) const
+{
+    if (auto columnDelegate = m_columnDelegates[column])
+        return columnDelegate;
+
+    return commonDelegate();
+}
+
+void QnWidgetTablePrivate::setUserDelegate(QnWidgetTableDelegate* newDelegate)
+{
+    if (m_userDelegate == newDelegate || !newDelegate)
+        return;
+
+    m_userDelegate = newDelegate;
+    reset();
+}
+
+void QnWidgetTablePrivate::setColumnDelegate(int column, QnWidgetTableDelegate* newDelegate)
+{
+    auto& columnDelegate = m_columnDelegates[column];
+    if (columnDelegate == newDelegate)
+        return;
+
+    columnDelegate = newDelegate;
+    reset();
+}
+
+void QnWidgetTablePrivate::reset()
+{
+    cleanupWidgets(0, rowCount() - 1, 0, columnCount() - 1);
+    m_rows.clear();
+
+    const int columnCount = m_model->columnCount(m_rootIndex);
+    const int rowCount = m_model->rowCount(m_rootIndex);
+
+    m_columnCount = columnCount;
+    m_rows.reserve(rowCount);
+
+    if (rowCount > 0)
+        rowsInserted(m_rootIndex, 0, rowCount - 1);
+
+    Q_Q(QnWidgetTable);
+    emit q->tableReset();
+}
+
+void QnWidgetTablePrivate::rowsInserted(const QModelIndex& parent, int first, int last)
+{
+    if (parent != m_rootIndex)
+        return;
+
+    const Row toInsert(columnCount());
+
+    for (int row = first; row <= last; ++row)
+        m_rows.insert(row, toInsert);
+
+    createWidgets(first, last, 0, columnCount() - 1);
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::rowsRemoved(const QModelIndex& parent, int first, int last)
+{
+    if (parent != m_rootIndex)
+        return;
+
+    cleanupWidgets(first, last, 0, columnCount() - 1);
+
+    m_rows.erase(m_rows.begin() + first, m_rows.begin() + last + 1);
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::rowsMoved(const QModelIndex& parent, int first, int last,
+    const QModelIndex& newParent, int position)
+{
+    if (parent != newParent)
+    {
+        rowsRemoved(parent, first, last);
+        rowsInserted(newParent, position, position + last - first);
+        return;
+    }
+
+    if (parent != m_rootIndex)
+        return;
+
+    const int end = last + 1;
+
+    if (position < first)
+        std::rotate(m_rows.begin() + position, m_rows.begin() + first, m_rows.begin() + end);
+    else if (position > end)
+        std::rotate(m_rows.begin() + first, m_rows.begin() + end, m_rows.begin() + position);
+
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::columnsInserted(const QModelIndex& parent, int first, int last)
+{
+    if (parent != m_rootIndex)
+        return;
+
+    const int count = last - first + 1;
+
+    for (auto& row: m_rows)
+        row.insert(row.begin() + first, count, nullptr);
+
+    m_columnCount += count;
+
+    createWidgets(0, rowCount() - 1, first, last);
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::columnsRemoved(const QModelIndex& parent, int first, int last)
+{
+    if (parent != m_rootIndex)
+        return;
+
+    const int afterLast = last + 1;
+
+    cleanupWidgets(0, rowCount() - 1, first, last);
+
+    for (auto& row: m_rows)
+        row.erase(row.begin() + first, row.begin() + afterLast);
+
+    m_columnCount -= (afterLast - first);
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::columnsMoved(const QModelIndex& parent, int first, int last,
+    const QModelIndex& newParent, int position)
+{
+    if (parent != newParent)
+    {
+        columnsRemoved(parent, first, last);
+        columnsInserted(newParent, position, position + last - first);
+        return;
+    }
+
+    if (parent != m_rootIndex)
+        return;
+
+    const int end = last + 1;
+
+    if (position < first)
+    {
+        for (auto& row: m_rows)
+            std::rotate(row.begin() + position, row.begin() + first, row.begin() + end);
+    }
+    else if (position > end)
+    {
+        for (auto& row: m_rows)
+            std::rotate(row.begin() + first, row.begin() + end, row.begin() + position);
+    }
+
+    invalidateLayout();
+}
+
+void QnWidgetTablePrivate::dataChanged(
+    const QModelIndex& topLeft,
+    const QModelIndex& bottomRight,
+    const QVector<int>& roles)
+{
+    Q_UNUSED(roles); //< unused so far
+
+    if (topLeft.parent() != bottomRight.parent())
+        return;
+
+    if (topLeft.parent() != m_rootIndex)
+        return;
+
+    for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
+    {
+        for (int column = topLeft.column(); column <= bottomRight.column(); ++column)
+        {
+            const auto widget = widgetFor(row, column);
+            const auto index = m_model->index(row, column, m_rootIndex);
+
+            if (!widget || !columnDelegate(column)->updateWidget(widget, index))
+            {
+                if (createWidgetFor(row, column) != widget)
+                    invalidateLayout();
+            }
+        }
+    }
+}
+
+QWidget* QnWidgetTablePrivate::widgetFor(int row, int column) const
+{
+    return m_rows[row][column];
+}
+
+void QnWidgetTablePrivate::setWidgetFor(int row, int column, QWidget* newWidget)
+{
+    auto& widget = m_rows[row][column];
+    if (widget == newWidget)
+        return;
+
+    destroyWidget(widget); //< has nullptr check inside
+    widget = newWidget;
+
+    //TODO: #vkutin Make widget scrolling into viewport when activated
+
+    NX_EXPECT(!widget || widget->parent() == m_container);
+}
+
+QWidget* QnWidgetTablePrivate::createWidgetFor(int row, int column)
+{
+    const auto index = m_model->index(row, column, m_rootIndex);
+    auto itemDelegate = columnDelegate(column);
+
+    auto widget = itemDelegate->createWidget(m_model, index, m_container);
+    if (widget)
+        itemDelegate->updateWidget(widget, index);
+
+    setWidgetFor(row, column, widget);
+    return widget;
+}
+
+void QnWidgetTablePrivate::createWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn)
+{
+    for (int row = firstRow; row <= lastRow; ++row)
+    {
+        for (int column = firstColumn; column <= lastColumn; ++column)
+            createWidgetFor(row, column);
+    }
+}
+
+void QnWidgetTablePrivate::cleanupWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn)
+{
+    for (int row = firstRow; row <= lastRow; ++row)
+    {
+        for (int column = firstColumn; column <= lastColumn; ++column)
+            cleanupWidgetFor(row, column);
+    }
+}
+
+void QnWidgetTablePrivate::cleanupWidgetFor(int row, int column)
+{
+    setWidgetFor(row, column, nullptr);
+}
+
+void QnWidgetTablePrivate::destroyWidget(QWidget* widget)
+{
+    if (widget)
+        widget->deleteLater();
+}
+
+int QnWidgetTablePrivate::sizeHintForColumn(int column) const
+{
+    if (column < 0 || column >= columnCount())
+        return 0;
+
+    int width = 0;
+    for (int row = 0; row < rowCount(); ++row)
+    {
+        const auto widget = widgetFor(row, column);
+        if (!widget)
+            continue;
+
+        const auto index = m_model->index(row, column);
+        const auto itemDelegate = columnDelegate(column);
+        const auto indents = itemDelegate->itemIndents(widget, index);
+        width = qMax(width, itemDelegate->sizeHint(widget, index).width()
+            + indents.left() + indents.right());
+    }
+
+    return width;
+}
+
+void QnWidgetTablePrivate::updateSorting(int column, Qt::SortOrder order)
+{
+    if (sortingEnabled())
+        m_model->sort(column, order);
+}
+
+void QnWidgetTablePrivate::invalidateLayout()
+{
+    if (m_pendingLayout)
+        return;
+
+    m_pendingLayout = true;
+    m_layoutTimer->start(1);
+}
+
+void QnWidgetTablePrivate::doLayout()
+{
+    /* Column locations: position and width: */
+    QVarLengthArray<QPair<int, int>> columnBounds(columnCount());
+
+    auto header = this->header();
+    const int count = qMin(columnCount(), header->count()); //< to be safe
+
+    /* Fetch column bounds from the header: */
+    for (int i = 0; i < count; ++i)
+    {
+        if (header->isSectionHidden(i))
+            continue;
+
+        columnBounds[i] = qMakePair(
+            header->sectionViewportPosition(i),
+            header->sectionSize(i));
+    }
+
+    /* Calculated item geometries, per row: */
+    QVarLengthArray<QRect> itemRects(columnCount());
+
+    int y = 0;
+    for (int row = 0; row < rowCount(); ++row)
+    {
+        /* Calculate cell geometries: */
+        int maxHeight = m_minimumRowHeight;
+        for (int column = 0; column < columnCount(); ++column)
+        {
+            const auto widget = widgetFor(row, column);
+            if (!widget)
+                continue;
+
+            const auto& bounds = columnBounds[column];
+            bool hidden = (bounds.second == 0);
+
+            widget->setHidden(hidden);
+            if (hidden)
+                continue;
+
+            const auto index = m_model->index(row, column, m_rootIndex);
+            const auto itemDelegate = columnDelegate(column);
+            const auto indents = itemDelegate->itemIndents(widget, index);
+            const auto sizeHint = itemDelegate->sizeHint(widget, index);
+
+            itemRects[column] = QRect(
+                bounds.first + indents.left(),
+                y,
+                bounds.second - indents.left() - indents.right(),
+                sizeHint.height());
+
+            maxHeight = qMax(maxHeight, sizeHint.height());
+        }
+
+        /* Apply row geometries: */
+        for (int column = 0; column < columnCount(); ++column)
+        {
+            const auto widget = widgetFor(row, column);
+            if (!widget || widget->isHidden())
+                continue;
+
+            const auto contentRect = itemRects[column];
+            const auto contentSize = contentRect.size();
+
+            const auto itemRect = QRect(
+                contentRect.left(),
+                contentRect.top(),
+                contentRect.width(),
+                maxHeight);
+
+            widget->setGeometry(QStyle::alignedRect(
+                Qt::LeftToRight, Qt::AlignCenter,
+                contentRect.size(),
+                itemRect));
+        }
+
+        y += maxHeight + m_rowSpacing;
+    }
+
+    m_container->setMinimumHeight(y);
+    m_pendingLayout = false;
+}
