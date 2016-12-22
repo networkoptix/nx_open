@@ -379,8 +379,8 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     m_desiredTransport = RtpTransport::fromString(desiredTransport);
 
-    auto dualStreamingCapability = false;
-    auto fisheyeStreamingCapability = false;
+    bool dualStreamingCapability = false;
+    bool fisheyeStreamingCapability = false;
 
     auto streamingModeCapabilities = tryToGetSystemInfoValue(report, kActiGetStreamingModeCapabilitiesParamName);
 
