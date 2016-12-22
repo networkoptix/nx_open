@@ -6,6 +6,8 @@ from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json, os
 from util.config import get_config
+from util.helpers import get_language_for_email
+
 
 templates_cache = {}
 configs_cache = {}
@@ -13,7 +15,9 @@ logos_cache = {}
 
 
 def send(email, msg_type, message, customization):
-    templates_location = os.path.join(settings.STATIC_LOCATION, customization, "templates")
+    lang = get_language_for_email(email)
+    templates_root = os.path.join(settings.STATIC_LOCATION, customization, "templates", "lang_" + lang)
+    templates_location = os.path.join(templates_root, "lang_" + lang)
 
     custom_config = get_custom_config(customization)
     subject = msg_type
@@ -42,7 +46,7 @@ def send(email, msg_type, message, customization):
 
     msg.content_subtype = 'html'  # Main content is now text/html
 
-    logo_filename = os.path.join(templates_location, 'email_logo.png')
+    logo_filename = os.path.join(templates_root, 'email_logo.png')
     msg_img = MIMEImage(read_logo(logo_filename))
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
