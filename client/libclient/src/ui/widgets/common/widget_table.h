@@ -8,6 +8,11 @@ class QHeaderView;
 class QnWidgetTableDelegate;
 class QnWidgetTablePrivate;
 
+/*
+* QnWidgetTable: a scrollable view into a simple item model displayed as a grid of widgets.
+* Creation of widgets, data exchange between them and the model and determining their size
+* is managed by a delegate of class QnWidgetTableDelegate.
+*/
 class QnWidgetTable: public QScrollArea
 {
     Q_OBJECT
