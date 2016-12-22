@@ -107,7 +107,8 @@ private:
     {
         QnMutexLocker lk(&m_mutex);
 
-        std::map<KeyType, std::unique_ptr<DataCtx>>::iterator lockItemIter = m_elements.end();
+        typename std::map<KeyType, std::unique_ptr<DataCtx>>::iterator 
+            lockItemIter = m_elements.end();
         for (;;)
         {
             auto p = m_elements.emplace(std::make_pair(key, nullptr));
