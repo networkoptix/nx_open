@@ -1,7 +1,13 @@
 
 #include "hidpi_workarounds.h"
 
+#include <QtGui/QMovie>
+#include <QtGui/QPixmap>
+#include <QtWidgets/QLabel>
+
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/log/assert.h>
+
 #include <utils/common/connective.h>
 
 #include <ui/widgets/common/emulated_frame_widget.h>
@@ -300,3 +306,24 @@ void QnHiDpiWorkarounds::init()
     qApp->installEventFilter(new TopLevelWidgetsPositionCorrector());
 }
 
+void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
+{
+    if (!label || !movie)
+        return;
+
+    const bool started = movie->state() != QMovie::NotRunning;
+    QnRaiiGuardPtr stopGuard;
+    if (!started)
+    {
+        stopGuard = QnRaiiGuard::createDestructible([movie](){ movie->stop(); });
+        movie->start();
+    }
+
+    const auto pixmap = movie->currentPixmap();
+    label->setMovie(movie);
+    if (pixmap.isNull())
+        return;
+
+    const auto fixedSize = pixmap.size() / pixmap.devicePixelRatio();
+    label->setFixedSize(fixedSize);
+}

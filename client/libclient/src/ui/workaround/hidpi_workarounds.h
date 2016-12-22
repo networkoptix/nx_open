@@ -3,9 +3,9 @@
 
 class QMenu;
 class QAction;
-class QToolButton;
 class QPoint;
-class QComboBox;
+class QMovie;
+class QLabel;
 
 class QnHiDpiWorkarounds
 {
@@ -15,4 +15,11 @@ public:
     static QPoint safeMapToGlobal(QWidget*widget, const QPoint& offset);
 
     static void init();
+
+    /**
+     * Workaround for https://bugreports.qt.io/browse/QTBUG-48157
+     * TODO: #ynikitenkov Remove this workaround after we come to
+     * Qt 5.6.3+ version
+     */
+    static void setMovieToLabel(QLabel* label, QMovie* movie);
 };

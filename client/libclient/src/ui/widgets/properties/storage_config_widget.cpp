@@ -34,6 +34,7 @@
 #include <ui/style/skin.h>
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
@@ -289,15 +290,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     connect(ui->storageView, &QnTreeView::clicked, this, itemClicked);
 
-    connect(ui->backupPages, &QStackedWidget::currentChanged, this,
-        [this](int index)
-        {
-            const auto page = ui->backupPages->widget(index);
-            if (page == ui->backupRealtimePage)
-                m_realtimeBackupMovie->start();
-            else
-                m_realtimeBackupMovie->stop();
-        });
+    connect(ui->backupPages, &QStackedWidget::currentChanged,
+        this, &QnStorageConfigWidget::updateRealtimeBackupMovieStatus);
 
     connect(ui->addExtStorageToMainBtn,     &QPushButton::clicked, this, [this]() { at_addExtStorage(true); });
 
@@ -899,6 +893,15 @@ QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
     return QString();
 }
 
+void QnStorageConfigWidget::updateRealtimeBackupMovieStatus(int index)
+{
+    const auto page = ui->backupPages->widget(index);
+    if (page == ui->backupRealtimePage)
+        m_realtimeBackupMovie->start();
+    else
+        m_realtimeBackupMovie->stop();
+}
+
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras)
 {
     m_lastPerformedBackupTimeMs = m_nextScheduledBackupTimeMs = 0;
@@ -925,7 +928,8 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
             if (canStartBackup)
             {
                 ui->realtimeBackupStatusLabel->setText(tr("Realtime backup is active..."));
-                ui->realtimeIconLabel->setMovie(m_realtimeBackupMovie.data());
+                QnHiDpiWorkarounds::setMovieToLabel(ui->realtimeIconLabel, m_realtimeBackupMovie.data());
+                updateRealtimeBackupMovieStatus(ui->backupPages->currentIndex());
             }
             else
             {
