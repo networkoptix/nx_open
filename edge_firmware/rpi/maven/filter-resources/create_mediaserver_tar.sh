@@ -185,6 +185,8 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   fi
+  #creating symlink for rpath needed by mediaserver binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
 
   #creating symlink for rpath needed by mobile_client binary
   ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/lib"
@@ -210,10 +212,10 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   #copying debs and uboot
   cp -Rfv $DEBS_DIR $BUILD_DIR/opt
   cp -Rfv $UBOOT_DIR $BUILD_DIR/root
-  
+
   #copying additional binaries
   cp -Rfv $USR_DIR $BUILD_DIR/usr
-  
+
   #additional platform specific files
   cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
