@@ -179,7 +179,6 @@ bool BaseHttpAudioTransmitter::startTransmission()
         Qt::DirectConnection);
 
     auto url = transmissionUrl();
-    nx_http::StringType contentType(contentType());
     nx_http::StringType contentBody;
 
     QnMutexLocker lock(&m_mutex);
@@ -189,7 +188,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
         httpClient
             ->doPost(
                 url,
-                contentType,
+                contentType(),
                 contentBody,
                 true);
     }
@@ -198,7 +197,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
         httpClient
             ->doPut(
                 url,
-                contentType,
+                contentType(),
                 contentBody);
     }
     else
