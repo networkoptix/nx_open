@@ -18,6 +18,7 @@ public:
     virtual void deinitialize() override;
 
     virtual QVariant data(int role, int column) const override;
+    virtual Qt::ItemFlags flags(int column) const override;
 
 protected:
     virtual QIcon calculateIcon() const override;
