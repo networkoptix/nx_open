@@ -81,10 +81,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent),
     ui(new Ui::QnServerUpdatesWidget),
-    m_latestVersion(),
-    m_checking(false),
-    m_longUpdateWarningTimer(new QTimer(this)),
-    m_lastAutoUpdateCheck(0)
+    m_longUpdateWarningTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -185,9 +182,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->downloadButton->hide();
     ui->downloadButton->setIcon(qnSkin->icon(lit("buttons/download.png")));
     ui->downloadButton->setForegroundRole(QPalette::WindowText);
-    initDownloadActions();
 
+    initDownloadActions();
     initDropdownActions();
+
+    updateButtonAccent();
+    updateButtonText();
 }
 
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)
@@ -201,6 +201,18 @@ void QnServerUpdatesWidget::forcedUpdate()
     refresh();
 }
 
+void QnServerUpdatesWidget::setMode(Mode mode)
+{
+    if (m_mode == mode)
+        return;
+
+    m_mode = mode;
+
+    updateButtonText();
+    updateButtonAccent();
+    updateDownloadButton();
+}
+
 void QnServerUpdatesWidget::initDropdownActions()
 {
     auto selectUpdateTypeMenu = new QMenu(this);
@@ -209,6 +221,7 @@ void QnServerUpdatesWidget::initDropdownActions()
     auto defaultAction = selectUpdateTypeMenu->addAction(tr("Latest Available Update"),
         [this]()
         {
+            setMode(Mode::LatestVersion);
             m_targetVersion = QnSoftwareVersion();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_latestVersion);
@@ -217,9 +230,6 @@ void QnServerUpdatesWidget::initDropdownActions()
             ui->targetVersionLabel->setText(m_latestVersion.isNull()
                 ? kNoVersionNumberText
                 : m_latestVersion.toString());
-
-            ui->downloadButton->setText(tr("Download the Latest Version Update File"));
-            ui->downloadButton->show();
 
             checkForUpdates(true);
         });
@@ -231,6 +241,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             if (!dialog.exec())
                 return;
 
+            setMode(Mode::SpecificBuild);
             QnSoftwareVersion version = qnCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_localFileName = QString();
@@ -238,9 +249,6 @@ void QnServerUpdatesWidget::initDropdownActions()
 
             ui->targetVersionLabel->setText(m_targetVersion.toString());
             ui->selectUpdateTypeButton->setText(tr("Selected Version"));
-
-            ui->downloadButton->setText(tr("Download Update File"));
-            ui->downloadButton->hide();
 
             checkForUpdates(true);
         });
@@ -257,10 +265,10 @@ void QnServerUpdatesWidget::initDropdownActions()
             if (m_localFileName.isEmpty())
                 return;
 
+            setMode(Mode::LocalFile);
             ui->targetVersionLabel->setText(kNoVersionNumberText);
             ui->selectUpdateTypeButton->setText(tr("Selected Update File"));
             m_updatesModel->setLatestVersion(QnSoftwareVersion());
-            ui->downloadButton->hide();
 
             checkForUpdates(false);
         });
@@ -305,6 +313,46 @@ void QnServerUpdatesWidget::initDownloadActions()
 
             ui->downloadButton->update();
         });
+}
+
+void QnServerUpdatesWidget::updateButtonText()
+{
+    QString text = tr("Update System");
+    if (m_mode == Mode::SpecificBuild)
+        text = tr("Update to Specific Build");
+    ui->updateButton->setText(text);
+}
+
+void QnServerUpdatesWidget::updateButtonAccent()
+{
+    // 'Update' button accented by default if update is possible
+    bool accented = m_lastUpdateCheckResult.result == QnCheckForUpdateResult::UpdateFound;
+
+    // If warning is displayed, do not accent automatic update
+    if (m_mode == Mode::LatestVersion && !ui->dayWarningBanner->isHidden())
+        accented = false;
+
+    setAccentStyle(ui->updateButton, accented);
+}
+
+void QnServerUpdatesWidget::updateDownloadButton()
+{
+    switch (m_mode)
+    {
+        case QnServerUpdatesWidget::Mode::LatestVersion:
+            ui->downloadButton->setText(tr("Download the Latest Version Update File"));
+            ui->downloadButton->show();
+            break;
+        case QnServerUpdatesWidget::Mode::SpecificBuild:
+            ui->downloadButton->setText(tr("Download Update File"));
+            ui->downloadButton->hide();
+            break;
+        case QnServerUpdatesWidget::Mode::LocalFile:
+            ui->downloadButton->hide();
+            break;
+        default:
+            break;
+    }
 }
 
 bool QnServerUpdatesWidget::cancelUpdate()
@@ -530,6 +578,8 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     ui->targetVersionLabel->setText(versionText);
 
     ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
+
+    updateButtonAccent();
 }
 
 bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
@@ -586,8 +636,8 @@ void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
         m_updateTool->checkForUpdates(m_localFileName,
             [this](const QnCheckForUpdateResult& result)
             {
-                endChecking(result);
                 m_updatesModel->setLatestVersion(result.version);
+                endChecking(result);
             });
     }
 }
@@ -614,6 +664,7 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage)
     }
 
     ui->dayWarningBanner->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek);
+    updateButtonAccent();
 
     bool cancellable = false;
     switch (stage)
