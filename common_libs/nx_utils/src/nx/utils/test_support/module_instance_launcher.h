@@ -5,7 +5,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include "nx/utils/atomic_unique_ptr.h"
 #include "nx/utils/std/future.h"
 #include "nx/utils/std/thread.h"
 
@@ -27,6 +26,8 @@ public:
     ~ModuleLauncher()
     {
         stop();
+        for (auto ptr: m_args)
+            free(ptr);
     }
 
     void start()
@@ -54,16 +55,8 @@ public:
 
     virtual bool startAndWaitUntilStarted()
     {
-        for (size_t attempt = 0; attempt < ModuleProcessType::kMaxStartRetryCount; ++attempt)
-        {
-            start();
-            if (waitUntilStarted())
-                return true;
-
-            stop();
-        }
-
-        return false;
+        start();
+        return waitUntilStarted();
     }
 
     virtual bool waitUntilStarted()
@@ -89,9 +82,9 @@ public:
         m_moduleInstance->pleaseStop();
         m_moduleProcessThread.join();
         m_moduleInstance.reset();
-        clearArgs();
     }
 
+    //!restarts process
     bool restart()
     {
         stop();
@@ -110,22 +103,14 @@ public:
         addArg(value);
     }
 
-    void clearArgs()
-    {
-        for (auto ptr: m_args)
-            free(ptr);
-
-        m_args.resize(0);
-    }
-
-    const AtomicUniquePtr<ModuleProcessType>& moduleInstance()
+    const std::unique_ptr<ModuleProcessType>& moduleInstance()
     {
         return m_moduleInstance;
     }
 
 private:
     std::vector<char*> m_args;
-    AtomicUniquePtr<ModuleProcessType> m_moduleInstance;
+    std::unique_ptr<ModuleProcessType> m_moduleInstance;
     nx::utils::thread m_moduleProcessThread;
     std::unique_ptr<nx::utils::promise<bool /*result*/>> m_moduleStartedPromise;
 };

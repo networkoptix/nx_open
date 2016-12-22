@@ -13,8 +13,6 @@ class VmsGatewayProcessPublic
     public QnStoppable
 {
 public:
-    static constexpr size_t kMaxStartRetryCount = 1;
-
     VmsGatewayProcessPublic(int argc, char **argv);
     virtual ~VmsGatewayProcessPublic();
 

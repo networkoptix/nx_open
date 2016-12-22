@@ -13,9 +13,6 @@ class MediatorProcessPublic
     public QnStoppable
 {
 public:
-    //< As STUN have to take the same TCP and UDP port.
-    static constexpr size_t kMaxStartRetryCount = 3;
-
     MediatorProcessPublic(int argc, char **argv);
     virtual ~MediatorProcessPublic();
 
