@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/log/log_settings.h>
 
 namespace nx {
 namespace utils {
 namespace log {
 namespace test {
 
-TEST(QnLogSettings, correct_parsing)
+TEST(Settings, correct_parsing)
 {
     const char* args[] = {
         "-log/logDir", "/var/log/",
@@ -19,7 +20,7 @@ TEST(QnLogSettings, correct_parsing)
     QnSettings settings("company", "app", "mod");
     settings.parseArgs(sizeof(args) / sizeof(*args), args);
 
-    log::QnLogSettings logSettings;
+    log::Settings logSettings;
     logSettings.load(settings, "log");
 
     ASSERT_EQ(cl_logDEBUG2, logSettings.level);
