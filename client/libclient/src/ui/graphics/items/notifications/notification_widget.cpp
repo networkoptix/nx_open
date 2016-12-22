@@ -75,9 +75,14 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider)
     connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull())
+    {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
+    }
     else
-        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+    {
+        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png",
+            QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    }
 
     connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage& image)
     {

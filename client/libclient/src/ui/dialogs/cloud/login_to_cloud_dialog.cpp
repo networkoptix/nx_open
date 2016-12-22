@@ -77,7 +77,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
 
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png",
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
