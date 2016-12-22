@@ -6,7 +6,6 @@
 #include <QtWidgets/QLabel>
 
 #include <nx/utils/raii_guard.h>
-#include <nx/utils/log/assert.h>
 
 #include <utils/common/connective.h>
 
