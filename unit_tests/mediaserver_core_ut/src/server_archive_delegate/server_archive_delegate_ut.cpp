@@ -343,7 +343,7 @@ private:
                 qnNormalStorageMan->addStorage(storage);
             else
                 qnBackupStorageMan->addStorage(storage);
-            storage->setStatus(Qn::Online);
+            storage->setStatus(Qn::Online, true);
             m_storages.push_back(storage);
         }
     }
