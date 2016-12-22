@@ -3,25 +3,74 @@
 
 #include <core/resource/param.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/string.h>
+
 #include <ui/delegates/ioport_item_delegate.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ioports_view_model.h>
+#include <ui/widgets/common/widget_table.h>
 
+
+namespace {
+
+class QnIoPortSortedModel: public QSortFilterProxyModel
+{
+public:
+    using QSortFilterProxyModel::QSortFilterProxyModel; //< forward constructor
+
+protected:
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
+    {
+        /* IDs are sorted by sequential number: */
+        if (left.column() == QnIOPortsViewModel::IdColumn)
+            return left.row() < right.row();
+
+        /* Durations are sorted by integer value: */
+        if (left.column() == QnIOPortsViewModel::DurationColumn)
+        {
+            const auto leftValue = left.data(Qt::EditRole).toInt();
+            const auto rightValue = right.data(Qt::EditRole).toInt();
+
+            /* Zero (unset) durations are always last: */
+            const bool leftZero = (leftValue == 0);
+            const bool rightZero = (rightValue == 0);
+            if (leftZero != rightZero)
+                return rightZero;
+
+            return leftValue < rightValue;
+        }
+
+        /* Other columns are sorted by string value: */
+        const auto leftStr = left.data(Qt::DisplayRole).toString();
+        const auto rightStr = right.data(Qt::DisplayRole).toString();
+
+        /* Empty strings are always last: */
+        if (leftStr.isEmpty() != rightStr.isEmpty())
+            return rightStr.isEmpty();
+
+        return nx::utils::naturalStringCompare(leftStr, rightStr, Qt::CaseInsensitive) < 0;
+    }
+};
+
+} // namespace
 
 QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::QnIOPortSettingsWidget),
     m_model(new QnIOPortsViewModel(this))
 {
+    auto sortModel = new QnIoPortSortedModel(this);
+    sortModel->setSourceModel(m_model);
+
     ui->setupUi(this);
-    ui->tableView->setModel(m_model);
-    ui->tableView->setItemDelegate(new QnIOPortItemDelegate(this));
-    ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setStretchLastSection(false);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
+    ui->table->setModel(sortModel);
+    ui->table->setItemDelegate(new QnIoPortItemDelegate(this));
+    ui->table->setSortingEnabled(true);
+    ui->table->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->table->header()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
+    ui->table->header()->setSortIndicator(QnIOPortsViewModel::IdColumn, Qt::AscendingOrder);
 
     //TODO: #vkutin #gdm #common Change to usual hasChanges/hasChangesChanged logic
     connect(m_model, &QAbstractItemModel::dataChanged,
