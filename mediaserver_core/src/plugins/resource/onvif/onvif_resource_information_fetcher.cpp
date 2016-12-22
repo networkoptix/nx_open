@@ -72,44 +72,6 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-QnVirtualCameraResourcePtr OnvifResourceInformationFetcher::findExistingResource(const QString& endpoint, const QString& uniqueId) const
-{
-    QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(uniqueId)
-        .dynamicCast<QnVirtualCameraResource>();
-
-    if (existResource)
-        return existResource;
-
-    auto endpointUrl = QUrl(endpoint);
-    auto hostAddress = endpointUrl.host();
-    auto port = endpointUrl.port(nx_http::DEFAULT_HTTP_PORT);
-
-    if (hostAddress.isEmpty())
-        return QnVirtualCameraResourcePtr();
-
-    QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(hostAddress);
-    for (const auto& existRes: existResList)
-    {
-        auto camRes = existRes.dynamicCast<QnVirtualCameraResource>();
-
-        if (!camRes)
-            continue;
-
-        auto existResUrl = camRes->getUrl();
-        auto existResPort = QUrl(existResUrl).port(nx_http::DEFAULT_HTTP_PORT);
-
-        if (port == existResPort)
-        {
-            if (camRes->getVendor() == lit("GENERIC_RTSP"))
-                continue;
-
-            return camRes;
-        }
-    }
-
-    return QnVirtualCameraResourcePtr();
-}
-
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
 :
     /*passwordsData(PasswordHelper::instance()),*/
@@ -211,14 +173,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
-    QnVirtualCameraResourcePtr existResource = findExistingResource(endpoint, info.uniqId);
+    QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
-    // if camera supports Onvif, but was found by existing driver we shouldn't check it
-    if (existResource && !existResource.dynamicCast<QnPlOnvifResource>())
-        return;
-
-    if (existResource)
-    {
+    if (existResource) {
         QAuthenticator auth = existResource->getAuth();
 
         if (!auth.isNull())
@@ -227,15 +184,12 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             soapWrapper.setPassword(auth.password());
         }
     }
-    else if (!info.defaultLogin.isEmpty())
-    {
+    else if (!info.defaultLogin.isEmpty()) {
         soapWrapper.setLogin(info.defaultLogin);
         soapWrapper.setPassword(info.defaultPassword);
     }
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
-    {
         soapWrapper.fetchLoginPassword(info.manufacturer, info.name);
-    }
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
         return; //ignoring unknown cameras
@@ -253,7 +207,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (mac.isEmpty())
             mac = existResource->getMAC().toString();
     }
-    else if (model.isEmpty() || manufacturer.isEmpty() || firmware.isEmpty() ||
+
+    if (model.isEmpty() || manufacturer.isEmpty() || firmware.isEmpty() ||
         QnMacAddress(mac).isNull())
     {
         OnvifResExtInfo extInfo;

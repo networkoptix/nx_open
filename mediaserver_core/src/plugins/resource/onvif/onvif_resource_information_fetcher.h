@@ -65,6 +65,9 @@ public:
     static bool isModelSupported(const QString& manufacturer, const QString& modelNamee);
 private:
 
+
+    bool findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender, const QString& manufacturer, QnResourceList& result) const;
+
     QnPlOnvifResourcePtr createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, const QString& mac,
         const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const;
 
@@ -72,9 +75,6 @@ private:
     QString fetchSerial(const DeviceInfoResp& response) const;
     static bool isAnalogOnvifResource(const QString& vendor, const QString& model);
     static bool isModelContainVendor(const QString& vendor, const QString& model);
-
-    QnVirtualCameraResourcePtr findExistingResource(const QString& endpoint, const QString& uniqueId) const;
-
 private:
     static const char *ONVIF_RT;
     QnUuid onvifTypeId;
