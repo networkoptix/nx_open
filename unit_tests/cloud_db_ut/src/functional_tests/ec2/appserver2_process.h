@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 25, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
@@ -55,6 +50,8 @@ class Appserver2ProcessPublic:
     public QnStoppable
 {
 public:
+    static constexpr size_t kMaxStartRetryCount = 1;
+
     Appserver2ProcessPublic(int argc, char **argv);
     virtual ~Appserver2ProcessPublic();
 

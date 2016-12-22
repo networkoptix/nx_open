@@ -1,12 +1,6 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <utils/common/stoppable.h>
-
 
 namespace nx {
 namespace cloud {
@@ -19,6 +13,8 @@ class VmsGatewayProcessPublic
     public QnStoppable
 {
 public:
+    static constexpr size_t kMaxStartRetryCount = 1;
+
     VmsGatewayProcessPublic(int argc, char **argv);
     virtual ~VmsGatewayProcessPublic();
 
