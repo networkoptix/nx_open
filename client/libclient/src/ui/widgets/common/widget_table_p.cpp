@@ -238,7 +238,7 @@ void QnWidgetTablePrivate::setMinimumRowHeight(int height)
 
 QnWidgetTableDelegate* QnWidgetTablePrivate::commonDelegate() const
 {
-    return (m_userDelegate ? m_userDelegate : m_defaultDelegate);
+    return (m_userDelegate ? m_userDelegate.data() : m_defaultDelegate);
 }
 
 QnWidgetTableDelegate* QnWidgetTablePrivate::columnDelegate(int column) const
