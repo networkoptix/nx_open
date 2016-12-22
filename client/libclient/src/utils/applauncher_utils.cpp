@@ -15,7 +15,7 @@
 
 namespace applauncher
 {
-    static const int MAX_MSG_LEN = 1024;
+    static const int MAX_MSG_LEN = 1024 * 64; //64K ought to be enough for anybody
 
     static api::ResultType::Value sendCommandToLauncher(
         const applauncher::api::BaseTask& commandToSend,

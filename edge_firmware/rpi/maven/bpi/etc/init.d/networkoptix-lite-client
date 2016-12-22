@@ -38,7 +38,7 @@ start()
     fi
 
     # Disable console cursor blinking.
-    echo "1" >/sys/class/graphics/fbcon/cursor_blink
+    echo "0" >/sys/class/graphics/fbcon/cursor_blink
 
     WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" |grep changeset |awk '{print $2}')
     if [ -z "$WEBADMIN_BUILD" ]; then 

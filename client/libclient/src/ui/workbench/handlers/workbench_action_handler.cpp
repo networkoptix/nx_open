@@ -57,6 +57,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <network/cloud_url_validator.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -2237,21 +2238,16 @@ void QnWorkbenchActionHandler::openInBrowserDirectly(const QnMediaServerResource
 {
     // TODO: #akolesnikov #3.1 VMS-2806 deprecate this method, always use openInBrowser()
 
-    QUrl url(server->getApiUrl());
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+    if (nx::network::isCloudServer(server))
         return;
 
+    QUrl url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
-
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-        return;
-
     QDesktopServices::openUrl(url);
 }
 

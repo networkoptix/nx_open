@@ -63,12 +63,12 @@ Result copy(const QString& sourcePath, const QString& targetPath, Options option
 
         const auto entries = sourceDir.entryList(
             QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
-        foreach (const auto& entry, entries)
+        for (const auto& entry: entries)
         {
             const auto newSrcFilePath = sourceDir.absoluteFilePath(entry);
 
             const auto result = copy(newSrcFilePath, tgtFileInfo.absoluteFilePath(), options);
-            if (!result.isOk())
+            if (!result)
                 return result;
         }
     }

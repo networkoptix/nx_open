@@ -13,10 +13,6 @@ const QString kAuthKey = "auth";
 const QString kReferralSourceKey = "from";
 const QString kReferralContextKey = "context";
 
-const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
-const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
-const SystemUri::SystemAction kDefaultSystemAction = SystemUri::SystemAction::View;
-
 const int kDefaultPort = 80;
 const int kMaxPort = 65535;
 
@@ -40,7 +36,7 @@ const QMap<SystemUri::ClientCommand, QString> clientCommandToString
     {SystemUri::ClientCommand::None,            "_invalid_"},
     {SystemUri::ClientCommand::Client,          "client"},
     {SystemUri::ClientCommand::LoginToCloud,    "cloud"},
-    {SystemUri::ClientCommand::ConnectToSystem, "systems"}
+    {SystemUri::ClientCommand::OpenOnPortal,    "systems"}
 };
 
 const QMap<SystemUri::SystemAction, QString> systemActionToString
@@ -86,26 +82,17 @@ void splitString(const QString& source, QChar separator, QString& left, QString&
 class nx::vms::utils::SystemUriPrivate
 {
 public:
-    SystemUri::Scope scope;
-    SystemUri::Protocol protocol;
+    SystemUri::Scope scope = SystemUri::Scope::Generic;
+    SystemUri::Protocol protocol = SystemUri::Protocol::Http;
     QString domain;
-    SystemUri::ClientCommand clientCommand;
+    SystemUri::ClientCommand clientCommand = SystemUri::ClientCommand::None;
     QString systemId;
-    SystemUri::SystemAction systemAction;
+    SystemUri::SystemAction systemAction = SystemUri::SystemAction::View;
     SystemUri::Auth authenticator;
     SystemUri::Referral referral;
     SystemUri::Parameters parameters;
 
-    SystemUriPrivate() :
-        scope(kDefaultScope),
-        protocol(kDefaultProtocol),
-        domain(),
-        clientCommand(SystemUri::ClientCommand::None),
-        systemId(),
-        systemAction(kDefaultSystemAction),
-        authenticator(),
-        referral(),
-        parameters()
+    SystemUriPrivate()
     {}
 
     SystemUriPrivate(const SystemUriPrivate &other) :
@@ -122,6 +109,8 @@ public:
 
     void parse(const QUrl& url)
     {
+        // For now we support parsing of generic links only
+        scope = SystemUri::Scope::Generic;
         protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
         domain = url.host();
         int port = url.port(kDefaultPort);
@@ -143,25 +132,26 @@ public:
 
         switch (clientCommand)
         {
-            case SystemUri::ClientCommand::Client:
+            // No more parameters are required for these commands
+            case SystemUri::ClientCommand::None:
             case SystemUri::ClientCommand::LoginToCloud:
-                /* No more parameters are required for these commands */
                 return;
+
+            // Client opens such links as usual client links
+            case SystemUri::ClientCommand::OpenOnPortal:
+                NX_ASSERT(protocol == SystemUri::Protocol::Native);
+                clientCommand = SystemUri::ClientCommand::Client;
+                break;
+
             default:
                 break;
         }
 
-        if (path.isEmpty())
-        {
-            scope = SystemUri::Scope::Direct;
-            systemId = domain;
-        }
-        else
+        if (!path.isEmpty())
         {
             QString systemIdOrAction = path.takeFirst();
             if (systemActionToString.values().contains(systemIdOrAction))
             {
-                scope = SystemUri::Scope::Direct;
                 systemId = domain;
             }
             else
@@ -188,7 +178,7 @@ public:
         }
 
         QString path = '/' + clientCommandToString[clientCommand];
-        if (clientCommand == SystemUri::ClientCommand::ConnectToSystem)
+        if (clientCommand == SystemUri::ClientCommand::Client && isValidSystemId())
         {
             if (scope == SystemUri::Scope::Generic)
                 path += '/' + systemId;
@@ -243,7 +233,7 @@ public:
 
     bool isNull() const
     {
-        return protocol == kDefaultProtocol
+        return protocol == SystemUri::Protocol::Http
             && clientCommand == SystemUri::ClientCommand::None
             && domain.isEmpty()
             && systemId.isEmpty()
@@ -284,14 +274,15 @@ private:
     {
         bool hasDomain = !domain.isEmpty();
         bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
+        bool hasSystemId = !systemId.isEmpty();
 
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return hasDomain;
+                return hasDomain && (hasSystemId ? hasAuth && isValidSystemId() : !hasAuth );
             case SystemUri::ClientCommand::LoginToCloud:
                 return hasDomain && hasAuth;
-            case SystemUri::ClientCommand::ConnectToSystem:
+            case SystemUri::ClientCommand::OpenOnPortal:
                 return hasDomain
                     && hasAuth
                     && isValidSystemId();
@@ -314,11 +305,11 @@ private:
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return protocol == SystemUri::Protocol::Native;
+                return protocol == SystemUri::Protocol::Native && (!hasAuth || isValidSystemId());
             case SystemUri::ClientCommand::LoginToCloud:
                 return protocol == SystemUri::Protocol::Native
                     && hasAuth;
-            case SystemUri::ClientCommand::ConnectToSystem:
+            case SystemUri::ClientCommand::OpenOnPortal:
                 return hasAuth
                     && isValidSystemId();
             default:

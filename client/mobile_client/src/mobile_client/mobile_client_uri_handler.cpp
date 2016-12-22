@@ -70,10 +70,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
         case SystemUri::ClientCommand::None:
             break;
         case SystemUri::ClientCommand::Client:
-            // Do nothing because the app will be raised by OS whithout our help.
-            break;
-        case SystemUri::ClientCommand::ConnectToSystem:
-            if (m_uiController)
+            if (m_uiController && !uri.systemId().isEmpty())
             {
                 m_uiController->disconnectFromSystem();
 

@@ -778,6 +778,8 @@ void Player::setPosition(qint64 value)
     d->setLiveMode(value == kLivePosition);
 
     d->at_hurryUp(); //< renew receiving frames
+
+    emit positionChanged();
 }
 
 int Player::maxTextureSize() const

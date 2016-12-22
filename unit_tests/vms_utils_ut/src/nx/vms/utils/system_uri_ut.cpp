@@ -8,35 +8,30 @@ using namespace nx::vms::utils;
 /*
     Valid Links Examples
 
-    Http(s) Generic Links
-        http://cloud-demo.hdw.mx/
-        http://cloud-demo.hdw.mx/client
-        http://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
-        http://cloud-demo.hdw.mx/systems/localhost:7001?auth=YWJyYTprYWRhYnJh
-        http://cloud-demo.hdw.mx/systems/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
-        http://cloud-demo.hdw.mx/systems/localhost:7001/view?auth=YWJyYTprYWRhYnJh
-        http://cloud-demo.hdw.mx/systems/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+    Http(s) Universal Links
 
-    Native Generic Links
-        nx-vms://cloud-demo.hdw.mx/
-        nx-vms://cloud-demo.hdw.mx/client
-        nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
+        http://cloud-demo.hdw.mx/client - just open the client
+        http://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh - open the client and connect to cloud
+        http://cloud-demo.hdw.mx/client/localhost:7001?auth=YWJyYTprYWRhYnJh
+        http://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+        http://cloud-demo.hdw.mx/client/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+        http://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+
+   Native Links
+        nx-vms://cloud-demo.hdw.mx/ - just open the client
+        nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh - open the client and login to cloud
+
+        nx-vms://cloud-demo.hdw.mx/client - just open the client
+        nx-vms://cloud-demo.hdw.mx/client/localhost:7001?auth=YWJyYTprYWRhYnJh
+        nx-vms://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
+        nx-vms://cloud-demo.hdw.mx/client/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+        nx-vms://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
+
+        nx-vms://cloud-demo.hdw.mx/systems - just open the client
         nx-vms://cloud-demo.hdw.mx/systems/localhost:7001?auth=YWJyYTprYWRhYnJh
         nx-vms://cloud-demo.hdw.mx/systems/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
         nx-vms://cloud-demo.hdw.mx/systems/localhost:7001/view?auth=YWJyYTprYWRhYnJh
         nx-vms://cloud-demo.hdw.mx/systems/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
-
-    Http(s) Direct Links
-        http://localhost:7001/ - cannot be distinguished from generic link
-        http://localhost:7001/systems?auth=YWJyYTprYWRhYnJh
-        http://localhost:7001/systems/view?auth=YWJyYTprYWRhYnJh
-
-    Native Direct Links
-        nx-vms://localhost:7001/ - cannot be distinguished from generic link
-        nx-vms://localhost:7001/client - cannot be distinguished from generic link
-        nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - cannot be distinguished from generic link
-        nx-vms://localhost:7001/systems?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
-        nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/systems?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
 */
 
 
@@ -48,6 +43,7 @@ namespace
     const QString kCloudSystemId("d0b73d03-3e2e-405d-8226-019c83b13a08");
     const QString kLocalSystemId("localhost:7001");
     const QString kEncodedLocalSystemId("localhost%3A7001");
+    const QString kInvalidSystemId("_invalid_system_id_");
 
     const QString kUser("user");
     const QString kPassword("password");
@@ -57,51 +53,49 @@ namespace
     const QString kParamValue("value");
 }
 
-namespace nx
+
+namespace nx {
+namespace vms {
+namespace utils {
+
+void PrintTo(SystemUri::Scope val, ::std::ostream* os)
 {
-    namespace vms
-    {
-        namespace utils
-        {
-            void PrintTo(SystemUri::Scope val, ::std::ostream* os)
-            {
-                *os << SystemUri::toString(val).toStdString();
-            }
-
-            void PrintTo(SystemUri::Protocol val, ::std::ostream* os)
-            {
-                *os << SystemUri::toString(val).toStdString();
-            }
-
-            void PrintTo(SystemUri::ClientCommand val, ::std::ostream* os)
-            {
-                *os << SystemUri::toString(val).toStdString();
-            }
-
-
-            void PrintTo(SystemUri::SystemAction val, ::std::ostream* os)
-            {
-                *os << SystemUri::toString(val).toStdString();
-            }
-
-            void PrintTo(SystemUri::ReferralSource val, ::std::ostream* os)
-            {
-                *os << SystemUri::toString(val).toStdString();
-            }
-
-            void PrintTo(SystemUri::ReferralContext val, ::std::ostream* os)
-            {
-                *os << SystemUri::toString(val).toStdString();
-            }
-
-            void PrintTo(const SystemUri& val, ::std::ostream* os)
-            {
-                *os << val.toString().toStdString();
-            }
-        }
-    }
+    *os << SystemUri::toString(val).toStdString();
 }
 
+void PrintTo(SystemUri::Protocol val, ::std::ostream* os)
+{
+    *os << SystemUri::toString(val).toStdString();
+}
+
+void PrintTo(SystemUri::ClientCommand val, ::std::ostream* os)
+{
+    *os << SystemUri::toString(val).toStdString();
+}
+
+void PrintTo(SystemUri::SystemAction val, ::std::ostream* os)
+{
+    *os << SystemUri::toString(val).toStdString();
+}
+
+void PrintTo(SystemUri::ReferralSource val, ::std::ostream* os)
+{
+    *os << SystemUri::toString(val).toStdString();
+}
+
+void PrintTo(SystemUri::ReferralContext val, ::std::ostream* os)
+{
+    *os << SystemUri::toString(val).toStdString();
+}
+
+void PrintTo(const SystemUri& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
+}
+
+} // namespace utils
+} // namespace vms
+} // namespace nx
 
 
 class SystemUriTest : public testing::Test
@@ -124,6 +118,7 @@ public:
     void assertEqual(const SystemUri& l, const SystemUri& r)
     {
         ASSERT_EQ(l.protocol(), r.protocol());
+        ASSERT_EQ(l.scope(), r.scope());
         ASSERT_EQ(l.clientCommand(), r.clientCommand());
         ASSERT_EQ(l.domain(), r.domain());
         ASSERT_EQ(l.systemId(), r.systemId());
@@ -249,7 +244,7 @@ TEST_F(SystemUriTest, genericCloudValidAuth)
 /** Generic system command. Domain is required. */
 TEST_F(SystemUriTest, genericSystemValidDomain)
 {
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
@@ -258,10 +253,10 @@ TEST_F(SystemUriTest, genericSystemValidDomain)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Generic system command. Auth is required. */
+/** Generic system command. Auth is required if system id is present. */
 TEST_F(SystemUriTest, genericSystemValidAuth)
 {
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
@@ -270,72 +265,79 @@ TEST_F(SystemUriTest, genericSystemValidAuth)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Generic system command. System Id is required. */
+/** Generic system command. System Id is required if auth is present. */
 TEST_F(SystemUriTest, genericSystemValidSystemId)
 {
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
     m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_FALSE(m_uri.isValid());
 
-    m_uri.setSystemId(kLocalSystemId);
-    ASSERT_TRUE(m_uri.isValid());
-}
-
-/** Direct system command. System Id is required. */
-TEST_F(SystemUriTest, directSystemValidSystemId)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kInvalidSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Direct system command. Valid client commands for http protocol. */
-TEST_F(SystemUriTest, directSystemValidClientCommandHttp)
+/** Direct system command. Works only with native protocol. */
+TEST_F(SystemUriTest, directSystemValidProtocol)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
-    ASSERT_EQ(SystemUri::Protocol::Http, m_uri.protocol());
-    m_uri.setSystemId(kLocalSystemId);
-    m_uri.setAuthenticator(kUser, kPassword);
-
-    /* Cannot connect to cloud with direct http link. */
-    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
-    ASSERT_FALSE(m_uri.isValid());
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    ASSERT_TRUE(m_uri.isValid());
-}
-
-/** Direct system command. Valid client commands for https protocol. */
-TEST_F(SystemUriTest, directSystemValidClientCommandHttps)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Https);
-    m_uri.setSystemId(kLocalSystemId);
-    m_uri.setAuthenticator(kUser, kPassword);
-
-    /* Cannot connect to cloud with direct http link. */
-    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
-    ASSERT_FALSE(m_uri.isValid());
-    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     ASSERT_FALSE(m_uri.isValid());
 
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setProtocol(SystemUri::Protocol::Native);
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Direct system command. Valid client commands for native protocol. */
+/** Direct system command. Any system id is required. */
+TEST_F(SystemUriTest, directSystemAnySystemId)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setSystemId(kInvalidSystemId);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Direct system command. Valid system id is required if auth is provided. */
+TEST_F(SystemUriTest, directSystemValidSystemIdWithAuth)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setAuthenticator(kUser, kPassword);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setSystemId(kInvalidSystemId);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setSystemId(kLocalSystemId);
+    ASSERT_TRUE(m_uri.isValid());
+
+    m_uri.setSystemId(kCloudSystemId);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Direct system command. Valid client commands for native protocol without auth. */
 TEST_F(SystemUriTest, directSystemNativeClient)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
     m_uri.setSystemId(kLocalSystemId);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setClientCommand(SystemUri::ClientCommand::OpenOnPortal);
     ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
@@ -354,134 +356,164 @@ TEST_F(SystemUriTest, directSystemNativeCloud)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Direct system command. Login to system for native protocol. */
-TEST_F(SystemUriTest, directSystemNativeSystem)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setSystemId(kLocalSystemId);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    ASSERT_FALSE(m_uri.isValid());
-    m_uri.setAuthenticator(kUser, kPassword);
-    ASSERT_TRUE(m_uri.isValid());
-}
+/* Testing links parsing */
 
-/** Direct system command. Login to cloud system for native protocol. */
-TEST_F(SystemUriTest, directCloudNativeSystem)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setSystemId(kCloudSystemId);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    ASSERT_FALSE(m_uri.isValid());
-    m_uri.setAuthenticator(kUser, kPassword);
-    ASSERT_TRUE(m_uri.isValid());
-}
-
-/* Testing links */
-TEST_F(SystemUriTest, genericLinkClientShort)
-{
-    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
-    m_uri.setDomain(kCloudDomain);
-    validateLink(QString("http://%1/").arg(kCloudDomain));
-    validateLink(QString("http://%1/client").arg(kCloudDomain));
-    validateLink(QString("http://%1/client/").arg(kCloudDomain));
-}
-
-TEST_F(SystemUriTest, genericLinkClientProtocolHttp)
+// http://cloud-demo.hdw.mx/client - just open the client
+// https://cloud-demo.hdw.mx/client - just open the client
+TEST_F(SystemUriTest, universalLinkClient)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
 
     ASSERT_EQ(SystemUri::Protocol::Http, m_uri.protocol());
-    validateLink(QString("http://%1/").arg(kCloudDomain));
-}
+    validateLink(QString("http://%1/client").arg(kCloudDomain));
 
-TEST_F(SystemUriTest, genericLinkClientProtocolHttps)
-{
-    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
-    m_uri.setDomain(kCloudDomain);
     m_uri.setProtocol(SystemUri::Protocol::Https);
-    validateLink(QString("https://%1/").arg(kCloudDomain));
+    validateLink(QString("https://%1/client").arg(kCloudDomain));
 }
 
-TEST_F(SystemUriTest, genericLinkClientProtocolNative)
+// http://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh - open the client and connect to cloud
+// https://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh - open the client and connect to cloud
+TEST_F(SystemUriTest, universalLinkCloud)
 {
-    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     m_uri.setDomain(kCloudDomain);
-    m_uri.setProtocol(SystemUri::Protocol::Native);
-    validateLink(QString("%1://%2/").arg(AppInfo::nativeUriProtocol()).arg(kCloudDomain));
-    validateLink(QString("customprotocol://%1/").arg(kCloudDomain));
+    m_uri.setAuthenticator(kUser, kPassword);
+
+    validateLink(QString("http://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
+
+    m_uri.setProtocol(SystemUri::Protocol::Https);
+    validateLink(QString("https://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
 }
 
-TEST_F(SystemUriTest, genericLinkCloud)
+// http://cloud-demo.hdw.mx/client/localhost:7001?auth=YWJyYTprYWRhYnJh
+// http://cloud-demo.hdw.mx/client/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+// https://cloud-demo.hdw.mx/client/localhost:7001?auth=YWJyYTprYWRhYnJh
+// https://cloud-demo.hdw.mx/client/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+TEST_F(SystemUriTest, universalLinkLocalSystem)
 {
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+
+    validateLink(QString("http://%1/client/%2?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/client/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+
+    m_uri.setProtocol(SystemUri::Protocol::Https);
+    validateLink(QString("https://%1/client/%2?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("https://%1/client/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+}
+
+// http://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+// http://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+// https://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+// https://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+TEST_F(SystemUriTest, universalLinkCloudSystem)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kCloudSystemId);
+
+    validateLink(QString("http://%1/client/%2?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/client/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+
+    m_uri.setProtocol(SystemUri::Protocol::Https);
+    validateLink(QString("https://%1/client/%2?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("https://%1/client/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+}
+
+// nx-vms://cloud-demo.hdw.mx/ - just open the client
+// nx-vms://cloud-demo.hdw.mx/client - just open the client
+// nx-vms://cloud-demo.hdw.mx/systems - just open the client
+TEST_F(SystemUriTest, nativeLinkClient)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+
+    validateLink(QString("nx-vms://%1").arg(kCloudDomain));
+    validateLink(QString("nx-vms://%1/client").arg(kCloudDomain));
+    validateLink(QString("nx-vms://%1/systems").arg(kCloudDomain));
+}
+
+// nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh - open the client and login to cloud
+TEST_F(SystemUriTest, nativeLinkCloud)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
     m_uri.setDomain(kCloudDomain);
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     m_uri.setAuthenticator(kUser, kPassword);
 
-    validateLink(QString("http://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
 }
 
-TEST_F(SystemUriTest, genericLinkLocalSystem)
+// nx-vms://cloud-demo.hdw.mx/client/localhost:7001?auth=YWJyYTprYWRhYnJh
+// nx-vms://cloud-demo.hdw.mx/client/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+// nx-vms://cloud-demo.hdw.mx/systems/localhost:7001?auth=YWJyYTprYWRhYnJh
+// nx-vms://cloud-demo.hdw.mx/systems/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+TEST_F(SystemUriTest, nativeLinkLocalSystem)
 {
-    m_uri.setDomain(kCloudDomain);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kLocalSystemId);
-
-    validateLink(QString("http://%1/systems/%2?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
-    validateLink(QString("http://%1/systems/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
-}
-
-TEST_F(SystemUriTest, genericLinkCloudSystem)
-{
-    m_uri.setDomain(kCloudDomain);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kCloudSystemId);
-
-    validateLink(QString("http://%1/systems/%2?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
-    validateLink(QString("http://%1/systems/%2/view?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
-}
-
-TEST_F(SystemUriTest, directLinkLocalSystem)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setDomain(kLocalDomain);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kLocalSystemId);
-
-    validateLink(QString("http://%1/systems?auth=%2").arg(kLocalDomain).arg(kEncodedAuthKey));
-    validateLink(QString("http://%1/systems/view?auth=%2").arg(kLocalDomain).arg(kEncodedAuthKey));
-}
-
-TEST_F(SystemUriTest, directLinkCloudSystemNative)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setDomain(kCloudSystemId);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+
+    validateLink(QString("nx-vms://%1/client/%2?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/client/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/systems/%2?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/systems/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+}
+
+// nx-vms://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+// nx-vms://cloud-demo.hdw.mx/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+// nx-vms://cloud-demo.hdw.mx/systems/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+// nx-vms://cloud-demo.hdw.mx/systems/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+TEST_F(SystemUriTest, nativeLinkCloudSystem)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kCloudSystemId);
 
-    validateLink(QString("%1://%2/systems?auth=%3").arg(AppInfo::nativeUriProtocol()).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/client/%2?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/client/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/systems/%2?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("nx-vms://%1/systems/%2/view?auth=%3")
+        .arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
 /* Testing invalid domains. */
 
 TEST_F(SystemUriTest, directLinkCloudSystem)
 {
-    m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setDomain(kCloudSystemId);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kCloudSystemId);
 
-    validateLink(QString("http://%1/systems?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/client?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
     ASSERT_FALSE(m_uri.isValid());
 }
+
+/* Referral links */
 
 TEST_F(SystemUriTest, referralLinkSource)
 {
@@ -555,29 +587,19 @@ TEST_F(SystemUriTest, genericCloudToString)
 TEST_F(SystemUriTest, genericSystemCloudSystemIdToString)
 {
     m_uri.setDomain(kCloudDomain);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kCloudSystemId);
-    validateToString(QString("http://%1/systems/%2/view?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateToString(QString("http://%1/client/%2/view?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
 TEST_F(SystemUriTest, genericSystemLocalSystemIdToString)
 {
     m_uri.setDomain(kCloudDomain);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kLocalSystemId);
-    validateToString(QString("http://%1/systems/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
-}
-
-TEST_F(SystemUriTest,directSystemLocalSystemIdToString)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setDomain(kLocalSystemId);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kLocalSystemId);
-    validateToString(QString("http://%1/systems/view?auth=%2").arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateToString(QString("http://%1/client/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
 }
 
 TEST_F(SystemUriTest, directSystemCloudSystemIdToString)
@@ -585,10 +607,10 @@ TEST_F(SystemUriTest, directSystemCloudSystemIdToString)
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
     m_uri.setDomain(kCloudSystemId);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kCloudSystemId);
-    validateToString(QString("%1://%2/systems/view?auth=%3").arg(AppInfo::nativeUriProtocol()).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateToString(QString("%1://%2/client/view?auth=%3").arg(AppInfo::nativeUriProtocol()).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
 TEST_F(SystemUriTest, customParametersToString)
@@ -614,7 +636,7 @@ TEST_F(SystemUriTest, referralLinkToString)
 TEST_F(SystemUriTest, constructors)
 {
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
     m_uri.setSystemId(kLocalSystemId);
     m_uri.setAuthenticator(kUser, kPassword);
@@ -631,7 +653,7 @@ TEST_F(SystemUriTest, constructors)
 TEST_F(SystemUriTest, assignmentOperator)
 {
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
     m_uri.setSystemId(kLocalSystemId);
     m_uri.setAuthenticator(kUser, kPassword);

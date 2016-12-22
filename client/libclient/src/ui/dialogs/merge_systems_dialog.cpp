@@ -269,15 +269,29 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
 
     m_discoverer = discoverer;
     ui->remoteSystemLabel->setText(moduleInformation.systemName);
+    ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
+
+    if (helpers::isNewSystem(moduleInformation))
+    {
+        ui->currentSystemRadioButton->setChecked(true);
+        ui->remoteSystemRadioButton->setEnabled(false);
+    }
+    else
+    {
+        ui->remoteSystemRadioButton->setEnabled(true);
+    }
+
     m_mergeButton->setText(tr("Merge with %1").arg(moduleInformation.systemName));
     m_mergeButton->show();
-    ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
-    updateErrorLabel(QString());
 
     if (mergeStatus == utils::MergeSystemsStatus::starterLicense)
     {
         updateErrorLabel(
             utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation));
+    }
+    else
+    {
+        updateErrorLabel(QString());
     }
 
     updateConfigurationBlock();

@@ -79,7 +79,7 @@ public:
     QModelIndex createIndex(int row, int col);
     QModelIndex createIndex(int col);
 
-    Qt::ItemFlags flags(int column) const ;
+    virtual Qt::ItemFlags flags(int column) const;
 
     virtual QVariant data(int role, int column) const;
 

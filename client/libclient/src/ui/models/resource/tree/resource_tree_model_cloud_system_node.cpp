@@ -50,9 +50,17 @@ QVariant QnResourceTreeModelCloudSystemNode::data(int role, int column) const
     return base_type::data(role, column);
 }
 
+Qt::ItemFlags QnResourceTreeModelCloudSystemNode::flags(int column) const
+{
+    Qt::ItemFlags result = base_type::flags(column);
+    if (!m_system->isOnline())
+        result &= ~Qt::ItemIsEnabled;
+    return result;
+}
+
 QIcon QnResourceTreeModelCloudSystemNode::calculateIcon() const
 {
     return m_system->isOnline()
-        ? qnSkin->icon("welcome_page/cloud_online.png")
-        : qnSkin->icon("welcome_page/cloud_unavailable.png");
+        ? qnSkin->icon("tree/system_cloud.png")
+        : qnSkin->icon("tree/system_cloud_disabled.png");
 }

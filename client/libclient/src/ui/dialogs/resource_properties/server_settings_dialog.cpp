@@ -3,8 +3,9 @@
 
 #include <core/resource/media_server_resource.h>
 
+#include <network/cloud_url_validator.h>
+
 #include <nx/network/http/httptypes.h>
-#include <nx/network/socket_global.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
@@ -146,9 +147,7 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
 
 void QnServerSettingsDialog::updateWebPageButton()
 {
-    bool allowed = m_server
-        && !nx::network::SocketGlobals::addressResolver()
-            .isCloudHostName(m_server->getApiUrl().host());
+    bool allowed = m_server && !nx::network::isCloudServer(m_server);
 
     m_webPageButton->setVisible(allowed);
     m_webPageButton->setEnabled(allowed && m_server->getStatus() == Qn::Online);

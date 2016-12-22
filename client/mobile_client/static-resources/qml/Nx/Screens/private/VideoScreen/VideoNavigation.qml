@@ -148,11 +148,14 @@ Item
                 chunkProvider: cameraChunkProvider
                 startBound: cameraChunkProvider.bottomBound
 
-                onMoveFinished:
+                onMovingChanged:
                 {
-                    mediaPlayer.position = position
-                    if (resumeWhenDragFinished)
-                        mediaPlayer.play()
+                    if (!moving)
+                    {
+                        mediaPlayer.position = position
+                        if (resumeWhenDragFinished)
+                            mediaPlayer.play()
+                    }
                 }
                 onPositionTapped: mediaPlayer.position = position
                 onPositionChanged:

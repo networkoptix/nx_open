@@ -1854,12 +1854,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     factory(QnActions::DebugIncrementCounterAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::GlobalHotkey | Qn::DevMode).
         shortcut(lit("Ctrl+Alt+Shift++")).
         text(lit("Increment Debug Counter"));
 
     factory(QnActions::DebugDecrementCounterAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::GlobalHotkey | Qn::DevMode).
         shortcut(lit("Ctrl+Alt+Shift+-")).
         text(lit("Decrement Debug Counter"));
 

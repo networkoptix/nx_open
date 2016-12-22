@@ -15,7 +15,7 @@ FocusScope
     property alias echoMode: textField.echoMode;
     property alias error: textField.error;
     property alias hasFocus: textField.activeFocus;
-
+    property alias textControlEnabled: textField.enabled;
     property Component leftControlDelegate;
     property Component rightControlDelegate;
 

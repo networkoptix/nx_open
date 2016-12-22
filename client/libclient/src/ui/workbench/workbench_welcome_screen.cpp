@@ -491,22 +491,25 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             if (dialog->exec() != QDialog::Accepted)
                 return;
 
+            bool autoLogin = false;
             if (dialog->localCredentials().isValid())
             {
                 connectToSystemInternal(QString(), serverUrl, dialog->localCredentials(),
-                    false, false, controlsGuard);
+                    dialog->savePassword(), autoLogin, controlsGuard);
             }
             else if (dialog->cloudCredentials().isValid())
             {
                 const auto cloudCredentials = dialog->cloudCredentials();
 
-                // We suppose that connection to cloud from new systems is always permanent
-                qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
-                qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
+                if (dialog->savePassword())
+                {
+                    qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
+                    qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
+                }
 
                 qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
                 connectToSystemInternal(QString(), serverUrl, cloudCredentials,
-                    false, false, controlsGuard);
+                    dialog->savePassword(), autoLogin, controlsGuard);
             }
 
         };
