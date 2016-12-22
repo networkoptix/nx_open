@@ -644,9 +644,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
     if (nodeType == Qn::VideoWallItemNode)
     {
-        if (!resource)
-            return;
-        extInfo = kCustomExtInfoTemplate.arg(resource->getName());
+        // skip videowall screens
     }
     else if (nodeType == Qn::RecorderNode)
     {

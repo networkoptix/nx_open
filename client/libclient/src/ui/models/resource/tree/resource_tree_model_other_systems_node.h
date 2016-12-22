@@ -6,9 +6,6 @@
 
 #include <nx/utils/disconnect_helper.h>
 
-class QnFakeMediaServerResource;
-typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;
-
 /**
  * Node which displays cloud systems, accessible to the client, and local systems, accessible to
  * the server.
@@ -39,6 +36,7 @@ private:
     QnResourceTreeModelNodePtr ensureFakeServerNode(const QnFakeMediaServerResourcePtr& server);
 
     bool canSeeFakeServers() const;
+    bool canSeeSystem(const QnSystemDescriptionPtr& system) const;
 
     void cleanupEmptyLocalNodes();
 
