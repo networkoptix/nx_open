@@ -7,6 +7,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <functional>
 
 #include "log_message.h"
 
@@ -20,10 +21,11 @@
 namespace nx {
 namespace utils {
 
-NX_UTILS_API void logError(const lm& message);
+NX_UTILS_API void logError(const QnLogMessage& message);
+void NX_UTILS_API setErrorMonitor(std::function<void(const QnLogMessage&)> handler);
 
 template<typename Reason>
-lm assertLog(const char* file, int line, const char* condition, const Reason& message)
+QnLogMessage assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
    #if defined(ANDROID) || defined(__ANDROID__)
        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")

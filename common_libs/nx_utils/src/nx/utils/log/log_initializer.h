@@ -7,26 +7,10 @@ namespace nx {
 namespace utils {
 namespace log {
 
-class NX_UTILS_API QnLogSettings
-{
-public:
-#ifdef _DEBUG
-    static constexpr QnLogLevel kDefaultLogLevel = cl_logDEBUG1;
-#else
-    static constexpr QnLogLevel kDefaultLogLevel = cl_logINFO;
-#endif
+class Settings;
 
-    QnLogLevel level = kDefaultLogLevel;
-    QString directory = QString(); //< dataDir/log
-    quint32 maxFileSize = nx::utils::stringToBytesConst("10M");
-    quint8 maxBackupCount = 5;
-
-    /** Rewrites values from settings if specified */
-    void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
-};
-
-void NX_UTILS_API initializeQnLog(
-    const QnLogSettings& settings,
+void NX_UTILS_API initialize(
+    const Settings& settings,
     const QString& dataDir,
     const QString& applicationName,
     const QString& baseName = QLatin1String("log_file"),

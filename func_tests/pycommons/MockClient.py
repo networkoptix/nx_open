@@ -11,6 +11,8 @@ DEFAULT_TIMEOUT =  10.0
 DEFAULT_USER = 'admin'
 DEFAULT_PASSWORD = 'admin'
 
+HTTP_OK = 200
+
 class Client:
 
     currentIdx = 0
@@ -66,14 +68,14 @@ class Client:
         return urllib2.urlopen(request, timeout = self._timeout)
 
     def httpRequest(
-        self, address,  command,
+        self, address, method,
         data = None,
         headers={},
         auth_user = None,
         auth_password = None,  **kw):
         user = auth_user or self.__user
         password = auth_password or self.__password
-        url = "http://%s/%s" % (address, command)
+        url = "http://%s/%s" % (address, method)
         params = self._params2url(kw)
         if params:
             url+= '?' + params
@@ -139,12 +141,27 @@ class ClientMixin(ComparisonMixin):
         pass
 
     # Check API call error
-    def checkResponseError(self, response, method):
-        self.assertEqual(response.status, 200, "'%s' status" % method)
-        if isinstance(response, Client.ServerResponseData):
+    def checkResponseError(self, response, method, status = HTTP_OK):
+        self.assertEqual(response.status, status, "'%s' status" % method)
+        if isinstance(response, Client.ServerResponseData) and status == HTTP_OK:
             self.assertFalse(type(response.data) is str, 'JSON response expected')
             if not isinstance(response.data, list):
                 self.assertEqual(int(response.data.get('error', 0)), 0, "'%s' reply.error" % method)
                 self.assertEqual(response.data.get('errorString', ''), '', "'%s' reply.errorString" % method)
+
+    # Call API method & check error
+    def sendAndCheckRequest(self,
+                            address,  method,
+                            data = None,
+                            headers={},
+                            auth_user = None,
+                            auth_password = None,
+                            status = HTTP_OK,
+                            **kw):
+        response = self.client.httpRequest(
+            address, method, data, headers,
+            auth_user, auth_password, **kw)
+        self.checkResponseError(response, method, status)
+        return response
 
                 

@@ -6,6 +6,7 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "media_server_helper.h"
+#include "nx/network/socket_global.h"
 
 namespace nx {
 namespace ut {
@@ -14,6 +15,8 @@ namespace utils {
 MediaServerHelper::MediaServerHelper(const MediaServerTestFuncTypeList& testList) :
     m_testList(testList)
 {
+    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+
     int argc = 2;
     char* argv[] = { "", "-e" };
 
@@ -34,9 +37,9 @@ MediaServerHelper::MediaServerHelper(const MediaServerTestFuncTypeList& testList
     m_testsReadyFuture = m_testReadyPromise.get_future();
 
     QObject::connect(
-        m_serverProcess.get(), 
-        &MediaServerProcess::started, 
-        [this]() 
+        m_serverProcess.get(),
+        &MediaServerProcess::started,
+        [this]()
         {
             m_thread = std::thread([this]()
             {

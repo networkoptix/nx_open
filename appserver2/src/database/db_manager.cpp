@@ -560,6 +560,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
             userResource->setDigest(beforeRestoreDbData.digest);
             userResource->setCryptSha512Hash(beforeRestoreDbData.cryptSha512Hash);
             userResource->setRealm(beforeRestoreDbData.realm);
+            userResource->setEnabled(true);
             updateUserResource = true;
         }
         if (updateUserResource)

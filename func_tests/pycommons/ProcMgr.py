@@ -55,6 +55,8 @@ class Process:
         self.__env = env
         if self.__procMgr:
             self.__procMgr.add(self)
+        self.__out = None
+        self.__err = None
 
     @property
     def name( self ):
@@ -68,13 +70,13 @@ class Process:
           stderr = subprocess.PIPE,
           env = self.__env)
 
-        self.out = BindOutput(self.__name, self.__proc.stdout, self._output, (), self._finished)
-        self.err = BindOutput(self.__name, self.__proc.stderr, self._error)
+        self.__out = BindOutput(self.__name, self.__proc.stdout, self._output, (), self._finished)
+        self.__err = BindOutput(self.__name, self.__proc.stderr, self._error)
 
     # will block until process finishes
     def _close( self ):
-        self.out.close()
-        self.err.close()
+        if self.__out: self.__out.close()
+        if self.__err: self.__err.close()
 
     def _output( self, line ):
         log(5, '%s' % line)
@@ -89,6 +91,12 @@ class Process:
         if self.__proc.poll() is None:
             log(13, 'sending signal %d to %s (%d)' % (sig, self.__name, self.__proc.pid))
             os.kill(self.__proc.pid, sig)
+            finishTime = time.time() + 5.0
+            while self.__proc.poll() is None and time.time() < finishTime:
+                time.sleep(0.5)
+            if self.__proc.poll() is None:
+                log(13, 'sending signal %d to %s (%d)' % (signal.KILL, self.__name, self.__proc.pid))
+                os.kill(self.__proc.pid, signal.KILL)
         else:
             log(13, 'not sending signal %d to %s - already stopped' % (sig, self.__name))
 

@@ -23,9 +23,12 @@ ReverseConnectionHolder::~ReverseConnectionHolder()
 
 void ReverseConnectionHolder::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    NX_CRITICAL(m_socketCount, "Thred can not be changed while holder has saved sockets");
     aio::BasicPollable::bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
+
+    NX_ASSERT(m_socketCount, "Thread can not be changed in working state");
+    for (auto& socket: m_sockets)
+        socket->bindToAioThread(aioThread);
 }
 
 void ReverseConnectionHolder::stopWhileInAioThread()

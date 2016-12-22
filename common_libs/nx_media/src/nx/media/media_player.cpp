@@ -54,8 +54,8 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
-// Player will go invalid state if no data during timeout
-static const int kGotDataTimeoutMs = 1000 * 15;
+// Player will go to the invalid state if no data is received within this timeout.
+static const int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;

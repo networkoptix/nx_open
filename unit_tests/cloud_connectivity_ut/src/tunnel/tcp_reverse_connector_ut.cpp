@@ -50,7 +50,7 @@ TEST(TcpReverseConnector, General)
     std::thread serverThread(
         [this, &serverAddress]()
         {
-            const auto server = std::make_unique<TCPServerSocket>(AF_INET);
+            const auto server = SocketFactory::createStreamServerSocket();
             ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
             ASSERT_TRUE(server->listen());
             serverAddress.set_value(server->getLocalAddress());

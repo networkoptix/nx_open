@@ -1982,7 +1982,6 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 int MixedSslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(MixedSslSocket);
-    NX_ASSERT(d->ioMode == SslSocket::SYNC);
     if (d->useSSL)
         return SslSocket::send((char*) buffer, bufferLen);
     else

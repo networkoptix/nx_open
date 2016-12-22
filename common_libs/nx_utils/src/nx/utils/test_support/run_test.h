@@ -18,6 +18,7 @@ inline int runTest(
     int argc, const char* argv[],
     std::function<void(const ArgumentParser& args)> extraInit = nullptr)
 {
+    nx::utils::setErrorMonitor([&](const QnLogMessage& m) { FAIL() << m.toStdString(); });
     nx::utils::FlagConfig::setOutputAllowed(false);
 
     // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...)

@@ -537,6 +537,37 @@ static int freeGB(QString drive)
 }
 #endif
 
+aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
+    m_mediaFolderName(mediaFolderName)
+{}
+
+QString aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
+{
+    if (!url.endsWith(m_mediaFolderName))
+        return url;
+    
+    int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
+    NX_ASSERT(indexBeforeMediaFolderName > 0);
+    if (indexBeforeMediaFolderName <= 0)
+        return url;
+
+    return url.mid(0, indexBeforeMediaFolderName);
+}
+
+QnStorageResourceList aux::UnmountedStoragesFilter::getUnmountedStorages(
+        const QnStorageResourceList& allStorages,
+        const QStringList& paths)
+{
+    QnStorageResourceList result;
+    for (const auto& storage: allStorages)
+    {
+        if (!paths.contains(getStorageUrlWithoutMediaFolder(storage->getUrl())))
+            result.append(storage);
+    }
+
+    return result;
+}
+
 static QStringList listRecordFolders()
 {
     QStringList folderPaths;
@@ -769,6 +800,13 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
 
+        aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
+        auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
+                m_mediaServer->getStorages(), 
+                listRecordFolders());
+
+        storagesToRemove.append(unMountedStorages);
+
         NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
         for (const auto& storage: storagesToRemove)
             NX_LOG(lit("%1 Storage to remove: %2, id: %3")
@@ -849,7 +887,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, const QnMediaServerResourcePtr &server, bool isNewServerInstance)
 {
-    server->setStatus(Qn::Online, true);
+    server->setStatus(Qn::Online, Qn::StatusChangeReason::CreateInitialData);
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
@@ -1366,6 +1404,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
         qnCameraHistoryPool->resetServerFootageData(serverFootageData);
+        qnCameraHistoryPool->setHistoryCheckDelay(1000);
     }
 
     {
@@ -1768,11 +1807,14 @@ bool MediaServerProcess::initTcpListener(
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
     bool acceptSslConnections = true;
+    int maxConnections = MSSettings::roSettings()->value("maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
+    NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
+
     m_universalTcpListener = new QnUniversalTcpListener(
         cloudManagerGroup->connectionManager,
         QHostAddress::Any,
         rtspPort,
-        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        maxConnections,
         acceptSslConnections );
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;

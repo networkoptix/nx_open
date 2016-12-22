@@ -30,14 +30,8 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
-PACKAGE=$CUSTOMIZATION-mediaserver-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
-UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
+PACKAGE_NAME=${final.artifact.name}-server.tar.gz
+UPDATE_NAME=server-update-${box}-${arch}-$VERSION
 
 TEMP_DIR="`mktemp -d`"
 BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"

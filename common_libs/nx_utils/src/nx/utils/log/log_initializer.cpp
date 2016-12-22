@@ -2,32 +2,15 @@
 
 #include <QtCore/QDir>
 
+#include "log_settings.h"
 #include "../app_info.h"
 
 namespace nx {
 namespace utils {
 namespace log {
 
-void QnLogSettings::load(const QnSettings& settings, const QString& prefix)
-{
-    const auto makeKey =
-        [&prefix](const char* key)
-    {
-        return QString(lm("%1/%2").arg(prefix).arg(key));
-    };
-
-    const auto confLevel = QnLog::logLevelFromString(settings.value(makeKey("logLevel")).toString());
-    if (confLevel != cl_logUNKNOWN)
-        level = confLevel;
-
-    directory = settings.value(makeKey("logDir")).toString();
-    maxBackupCount = (quint8)settings.value(makeKey("maxBackupCount"), 5).toInt();
-    maxFileSize = (quint32)nx::utils::stringToBytes(
-        settings.value(makeKey("maxFileSize")).toString(), maxFileSize);
-}
-
-void initializeQnLog(
-    const QnLogSettings& settings,
+void initialize(
+    const Settings& settings,
     const QString& dataDir,
     const QString& applicationName,
     const QString& baseName,
@@ -43,7 +26,7 @@ void initializeQnLog(
     QDir().mkpath(logDir);
     const QString& fileName = logDir + lit("/") + baseName;
     if (!QnLog::instance(id)->create(
-        fileName, settings.maxFileSize, settings.maxBackupCount, settings.level))
+            fileName, settings.maxFileSize, settings.maxBackupCount, settings.level))
     {
         std::cerr << "Failed to create log file " << fileName.toStdString() << std::endl;
     }

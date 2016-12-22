@@ -24,11 +24,12 @@ struct UpdateHistoryData
 };
 
 /**
+ * Transaction log cache of a single system.
  * Supports transactioned updates.
  * Supported transaction isolation level - read committed.
  * @note Supports multiple concurrent transactions.
- * @note Calls with same tran id are expected to be serialized be caller. 
- * Otherwise, behavior is undefined.
+ * @note Calls with same tran id are expected to be serialized by caller. 
+ *     Otherwise, behavior is undefined.
  */
 class VmsTransactionLogCache
 {

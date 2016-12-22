@@ -8,6 +8,7 @@
 
 #include "media_server_process.h"
 #include "platform/platform_abstraction.h"
+#include "utils.h"
 
 class MediaServerProcess;
 class QnPlatformAbstraction;

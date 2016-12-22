@@ -34,6 +34,8 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    void start();
+
 private:
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_tunnelConnection;

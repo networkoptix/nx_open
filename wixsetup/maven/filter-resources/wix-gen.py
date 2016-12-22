@@ -6,7 +6,7 @@ properties_dir='${root.dir}/wixsetup/${arch}'
 
 #if not os.path.exists(properties_dir):
 #    os.makedirs(properties_dir)
-#os.system("echo ${install.type}=${finalName}.msi >> %s/installer.properties " % properties_dir)
+#os.system("echo ${install.type}=${final.artifact.name}.msi >> %s/installer.properties " % properties_dir)
 
 generated_items = [
     ('fonts', ''),

@@ -209,6 +209,9 @@ public:
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
+    int maxRtpRetryCount() const;
+    void setMaxRtpRetryCount(int newVal);
+
     std::chrono::seconds proxyConnectTimeout() const;
 
     /*!
@@ -317,6 +320,8 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
+
+    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     AdaptorList m_allAdaptors;
 

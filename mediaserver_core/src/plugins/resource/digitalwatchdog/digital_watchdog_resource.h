@@ -46,6 +46,8 @@ private:
     QString fetchCameraModel();
     bool disableB2FramesForActiDW();
     bool isCproChipset() const;
+    bool useOnvifAdvancedParameterProviders() const;
+
 private:
     bool m_hasZoom;
 

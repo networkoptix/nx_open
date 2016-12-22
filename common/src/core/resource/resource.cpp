@@ -592,7 +592,7 @@ Qn::ResourceStatus QnResource::getStatus() const
     return qnStatusDictionary->value(getId());
 }
 
-void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus)
+void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
@@ -610,10 +610,10 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
         init();
 
-    emit statusChanged(toSharedPointer(this));
+    emit statusChanged(toSharedPointer(this), reason);
 }
 
-void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (newStatus == Qn::NotDefined)
         return;
@@ -628,8 +628,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     if (oldStatus == newStatus)
         return;
     qnStatusDictionary->setValue(id, newStatus);
-    if (!silenceMode)
-        doStatusChanged(oldStatus, newStatus);
+    doStatusChanged(oldStatus, newStatus, reason);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const

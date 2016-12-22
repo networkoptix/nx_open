@@ -370,6 +370,14 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
+	    enum class StatusChangeReason
+    {
+        Default,
+        CreateInitialData,
+        GotFromRemotePeer
+    };
+
+
     enum BitratePerGopType {
         BPG_None,
         BPG_Predefined,
@@ -549,6 +557,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_OldMobileClient = 3,
         PT_MobileClient = 4,
         PT_CloudServer = 5,
+        PT_OldServer = 6, //< 2.6 or below
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -881,6 +890,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 

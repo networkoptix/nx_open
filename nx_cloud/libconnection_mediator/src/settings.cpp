@@ -144,7 +144,7 @@ const api::ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::utils::log::QnLogSettings& Settings::logging() const
+const nx::utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }

@@ -1,12 +1,7 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-BETA=
-
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
-DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
+export DISTRIB=${final.artifact.name}-server
 
 update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop

@@ -376,7 +376,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
     std::thread serverThread(
         [&]()
         {
-            const auto server = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+            const auto server = SocketFactory::createStreamServerSocket();
             ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
             ASSERT_TRUE(server->listen());
             serverPort.set_value(server->getLocalAddress().port);

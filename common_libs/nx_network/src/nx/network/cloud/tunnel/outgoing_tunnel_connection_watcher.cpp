@@ -16,7 +16,6 @@ OutgoingTunnelConnectionWatcher::OutgoingTunnelConnectionWatcher(
     m_inactivityTimer(std::make_unique<aio::Timer>())
 {
     bindToAioThread(SocketGlobals::aioService().getCurrentAioThread());
-    launchInactivityTimer();
 }
 
 OutgoingTunnelConnectionWatcher::~OutgoingTunnelConnectionWatcher()
@@ -29,8 +28,8 @@ void OutgoingTunnelConnectionWatcher::bindToAioThread(
 {
     BaseType::bindToAioThread(aioThread);
 
-    m_tunnelConnection->bindToAioThread(getAioThread());
-    m_inactivityTimer->bindToAioThread(getAioThread());
+    m_tunnelConnection->bindToAioThread(aioThread);
+    m_inactivityTimer->bindToAioThread(aioThread);
 }
 
 void OutgoingTunnelConnectionWatcher::stopWhileInAioThread()
@@ -54,7 +53,6 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
                 std::move(socketAttributes),
                 std::move(handler));
         });
-
 }
 
 void OutgoingTunnelConnectionWatcher::launchInactivityTimer()
@@ -77,6 +75,11 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
+}
+
+void OutgoingTunnelConnectionWatcher::start()
+{
+    launchInactivityTimer();
 }
 
 void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)

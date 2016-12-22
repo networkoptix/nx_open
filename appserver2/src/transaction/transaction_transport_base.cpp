@@ -575,6 +575,10 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 
     q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
 
+    // add deprecated query item 'isClient' for compatibility with old server version <= 2.6
+    if (m_localPeer.peerType == Qn::PT_MobileClient)
+        q.addQueryItem("isClient", QString());
+
     // Client reconnects to the server
     if( m_localPeer.isClient() )
     {
@@ -715,9 +719,12 @@ void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayCo
             return;
     }
 
-    NX_ASSERT( !transportHeader.processedPeers.empty() );
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
-        arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+    if (!transportHeader.isNull())
+    {
+        NX_ASSERT(!transportHeader.processedPeers.empty());
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
+            arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+    }
 
     nx::utils::ObjectDestructionFlag::Watcher watcher(
         &m_connectionFreedFlag);
@@ -1181,6 +1188,9 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         return;
     }
 
+    nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
+        client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
+
     if (!m_localPeer.isMobileClient())
     {
         //checking remote server protocol version
@@ -1202,9 +1212,6 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             cancelConnecting();
             return;
         }
-
-        nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
-            client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
 
         const QString remotePeerCloudHost = ec2CloudHostItr == client->response()->headers.end()
             ? QnAppInfo::defaultCloudHost()
@@ -1228,6 +1235,8 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
+    else if (ec2CloudHostItr == client->response()->headers.end())
+        m_remotePeer.peerType = Qn::PT_OldServer; // outgoing connections for server or cloud peers only
     else
         m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server or cloud peers only
     #ifdef USE_JSON

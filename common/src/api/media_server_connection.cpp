@@ -129,10 +129,11 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 }
 #endif // 0
 
-void trace(int handle, int obj, const QString& message = QString())
+    void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
 {
     RequestObject object = static_cast<RequestObject>(obj);
-    NX_LOG(lit("QnMediaServerConnection %1: %2 %3")
+        NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
+            .arg(serverId)
         .arg(handle)
         .arg(message)
         .arg(QnLexical::serialized(object)),
@@ -144,9 +145,16 @@ void trace(int handle, int obj, const QString& message = QString())
 //-------------------------------------------------------------------------------------------------
 // QnMediaServerReplyProcessor
 
+QnMediaServerReplyProcessor::QnMediaServerReplyProcessor(int object, const QString& serverId):
+    QnAbstractReplyProcessor(object),
+    m_serverId(serverId)
+{
+    timer.start();
+}
+
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response, int handle)
 {
-    trace(handle, object(), lit("Received reply"));
+    trace(m_serverId, handle, object(), lit("Received reply (%1ms)").arg(timer.elapsed()));
     switch (object())
     {
         case StorageStatusObject:
@@ -356,9 +364,9 @@ QnMediaServerConnection::~QnMediaServerConnection()
     return;
 }
 
-QnAbstractReplyProcessor* QnMediaServerConnection::newReplyProcessor(int object)
+QnAbstractReplyProcessor* QnMediaServerConnection::newReplyProcessor(int object, const QString& serverId)
 {
-    return new QnMediaServerReplyProcessor(object);
+    return new QnMediaServerReplyProcessor(object, serverId);
 }
 
 bool QnMediaServerConnection::isReady() const
@@ -399,6 +407,11 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
 
     trace(handle, object);
     return handle;
+}
+
+void QnMediaServerConnection::trace(int handle, int obj, const QString& message /*= QString()*/)
+{
+    ::trace(m_serverId, handle, obj, message);
 }
 
 int QnMediaServerConnection::checkCameraList(

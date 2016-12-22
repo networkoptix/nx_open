@@ -83,6 +83,21 @@ class ComparisonMixin(object):
                 pass  # try another
         self.fail('No %s (%s) found' % (desc, self.__v2str(item)))
 
+    # check if list does not include given item
+    def assertHasNotItem(self, item, gotList, desc = 'item'):
+        found = False
+        for i, r in enumerate(gotList):
+            try:
+                self.compare(item, r, desc)
+                found = True
+                break
+            except self.failureException:
+                pass
+            except self.XInvAttr:
+                pass  # try another
+        if found:
+            self.fail('%s (%s) found' % (desc, self.__v2str(item)))
+
     def assertHasItems(self, items, gotList, desc = 'item'):
         for item in items:
             self.assertHasItem(item, gotList, desc)

@@ -1,14 +1,7 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_PROCESS_PUBLIC_H
-#define NX_MEDIATOR_PROCESS_PUBLIC_H
+#pragma once
 
 #include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
-
 
 namespace nx {
 namespace hpm {
@@ -20,6 +13,9 @@ class MediatorProcessPublic
     public QnStoppable
 {
 public:
+    //< As STUN have to take the same TCP and UDP port.
+    static constexpr size_t kMaxStartRetryCount = 3;
+
     MediatorProcessPublic(int argc, char **argv);
     virtual ~MediatorProcessPublic();
 
@@ -36,7 +32,5 @@ private:
     MediatorProcess* m_impl;
 };
 
-}   //hpm
-}   //nx
-
-#endif  //NX_MEDIATOR_PROCESS_PUBLIC_H
+} // namespace hpm
+} // namespace nx

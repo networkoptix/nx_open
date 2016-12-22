@@ -562,9 +562,9 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     qnNormalStorageMan->addStorage(storage2);
     qnNormalStorageMan->addStorage(storage3);
 
-    storage1->setStatus(Qn::Online, true);
-    storage2->setStatus(Qn::Online, true);
-    storage3->setStatus(Qn::Online, true);
+    storage1->setStatus(Qn::Online);
+    storage2->setStatus(Qn::Online);
+    storage3->setStatus(Qn::Online);
 
     QnUuid currentStorageId;
 
