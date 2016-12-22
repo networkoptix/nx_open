@@ -63,7 +63,8 @@ namespace nx_http
         enum AuthType {
             authBasicAndDigest,
             authDigest,
-            authDigestWithPasswordHash
+            authDigestWithPasswordHash,
+            authBasic,
         };
 
         enum State

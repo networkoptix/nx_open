@@ -46,6 +46,12 @@ public:
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
+
+    bool doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody);
+
     const Response* response() const;
     SystemError::ErrorCode lastSysErrorCode() const;
     bool isValid() const;

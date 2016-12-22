@@ -1087,8 +1087,21 @@ namespace nx_http
                 &m_request,
                 &m_authCacheItem))
         {
-            //not using Basic authentication by default, since it is not secure
-            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            if (m_authType == AuthType::authBasic)
+            {
+                header::BasicAuthorization basicAuthorization(m_userName.toLatin1(), m_userPassword.toLatin1());
+                nx_http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    nx_http::HttpHeader(
+                        header::Authorization::NAME,
+                        basicAuthorization.serialized()));
+            }
+            else
+            {
+                //not using Basic authentication by default, since it is not secure
+                nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            }
+            
         }
     }
 
@@ -1336,7 +1349,6 @@ namespace nx_http
         m_forcedEof = true;
         m_httpStreamReader.forceEndOfMsgBody();
     }
-
 
     /**********************************************************
     * utils

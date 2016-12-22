@@ -4,14 +4,14 @@
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/asynchttpclient.h>
 
-class QnAxisAudioTransmitter : public BaseHttpAudioTransmitter
+class ActiAudioTransmitter: public BaseHttpAudioTransmitter
 {
     using base_type = BaseHttpAudioTransmitter;
 
-    Q_OBJECT
 public:
-    QnAxisAudioTransmitter(QnSecurityCamResource* res);
+    ActiAudioTransmitter(QnSecurityCamResource* resource);
     virtual bool isCompatible(const QnAudioFormat& format) const override;
+    virtual void prepare() override;
 
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
@@ -25,5 +25,6 @@ protected:
     virtual nx_http::StringType contentType() const override;
 
 private:
-    bool m_noAuth;
+    nx::Buffer m_buffer;
+    nx::Buffer m_chunkPrefixBuffer;
 };

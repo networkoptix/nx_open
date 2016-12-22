@@ -3,15 +3,16 @@
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/httpclient.h>
 
-class QnAxisAudioTransmitter : public BaseHttpAudioTransmitter
+class HikvisionAudioTransmitter: public BaseHttpAudioTransmitter
 {
     using base_type = BaseHttpAudioTransmitter;
 
-    Q_OBJECT
 public:
-    QnAxisAudioTransmitter(QnSecurityCamResource* res);
+    HikvisionAudioTransmitter(QnSecurityCamResource* resource);
     virtual bool isCompatible(const QnAudioFormat& format) const override;
+    void setChannelId(QString channelId);
 
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
@@ -25,5 +26,11 @@ protected:
     virtual nx_http::StringType contentType() const override;
 
 private:
-    bool m_noAuth;
+    bool openChannelIfNeeded();
+    bool closeChannel();
+
+    std::unique_ptr<nx_http::HttpClient> createHttpHelper();
+
+private:
+    QString m_channelId;
 };
