@@ -36,11 +36,6 @@ def visited_key(request):
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 def language(request):
-    def unify_language(lang):
-        # Here we get language from client and select one of supported languages based on that lang
-        # If we cant - return default language
-        return lang
-
     if request.method == 'GET':  # Get language for current user
         # 1. Try session value
         lang = request.session.get('language', False)
@@ -56,11 +51,21 @@ def language(request):
 
         # 4. Try ACCEPT_LANGUAGE header
         if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
-            lang = request.META['HTTP_ACCEPT_LANGUAGE']
+            languages = request.META['HTTP_ACCEPT_LANGUAGE']
+            languages = languages.split(';')[0]
+            languages = languages.split(',')
+            for l in languages:
+                if l in settings.LANGUAGES:
+                    lang = l
+                    break
+                if l.split('-')[0] in settings.LANGUAGES:
+                    lang = l
+                    break
 
-        lang = unify_language(lang)
+        if not lang:  # not supported language
+            lang = settings.DEFAULT_LANGUAGE  # return default
 
-        language_file = '/static/views/language.json'
+        language_file = '/static/lang_' + lang + '/language.json'
         return redirect(language_file)
         # Return: redirect to language.json file for selected language
         pass
