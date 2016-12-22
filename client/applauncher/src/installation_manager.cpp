@@ -118,7 +118,10 @@ void InstallationManager::updateInstalledVersionsInformation()
             installation->setNeedsVerification(verify);
 
             if (verify && !installation->verify())
+            {
+                NX_LOG(QString::fromLatin1("Compatibility version %1 was not verified").arg(version), cl_logDEBUG1);
                 return;
+            }
 
             installation->setVersion(QnSoftwareVersion(version));
             installations.insert(installation->version(), installation);

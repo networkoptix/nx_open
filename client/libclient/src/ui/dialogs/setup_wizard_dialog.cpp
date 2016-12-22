@@ -93,3 +93,9 @@ void QnSetupWizardDialog::setCloudCredentials(const QnCredentials& value)
     d->loginInfo.cloudEmail = value.user;
     d->loginInfo.cloudPassword = value.password;
 }
+
+bool QnSetupWizardDialog::savePassword() const
+{
+    Q_D(const QnSetupWizardDialog);
+    return d->loginInfo.savePassword;
+}

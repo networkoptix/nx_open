@@ -12,11 +12,6 @@
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 
-#ifndef INFINITE
-#define INFINITE            0xFFFFFFFF  // Infinite timeout
-#endif
-
-
 template <typename T>
 class QnSafeQueue
 {
@@ -130,7 +125,7 @@ public:
         return true;
     }
 
-    bool pop(T& val, quint32 time = INFINITE)
+    bool pop(T& val, unsigned long time = ULONG_MAX)
     {
         QnMutexLocker mutex(&m_mutex);
         if (!m_terminated && m_bufferLen == 0)

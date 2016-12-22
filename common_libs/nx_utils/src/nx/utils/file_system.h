@@ -25,7 +25,7 @@ struct NX_UTILS_API Result
 
     Result(ResultCode code, const QString& path = QString()): code(code), path(path) {}
 
-    bool isOk() const { return code == ok; }
+    explicit operator bool() const { return code == ok; }
 };
 
 enum Option

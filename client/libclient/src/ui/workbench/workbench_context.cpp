@@ -226,26 +226,29 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
             break;
         }
-        case SystemUri::ClientCommand::ConnectToSystem:
+        case SystemUri::ClientCommand::Client:
         {
             QString systemId = uri.systemId();
-            bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
-
-            QUrl systemUrl = QUrl::fromUserInput(systemId);
-            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
-
-            systemUrl.setUserName(auth.user);
-            systemUrl.setPassword(auth.password);
-
-            if (systemIsCloud)
+            if (!systemId.isEmpty())
             {
-                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
-                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
-            }
+                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
-            auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
-            parameters.setArgument(Qn::ForceRole, true);
-            menu()->trigger(QnActions::ConnectAction, parameters);
+                QUrl systemUrl = QUrl::fromUserInput(systemId);
+                NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+
+                systemUrl.setUserName(auth.user);
+                systemUrl.setPassword(auth.password);
+
+                if (systemIsCloud)
+                {
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                    NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+                }
+
+                auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
+                parameters.setArgument(Qn::ForceRole, true);
+                menu()->trigger(QnActions::ConnectAction, parameters);
+            }
             break;
         }
         default:

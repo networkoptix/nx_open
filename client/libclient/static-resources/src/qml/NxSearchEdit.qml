@@ -15,6 +15,7 @@ NxTextEdit
 
     backgroundColor: activeColor;
     activeColor: Style.darkerColor(Style.colors.shadow, 2)
+    textControlEnabled: (state != "masked");
 
     state: "masked";
     width: mask.width;

@@ -2,6 +2,7 @@
 #include <vector>
 #include <locale>
 #include <codecvt>
+#include <iostream>
 
 #include <tchar.h>
 #include <Windows.h>
@@ -97,6 +98,7 @@ BOOL startProcessAsync(wchar_t* commandline, const std::wstring& dstDir)
 
 bool launchInDir(const std::wstring& dir, int argc, _TCHAR* argv[])
 {
+    std::wcout << L"Launching in path " << dir;
     try
     {
         wchar_t buffer[MAX_PATH * 2 + 3];
