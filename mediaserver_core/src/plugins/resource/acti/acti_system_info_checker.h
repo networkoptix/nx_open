@@ -51,7 +51,6 @@ private:
     nx_http::AsyncHttpClientPtr m_httpClient;
     bool m_failed;
     bool m_cycleIsInProgress;
-    bool m_isFirstCycle;
     bool m_terminated;
 
     mutable QnMutex m_mutex;

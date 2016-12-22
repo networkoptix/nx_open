@@ -218,9 +218,12 @@ QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray&
     for(const auto& line: lines)
     {
         auto tmp = line.split('=');
+        if (tmp.size() != 2)
+            continue;
+
         result.insert(
             QString::fromUtf8(tmp[0]).trimmed().toLower(),
-            QString::fromUtf8(tmp.size() >= 2 ? tmp[1].trimmed() : ""));
+            QString::fromUtf8(tmp[1].trimmed()));
     }
 
     return result;

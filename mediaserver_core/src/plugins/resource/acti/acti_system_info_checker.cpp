@@ -22,9 +22,9 @@ QnActiSystemInfoChecker::QnActiSystemInfoChecker(const QUrl& url):
     m_cacheExpirationInterval(kDefaultCacheExpirationTime),
     m_failed(false),
     m_cycleIsInProgress(false),
-    m_isFirstCycle(true),
     m_terminated(false)
 {
+    m_cacheExpirationTimer.invalidate();
 }
 
 QnActiSystemInfoChecker::~QnActiSystemInfoChecker()
@@ -100,10 +100,8 @@ void QnActiSystemInfoChecker::startNewCycleIfNeededUnsafe()
         m_cacheExpirationInterval);
 
     bool needToStartNewCycle =
-            (m_cacheExpirationTimer.elapsed() > expirationInterval.count() || m_isFirstCycle)
+            (!m_cacheExpirationTimer.isValid() || m_cacheExpirationTimer.elapsed() > expirationInterval.count())
             && !m_cycleIsInProgress;
-
-    m_isFirstCycle = false;
 
     if(!needToStartNewCycle)
         return;
@@ -163,7 +161,6 @@ QAuthenticator QnActiSystemInfoChecker::getNextAuthToCheckUnsafe()
 
 void QnActiSystemInfoChecker::handleSystemInfoResponse(nx_http::AsyncHttpClientPtr httpClient)
 {
-    qDebug() << "==========================> Handling system info response" << m_baseUrl.toString();
     if (httpClient->state() != nx_http::AsyncHttpClient::State::sDone)
     {
         handleFail();

@@ -231,7 +231,11 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     actiRes->setUrl(urlCopy.toString());
     actiRes->setDefaultAuth(auth);
 
-    auto devInfo = m_cachedDevInfo.value(urlCopy.toString());
+    QnActiResourceSearcher::CachedDevInfo devInfo;
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto devInfo = m_cachedDevInfo.value(urlCopy.toString());
+    }
 
     if (!devInfo.info.presentationUrl.isEmpty() && devInfo.timer.elapsed() < kCacheExpirationInterval)
     {
@@ -266,7 +270,11 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         return result;
 
     devInfo.timer.restart();
-    m_cachedDevInfo[urlCopy.toString()] = devInfo;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_cachedDevInfo[urlCopy.toString()] = devInfo;
+    }
 
     createResource(devInfo.info, devInfo.mac, auth, result);
     return result;
