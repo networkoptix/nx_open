@@ -87,30 +87,32 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
 
 QnPtzControllerPool::~QnPtzControllerPool()
 {
-    if (!d->deinitialized)
-        deinitialize();
+    deinitialize();
 }
 
 void QnPtzControllerPool::deinitialize()
 {
-    while (!d->controllerByResource.isEmpty())
+    if (!d->deinitialized)
     {
-        auto resourcePtr = d->controllerByResource.begin().key();
-        unregisterResource(resourcePtr);
+        while (!d->controllerByResource.isEmpty())
+        {
+            auto resourcePtr = d->controllerByResource.begin().key();
+            unregisterResource(resourcePtr);
+        }
+
+        //have to wait until all posted events have been processed, deleteLater can be called
+        //within event slot, that's why we specify second parameter
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
+        waitingForObjectsToBeFreed.join();
+
+        d->executorThread->exit();
+        d->executorThread->wait();
+
+        d->commandThreadPool->clear();
+        d->commandThreadPool->waitForDone();
+
+        d->deinitialized = true;
     }
-
-    //have to wait until all posted events have been processed, deleteLater can be called
-    //within event slot, that's why we specify second parameter
-    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
-    waitingForObjectsToBeFreed.join();
-
-    d->executorThread->exit();
-    d->executorThread->wait();
-
-    d->commandThreadPool->clear();
-    d->commandThreadPool->waitForDone();
-
-    d->deinitialized = true;
 }
 
 QThread *QnPtzControllerPool::executorThread() const {
