@@ -68,7 +68,7 @@ Result copy(const QString& sourcePath, const QString& targetPath, Options option
             const auto newSrcFilePath = sourceDir.absoluteFilePath(entry);
 
             const auto result = copy(newSrcFilePath, tgtFileInfo.absoluteFilePath(), options);
-            if (!result.isOk())
+            if (!result)
                 return result;
         }
     }
