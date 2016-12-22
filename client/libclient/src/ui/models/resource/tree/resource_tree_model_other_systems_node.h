@@ -38,6 +38,8 @@ private:
     QnResourceTreeModelNodePtr ensureLocalSystemNode(const QString &systemName);
     QnResourceTreeModelNodePtr ensureFakeServerNode(const QnFakeMediaServerResourcePtr& server);
 
+    bool canSeeFakeServers() const;
+
     void cleanupEmptyLocalNodes();
 
     void rebuild();

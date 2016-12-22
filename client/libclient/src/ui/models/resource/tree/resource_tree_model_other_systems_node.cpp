@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/fake_media_server.h>
+#include <core/resource/user_resource.h>
 
 #include <finders/systems_finder.h>
 
@@ -14,7 +15,6 @@
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 QnResourceTreeModelOtherSystemsNode::QnResourceTreeModelOtherSystemsNode(QnResourceTreeModel* model):
     base_type(model, Qn::OtherSystemsNode)
@@ -41,7 +41,7 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModelOtherSystemsNode::handleResourceRemoved);
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+    connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModelOtherSystemsNode::rebuild);
     connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged, this,
          &QnResourceTreeModelOtherSystemsNode::rebuild);
@@ -52,6 +52,7 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
 void QnResourceTreeModelOtherSystemsNode::deinitialize()
 {
     qnGlobalSettings->disconnect(this);
+    context()->disconnect(this);
     qnResPool->disconnect(this);
     qnSystemsFinder->disconnect(this);
 
@@ -126,10 +127,7 @@ void QnResourceTreeModelOtherSystemsNode::handleResourceRemoved(const QnResource
 void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
     const QnFakeMediaServerResourcePtr& server)
 {
-    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    bool isAutoDiscoveryEnabled = qnGlobalSettings->isAutoDiscoveryEnabled();
-
-    if (!isAdmin || !isAutoDiscoveryEnabled)
+    if (!canSeeFakeServers())
     {
         if (auto node = m_fakeServers.value(server))
         {
@@ -196,6 +194,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModelOtherSystemsNode::ensureFakeServer
     return *iter;
 }
 
+bool QnResourceTreeModelOtherSystemsNode::canSeeFakeServers() const
+{
+    bool isOwner = context()->user() && context()->user()->isOwner();
+    bool isAutoDiscoveryEnabled = qnGlobalSettings->isAutoDiscoveryEnabled();
+
+    return isOwner && isAutoDiscoveryEnabled;
+}
+
 void QnResourceTreeModelOtherSystemsNode::cleanupEmptyLocalNodes()
 {
     NodeList nodesToRemove;
@@ -214,6 +220,9 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
 
     for (const auto& system : qnSystemsFinder->systems())
         handleSystemDiscovered(system);
+
+    if (!canSeeFakeServers())
+        return;
 
     for (const auto& resource: qnResPool->getAllIncompatibleResources())
     {
