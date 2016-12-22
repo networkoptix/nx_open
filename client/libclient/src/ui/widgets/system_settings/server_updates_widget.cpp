@@ -211,6 +211,7 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             m_targetVersion = QnSoftwareVersion();
             m_localFileName = QString();
+            m_updatesModel->setLatestVersion(m_latestVersion);
 
             ui->selectUpdateTypeButton->setText(tr("Latest Available Update"));
             ui->targetVersionLabel->setText(m_latestVersion.isNull()
@@ -233,6 +234,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             QnSoftwareVersion version = qnCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_localFileName = QString();
+            m_updatesModel->setLatestVersion(m_targetVersion);
 
             ui->targetVersionLabel->setText(m_targetVersion.toString());
             ui->selectUpdateTypeButton->setText(tr("Selected Version"));
@@ -257,6 +259,7 @@ void QnServerUpdatesWidget::initDropdownActions()
 
             ui->targetVersionLabel->setText(kNoVersionNumberText);
             ui->selectUpdateTypeButton->setText(tr("Selected Update File"));
+            m_updatesModel->setLatestVersion(QnSoftwareVersion());
             ui->downloadButton->hide();
 
             checkForUpdates(false);
@@ -584,6 +587,7 @@ void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
             [this](const QnCheckForUpdateResult& result)
             {
                 endChecking(result);
+                m_updatesModel->setLatestVersion(result.version);
             });
     }
 }
