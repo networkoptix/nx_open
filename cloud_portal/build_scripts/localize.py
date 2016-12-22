@@ -50,7 +50,7 @@ def save_content(filename, content):
         active_content = process_branding(content)
 
         with codecs.open(filename, "w", "utf-8") as file:
-            file.write(u'\ufeff')
+            file.write(active_content)
             file.close()
 
 
