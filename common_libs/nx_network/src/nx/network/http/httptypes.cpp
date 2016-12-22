@@ -35,6 +35,14 @@ namespace nx_http
 #endif
     }
 
+    int defaultPortForScheme(const StringType& scheme)
+    {
+        if (strcasecmp(scheme, StringType("http")) == 0)
+            return DEFAULT_HTTP_PORT;
+        if (strcasecmp(scheme, StringType("https")) == 0)
+            return DEFAULT_HTTPS_PORT;
+        return -1;
+    }
 
     StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
     {

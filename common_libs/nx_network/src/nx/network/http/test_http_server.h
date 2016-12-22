@@ -54,6 +54,10 @@ public:
         const QString& filePath,
         const nx_http::StringType& mimeType);
 
+    bool registerRedirectHandler(
+        const QString& resourcePath,
+        const QUrl& location);
+
     // used for test purpose
     void setPersistentConnectionEnabled(bool value);
     void addModRewriteRule(QString oldPrefix, QString newPrefix);
