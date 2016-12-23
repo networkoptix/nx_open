@@ -8,17 +8,17 @@
 
 
 /*
-QnWidgetTablePrivate::HeaderInterface
+QnWidgetTablePrivate::HeaderProxyView
 A private class - an empty tree view - showing only header
 and delegating column size computations to our widget table
 */
 
-class QnWidgetTablePrivate::HeaderInterface: public QTreeView
+class QnWidgetTablePrivate::HeaderProxyView: public QTreeView
 {
     using base_type = QTreeView;
 
 public:
-    HeaderInterface(QnWidgetTablePrivate* impl, QWidget* parent): base_type(parent), m_impl(impl)
+    HeaderProxyView(QnWidgetTablePrivate* impl, QWidget* parent): base_type(parent), m_impl(impl)
     {
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -42,6 +42,17 @@ private:
 };
 
 /*
+QnWidgetTablePrivate::HorizontalRange
+*/
+
+struct QnWidgetTablePrivate::HorizontalRange
+{
+    int left;
+    int width;
+    HorizontalRange(int left = 0, int width = 0): left(left), width(width) {}
+};
+
+/*
 QnWidgetTablePrivate
 */
 
@@ -52,28 +63,27 @@ QnWidgetTablePrivate::QnWidgetTablePrivate(QnWidgetTable* table):
     m_defaultDelegate(new QnWidgetTableDelegate(this)),
     m_container(new QWidget(table)),
     m_layoutTimer(new QTimer(this)),
-    m_headerInterface(new HeaderInterface(this, table)),
+    m_headerProxyView(new HeaderProxyView(this, table)),
     m_columnCount(0),
     m_minimumRowHeight(0),
     m_headerPadding(table->style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing)),
-    m_rowSpacing(m_headerPadding),
-    m_pendingLayout(false)
+    m_rowSpacing(m_headerPadding)
 {
     table->setWidget(m_container);
     table->setWidgetResizable(true);
 
-    m_headerInterface->ensurePolished();
-    m_headerInterface->setFrameShape(QFrame::NoFrame);
-    m_headerInterface->setContentsMargins(0, 0, 0, 0);
-    m_headerInterface->setPalette(table->palette());
+    m_headerProxyView->ensurePolished();
+    m_headerProxyView->setFrameShape(QFrame::NoFrame);
+    m_headerProxyView->setContentsMargins(0, 0, 0, 0);
+    m_headerProxyView->setPalette(table->palette());
 
     installEventHandler(m_container, { QEvent::Resize, QEvent::Move }, this,
         [this]()
         {
             /* Horizontal position and size are handled here: */
             const auto containerGeom = m_container->geometry();
-            m_headerInterface->setGeometry(containerGeom.left(), 0,
-                containerGeom.width(), m_headerInterface->height());
+            m_headerProxyView->setGeometry(containerGeom.left(), 0,
+                containerGeom.width(), m_headerProxyView->height());
         });
 
     setHeader(new QHeaderView(Qt::Horizontal));
@@ -137,7 +147,7 @@ void QnWidgetTablePrivate::setRootIndex(const QModelIndex& rootIndex, bool force
         newRootIndex = QModelIndex();
     }
 
-    if (newRootIndex != m_rootIndex && !forceReset)
+    if (newRootIndex == m_rootIndex && !forceReset)
         return;
 
     m_rootIndex = newRootIndex;
@@ -146,7 +156,7 @@ void QnWidgetTablePrivate::setRootIndex(const QModelIndex& rootIndex, bool force
 
 QHeaderView* QnWidgetTablePrivate::header() const
 {
-    return m_headerInterface->header();
+    return m_headerProxyView->header();
 }
 
 void QnWidgetTablePrivate::setHeader(QHeaderView* newHeader)
@@ -160,7 +170,7 @@ void QnWidgetTablePrivate::setHeader(QHeaderView* newHeader)
     if (header())
         header()->disconnect(this);
 
-    m_headerInterface->setHeader(newHeader);
+    m_headerProxyView->setHeader(newHeader);
     newHeader->setModel(m_model);
 
     connect(newHeader, &QHeaderView::sectionResized, this, &QnWidgetTablePrivate::invalidateLayout);
@@ -173,7 +183,7 @@ void QnWidgetTablePrivate::setHeader(QHeaderView* newHeader)
 void QnWidgetTablePrivate::updateViewportMargins()
 {
     Q_Q(QnWidgetTable);
-    const int margin = (headerVisible() ? m_headerInterface->height() + m_headerPadding : 0);
+    const int margin = (headerVisible() ? m_headerProxyView->height() + m_headerPadding : 0);
     q->setViewportMargins(0, margin, 0, 0);
 }
 
@@ -188,7 +198,7 @@ void QnWidgetTablePrivate::setHeaderPadding(int padding)
 
 bool QnWidgetTablePrivate::headerVisible() const
 {
-    return !m_headerInterface->isHidden();
+    return !m_headerProxyView->isHidden();
 }
 
 void QnWidgetTablePrivate::setHeaderVisible(bool visible)
@@ -196,7 +206,7 @@ void QnWidgetTablePrivate::setHeaderVisible(bool visible)
     if (visible == headerVisible())
         return;
 
-    m_headerInterface->setVisible(visible);
+    m_headerProxyView->setVisible(visible);
     updateViewportMargins();
 }
 
@@ -251,21 +261,31 @@ QnWidgetTableDelegate* QnWidgetTablePrivate::columnDelegate(int column) const
 
 void QnWidgetTablePrivate::setUserDelegate(QnWidgetTableDelegate* newDelegate)
 {
-    if (m_userDelegate == newDelegate || !newDelegate)
+    if (m_userDelegate == newDelegate)
         return;
 
+    const auto oldEffectiveDelegate = commonDelegate();
     m_userDelegate = newDelegate;
+
+    if (oldEffectiveDelegate == commonDelegate())
+        return;
+
     reset();
 }
 
 void QnWidgetTablePrivate::setColumnDelegate(int column, QnWidgetTableDelegate* newDelegate)
 {
-    auto& columnDelegate = m_columnDelegates[column];
-    if (columnDelegate == newDelegate)
+    auto& columnDelegateRef = m_columnDelegates[column];
+    if (columnDelegateRef == newDelegate)
         return;
 
-    columnDelegate = newDelegate;
-    reset();
+    const auto oldEffectiveDelegate = columnDelegate(column);
+    columnDelegateRef = newDelegate;
+
+    if (oldEffectiveDelegate == columnDelegate(column))
+        return;
+
+    createWidgets(0, rowCount() - 1, column, column);
 }
 
 void QnWidgetTablePrivate::reset()
@@ -515,17 +535,16 @@ void QnWidgetTablePrivate::updateSorting(int column, Qt::SortOrder order)
 
 void QnWidgetTablePrivate::invalidateLayout()
 {
-    if (m_pendingLayout)
+    if (m_layoutTimer->isActive())
         return;
 
-    m_pendingLayout = true;
     m_layoutTimer->start(1);
 }
 
 void QnWidgetTablePrivate::doLayout()
 {
     /* Column locations: position and width: */
-    QVarLengthArray<QPair<int, int>> columnBounds(columnCount());
+    QVarLengthArray<HorizontalRange> columnBounds(columnCount());
 
     auto header = this->header();
     const int count = qMin(columnCount(), header->count()); //< to be safe
@@ -536,7 +555,7 @@ void QnWidgetTablePrivate::doLayout()
         if (header->isSectionHidden(i))
             continue;
 
-        columnBounds[i] = qMakePair(
+        columnBounds[i] = HorizontalRange(
             header->sectionViewportPosition(i),
             header->sectionSize(i));
     }
@@ -556,7 +575,7 @@ void QnWidgetTablePrivate::doLayout()
                 continue;
 
             const auto& bounds = columnBounds[column];
-            bool hidden = (bounds.second == 0);
+            bool hidden = (bounds.width == 0);
 
             widget->setHidden(hidden);
             if (hidden)
@@ -568,9 +587,9 @@ void QnWidgetTablePrivate::doLayout()
             const auto sizeHint = itemDelegate->sizeHint(widget, index);
 
             itemRects[column] = QRect(
-                bounds.first + indents.left(),
+                bounds.left + indents.left(),
                 y,
-                bounds.second - indents.left() - indents.right(),
+                bounds.width - indents.left() - indents.right(),
                 sizeHint.height());
 
             maxHeight = qMax(maxHeight, sizeHint.height());
@@ -602,5 +621,4 @@ void QnWidgetTablePrivate::doLayout()
     }
 
     m_container->setMinimumHeight(y);
-    m_pendingLayout = false;
 }

@@ -31,6 +31,8 @@ public:
 
     QnWidgetTableDelegate* commonDelegate() const;
     QnWidgetTableDelegate* columnDelegate(int column) const;
+
+    /* Delegates are owned externally. QnWidgetTable does not take ownership. */
     void setUserDelegate(QnWidgetTableDelegate* newDelegate);
     void setColumnDelegate(int column, QnWidgetTableDelegate* newDelegate);
 
@@ -94,8 +96,10 @@ private:
 
     QTimer* const m_layoutTimer;
 
-    class HeaderInterface;
-    HeaderInterface* const m_headerInterface;
+    class HeaderProxyView;
+    HeaderProxyView* const m_headerProxyView;
+
+    struct HorizontalRange;
 
     using Row = QVector<QPointer<QWidget>>;
     using Grid = QList<Row>;
@@ -105,6 +109,4 @@ private:
     int m_minimumRowHeight;
     int m_headerPadding;
     int m_rowSpacing;
-
-    bool m_pendingLayout;
 };

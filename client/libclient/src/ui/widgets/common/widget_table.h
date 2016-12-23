@@ -35,7 +35,8 @@ public:
     QHeaderView* header() const;
     void setHeader(QHeaderView* header);
 
-    /** Item delegate. Ownership is not taken: */
+    /** Item delegate. Ownership is not taken.
+      * Passing nullptr restores default delegate: */
     QnWidgetTableDelegate* itemDelegate() const;
     void setItemDelegate(QnWidgetTableDelegate* newDelegate);
 
