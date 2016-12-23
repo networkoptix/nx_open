@@ -1111,6 +1111,7 @@
                 <android.toolchain.version>4.9</android.toolchain.version>
                 <android.platform>android-16</android.platform>
                 <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
@@ -1138,6 +1139,7 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
