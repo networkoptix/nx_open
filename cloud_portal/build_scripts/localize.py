@@ -17,7 +17,6 @@ branding_messages = {}
 
 
 def read_branding():
-    print "read_branding"
     branding_file = 'branding.ts'
     tree = eTree.parse(branding_file)
     root = tree.getroot()
@@ -102,7 +101,6 @@ def process_files(lang, root_directory, xml_filename):
                 else:
                     # 4. Replacing in json mode - values only
                     active_content = re.sub('(?<=:\s")' + re.escape(source) + '(?=")', translation, active_content)
-                    print("final:", target_filename, active_content)
 
     save_content(target_filename, active_content)
 
