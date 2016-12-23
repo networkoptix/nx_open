@@ -116,6 +116,14 @@ config = yaml.safe_load(open('cloud_portal.yaml'))
 if 'languages' not in config:
     raise 'No languages section in cloud_portal.yaml'
 
+
+app_filename = 'static/apple-app-site-association'
+with open(app_filename, 'r') as file_descriptor:
+    active_content = file_descriptor.read()
+active_content = process_branding(active_content)
+save_content(app_filename, active_content)
+
+
 languages = config['languages']
 # Localize this language
 for lang in languages:
