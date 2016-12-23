@@ -32,6 +32,8 @@ nx::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
     saveTranQuery.addBindValue(tran.ubjsonSerializedTransaction);
     if (!saveTranQuery.exec())
     {
+        const auto str = saveTranQuery.lastError().text();
+
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
             .arg(tran.systemId).arg(::ec2::ApiCommand::toString(tran.header.command))

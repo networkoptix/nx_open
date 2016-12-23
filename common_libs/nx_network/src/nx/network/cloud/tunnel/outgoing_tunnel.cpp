@@ -53,7 +53,7 @@ void OutgoingTunnel::stopWhileInAioThread()
     m_connection.reset();
     m_timer.reset();
 
-    for (auto& connectRequest : m_connectHandlers)
+    for (auto& connectRequest: m_connectHandlers)
         connectRequest.second.handler(SystemError::interrupted, nullptr);
     m_connectHandlers.clear();
 }
@@ -291,7 +291,7 @@ void OutgoingTunnel::onConnectorFinished(
     m_state = State::closed;
     m_lastErrorCode = errorCode;
     lk.unlock();
-    for (auto& connectRequest : connectHandlers)
+    for (auto& connectRequest: connectHandlers)
         connectRequest.second.handler(errorCode, nullptr);
     // Reporting tunnel failure.
     onTunnelClosed(errorCode);
@@ -305,8 +305,10 @@ void OutgoingTunnel::setTunnelConnection(
         std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
     m_state = State::connected;
 
+    NX_ASSERT(m_connection->getAioThread() == getAioThread());
+
     // We've connected to the host. Requesting client connections.
-    for (auto& connectRequest : m_connectHandlers)
+    for (auto& connectRequest: m_connectHandlers)
     {
         using namespace std::placeholders;
         m_connection->establishNewConnection(

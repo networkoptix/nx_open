@@ -108,7 +108,9 @@ void VmsTransactionLogCache::commit(TranId tranId)
          it != tranContext.data.transactionState.values.cend();
          ++it)
     {
-        m_committedData.transactionState.values[it.key()] = it.value();
+        auto& currentSequence = m_committedData.transactionState.values[it.key()];
+        if (currentSequence < it.value())
+            currentSequence = it.value();
     }
 
     if (tranContext.data.timestampSequence)

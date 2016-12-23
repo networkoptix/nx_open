@@ -18,9 +18,10 @@
 #include <plugins/resource/pelco/optera/optera_resource.h>
 #include "plugins/resource/flir/flir_onvif_resource.h"
 #include "../vista/vista_resource.h"
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
-#include "common/common_module.h"
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/common_module.h>
+#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -405,6 +406,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
 #endif
+    else if (manufacture.toLower().contains(QLatin1String("hikvision")))
+        resource = QnPlOnvifResourcePtr(new QnHikvisionOnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("flir")))
         resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
     else

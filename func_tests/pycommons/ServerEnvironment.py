@@ -26,8 +26,11 @@ def get_path_parts(path):
 class ServerEnvironment:
 
     SrvEnvCfg = "../build_variables/target/current_config.py"
+    BASE_PORT = 27000
     _srvBinPath = None
     _ldPaths = []
+    _procNum = 0
+    _portNum = 0
 
     @classmethod
     def _findPath(cls, path, pattern):
@@ -54,5 +57,16 @@ class ServerEnvironment:
         execfile(cls.SrvEnvCfg, env)
         cls._ldPaths = [env['QT_LIB'], env['LIB_PATH']]
         cls._srvBinPath = env['BIN_PATH']
+
+    @classmethod
+    def getProcName(cls):
+        cls._procNum+=1
+        return "MediaServer_%d" % cls._procNum
+
+    @classmethod
+    def getPort(cls):
+        cls._portNum+=1
+        return cls.BASE_PORT + cls._portNum
+
 
 ServerEnvironment.initEnv()

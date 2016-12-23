@@ -10,6 +10,7 @@
 #endif
 
 #include "server/server_globals.h"
+#include <plugins/resource/onvif/onvif_helper.h>
 
 #include <nx/network/socket_global.h>
 
@@ -28,6 +29,8 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
+    store<PasswordHelper>(new PasswordHelper());
+
     auto soapServer = store(new QnSoapServer());
     soapServer->bind();
     soapServer->start();     //starting soap server to accept event notifications from onvif cameras

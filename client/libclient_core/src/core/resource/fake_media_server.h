@@ -19,7 +19,7 @@ public:
     virtual QnUuid getOriginalGuid() const override;
     void setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData);
     virtual QnModuleInformation getModuleInformation() const override;
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason) override;
 
     virtual QUrl getApiUrl() const override;
 

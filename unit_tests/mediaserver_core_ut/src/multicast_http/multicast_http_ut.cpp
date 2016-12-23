@@ -4,6 +4,7 @@
 #include "utils/common/long_runnable.h"
 #include "media_server/media_server_module.h"
 #include "core/multicast/multicast_http_client.h"
+#include "nx/network/socket_global.h"
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -291,6 +292,8 @@ private:
 
 TEST(MulticastHttpTest, main)
 {
+    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+
     //QApplication::instance()->args();
     int argc = 2;
     char* argv[] = {"", "-e" };

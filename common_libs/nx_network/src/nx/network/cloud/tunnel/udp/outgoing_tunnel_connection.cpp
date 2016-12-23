@@ -79,7 +79,7 @@ void OutgoingTunnelConnection::stopWhileInAioThread()
     ongoingConnections.swap(m_ongoingConnections);
     lk.unlock();
 
-    for (auto& connectionContext : ongoingConnections)
+    for (auto& connectionContext: ongoingConnections)
     {
         connectionContext.second.completionHandler(
             SystemError::interrupted,

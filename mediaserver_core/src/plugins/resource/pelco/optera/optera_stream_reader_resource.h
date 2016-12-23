@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_ONVIF
+
 #include <plugins/resource/onvif/onvif_resource.h>
 
 namespace nx {
@@ -28,3 +30,5 @@ private:
 } // namespace pelco
 } // namespace plugins
 } // namespace nx
+
+#endif // ENABLE_ONVIF

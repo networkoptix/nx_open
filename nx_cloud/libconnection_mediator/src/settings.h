@@ -7,6 +7,7 @@
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
 
 #include <utils/common/command_line_parser.h>
@@ -70,7 +71,7 @@ public:
     bool showHelp() const;
 
     const General& general() const;
-    const nx::utils::log::QnLogSettings& logging() const;
+    const nx::utils::log::Settings& logging() const;
     const CloudDB& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
@@ -90,7 +91,7 @@ private:
     bool m_showHelp;
 
     General m_general;
-    nx::utils::log::QnLogSettings m_logging;
+    nx::utils::log::Settings m_logging;
     CloudDB m_cloudDB;
     Stun m_stun;
     Http m_http;

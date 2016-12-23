@@ -1,12 +1,6 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
 #include "mediator_process_public.h"
 
 #include "mediator_service.h"
-
 
 namespace nx {
 namespace hpm {
@@ -44,5 +38,5 @@ const MediatorProcess* MediatorProcessPublic::impl() const
     return m_impl;
 }
 
-}   //hpm
-}   //nx
+} // namespace hpm
+} // namespace nx
