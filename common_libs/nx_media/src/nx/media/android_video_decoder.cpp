@@ -61,6 +61,7 @@ static QString codecToString(AVCodecID codecId)
         case AV_CODEC_ID_H264:
             return lit("video/avc");
         case AV_CODEC_ID_H263:
+        case AV_CODEC_ID_H263P:
             return lit("video/3gpp");
         case AV_CODEC_ID_MPEG4:
             return lit("video/mp4v-es");
@@ -477,9 +478,12 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     {
         if (!frame)
             return 0;
-        extractSpsPps(frame, &d->frameSize, nullptr);
-        if (d->frameSize.isNull())
-            return 0; //< wait for I frame
+
+        d->frameSize = QSize(frame->width, frame->height);
+        if (d->frameSize.isEmpty())
+            d->frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        if (d->frameSize.isEmpty())
+            return 0; //< wait for I frame to be able to extract data from binary stream
 
         QString codecName = codecToString(frame->compressionType);
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);

@@ -58,6 +58,7 @@ private:
 
     bool m_useRealTimeOptimization;
     AVPacket* m_outPacket;
+    QnConstMediaContextPtr m_ctxPtr;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
