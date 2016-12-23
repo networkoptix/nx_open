@@ -296,8 +296,10 @@ void QnWidgetTablePrivate::reset()
     const int columnCount = m_model->columnCount(m_rootIndex);
     const int rowCount = m_model->rowCount(m_rootIndex);
 
+    constexpr int kRowsReserve = 32;
+    m_rows.reserve(qMax(rowCount, kRowsReserve));
+
     m_columnCount = columnCount;
-    m_rows.reserve(rowCount);
 
     if (rowCount > 0)
         rowsInserted(m_rootIndex, 0, rowCount - 1);
