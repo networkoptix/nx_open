@@ -24,8 +24,8 @@ public:
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
     {
-        /* IDs are sorted by sequential number: */
-        if (left.column() == QnIOPortsViewModel::IdColumn)
+        /* Numbers have special sorting: */
+        if (left.column() == QnIOPortsViewModel::NumberColumn)
             return left.row() < right.row();
 
         /* Durations are sorted by integer value: */
@@ -71,7 +71,7 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent):
     ui->table->setSortingEnabled(true);
     ui->table->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->table->header()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
-    ui->table->header()->setSortIndicator(QnIOPortsViewModel::IdColumn, Qt::AscendingOrder);
+    ui->table->header()->setSortIndicator(QnIOPortsViewModel::NumberColumn, Qt::AscendingOrder);
 
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
     ui->table->setVerticalScrollBar(scrollBar->proxyScrollBar());

@@ -41,6 +41,8 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
 
     switch(index.column())
     {
+    case NumberColumn:
+        return QString::number(index.row() + 1 /* 1-based */);
     case IdColumn:
         return nx::utils::elideString(value.id, kMaxIdLength);
     case TypeColumn:
@@ -66,6 +68,8 @@ QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
 
     switch(index.column())
     {
+    case NumberColumn:
+        return index.row();
     case IdColumn:
         return value.id;
     case TypeColumn:
@@ -137,6 +141,7 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     switch(index.column())
     {
     case IdColumn:
+    case NumberColumn:
         return false; // doesn't allowed
 
     case TypeColumn:
@@ -209,6 +214,7 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
         switch(section) {
+        case NumberColumn:       return tr("#");
         case IdColumn:           return tr("ID");
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");
@@ -231,6 +237,7 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
 
     switch (index.column())
     {
+        case NumberColumn:
         case IdColumn:
             break;
         case TypeColumn:
@@ -262,6 +269,7 @@ bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const
 
     switch (index.column())
     {
+    case NumberColumn:
     case IdColumn:
     case TypeColumn:
     case DefaultStateColumn:

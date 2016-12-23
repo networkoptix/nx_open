@@ -17,6 +17,7 @@ QWidget* QnIoPortItemDelegate::createWidget(
 {
     switch (index.column())
     {
+        case QnIOPortsViewModel::NumberColumn:
         case QnIOPortsViewModel::IdColumn:
             return base_type::createWidget(model, index, parent);
 
@@ -149,6 +150,7 @@ bool QnIoPortItemDelegate::updateWidget(QWidget* widget, const QModelIndex& inde
 
     switch (index.column())
     {
+        case QnIOPortsViewModel::NumberColumn:
         case QnIOPortsViewModel::IdColumn:
             return false; //< should have been handled by base_type
 
@@ -186,7 +188,10 @@ bool QnIoPortItemDelegate::updateWidget(QWidget* widget, const QModelIndex& inde
             if (!lineEdit)
                 return false;
 
-            lineEdit->setText(index.data(Qt::EditRole).toString());
+            const auto newText = index.data(Qt::EditRole).toString();
+            if (lineEdit->text() != newText)
+                lineEdit->setText(newText);
+
             lineEdit->setReadOnly(!index.flags().testFlag(Qt::ItemIsEditable));
             return true;
         }
@@ -200,7 +205,10 @@ bool QnIoPortItemDelegate::updateWidget(QWidget* widget, const QModelIndex& inde
             if (!spinBox)
                 return false;
 
-            spinBox->setValue(index.data(Qt::EditRole).toInt());
+            int newValue = index.data(Qt::EditRole).toInt();
+            if (spinBox->value() != newValue)
+                spinBox->setValue(newValue);
+
             return true;
         }
     }

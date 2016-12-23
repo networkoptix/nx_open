@@ -14,6 +14,7 @@ class QnIOPortsViewModel : public QAbstractListModel
 public:
     enum Columns
     {
+        NumberColumn,
         IdColumn,
         TypeColumn,
         DefaultStateColumn,
