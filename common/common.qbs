@@ -85,6 +85,18 @@ GenericProduct
             "freeLicenseIsTrial": customization.freeLicenseIsTrial
         })
     }
+    Group
+    {
+        files: "qt.conf"
+        fileTags: "configure.input"
+        configure.outputTags: "resources.resource_data"
+        configure.outputProperties: ({
+            "resources": {
+                "priority": 10,
+                "resourcePrefix": "qt/etc"
+            }
+        })
+    }
 
     ResourcesGroup
     {

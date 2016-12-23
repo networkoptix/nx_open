@@ -119,8 +119,9 @@ Product
 
         Artifact
         {
-            filePath: product.sourceDirectory + "/translations/" + input.fileName
-            fileTags: ["resources.resource_data", "qm_copy"]
+            filePath: "translations/" + input.fileName
+            fileTags: ["resources.resource_data"]
+            resources.resourcePrefix: "translations"
         }
         prepare:
         {
@@ -129,12 +130,6 @@ Product
             cmd.sourceCode = function() { File.copy(input.filePath, output.filePath) }
             return cmd
         }
-    }
-    Group
-    {
-        name: "compiled_translations"
-        fileTagsFilter: ["qm_copy"]
-        resources.resourcePrefix: product.sourceDirectory + "/translations/"
     }
 
     Export
