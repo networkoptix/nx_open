@@ -52,6 +52,7 @@ Pane
     {
         id: mouseArea
 
+        parent: control
         anchors.fill: parent
         onClicked: open()
     }
@@ -86,6 +87,12 @@ Pane
 
     function open()
     {
+        if (!compatible)
+        {
+            Workflow.openOldClientDownloadSuggestion()
+            return
+        }
+
         if (!contentItem.enabled)
             return
 
