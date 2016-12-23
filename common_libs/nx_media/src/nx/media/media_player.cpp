@@ -451,7 +451,8 @@ void PlayerPrivate::presentNextFrame()
     if (videoSurface)
     {
         if (videoSurface->isActive() &&
-            videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+            (videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat()
+                || videoSurface->surfaceFormat().frameSize() != videoFrameToRender->size()))
         {
             videoSurface->stop();
         }
