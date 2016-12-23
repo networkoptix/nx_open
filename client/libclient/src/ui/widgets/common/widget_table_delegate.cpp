@@ -1,4 +1,5 @@
 #include "widget_table_delegate.h"
+#include "widget_table_p.h"
 
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
@@ -9,8 +10,8 @@ QnWidgetTableDelegate::QnWidgetTableDelegate(QObject* parent):
 {
 }
 
-QWidget* QnWidgetTableDelegate::createWidget(QAbstractItemModel* model,
-    const QPersistentModelIndex& index, QWidget* parent) const
+QWidget* QnWidgetTableDelegate::createWidget(
+    QAbstractItemModel* model, const QModelIndex& index, QWidget* parent) const
 {
     Q_UNUSED(index);
     Q_UNUSED(model);
@@ -58,4 +59,9 @@ QSize QnWidgetTableDelegate::sizeHint(QWidget* widget, const QModelIndex& index)
 {
     Q_UNUSED(index);
     return (widget ? widget->sizeHint() : QSize());
+}
+
+QModelIndex QnWidgetTableDelegate::indexForWidget(QWidget* widget)
+{
+    return QnWidgetTablePrivate::indexForWidget(widget);
 }

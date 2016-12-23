@@ -16,7 +16,7 @@ public:
 
     /** Create a widget for specified model index. */
     virtual QWidget* createWidget(QAbstractItemModel* model,
-        const QPersistentModelIndex& index, QWidget* parent) const;
+        const QModelIndex& index, QWidget* parent) const;
 
     /** Attempt to update widget with data from specified model index.
       * Return true if successful or false if a new widget must be created. */
@@ -27,4 +27,7 @@ public:
 
     /** Size hint for specified widget or model index. */
     virtual QSize sizeHint(QWidget* widget, const QModelIndex& index) const;
+
+    /** Model index for specified widget. */
+    static QModelIndex indexForWidget(QWidget* widget);
 };

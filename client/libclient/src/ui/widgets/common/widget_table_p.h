@@ -57,6 +57,11 @@ public:
     inline int rowCount() const { return m_rows.size(); }
     inline int columnCount() const { return m_columnCount; }
 
+    /** Connection between widget and model index. Index is stored with widget
+      * as persistent model index and stays valid if model layout changes. */
+    static QModelIndex indexForWidget(QWidget* widget);
+    static void setIndexForWidget(QWidget* widget, const QPersistentModelIndex& index);
+
 private:
     void reset();
     void doLayout();
@@ -74,6 +79,8 @@ private:
         const QModelIndex& newParent, int position);
     void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
         const QVector<int>& roles);
+    void layoutChanged(const QList<QPersistentModelIndex>& parents,
+        QAbstractItemModel::LayoutChangeHint hint);
 
     QWidget* widgetFor(int row, int column) const;
     void setWidgetFor(int row, int column, QWidget* newWidget);
@@ -82,7 +89,9 @@ private:
     void createWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn);
     void cleanupWidgetFor(int row, int column);
     void cleanupWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn);
-    void destroyWidget(QWidget* widget);
+    static void destroyWidget(QWidget* widget);
+
+    void ensureWidgetVisible(QWidget* widget);
 
 protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;

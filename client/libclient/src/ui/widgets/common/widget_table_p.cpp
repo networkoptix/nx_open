@@ -6,6 +6,12 @@
 
 #include <utils/common/event_processors.h>
 
+namespace {
+
+/* Name of a widget property to hold QPesistentModelIndex bound to the widget: */
+static const char* kModelIndexPropertyName = "_qn_widgetTableModelIndex";
+
+} // namespace
 
 /*
 QnWidgetTablePrivate::HeaderProxyView
@@ -111,9 +117,8 @@ void QnWidgetTablePrivate::setModel(QAbstractItemModel* model, const QModelIndex
         connect(m_model, &QAbstractItemModel::modelReset,
             this, &QnWidgetTablePrivate::reset);
 
-        //TODO: #vkutin optimize this to avoid recreation of all widgets
         connect(m_model, &QAbstractItemModel::layoutChanged,
-            this, &QnWidgetTablePrivate::reset);
+            this, &QnWidgetTablePrivate::layoutChanged);
 
         connect(m_model, &QAbstractItemModel::rowsInserted,
             this, &QnWidgetTablePrivate::rowsInserted);
@@ -308,6 +313,116 @@ void QnWidgetTablePrivate::reset()
     emit q->tableReset();
 }
 
+void QnWidgetTablePrivate::layoutChanged(
+    const QList<QPersistentModelIndex>& parents,
+    QAbstractItemModel::LayoutChangeHint hint)
+{
+    if (!parents.empty() && !parents.contains(m_rootIndex))
+        return; //< nothing to do
+
+    QVector<QWidget*> buffer; //< buffer for widgets relocation
+
+    /* Copy widget pointer to the buffer and clear its source location: */
+    auto fetchItem =
+        [this, &buffer](QPointer<QWidget>& source)
+        {
+            if (source)
+            {
+                buffer.push_back(source);
+                source = nullptr;
+            }
+        };
+
+    /* Relocate widgets from the buffer to new locations in the grid: */
+    auto relocateItems =
+        [this, &buffer](const QRect& validRange) //< validRange is just for validation
+        {
+            for (auto widget: buffer)
+            {
+                const auto index = indexForWidget(widget);
+                if (index.isValid())
+                {
+                    if (validRange.contains(index.column(), index.row()))
+                    {
+                        /* Relocate widget if index is valid: */
+                        m_rows[index.row()][index.column()] = widget;
+                    }
+                    else
+                    {
+                        NX_ASSERT(false); //< should not happen with correct model
+                        destroyWidget(widget);
+                    }
+                }
+                else
+                {
+                    /* Destroy widget if index became invalid: */
+                    destroyWidget(widget);
+                }
+            }
+        };
+
+    switch (hint)
+    {
+        case QAbstractItemModel::VerticalSortHint:
+        {
+            /* Relocate widgets within each column: */
+            buffer.reserve(rowCount());
+            QRect validRange(0, 0, 1, rowCount());
+
+            for (int column = 0; column < columnCount(); ++column)
+            {
+                for (auto& row: m_rows)
+                    fetchItem(row[column]);
+
+                validRange.moveLeft(column); //< valid range is current column
+                relocateItems(validRange);
+
+                buffer.clear();
+            }
+
+            break;
+        }
+
+        case QAbstractItemModel::HorizontalSortHint:
+        {
+            /* Relocate widgets within each row: */
+            buffer.reserve(columnCount());
+            QRect validRange(0, 0, columnCount(), 1);
+
+            for (int row = 0; row < rowCount(); ++row)
+            {
+                for (auto& item: m_rows[row])
+                    fetchItem(item);
+
+                validRange.moveTop(row); //< valid range is current row
+                relocateItems(validRange);
+
+                buffer.clear();
+            }
+
+            break;
+        }
+
+        default:
+        {
+            /* Relocate entire grid: */
+            buffer.reserve(rowCount() * columnCount());
+            const QRect validRange(0, 0, columnCount(), rowCount());
+
+            for (auto& row: m_rows)
+            {
+                for (auto& item: row)
+                    fetchItem(item);
+            }
+
+            relocateItems(validRange); //< valid range is entire grid
+            break;
+        }
+    }
+
+    invalidateLayout();
+}
+
 void QnWidgetTablePrivate::rowsInserted(const QModelIndex& parent, int first, int last)
 {
     if (parent != m_rootIndex)
@@ -472,6 +587,7 @@ QWidget* QnWidgetTablePrivate::createWidgetFor(int row, int column)
     if (widget)
     {
         widget->installEventFilter(this);
+        setIndexForWidget(widget, index);
         itemDelegate->updateWidget(widget, index);
     }
 
@@ -507,7 +623,7 @@ void QnWidgetTablePrivate::destroyWidget(QWidget* widget)
     if (!widget)
         return;
 
-    widget->removeEventFilter(this);
+    setIndexForWidget(widget, QModelIndex());
     widget->setHidden(true);
     widget->deleteLater();
 }
@@ -553,10 +669,11 @@ void QnWidgetTablePrivate::doLayout()
     /* Column locations: position and width: */
     QVarLengthArray<HorizontalRange> columnBounds(columnCount());
 
-    auto header = this->header();
-    const int count = qMin(columnCount(), header->count()); //< to be safe
+    const auto header = this->header();
+    const int headerSectionCount = header->count();
 
     /* Fetch column bounds from the header: */
+    const int count = qMin(columnCount(), headerSectionCount); //< to be safe
     for (int i = 0; i < count; ++i)
     {
         if (header->isSectionHidden(i))
@@ -570,16 +687,34 @@ void QnWidgetTablePrivate::doLayout()
     /* Calculated item geometries, per row: */
     QVarLengthArray<QRect> itemRects(columnCount());
 
+    /* Visual-to-logical column lookup: */
+    QVarLengthArray<int> visualToLogical(columnCount());
+    for (int i = 0; i < columnCount(); ++i)
+        visualToLogical[i] = (i < headerSectionCount ? header->logicalIndex(i) : i);
+
     int y = 0;
+    QWidget* previousInFocusChain = nullptr;
+
+    /* Process rows: */
     for (int row = 0; row < rowCount(); ++row)
     {
         /* Calculate cell geometries: */
         int maxHeight = m_minimumRowHeight;
-        for (int column = 0; column < columnCount(); ++column)
+        for (int visualColumn = 0; visualColumn < columnCount(); ++visualColumn)
         {
+            const int column = visualToLogical[visualColumn];
             const auto widget = widgetFor(row, column);
             if (!widget)
                 continue;
+
+            /* Maintain focus chain: */
+            if (widget->focusPolicy() != Qt::NoFocus)
+            {
+                if (previousInFocusChain)
+                    QWidget::setTabOrder(previousInFocusChain, widget);
+
+                previousInFocusChain = widget;
+            }
 
             const auto& bounds = columnBounds[column];
             bool hidden = (bounds.width == 0);
@@ -628,6 +763,18 @@ void QnWidgetTablePrivate::doLayout()
     }
 
     m_container->setMinimumHeight(y);
+
+    /* Keep widget with focus visible. All safety checks are inside. */
+    ensureWidgetVisible(qApp->focusWidget());
+}
+
+void QnWidgetTablePrivate::ensureWidgetVisible(QWidget* widget)
+{
+    if (!widget || !indexForWidget(widget).isValid())
+        return;
+
+    Q_Q(QnWidgetTable);
+    q->ensureWidgetVisible(widget);
 }
 
 bool QnWidgetTablePrivate::eventFilter(QObject* watched, QEvent* event)
@@ -637,19 +784,25 @@ bool QnWidgetTablePrivate::eventFilter(QObject* watched, QEvent* event)
         case QEvent::FocusIn:
         case QEvent::KeyPress:
         case QEvent::MouseButtonPress:
-        {
-            QPointer<QWidget> widget = qobject_cast<QWidget*>(watched);
-            if (!widget)
-                break;
-
-            Q_Q(QnWidgetTable);
-            q->ensureWidgetVisible(widget);
+            ensureWidgetVisible(qobject_cast<QWidget*>(watched)); //< safety checks are inside
             break;
-        }
 
         default:
             break;
     }
 
     return base_type::eventFilter(watched, event);
+}
+
+QModelIndex QnWidgetTablePrivate::indexForWidget(QWidget* widget)
+{
+    return widget
+        ? widget->property(kModelIndexPropertyName).toModelIndex()
+        : QModelIndex();
+}
+
+void QnWidgetTablePrivate::setIndexForWidget(QWidget* widget, const QPersistentModelIndex& index)
+{
+    if (widget)
+        widget->setProperty(kModelIndexPropertyName, index);
 }

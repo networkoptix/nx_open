@@ -12,8 +12,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 
-QWidget* QnIoPortItemDelegate::createWidget(QAbstractItemModel* model,
-    const QPersistentModelIndex& index, QWidget* parent) const
+QWidget* QnIoPortItemDelegate::createWidget(
+    QAbstractItemModel* model, const QModelIndex& index, QWidget* parent) const
 {
     switch (index.column())
     {
@@ -78,8 +78,10 @@ QWidget* QnIoPortItemDelegate::createWidget(QAbstractItemModel* model,
                 }
 
                 auto commit =
-                    [model, index, comboBox](int i)
+                    [model, comboBox](int i)
                     {
+                        const auto index = indexForWidget(comboBox);
+
                         if (index.isValid())
                             model->setData(index, comboBox->itemData(i), Qt::EditRole);
                     };
@@ -102,8 +104,10 @@ QWidget* QnIoPortItemDelegate::createWidget(QAbstractItemModel* model,
         {
             auto lineEdit = new QLineEdit(parent);
             auto commit =
-                [model, index](const QString& text)
+                [model, lineEdit](const QString& text)
                 {
+                    const auto index = indexForWidget(lineEdit);
+
                     if (index.isValid())
                         model->setData(index, text, Qt::EditRole);
                 };
@@ -122,8 +126,10 @@ QWidget* QnIoPortItemDelegate::createWidget(QAbstractItemModel* model,
             spinBox->setMinimum(1);
 
             auto commit =
-                [model, index](int value)
+                [model, spinBox](int value)
                 {
+                    const auto index = indexForWidget(spinBox);
+
                     if (index.isValid())
                         model->setData(index, value, Qt::EditRole);
                 };

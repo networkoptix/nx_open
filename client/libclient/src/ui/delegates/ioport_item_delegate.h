@@ -11,7 +11,7 @@ public:
     using base_type::QnWidgetTableDelegate; //< forward constructor
 
     virtual QWidget* createWidget(QAbstractItemModel* model,
-        const QPersistentModelIndex& index, QWidget* parent) const override;
+        const QModelIndex& index, QWidget* parent) const override;
 
     virtual bool updateWidget(QWidget* widget, const QModelIndex& index) const override;
 
