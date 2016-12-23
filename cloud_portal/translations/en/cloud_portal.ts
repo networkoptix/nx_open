@@ -529,29 +529,6 @@
     </message>
   </context>
   <context>
-    <name>apple-app-site-association</name>
-    <message>
-      <location filename="apple-app-site-association"/>
-      <source>/client*</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/cloud*</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/systems/*/client</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>{{iOSappID}}</source>
-      <translation> </translation>
-    </message>
-  </context>
-  <context>
     <name>views/404.html</name>
     <message>
       <location filename="views/404.html"/>
@@ -565,7 +542,7 @@
     </message>
     <message>
       <location/>
-      <source>/static/images/404@2x.png 2x&quot; set-title</source>
+      <source>set-title</source>
       <translation> </translation>
     </message>
   </context>
@@ -1808,83 +1785,7 @@
     </message>
     <message>
       <location/>
-      <source>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
-'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',Config.googleTagsCode);</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>html</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>utf-8</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>shortcut icon</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/static/images/favicon.ico</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>stylesheet</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_bold/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_light/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_regular/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_medium/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>static/styles/f01c59fd.503.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/static/images/503@2x.png 2x</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>d.getElementsByTagName(s)[0],</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>'+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',Config.googleTagsCode);</source>
       <translation> </translation>
     </message>
   </context>

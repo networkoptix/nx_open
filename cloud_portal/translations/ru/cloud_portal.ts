@@ -1,20 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>scripts/language.js</name>
+    <name>views/language.json</name>
     <message>
-      <location filename="scripts/language.js"/>
-      <source>PRODUCT_NAME</source>
+      <location filename="views/language.json"/>
+      <source>You are about to change the owner of the system. You will lose owner permissions. This action is irreversible. Are you sure?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>CLIENT_PROTOCOL:</source>
+      <source>Share</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>{{portalDomain}}</source>
+      <source>Edit users' permissions</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Share</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Log in to PRODUCT_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You are already logged in to portal.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Log out to continue, or cancel to go to your systems</source>
       <translation> </translation>
     </message>
     <message>
@@ -24,327 +49,117 @@
     </message>
     <message>
       <location/>
-      <source>Log in to </source>
-      <translation>Войти в </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Welcome to</source>
-      <translation>Добро пожаловать в </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Create account in</source>
-      <translation>Создать аккаунт в </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Change password</source>
-      <translation>Сменить пароль </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Account settings</source>
-      <translation>Настройки аккаунта </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Systems</source>
-      <translation>Системы</translation>
-    </message>
-    <message>
-      <location/>
-      <source>System</source>
-      <translation>Система</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Share the system</source>
-      <translation>Предоставить доступ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Activate account</source>
-      <translation>Активировать аккаунт</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Account activated</source>
-      <translation>Аккаунт активирован</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Reset password</source>
-      <translation>Сбросить пароль</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password saved</source>
-      <translation>Пароль сохранен</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Reset password</source>
-      <translation>Сбросить пароль</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Debug</source>
+      <source>Log out</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Log in</source>
-      <translation>Войти</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Download</source>
-      <translation>Скачать </translation>
-    </message>
-    <message>
-      <location/>
-      <source>for</source>
-      <translation>для</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Page not found</source>
-      <translation>Страница не найдена</translation>
-    </message>
-    <message>
-      <location/>
-      <source>not activated</source>
-      <translation>не активирован</translation>
-    </message>
-    <message>
-      <location/>
-      <source>activated</source>
-      <translation>активирован</translation>
-    </message>
-    <message>
-      <location/>
-      <source>online</source>
+      <source>You are going to restrict the access to this user. Are you sure?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>offline</source>
+      <source>System was successfully disconnected from PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>unavailable</source>
-      <translation>не доступно</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Disabled</source>
-      <translation>Отключен</translation>
-    </message>
-    <message>
-      <location/>
-      <source>User is disabled and cannot log in to the system.</source>
-      <translation>Пользователь отключен и не может войти в систему</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Owner</source>
-      <translation>Владелец</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Unrestricted access including the ability to share and connect/disconnect system from cloud.</source>
-      <translation>Неограниченный доступ, включая возможность подключать/отклюячать систему от облака </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Viewer</source>
-      <translation>Зрящий</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Can view live video and browse the archive.</source>
+      <source>System is unreachable</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Live Viewer</source>
-      <translation>Живой провидец</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Can only view live video.</source>
-      <translation>Может наблюдать за живыми</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Advanced Viewer</source>
-      <translation>Великий видящий </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Can view live video, browse the archive, configure cameras, control PTZ etc.</source>
+      <source>You are about to disconnect this system from your account. You will not be able to access this system via cloud anymore. Are you sure?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Administrator</source>
-      <translation>Бог</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Unrestricted access including the ability to share.</source>
+      <source>Delete</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Custom</source>
-      <translation>Костюм</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Use the desktop client application to set up custom permissions.</source>
+      <source>Permissions were removed from {email}</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Administrator</source>
+      <source>IMeMyMine</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Can configure system and share it.</source>
+      <source>Your system</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Custom role</source>
+      <source>System name was successfully saved</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Custom user role specified in the system.</source>
+      <source>Disconnect</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>ok</source>
+      <source>Delete</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Cloud DB returned an unexpected response.</source>
+      <source>Disconnect system from PRODUCT_NAME?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Login or password are incorrect.</source>
+      <source>Save</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Some parameters on the form are incorrect.</source>
+      <source>Open in VMS_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Account was already activated or confirmation code is incorrect.</source>
+      <source>System is offline</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You do not have permissions to perform this action.</source>
+      <source>System {systemName} was successfully deleted from your account</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>This account hasn\'t been activated yet. &lt;a href=&quot;/activate&quot;&gt;Send activation link again&lt;/a&gt;</source>
+      <source>Delete user?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>This account has been blocked.</source>
+      <source>System name</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Not found</source>
+      <source>Delete system?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Already exists</source>
+      <source>en</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Unexpected error occured.</source>
+      <source>Download VMS_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>This account has been already activated.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This email has not been registered in portal.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This email address has been already registered.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Current password is incorrect.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wrong password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You don\'t have access to this system.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System not found.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Changing own permissions is not allowed.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This user already has administrator permissions.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS_NAME application was not detected. &lt;a href=&quot;/download&quot;&gt;Download&lt;/a&gt;</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password must contain at least 8 characters</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Use numbers, upper and lower case letters and special characters to make your password stronger.</source>
+      <source>Install VMS_NAME to view your system</source>
       <translation> </translation>
     </message>
     <message>
@@ -359,87 +174,47 @@
     </message>
     <message>
       <location/>
-      <source>You are about to change the owner of the system. You will lose owner permissions. This action is irreversible. Are you sure?</source>
+      <source>Password must contain at least 8 characters</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Share</source>
+      <source>Use numbers, upper and lower case letters and special characters to make your password stronger.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Share</source>
+      <source>Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Edit users\' permissions</source>
+      <source>{{portalDomain}}</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Save</source>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Your system</source>
+      <source>Welcome to</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>IMeMyMine</source>
+      <source>Reset password -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>System is unreachable</source>
+      <source>Activate account -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>System is offline</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Open in VMS_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System name</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Save</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System name was successfully saved</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System was successfully disconnected from PRODUCT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System {systemName} was successfully deleted from your account</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Permissions were removed from {email}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Install VMS_NAME to view your system</source>
+      <source>Change password -</source>
       <translation> </translation>
     </message>
     <message>
@@ -449,115 +224,307 @@
     </message>
     <message>
       <location/>
-      <source>Log out to continue, or cancel to go to your systems</source>
+      <source>Download VMS_NAME for</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You are already logged in to portal.</source>
+      <source>Page not found</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Log out</source>
+      <source>System -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/activate</source>
+      <source>Account activated -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/download</source>
+      <source>Systems -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Disconnect system from PRODUCT_NAME?</source>
+      <source>{{title}} PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Disconnect</source>
+      <source>Reset password -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You are about to disconnect this system from your account. You will not be able to access this system via cloud anymore. Are you sure?</source>
+      <source>Activate account -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Delete system?</source>
+      <source>Password saved -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Delete</source>
+      <source>Account settings -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You are going to restrict the access to this user. Are you sure?</source>
+      <source>Share the system -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Delete user?</source>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Delete</source>
-      <translation> </translation>
-    </message>
-  </context>
-  <context>
-    <name>apple-app-site-association</name>
-    <message>
-      <location filename="apple-app-site-association"/>
-      <source>applinks</source>
+      <source>Create account in</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>apps</source>
+      <source>Debug</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>details</source>
+      <source>Activate account -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>appID</source>
+      <source>Log in -</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>{{iOSappID}}</source>
+      <source>CLIENT_PROTOCOL:</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>paths</source>
+      <source>Not found</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/client*</source>
+      <source>This user already has administrator permissions.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/cloud*</source>
+      <source>ok</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/systems/*/client</source>
+      <source>Cloud DB returned an unexpected response.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This account hasn't been activated yet. &lt;a href=&quot;/activate&quot;&gt;Send activation link again&lt;/a&gt;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Changing own permissions is not allowed.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System not found.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This email has not been registered in portal.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You do not have permissions to perform this action.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Some parameters on the form are incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login or password are incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This email address has been already registered.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You don't have access to this system.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Account was already activated or confirmation code is incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Current password is incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This account has been already activated.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unexpected error occured.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Already exists</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Wrong password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>VMS_NAME application was not detected. &lt;a href=&quot;/download&quot;&gt;Download&lt;/a&gt;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This account has been blocked.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unrestricted access including the ability to share.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Administrator</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can view live video and browse the archive.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Viewer</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can configure system and share it.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Administrator</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can view live video, browse the archive, configure cameras, control PTZ etc.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Advanced Viewer</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can only view live video.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Live Viewer</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>User is disabled and cannot log in to the system.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disabled</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unrestricted access including the ability to share and connect/disconnect system from cloud.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Owner</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use the desktop client application to set up custom permissions.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom user role specified in the system.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom role</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>activated</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>offline</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>not activated</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>unavailable</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>online</source>
       <translation> </translation>
     </message>
   </context>
@@ -566,16 +533,16 @@
     <message>
       <location filename="views/404.html"/>
       <source>Page not found</source>
-      <translation>Нема</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Take me home</source>
-      <translation>Хочу домой</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>/images/404@2x.png 2x&quot; set-title</source>
+      <source>set-title</source>
       <translation> </translation>
     </message>
   </context>
@@ -583,17 +550,17 @@
     <name>views/account.html</name>
     <message>
       <location filename="views/account.html"/>
-      <source>Аккаунт</source>
+      <source>Account</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Адрес электронной почту</source>
+      <source>Email address</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Имя</source>
+      <source>First name</source>
       <translation> </translation>
     </message>
     <message>
@@ -603,7 +570,7 @@
     </message>
     <message>
       <location/>
-      <source>Фамилия</source>
+      <source>Last name</source>
       <translation> </translation>
     </message>
     <message>
@@ -613,12 +580,12 @@
     </message>
     <message>
       <location/>
-      <source>Подписаться на спам</source>
+      <source>Subscribe to email newsletters</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Сменить пароль</source>
+      <source>Change Password</source>
       <translation> </translation>
     </message>
     <message>
@@ -629,6 +596,11 @@
     <message>
       <location/>
       <source>Current password is required.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>readonly</source>
       <translation> </translation>
     </message>
     <message>
@@ -898,22 +870,52 @@
     <message>
       <location filename="views/download.html"/>
       <source>Download</source>
-      <translation>Скачать </translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Latest version</source>
-      <translation>Последняя верся </translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>What's new?</source>
-      <translation>Что нового?</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Download</source>
-      <translation>Скачать</translation>
+      <source>&amp;nbsp;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Download VMS_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>1&quot;&gt;Other packages:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>0 &amp;&amp; $index</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>= (platform.installers.length / 2)&quot;&gt;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>platform.active</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>changeHash(platform)&quot; in platform.installers&quot;</source>
+      <translation> </translation>
     </message>
   </context>
   <context>
@@ -1512,12 +1514,12 @@
     </message>
   </context>
   <context>
-    <name>views/about.html</name>
+    <name>views/static/about.html</name>
   </context>
   <context>
-    <name>views/eula.html</name>
+    <name>views/static/eula.html</name>
     <message>
-      <location filename="views/eula.html"/>
+      <location filename="views/static/eula.html"/>
       <source>Terms and conditions</source>
       <translation> </translation>
     </message>
@@ -1593,9 +1595,9 @@
     </message>
   </context>
   <context>
-    <name>views/help.html</name>
+    <name>views/static/help.html</name>
     <message>
-      <location filename="views/help.html"/>
+      <location filename="views/static/help.html"/>
       <source>How to use</source>
       <translation> </translation>
     </message>
@@ -1636,9 +1638,9 @@
     </message>
   </context>
   <context>
-    <name>views/landing.html</name>
+    <name>views/static/landing.html</name>
     <message>
-      <location filename="views/landing.html"/>
+      <location filename="views/static/landing.html"/>
       <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -1689,9 +1691,9 @@
     </message>
   </context>
   <context>
-    <name>views/no-systems.html</name>
+    <name>views/static/no-systems.html</name>
     <message>
-      <location filename="views/no-systems.html"/>
+      <location filename="views/static/no-systems.html"/>
       <source>You have no systems connected to PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -1712,9 +1714,9 @@
     </message>
   </context>
   <context>
-    <name>views/register-intro.html</name>
+    <name>views/static/register-intro.html</name>
     <message>
-      <location filename="views/register-intro.html"/>
+      <location filename="views/static/register-intro.html"/>
       <source>Welcome to</source>
       <translation> </translation>
     </message>
@@ -1783,83 +1785,7 @@
     </message>
     <message>
       <location/>
-      <source>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
-'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',Config.googleTagsCode);</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>html</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>utf-8</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>shortcut icon</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/images/favicon.ico</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>stylesheet</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_bold/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_light/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_regular/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>fonts/roboto/roboto_medium/stylesheet.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>styles/f01c59fd.503.css</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/images/503@2x.png 2x</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>d.getElementsByTagName(s)[0],</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>'+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',Config.googleTagsCode);</source>
       <translation> </translation>
     </message>
   </context>
