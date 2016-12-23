@@ -458,8 +458,6 @@ void QnWidgetTablePrivate::setWidgetFor(int row, int column, QWidget* newWidget)
     destroyWidget(widget); //< has nullptr check inside
     widget = newWidget;
 
-    //TODO: #vkutin Make widget scrolling into viewport when activated
-
     NX_EXPECT(!widget || widget->parent() == m_container);
 }
 
@@ -470,7 +468,10 @@ QWidget* QnWidgetTablePrivate::createWidgetFor(int row, int column)
 
     auto widget = itemDelegate->createWidget(m_model, index, m_container);
     if (widget)
+    {
+        widget->installEventFilter(this);
         itemDelegate->updateWidget(widget, index);
+    }
 
     setWidgetFor(row, column, widget);
     return widget;
@@ -501,8 +502,12 @@ void QnWidgetTablePrivate::cleanupWidgetFor(int row, int column)
 
 void QnWidgetTablePrivate::destroyWidget(QWidget* widget)
 {
-    if (widget)
-        widget->deleteLater();
+    if (!widget)
+        return;
+
+    widget->removeEventFilter(this);
+    widget->setHidden(true);
+    widget->deleteLater();
 }
 
 int QnWidgetTablePrivate::sizeHintForColumn(int column) const
@@ -621,4 +626,28 @@ void QnWidgetTablePrivate::doLayout()
     }
 
     m_container->setMinimumHeight(y);
+}
+
+bool QnWidgetTablePrivate::eventFilter(QObject* watched, QEvent* event)
+{
+    switch (event->type())
+    {
+        case QEvent::FocusIn:
+        case QEvent::KeyPress:
+        case QEvent::MouseButtonPress:
+        {
+            QPointer<QWidget> widget = qobject_cast<QWidget*>(watched);
+            if (!widget)
+                break;
+
+            Q_Q(QnWidgetTable);
+            q->ensureWidgetVisible(widget);
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return base_type::eventFilter(watched, event);
 }

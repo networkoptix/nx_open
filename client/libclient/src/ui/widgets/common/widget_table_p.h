@@ -82,7 +82,10 @@ private:
     void createWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn);
     void cleanupWidgetFor(int row, int column);
     void cleanupWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn);
-    static void destroyWidget(QWidget* widget);
+    void destroyWidget(QWidget* widget);
+
+protected:
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     QAbstractItemModel* m_model;
