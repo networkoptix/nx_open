@@ -68,6 +68,11 @@ def process_js_file_old(root_dir, file_name):
 def process_html_file(root_dir, file_name):
     with open(os.path.join(root_dir, file_name), 'r') as file_descriptor:
         data = file_descriptor.read()
+
+        # 1. Replace <script> and <head> tags
+        data = re.sub('\<script\s*\>.+?\</script\>', '', data, flags=re.DOTALL)
+        data = re.sub('\<head\s*\>.+?\</head\>', '', data, flags=re.DOTALL)
+
         inline = process_inline_text(data)
         attributes = process_attributes(data)
         if not inline and not attributes:
@@ -89,7 +94,7 @@ def process_inline_text(data):
 
 
 ignore_attributes = ('id', 'name', 'class', 'style',
-                     'src',
+                     'src', 'srcset', 'rel', 'charset',
                      'type', 'role', 'for', 'target',
                      'width', 'rows', 'cols', 'maxlength',
                      'autocomplete',
@@ -100,7 +105,7 @@ ignore_attributes = ('id', 'name', 'class', 'style',
 
 ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'uib\-.*?')
 
-ignore_regex = (r'href="#.+?"',)
+ignore_regex = (r'href="#.+?"', r'href=".+?\.css"')
 ignore_strings = ('use strict',)
 
 
@@ -164,7 +169,6 @@ def extract_strings(root_dir, file_dir, file_filter, dir_exclude=None, mode='htm
             continue
 
         if not recursive:
-            print ("drop", dirs)
             while len(dirs) > 0:
                 dirs.pop()
 

@@ -4,6 +4,7 @@ import xml.etree.ElementTree as eTree
 import yaml
 from os.path import join
 
+import json
 import errno
 import yaml
 import shutil
@@ -66,6 +67,7 @@ def process_files(lang, root_directory, xml_filename):
     active_filename = ''
     target_filename = ''
     active_content = ''
+    json_mode = False
     for context in root.iter('context'):
         for message in context.iter('message'):
             location = message.find('location')
@@ -74,26 +76,34 @@ def process_files(lang, root_directory, xml_filename):
                 save_content(target_filename, active_content)
                 active_filename = os.path.join(root_directory, filename)
                 target_filename = os.path.join(root_directory, "lang_" + lang, filename)
-
+                html_mode = active_filename.endswith('.html') or active_filename.endswith('.mustache')
                 try:
                     with open(active_filename, 'r') as file_descriptor:
                         active_content = file_descriptor.read()
                 except IOError as a:
                     print(a)
                     continue
+                if not html_mode:
+                    active_content = json.dumps(json.loads(active_content))  # normalize json
 
             source = message.find('source').text
 
             translation = message.find('translation').text
 
             if translation and translation.strip():
-                # 3. replace string in file
-                if ' ' not in source:
-                    print("! replacing single word:", source, active_filename)
-                    active_content = re.sub('(?<=\W)' + re.escape(source) + '(?=\W)', translation, active_content)
+                if html_mode:
+                    # 3. replace string in file
+                    if ' ' not in source:
+                        # print("! replacing single word:", source, active_filename)
+                        active_content = re.sub('(?<=\W)' + re.escape(source) + '(?=\W)', translation, active_content)
+                    else:
+                        # print("replacing:", active_filename, source, translation)
+                        active_content = active_content.replace(source, translation)
                 else:
-                    print("replacing:", active_filename, source, translation)
-                    active_content = active_content.replace(source, translation)
+                    # 4. Replacing in json mode - values only
+                    active_content = re.sub('(?<=:\s")' + re.escape(source) + '(?=")', translation, active_content)
+                    print("final:", target_filename, active_content)
+
     save_content(target_filename, active_content)
 
 
